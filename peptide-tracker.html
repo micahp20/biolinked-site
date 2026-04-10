@@ -1,1 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Peptide Calculator & Tracker — Bio Linked Peptide Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #9A7B2F; --gold-light: #B8960C; --gold-dim: rgba(154,123,47,0.1);
+  --gold-glow: rgba(154,123,47,0.07); --gold-border: rgba(154,123,47,0.22);
+  --gold-border-bright: rgba(154,123,47,0.5);
+  --bg: #f8f8f8; --surface: #ffffff; --surface2: #f2f2f2; --surface3: #eaeaea;
+  --text: #1a1a1a; --text2: #444444; --muted: #777777; --border: rgba(0,0,0,0.08);
+  --danger: #c0392b;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; -webkit-text-size-adjust: 100%; }
 
+/* NAV */
+.site-nav { background: #fff; border-bottom: 1px solid #eaeaea; position: sticky; top: 0; z-index: 600; }
+.site-nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.site-nav-logo { text-decoration: none; display: flex; flex-direction: column; line-height: 1; }
+.site-nav-logo-main { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.1em; }
+.site-nav-logo-sub { font-size: 8px; color: #777; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 2px; }
+.site-nav-links { display: flex; align-items: center; gap: 2px; }
+.site-nav-link { font-size: 11.5px; color: #444; text-decoration: none; padding: 7px 11px; border-radius: 3px; transition: all .18s; background: none; border: none; cursor: pointer; font-family: 'Outfit', sans-serif; }
+.site-nav-link:hover, .site-nav-link.active { color: var(--gold); background: var(--gold-dim); }
+.site-nav-dropdown { position: relative; }
+.site-nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #eaeaea; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 180px; overflow: hidden; z-index: 700; }
+.site-nav-dropdown:hover .site-nav-dropdown-menu { display: block; }
+.site-nav-dropdown-item { display: block; padding: 10px 16px; font-size: 11.5px; color: #444; text-decoration: none; transition: all .15s; font-family: 'Outfit', sans-serif; }
+.site-nav-dropdown-item:hover { background: #f8f8f8; color: var(--gold); padding-left: 20px; }
+.site-nav-mobile-btn { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #1a1a1a; padding: 8px; }
+.site-nav-mobile-menu { display: none; border-top: 1px solid #eaeaea; background: #fff; padding: 12px 20px 20px; }
+.site-nav-mobile-menu.open { display: block; }
+.site-nav-mobile-link { display: block; padding: 10px 0; font-size: 13px; color: #444; text-decoration: none; border-bottom: 1px solid #eaeaea; font-family: 'Outfit', sans-serif; }
+.site-nav-mobile-link:last-child { border-bottom: none; }
+.site-nav-mobile-sub { padding-left: 16px; font-size: 12px; color: #777; }
+.site-nav-mobile-section { padding: 10px 0 4px; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-family: 'Outfit', sans-serif; font-weight: 600; border-bottom: 1px solid #eaeaea; }
+@media (max-width: 768px) { .site-nav-links { display: none; } .site-nav-mobile-btn { display: block; } .site-nav-inner { padding: 0 16px; } }
+
+/* TOOL WRAPPER — light theme overrides for the embedded widget */
+.tool-wrap { background: var(--bg); }
+
+.bio-linked-peptide-app, .bio-linked-peptide-app *, .bio-linked-peptide-app *::before, .bio-linked-peptide-app *::after { box-sizing: border-box; }
+.bio-linked-peptide-app {
+  --black: var(--bg);
+  --surface: #ffffff;
+  --surface2: #f2f2f2;
+  --surface3: #eaeaea;
+  --gold: #9A7B2F;
+  --gold-light: #B8960C;
+  --gold-dim: rgba(154,123,47,0.55);
+  --gold-glow: rgba(154,123,47,0.07);
+  --gold-border: rgba(154,123,47,0.22);
+  --gold-border-bright: rgba(154,123,47,0.5);
+  --text: #1a1a1a;
+  --text2: #444444;
+  --muted: #777777;
+  --muted2: #aaaaaa;
+  --danger: #c0392b;
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  position: relative;
+}
+
+.bio-linked-peptide-app::before { display: none; }
+.bio-linked-peptide-app a { color: inherit; text-decoration: none; }
+.bio-linked-peptide-app button, .bio-linked-peptide-app input, .bio-linked-peptide-app select, .bio-linked-peptide-app textarea { font: inherit; }
+
+/* HERO */
+.bio-linked-peptide-app .hero { position: relative; border-bottom: 1px solid var(--gold-border); overflow: hidden; background: var(--surface); z-index: 1; }
+.bio-linked-peptide-app .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(154,123,47,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(154,123,47,0.03) 1px, transparent 1px); background-size: 48px 48px; animation: bioLinkedGridDrift 24s linear infinite; pointer-events: none; }
+@keyframes bioLinkedGridDrift { from { background-position: 0 0; } to { background-position: 48px 48px; } }
+.bio-linked-peptide-app .hero::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: min(700px, 100%); height: 300px; background: radial-gradient(ellipse, rgba(154,123,47,0.05) 0%, transparent 70%); pointer-events: none; }
+.bio-linked-peptide-app .hero::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent); }
+.bio-linked-peptide-app .hero-inner { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 52px 40px 48px; display: grid; grid-template-columns: 1.1fr .9fr; align-items: center; gap: 40px; }
+.bio-linked-peptide-app .hero-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 14px; animation: bioLinkedFadeUp 0.7s ease both; }
+.bio-linked-peptide-app .hero-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gold); opacity: 0.6; }
+.bio-linked-peptide-app .hero-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px, 5vw, 58px); font-weight: 400; color: var(--text); line-height: 1.05; letter-spacing: -0.01em; animation: bioLinkedFadeUp 0.7s 0.08s ease both; margin: 0; }
+.bio-linked-peptide-app .hero-title em { font-style: italic; color: var(--gold); font-weight: 300; }
+.bio-linked-peptide-app .hero-subtitle { font-size: 14px; font-weight: 300; color: var(--muted); letter-spacing: 0.04em; margin-top: 14px; line-height: 1.8; animation: bioLinkedFadeUp 0.7s 0.16s ease both; }
+.bio-linked-peptide-app .hero-ctas { display: flex; flex-direction: column; gap: 10px; animation: bioLinkedFadeUp 0.7s 0.22s ease both; }
+
+/* BUTTONS */
+.bio-linked-peptide-app .btn-primary, .bio-linked-peptide-app .btn-secondary, .bio-linked-peptide-app .btn-danger { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: 'Outfit', sans-serif; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; padding: 16px 32px; border-radius: 3px; transition: all 0.22s; cursor: pointer; min-height: 52px; -webkit-tap-highlight-color: transparent; }
+.bio-linked-peptide-app .btn-primary { background: var(--gold); color: #fff; font-weight: 600; border: none; }
+.bio-linked-peptide-app .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(154,123,47,0.25); }
+.bio-linked-peptide-app .btn-secondary { background: transparent; color: var(--gold); font-weight: 500; border: 1px solid var(--gold-border-bright); }
+.bio-linked-peptide-app .btn-secondary:hover { background: var(--gold-glow); border-color: var(--gold); transform: translateY(-2px); }
+.bio-linked-peptide-app .btn-danger { background: rgba(192,57,43,0.08); color: #c0392b; border: 1px solid rgba(192,57,43,0.22); }
+
+/* STATS BAR */
+.bio-linked-peptide-app .stats-bar { position: relative; z-index: 1; border-top: 1px solid var(--gold-border); border-bottom: 1px solid var(--gold-border); background: var(--surface2); padding: 0 40px; }
+.bio-linked-peptide-app .stats-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); }
+.bio-linked-peptide-app .stat-item { padding: 28px 16px; text-align: center; border-right: 1px solid var(--gold-border); transition: background 0.2s; }
+.bio-linked-peptide-app .stat-item:last-child { border-right: none; }
+.bio-linked-peptide-app .stat-item:hover { background: var(--gold-glow); }
+.bio-linked-peptide-app .stat-num { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 600; color: var(--gold); line-height: 1; display: block; }
+.bio-linked-peptide-app .stat-label { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: 6px; display: block; }
+
+/* SECTIONS */
+.bio-linked-peptide-app .section { position: relative; z-index: 1; padding: 80px 40px; }
+.bio-linked-peptide-app .section-inner { max-width: 1100px; margin: 0 auto; }
+.bio-linked-peptide-app .section-label { display: inline-flex; align-items: center; gap: 10px; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 16px; }
+.bio-linked-peptide-app .section-label::before { content: ''; display: block; width: 24px; height: 1px; background: var(--gold); }
+.bio-linked-peptide-app .section-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 5vw, 52px); font-weight: 400; color: var(--text); line-height: 1.1; letter-spacing: -0.01em; margin: 0; }
+.bio-linked-peptide-app .section-heading em { font-style: italic; color: var(--gold); }
+.bio-linked-peptide-app .section-body { font-size: 15px; font-weight: 300; color: var(--muted); line-height: 1.8; max-width: 660px; margin-top: 18px; }
+
+.bio-linked-peptide-app .mission-section, .bio-linked-peptide-app .topics-section, .bio-linked-peptide-app .why-section, .bio-linked-peptide-app .cta-section, .bio-linked-peptide-app .tracker-section { background: var(--surface); border-top: 1px solid var(--gold-border); border-bottom: 1px solid var(--gold-border); }
+
+.bio-linked-peptide-app .mission-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+.bio-linked-peptide-app .mission-visual { position: relative; min-height: 420px; border: 1px solid var(--gold-border); border-radius: 4px; overflow: hidden; background: var(--surface2); display: flex; align-items: center; justify-content: center; padding: 28px; }
+.bio-linked-peptide-app .mission-visual::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 30% 40%, rgba(154,123,47,0.05) 0%, transparent 60%); }
+.bio-linked-peptide-app .corner { position: absolute; width: 40px; height: 40px; border-color: var(--gold); border-style: solid; opacity: 0.3; }
+.bio-linked-peptide-app .corner.tl { top:12px;left:12px;border-width:1px 0 0 1px; }
+.bio-linked-peptide-app .corner.tr { top:12px;right:12px;border-width:1px 1px 0 0; }
+.bio-linked-peptide-app .corner.bl { bottom:12px;left:12px;border-width:0 0 1px 1px; }
+.bio-linked-peptide-app .corner.br { bottom:12px;right:12px;border-width:0 1px 1px 0; }
+
+.bio-linked-peptide-app .calculator-shell { position: relative; z-index: 1; width: 100%; }
+.bio-linked-peptide-app .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.bio-linked-peptide-app .field { display: grid; gap: 8px; }
+.bio-linked-peptide-app .field.full { grid-column: 1 / -1; }
+.bio-linked-peptide-app .field label { color: var(--text2); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.bio-linked-peptide-app .field input, .bio-linked-peptide-app .field select, .bio-linked-peptide-app .field textarea { width: 100%; background: var(--surface3); color: var(--text); border: 1px solid var(--gold-border); border-radius: 4px; padding: 14px; outline: none; }
+.bio-linked-peptide-app .field textarea { min-height: 100px; resize: vertical; }
+.bio-linked-peptide-app .field input:focus, .bio-linked-peptide-app .field select:focus, .bio-linked-peptide-app .field textarea:focus { border-color: var(--gold-border-bright); box-shadow: 0 0 0 3px var(--gold-glow); }
+.bio-linked-peptide-app .helper { margin-top: 14px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+
+.bio-linked-peptide-app .mission-pillars, .bio-linked-peptide-app .result-grid, .bio-linked-peptide-app .tracker-actions, .bio-linked-peptide-app .cta-btns { display: flex; flex-direction: column; gap: 12px; }
+.bio-linked-peptide-app .result-grid { margin-top: 22px; }
+
+.bio-linked-peptide-app .pillar, .bio-linked-peptide-app .result-card, .bio-linked-peptide-app .log-card, .bio-linked-peptide-app .topic-card, .bio-linked-peptide-app .why-card, .bio-linked-peptide-app .res-card, .bio-linked-peptide-app .preview-box { border: 1px solid var(--gold-border); border-radius: 4px; background: var(--surface2); }
+.bio-linked-peptide-app .pillar { display: flex; gap: 14px; align-items: flex-start; padding: 14px; transition: all 0.22s; }
+.bio-linked-peptide-app .pillar:hover, .bio-linked-peptide-app .topic-card:hover, .bio-linked-peptide-app .why-card:hover, .bio-linked-peptide-app .res-card:hover, .bio-linked-peptide-app .result-card:hover, .bio-linked-peptide-app .log-card:hover { border-color: var(--gold-border-bright); background: var(--gold-glow); }
+.bio-linked-peptide-app .pillar-icon { width: 36px; height: 36px; border-radius: 3px; background: var(--gold-glow); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--gold); flex-shrink: 0; }
+.bio-linked-peptide-app .pillar-title, .bio-linked-peptide-app .card-title { font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: 0.03em; margin-bottom: 3px; }
+.bio-linked-peptide-app .pillar-desc, .bio-linked-peptide-app .card-body, .bio-linked-peptide-app .mini-text { font-size: 12px; color: var(--muted); font-weight: 300; line-height: 1.65; }
+.bio-linked-peptide-app .result-card { padding: 18px; }
+.bio-linked-peptide-app .result-card strong { display: block; font-family: 'Cormorant Garamond', serif; font-size: 32px; color: var(--gold); font-weight: 600; }
+.bio-linked-peptide-app .result-card span { display: block; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+
+.bio-linked-peptide-app .res-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 48px; }
+.bio-linked-peptide-app .res-card { background: var(--surface); padding: 28px 22px; position: relative; overflow: hidden; transition: all 0.25s; display: flex; align-items: flex-start; flex-direction: column; border-top: 2px solid var(--surface3); }
+.bio-linked-peptide-app .res-card:hover { border-top-color: var(--gold); box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+.bio-linked-peptide-app .res-icon { font-size: 28px; margin-bottom: 16px; display: block; }
+.bio-linked-peptide-app .res-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+.bio-linked-peptide-app .res-desc { font-size: 12px; font-weight: 300; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
+.bio-linked-peptide-app .res-tag { font-size: 10px; letter-spacing: 0.12em; color: var(--gold); text-transform: uppercase; font-weight: 500; }
+
+.bio-linked-peptide-app .topics-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 40px; flex-wrap: wrap; gap: 16px; }
+.bio-linked-peptide-app .topics-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.bio-linked-peptide-app .topic-card { padding: 22px 18px; position: relative; overflow: hidden; transition: all 0.22s; display: block; border-top: 2px solid var(--surface3); }
+.bio-linked-peptide-app .topic-card:hover { border-top-color: var(--gold); }
+.bio-linked-peptide-app .topic-cat { font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600; padding: 3px 9px; border-radius: 2px; display: inline-block; margin-bottom: 12px; background: var(--gold-glow); color: var(--gold); border: 1px solid var(--gold-border); }
+.bio-linked-peptide-app .topic-name, .bio-linked-peptide-app .why-title, .bio-linked-peptide-app .table-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); margin-bottom: 8px; line-height: 1.2; }
+.bio-linked-peptide-app .topic-desc, .bio-linked-peptide-app .why-body { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.75; }
+
+.bio-linked-peptide-app .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 48px; }
+.bio-linked-peptide-app .why-card { position: relative; padding: 28px 22px; transition: all 0.22s; overflow: hidden; }
+.bio-linked-peptide-app .why-card::after { content: attr(data-num); position: absolute; bottom: -12px; right: 14px; font-family: 'Cormorant Garamond', serif; font-size: 84px; font-weight: 700; color: rgba(154,123,47,0.04); line-height: 1; pointer-events: none; }
+.bio-linked-peptide-app .why-icon { font-size: 24px; margin-bottom: 14px; display: block; }
+.bio-linked-peptide-app .why-divider { width: 28px; height: 1px; background: var(--gold); opacity: 0.4; margin-bottom: 14px; }
+
+.bio-linked-peptide-app .log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 40px; }
+.bio-linked-peptide-app .log-card { padding: 22px 20px; }
+
+.bio-linked-peptide-app .table-wrap { overflow-x: auto; margin-top: 18px; border: 1px solid var(--gold-border); border-radius: 4px; }
+.bio-linked-peptide-app table { width: 100%; border-collapse: collapse; min-width: 680px; }
+.bio-linked-peptide-app th, .bio-linked-peptide-app td { padding: 13px 14px; border-bottom: 1px solid var(--gold-border); text-align: left; vertical-align: top; }
+.bio-linked-peptide-app th { color: var(--gold); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500; background: var(--gold-glow); }
+.bio-linked-peptide-app td { color: var(--text2); font-size: 12px; line-height: 1.65; }
+.bio-linked-peptide-app tr:last-child td { border-bottom: none; }
+
+.bio-linked-peptide-app .pill { display: inline-flex; padding: 5px 9px; border-radius: 2px; background: var(--gold-glow); border: 1px solid var(--gold-border); color: var(--gold); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+.bio-linked-peptide-app .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.bio-linked-peptide-app .mini-btn { display: inline-flex; align-items: center; justify-content: center; padding: 8px 10px; border: 1px solid var(--gold-border); background: var(--surface2); color: var(--text2); border-radius: 3px; cursor: pointer; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; transition: all .15s; }
+.bio-linked-peptide-app .mini-btn:hover { border-color: var(--danger); color: var(--danger); }
+.bio-linked-peptide-app .empty-state { margin-top: 16px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.bio-linked-peptide-app .preview-box { padding: 18px; margin-top: 18px; }
+
+.bio-linked-peptide-app .cta-section { padding: 80px 40px; text-align: center; position: relative; overflow: hidden; }
+.bio-linked-peptide-app .cta-section::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 600px; height: 400px; background: radial-gradient(ellipse, rgba(154,123,47,0.05) 0%, transparent 70%); pointer-events: none; }
+.bio-linked-peptide-app .cta-inner { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
+
+@keyframes bioLinkedFadeUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+.bio-linked-peptide-app .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.72s ease, transform 0.72s ease; }
+.bio-linked-peptide-app .reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 900px) {
+  .bio-linked-peptide-app .hero-inner { grid-template-columns: 1fr; gap: 28px; padding: 44px 28px 40px; }
+  .bio-linked-peptide-app .hero-ctas { flex-direction: row; }
+  .bio-linked-peptide-app .mission-grid, .bio-linked-peptide-app .log-grid { grid-template-columns: 1fr; gap: 40px; }
+  .bio-linked-peptide-app .res-grid, .bio-linked-peptide-app .topics-grid { grid-template-columns: 1fr 1fr; }
+  .bio-linked-peptide-app .why-grid { grid-template-columns: 1fr; gap: 16px; }
+  .bio-linked-peptide-app .stats-inner { grid-template-columns: 1fr 1fr; }
+  .bio-linked-peptide-app .stat-item:nth-child(2) { border-right: none; }
+  .bio-linked-peptide-app .stat-item { border-bottom: 1px solid var(--gold-border); }
+  .bio-linked-peptide-app .stat-item:last-child { border-bottom: none; }
+  .bio-linked-peptide-app .stats-bar { padding: 0 28px; }
+  .bio-linked-peptide-app .section, .bio-linked-peptide-app .cta-section { padding: 64px 28px; }
+}
+@media (max-width: 600px) {
+  .bio-linked-peptide-app .hero-inner { padding: 36px 20px 32px; gap: 24px; }
+  .bio-linked-peptide-app .hero-title { font-size: clamp(28px, 8vw, 36px); }
+  .bio-linked-peptide-app .hero-ctas { flex-direction: column; width: 100%; }
+  .bio-linked-peptide-app .btn-primary, .bio-linked-peptide-app .btn-secondary, .bio-linked-peptide-app .btn-danger { width: 100%; font-size: 13px; padding: 18px 24px; }
+  .bio-linked-peptide-app .stats-bar { padding: 0; }
+  .bio-linked-peptide-app .stats-inner { grid-template-columns: 1fr 1fr; }
+  .bio-linked-peptide-app .stat-item { padding: 20px 12px; }
+  .bio-linked-peptide-app .stat-item:nth-child(2) { border-right: none; }
+  .bio-linked-peptide-app .stat-item:nth-child(3) { border-bottom: none; }
+  .bio-linked-peptide-app .section, .bio-linked-peptide-app .cta-section { padding: 52px 20px; }
+  .bio-linked-peptide-app .res-grid, .bio-linked-peptide-app .topics-grid { grid-template-columns: 1fr; gap: 8px; margin-top: 28px; }
+  .bio-linked-peptide-app .form-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 380px) {
+  .bio-linked-peptide-app .hero-title { font-size: 24px; }
+}
+
+/* SITE FOOTER */
+.site-footer { background: #1a1a1a; padding: 48px 40px 0; }
+.site-footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.site-footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #fff; letter-spacing: 0.12em; margin-bottom: 6px; }
+.site-footer-tagline { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: #9A7B2F; font-weight: 500; margin-bottom: 14px; font-family: 'Outfit', sans-serif; }
+.site-footer-disclaimer { font-size: 11px; color: #555; line-height: 1.65; font-weight: 300; max-width: 340px; font-family: 'Outfit', sans-serif; }
+.site-footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.site-footer-col { display: flex; flex-direction: column; gap: 10px; }
+.site-footer-col-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #9A7B2F; font-weight: 600; margin-bottom: 4px; font-family: 'Outfit', sans-serif; }
+.site-footer-col a { font-size: 12px; color: #666; text-decoration: none; font-family: 'Outfit', sans-serif; transition: color .18s; }
+.site-footer-col a:hover { color: #fff; }
+.site-footer-bottom { max-width: 1100px; margin: 0 auto; padding: 18px 0; font-size: 10px; color: #444; font-family: 'Outfit', sans-serif; }
+@media (max-width: 768px) { .site-footer { padding: 36px 16px 0; } .site-footer-inner { grid-template-columns: 1fr; gap: 28px; } .site-footer-links { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="site-nav-logo"><span class="site-nav-logo-main">BIO LINKED</span><span class="site-nav-logo-sub">Peptide Solutions</span></a>
+    <div class="site-nav-links">
+      <a href="/" class="site-nav-link">Home</a>
+      <a href="/peptide-index" class="site-nav-link">Index</a>
+      <a href="/cheat-sheet" class="site-nav-link">Cheat Sheet</a>
+      <a href="/stacks-blends" class="site-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biollinkedapp.netlify.app/" class="site-nav-link">App</a>
+      <div class="site-nav-dropdown">
+        <button class="site-nav-link site-nav-dropdown-btn">Tools ▾</button>
+        <div class="site-nav-dropdown-menu">
+          <a href="/peptide-tracker" class="site-nav-dropdown-item active">Peptide Tracker</a>
+          <a href="/stack-analyzer" class="site-nav-dropdown-item">Stack Analyzer</a>
+          <a href="/biomarker-analysis" class="site-nav-dropdown-item">Biomarker Analysis</a>
+        </div>
+      </div>
+    </div>
+    <button class="site-nav-mobile-btn" id="siteNavBtn">☰</button>
+  </div>
+  <div class="site-nav-mobile-menu" id="siteNavMenu">
+    <a href="/" class="site-nav-mobile-link">Home</a>
+    <a href="/peptide-index" class="site-nav-mobile-link">Index</a>
+    <a href="/cheat-sheet" class="site-nav-mobile-link">Cheat Sheet</a>
+    <a href="/stacks-blends" class="site-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biollinkedapp.netlify.app/" class="site-nav-mobile-link">App</a>
+    <div class="site-nav-mobile-section">Tools</div>
+    <a href="/peptide-tracker" class="site-nav-mobile-link site-nav-mobile-sub">Peptide Tracker</a>
+    <a href="/stack-analyzer" class="site-nav-mobile-link site-nav-mobile-sub">Stack Analyzer</a>
+    <a href="/biomarker-analysis" class="site-nav-mobile-link site-nav-mobile-sub">Biomarker Analysis</a>
+  </div>
+</nav>
+
+<div class="tool-wrap">
+<div class="bio-linked-peptide-app">
+
+  <section class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Bio Linked Peptide Solutions</div>
+        <h1 class="hero-title">Peptide Calculator &amp; Tracker <em>Built For Clarity</em></h1>
+        <p class="hero-subtitle">Reconstitution Math · Syringe Unit Conversion · Local Tracking · Downloadable iPhone &amp; Android Schedule</p>
+      </div>
+      <div class="hero-ctas">
+        <button class="btn-primary" type="button" onclick="document.querySelector('#calculator').scrollIntoView({behavior:'smooth',block:'start'});">Open Calculator →</button>
+        <button class="btn-secondary" type="button" onclick="document.querySelector('#schedule').scrollIntoView({behavior:'smooth',block:'start'});">Build Schedule</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item reveal"><span class="stat-num" id="statLoggedDoses">0</span><span class="stat-label">Logged Doses</span></div>
+      <div class="stat-item reveal"><span class="stat-num" id="statRemainingMg">0 mg</span><span class="stat-label">Estimated Remaining</span></div>
+      <div class="stat-item reveal"><span class="stat-num" id="statLatestWeight">-</span><span class="stat-label">Latest Weight</span></div>
+      <div class="stat-item reveal"><span class="stat-num" id="statCycleLength">-</span><span class="stat-label">Cycle Length</span></div>
+    </div>
+  </div>
+
+  <section class="section mission-section" id="calculator">
+    <div class="section-inner">
+      <div class="mission-grid">
+        <div class="mission-visual">
+          <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+          <div class="calculator-shell">
+            <div class="section-label">Dose Setup</div>
+            <h2 class="section-heading">Calculate A Dose With<br><em>Confidence</em></h2>
+            <p class="section-body">Enter vial strength, reconstitution volume, target dose, and syringe size. The calculator instantly returns syringe units, peptide concentration, estimated doses left, and projected cycle length.</p>
+            <div class="form-grid" style="margin-top:22px;">
+              <div class="field"><label for="peptideName">Peptide Name</label><input id="peptideName" type="text" placeholder="Example: BPC-157"></div>
+              <div class="field"><label for="syringeSize">Insulin Syringe Size</label><select id="syringeSize"><option value="100">100 unit / 1mL</option><option value="50">50 unit / 0.5mL</option><option value="30">30 unit / 0.3mL</option></select></div>
+              <div class="field"><label for="vialStrength">Vial Strength</label><input id="vialStrength" type="number" min="0" step="0.01" value="5"></div>
+              <div class="field"><label for="strengthUnit">Strength Unit</label><select id="strengthUnit"><option value="mg">mg</option><option value="mcg">mcg</option></select></div>
+              <div class="field"><label for="diluentAmount">Diluent Added</label><input id="diluentAmount" type="number" min="0" step="0.01" value="2"></div>
+              <div class="field"><label for="diluentUnit">Diluent Unit</label><select id="diluentUnit"><option value="mL">mL</option><option value="cc">cc</option></select></div>
+              <div class="field"><label for="targetDose">Target Dose</label><input id="targetDose" type="number" min="0" step="0.01" value="250"></div>
+              <div class="field"><label for="doseUnit">Dose Unit</label><select id="doseUnit"><option value="mcg">mcg</option><option value="mg">mg</option></select></div>
+              <div class="field"><label for="frequency">Dose Frequency</label><select id="frequency"><option value="daily">Daily</option><option value="everyOtherDay">Every Other Day</option><option value="twiceWeekly">Twice Weekly</option><option value="weekly">Weekly</option><option value="custom">Custom Interval</option></select></div>
+              <div class="field"><label for="customInterval">Custom Interval In Days</label><input id="customInterval" type="number" min="1" step="1" value="3"></div>
+            </div>
+            <div class="result-grid">
+              <div class="result-card"><strong id="calcUnits">-</strong><span>Draw this many syringe units per dose.</span></div>
+              <div class="result-card"><strong id="calcDosePerUnit">-</strong><span>Calculated concentration per syringe unit.</span></div>
+              <div class="result-card"><strong id="calcDosesRemaining">-</strong><span>Estimated complete doses available.</span></div>
+              <div class="result-card"><strong id="calcCycleLength">-</strong><span>Projected cycle duration at the selected frequency.</span></div>
+            </div>
+            <p class="helper" id="calcSummary">Enter values to calculate the dose.</p>
+          </div>
+        </div>
+        <div class="reveal">
+          <div class="section-label">Why It Helps</div>
+          <h2 class="section-heading">Simple Inputs. Clear<br><em>Answers</em></h2>
+          <p class="section-body">Most clients do not want to think in concentration formulas. They want to know how many units to draw, how much remains in the vial, and when the next dose should happen.</p>
+          <div class="mission-pillars">
+            <div class="pillar"><div class="pillar-icon">01</div><div><div class="pillar-title">Units Per Dose</div><div class="pillar-desc">Translates vial strength and dilution into an immediate syringe-unit answer.</div></div></div>
+            <div class="pillar"><div class="pillar-icon">02</div><div><div class="pillar-title">Inventory Awareness</div><div class="pillar-desc">Shows estimated doses left and total peptide remaining after logged entries.</div></div></div>
+            <div class="pillar"><div class="pillar-icon">03</div><div><div class="pillar-title">Schedule Export</div><div class="pillar-desc">Creates a downloadable .ics file that imports into iPhone and Android calendar apps.</div></div></div>
+            <div class="pillar"><div class="pillar-icon">04</div><div><div class="pillar-title">Progress Logging</div><div class="pillar-desc">Tracks dose timing, injection site, notes, body metrics, and protocol progress in one place.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section resources-section tracker-section">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">Tracker Hub</div>
+        <h2 class="section-heading">Log Doses, Metrics, And<br><em>Protocol Notes</em></h2>
+        <p class="section-body">Everything saves locally in the browser on this device. That keeps the tool fast, simple, and easy for clients to use without sign-in friction.</p>
+      </div>
+      <div class="res-grid reveal">
+        <div class="res-card"><span class="res-icon">💉</span><div><div class="res-name">Dose Entry</div><div class="res-desc">Save date, time, actual dose, units drawn, injection site, and notes for each administration.</div><div class="res-tag">Injection Tracking</div></div></div>
+        <div class="res-card"><span class="res-icon">📈</span><div><div class="res-name">Progress Metrics</div><div class="res-desc">Track weight, sleep, energy, appetite, waist measurement, and freeform progress notes over time.</div><div class="res-tag">Client Monitoring</div></div></div>
+        <div class="res-card"><span class="res-icon">📅</span><div><div class="res-name">Schedule Export</div><div class="res-desc">Generate a reusable dose plan and download a calendar file for Apple Calendar, Google Calendar, and Android apps.</div><div class="res-tag">Universal .ics File</div></div></div>
+      </div>
+      <div class="log-grid">
+        <div class="log-card reveal">
+          <div class="section-label">Dose Entry</div>
+          <h3 class="table-title">Save A Dose</h3>
+          <div class="form-grid" style="margin-top:18px;">
+            <div class="field"><label for="entryDate">Dose Date</label><input id="entryDate" type="date"></div>
+            <div class="field"><label for="entryTime">Dose Time</label><input id="entryTime" type="time"></div>
+            <div class="field"><label for="entryDose">Actual Dose</label><input id="entryDose" type="number" min="0" step="0.01" placeholder="250"></div>
+            <div class="field"><label for="entryDoseUnit">Dose Unit</label><select id="entryDoseUnit"><option value="mcg">mcg</option><option value="mg">mg</option></select></div>
+            <div class="field"><label for="entryUnits">Units Drawn</label><input id="entryUnits" type="number" min="0" step="0.1" placeholder="10"></div>
+            <div class="field"><label for="entrySite">Injection Site</label><select id="entrySite"><option value="Abdomen">Abdomen</option><option value="Thigh">Thigh</option><option value="Upper arm">Upper arm</option><option value="Glute">Glute</option><option value="Other">Other</option></select></div>
+            <div class="field full"><label for="entryNotes">Notes</label><textarea id="entryNotes" placeholder="Optional notes, appetite changes, response, or side effects"></textarea></div>
+          </div>
+          <div class="tracker-actions" style="margin-top:18px;">
+            <button class="btn-primary" id="saveDoseBtn" type="button">Save Dose Entry</button>
+            <button class="btn-secondary" id="useCalculatedDoseBtn" type="button">Use Calculated Dose</button>
+          </div>
+        </div>
+        <div class="log-card reveal">
+          <div class="section-label">Progress Metrics</div>
+          <h3 class="table-title">Save A Check-In</h3>
+          <div class="form-grid" style="margin-top:18px;">
+            <div class="field"><label for="metricDate">Metric Date</label><input id="metricDate" type="date"></div>
+            <div class="field"><label for="metricWeight">Weight</label><input id="metricWeight" type="number" min="0" step="0.1" placeholder="185.0"></div>
+            <div class="field"><label for="metricEnergy">Energy (1-10)</label><input id="metricEnergy" type="number" min="1" max="10" step="1" placeholder="8"></div>
+            <div class="field"><label for="metricSleep">Sleep Hours</label><input id="metricSleep" type="number" min="0" step="0.1" placeholder="7.5"></div>
+            <div class="field"><label for="metricAppetite">Appetite (1-10)</label><input id="metricAppetite" type="number" min="1" max="10" step="1" placeholder="5"></div>
+            <div class="field"><label for="metricWaist">Waist</label><input id="metricWaist" type="number" min="0" step="0.1" placeholder="34.0"></div>
+            <div class="field full"><label for="metricNotes">Progress Notes</label><textarea id="metricNotes" placeholder="Optional notes about progress, tolerance, or observations"></textarea></div>
+          </div>
+          <div class="tracker-actions" style="margin-top:18px;">
+            <button class="btn-secondary" id="saveMetricBtn" type="button">Save Metrics</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section topics-section" id="schedule">
+    <div class="section-inner">
+      <div class="topics-header reveal">
+        <div>
+          <div class="section-label">Schedule Builder</div>
+          <h2 class="section-heading">Create A Downloadable<br><em>Dosing Calendar</em></h2>
+          <p class="section-body">Build a dose schedule and download a universal .ics file that works with Apple Calendar, Google Calendar, and most Android calendar apps.</p>
+        </div>
+        <button class="btn-secondary" id="previewScheduleBtn" type="button">Preview Schedule</button>
+      </div>
+      <div class="topics-grid">
+        <div class="topic-card reveal">
+          <span class="topic-cat">Calendar Setup</span>
+          <div class="form-grid">
+            <div class="field"><label for="scheduleStart">Start Date</label><input id="scheduleStart" type="date"></div>
+            <div class="field"><label for="scheduleTime">Dose Time</label><input id="scheduleTime" type="time" value="08:00"></div>
+            <div class="field"><label for="scheduleLength">Cycle Length In Weeks</label><input id="scheduleLength" type="number" min="1" step="1" value="8"></div>
+            <div class="field"><label for="scheduleTitle">Calendar Event Title</label><input id="scheduleTitle" type="text" placeholder="Example: BPC-157 Dose"></div>
+            <div class="field full"><label for="scheduleNotes">Calendar Notes</label><textarea id="scheduleNotes" placeholder="Optional notes included in each calendar event"></textarea></div>
+          </div>
+        </div>
+        <div class="topic-card reveal">
+          <span class="topic-cat">Protocol Preview</span>
+          <div class="topic-name">Upcoming Schedule</div>
+          <div class="topic-desc" id="scheduleSummary">No schedule preview yet.</div>
+          <div class="preview-box">
+            <div class="mini-text">The export includes the calculated dose context and your custom notes. Download once, then import the .ics file into iPhone or Android.</div>
+          </div>
+          <div class="cta-btns" style="margin-top:18px;">
+            <button class="btn-primary" id="downloadScheduleBtn" type="button">Download .ics Schedule</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section why-section">
+    <div class="section-inner">
+      <div class="reveal" style="text-align:center;max-width:560px;margin:0 auto;">
+        <div class="section-label" style="justify-content:center;">Saved Data</div>
+        <h2 class="section-heading" style="text-align:center;">Review Dose History And<br><em>Progress Trends</em></h2>
+      </div>
+      <div class="why-grid" style="grid-template-columns:1fr; gap:24px;">
+        <div class="why-card reveal" data-num="01">
+          <span class="why-icon">🧾</span>
+          <div class="why-card-text" style="width:100%;">
+            <div class="why-divider"></div>
+            <div class="why-title">Dose Log</div>
+            <p class="why-body">Track each administration with peptide name, dose, units, timing, injection site, and notes.</p>
+            <div class="table-wrap">
+              <table><thead><tr><th>Date</th><th>Peptide</th><th>Dose</th><th>Units</th><th>Site</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="doseLogBody"></tbody></table>
+            </div>
+            <div class="empty-state" id="doseLogEmpty">No dose entries yet.</div>
+          </div>
+        </div>
+        <div class="why-card reveal" data-num="02">
+          <span class="why-icon">📊</span>
+          <div class="why-card-text" style="width:100%;">
+            <div class="why-divider"></div>
+            <div class="why-title">Metrics Log</div>
+            <p class="why-body">Monitor weight, energy, sleep, appetite, waist measurement, and general progress notes over time.</p>
+            <div class="table-wrap">
+              <table><thead><tr><th>Date</th><th>Weight</th><th>Energy</th><th>Sleep</th><th>Appetite</th><th>Waist</th><th>Notes</th><th>Actions</th></tr></thead><tbody id="metricsLogBody"></tbody></table>
+            </div>
+            <div class="empty-state" id="metricsLogEmpty">No metric entries yet.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-inner reveal">
+      <div class="section-label" style="justify-content:center;">Bio Linked Tool</div>
+      <h2 class="section-heading">Built To Make Complex<br><em>Protocols Simpler</em></h2>
+      <p class="section-body" style="margin: 18px auto 0; text-align: center;">This tool stores data in local browser storage on the current device. It is designed for educational planning and tracking support, not for medical instruction.</p>
+      <div class="cta-btns" style="margin-top:36px;flex-direction:row;justify-content:center;flex-wrap:wrap;gap:12px;">
+        <button class="btn-primary" type="button" onclick="document.querySelector('#calculator').scrollIntoView({behavior:'smooth',block:'start'});">Back To Calculator →</button>
+        <button class="btn-secondary" type="button" onclick="document.querySelector('#schedule').scrollIntoView({behavior:'smooth',block:'start'});">Go To Schedule →</button>
+      </div>
+    </div>
+  </section>
+
+</div><!-- end .bio-linked-peptide-app -->
+</div><!-- end .tool-wrap -->
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div>
+      <div class="site-footer-logo">BIO LINKED</div>
+      <div class="site-footer-tagline">Peptide Research &amp; Education</div>
+      <p class="site-footer-disclaimer">For educational purposes only. Not medical advice. Always consult a qualified healthcare professional before beginning any peptide protocol.</p>
+    </div>
+    <div class="site-footer-links">
+      <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index">Peptide Index</a><a href="/cheat-sheet">Cheat Sheet</a><a href="/stacks-blends">Stacks &amp; Blends</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/peptide-tracker">Peptide Tracker</a><a href="/stack-analyzer">Stack Analyzer</a><a href="/biomarker-analysis">Biomarker Analysis</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Platform</div><a href="https://biollinkedapp.netlify.app/">App</a><a href="/">Home</a></div>
+    </div>
+  </div>
+  <div class="site-footer-bottom">© 2025 Bio Linked Peptide Solutions. All rights reserved.</div>
+</footer>
+
+<script>
+document.getElementById('siteNavBtn').addEventListener('click',function(){document.getElementById('siteNavMenu').classList.toggle('open');});
+
+(function () {
+  const root = document.querySelector('.bio-linked-peptide-app');
+  const STORAGE_KEY = "peptide-calculator-state-v2";
+  const state = { doseLog: [], metricsLog: [], calculator: {} };
+
+  const els = {
+    peptideName: root.querySelector("#peptideName"), syringeSize: root.querySelector("#syringeSize"),
+    vialStrength: root.querySelector("#vialStrength"), strengthUnit: root.querySelector("#strengthUnit"),
+    diluentAmount: root.querySelector("#diluentAmount"), diluentUnit: root.querySelector("#diluentUnit"),
+    targetDose: root.querySelector("#targetDose"), doseUnit: root.querySelector("#doseUnit"),
+    frequency: root.querySelector("#frequency"), customInterval: root.querySelector("#customInterval"),
+    calcUnits: root.querySelector("#calcUnits"), calcDosePerUnit: root.querySelector("#calcDosePerUnit"),
+    calcDosesRemaining: root.querySelector("#calcDosesRemaining"), calcCycleLength: root.querySelector("#calcCycleLength"),
+    calcSummary: root.querySelector("#calcSummary"), entryDate: root.querySelector("#entryDate"),
+    entryTime: root.querySelector("#entryTime"), entryDose: root.querySelector("#entryDose"),
+    entryDoseUnit: root.querySelector("#entryDoseUnit"), entryUnits: root.querySelector("#entryUnits"),
+    entrySite: root.querySelector("#entrySite"), entryNotes: root.querySelector("#entryNotes"),
+    saveDoseBtn: root.querySelector("#saveDoseBtn"), useCalculatedDoseBtn: root.querySelector("#useCalculatedDoseBtn"),
+    metricDate: root.querySelector("#metricDate"), metricWeight: root.querySelector("#metricWeight"),
+    metricEnergy: root.querySelector("#metricEnergy"), metricSleep: root.querySelector("#metricSleep"),
+    metricAppetite: root.querySelector("#metricAppetite"), metricWaist: root.querySelector("#metricWaist"),
+    metricNotes: root.querySelector("#metricNotes"), saveMetricBtn: root.querySelector("#saveMetricBtn"),
+    scheduleStart: root.querySelector("#scheduleStart"), scheduleTime: root.querySelector("#scheduleTime"),
+    scheduleLength: root.querySelector("#scheduleLength"), scheduleTitle: root.querySelector("#scheduleTitle"),
+    scheduleNotes: root.querySelector("#scheduleNotes"), previewScheduleBtn: root.querySelector("#previewScheduleBtn"),
+    downloadScheduleBtn: root.querySelector("#downloadScheduleBtn"), scheduleSummary: root.querySelector("#scheduleSummary"),
+    doseLogBody: root.querySelector("#doseLogBody"), doseLogEmpty: root.querySelector("#doseLogEmpty"),
+    metricsLogBody: root.querySelector("#metricsLogBody"), metricsLogEmpty: root.querySelector("#metricsLogEmpty"),
+    statLoggedDoses: root.querySelector("#statLoggedDoses"), statRemainingMg: root.querySelector("#statRemainingMg"),
+    statLatestWeight: root.querySelector("#statLatestWeight"), statCycleLength: root.querySelector("#statCycleLength")
+  };
+
+  function toNumber(v){const p=parseFloat(v);return Number.isFinite(p)?p:0;}
+  function mgToMcg(v){return v*1000;}function mcgToMg(v){return v/1000;}
+  function formatNumber(v,d=2){if(!Number.isFinite(v))return"-";return parseFloat(v.toFixed(d)).toString();}
+  function convertToMcg(v,u){return u==="mg"?mgToMcg(v):v;}
+  function convertFromMcg(v,u){return u==="mg"?mcgToMg(v):v;}
+  function getFrequencyDays(){switch(els.frequency.value){case"daily":return 1;case"everyOtherDay":return 2;case"twiceWeekly":return 3.5;case"weekly":return 7;case"custom":return Math.max(1,toNumber(els.customInterval.value));default:return 1;}}
+  function todayDate(){return new Date().toISOString().split("T")[0];}
+  function currentTimeValue(){return new Date().toTimeString().slice(0,5);}
+  function generateId(){if(window.crypto&&typeof window.crypto.randomUUID==="function")return window.crypto.randomUUID();return"id-"+Date.now()+"-"+Math.random().toString(16).slice(2);}
+  function escapeHtml(v){return String(v).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");}
+
+  function calculateDose(){
+    const vsr=toNumber(els.vialStrength.value),vsMcg=convertToMcg(vsr,els.strengthUnit.value);
+    const dMl=toNumber(els.diluentAmount.value),tdMcg=convertToMcg(toNumber(els.targetDose.value),els.doseUnit.value);
+    const spMl=toNumber(els.syringeSize.value),iDays=getFrequencyDays();
+    const cMcgMl=dMl>0?vsMcg/dMl:0,mcgPU=spMl>0?cMcgMl/spMl:0;
+    const upd=mcgPU>0?tdMcg/mcgPU:0,dr=tdMcg>0?vsMcg/tdMcg:0,clDays=dr*iDays;
+    state.calculator={peptideName:els.peptideName.value.trim()||"Peptide",vialStrengthMcg:vsMcg,targetDoseMcg:tdMcg,unitsPerDose:upd,dosesRemaining:dr,cycleLengthDays:clDays,intervalDays:iDays};
+    els.calcUnits.textContent=upd>0?formatNumber(upd,1)+" units":"-";
+    els.calcDosePerUnit.textContent=mcgPU>0?formatNumber(mcgPU,2)+" mcg / unit":"-";
+    els.calcDosesRemaining.textContent=dr>0?formatNumber(dr,1)+" doses":"-";
+    els.calcCycleLength.textContent=clDays>0?formatNumber(clDays,1)+" days":"-";
+    els.statCycleLength.textContent=clDays>0?formatNumber(clDays,1)+"d":"-";
+    if(!vsMcg||!dMl||!tdMcg){els.calcSummary.textContent="Enter vial strength, dilution amount, and target dose to calculate syringe units and schedule length.";}
+    else{els.calcSummary.textContent=`${state.calculator.peptideName}: ${formatNumber(vsr,2)} ${els.strengthUnit.value} mixed with ${formatNumber(dMl,2)} ${els.diluentUnit.value} gives ${formatNumber(cMcgMl,2)} mcg/mL. A ${formatNumber(convertFromMcg(tdMcg,els.doseUnit.value),2)} ${els.doseUnit.value} dose is about ${formatNumber(upd,1)} units.`;}
+    persistState();renderStats();
+  }
+
+  function persistState(){localStorage.setItem(STORAGE_KEY,JSON.stringify({doseLog:state.doseLog,metricsLog:state.metricsLog,form:{peptideName:els.peptideName.value,syringeSize:els.syringeSize.value,vialStrength:els.vialStrength.value,strengthUnit:els.strengthUnit.value,diluentAmount:els.diluentAmount.value,diluentUnit:els.diluentUnit.value,targetDose:els.targetDose.value,doseUnit:els.doseUnit.value,frequency:els.frequency.value,customInterval:els.customInterval.value,scheduleStart:els.scheduleStart.value,scheduleTime:els.scheduleTime.value,scheduleLength:els.scheduleLength.value,scheduleTitle:els.scheduleTitle.value,scheduleNotes:els.scheduleNotes.value}}));}
+
+  function loadState(){const saved=localStorage.getItem(STORAGE_KEY);if(!saved)return;try{const p=JSON.parse(saved);state.doseLog=Array.isArray(p.doseLog)?p.doseLog:[];state.metricsLog=Array.isArray(p.metricsLog)?p.metricsLog:[];const f=p.form||{};els.peptideName.value=f.peptideName||"BPC-157";els.syringeSize.value=f.syringeSize||"100";els.vialStrength.value=f.vialStrength||"5";els.strengthUnit.value=f.strengthUnit||"mg";els.diluentAmount.value=f.diluentAmount||"2";els.diluentUnit.value=f.diluentUnit||"mL";els.targetDose.value=f.targetDose||"250";els.doseUnit.value=f.doseUnit||"mcg";els.frequency.value=f.frequency||"daily";els.customInterval.value=f.customInterval||"3";els.scheduleStart.value=f.scheduleStart||todayDate();els.scheduleTime.value=f.scheduleTime||"08:00";els.scheduleLength.value=f.scheduleLength||"8";els.scheduleTitle.value=f.scheduleTitle||"";els.scheduleNotes.value=f.scheduleNotes||"";}catch(e){console.error(e);}}
+
+  function useCalculatedDose(){els.entryDose.value=els.targetDose.value?formatNumber(toNumber(els.targetDose.value),2):"";els.entryDoseUnit.value=els.doseUnit.value;els.entryUnits.value=state.calculator.unitsPerDose?formatNumber(state.calculator.unitsPerDose,1):"";}
+
+  function saveDoseEntry(){if(!els.entryDate.value||!els.entryTime.value||!toNumber(els.entryDose.value)){alert("Add a dose date, time, and dose before saving.");return;}state.doseLog.unshift({id:generateId(),date:els.entryDate.value,time:els.entryTime.value,peptide:els.peptideName.value.trim()||"Peptide",dose:toNumber(els.entryDose.value),doseUnit:els.entryDoseUnit.value,units:toNumber(els.entryUnits.value),site:els.entrySite.value,notes:els.entryNotes.value.trim()});els.entryNotes.value="";persistState();renderDoseLog();renderStats();}
+
+  function saveMetricEntry(){if(!els.metricDate.value){alert("Pick a metric date before saving.");return;}state.metricsLog.unshift({id:generateId(),date:els.metricDate.value,weight:els.metricWeight.value.trim(),energy:els.metricEnergy.value.trim(),sleep:els.metricSleep.value.trim(),appetite:els.metricAppetite.value.trim(),waist:els.metricWaist.value.trim(),notes:els.metricNotes.value.trim()});els.metricNotes.value="";persistState();renderMetricsLog();renderStats();}
+
+  function renderDoseLog(){els.doseLogBody.innerHTML=state.doseLog.map(e=>`<tr><td>${e.date}<br><span class="mini-text">${e.time}</span></td><td><span class="pill">${escapeHtml(e.peptide)}</span></td><td>${escapeHtml(String(e.dose))} ${escapeHtml(e.doseUnit)}</td><td>${e.units?escapeHtml(String(e.units)):"-"}</td><td>${escapeHtml(e.site)}</td><td>${e.notes?escapeHtml(e.notes):"-"}</td><td><button class="mini-btn" type="button" data-delete-dose="${e.id}">Delete</button></td></tr>`).join("");els.doseLogEmpty.style.display=state.doseLog.length?"none":"block";}
+
+  function renderMetricsLog(){els.metricsLogBody.innerHTML=state.metricsLog.map(e=>`<tr><td>${e.date}</td><td>${e.weight||"-"}</td><td>${e.energy||"-"}</td><td>${e.sleep||"-"}</td><td>${e.appetite||"-"}</td><td>${e.waist||"-"}</td><td>${e.notes?escapeHtml(e.notes):"-"}</td><td><button class="mini-btn" type="button" data-delete-metric="${e.id}">Delete</button></td></tr>`).join("");els.metricsLogEmpty.style.display=state.metricsLog.length?"none":"block";}
+
+  function renderStats(){const tum=state.doseLog.reduce((s,e)=>s+convertToMcg(toNumber(e.dose),e.doseUnit),0);const rem=Math.max(0,(state.calculator.vialStrengthMcg||0)-tum);els.statLoggedDoses.textContent=String(state.doseLog.length);els.statRemainingMg.textContent=formatNumber(mcgToMg(rem),2)+" mg";els.statLatestWeight.textContent=state.metricsLog[0]&&state.metricsLog[0].weight?state.metricsLog[0].weight:"-";}
+
+  function deleteDose(id){state.doseLog=state.doseLog.filter(e=>e.id!==id);persistState();renderDoseLog();renderStats();}
+  function deleteMetric(id){state.metricsLog=state.metricsLog.filter(e=>e.id!==id);persistState();renderMetricsLog();renderStats();}
+
+  function getScheduleDates(){if(!els.scheduleStart.value)return[];const dates=[];const weeks=Math.max(1,toNumber(els.scheduleLength.value));const iDays=getFrequencyDays();let offset=0;while(offset<(weeks*7)+0.001){const d=new Date(`${els.scheduleStart.value}T${els.scheduleTime.value||"08:00"}:00`);d.setDate(d.getDate()+Math.round(offset));dates.push(d);offset+=iDays;}return dates;}
+
+  function previewSchedule(){const title=els.scheduleTitle.value.trim()||`${els.peptideName.value.trim()||"Peptide"} Dose`;const dose=els.targetDose.value?`${formatNumber(toNumber(els.targetDose.value),2)} ${els.doseUnit.value}`:"target dose";const units=state.calculator.unitsPerDose?`${formatNumber(state.calculator.unitsPerDose,1)} units`:"calculated units";const dates=getScheduleDates().slice(0,6);if(!dates.length){els.scheduleSummary.textContent="Pick a start date to preview the exported calendar schedule.";return;}const preview=dates.map(d=>d.toLocaleString([],{year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})).join(" | ");els.scheduleSummary.textContent=`${title}: ${dose}, ${units}. Upcoming: ${preview}.`;}
+
+  function formatICSDate(d){const y=d.getFullYear(),mo=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0"),h=String(d.getHours()).padStart(2,"0"),mi=String(d.getMinutes()).padStart(2,"0"),s=String(d.getSeconds()).padStart(2,"0");return`${y}${mo}${day}T${h}${mi}${s}`;}
+
+  function downloadSchedule(){const dates=getScheduleDates();if(!dates.length){alert("Pick a start date before downloading the schedule.");return;}const title=els.scheduleTitle.value.trim()||`${els.peptideName.value.trim()||"Peptide"} Dose`;const td=els.targetDose.value?`${formatNumber(toNumber(els.targetDose.value),2)} ${els.doseUnit.value}`:"";const units=state.calculator.unitsPerDose?`${formatNumber(state.calculator.unitsPerDose,1)} units`:"";const desc=(els.scheduleNotes.value.trim()||[td,units].filter(Boolean).join(" | ")||"Peptide schedule").replace(/\n/g,"\\n").replace(/,/g,"\\,").replace(/;/g,"\\;");const created=formatICSDate(new Date());const events=dates.map((d,i)=>{const end=new Date(d.getTime()+(30*60*1000));return["BEGIN:VEVENT",`UID:${created}-${i}@biolinked-calculator`,`DTSTAMP:${created}`,`DTSTART:${formatICSDate(d)}`,`DTEND:${formatICSDate(end)}`,`SUMMARY:${title.replace(/,/g,"\\,").replace(/;/g,"\\;")}`,`DESCRIPTION:${desc}`,"END:VEVENT"].join("\r\n");}).join("\r\n");const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Bio Linked//Peptide Calculator//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH",events,"END:VCALENDAR"].join("\r\n");const blob=new Blob([ics],{type:"text/calendar;charset=utf-8"});const url=URL.createObjectURL(blob);const link=document.createElement("a");const slug=(els.peptideName.value.trim()||"peptide").toLowerCase().replace(/[^a-z0-9]+/g,"-");link.href=url;link.download=`${slug}-schedule.ics`;document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);previewSchedule();}
+
+  function attachEvents(){[els.peptideName,els.syringeSize,els.vialStrength,els.strengthUnit,els.diluentAmount,els.diluentUnit,els.targetDose,els.doseUnit,els.frequency,els.customInterval].forEach(el=>{el.addEventListener("input",calculateDose);el.addEventListener("change",calculateDose);});[els.scheduleStart,els.scheduleTime,els.scheduleLength,els.scheduleTitle,els.scheduleNotes].forEach(el=>{el.addEventListener("input",persistState);el.addEventListener("change",persistState);});els.saveDoseBtn.addEventListener("click",saveDoseEntry);els.useCalculatedDoseBtn.addEventListener("click",useCalculatedDose);els.saveMetricBtn.addEventListener("click",saveMetricEntry);els.previewScheduleBtn.addEventListener("click",previewSchedule);els.downloadScheduleBtn.addEventListener("click",downloadSchedule);root.addEventListener("click",event=>{const di=event.target.getAttribute("data-delete-dose");const mi=event.target.getAttribute("data-delete-metric");if(di)deleteDose(di);if(mi)deleteMetric(mi);});}
+
+  function initDefaults(){if(!els.entryDate.value)els.entryDate.value=todayDate();if(!els.entryTime.value)els.entryTime.value=currentTimeValue();if(!els.metricDate.value)els.metricDate.value=todayDate();if(!els.scheduleStart.value)els.scheduleStart.value=todayDate();if(!els.scheduleTime.value)els.scheduleTime.value="08:00";}
+
+  function initReveals(){const reveals=root.querySelectorAll('.reveal');const observer=new IntersectionObserver(entries=>{entries.forEach((entry,i)=>{if(entry.isIntersecting){setTimeout(()=>entry.target.classList.add('visible'),i*55);observer.unobserve(entry.target);}});},{threshold:0.08});reveals.forEach(el=>observer.observe(el));}
+
+  function init(){loadState();initDefaults();calculateDose();renderDoseLog();renderMetricsLog();renderStats();previewSchedule();attachEvents();initReveals();}
+  init();
+})();
+</script>
+</body>
+</html>
