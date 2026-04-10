@@ -1,1 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Peptide Index — Bio Linked Peptide Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #9A7B2F; --gold2: #B8960C; --gold-dim: rgba(154,123,47,0.1); --gold-border: rgba(154,123,47,0.25);
+  --bg: #f8f8f8; --surface: #ffffff; --surface2: #f2f2f2; --surface3: #eaeaea;
+  --white: #ffffff; --text: #1a1a1a; --text2: #444444; --muted: #777777;
+  --border: rgba(0,0,0,0.08); --red: #c0392b; --red-dim: rgba(192,57,43,0.06); --red-border: rgba(192,57,43,0.18);
+  --green: #2e7d32; --purple: #6a0dad; --blue: #1565c0;
+  --radius: 10px; --radius-sm: 6px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
+/* NAV */
+.site-nav { background: #fff; border-bottom: 1px solid #eaeaea; position: sticky; top: 0; z-index: 600; }
+.site-nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.site-nav-logo { text-decoration: none; display: flex; flex-direction: column; line-height: 1; }
+.site-nav-logo-main { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.1em; }
+.site-nav-logo-sub { font-size: 8px; color: #777; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 2px; }
+.site-nav-links { display: flex; align-items: center; gap: 2px; }
+.site-nav-link { font-size: 11.5px; color: #444; text-decoration: none; padding: 7px 11px; border-radius: 3px; transition: all 0.18s; background: none; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+.site-nav-link:hover, .site-nav-link.active { color: var(--gold); background: var(--gold-dim); }
+.site-nav-dropdown { position: relative; }
+.site-nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #eaeaea; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 180px; overflow: hidden; z-index: 700; }
+.site-nav-dropdown:hover .site-nav-dropdown-menu { display: block; }
+.site-nav-dropdown-item { display: block; padding: 10px 16px; font-size: 11.5px; color: #444; text-decoration: none; transition: all 0.15s; font-family: 'Montserrat', sans-serif; }
+.site-nav-dropdown-item:hover { background: #f8f8f8; color: var(--gold); padding-left: 20px; }
+.site-nav-mobile-btn { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #1a1a1a; padding: 8px; }
+.site-nav-mobile-menu { display: none; border-top: 1px solid #eaeaea; background: #fff; padding: 12px 20px 20px; }
+.site-nav-mobile-menu.open { display: block; }
+.site-nav-mobile-link { display: block; padding: 10px 0; font-size: 13px; color: #444; text-decoration: none; border-bottom: 1px solid #eaeaea; font-family: 'Montserrat', sans-serif; }
+.site-nav-mobile-link:last-child { border-bottom: none; }
+.site-nav-mobile-sub { padding-left: 16px; font-size: 12px; color: #777; }
+.site-nav-mobile-section { padding: 10px 0 4px; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-family: 'Montserrat', sans-serif; font-weight: 600; border-bottom: 1px solid #eaeaea; }
+@media (max-width: 768px) { .site-nav-links { display: none; } .site-nav-mobile-btn { display: block; } .site-nav-inner { padding: 0 16px; } }
+
+/* RIBBON */
+.legal-ribbon { background: rgba(255,245,245,0.97); border-bottom: 1px solid var(--red-border); padding: 7px 16px; text-align: center; }
+.legal-ribbon span { font-size: 10.5px; color: rgba(160,40,30,0.8); font-weight: 500; }
+.legal-ribbon strong { color: var(--red); }
+
+/* HEADER */
+.header { background: var(--surface); border-bottom: 1px solid var(--gold-border); padding: 40px 20px 32px; position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent); }
+.header::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(154,123,47,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(154,123,47,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+.header-inner { max-width: 960px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; position: relative; z-index: 1; }
+.header-left { flex: 1; }
+.header-brand { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.header-brand::before { content: ''; width: 22px; height: 1px; background: var(--gold-border); }
+.header-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px, 7vw, 58px); font-weight: 400; color: var(--text); line-height: 1.05; margin-bottom: 8px; }
+.header-title em { color: var(--gold); font-style: italic; }
+.header-desc { font-size: 12.5px; color: var(--muted); font-weight: 300; line-height: 1.6; max-width: 500px; }
+.header-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 14px; padding: 5px 14px; background: var(--red-dim); border: 1px solid var(--red-border); border-radius: 99px; font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); font-weight: 700; }
+.header-count-box { background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: var(--radius); padding: 18px 22px; text-align: center; flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
+.count-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--gold); font-weight: 600; line-height: 1; display: block; }
+.count-lbl { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-top: 4px; display: block; }
+
+/* DESKTOP CONTROLS */
+.controls { max-width: 960px; margin: 0 auto; padding: 22px 20px 0; }
+.search-wrap { position: relative; margin-bottom: 16px; }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gold); opacity: 0.5; font-size: 17px; pointer-events: none; }
+#searchInput { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px 13px 42px; font-family: 'Montserrat', sans-serif; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+#searchInput::placeholder { color: var(--muted); }
+#searchInput:focus { border-color: var(--gold-border); box-shadow: 0 0 0 3px var(--gold-dim); }
+.filter-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 7px; align-items: center; }
+.filter-lbl { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.fchip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 18px; font-family: 'Montserrat', sans-serif; font-size: 11.5px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; white-space: nowrap; -webkit-tap-highlight-color: transparent; user-select: none; }
+.fchip:hover { border-color: var(--gold-border); color: var(--gold); background: var(--surface3); }
+.fchip.active { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 700; }
+
+/* MOBILE CONTROLS */
+.mobile-search-wrap { display: none; padding: 10px 14px 0; background: var(--surface2); border-bottom: 1px solid var(--gold-border); }
+.mobile-search-inner { position: relative; }
+.mobile-search-inner input { width: 100%; background: var(--surface3); border: 1px solid var(--gold-border); border-radius: 8px; padding: 13px 14px 13px 40px; font-family: 'Montserrat', sans-serif; font-size: 16px; color: var(--text); outline: none; -webkit-appearance: none; min-height: 48px; }
+.mobile-search-inner input::placeholder { color: var(--muted); }
+.mobile-search-inner input:focus { border-color: var(--gold); }
+.mobile-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted); pointer-events: none; }
+.mobile-filters { display: none; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--gold-border); background: var(--surface2); scrollbar-width: none; }
+.mobile-filters::-webkit-scrollbar { display: none; }
+.mobile-filters .fchip { flex-shrink: 0; font-size: 13px; padding: 10px 16px; min-height: 44px; border-radius: 8px; display: inline-flex; align-items: center; }
+
+/* RESULTS BAR */
+.results-bar { max-width: 960px; margin: 14px auto 0; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.results-count { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.results-count span { color: var(--gold); font-weight: 700; }
+.view-btns { display: flex; gap: 5px; }
+.vbtn { padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-family: 'Montserrat', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+.vbtn.active { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 700; }
+
+/* MAIN */
+.main { max-width: 960px; margin: 0 auto; padding: 20px 20px 80px; }
+
+/* CATEGORY SECTIONS */
+.cat-section { margin-bottom: 44px; }
+.cat-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--gold-border); }
+.cat-icon { font-size: 20px; line-height: 1; }
+.cat-name { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
+.cat-count { margin-left: auto; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* DESKTOP CARDS */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+.cards-list { display: flex; flex-direction: column; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--surface3); border-radius: var(--radius); overflow: hidden; transition: all 0.2s; position: relative; animation: fadeUp 0.3s ease both; }
+.card:hover { border-top-color: var(--gold); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.card.open { border-top-color: var(--gold); }
+.card-top { padding: 18px 18px 14px; }
+.card-row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 5px; }
+.card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.2; flex: 1; }
+.cat-tag { display: inline-block; padding: 3px 9px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 3px; font-size: 8.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
+.cat-tag.tag-purple { background: rgba(106,13,173,0.07); border-color: rgba(106,13,173,0.2); color: var(--purple); }
+.cat-tag.tag-blue { background: rgba(21,101,192,0.07); border-color: rgba(21,101,192,0.2); color: var(--blue); }
+.cat-tag.tag-green { background: rgba(46,125,50,0.07); border-color: rgba(46,125,50,0.2); color: var(--green); }
+.cat-tag.tag-red { background: var(--red-dim); border-color: var(--red-border); color: var(--red); }
+.card-subtitle { font-size: 11.5px; color: var(--muted); font-style: italic; margin-bottom: 8px; }
+.card-goal { font-size: 13px; color: var(--text2); line-height: 1.5; font-weight: 300; margin-bottom: 10px; }
+.card-footer { border-top: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.15s; }
+.card-footer:hover { background: var(--gold-dim); }
+.view-details-btn { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); pointer-events: none; font-family: 'Montserrat', sans-serif; }
+.expand-icon { font-size: 13px; color: var(--gold); opacity: 0.7; transition: transform 0.25s; pointer-events: none; }
+.card.open .expand-icon { transform: rotate(180deg); }
+.card-detail { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); background: var(--surface2); }
+.card.open .card-detail { display: block; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.dblock { display: flex; flex-direction: column; gap: 4px; }
+.dblock.full { grid-column: 1 / -1; }
+.d-divider { grid-column: 1 / -1; height: 1px; background: var(--border); }
+.dkey { font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); opacity: 0.8; font-weight: 700; }
+.dval { font-size: 12.5px; color: var(--text2); line-height: 1.55; white-space: pre-line; }
+.notes-box { margin-top: 12px; padding: 12px 14px; background: var(--surface3); border-left: 2px solid var(--gold-border); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.notes-box .dkey { margin-bottom: 5px; }
+.notes-box .dval { font-size: 12px; color: var(--text2); }
+.card-disclaimer { margin-top: 10px; padding: 8px 12px; background: var(--red-dim); border: 1px solid var(--red-border); border-radius: var(--radius-sm); font-size: 10px; color: var(--red); font-style: italic; line-height: 1.55; opacity: 0.85; }
+
+/* MOBILE CARDS */
+.mobile-card-list { display: none; flex-direction: column; gap: 10px; }
+.m-card { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--surface3); border-radius: 12px; overflow: hidden; }
+.m-card:hover { border-top-color: var(--gold); }
+.m-card-header { padding: 14px 14px 0; }
+.m-card-row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.m-card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.2; flex: 1; }
+.m-cat-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; border: 1px solid; white-space: nowrap; flex-shrink: 0; }
+.pill-recovery   { background: rgba(154,123,47,0.1); color: var(--gold); border-color: rgba(154,123,47,0.3); }
+.pill-metabolic  { background: rgba(46,125,50,0.08); color: var(--green); border-color: rgba(46,125,50,0.25); }
+.pill-gh         { background: rgba(21,101,192,0.08); color: var(--blue); border-color: rgba(21,101,192,0.2); }
+.pill-cognitive  { background: rgba(106,13,173,0.07); color: var(--purple); border-color: rgba(106,13,173,0.2); }
+.pill-longevity  { background: rgba(190,100,10,0.08); color: #b06800; border-color: rgba(190,100,10,0.2); }
+.pill-immune     { background: rgba(192,57,43,0.07); color: var(--red); border-color: rgba(192,57,43,0.18); }
+.pill-energy     { background: rgba(46,125,50,0.07); color: var(--green); border-color: rgba(46,125,50,0.18); }
+.pill-sexual     { background: rgba(173,20,87,0.07); color: #ad1457; border-color: rgba(173,20,87,0.18); }
+.pill-bioregulator { background: rgba(0,96,100,0.07); color: #006064; border-color: rgba(0,96,100,0.18); }
+.pill-skin       { background: rgba(173,20,87,0.06); color: #880e4f; border-color: rgba(173,20,87,0.15); }
+.pill-other      { background: rgba(0,0,0,0.04); color: var(--muted); border-color: var(--border); }
+.m-card-sub { font-size: 11px; color: var(--muted); font-style: italic; margin-bottom: 6px; }
+.m-card-goal { font-size: 13px; color: var(--text2); line-height: 1.5; font-weight: 300; padding: 0 14px 12px; }
+.m-card-stats { display: grid; grid-template-columns: 1fr 1fr; background: var(--gold-dim); border-top: 1px solid var(--gold-border); border-bottom: 1px solid var(--gold-border); }
+.m-stat { padding: 11px 12px; border-right: 1px solid var(--gold-border); }
+.m-stat:last-child { border-right: none; }
+.m-stat-lbl { font-size: 8.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.m-stat-val { font-size: 12px; color: var(--text); font-weight: 500; line-height: 1.3; }
+.m-card-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; transition: background 0.15s; }
+.m-card-toggle:active { background: var(--gold-dim); }
+.m-toggle-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.m-toggle-icon { font-size: 13px; color: var(--gold); opacity: 0.7; transition: transform 0.25s; }
+.m-card.open .m-toggle-icon { transform: rotate(180deg); }
+.m-card-detail { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); background: var(--surface2); }
+.m-card.open .m-card-detail { display: block; }
+.m-detail-section { margin-top: 12px; }
+.m-detail-label { font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); opacity: 0.8; font-weight: 700; margin-bottom: 5px; }
+.m-detail-text { font-size: 12.5px; color: var(--text2); line-height: 1.6; }
+.m-notes { margin-top: 12px; padding: 11px 13px; background: var(--surface3); border-left: 2px solid var(--gold-border); border-radius: 0 6px 6px 0; }
+.m-disclaimer { margin-top: 10px; padding: 8px 11px; background: var(--red-dim); border: 1px solid var(--red-border); border-radius: 6px; font-size: 10px; color: var(--red); font-style: italic; line-height: 1.5; opacity: 0.85; }
+.m-cat-section { margin-bottom: 28px; }
+.m-cat-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--gold-border); }
+.m-cat-icon { font-size: 18px; }
+.m-cat-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); }
+.m-cat-count { margin-left: auto; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.m-research-stamp { padding: 8px 14px; background: var(--red-dim); border-top: 1px solid var(--red-border); font-size: 10px; color: var(--red); font-weight: 600; letter-spacing: 0.06em; text-align: center; opacity: 0.85; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 60px 20px; }
+.empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold-border); margin-bottom: 8px; }
+.empty p { font-size: 13px; color: var(--muted); }
+
+/* LEGAL FOOTER */
+.legal-footer { background: #1a1a1a; border-top: 1px solid rgba(154,123,47,0.2); padding: 36px 20px; }
+.legal-footer-inner { max-width: 960px; margin: 0 auto; }
+.lf-title { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.lf-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+.lf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lf-block { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: var(--radius-sm); padding: 14px 16px; }
+.lf-block-title { font-size: 9px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #e57373; margin-bottom: 6px; }
+.lf-block p { font-size: 11px; color: rgba(200,198,190,0.5); line-height: 1.7; font-weight: 300; }
+.lf-block strong { color: rgba(200,198,190,0.75); font-weight: 600; }
+.lf-brand { text-align: center; margin-top: 16px; font-size: 10px; color: rgba(150,148,140,0.4); letter-spacing: 0.1em; }
+
+/* SITE FOOTER */
+.site-footer { background: #1a1a1a; padding: 48px 40px 0; }
+.site-footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.site-footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #fff; letter-spacing: 0.12em; margin-bottom: 6px; }
+.site-footer-tagline { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 14px; font-family: 'Montserrat', sans-serif; }
+.site-footer-disclaimer { font-size: 11px; color: #555; line-height: 1.65; font-weight: 300; max-width: 340px; font-family: 'Montserrat', sans-serif; }
+.site-footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.site-footer-col { display: flex; flex-direction: column; gap: 10px; }
+.site-footer-col-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 4px; font-family: 'Montserrat', sans-serif; }
+.site-footer-col a { font-size: 12px; color: #666; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: color 0.18s; }
+.site-footer-col a:hover { color: #fff; }
+.site-footer-bottom { max-width: 1100px; margin: 0 auto; padding: 18px 0; font-size: 10px; color: #444; font-family: 'Montserrat', sans-serif; }
+@media (max-width: 768px) { .site-footer { padding: 36px 16px 0; } .site-footer-inner { grid-template-columns: 1fr; gap: 28px; } .site-footer-links { grid-template-columns: 1fr 1fr; } }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .header-inner { flex-direction: column; gap: 16px; }
+  .header-count-box { align-self: flex-start; padding: 12px 18px; }
+  .count-num { font-size: 36px; }
+  .controls { display: none; }
+  .results-bar { padding: 10px 14px 0; margin-top: 0; }
+  .mobile-search-wrap { display: block; }
+  .mobile-filters { display: flex; }
+  .mobile-card-list { display: flex; }
+  .cards-grid, .cards-list, .cat-section { display: none; }
+  .main { padding: 14px 12px 60px; }
+  .lf-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .header { padding: 28px 14px 24px; }
+  .header-title { font-size: clamp(28px, 8vw, 40px); }
+  .header-desc { font-size: 12px; }
+  .results-bar { padding: 8px 12px 0; }
+  .view-btns { display: none; }
+  .main { padding: 12px 10px 60px; }
+  .m-card-name { font-size: 18px; }
+  .m-cat-name { font-size: 20px; }
+}
+@media (max-width: 380px) {
+  .header-title { font-size: 24px; }
+  .m-card-name { font-size: 16px; }
+  .m-card-stats { grid-template-columns: 1fr; }
+  .m-stat { border-right: none; border-bottom: 1px solid var(--gold-border); }
+  .m-stat:last-child { border-bottom: none; }
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="site-nav-logo"><span class="site-nav-logo-main">BIO LINKED</span><span class="site-nav-logo-sub">Peptide Solutions</span></a>
+    <div class="site-nav-links">
+      <a href="/" class="site-nav-link">Home</a>
+      <a href="/peptide-index" class="site-nav-link active">Index</a>
+      <a href="/cheat-sheet" class="site-nav-link">Cheat Sheet</a>
+      <a href="/stacks-blends" class="site-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biollinkedapp.netlify.app/" class="site-nav-link">App</a>
+      <div class="site-nav-dropdown">
+        <button class="site-nav-link site-nav-dropdown-btn">Tools ▾</button>
+        <div class="site-nav-dropdown-menu">
+          <a href="/tools/peptide-tracker" class="site-nav-dropdown-item">Peptide Tracker</a>
+          <a href="/tools/stack-analyzer" class="site-nav-dropdown-item">Stack Analyzer</a>
+          <a href="/tools/biomarker-analysis" class="site-nav-dropdown-item">Biomarker Analysis</a>
+        </div>
+      </div>
+    </div>
+    <button class="site-nav-mobile-btn" id="siteNavBtn">☰</button>
+  </div>
+  <div class="site-nav-mobile-menu" id="siteNavMenu">
+    <a href="/" class="site-nav-mobile-link">Home</a>
+    <a href="/peptide-index" class="site-nav-mobile-link">Index</a>
+    <a href="/cheat-sheet" class="site-nav-mobile-link">Cheat Sheet</a>
+    <a href="/stacks-blends" class="site-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biollinkedapp.netlify.app/" class="site-nav-mobile-link">App</a>
+    <div class="site-nav-mobile-section">Tools</div>
+    <a href="/tools/peptide-tracker" class="site-nav-mobile-link site-nav-mobile-sub">Peptide Tracker</a>
+    <a href="/tools/stack-analyzer" class="site-nav-mobile-link site-nav-mobile-sub">Stack Analyzer</a>
+    <a href="/tools/biomarker-analysis" class="site-nav-mobile-link site-nav-mobile-sub">Biomarker Analysis</a>
+  </div>
+</nav>
+
+<div class="legal-ribbon">
+  <span>⚠ <strong>Research &amp; Educational Reference Only</strong> — Not for human use · Not medical advice · Consult a licensed healthcare provider before any protocol</span>
+</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-brand">Bio Linked Peptide Solutions</div>
+      <div class="header-title">Peptide <em>Index</em></div>
+      <div class="header-desc">102 compound profiles · Mechanisms · Research areas · Synergistic stacks · Educational reference only</div>
+      <div class="header-badge">⚠ Research Reference Only — Not for Human Use</div>
+    </div>
+    <div class="header-count-box">
+      <span class="count-num" id="liveCount">102</span>
+      <span class="count-lbl">Compound Profiles</span>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-search-wrap">
+  <div class="mobile-search-inner">
+    <span class="mobile-search-icon">🔍</span>
+    <input type="text" id="mobileSearch" placeholder="Search compounds, categories..." oninput="onSearch(this.value)" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+
+<div class="mobile-filters" id="mobile-filters"></div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search compounds, categories, research areas..." autocomplete="off" spellcheck="false">
+  </div>
+  <div class="filter-row">
+    <span class="filter-lbl">Category</span>
+    <button class="fchip active" data-cat="all">All</button>
+    <button class="fchip" data-cat="Recovery">🩹 Recovery</button>
+    <button class="fchip" data-cat="GLP-1 / Metabolic">⚖ GLP-1 / Metabolic</button>
+    <button class="fchip" data-cat="Growth Hormone">📈 Growth Hormone</button>
+    <button class="fchip" data-cat="Cognitive">🧠 Cognitive</button>
+    <button class="fchip" data-cat="Longevity">⏳ Longevity</button>
+    <button class="fchip" data-cat="Immune">🛡 Immune</button>
+    <button class="fchip" data-cat="Energy / NAD+">⚡ Energy / NAD+</button>
+    <button class="fchip" data-cat="Sexual Health">💛 Sexual Health</button>
+    <button class="fchip" data-cat="Bioregulators">🔬 Bioregulators</button>
+    <button class="fchip" data-cat="Skin & Cosmetic">✨ Skin &amp; Cosmetic</button>
+    <button class="fchip" data-cat="Other">🧪 Other</button>
+  </div>
+</div>
+
+<div class="results-bar">
+  <div class="results-count">Showing <span id="countNum">102</span> compounds</div>
+  <div class="view-btns">
+    <button class="vbtn active" id="btnGrid" onclick="setView('grid')">⊞ Grid</button>
+    <button class="vbtn" id="btnList" onclick="setView('list')">☰ List</button>
+  </div>
+</div>
+
+<div class="main" id="mainContainer">
+  <div id="desktop-content"></div>
+  <div class="mobile-card-list" id="mobile-content"></div>
+  <div id="empty-state" class="empty" style="display:none">
+    <h3>No compounds found</h3>
+    <p>Try a different search term or category</p>
+  </div>
+</div>
+
+<div class="legal-footer">
+  <div class="legal-footer-inner">
+    <div class="lf-title">Legal Disclaimers &amp; Terms of Use</div>
+    <div class="lf-grid">
+      <div class="lf-block"><div class="lf-block-title">⚠ Not for Human Use</div><p>All compounds referenced are <strong>research chemicals intended solely for in-vitro laboratory research</strong>. Not approved by the FDA or any regulatory agency for human consumption, self-administration, or therapeutic use unless specifically noted as prescription-available.</p></div>
+      <div class="lf-block"><div class="lf-block-title">⚠ Not Medical Advice</div><p>Nothing on this site constitutes <strong>medical advice, diagnosis, or treatment</strong>. Information is compiled from publicly available scientific literature for educational purposes only. <strong>Always consult a qualified healthcare provider.</strong></p></div>
+      <div class="lf-block"><div class="lf-block-title">⚠ No Liability</div><p>Bio Linked Peptide Solutions <strong>expressly disclaims all liability</strong> for any harm, injury, or damages resulting from use or misuse of information found here. Individual results vary and cannot be predicted or guaranteed.</p></div>
+      <div class="lf-block"><div class="lf-block-title">⚠ Regulatory Compliance</div><p>It is the reader's sole responsibility to ensure compliance with all <strong>local, state, federal, and international laws</strong> governing research compounds. Laws vary by jurisdiction. Bio Linked makes no representation that compounds are legal in any specific location.</p></div>
+    </div>
+    <div class="lf-brand">© Bio Linked Peptide Solutions · Peptide Index · 102 Compound Profiles · Educational Use Only</div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div>
+      <div class="site-footer-logo">BIO LINKED</div>
+      <div class="site-footer-tagline">Peptide Research &amp; Education</div>
+      <p class="site-footer-disclaimer">For educational purposes only. Not medical advice. Always consult a qualified healthcare professional before beginning any peptide protocol.</p>
+    </div>
+    <div class="site-footer-links">
+      <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index">Peptide Index</a><a href="/cheat-sheet">Cheat Sheet</a><a href="/stacks-blends">Stacks &amp; Blends</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/tools/peptide-tracker">Peptide Tracker</a><a href="/tools/stack-analyzer">Stack Analyzer</a><a href="/tools/biomarker-analysis">Biomarker Analysis</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Platform</div><a href="https://biollinkedapp.netlify.app/">App</a><a href="/">Home</a></div>
+    </div>
+  </div>
+  <div class="site-footer-bottom">© 2025 Bio Linked Peptide Solutions. All rights reserved.</div>
+</footer>
+
+<script>
+const COMPOUNDS = [
+  {cat:"Recovery",emoji:"🩹",name:"BPC-157",sub:"Body Protection Compound-157",avail:"mixed",availLabel:"Mixed Availability",goal:"Tissue healing, gut repair, tendon & ligament recovery",mechanism:"Activates VEGFR2 signaling for angiogenesis; upregulates growth hormone receptors in injured tissue; modulates nitric oxide and FAK-paxillin pathways for accelerated cell migration and repair. Heals gut lining, tendons, ligaments, and muscle.",dose:"250–500 mcg/day SQ or IM near injury site",cycle:"6–12 weeks",frequency:"Daily or 2×/day",timing:"Morning fasted or split AM/PM",notes:"#1 most researched healing peptide. Can be taken orally for gut-specific benefits (swallowed in BAC water). Often stacked with TB-500 as 'The Wolverine Stack'. Available as premix BB10 at Bio Linked."},
+  {cat:"Recovery",emoji:"🩹",name:"TB-500",sub:"Thymosin Beta-4 Fragment",avail:"mixed",availLabel:"Mixed Availability",goal:"Systemic tissue repair, inflammation reduction, flexibility",mechanism:"Thymosin Beta-4 fragment promotes actin polymerization, cell migration, and anti-inflammatory responses. Enhances systemic healing of cardiac muscle, skeletal muscle, and connective tissue throughout the body.",dose:"2.5–5 mg 2×/week",cycle:"6–8 weeks loading, then maintenance",frequency:"2× per week",timing:"Any time SQ or IM",notes:"Pairs perfectly with BPC-157 for the Wolverine Stack (premix BB10). TB-500 handles systemic healing while BPC-157 addresses local tissue. Reduces inflammation and speeds recovery from injuries, surgery, and overtraining."},
+  {cat:"Recovery",emoji:"🩹",name:"GHK-Cu",sub:"Copper Peptide Gly-His-Lys",avail:"research",availLabel:"Research Only",goal:"Skin rejuvenation, collagen production, wound healing",mechanism:"Copper-binding tripeptide upregulates collagen I/III synthesis, glycosaminoglycans, and antioxidant enzymes. Stimulates VEGF and fibroblast growth factors. Reduces MMP-9 enzyme activity that degrades extracellular matrix during aging.",dose:"1–2 mg 3×/week SQ",cycle:"8–12 weeks",frequency:"3× per week",timing:"Any time SQ",notes:"Available as GLOW Formula (BBG70) at Bio Linked. Clinical studies show 35% reduction in fine lines. Pairs with BPC-157 for comprehensive skin + tissue healing. Also shows hair follicle stimulation properties."},
+  {cat:"Recovery",emoji:"🩹",name:"KPV",sub:"Alpha-MSH Tripeptide Fragment",avail:"research",availLabel:"Research Only",goal:"Anti-inflammatory, gut healing, IBS/IBD support",mechanism:"Tripeptide fragment of alpha-MSH that directly inhibits NF-κB signaling and pro-inflammatory cytokine cascade. Reduces intestinal inflammation at the mucosal level. Calms immune overactivation in gut and skin tissue.",dose:"500 mcg–1 mg/day SQ or oral",cycle:"8–12 weeks",frequency:"Daily",timing:"Any time — can be taken orally for gut effects",notes:"Key component of Bio Linked's KLOW blend. Especially effective for IBS, Crohn's, leaky gut, and inflammatory skin conditions. Can be swallowed in BAC water for direct GI anti-inflammatory effect."},
+  {cat:"Recovery",emoji:"🩹",name:"LL-37",sub:"Human Cathelicidin Antimicrobial Peptide",avail:"research",availLabel:"Research Only",goal:"Wound healing, antimicrobial defense, immune modulation",mechanism:"Naturally occurring cathelicidin peptide with broad-spectrum antimicrobial activity. Promotes wound healing through keratinocyte migration, angiogenesis, and re-epithelialization. Modulates innate immune response without overstimulation.",dose:"1–2 mg 2–3×/week SQ",cycle:"6–8 weeks",frequency:"2–3× per week",timing:"Any time SQ",notes:"Excellent addition to healing protocols where infection risk is present or wound healing is impaired. Synergistic with BPC-157 for chronic wound or post-surgical recovery. Emerging use in antibiotic-resistant infection research."},
+  {cat:"Recovery",emoji:"🩹",name:"ARA-290",sub:"Erythropoietin-Derived Peptide",avail:"research",availLabel:"Research Only",goal:"Neuropathic pain relief, tissue repair, nerve protection",mechanism:"Derived from the non-hematopoietic region of erythropoietin (EPO). Activates innate repair receptor without blood-stimulating effects of EPO. Promotes tissue repair, reduces neuroinflammation, and provides neuropathic pain relief through anti-apoptotic mechanisms.",dose:"4–8 mg/day SQ",cycle:"4–8 weeks",frequency:"Daily",timing:"Any time SQ",notes:"Particularly valuable for diabetic neuropathy, small fiber neuropathy, and chronic pain research. Does not raise red blood cell count like EPO. Emerging research for sarcoidosis-related neuropathy."},
+  {cat:"Recovery",emoji:"🩹",name:"PGPIPN",sub:"Anti-Inflammatory Hexapeptide",avail:"research",availLabel:"Research Only",goal:"Anti-inflammation, tissue repair, immunomodulation",mechanism:"Therapeutic hexapeptide (Pro-Gly-Pro-Ile-Pro-Asn) that modulates inflammatory cytokine cascades. Inhibits pro-inflammatory signaling while supporting tissue repair mechanisms. Researched for chronic inflammatory conditions.",dose:"1–2 mg/day SQ",cycle:"6–8 weeks",frequency:"Daily",timing:"Any time SQ",notes:"Emerging research compound. Shows promise in chronic inflammatory conditions and autoimmune-adjacent applications. Can be stacked with KPV for comprehensive anti-inflammatory protocols."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Tirzepatide",sub:"Dual GLP-1/GIP Agonist",avail:"rx",availLabel:"Prescription Available",goal:"Significant weight loss, appetite suppression, blood sugar regulation",mechanism:"Dual agonist activating both GLP-1 and GIP receptors simultaneously. Slows gastric emptying, reduces appetite via hypothalamic signaling, improves insulin sensitivity, and promotes fat oxidation. Phase 3 trials showed 20-22% average body weight reduction.",dose:"2.5 mg weekly → titrate to 5/10/15 mg over 4–12 weeks",cycle:"Until goal weight, then maintenance",frequency:"Once weekly SQ",timing:"Same day each week",notes:"Most clinically validated weight loss peptide available. Titrate slowly (every 4 weeks) to manage nausea. Available as TR10/20/30 at Bio Linked. Best entry point for GLP-1 therapy."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Semaglutide",sub:"GLP-1 Receptor Agonist",avail:"rx",availLabel:"Prescription Available",goal:"Weight loss, blood sugar regulation, cardiovascular protection",mechanism:"GLP-1 receptor agonist that suppresses appetite, slows gastric emptying, and improves glycemic control. Originally developed for T2D (Ozempic), now widely used for weight management (Wegovy). Shows cardiovascular risk reduction in trials.",dose:"0.25 mg weekly → titrate to 1–2.4 mg",cycle:"Ongoing — maintenance after goal",frequency:"Once weekly SQ",timing:"Same day each week",notes:"The peptide that started the GLP-1 revolution. Slower titration than Tirzepatide. Strong cardiovascular data. Can be compounded. Slightly less weight loss vs Tirzepatide in head-to-head data."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Retatrutide",sub:"Triple GIP/GLP-1/Glucagon Agonist",avail:"research",availLabel:"Research Only",goal:"Aggressive fat loss, metabolic optimization",mechanism:"Triple agonist activating GIP, GLP-1, and glucagon receptors simultaneously. Phase 2 trials showed up to 24% weight loss — most powerful in class. Glucagon activation adds thermogenic fat burning on top of GLP-1/GIP appetite suppression.",dose:"1–4 mg weekly (titrate slowly)",cycle:"12–20 weeks",frequency:"Once weekly SQ",timing:"Same day each week",notes:"Most cutting-edge weight loss compound in research. Titrate very slowly — 1 mg for 4 weeks before increasing. Available as RT10/20/30. GI side effects more pronounced than Tirzepatide — slower titration critical."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Cagrilintide",sub:"Long-Acting Amylin Analog",avail:"research",availLabel:"Research Only",goal:"Appetite regulation, weight management, complementary GLP-1 stack",mechanism:"Long-acting amylin receptor agonist mimicking the satiety hormone amylin. Works through a complementary pathway to GLP-1 — enhances satiety signaling from the brainstem and reduces gastric motility through a different receptor than GLP-1.",dose:"0.3–2.4 mg weekly",cycle:"12–24 weeks",frequency:"Once weekly SQ",timing:"Same day each week",notes:"Particularly powerful when stacked with semaglutide (CagriSema combination showed 25%+ weight loss in early trials). Complementary mechanism to GLP-1 agonists makes it ideal for combination therapy research."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Survodutide",sub:"Dual GLP-1/Glucagon Agonist",avail:"research",availLabel:"Research Only",goal:"Weight loss, liver health, metabolic disease research",mechanism:"Dual GLP-1 and glucagon receptor agonist. GLP-1 activation suppresses appetite while glucagon activation increases liver fat burning and thermogenesis. Phase 2 data shows significant weight loss with potential benefit for NASH/metabolic liver disease.",dose:"0.6–6 mg weekly (titrate)",cycle:"12–20 weeks",frequency:"Once weekly SQ",timing:"Same day each week",notes:"Particularly promising for individuals with liver health concerns alongside weight management goals. Strong NASH (non-alcoholic steatohepatitis) data emerging. Next-generation after Tirzepatide."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Mazdutide",sub:"GLP-1/Glucagon Dual Agonist",avail:"research",availLabel:"Research Only",goal:"Weight loss, metabolic enhancement",mechanism:"Dual GLP-1 and glucagon receptor co-agonist developed in China with strong Phase 2 weight loss data. Glucagon component increases energy expenditure and liver fat oxidation on top of GLP-1-mediated appetite suppression.",dose:"3–9 mg weekly",cycle:"12–24 weeks",frequency:"Once weekly SQ",timing:"Same day each week",notes:"Emerging compound with impressive Phase 2 trial results. Represents next generation of dual-mechanism metabolic peptides. Less widely studied than Tirzepatide in Western research but gaining attention rapidly."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Liraglutide",sub:"First-Generation GLP-1 Agonist",avail:"rx",availLabel:"Prescription Available",goal:"Weight management, blood sugar regulation",mechanism:"First-generation GLP-1 receptor agonist (Victoza/Saxenda). Daily dosing due to shorter half-life than semaglutide. Suppresses appetite, improves glycemic control, and has cardiovascular risk reduction data.",dose:"0.6 mg daily → titrate to 3 mg",cycle:"Ongoing",frequency:"Daily SQ",timing:"Any time daily",notes:"The original daily GLP-1. Generally replaced by once-weekly options (semaglutide, tirzepatide) for convenience but some clients prefer daily dosing for more consistent effect. FDA-approved for both diabetes and weight loss."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Dulaglutide",sub:"Once-Weekly GLP-1 Agonist",avail:"rx",availLabel:"Prescription Available",goal:"Blood sugar regulation, cardiovascular risk reduction",mechanism:"Once-weekly GLP-1 receptor agonist (Trulicity) with strong cardiovascular outcomes data. Primarily used for T2D management. Auto-injector delivery makes compliance easier.",dose:"0.75–4.5 mg once weekly",cycle:"Ongoing",frequency:"Once weekly SQ",timing:"Same day each week",notes:"Primarily a diabetes medication but used in metabolic health protocols. Less weight loss than semaglutide or tirzepatide. Strong cardiovascular safety data. Convenient auto-injector format."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"AOD-9604",sub:"HGH Fragment 176-191 Modified",avail:"mixed",availLabel:"Mixed Availability",goal:"Targeted fat loss, lipolysis, body composition",mechanism:"Modified fragment of HGH containing the fat-burning region without growth-promoting effects. Directly activates fat cell lipolysis through beta-3 adrenergic receptor stimulation. No effect on blood glucose or IGF-1.",dose:"300 mcg/day fasted AM SQ",cycle:"12–16 weeks",frequency:"Daily",timing:"Fasted morning",notes:"Available as 5AD at Bio Linked. Excellent add-on to GLP-1 protocols for enhanced targeted fat burning. No blood sugar effects unlike full HGH. Specifically targets visceral and subcutaneous fat."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"5-Amino-1MQ",sub:"NNMT Enzyme Inhibitor",avail:"research",availLabel:"Research Only",goal:"Metabolic enhancement, fat storage reduction, NAD+ optimization",mechanism:"Inhibits NNMT (nicotinamide N-methyltransferase), an enzyme that converts NAD+ to a methylated form, reducing fat cell formation and boosting cellular energy metabolism. Reduces fat storage at the cellular level while preserving NAD+ availability.",dose:"50–100 mg/day oral",cycle:"8–12 weeks",frequency:"Daily oral",timing:"Morning",notes:"Available as 5AM at Bio Linked. Works synergistically with NAD+ protocols and GLP-1 therapy. Oral delivery makes it convenient. Excellent for clients who want metabolic optimization without injectable peptides."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"AICAR",sub:"AMPK Activator / Exercise Mimetic",avail:"research",availLabel:"Research Only",goal:"Fat oxidation, metabolic adaptation, exercise-mimetic effects",mechanism:"AMP-kinase (AMPK) activator that mimics low-energy cellular states, promoting fat oxidation, mitochondrial biogenesis, and glucose uptake without exercise. Researched as an exercise mimetic for metabolic adaptation.",dose:"10–50 mg/day SQ",cycle:"4–8 weeks",frequency:"Daily",timing:"Pre-exercise or morning",notes:"One of the original exercise mimetics. Pairs well with MOTS-c and SLU-PP-332 for comprehensive metabolic activation. More established research than SLU-PP-332. Increases endurance capacity in research models."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Tesofensine",sub:"Triple Monoamine Reuptake Inhibitor",avail:"research",availLabel:"Research Only",goal:"Significant weight loss, appetite suppression",mechanism:"Triple reuptake inhibitor blocking norepinephrine, dopamine, and serotonin reuptake — originally developed for neurological conditions. Significantly suppresses appetite through central nervous system pathways. Phase 2 data showed up to 10% weight loss in 24 weeks.",dose:"0.25–0.5 mg/day oral",cycle:"12–24 weeks",frequency:"Daily oral",timing:"Morning",notes:"Powerful appetite suppressant through CNS mechanism rather than GI/hormonal pathway. Different mechanism from GLP-1 agonists — can be complementary or standalone. Watch for cardiovascular effects (heart rate increase) at higher doses."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Adipotide",sub:"Proapoptotic Peptide / Fat Cell Targeting",avail:"research",availLabel:"Research Only",goal:"Targeted fat cell elimination, visceral fat reduction",mechanism:"Proapoptotic peptide that selectively targets and induces programmed cell death (apoptosis) in fat cell vasculature, reducing blood supply to adipose tissue. Unique mechanism: eliminates fat cells rather than just shrinking them.",dose:"Low doses under research protocol",cycle:"4–8 weeks",frequency:"Per research protocol",timing:"Per research protocol",notes:"Highly experimental. Shows dramatic visceral fat reduction in primate studies. Kidney function monitoring recommended. Represents a fundamentally different approach to fat loss — ablation vs. suppression. Not widely available."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Orforglipron",sub:"Oral Non-Peptide GLP-1 Agonist",avail:"research",availLabel:"Research Only",goal:"Weight loss via oral GLP-1 activation (no injections)",mechanism:"Small molecule non-peptide GLP-1 receptor agonist that can be taken orally — no injection required. Activates same pathway as semaglutide/tirzepatide but in pill form. Phase 3 trials ongoing (Eli Lilly).",dose:"12–45 mg/day oral",cycle:"Ongoing",frequency:"Daily oral",timing:"With or without food",notes:"The future of GLP-1 therapy — if trials succeed, this eliminates the injection barrier entirely. Currently in Phase 3. Watch for FDA approval timeline. Game-changer for patient compliance."},
+  {cat:"GLP-1 / Metabolic",emoji:"⚖",name:"Eloralintide",sub:"Investigational Amylin Receptor Agonist",avail:"research",availLabel:"Research Only",goal:"Weight management via amylin pathway",mechanism:"Novel amylin receptor agonist (LY3841136) in development by Eli Lilly. Acts through amylin satiety pathway complementary to GLP-1. Being studied in combination with GLP-1 agonists for additive weight loss.",dose:"Under clinical investigation",cycle:"Under clinical investigation",frequency:"Under clinical investigation",timing:"Under clinical investigation",notes:"Very early stage. Phase 1/2 data promising. Designed to stack with GLP-1 agonists for enhanced weight loss. The amylin+GLP-1 combination (like cagrilintide+sema) is becoming a major research focus."},
+  {cat:"Growth Hormone",emoji:"📈",name:"CJC-1295",sub:"GHRH Analog (No DAC)",avail:"compound",availLabel:"Compoundable",goal:"Optimize natural GH output, lean mass, recovery, sleep",mechanism:"GHRH (growth hormone-releasing hormone) analog that extends the duration of natural GH pulses from the pituitary. No DAC version has shorter half-life creating more physiologic pulsatile release. Synergizes powerfully with GHRPs like Ipamorelin.",dose:"200–300 mcg per injection",cycle:"12–16 weeks on / 4–8 weeks off",frequency:"1–3× daily",timing:"Pre-bed primary; AM fasted secondary",notes:"Available as CND5/10 and as premix CP10 (with Ipamorelin) at Bio Linked. Most widely used GH peptide globally. No cortisol or prolactin spike. Stack with Ipamorelin for dual-pathway GH amplification."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Ipamorelin",sub:"Selective GHRP",avail:"compound",availLabel:"Compoundable",goal:"Clean GH pulse amplification, anti-aging, recovery",mechanism:"Selective GHRP (growth hormone-releasing peptide) that amplifies the amplitude of GH pulses without significantly affecting cortisol, prolactin, or appetite. Most selective and cleanest GHRP available — ideal first GH secretagogue.",dose:"200–300 mcg per injection",cycle:"12–16 weeks on / 4–8 off",frequency:"1–3× daily",timing:"Pre-bed; AM fasted; pre-workout",notes:"Available as IP10 and as premix CP10 (with CJC-1295) at Bio Linked. The gold standard pairing: CJC-1295 extends pulse duration, Ipamorelin amplifies pulse amplitude. No hunger or cortisol side effects."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Sermorelin",sub:"Original GHRH Analog",avail:"compound",availLabel:"Compoundable",goal:"Gentle GH stimulation, anti-aging, sleep improvement",mechanism:"The original FDA-approved GHRH analog — shorter half-life than CJC-1295 creates more physiologically natural GH release. Gentler stimulation preferred for older adults or those new to GH peptides.",dose:"200–300 mcg nightly",cycle:"12–24 weeks",frequency:"Nightly",timing:"30–60 min before sleep",notes:"Available as SMO10 at Bio Linked. Best entry-level GH peptide for clients over 50. Most well-studied GHRH analog with decades of safety data. Pairs well with Ipamorelin."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Tesamorelin",sub:"GHRH Analog — Visceral Fat Specific",avail:"rx",availLabel:"Prescription Available",goal:"Visceral fat reduction, GH optimization",mechanism:"FDA-studied GHRH analog with the strongest clinical data for visceral fat reduction (15–20% reduction in trials). Specifically researched for HIV-associated lipodystrophy but widely applied for general visceral fat and body recomposition.",dose:"1–2 mg/day",cycle:"12–26 weeks",frequency:"Daily",timing:"Pre-bed",notes:"Available as TSM10 at Bio Linked. Best GH peptide specifically for belly/visceral fat. Stack with Ipamorelin for enhanced effect. Has the most robust clinical trial data of any GHRH analog."},
+  {cat:"Growth Hormone",emoji:"📈",name:"GHRP-2",sub:"Growth Hormone Releasing Peptide-2",avail:"research",availLabel:"Research Only",goal:"Potent GH release, muscle, recovery",mechanism:"One of the most potent synthetic GHRPs — stimulates strong GH release from pituitary via ghrelin receptor. More potent than Ipamorelin but also stimulates cortisol and prolactin at higher doses. Also increases appetite.",dose:"100–300 mcg per injection",cycle:"8–12 weeks",frequency:"2–3× daily",timing:"Pre-bed, AM fasted, pre-workout",notes:"More powerful but less 'clean' than Ipamorelin. Cortisol increase is dose-dependent — keep doses moderate. Best for clients wanting maximum GH output who can tolerate appetite stimulation. Stack with CJC-1295."},
+  {cat:"Growth Hormone",emoji:"📈",name:"GHRP-6",sub:"Growth Hormone Releasing Peptide-6",avail:"research",availLabel:"Research Only",goal:"GH release, appetite stimulation, muscle building",mechanism:"Potent GHRP that stimulates strong GH release while also significantly increasing appetite through ghrelin receptor activation. Can increase food intake by 30–40% in research models — useful for clients who need to eat more.",dose:"100–300 mcg per injection",cycle:"8–12 weeks",frequency:"2–3× daily",timing:"Pre-workout, AM, pre-bed",notes:"Primarily useful when appetite stimulation is desired (underweight, muscle-building, post-illness). Not ideal for weight loss clients due to hunger effect. Very affordable. Stack with CJC-1295."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Hexarelin",sub:"Most Potent GHRP",avail:"research",availLabel:"Research Only",goal:"Maximum GH output, muscle, cardioprotection",mechanism:"Considered the most potent GHRP available — produces the strongest GH secretion of any GHRP. Unlike other GHRPs, maintains potency even after repeated administration. Also shows unique cardioprotective properties through GHS-R1b receptors.",dose:"100–200 mcg per injection",cycle:"8–12 weeks (desensitization possible with longer cycles)",frequency:"2× daily",timing:"Pre-bed and AM fasted",notes:"Reserve for maximum GH output protocols. Cardioprotective data makes it interesting for cardiovascular health applications. Cortisol/prolactin elevation similar to GHRP-2. Stack with GHRH analog."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Somatropin (HGH)",sub:"Recombinant Human Growth Hormone",avail:"rx",availLabel:"Prescription Available",goal:"Direct GH supplementation, muscle growth, fat metabolism",mechanism:"Recombinant human GH identical to endogenous GH. Provides direct, reliable GH elevation without relying on pituitary response. Promotes protein synthesis, fat lipolysis, IGF-1 production, and tissue repair throughout the body.",dose:"1–4 IU daily",cycle:"3–6 months minimum",frequency:"Daily SQ",timing:"AM or pre-bed",notes:"Available as H10/H15 at Bio Linked. Most powerful GH option but also most expensive. Stack with IGF-1 LR3 for synergistic muscle-building effect. Requires monitoring for glucose and IGF-1 levels."},
+  {cat:"Growth Hormone",emoji:"📈",name:"IGF-1 LR3",sub:"Extended Half-Life IGF-1",avail:"research",availLabel:"Research Only",goal:"Muscle growth, cellular proliferation, recovery",mechanism:"Modified IGF-1 with reduced binding protein affinity — ~20-hour half-life vs 20 minutes for native IGF-1. Primary downstream mediator of GH: promotes muscle hypertrophy, fat oxidation, cellular repair, and protein synthesis throughout body.",dose:"40–80 mcg post-workout",cycle:"4–6 weeks cycles (receptor downregulation with longer use)",frequency:"Daily on training days",timing:"Within 30 min post-workout",notes:"Available as IG1 at Bio Linked. Pairs powerfully with HGH. Only one injection needed daily due to long half-life. Monitor blood glucose — can cause hypoglycemia. Use DES variant for more localized muscle effects."},
+  {cat:"Growth Hormone",emoji:"📈",name:"IGF-1 DES",sub:"Truncated IGF-1 — High Potency",avail:"research",availLabel:"Research Only",goal:"Enhanced local muscle growth, hyperplasia",mechanism:"Truncated IGF-1 lacking first 3 amino acids, making it 5–10× more potent than standard IGF-1 due to minimal binding protein affinity. Effects are more localized — injected near target muscle for site-specific hypertrophy research.",dose:"20–50 mcg per injection near target muscle",cycle:"4–6 weeks",frequency:"Daily on training days",timing:"Post-workout near target muscle",notes:"Used for localized muscle growth research. More potent than LR3 but shorter half-life (30 min) so effects are site-specific. Best for bodybuilding research protocols targeting specific lagging muscle groups."},
+  {cat:"Growth Hormone",emoji:"📈",name:"MK-677",sub:"Ibutamoren — Oral GH Secretagogue",avail:"research",availLabel:"Research Only",goal:"GH/IGF-1 elevation, sleep quality, convenience",mechanism:"Oral ghrelin mimetic activating GHS-R1a receptor — stimulates GH and IGF-1 release without injection. Raises IGF-1 by 60–70%. The only oral GH secretagogue available. Also improves deep sleep (REM and slow-wave).",dose:"10–25 mg nightly oral",cycle:"12–24 weeks, can run extended cycles",frequency:"Daily oral",timing:"Evening with food (reduces hunger side effect)",notes:"Best for clients who won't inject. Significantly increases appetite — take with dinner to buffer. Excellent for sleep improvement, recovery, and anti-aging in older clients. Water retention common at higher doses."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Follistatin 344",sub:"Myostatin Inhibitor — Circulating Form",avail:"research",availLabel:"Research Only",goal:"Maximum muscle growth, myostatin suppression",mechanism:"Naturally occurring glycoprotein that binds and inhibits myostatin (the protein that limits muscle growth) and activin. Follistatin 344 is the circulating form with systemic effects throughout the body.",dose:"50–100 mcg/day SQ",cycle:"10–30 days maximum (receptor effects)",frequency:"Daily",timing:"Any time SQ",notes:"Very potent muscle growth research compound. Short cycles recommended. Widely discussed in bodybuilding research. Combines well with IGF-1 protocols. Not widely available — confirm stock."},
+  {cat:"Growth Hormone",emoji:"📈",name:"Follistatin 315",sub:"Myostatin Inhibitor — Localized Form",avail:"research",availLabel:"Research Only",goal:"Localized muscle support, lean mass preservation",mechanism:"Tissue-bound isoform of follistatin with more localized myostatin-blocking activity compared to the systemic Follistatin 344. Targets muscle tissue more specifically with less systemic distribution.",dose:"50–100 mcg/day SQ near target",cycle:"10–30 days",frequency:"Daily",timing:"Near target muscle",notes:"Preferred over Follistatin 344 when localized effect is desired. Less systemic activity means potentially fewer off-target effects. Emerging research compound — confirm stock."},
+  {cat:"Growth Hormone",emoji:"📈",name:"MGF",sub:"Mechano Growth Factor",avail:"research",availLabel:"Research Only",goal:"Local muscle repair, satellite cell activation",mechanism:"Splice variant of IGF-1 produced in response to muscle stretching and damage. Activates muscle satellite (stem) cells for repair and growth. Short half-life (minutes) means effects are highly localized to injection site.",dose:"200–400 mcg post-workout near target",cycle:"4–8 weeks",frequency:"Post-workout 2–3×/week",timing:"Immediately post-workout near target muscle",notes:"Pairs well with PEG-MGF (extended half-life version) or IGF-1 LR3. Rapidly clears so must inject immediately post-workout. Research use for muscle recovery and hypertrophy."},
+  {cat:"Growth Hormone",emoji:"📈",name:"PEG-MGF",sub:"Pegylated Mechano Growth Factor",avail:"research",availLabel:"Research Only",goal:"Systemic muscle repair, extended satellite cell activation",mechanism:"Pegylated version of MGF — polyethylene glycol (PEG) attachment extends half-life from minutes to days. Allows once or twice weekly dosing while maintaining systemic satellite cell activation for muscle repair.",dose:"200–400 mcg 2×/week",cycle:"4–8 weeks",frequency:"2× per week",timing:"Any time — not required post-workout like native MGF",notes:"More practical than native MGF due to extended half-life. Better for systemic muscle support vs localized repair. Can be dosed anywhere due to improved stability."},
+  {cat:"Cognitive",emoji:"🧠",name:"Semax",sub:"ACTH Fragment Analog",avail:"research",availLabel:"Research Only",goal:"Cognitive enhancement, BDNF upregulation, neuroprotection",mechanism:"Synthetic peptide based on ACTH fragment. Dramatically increases BDNF, VEGF, and NGF — key neurotrophic factors for neuroplasticity and memory. Enhances dopaminergic and serotonergic transmission. Developed in Russia for stroke recovery and cognitive enhancement.",dose:"300–600 mcg/day SQ or intranasal",cycle:"10–14 day cycles with equal breaks",frequency:"Daily",timing:"Morning",notes:"Available as XA10 at Bio Linked. Pairs perfectly with Selank (Semax sharpens, Selank steadies). Intranasal delivery is popular. Strong research base from Russian clinical use. Key compound in cognitive recovery protocols."},
+  {cat:"Cognitive",emoji:"🧠",name:"Selank",sub:"Anxiolytic Peptide / Tuftsin Analog",avail:"research",availLabel:"Research Only",goal:"Anxiety reduction, stress resilience, GABA modulation",mechanism:"Synthetic analog of tuftsin modulating GABAergic system, serotonin, and dopamine. Produces anxiety relief without sedation or dependency. Increases enkephalin levels. No withdrawal effects unlike benzodiazepines.",dose:"250–500 mcg/day SQ or intranasal",cycle:"10–14 days on / 7–10 days off",frequency:"Daily",timing:"Morning or pre-stress",notes:"Available as SK10 at Bio Linked. Non-habit forming — no dependency risk. Often described as 'calm clarity'. Intranasal popular. Perfect pair with Semax for cognitive + anxiety protocols."},
+  {cat:"Cognitive",emoji:"🧠",name:"Dihexa",sub:"Angiotensin IV Derivative — Potent Nootropic",avail:"research",availLabel:"Research Only",goal:"Synaptogenesis, memory enhancement, executive function",mechanism:"Derived from angiotensin IV — potentiates HGF/c-Met signaling pathway to promote synapse formation (synaptogenesis). Reportedly 7 orders of magnitude more potent than BDNF in crossing the blood-brain barrier. Promotes long-term cognitive improvement.",dose:"10–15 mg once weekly (extremely potent — very long half-life)",cycle:"4–8 weeks",frequency:"Once weekly",timing:"Morning",notes:"Most potent nootropic peptide known. Start at 10 mg and do not exceed 15 mg weekly. Effects accumulate — results continue building weeks after dosing. Confirm stock. Stack with Semax/Selank for comprehensive cognitive protocol."},
+  {cat:"Cognitive",emoji:"🧠",name:"P21",sub:"BDNF Mimetic Nootropic",avail:"research",availLabel:"Research Only",goal:"Cognitive enhancement, neurogenesis, memory",mechanism:"Synthetic peptide designed to mimic BDNF (Brain-Derived Neurotrophic Factor) effects. Activates TrkB receptors promoting neurogenesis, synaptic plasticity, and memory formation without systemic BDNF side effects.",dose:"500 mcg–1 mg/day SQ",cycle:"4–6 weeks",frequency:"Daily",timing:"Morning",notes:"Safer than direct BDNF administration. Research shows improved spatial memory and learning in preclinical models. Good stack companion with Semax for comprehensive BDNF-pathway cognitive enhancement."},
+  {cat:"Cognitive",emoji:"🧠",name:"PE-22-28",sub:"Spadin Analog — Antidepressant Nootropic",avail:"research",availLabel:"Research Only",goal:"Antidepressant effects, mood support, cognitive enhancement",mechanism:"Synthetic peptide analog of Spadin (a natural antidepressant peptide). Blocks TREK-1 potassium channels — same target as many antidepressants. Shows rapid antidepressant-like effects with potential cognitive enhancement properties.",dose:"500 mcg–1 mg/day SQ",cycle:"4–8 weeks",frequency:"Daily",timing:"Morning",notes:"Interesting alternative for clients seeking antidepressant support through peptide mechanisms rather than pharmaceutical SSRIs. Emerging compound — limited human data but promising preclinical results."},
+  {cat:"Cognitive",emoji:"🧠",name:"Cerebrolysin",sub:"Neuropeptide Mixture — Brain Recovery",avail:"mixed",availLabel:"Mixed Availability",goal:"Cognitive recovery, neuroprotection, brain repair",mechanism:"Mixture of neuropeptides and amino acids derived from pig brain tissue. Provides neurotrophic support similar to BDNF and NGF. Widely used in Eastern Europe/Asia for stroke recovery, TBI, and age-related cognitive decline. Extensive clinical trial data.",dose:"10–30 mL IM or IV (clinic protocol)",cycle:"10–20 day intensive courses",frequency:"Daily during course",timing:"Morning IM or IV",notes:"Has the most robust clinical data of any nootropic peptide — used in hospitals in Europe and Asia. Particularly strong for post-stroke and TBI recovery. Requires injection or IV. Confirm availability."},
+  {cat:"Cognitive",emoji:"🧠",name:"DSIP",sub:"Delta Sleep-Inducing Peptide",avail:"research",availLabel:"Research Only",goal:"Sleep quality improvement, stress recovery, relaxation",mechanism:"Neuropeptide that promotes delta (slow-wave) sleep stages and modulates stress response via CRH pathways. Reduces cortisol during stress and promotes deeper, more restorative sleep architecture.",dose:"200–500 mcg SQ at bedtime",cycle:"2–4 weeks",frequency:"Nightly or as needed",timing:"30–60 min before bed",notes:"Interesting option for sleep-focused protocols. Pairs well with CJC-1295/Ipamorelin for comprehensive sleep optimization. Non-habit forming unlike pharmaceutical sleep aids."},
+  {cat:"Longevity",emoji:"⏳",name:"Epithalon",sub:"Pineal Gland Tetrapeptide",avail:"research",availLabel:"Research Only",goal:"Telomere support, cellular anti-aging, circadian regulation",mechanism:"Synthetic tetrapeptide from pineal gland research by Khavinson. Activates telomerase enzyme — promotes telomere elongation in somatic cells. Regulates pineal melatonin production and circadian rhythms. Human studies show increased lifespan and improved immune function.",dose:"10 mg/day for 10 consecutive days",cycle:"2–4× per year (quarterly protocol)",frequency:"Daily during 10-day course",timing:"Pre-bed (pineal alignment)",notes:"Available at Bio Linked — confirm stock. Most evidence-backed anti-aging peptide. The quarterly 10-day protocol is standard. Stack with GHK-Cu and NAD+ for comprehensive longevity protocol. Human longevity data from Russian 40-year studies."},
+  {cat:"Longevity",emoji:"⏳",name:"FOXO4-DRI",sub:"Senolytic Peptide",avail:"research",availLabel:"Research Only",goal:"Senescent cell clearance, cellular renewal, anti-aging",mechanism:"Designed to interrupt FOXO4-p53 interaction in senescent cells, triggering apoptosis selectively in 'zombie cells' that accumulate with age and promote inflammation and tissue dysfunction. Does not harm healthy cells.",dose:"1–5 mg/kg 3× per week",cycle:"1–3 week courses",frequency:"3× per week during course",timing:"Any time SQ",notes:"Experimental senolytic — eliminates senescent cells that contribute to aging. Emerging research area. Shows restoration of fitness, fur density, and kidney function in aged mouse models. Confirm availability."},
+  {cat:"Longevity",emoji:"⏳",name:"Humanin",sub:"Mitochondria-Derived Peptide",avail:"research",availLabel:"Research Only",goal:"Neuroprotection, mitochondrial support, anti-aging",mechanism:"Mitochondria-derived peptide (MDP) discovered in 2001. Protects neurons from amyloid-beta toxicity and other apoptotic stimuli. Supports mitochondrial function and has anti-inflammatory, cytoprotective effects throughout the body.",dose:"2–4 mg 2–3×/week SQ",cycle:"8–12 weeks",frequency:"2–3× per week",timing:"Any time SQ",notes:"Interesting for neurodegenerative disease research and longevity. Declines with age in humans — making supplementation theoretically beneficial. Synergistic with MOTS-c (both are mitochondria-derived)."},
+  {cat:"Longevity",emoji:"⏳",name:"MOTS-c",sub:"Mitochondrial Peptide — Exercise Mimetic",avail:"research",availLabel:"Research Only",goal:"Mitochondrial restoration, metabolic reset, exercise mimetic",mechanism:"Mitochondria-derived peptide that activates AMPK pathway, improving insulin sensitivity, mitochondrial biogenesis, and metabolic flexibility. Mimics exercise effects at cellular level. Reduces neuroinflammation and supports longevity pathways.",dose:"5–10 mg 2–3×/week SQ",cycle:"8–12 weeks",frequency:"2–3× per week",timing:"Morning, pre-exercise if applicable",notes:"Available as MS10/MS40 at Bio Linked. Foundation of mitochondrial and metabolic protocols. Pairs with NAD+ and SS-31 for complete cellular energy optimization."},
+  {cat:"Longevity",emoji:"⏳",name:"SS-31",sub:"Elamipretide — Mitochondrial Membrane Repair",avail:"research",availLabel:"Research Only",goal:"Mitochondrial membrane repair, oxidative stress reduction",mechanism:"Concentrates in inner mitochondrial membrane binding to cardiolipin — reduces reactive oxygen species (ROS), restores electron transport chain function, and improves ATP production. Cardioprotective, neuroprotective, and muscle-preserving effects in research.",dose:"1–5 mg/day SQ",cycle:"4–8 weeks",frequency:"Daily or 5 days on / 2 off",timing:"Morning",notes:"Available as 2S10 at Bio Linked. Most targeted mitochondrial repair peptide available. Pairs with MOTS-c for dual mitochondrial stack. Phase 2 clinical trials for heart failure ongoing."},
+  {cat:"Longevity",emoji:"⏳",name:"NAD+",sub:"Nicotinamide Adenine Dinucleotide",avail:"research",availLabel:"Research Only",goal:"Cellular energy, DNA repair, recovery, longevity",mechanism:"Essential coenzyme for every energy-producing reaction in the body. Powers sirtuin (SIRT1/3) longevity pathways, supports mitochondrial function, and activates DNA repair mechanisms. Declines 50%+ with age. Injectable NAD+ provides superior bioavailability vs oral precursors.",dose:"100–500 mg IM 2×/week or loading series",cycle:"Monthly 5–10 day loading series or ongoing 2×/week",frequency:"2× per week or loading series",timing:"Any time IM — inject slowly over 30–60 sec",notes:"Available as NJ500 at Bio Linked. Backbone of longevity protocols. Reduces cravings, improves mood stability, supports dopamine receptor repair. Mild flushing normal — slow injection resolves it."},
+  {cat:"Longevity",emoji:"⏳",name:"Glutathione",sub:"Master Antioxidant Tripeptide",avail:"research",availLabel:"Research Only",goal:"Detoxification, antioxidant protection, skin brightening",mechanism:"The body's primary antioxidant — tripeptide (Glu-Cys-Gly) neutralizing free radicals, supporting liver detoxification pathways, and protecting cells from oxidative damage. Injectable GSH bypasses oral degradation for superior systemic delivery.",dose:"300–600 mg IM 2–3×/week",cycle:"Monthly series",frequency:"2–3× per week IM",timing:"Any time IM",notes:"Available as GTT600/GTT1500 at Bio Linked. Skin brightening effect at higher doses. Pairs with NAD+ for comprehensive cellular health protocol. Pairs with Vitamin C IM for enhanced antioxidant effect."},
+  {cat:"Longevity",emoji:"⏳",name:"PNC-27",sub:"Experimental Anti-Cancer Research Peptide",avail:"research",availLabel:"Research Only",goal:"Selective abnormal cell targeting research",mechanism:"Experimental peptide designed with an HDM-2 binding domain and a transmembrane-penetrating domain. Researched for selective effects on abnormal cells while potentially sparing healthy cells. Mechanism involves membrane disruption in target cells.",dose:"Under research protocol",cycle:"Under research protocol",frequency:"Under research protocol",timing:"Under research protocol",notes:"Highly experimental with limited human data. Pre-clinical research only. Confirm stock and research context before considering. Not for general wellness protocols — specialized research application."},
+  {cat:"Immune",emoji:"🛡",name:"Thymosin Alpha-1",sub:"Thymic Immune Modulator",avail:"mixed",availLabel:"Mixed Availability",goal:"Immune modulation, T-cell support, chronic infection recovery",mechanism:"Thymic peptide that enhances T-cell maturation, NK cell activity, and innate immune signaling. Used clinically (Zadaxin) for hepatitis B, hepatitis C, and cancer support. Modulates both innate and adaptive immunity without overstimulation.",dose:"1.5 mg 2×/week SQ",cycle:"4–8 weeks",frequency:"2× per week",timing:"Any time SQ",notes:"Strongest immune-modulating peptide available. Used in hospitals globally for chronic viral infections. Pairs well with BPC-157 for gut-immune axis support. Excellent for post-illness recovery, long COVID, and mold/Lyme protocols."},
+  {cat:"Immune",emoji:"🛡",name:"Thymalin",sub:"Thymus Tissue Peptide Extract",avail:"research",availLabel:"Research Only",goal:"Thymus regeneration, immune anti-aging, longevity",mechanism:"Peptide extract from thymus tissue that supports thymic regeneration and function. The thymus shrinks with age (thymic involution) reducing T-cell production. Thymalin research shows potential to restore thymic activity and immune competence in aging.",dose:"10 mg/day for 10 days — quarterly protocol",cycle:"Quarterly 10-day courses",frequency:"Daily during course",timing:"Any time SQ",notes:"Part of the Khavinson bioregulator family. Used in Russian longevity protocols alongside Epithalon. The thymus-pineal connection makes Thymalin + Epithalon a classic Russian anti-aging combination."},
+  {cat:"Immune",emoji:"🛡",name:"Thymagen",sub:"Dipeptide Thymus Bioregulator",avail:"research",availLabel:"Research Only",goal:"Thymus support, T-cell function, immune aging",mechanism:"Khavinson bioregulator dipeptide (Glu-Trp) specifically targeting thymic function and age-related immune decline (immunosenescence). Promotes T-cell differentiation and restores thymic peptide production in aging models.",dose:"100–200 mcg/day SQ",cycle:"10-day courses, 2–3× per year",frequency:"Daily during course",timing:"Any time SQ",notes:"Synthesized Cytogen version of thymus bioregulator. More specific than Thymalin. Part of comprehensive immune anti-aging stacks. Pairs with Epithalon for Russian longevity protocol."},
+  {cat:"Immune",emoji:"🛡",name:"Gonadorelin",sub:"Synthetic GnRH",avail:"rx",availLabel:"Prescription Available",goal:"LH/FSH stimulation, testosterone support, TRT adjunct",mechanism:"Synthetic form of gonadotropin-releasing hormone (GnRH) that stimulates pituitary release of LH and FSH. Maintains the HPG axis function — prevents pituitary desensitization from TRT. Supports natural testosterone production and testicular function.",dose:"100–200 mcg 2–3×/week SQ",cycle:"Ongoing with TRT",frequency:"2–3× per week",timing:"Morning SQ",notes:"Increasingly preferred over HCG for maintaining testicular function during TRT as HCG shortages increase. Supports natural testosterone production pathway. Prevents testicular atrophy during exogenous testosterone use."},
+  {cat:"Immune",emoji:"🛡",name:"VIP",sub:"Vasoactive Intestinal Peptide",avail:"research",availLabel:"Research Only",goal:"Gut function, neuroprotection, immune modulation",mechanism:"Naturally occurring neuropeptide with wide-ranging effects — relaxes smooth muscle in gut (IBS benefit), promotes anti-inflammatory immune response, supports lung function, and has neuroprotective properties.",dose:"25–50 mcg/day intranasal or SQ",cycle:"4–8 weeks",frequency:"Daily",timing:"Any time",notes:"Emerging use in MCAS, CIRS (mold illness), and long COVID protocols. Shows particular promise for post-COVID autonomic dysfunction. Also researched for pulmonary hypertension and inflammatory bowel conditions."},
+  {cat:"Energy / NAD+",emoji:"⚡",name:"MOTS-c",sub:"Mitochondrial Peptide",avail:"research",availLabel:"Research Only",goal:"Energy optimization, mitochondrial biogenesis",mechanism:"See Longevity section. Listed here as it is Bio Linked's primary energy compound.",dose:"5–10 mg 2–3×/week",cycle:"8–12 weeks",frequency:"2–3× per week",timing:"Morning",notes:"See full profile in Longevity category. Core energy compound at Bio Linked."},
+  {cat:"Energy / NAD+",emoji:"⚡",name:"SLU-PP-332",sub:"ERRα Agonist — Exercise Mimetic",avail:"research",availLabel:"Research Only",goal:"Exercise-mimetic effects, endurance, metabolic activation",mechanism:"Activates estrogen-related receptor alpha (ERRα) — upregulates mitochondrial gene expression mimicking exercise adaptations. Preclinical data shows increased running endurance by 70%+ in sedentary mice without training.",dose:"5–10 mg/day SQ or oral",cycle:"8–12 weeks",frequency:"Daily",timing:"Morning",notes:"Available as 33210 at Bio Linked. Cutting-edge exercise mimetic. Pairs with MOTS-c and AICAR for triple metabolic activation. Very new — mostly preclinical data but highly promising."},
+  {cat:"Sexual Health",emoji:"💛",name:"PT-141",sub:"Bremelanotide — Central Desire Peptide",avail:"rx",availLabel:"Prescription Available",goal:"Sexual arousal, libido enhancement",mechanism:"Melanocortin receptor agonist activating MC3R and MC4R in the brain — stimulates desire through CNS rather than vascular mechanism. Works for both men and women. FDA-approved (Vyleesi) for premenopausal women with HSDD.",dose:"0.5–2 mg SQ 30–60 min before activity",cycle:"As needed — max 8× per month",frequency:"As needed",timing:"30–60 min before activity",notes:"Available as P41 at Bio Linked. Unlike Viagra/Cialis which work on blood flow mechanics, PT-141 works on desire. Nausea most common side effect — start at 0.5 mg. Effective for both men and women."},
+  {cat:"Sexual Health",emoji:"💛",name:"Kisspeptin-10",sub:"Reproductive Hormone Axis Activator",avail:"mixed",availLabel:"Mixed Availability",goal:"Libido, hormone axis stimulation, reproductive function",mechanism:"Neuropeptide that activates GPR54 receptor — the master regulator of reproductive hormone cascade. Stimulates GnRH release, triggering LH and FSH, which then drive testosterone/estrogen production. Addresses libido at the hormonal root.",dose:"100–250 mcg SQ or IV",cycle:"As needed or protocol-based",frequency:"As needed",timing:"Evening SQ",notes:"Particularly interesting for low libido linked to low LH/testosterone. Different mechanism from PT-141 — hormonal vs. CNS. Emerging use in fertility protocols and hypogonadism research."},
+  {cat:"Sexual Health",emoji:"💛",name:"Enclomiphene",sub:"Selective Estrogen Receptor Modulator",avail:"research",availLabel:"Research Only",goal:"Testosterone restoration, fertility support",mechanism:"SERM (selective estrogen receptor modulator) that blocks estrogen feedback to hypothalamus, increasing LH and FSH release, which drives natural testosterone production. Restores testosterone without suppressing sperm production.",dose:"12.5–25 mg/day oral",cycle:"3–6 months",frequency:"Daily oral",timing:"Morning",notes:"Alternative to TRT for men wanting testosterone restoration while maintaining fertility. Increases endogenous T production rather than replacing it. Growing use in men's health clinics."},
+  {cat:"Sexual Health",emoji:"💛",name:"Oxytocin",sub:"Bonding Hormone",avail:"rx",availLabel:"Prescription Available",goal:"Social bonding, stress reduction, reproductive function",mechanism:"Naturally occurring neuropeptide involved in social bonding, trust, empathy, and reproductive behavior. Reduces cortisol and anxiety during social situations. Used in sexual health protocols for emotional intimacy enhancement and postpartum support.",dose:"10–40 IU intranasal or SQ",cycle:"As needed",frequency:"As needed",timing:"Pre-social/intimate activity",notes:"Available via prescription. Growing use in relationship therapy and sexual health. Pairs with PT-141 for comprehensive intimacy protocol. Anti-anxiety effects can help performance anxiety."},
+  {cat:"Sexual Health",emoji:"💛",name:"Triptorelin",sub:"GnRH Agonist",avail:"rx",availLabel:"Prescription Available",goal:"Hormonal reset, GnRH axis stimulation",mechanism:"Synthetic GnRH agonist — when used in a single injection, stimulates a strong testosterone surge ('hormonal reset'). In clinical use for prostate cancer when used continuously (paradoxically suppresses T). Single-dose reset protocol emerging in TRT recovery.",dose:"100 mcg single injection for reset protocol",cycle:"Single dose or per clinical protocol",frequency:"Per protocol",timing:"Per protocol",notes:"Primarily known as prostate cancer treatment but gaining attention for 'hormonal reset' in TRT recovery protocols. Single low dose can stimulate significant LH surge. Consult healthcare provider — prescription only."},
+  {cat:"Sexual Health",emoji:"💛",name:"HCG",sub:"Human Chorionic Gonadotropin",avail:"rx",availLabel:"Prescription Available",goal:"Testosterone support, testicular function during TRT",mechanism:"Mimics LH at Leydig cells in the testes — maintains testosterone production and testicular volume during TRT-induced LH suppression. Prevents testicular atrophy, maintains fertility signals, and supports intratesticular testosterone.",dose:"250–500 IU 2–3×/week SQ",cycle:"Ongoing with TRT",frequency:"2–3× per week",timing:"Morning SQ",notes:"Available as GK5/G10K at Bio Linked. Standard adjunct for TRT protocols. Note: FDA has restricted compounded HCG, making Gonadorelin an alternative worth considering."},
+  {cat:"Sexual Health",emoji:"💛",name:"Dermorphin",sub:"Natural Opioid Peptide",avail:"research",availLabel:"Research Only",goal:"Analgesic research, pain relief studies",mechanism:"Naturally occurring opioid peptide isolated from South American frog skin. Activates mu-opioid receptors with high potency and selectivity — 30–40× more potent than morphine in preclinical models while maintaining selectivity.",dose:"Under research protocol",cycle:"Under research protocol",frequency:"Under research protocol",timing:"Under research protocol",notes:"Research compound — not for human use. Interesting for pain research due to selective opioid receptor activity. Limited practical application outside specific research contexts."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Cartalax",sub:"Cartilage & Bone Cytogen",avail:"research",availLabel:"Research Only",goal:"Cartilage regeneration, joint health, bone metabolism",mechanism:"Khavinson tetrapeptide (Ala-Glu-Asp) targeting chondrocytes and osteoblasts. Normalizes gene expression for collagen type II and proteoglycan production. Reduces MMP-9 degradation enzymes, inhibits caspase-3 apoptosis in cartilage cells, upregulates Ki-67 proliferation markers by 20–30%.",dose:"200 mcg/day SQ for 10 days — courses 2–4×/year",cycle:"10-day courses quarterly",frequency:"Daily during course",timing:"Evening SQ",notes:"Available at Bio Linked. The cartilage and bone bioregulator. Pairs excellently with BPC-157/TB-500 for comprehensive joint recovery. Russian clinical data shows joint comfort improvements 2–4 weeks post-course."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Bronchogen",sub:"Lung & Respiratory Cytogen",avail:"research",availLabel:"Research Only",goal:"Bronchial tissue support, respiratory function, COPD research",mechanism:"Khavinson tetrapeptide functioning as a DNA-stabilizing agent with bronchodilating and anti-inflammatory properties specific to respiratory tissue. Modulates airway epithelial gene expression, reduces inflammation in bronchial tissue.",dose:"200 mcg/day SQ for 10 days — courses 2–3×/year",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Primary lung/respiratory bioregulator. Research applications include COPD, bronchial asthma, and post-infection respiratory recovery. Pairs with Chonluten for comprehensive respiratory protocol."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Cardiogen",sub:"Cardiac Tissue Cytogen",avail:"research",availLabel:"Research Only",goal:"Cardiac tissue support, myocardial health, cardiovascular function",mechanism:"Khavinson tetrapeptide targeting cardiac muscle cells (cardiomyocytes). Supports myocardial gene expression, contractile protein synthesis, and cardiac cell function. Researched for age-related cardiac decline and cardiac tissue maintenance.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–4× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Cardiac bioregulator. Pairs with Vesugen (vascular) for comprehensive cardiovascular support stack."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Chonluten",sub:"Lung & GI Epithelial Cytogen",avail:"research",availLabel:"Research Only",goal:"Respiratory epithelial regeneration, lung tissue, GI mucosal health",mechanism:"Khavinson bioregulator targeting respiratory epithelial cells and GI mucosa. Modulates respiratory gene expression, oxidative response, and cytokine balance.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Dual respiratory/GI bioregulator. Pairs with Bronchogen for lung health stack. Synergistic with KPV for GI inflammatory conditions."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Cortagen",sub:"Cerebral Cortex & CNS Cytogen",avail:"research",availLabel:"Research Only",goal:"Brain cortex support, neuroprotection, cognitive aging",mechanism:"Khavinson tetrapeptide targeting cerebral cortex cells. Modulates chromatin accessibility and transcriptional activation in CNS tissue. Influences gene expression patterns associated with cellular stress responses and oxidative balance in neural cells.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–4× yearly",frequency:"Daily during course",timing:"Evening SQ",notes:"CNS bioregulator for brain aging. Pairs with Semax/Selank for comprehensive cognitive protocol. Stack with Pinealon for brain aging."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Livagen",sub:"Liver Tissue Cytogen",avail:"research",availLabel:"Research Only",goal:"Liver tissue support, hepatocyte function, chromatin remodeling",mechanism:"Khavinson tetrapeptide (Lys-Glu-Asp-Ala) targeting hepatic cells. Promotes chromatin decondensation in hepatocytes, potentially restoring gene expression patterns altered by aging or damage.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Liver bioregulator. Pairs with Ovagen (GI/liver) for comprehensive hepatic support."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Ovagen",sub:"Liver & GI Tract Cytogen",avail:"research",availLabel:"Research Only",goal:"Liver and GI support, hepatic function, mucosal health",mechanism:"Khavinson bioregulator tripeptide targeting liver and gastrointestinal mucosal tissue. Supports hepatic cell function and GI mucosal health.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"GI/liver bioregulator. Pairs with Livagen and BPC-157 for comprehensive gut-liver health stack."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Pancragen",sub:"Pancreatic & Beta-Cell Cytogen",avail:"research",availLabel:"Research Only",goal:"Pancreatic tissue support, beta-cell function, glucose metabolism",mechanism:"Khavinson tetrapeptide targeting pancreatic tissue, specifically beta-cells. Researched for restoration of insulin-producing cell function and glucose regulation mechanisms.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–4× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Pancreatic bioregulator. Pairs with GLP-1 protocols for comprehensive metabolic support."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Pinealon",sub:"Pineal Gland & Brain Cytogen",avail:"research",availLabel:"Research Only",goal:"Brain aging, pineal function, cognitive support",mechanism:"Khavinson tripeptide developed for brain aging and pineal gland function. Researched for neuroprotective activity in age-related cognitive decline, circadian rhythm support, and brain cell maintenance.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–4× yearly",frequency:"Daily during course",timing:"Pre-bed (pineal alignment)",notes:"Brain bioregulator. Pairs with Cortagen for CNS aging protocol. Synergistic with Epithalon which also works on pineal regulation."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Prostamax",sub:"Prostate Cytogen",avail:"research",availLabel:"Research Only",goal:"Prostate health, urological function, anti-aging",mechanism:"Khavinson bioregulator peptide targeting prostate tissue. Researched for prostate health maintenance, urological function support, and anti-aging effects on prostate cells.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Prostate bioregulator. Stack with Testagen for comprehensive male hormonal health bioregulator protocol."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Testagen",sub:"Testicular Cytogen",avail:"research",availLabel:"Research Only",goal:"Testosterone support, testicular function, male anti-aging",mechanism:"Khavinson synthetic peptide bioregulator researched for testicular function and testosterone support. Supports Leydig cell function and steroidogenesis pathways.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–4× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Male hormonal bioregulator. Pairs with Prostamax for comprehensive male health protocol."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Thymalin",sub:"Thymus Tissue Extract Bioregulator",avail:"research",availLabel:"Research Only",goal:"Thymus regeneration, immune anti-aging",mechanism:"See Immune category entry. Listed here as it is a Khavinson bioregulator.",dose:"10 mg/day for 10 days quarterly",cycle:"Quarterly",frequency:"Daily during course",timing:"Any time SQ",notes:"See Immune category for full profile."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Thymagen",sub:"Dipeptide Thymus Bioregulator",avail:"research",availLabel:"Research Only",goal:"Thymus support, T-cell function",mechanism:"See Immune category entry.",dose:"100–200 mcg/day SQ",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Any time SQ",notes:"See Immune category for full profile."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Vesugen",sub:"Vascular Endothelial Cytogen",avail:"research",availLabel:"Research Only",goal:"Vascular health, endothelial support, cardiovascular tissue maintenance",mechanism:"Khavinson tripeptide (Lys-Glu-Asp) targeting vascular endothelial cells. Supports blood vessel wall integrity, endothelial gene expression, and vascular function.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–4× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Vascular bioregulator. Pairs with Cardiogen for comprehensive cardiovascular bioregulator stack."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Vesilute",sub:"Vascular Tissue Cytogen",avail:"research",availLabel:"Research Only",goal:"Vascular tissue support, blood vessel function",mechanism:"Khavinson bioregulator targeting vascular tissue and blood vessel wall function.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses 2–3× yearly",frequency:"Daily during course",timing:"Morning SQ",notes:"Similar to Vesugen but slightly different target profile. Can be used interchangeably or stacked."},
+  {cat:"Bioregulators",emoji:"🔬",name:"Vilon",sub:"Dipeptide Thymus/Immune Bioregulator",avail:"research",availLabel:"Research Only",goal:"Thymus support, immune aging, longevity",mechanism:"Synthetic dipeptide bioregulator researched for thymus function and immune aging. Researched for longevity effects through immune system restoration.",dose:"200 mcg/day SQ for 10 days",cycle:"10-day courses quarterly",frequency:"Daily during course",timing:"Any time SQ",notes:"Part of the Khavinson immune aging protocol alongside Thymalin and Thymagen."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"GHK-Cu",sub:"Copper Peptide — Skin & Repair",avail:"research",availLabel:"Research Only",goal:"Skin rejuvenation, collagen, wound healing",mechanism:"See Recovery category for full profile. Key skin/cosmetic compound.",dose:"1–2 mg 3×/week SQ or topical",cycle:"8–12 weeks",frequency:"3× per week",timing:"Any time",notes:"See Recovery category. Available as GLOW Formula BBG70. Also available topically for skin-specific applications."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Melanotan II",sub:"Melanocortin Tanning Peptide",avail:"research",availLabel:"Research Only",goal:"Skin tanning, melanin production, libido enhancement",mechanism:"Synthetic melanocortin peptide activating MC1R (tanning), MC3R, and MC4R (libido). Stimulates melanogenesis for UV-independent tanning. Also activates desire pathway (shares receptor with PT-141).",dose:"0.5–1 mg 3–5×/week loading, then 0.5 mg maintenance",cycle:"4–8 weeks loading, then maintenance",frequency:"3–5×/week loading; 2×/week maintenance",timing:"Evening (reduces nausea)",notes:"Nausea and facial flushing common with first doses — start at 0.25 mg and titrate. Unwanted erections in men possible (shared MC4R with PT-141). Reduces UV exposure needed for tanning."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Melanotan I",sub:"Melanocortin — Selective Tanning",avail:"research",availLabel:"Research Only",goal:"Tanning, melanin production, skin protection research",mechanism:"Melanocortin peptide with more selective MC1R targeting compared to Melanotan II — less libido effect. Primarily stimulates melanogenesis for UV-protective tanning.",dose:"16 mg SC implant (clinical) or 1–2 mg/day SQ",cycle:"4–8 weeks",frequency:"Per protocol",timing:"Any time SQ",notes:"Cleaner tanning effect vs MT2 with less libido side effect. More selective MC1R activation."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"AHK-Cu",sub:"Copper Peptide for Hair",avail:"research",availLabel:"Research Only",goal:"Hair growth stimulation, follicle health, scalp improvement",mechanism:"Copper peptide complex (Ala-His-Lys-Cu) researched for hair follicle health and growth stimulation. Activates follicle stem cells, improves scalp blood circulation, and stimulates follicle-supporting growth factors.",dose:"Topical application to scalp",cycle:"3–6 months continuous",frequency:"Daily topical",timing:"Post-shower to clean scalp",notes:"Popular in hair loss prevention protocols. Pairs with Pal-AHK for comprehensive follicle support."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Argireline",sub:"Acetyl Hexapeptide-3 — Topical Botox-Like",avail:"cosmetic",availLabel:"Cosmetic",goal:"Expression wrinkle reduction, muscle relaxation",mechanism:"Cosmetic peptide mimicking the N-terminal end of SNAP-25 — inhibits neuromuscular junction signaling to reduce muscle contractions that cause expression lines.",dose:"Topical 5–10% concentration in serum/cream",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and/or PM",notes:"Most popular topical anti-wrinkle peptide. Pairs with Syn-Ake for enhanced NMJ inhibition."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Matrixyl",sub:"Palmitoyl Pentapeptide-4 — Collagen Stimulator",avail:"cosmetic",availLabel:"Cosmetic",goal:"Collagen synthesis, ECM production, wrinkle reduction",mechanism:"Lipopeptide that stimulates fibroblasts to produce collagen, fibronectin, and hyaluronic acid. Mimics collagen breakdown fragments to trigger repair response.",dose:"Topical in skincare formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM",notes:"Foundational topical anti-aging peptide. Pairs with Rigin in premium anti-aging formulations."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Syn-Ake",sub:"Snake Venom-Inspired Topical Relaxant",avail:"cosmetic",availLabel:"Cosmetic",goal:"Wrinkle smoothing, muscle relaxation, anti-aging",mechanism:"Synthetic tripeptide mimicking the paralytic mechanism of Waglerin-1 — inhibits acetylcholine binding at neuromuscular junctions. Non-toxic synthetic version.",dose:"Topical 2–4% in serum/cream",cycle:"Ongoing",frequency:"Daily topical",timing:"PM or AM+PM",notes:"Effective for dynamic wrinkles. Pairs with Argireline for enhanced NMJ inhibition."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Syn-Coll",sub:"Palmitoyl Tripeptide-5",avail:"cosmetic",availLabel:"Cosmetic",goal:"Collagen stimulation, wrinkle depth reduction, elasticity",mechanism:"Cosmetic peptide mimicking thrombospondin-1 signaling — activates TGF-β pathway to stimulate collagen production.",dose:"Topical in skincare formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM",notes:"Strong collagen stimulator. Pairs with Matrixyl for comprehensive collagen support."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Rigin",sub:"Palmitoyl Tetrapeptide-7 — Anti-Inflammaging",avail:"cosmetic",availLabel:"Cosmetic",goal:"Anti-inflammatory skin aging, IL-6 suppression",mechanism:"Lipopeptide reducing inflammation-driven skin aging by inhibiting IL-6 secretion from skin cells.",dose:"Topical in skincare formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM",notes:"Pairs with Pal-GHK in premium anti-aging formulations. Addresses the inflammation side of aging skin."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"SNAP-8",sub:"Acetyl Octapeptide-3 — Enhanced Botox-Like",avail:"cosmetic",availLabel:"Cosmetic",goal:"Expression wrinkle reduction, advanced NMJ inhibition",mechanism:"Enhanced version of Argireline (8 amino acids vs 6). Inhibits SNARE complex formation at neuromuscular junctions.",dose:"Topical 5–10% in serum",cycle:"Ongoing",frequency:"Daily topical",timing:"PM or twice daily",notes:"More potent than Argireline. Often combined with Argireline for synergistic NMJ inhibition."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Pal-GHK",sub:"Palmitoyl Tripeptide-1 — Enhanced GHK",avail:"cosmetic",availLabel:"Cosmetic",goal:"Enhanced collagen synthesis, skin repair, anti-aging",mechanism:"Lipopeptide form of GHK with palmitoyl group improving skin penetration. Stimulates collagen production and skin repair.",dose:"Topical in skincare formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM",notes:"Topical version of GHK for clients not using injectable GHK-Cu. Pairs with Rigin."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Pal-AHK",sub:"Palmitoyl Tripeptide-3 — Hair Follicle",avail:"cosmetic",availLabel:"Cosmetic",goal:"Hair follicle stimulation, scalp health, hair thickness",mechanism:"Lipopeptide combining palmitoyl group with AHK copper-binding sequence. Promotes hair follicle stem cell activity.",dose:"Topical to scalp",cycle:"3–6 months continuous",frequency:"Daily topical",timing:"Post-shower",notes:"Pairs with AHK-Cu for comprehensive topical hair protocol."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Nonapeptide-1",sub:"MSH Inhibitor — Skin Brightening",avail:"cosmetic",availLabel:"Cosmetic",goal:"Skin brightening, melanin inhibition, pigmentation control",mechanism:"Synthetic peptide blocking alpha-MSH binding to MC1R receptors — inhibits melanin synthesis for skin brightening.",dose:"Topical 1–5% in serum",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM (SPF required AM)",notes:"Effective brightening peptide. Pairs with injectable Glutathione for comprehensive brightening protocol."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Decapeptide-12",sub:"Tyrosinase Inhibitor — Brightening",avail:"cosmetic",availLabel:"Cosmetic",goal:"Hyperpigmentation reduction, dark spot treatment, brightening",mechanism:"Synthetic skin-lightening peptide inhibiting tyrosinase activity — the key enzyme in melanin biosynthesis.",dose:"Topical in brightening formulations",cycle:"Ongoing",frequency:"Daily topical with SPF",timing:"AM and PM",notes:"Combines with Nonapeptide-1 for multi-mechanism brightening."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Tripeptide-29",sub:"Collagen Tripeptide Signal",avail:"cosmetic",availLabel:"Cosmetic",goal:"Collagen synthesis, skin structure, wrinkle reduction",mechanism:"Gly-Pro-Hyp sequence identical to the most common repeating unit in type I collagen. Signals fibroblasts to produce collagen.",dose:"Topical in skincare formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM",notes:"Works synergistically with Matrixyl and Syn-Coll for multi-pathway collagen stimulation."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Palmitoyl Dipeptide-6",sub:"Retinol-Like Renewal Peptide",avail:"cosmetic",availLabel:"Cosmetic",goal:"Skin cell renewal, anti-aging, retinol alternative",mechanism:"Lipopeptide mimicking retinol-like effects by stimulating skin renewal pathways without retinoid irritation.",dose:"Topical in skincare formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"PM (retinol-like protocol)",notes:"Excellent retinol alternative for sensitive skin. Pairs with collagen stimulators."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Pentapeptide-18",sub:"Leuphasyl — Expression Line Reducer",avail:"cosmetic",availLabel:"Cosmetic",goal:"Expression wrinkle reduction, synergistic NMJ inhibition",mechanism:"Cosmetic peptide with opioid receptor modulation that reduces enkephalin release, indirectly reducing muscle contraction signals.",dose:"Topical in eye/expression line serums",cycle:"Ongoing",frequency:"Daily topical",timing:"AM and PM",notes:"Best used with Argireline for synergy. Standard in premium eye cream formulations."},
+  {cat:"Skin & Cosmetic",emoji:"✨",name:"Vialox",sub:"Pentapeptide-3 — Competitive NMJ Inhibitor",avail:"cosmetic",availLabel:"Cosmetic",goal:"Muscle relaxation, expression wrinkle reduction",mechanism:"Synthetic cosmetic peptide competitively inhibiting acetylcholine binding at NMJ via a different binding site than Argireline/SNAP-8.",dose:"Topical in wrinkle-treatment formulations",cycle:"Ongoing",frequency:"Daily topical",timing:"PM or twice daily",notes:"Triple-combination of Argireline + SNAP-8 + Vialox represents maximum topical NMJ inhibition."},
+  {cat:"Other",emoji:"🧪",name:"Adamax",sub:"Enhanced Semax Variant",avail:"research",availLabel:"Research Only",goal:"Enhanced cognitive effects vs Semax",mechanism:"Enhanced variant of Semax with modifications for improved potency and/or duration. Developed for cognitive enhancement research with similar BDNF-upregulating and neuroprotective properties to Semax.",dose:"300–600 mcg/day SQ or intranasal",cycle:"10–14 day cycles",frequency:"Daily",timing:"Morning",notes:"Consider as an upgrade from standard Semax for clients who have plateaued. Limited comparative data."},
+  {cat:"Other",emoji:"🧪",name:"HGH Fragment 176-191",sub:"Fat-Burning HGH Fragment",avail:"research",availLabel:"Research Only",goal:"Fat loss, lipolysis, body composition",mechanism:"Fragment of HGH containing the fat-burning region (amino acids 176–191) without growth-promoting properties. Activates beta-3 adrenergic receptor in fat cells.",dose:"250–500 mcg 2× daily fasted",cycle:"12–16 weeks",frequency:"2× daily (AM fasted + pre-bed)",timing:"Morning fasted and pre-bed",notes:"Alternative to AOD-9604. Best results with fasted dosing. No effect on blood glucose or IGF-1 — safe for diabetics."}
+];
+
+const CAT_CHIPS = [
+  {cat:'all', label:'All'},
+  {cat:'Recovery', label:'🩹 Recovery', pill:'pill-recovery'},
+  {cat:'GLP-1 / Metabolic', label:'⚖ GLP-1 / Metabolic', pill:'pill-metabolic'},
+  {cat:'Growth Hormone', label:'📈 Growth Hormone', pill:'pill-gh'},
+  {cat:'Cognitive', label:'🧠 Cognitive', pill:'pill-cognitive'},
+  {cat:'Longevity', label:'⏳ Longevity', pill:'pill-longevity'},
+  {cat:'Immune', label:'🛡 Immune', pill:'pill-immune'},
+  {cat:'Energy / NAD+', label:'⚡ Energy / NAD+', pill:'pill-energy'},
+  {cat:'Sexual Health', label:'💛 Sexual Health', pill:'pill-sexual'},
+  {cat:'Bioregulators', label:'🔬 Bioregulators', pill:'pill-bioregulator'},
+  {cat:'Skin & Cosmetic', label:'✨ Skin & Cosmetic', pill:'pill-skin'},
+  {cat:'Other', label:'🧪 Other', pill:'pill-other'},
+];
+function pillClass(cat){ return CAT_CHIPS.find(c=>c.cat===cat)?.pill || 'pill-other'; }
+
+let view='grid', activeCat='all', searchQ='';
+
+function buildMobileFilters(){
+  const mf = document.getElementById('mobile-filters');
+  mf.innerHTML = CAT_CHIPS.map((c,i) =>
+    `<button class="fchip ${i===0?'active':''}" data-cat="${c.cat}" onclick="setMobileCat('${c.cat}',this)">${c.label}</button>`
+  ).join('');
+}
+
+function setMobileCat(cat, btn){
+  activeCat = cat;
+  document.querySelectorAll('#mobile-filters .fchip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function setView(v){
+  view=v;
+  document.getElementById('btnGrid').classList.toggle('active',v==='grid');
+  document.getElementById('btnList').classList.toggle('active',v==='list');
+  render();
+}
+
+function onSearch(q){ searchQ=q; render(); }
+function toggleCard(el){ el.classList.toggle('open'); }
+
+function filtered(){
+  const ql = searchQ.toLowerCase().trim();
+  return COMPOUNDS.filter(c => {
+    if(activeCat !== 'all' && c.cat !== activeCat) return false;
+    if(ql){ const hay=[c.name,c.sub,c.goal,c.mechanism,c.notes,c.cat].join(' ').toLowerCase(); return ql.split(' ').every(w=>hay.includes(w)); }
+    return true;
+  });
+}
+
+function tagClass(avail){ return {rx:'tag-blue',research:'',compound:'tag-green',cosmetic:'tag-purple',mixed:''}[avail]||''; }
+
+function buildDesktopCard(c, i){
+  return `<div class="card" style="animation-delay:${Math.min(i*0.03,0.45)}s">
+  <div class="card-top">
+    <div class="card-row1"><div class="card-name">${c.name}</div><span class="cat-tag ${tagClass(c.avail)}">${c.availLabel}</span></div>
+    <div class="card-subtitle">${c.sub}</div>
+    <div class="card-goal">${c.goal}</div>
+  </div>
+  <div class="card-footer" onclick="toggleCard(this.closest('.card'))">
+    <span class="view-details-btn">View Details</span>
+    <span class="expand-icon">▾</span>
+  </div>
+  <div class="card-detail">
+    <div class="detail-grid">
+      <div class="dblock full"><span class="dkey">Mechanism / How It Works</span><span class="dval">${c.mechanism}</span></div>
+      <div class="d-divider"></div>
+      <div class="dblock"><span class="dkey">Typical Dose</span><span class="dval">${c.dose||'—'}</span></div>
+      <div class="dblock"><span class="dkey">Cycle Length</span><span class="dval">${c.cycle||'—'}</span></div>
+      <div class="dblock"><span class="dkey">Frequency</span><span class="dval">${c.frequency||'—'}</span></div>
+      <div class="dblock"><span class="dkey">Best Timing</span><span class="dval">${c.timing||'—'}</span></div>
+    </div>
+    <div class="notes-box"><div class="dkey">Research Notes &amp; Clinical Context</div><div class="dval">${c.notes}</div></div>
+    <div class="card-disclaimer">⚠ For in-vitro research and educational reference only. Not approved for human use. Not medical advice.</div>
+  </div>
+</div>`;
+}
+
+function buildMobileCard(c, i){
+  const pClass = pillClass(c.cat);
+  return `<div class="m-card" style="animation-delay:${Math.min(i*0.025,0.4)}s">
+  <div class="m-card-header">
+    <div class="m-card-row1"><div class="m-card-name">${c.name}</div><span class="m-cat-pill ${pClass}">${c.cat.split(' /')[0]}</span></div>
+    <div class="m-card-sub">${c.sub}</div>
+  </div>
+  <div class="m-card-goal">${c.goal}</div>
+  <div class="m-card-stats">
+    <div class="m-stat"><div class="m-stat-lbl">Dose</div><div class="m-stat-val">${c.dose||'—'}</div></div>
+    <div class="m-stat"><div class="m-stat-lbl">Frequency</div><div class="m-stat-val">${c.frequency||'—'}</div></div>
+  </div>
+  <div class="m-card-toggle" onclick="toggleCard(this.closest('.m-card'))">
+    <span class="m-toggle-lbl">View Mechanism &amp; Details</span>
+    <span class="m-toggle-icon">▾</span>
+  </div>
+  <div class="m-card-detail">
+    <div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${c.mechanism}</div></div>
+    <div class="m-detail-section" style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div><div class="m-detail-label">Cycle Length</div><div class="m-detail-text">${c.cycle||'—'}</div></div>
+      <div><div class="m-detail-label">Best Timing</div><div class="m-detail-text">${c.timing||'—'}</div></div>
+    </div>
+    <div class="m-notes"><div class="m-detail-label">Research Notes</div><div class="m-detail-text" style="font-size:11.5px">${c.notes}</div></div>
+    <div class="m-disclaimer">⚠ Research &amp; educational reference only. Not for human use. Not medical advice.</div>
+  </div>
+  <div class="m-research-stamp">⚠ ${c.availLabel} · Research Use Only</div>
+</div>`;
+}
+
+function render(){
+  const list = filtered();
+  document.getElementById('countNum').textContent = list.length;
+  document.getElementById('liveCount').textContent = list.length;
+  const desktopEl = document.getElementById('desktop-content');
+  const mobileEl  = document.getElementById('mobile-content');
+  const emptyEl   = document.getElementById('empty-state');
+  if(!list.length){ desktopEl.innerHTML=''; mobileEl.innerHTML=''; emptyEl.style.display='block'; return; }
+  emptyEl.style.display = 'none';
+  const grouped = activeCat === 'all' && !searchQ.trim();
+  if(grouped){
+    const groups = {}, order = [];
+    list.forEach(c => { if(!groups[c.cat]){ groups[c.cat]=[]; order.push(c.cat); } groups[c.cat].push(c); });
+    let idx = 0;
+    desktopEl.innerHTML = order.map(ct => {
+      const items = groups[ct];
+      return `<div class="cat-section"><div class="cat-heading"><span class="cat-icon">${items[0].emoji}</span><span class="cat-name">${ct}</span><span class="cat-count">${items.length} Compound${items.length>1?'s':''}</span></div><div class="${view==='grid'?'cards-grid':'cards-list'}">${items.map(c=>buildDesktopCard(c,idx++)).join('')}</div></div>`;
+    }).join('');
+    mobileEl.innerHTML = order.map((ct, gi) => {
+      const items = groups[ct];
+      return `<div class="m-cat-section"><div class="m-cat-heading"><span class="m-cat-icon">${items[0].emoji}</span><span class="m-cat-name">${ct}</span><span class="m-cat-count">${items.length}</span></div>${items.map((c,i)=>buildMobileCard(c,gi*10+i)).join('')}</div>`;
+    }).join('');
+  } else {
+    desktopEl.innerHTML = `<div class="${view==='grid'?'cards-grid':'cards-list'}">${list.map((c,i)=>buildDesktopCard(c,i)).join('')}</div>`;
+    mobileEl.innerHTML  = list.map((c,i)=>buildMobileCard(c,i)).join('');
+  }
+}
+
+buildMobileFilters();
+document.getElementById('searchInput').addEventListener('input', e => { searchQ=e.target.value; render(); });
+document.querySelectorAll('.filter-row .fchip[data-cat]').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.filter-row .fchip').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  activeCat = b.dataset.cat;
+  render();
+}));
+document.getElementById('siteNavBtn').addEventListener('click',function(){document.getElementById('siteNavMenu').classList.toggle('open');});
+render();
+</script>
+</body>
+</html>
