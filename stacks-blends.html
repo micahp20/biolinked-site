@@ -1,1 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Peptide Stacks — Research Reference · Bio Linked</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #9A7B2F; --gold2: #B8960C; --gold-dim: rgba(154,123,47,0.1); --gold-border: rgba(154,123,47,0.25);
+  --bg: #f8f8f8; --surface: #ffffff; --surface2: #f2f2f2; --surface3: #eaeaea;
+  --white: #ffffff; --text: #1a1a1a; --text2: #444444; --muted: #777777;
+  --border: rgba(0,0,0,0.08); --red: #c0392b; --red-dim: rgba(192,57,43,0.06); --red-border: rgba(192,57,43,0.18);
+  --green: #2e7d32; --radius: 10px; --radius-sm: 6px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
+/* NAV */
+.site-nav { background: #fff; border-bottom: 1px solid #eaeaea; position: sticky; top: 0; z-index: 600; }
+.site-nav-inner { max-width: 1100px; margin: 0 auto; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+.site-nav-logo { text-decoration: none; display: flex; flex-direction: column; line-height: 1; }
+.site-nav-logo-main { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.1em; }
+.site-nav-logo-sub { font-size: 8px; color: #777; letter-spacing: 0.18em; text-transform: uppercase; margin-top: 2px; }
+.site-nav-links { display: flex; align-items: center; gap: 2px; }
+.site-nav-link { font-size: 11.5px; color: #444; text-decoration: none; padding: 7px 11px; border-radius: 3px; transition: all .18s; background: none; border: none; cursor: pointer; font-family: 'Montserrat', sans-serif; }
+.site-nav-link:hover, .site-nav-link.active { color: var(--gold); background: var(--gold-dim); }
+.site-nav-dropdown { position: relative; }
+.site-nav-dropdown-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #fff; border: 1px solid #eaeaea; border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); min-width: 180px; overflow: hidden; z-index: 700; }
+.site-nav-dropdown:hover .site-nav-dropdown-menu { display: block; }
+.site-nav-dropdown-item { display: block; padding: 10px 16px; font-size: 11.5px; color: #444; text-decoration: none; transition: all .15s; font-family: 'Montserrat', sans-serif; }
+.site-nav-dropdown-item:hover { background: #f8f8f8; color: var(--gold); padding-left: 20px; }
+.site-nav-mobile-btn { display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #1a1a1a; padding: 8px; }
+.site-nav-mobile-menu { display: none; border-top: 1px solid #eaeaea; background: #fff; padding: 12px 20px 20px; }
+.site-nav-mobile-menu.open { display: block; }
+.site-nav-mobile-link { display: block; padding: 10px 0; font-size: 13px; color: #444; text-decoration: none; border-bottom: 1px solid #eaeaea; font-family: 'Montserrat', sans-serif; }
+.site-nav-mobile-link:last-child { border-bottom: none; }
+.site-nav-mobile-sub { padding-left: 16px; font-size: 12px; color: #777; }
+.site-nav-mobile-section { padding: 10px 0 4px; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-family: 'Montserrat', sans-serif; font-weight: 600; border-bottom: 1px solid #eaeaea; }
+@media (max-width: 768px) { .site-nav-links { display: none; } .site-nav-mobile-btn { display: block; } .site-nav-inner { padding: 0 16px; } }
+
+/* HEADER */
+.header { background: var(--surface); border-bottom: 1px solid var(--gold-border); padding: 40px 20px 32px; position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent); }
+.header::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(154,123,47,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(154,123,47,0.03) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none; }
+.header-inner { max-width: 900px; margin: 0 auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; position: relative; z-index: 1; }
+.header-left { flex: 1; }
+.header-brand { font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.header-brand::before { content: ''; width: 22px; height: 1px; background: var(--gold-border); }
+.header-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(34px, 7vw, 58px); font-weight: 400; color: var(--text); line-height: 1.05; margin-bottom: 8px; }
+.header-title em { color: var(--gold); font-style: italic; }
+.header-desc { font-size: 12.5px; color: var(--muted); font-weight: 300; line-height: 1.6; max-width: 460px; }
+.header-count-box { background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: var(--radius); padding: 18px 22px; text-align: center; flex-shrink: 0; align-self: flex-start; margin-top: 4px; }
+.count-num { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--gold); font-weight: 600; line-height: 1; display: block; }
+.count-lbl { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); font-weight: 600; margin-top: 4px; display: block; }
+
+/* CONTROLS */
+.controls { max-width: 900px; margin: 0 auto; padding: 22px 20px 0; }
+.search-wrap { position: relative; margin-bottom: 16px; }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--gold); opacity: 0.5; font-size: 17px; pointer-events: none; }
+#searchInput { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 13px 16px 13px 42px; font-family: 'Montserrat', sans-serif; font-size: 14px; color: var(--text); outline: none; transition: border-color 0.2s; -webkit-appearance: none; }
+#searchInput::placeholder { color: var(--muted); }
+#searchInput:focus { border-color: var(--gold-border); box-shadow: 0 0 0 3px var(--gold-dim); }
+.filter-row { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 7px; align-items: center; }
+.filter-lbl { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); font-weight: 700; white-space: nowrap; }
+.fchip { background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 20px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 500; color: var(--text2); cursor: pointer; transition: all 0.15s; white-space: nowrap; -webkit-tap-highlight-color: transparent; user-select: none; }
+.fchip:hover { border-color: var(--gold-border); color: var(--gold); background: var(--surface3); }
+.fchip.active { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 700; }
+
+/* MOBILE SEARCH */
+.mobile-search-wrap { display: none; padding: 10px 14px 0; background: var(--surface2); border-bottom: 1px solid var(--gold-border); }
+.mobile-search-inner { position: relative; }
+.mobile-search-inner input { width: 100%; background: var(--surface3); border: 1px solid var(--gold-border); border-radius: 8px; padding: 13px 14px 13px 40px; font-family: 'Montserrat', sans-serif; font-size: 16px; color: var(--text); outline: none; -webkit-appearance: none; min-height: 48px; }
+.mobile-search-inner input::placeholder { color: var(--muted); }
+.mobile-search-inner input:focus { border-color: var(--gold); }
+.mobile-search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--muted); pointer-events: none; }
+.mobile-filters { display: none; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--gold-border); background: var(--surface2); scrollbar-width: none; }
+.mobile-filters::-webkit-scrollbar { display: none; }
+.mobile-filters .fchip { flex-shrink: 0; font-size: 13px; padding: 10px 16px; min-height: 44px; border-radius: 8px; display: inline-flex; align-items: center; }
+.mobile-diff-strip { display: none; overflow-x: auto; -webkit-overflow-scrolling: touch; gap: 8px; padding: 6px 14px 10px; border-bottom: 1px solid rgba(154,123,47,0.1); background: var(--surface2); scrollbar-width: none; }
+.mobile-diff-strip::-webkit-scrollbar { display: none; }
+.mobile-diff-strip .fchip { flex-shrink: 0; font-size: 12px; padding: 8px 14px; min-height: 40px; border-radius: 8px; display: inline-flex; align-items: center; }
+
+/* RESULTS BAR */
+.results-bar { max-width: 900px; margin: 14px auto 0; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.results-count { font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.results-count span { color: var(--gold); font-weight: 700; }
+.view-btns { display: flex; gap: 5px; }
+.vbtn { padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-family: 'Montserrat', sans-serif; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+.vbtn.active { background: var(--gold); border-color: var(--gold); color: #fff; font-weight: 700; }
+
+/* MAIN */
+.main { max-width: 900px; margin: 0 auto; padding: 20px 20px 80px; }
+
+/* CATEGORY SECTIONS */
+.cat-section { margin-bottom: 44px; }
+.cat-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--gold-border); }
+.cat-icon { font-size: 20px; line-height: 1; }
+.cat-name { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: var(--text); }
+.cat-count { margin-left: auto; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* DESKTOP CARDS */
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.cards-list { display: flex; flex-direction: column; gap: 8px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--surface3); border-radius: var(--radius); overflow: hidden; transition: all 0.2s; position: relative; animation: fadeUp 0.3s ease both; }
+.card:hover { border-top-color: var(--gold); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+.card.open { border-top-color: var(--gold); }
+.card-top { padding: 18px 18px 14px; }
+.card-row1 { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+.card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.2; flex: 1; }
+.cat-tag { display: inline-block; padding: 3px 10px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); white-space: nowrap; flex-shrink: 0; }
+.card-peptides { font-size: 12px; color: var(--muted); font-style: italic; margin-bottom: 10px; }
+.card-goal { font-size: 13px; color: var(--text2); line-height: 1.5; font-weight: 300; margin-bottom: 12px; }
+.diff-row { display: flex; align-items: center; gap: 6px; }
+.diff-chip { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }
+.diff-green { background: rgba(46,125,50,0.1); color: var(--green); }
+.diff-gold  { background: rgba(154,123,47,0.1); color: var(--gold); }
+.diff-red   { background: rgba(192,57,43,0.1); color: var(--red); }
+.card-footer { border-top: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: background 0.15s; }
+.card-footer:hover { background: var(--gold-dim); }
+.view-details-btn { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); pointer-events: none; font-family: 'Montserrat', sans-serif; }
+.footer-meta { display: flex; gap: 14px; }
+.fmeta { display: flex; flex-direction: column; gap: 1px; }
+.fmeta-key { font-size: 8.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.fmeta-val { font-size: 11px; color: var(--text2); }
+.expand-icon { font-size: 13px; color: var(--gold); opacity: 0.7; transition: transform 0.25s; pointer-events: none; margin-left: 8px; }
+.card.open .expand-icon { transform: rotate(180deg); }
+.card-detail { display: none; padding: 0 18px 18px; border-top: 1px solid var(--border); background: var(--surface2); }
+.card.open .card-detail { display: block; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.dblock { display: flex; flex-direction: column; gap: 4px; }
+.dblock.full { grid-column: 1 / -1; }
+.d-divider { grid-column: 1 / -1; height: 1px; background: var(--border); }
+.dkey { font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); opacity: 0.8; font-weight: 700; }
+.dval { font-size: 12.5px; color: var(--text2); line-height: 1.55; white-space: pre-line; }
+.avail-list { display: flex; flex-direction: column; gap: 3px; }
+.avail-yes  { font-size: 12px; color: var(--green); font-weight: 500; }
+.avail-soft { font-size: 12px; color: var(--muted); }
+.notes-box { margin-top: 12px; padding: 12px 14px; background: var(--surface3); border-left: 2px solid var(--gold-border); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+.notes-box .dkey { margin-bottom: 5px; }
+.notes-box .dval { font-size: 12px; color: var(--text2); }
+.cards-list .footer-meta { display: none; }
+
+/* MOBILE CARDS */
+.mobile-card-list { display: none; flex-direction: column; gap: 10px; }
+.m-card { background: var(--surface); border: 1px solid var(--border); border-top: 2px solid var(--surface3); border-radius: 12px; overflow: hidden; animation: fadeUp 0.3s ease both; }
+.m-card:hover { border-top-color: var(--gold); }
+.m-card-header { padding: 14px 14px 0; }
+.m-card-row1 { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.m-card-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--text); line-height: 1.2; flex: 1; }
+.m-cat-pill { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 9px; border-radius: 20px; border: 1px solid; white-space: nowrap; flex-shrink: 0; }
+.pill-weight    { background: rgba(46,125,50,0.08);  color: #2e7d32; border-color: rgba(46,125,50,0.25); }
+.pill-hormones  { background: rgba(21,101,192,0.08); color: #1565c0; border-color: rgba(21,101,192,0.2); }
+.pill-healing   { background: rgba(154,123,47,0.1);  color: var(--gold); border-color: rgba(154,123,47,0.3); }
+.pill-cognitive { background: rgba(106,13,173,0.07); color: #6a0dad; border-color: rgba(106,13,173,0.2); }
+.pill-energy    { background: rgba(46,125,50,0.07);  color: #2e7d32; border-color: rgba(46,125,50,0.18); }
+.pill-sexual    { background: rgba(173,20,87,0.07);  color: #ad1457; border-color: rgba(173,20,87,0.18); }
+.pill-immune    { background: rgba(192,57,43,0.07);  color: var(--red); border-color: rgba(192,57,43,0.18); }
+.pill-skin      { background: rgba(173,20,87,0.06);  color: #880e4f; border-color: rgba(173,20,87,0.15); }
+.pill-antiaging { background: rgba(190,100,10,0.08); color: #b06800; border-color: rgba(190,100,10,0.2); }
+.m-card-peptides { font-size: 12px; color: var(--muted); font-style: italic; margin-bottom: 6px; padding: 0 14px; }
+.m-card-goal { font-size: 13px; color: var(--text2); line-height: 1.5; font-weight: 300; padding: 0 14px 10px; }
+.m-card-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; background: var(--gold-dim); border-top: 1px solid var(--gold-border); border-bottom: 1px solid var(--gold-border); }
+.m-stat { padding: 11px 10px; border-right: 1px solid var(--gold-border); text-align: center; }
+.m-stat:last-child { border-right: none; }
+.m-stat-lbl { font-size: 8px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px; }
+.m-stat-val { font-size: 11px; color: var(--text); font-weight: 500; line-height: 1.3; }
+.m-card-toggle { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; transition: background 0.15s; }
+.m-card-toggle:active { background: var(--gold-dim); }
+.m-toggle-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.m-toggle-icon { font-size: 13px; color: var(--gold); opacity: 0.7; transition: transform 0.25s; }
+.m-card.open .m-toggle-icon { transform: rotate(180deg); }
+.m-card-detail { display: none; padding: 0 14px 14px; border-top: 1px solid var(--border); background: var(--surface2); }
+.m-card.open .m-card-detail { display: block; }
+.m-detail-section { margin-top: 12px; }
+.m-detail-label { font-size: 8.5px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); opacity: 0.8; font-weight: 700; margin-bottom: 5px; }
+.m-detail-text { font-size: 12.5px; color: var(--text2); line-height: 1.6; }
+.m-detail-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.m-avail { margin-top: 12px; }
+.m-avail-list { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+.m-avail-yes { font-size: 12px; color: var(--green); font-weight: 500; }
+.m-avail-soft { font-size: 12px; color: var(--muted); }
+.m-notes { margin-top: 12px; padding: 11px 13px; background: var(--surface3); border-left: 2px solid var(--gold-border); border-radius: 0 6px 6px 0; }
+.m-cat-section { margin-bottom: 28px; }
+.m-cat-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--gold-border); }
+.m-cat-icon { font-size: 18px; }
+.m-cat-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--text); }
+.m-cat-count { margin-left: auto; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 60px 20px; }
+.empty h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold-border); margin-bottom: 8px; }
+.empty p { font-size: 13px; color: var(--muted); }
+
+/* SITE FOOTER */
+.site-footer { background: #1a1a1a; padding: 48px 28px 0; }
+.site-footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.5fr 1fr; gap: 60px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.site-footer-logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #fff; letter-spacing: 0.12em; margin-bottom: 6px; }
+.site-footer-tagline { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 500; margin-bottom: 14px; font-family: 'Montserrat', sans-serif; }
+.site-footer-disclaimer { font-size: 11px; color: #555; line-height: 1.65; font-weight: 300; max-width: 340px; font-family: 'Montserrat', sans-serif; }
+.site-footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.site-footer-col { display: flex; flex-direction: column; gap: 10px; }
+.site-footer-col-title { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 4px; font-family: 'Montserrat', sans-serif; }
+.site-footer-col a { font-size: 12px; color: #666; text-decoration: none; font-family: 'Montserrat', sans-serif; transition: color .18s; }
+.site-footer-col a:hover { color: #fff; }
+.site-footer-bottom { max-width: 1100px; margin: 0 auto; padding: 18px 0; font-size: 10px; color: #444; font-family: 'Montserrat', sans-serif; }
+@media (max-width: 768px) { .site-footer { padding: 36px 16px 0; } .site-footer-inner { grid-template-columns: 1fr; gap: 28px; } .site-footer-links { grid-template-columns: 1fr 1fr; } }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .header-inner { flex-direction: column; gap: 16px; }
+  .header-count-box { align-self: flex-start; padding: 12px 18px; }
+  .count-num { font-size: 36px; }
+  .controls { display: none; }
+  .results-bar { padding: 10px 14px 0; margin-top: 0; }
+  .mobile-search-wrap { display: block; }
+  .mobile-filters { display: flex; }
+  .mobile-diff-strip { display: flex; }
+  .mobile-card-list { display: flex; }
+  .cards-grid, .cards-list, .cat-section { display: none; }
+  .main { padding: 14px 12px 60px; }
+}
+@media (max-width: 640px) {
+  .header { padding: 28px 14px 24px; }
+  .header-title { font-size: clamp(28px, 8vw, 40px); }
+  .results-bar { padding: 8px 12px 0; }
+  .view-btns { display: none; }
+  .main { padding: 12px 10px 60px; }
+  .m-card-name { font-size: 18px; }
+}
+@media (max-width: 380px) {
+  .header-title { font-size: 24px; }
+  .m-card-name { font-size: 16px; }
+  .m-card-stats { grid-template-columns: 1fr 1fr; }
+  .m-card-stats .m-stat:last-child { grid-column: 1 / -1; border-right: none; border-top: 1px solid var(--gold-border); }
+  .m-detail-2col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a href="/" class="site-nav-logo"><span class="site-nav-logo-main">BIO LINKED</span><span class="site-nav-logo-sub">Peptide Solutions</span></a>
+    <div class="site-nav-links">
+      <a href="/" class="site-nav-link">Home</a>
+      <a href="/peptide-index" class="site-nav-link">Index</a>
+      <a href="/cheat-sheet" class="site-nav-link">Cheat Sheet</a>
+      <a href="/stacks-blends" class="site-nav-link active">Stacks &amp; Blends</a>
+      <a href="https://biollinkedapp.netlify.app/" class="site-nav-link">App</a>
+      <div class="site-nav-dropdown">
+        <button class="site-nav-link site-nav-dropdown-btn">Tools ▾</button>
+        <div class="site-nav-dropdown-menu">
+          <a href="/tools/peptide-tracker" class="site-nav-dropdown-item">Peptide Tracker</a>
+          <a href="/tools/stack-analyzer" class="site-nav-dropdown-item">Stack Analyzer</a>
+          <a href="/tools/biomarker-analysis" class="site-nav-dropdown-item">Biomarker Analysis</a>
+        </div>
+      </div>
+    </div>
+    <button class="site-nav-mobile-btn" id="siteNavBtn">☰</button>
+  </div>
+  <div class="site-nav-mobile-menu" id="siteNavMenu">
+    <a href="/" class="site-nav-mobile-link">Home</a>
+    <a href="/peptide-index" class="site-nav-mobile-link">Index</a>
+    <a href="/cheat-sheet" class="site-nav-mobile-link">Cheat Sheet</a>
+    <a href="/stacks-blends" class="site-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biollinkedapp.netlify.app/" class="site-nav-mobile-link">App</a>
+    <div class="site-nav-mobile-section">Tools</div>
+    <a href="/tools/peptide-tracker" class="site-nav-mobile-link site-nav-mobile-sub">Peptide Tracker</a>
+    <a href="/tools/stack-analyzer" class="site-nav-mobile-link site-nav-mobile-sub">Stack Analyzer</a>
+    <a href="/tools/biomarker-analysis" class="site-nav-mobile-link site-nav-mobile-sub">Biomarker Analysis</a>
+  </div>
+</nav>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="header-brand">Bio Linked Peptide Solutions</div>
+      <div class="header-title">Peptide Stacks <em>Library</em></div>
+      <div class="header-desc">35 research-compiled protocols across 9 categories · Mechanisms · Dosing · Synergies</div>
+    </div>
+    <div class="header-count-box">
+      <span class="count-num" id="liveCount">35</span>
+      <span class="count-lbl">Stacks Showing</span>
+    </div>
+  </div>
+</div>
+
+<div class="mobile-search-wrap">
+  <div class="mobile-search-inner">
+    <span class="mobile-search-icon">🔍</span>
+    <input type="text" id="mobileSearch" placeholder="Search stacks, peptides, goals…" oninput="onSearch(this.value)" autocomplete="off" spellcheck="false">
+  </div>
+</div>
+<div class="mobile-filters" id="mobile-cat-filters"></div>
+<div class="mobile-diff-strip" id="mobile-diff-filters"></div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="searchInput" placeholder="Search stacks, peptides, goals…" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="filter-row">
+    <span class="filter-lbl">Category</span>
+    <button class="fchip active" data-cat="all">All</button>
+    <button class="fchip" data-cat="Weight Loss">⚖ Weight Loss</button>
+    <button class="fchip" data-cat="Hormones & GH">📈 Hormones</button>
+    <button class="fchip" data-cat="Healing & Recovery">🩹 Healing</button>
+    <button class="fchip" data-cat="Cognitive & Neuro">🧠 Cognitive</button>
+    <button class="fchip" data-cat="Energy & Mitochondria">⚡ Energy</button>
+    <button class="fchip" data-cat="Sexual Health">💛 Sexual Health</button>
+    <button class="fchip" data-cat="Immune">🛡 Immune</button>
+    <button class="fchip" data-cat="Skin & Hair">✨ Skin &amp; Hair</button>
+    <button class="fchip" data-cat="Anti-Aging">🕰 Anti-Aging</button>
+  </div>
+  <div class="filter-row">
+    <span class="filter-lbl">Level</span>
+    <button class="fchip active" data-diff="all">All Levels</button>
+    <button class="fchip" data-diff="Beginner">🟢 Beginner</button>
+    <button class="fchip" data-diff="Intermediate">🟡 Intermediate</button>
+    <button class="fchip" data-diff="Advanced">🔴 Advanced</button>
+  </div>
+</div>
+
+<div class="results-bar">
+  <div class="results-count">Showing <span id="countNum">35</span> stacks</div>
+  <div class="view-btns">
+    <button class="vbtn active" id="btnGrid" onclick="setView('grid')">⊞ Grid</button>
+    <button class="vbtn" id="btnList" onclick="setView('list')">☰ List</button>
+  </div>
+</div>
+
+<div class="main" id="mainContainer">
+  <div id="desktop-content"></div>
+  <div class="mobile-card-list" id="mobile-content"></div>
+  <div id="empty-state" class="empty" style="display:none">
+    <h3>No stacks found</h3><p>Try a different search or filter.</p>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div>
+      <div class="site-footer-logo">BIO LINKED</div>
+      <div class="site-footer-tagline">Peptide Research &amp; Education</div>
+      <p class="site-footer-disclaimer">For educational purposes only. Not medical advice. Always consult a qualified healthcare professional before beginning any peptide protocol.</p>
+    </div>
+    <div class="site-footer-links">
+      <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index">Peptide Index</a><a href="/cheat-sheet">Cheat Sheet</a><a href="/stacks-blends">Stacks &amp; Blends</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/tools/peptide-tracker">Peptide Tracker</a><a href="/tools/stack-analyzer">Stack Analyzer</a><a href="/tools/biomarker-analysis">Biomarker Analysis</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Platform</div><a href="https://biollinkedapp.netlify.app/">App</a><a href="/">Home</a></div>
+    </div>
+  </div>
+  <div class="site-footer-bottom">© 2025 Bio Linked Peptide Solutions. All rights reserved.</div>
+</footer>
+
+<script>
+const STACKS = [
+  {category:"Weight Loss",emoji:"⚖",name:"The GLP-1 Powerhouse",peptides:"Tirzepatide + AOD-9604",goal:"Maximum fat loss + visceral fat reduction",mechanism:"Tirzepatide activates GLP-1 & GIP receptors suppressing appetite; AOD-9604 directly targets fat cells mimicking GH lipolysis without blood sugar impact",dose:"Tirzepatide 2.5–10mg weekly; AOD-9604 300mcg daily",cycle:"12–24 weeks",frequency:"Tirzepatide: 1×/week; AOD-9604: daily",timing:"Tirzepatide: same day each week; AOD-9604: fasted AM",available:"✅ Tirzepatide (TR10/20/30)\n✅ AOD-9604 (5AD)",difficulty:"Intermediate",notes:"Most powerful fat-loss stack available. Titrate Tirzepatide slowly (2.5mg → 5 → 10mg). AOD adds targeted lipolysis without GH side effects."},
+  {category:"Weight Loss",emoji:"⚖",name:"The Triple Agonist",peptides:"Retatrutide + MOTS-c",goal:"Aggressive fat loss + metabolic optimization",mechanism:"Retatrutide is a GIP/GLP-1/Glucagon triple agonist; MOTS-c activates AMPK improving insulin sensitivity and cellular energy",dose:"Retatrutide 1–4mg weekly (titrate); MOTS-c 5–10mg 2×/week",cycle:"12–20 weeks",frequency:"Retatrutide: weekly; MOTS-c: 2×/week",timing:"Both: SQ injection, any time",available:"✅ Retatrutide (RT10/20/30)\n✅ MOTS-c (MS10/MS40)",difficulty:"Advanced",notes:"Most cutting-edge fat loss combination. Retatrutide showed up to 24% weight loss in trials. MOTS-c adds metabolic flexibility. Titrate Retatrutide slowly to avoid GI side effects."},
+  {category:"Weight Loss",emoji:"⚖",name:"Body Recomp Classic",peptides:"CJC-1295 No DAC + Ipamorelin + Tesamorelin",goal:"Fat loss + lean muscle preservation",mechanism:"CJC/Ipa stimulate natural GH release promoting lipolysis and muscle preservation; Tesamorelin specifically reduces visceral abdominal fat",dose:"CJC-1295: 300mcg; Ipamorelin: 200–300mcg; Tesamorelin: 1mg — all nightly",cycle:"12–16 weeks on / 4–8 off",frequency:"Daily (nightly)",timing:"30–60 min before bed, fasted",available:"✅ CJC-1295 No DAC (CND5/10)\n✅ Ipamorelin (IP10)\n✅ Tesamorelin (TSM10)",difficulty:"Intermediate",notes:"Classic body recomp stack. CJC + Ipa often sold as premix (CP10). Add Tesamorelin for stubborn belly fat. Works best with caloric deficit + resistance training."},
+  {category:"Weight Loss",emoji:"⚖",name:"GLP-1 Starter",peptides:"Tirzepatide solo",goal:"Weight loss, appetite suppression, blood sugar regulation",mechanism:"Dual GLP-1 + GIP agonist. Slows gastric emptying, reduces appetite, improves insulin sensitivity",dose:"2.5mg weekly → titrate to 5/10/15mg over 4–12 weeks",cycle:"Until goal weight, then maintenance",frequency:"Once weekly",timing:"Same day each week, SQ injection",available:"✅ Tirzepatide (TR10/20/30)",difficulty:"Beginner",notes:"Best entry point for weight loss peptides. Proven in Phase 3 trials with 20%+ weight loss. Titrate slowly to manage nausea."},
+  {category:"Weight Loss",emoji:"⚖",name:"The Metabolic Booster",peptides:"MOTS-c + 5-Amino-1MQ",goal:"Metabolic enhancement, fat storage reduction, energy",mechanism:"MOTS-c activates AMPK for metabolic flexibility; 5-Amino-1MQ inhibits NNMT enzyme reducing fat storage and boosting NAD+ metabolism",dose:"MOTS-c 10mg 2–3×/week; 5-Amino-1MQ 50–100mg daily (oral)",cycle:"8–12 weeks",frequency:"MOTS-c: 2–3×/week; 5-Amino-1MQ: daily",timing:"MOTS-c: any time SQ; 5-Amino: morning",available:"✅ MOTS-c (MS10/MS40)\n✅ 5-Amino-1MQ (5AM)",difficulty:"Intermediate",notes:"Excellent add-on to GLP-1 protocols or standalone for moderate fat loss goals. 5-Amino-1MQ preserves NAD+ levels while reducing fat cell formation."},
+  {category:"Hormones & GH",emoji:"📈",name:"The Gold Standard GH Stack",peptides:"CJC-1295 No DAC + Ipamorelin",goal:"Optimize natural GH output, lean mass, recovery, sleep",mechanism:"CJC-1295 (GHRH analog) extends GH pulse duration; Ipamorelin (GHRP) amplifies GH pulse amplitude — dual pathway synergy with no cortisol/prolactin spike",dose:"CJC-1295: 200–300mcg; Ipamorelin: 200–300mcg — each injection",cycle:"12–16 weeks on / 4–8 weeks off",frequency:"1–3× daily",timing:"Pre-bed (primary); AM fasted (secondary)",available:"✅ CJC-1295 No DAC (CND5/10)\n✅ Ipamorelin (IP10)\n✅ Premix (CP10)",difficulty:"Beginner",notes:"Most widely used GH stack globally. Available as premix CP10. Best results pre-bed to align with natural GH pulse during sleep. No cortisol spike unlike GHRP-2/6."},
+  {category:"Hormones & GH",emoji:"📈",name:"The Sermorelin Stack",peptides:"Sermorelin + Ipamorelin",goal:"Gentle GH stimulation, anti-aging, sleep improvement",mechanism:"Sermorelin is the original GHRH analog — gentler than CJC-1295, shorter half-life, more physiologic. Ipamorelin adds pulse amplification",dose:"Sermorelin: 200–300mcg; Ipamorelin: 100–200mcg nightly",cycle:"12–24 weeks",frequency:"Nightly",timing:"30–60 min before sleep",available:"✅ Sermorelin (SMO10)\n✅ Ipamorelin (IP10)",difficulty:"Beginner",notes:"Preferred for older adults or those new to GH peptides. Sermorelin is the most well-studied GHRH analog. Gentler than CJC-1295 with excellent safety profile."},
+  {category:"Hormones & GH",emoji:"📈",name:"The Tesamorelin Protocol",peptides:"Tesamorelin + Ipamorelin",goal:"Visceral fat reduction + GH optimization",mechanism:"Tesamorelin is an FDA-studied GHRH analog proven to reduce visceral fat by 15–20%; Ipamorelin amplifies the GH pulse",dose:"Tesamorelin: 1–2mg daily; Ipamorelin: 200mcg daily",cycle:"12–26 weeks",frequency:"Daily",timing:"Pre-bed",available:"✅ Tesamorelin (TSM10)\n✅ Ipamorelin (IP10)",difficulty:"Intermediate",notes:"Best protocol for reducing central/abdominal fat. Tesamorelin has the strongest visceral fat data of any GHRH. Stack with Ipamorelin for compounded effect."},
+  {category:"Hormones & GH",emoji:"📈",name:"The HGH Stack",peptides:"HGH (Somatropin) + IGF-1 LR3",goal:"Maximum GH effect, muscle growth, body recomp",mechanism:"Exogenous HGH provides direct GH supplementation; IGF-1 LR3 is the primary downstream mediator — muscle hypertrophy, fat loss, recovery",dose:"HGH: 2–4 IU daily; IGF-1 LR3: 40–80mcg post-workout",cycle:"HGH: 3–6 months; IGF-1 LR3: 4–6 weeks cycles",frequency:"HGH: daily; IGF-1 LR3: daily on training days",timing:"HGH: AM or pre-bed; IGF-1 LR3: within 30 min post-workout",available:"✅ HGH (H10/H15)\n✅ IGF-1 LR3 (IG1)",difficulty:"Advanced",notes:"Advanced protocol. Most potent GH stack. IGF-1 LR3 has a long half-life (~20hrs). Monitor glucose — IGF-1 can cause hypoglycemia."},
+  {category:"Hormones & GH",emoji:"📈",name:"MK-677 Solo Protocol",peptides:"MK-677 (Ibutamoren)",goal:"GH/IGF-1 elevation, sleep quality, muscle, convenience",mechanism:"Oral ghrelin mimetic — stimulates GH release via GHS-R1a receptor. Only oral GH secretagogue. Raises IGF-1 by 60–70%",dose:"10–25mg orally daily",cycle:"12–24 weeks, can run longer",frequency:"Daily",timing:"Evening with food (reduces hunger side effect)",available:"✅ MK-677 (confirm current stock)",difficulty:"Beginner",notes:"Only oral option. No injections required. Ideal entry point for GH optimization. Increases appetite significantly — take with dinner. Excellent for sleep improvement."},
+  {category:"Healing & Recovery",emoji:"🩹",name:"The Wolverine Stack",peptides:"BPC-157 + TB-500",goal:"Accelerated healing of tendons, ligaments, muscles, gut",mechanism:"BPC-157 promotes angiogenesis, collagen synthesis, gut repair; TB-500 (Thymosin Beta-4) enhances cell migration, reduces inflammation, repairs cardiac & skeletal muscle",dose:"BPC-157: 250–500mcg daily; TB-500: 2.5–5mg 2×/week",cycle:"6–8 weeks loading, then maintenance",frequency:"BPC-157 daily; TB-500 2×/week",timing:"BPC-157: SQ near injury site or IM; TB-500: SQ or IM",available:"✅ BPC-157 (BC5/BC10)\n✅ TB-500 (BT5)\n✅ Premix Wolverine (BB10)",difficulty:"Beginner",notes:"#1 most popular healing stack. Available as premix BB10. BPC-157 targets local tissue while TB-500 provides systemic healing support."},
+  {category:"Healing & Recovery",emoji:"🩹",name:"The GLOW Stack",peptides:"TB-500 + BPC-157 + GHK-Cu",goal:"Healing + skin/collagen regeneration + systemic repair",mechanism:"TB-500 + BPC-157 cover injury repair; GHK-Cu adds collagen production, skin healing, and anti-inflammatory copper complex signaling",dose:"TB-500: 5mg/week; BPC-157: 500mcg/day; GHK-Cu: 1–2mg/day",cycle:"8–12 weeks",frequency:"Per individual peptide schedule",timing:"BPC-157 AM; TB-500 + GHK-Cu alternating days",available:"✅ GLOW Formula (BBG70)\n✅ Individual vials available",difficulty:"Intermediate",notes:"Bio Linked GLOW Formula contains all three. Excellent for active individuals wanting healing + aesthetic benefits simultaneously."},
+  {category:"Healing & Recovery",emoji:"🩹",name:"The KLOW Stack",peptides:"TB-500 + BPC-157 + GHK-Cu + KPV",goal:"Maximum healing + anti-inflammatory + gut repair",mechanism:"Adds KPV (anti-inflammatory tripeptide) to GLOW stack. KPV directly calms immune overactivation in gut and skin.",dose:"Per GLOW stack + KPV 500mcg–1mg daily",cycle:"8–12 weeks",frequency:"Daily",timing:"KPV: oral or SQ; rest per GLOW protocol",available:"✅ KLOW Blend (KLOW)\n✅ Available as premix",difficulty:"Intermediate",notes:"Bio Linked exclusive KLOW blend. Best stack for gut-related conditions alongside injury healing."},
+  {category:"Healing & Recovery",emoji:"🩹",name:"The Gut Repair Stack",peptides:"BPC-157 + KPV",goal:"Gut healing, IBS, leaky gut, inflammatory bowel",mechanism:"BPC-157 regenerates gut lining and reduces intestinal permeability; KPV inhibits pro-inflammatory cytokines specifically in GI tissue",dose:"BPC-157: 250–500mcg 2×/day; KPV: 500mcg–1mg daily",cycle:"8–12 weeks",frequency:"2× daily (BPC-157); daily (KPV)",timing:"BPC-157: AM + PM on empty stomach; KPV: can be oral",available:"✅ BPC-157 (BC5/BC10)\n✅ KPV (ask for availability)",difficulty:"Beginner",notes:"Ideal for gut issues. BPC-157 can be taken orally (swallowed in BAC water). Used for IBS, Crohn's, post-antibiotic gut damage."},
+  {category:"Healing & Recovery",emoji:"🩹",name:"The Athlete Recovery Stack",peptides:"BPC-157 + TB-500 + CJC-1295 + Ipamorelin",goal:"Elite recovery: tissue repair + GH optimization",mechanism:"Wolverine stack provides local/systemic tissue repair; CJC/Ipa adds GH-driven anabolic recovery, improved sleep, and systemic healing cascade",dose:"Wolverine dosing + CJC 300mcg / Ipa 300mcg pre-bed",cycle:"12–16 weeks",frequency:"Daily + 2×/week TB-500",timing:"CJC/Ipa: pre-bed; BPC-157: AM; TB-500: 2×/week",available:"✅ All available individually\n✅ Premixes available (BB10, CP10)",difficulty:"Advanced",notes:"Comprehensive protocol for high-level athletes or post-surgery recovery."},
+  {category:"Cognitive & Neuro",emoji:"🧠",name:"The Calm Focus Stack",peptides:"Semax + Selank",goal:"Focus + memory + anxiety reduction + neuroprotection",mechanism:"Semax increases BDNF and NGF supporting neuroplasticity and focus; Selank modulates GABA-A and serotonin providing anxiolytic effects without sedation",dose:"Semax: 250–500mcg; Selank: 250–500mcg — each daily or alternating",cycle:"10–14 day cycles with equal breaks",frequency:"Daily or alternating",timing:"Morning — both are stimulating/balancing",available:"✅ Semax (XA10)\n✅ Selank (SK10)",difficulty:"Intermediate",notes:"Most popular cognitive peptide stack. Semax for drive and focus; Selank for calm and emotional resilience. No dependency risk."},
+  {category:"Cognitive & Neuro",emoji:"🧠",name:"The Neuroprotection Stack",peptides:"Semax + NAD+",goal:"Brain health, cognitive longevity, mitochondrial support",mechanism:"Semax upregulates BDNF protecting neurons; NAD+ supports mitochondrial energy in neurons, DNA repair, and sirtuin activation",dose:"Semax: 300–600mcg daily; NAD+: 50–100mg weekly IM",cycle:"Semax: 10–14 day cycles; NAD+: monthly",frequency:"Semax: daily; NAD+: 1–2×/month",timing:"Semax: AM; NAD+: any time IM",available:"✅ Semax (XA10)\n✅ NAD+ (NJ500)",difficulty:"Intermediate",notes:"Excellent long-term brain health stack. NAD+ provides cellular energy foundation; Semax drives neuroplasticity."},
+  {category:"Cognitive & Neuro",emoji:"🧠",name:"The Anxiety & Resilience Stack",peptides:"Selank solo or Selank + Semax",goal:"Anxiety reduction, stress resilience, emotional stability",mechanism:"Selank is an analogue of tuftsin — modulates GABA system, serotonin, dopamine. Anti-anxiety without sedation or dependence risk",dose:"Selank: 250–500mcg daily",cycle:"10–14 days on / 7–10 days off",frequency:"Daily",timing:"Morning or as needed",available:"✅ Selank (SK10)",difficulty:"Beginner",notes:"Ideal starting point for cognitive peptides. Non-habit forming. Often described as 'calm clarity.'"},
+  {category:"Cognitive & Neuro",emoji:"🧠",name:"The Advanced Nootropic Stack",peptides:"Dihexa + Semax + Selank",goal:"Synaptogenesis, memory, executive function",mechanism:"Dihexa potentiates HGF/c-Met signaling — promotes synapse formation. Semax adds BDNF; Selank provides anxiolysis. Most powerful cognitive stack",dose:"Dihexa: 10–15mg weekly; Semax: 300mcg daily; Selank: 300mcg daily",cycle:"Dihexa: 4–8 week cycles; others: standard",frequency:"Dihexa: 1×/week; Semax/Selank: daily",timing:"Morning for all",available:"✅ Semax (XA10)\n✅ Selank (SK10)\n(Dihexa: confirm stock)",difficulty:"Advanced",notes:"Dihexa is one of the most potent nootropics known. Start very low (10mg)."},
+  {category:"Energy & Mitochondria",emoji:"⚡",name:"The NAD+ Recharge",peptides:"NAD+ + MOTS-c",goal:"Cellular energy restoration, mitochondrial function",mechanism:"NAD+ restores coenzyme levels powering SIRT1/SIRT3 pathways; MOTS-c activates AMPK improving mitochondrial biogenesis and insulin sensitivity",dose:"NAD+ 100–500mg IM or IV; MOTS-c 10mg 2–3×/week",cycle:"NAD+ series monthly; MOTS-c 8–12 weeks",frequency:"NAD+: 5–10 day loading series; MOTS-c: 2–3×/week",timing:"NAD+: any time IM; MOTS-c: morning pre-exercise",available:"✅ NAD+ (NJ500)\n✅ MOTS-c (MS10/MS40)",difficulty:"Intermediate",notes:"Best combination for energy optimization. NAD+ provides immediate cellular fuel; MOTS-c improves long-term metabolic flexibility."},
+  {category:"Energy & Mitochondria",emoji:"⚡",name:"The Mitochondrial Stack",peptides:"NAD+ + SS-31",goal:"Mitochondrial health, reduce oxidative stress, anti-aging",mechanism:"NAD+ powers mitochondrial energy chain; SS-31 (Elamipretide) concentrates in inner mitochondrial membrane, reduces ROS, improves ATP production",dose:"NAD+ 100–500mg; SS-31 1–10mg daily SQ",cycle:"NAD+: monthly series; SS-31: 4–8 weeks",frequency:"As above",timing:"Both: any time",available:"✅ NAD+ (NJ500)\n✅ SS-31 (2S10)",difficulty:"Advanced",notes:"Premier anti-aging mitochondrial stack. SS-31 has strong preclinical data showing cardioprotective, neuroprotective, and muscle-preserving effects."},
+  {category:"Energy & Mitochondria",emoji:"⚡",name:"The Exercise Mimetic Stack",peptides:"MOTS-c + SLU-PP-332",goal:"Metabolic activation, exercise-mimetic effects, endurance",mechanism:"MOTS-c mimics exercise at cellular level activating AMPK; SLU-PP-332 activates ERR receptors upregulating mitochondrial genes",dose:"MOTS-c: 10mg 2–3×/week; SLU-PP-332: 5–10mg daily",cycle:"8–12 weeks",frequency:"MOTS-c: 2–3×/week; SLU-PP-332: daily",timing:"Morning pre-exercise or with AM routine",available:"✅ MOTS-c (MS10/MS40)\n✅ SLU-PP-332 (33210)",difficulty:"Advanced",notes:"Cutting edge. SLU-PP-332 shows remarkable exercise-mimetic effects in preclinical studies."},
+  {category:"Energy & Mitochondria",emoji:"⚡",name:"The Glutathione Detox",peptides:"Glutathione + NAD+",goal:"Detoxification, antioxidant support, cellular health",mechanism:"Glutathione is the body's master antioxidant — reduces oxidative stress, supports liver detox pathways; NAD+ powers cellular repair and sirtuin-based longevity pathways",dose:"Glutathione: 300–600mg IM 2–3×/week; NAD+: 100–500mg IM",cycle:"Monthly",frequency:"2–3×/week glutathione; 5–10 day NAD+ series",timing:"Any time IM",available:"✅ Glutathione (GTT1500/GTT600)\n✅ NAD+ (NJ500)",difficulty:"Beginner",notes:"Popular wellness protocol. Glutathione brightens skin, reduces oxidative damage, supports liver health."},
+  {category:"Sexual Health",emoji:"💛",name:"The Libido Stack",peptides:"PT-141 (Bremelanotide)",goal:"Sexual arousal, libido, erectile/arousal response",mechanism:"Activates melanocortin MC3R and MC4R receptors in the brain — acts on CNS desire pathway. Works for both men and women",dose:"0.5–2mg SQ 30–60 min before activity",cycle:"As needed — not daily protocol",frequency:"Max 8× per month",timing:"30–60 min before sexual activity",available:"✅ PT-141 (P41)",difficulty:"Beginner",notes:"Works on desire not mechanics. Nausea most common side effect (reduce dose). Effective for both men and women."},
+  {category:"Sexual Health",emoji:"💛",name:"The Men's Performance Stack",peptides:"PT-141 + Tadalafil",goal:"Libido + erectile function + performance enhancement",mechanism:"PT-141 stimulates CNS desire pathway; Tadalafil (Cialis) is a PDE5 inhibitor increasing blood flow. Dual mechanism — desire AND mechanics",dose:"PT-141: 1mg SQ; Tadalafil: 5–10mg oral — both 1–2 hrs before",cycle:"As needed",frequency:"As needed, max 8× PT-141/month",timing:"1–2 hrs before activity",available:"✅ PT-141 (P41)\n✅ Tadalafil (check availability)",difficulty:"Beginner",notes:"Most popular men's sexual health stack. Addresses both desire and physical function simultaneously."},
+  {category:"Sexual Health",emoji:"💛",name:"The Hormone Support Stack",peptides:"PT-141 + HCG",goal:"Libido + natural testosterone/LH support (men)",mechanism:"PT-141 activates desire; HCG mimics LH stimulating Leydig cells to produce testosterone — especially relevant for TRT users",dose:"PT-141: 1mg as needed; HCG: 250–500 IU 2–3×/week",cycle:"HCG: ongoing; PT-141: as needed",frequency:"HCG: 2–3×/week; PT-141: as needed",timing:"HCG: morning SQ; PT-141: pre-activity",available:"✅ PT-141 (P41)\n✅ HCG (GK5/G10K)",difficulty:"Intermediate",notes:"Commonly used alongside TRT protocols. HCG prevents testicular atrophy and maintains natural hormone production."},
+  {category:"Sexual Health",emoji:"💛",name:"The Women's Wellness Stack",peptides:"PT-141 + GHK-Cu",goal:"Female libido + skin + tissue health",mechanism:"PT-141 activates desire pathway (particularly effective in women); GHK-Cu supports collagen, tissue health, and regenerative effects",dose:"PT-141: 0.5–1mg as needed; GHK-Cu: 1–2mg 3×/week",cycle:"PT-141: as needed; GHK-Cu: 8–12 week cycles",frequency:"As above",timing:"PT-141: pre-activity; GHK-Cu: any time SQ",available:"✅ PT-141 (P41)\n✅ GHK-Cu (CU50/CU100)",difficulty:"Beginner",notes:"Popular women's wellness combination. GHK-Cu adds skin/tissue regeneration benefits."},
+  {category:"Immune",emoji:"🛡",name:"The Immune Foundation",peptides:"Thymosin Alpha-1 + BPC-157",goal:"Immune modulation + gut-immune axis support",mechanism:"Thymosin Alpha-1 (Tα1) enhances T-cell maturation and innate immunity; BPC-157 supports gut lining — combined systemic + GI immune support",dose:"Tα1: 1.5mg 2×/week; BPC-157: 250–500mcg daily",cycle:"4–8 weeks",frequency:"Tα1: 2×/week; BPC-157: daily",timing:"Tα1: any time SQ; BPC-157: AM",available:"✅ Thymosin Alpha-1 (available)\n✅ BPC-157 (BC5/BC10)",difficulty:"Intermediate",notes:"Best immune foundation stack. Tα1 used clinically for chronic infections, hepatitis, cancer support."},
+  {category:"Immune",emoji:"🛡",name:"The Anti-Inflammatory Stack",peptides:"Thymosin Alpha-1 + KPV",goal:"Autoimmune support, inflammation reduction, immune regulation",mechanism:"Tα1 modulates adaptive immune response; KPV directly inhibits pro-inflammatory NF-κB pathway — dual immune regulation",dose:"Tα1: 1.5mg 2×/week; KPV: 500mcg–1mg daily",cycle:"4–8 weeks",frequency:"As above",timing:"Any time SQ",available:"✅ Thymosin Alpha-1\n(KPV: confirm stock)",difficulty:"Intermediate",notes:"Used for autoimmune conditions, mold illness, Lyme, post-viral syndromes. KPV specifically calms cytokine storms."},
+  {category:"Immune",emoji:"🛡",name:"The Gut-Immune Stack",peptides:"BPC-157 + KPV",goal:"Gut immunity, intestinal inflammation, barrier restoration",mechanism:"BPC-157 repairs gut lining permeability; KPV reduces intestinal inflammation — addressing both structure and inflammation of gut-immune barrier",dose:"BPC-157: 250–500mcg 2×/day; KPV: 500mcg daily",cycle:"8–12 weeks",frequency:"BPC-157: 2×/day; KPV: daily",timing:"BPC-157: AM + PM on empty stomach; KPV: with BPC-157 or oral",available:"✅ BPC-157 (BC5/BC10)\n(KPV: confirm stock)",difficulty:"Beginner",notes:"Best for gut-driven immune issues. BPC-157 can be taken orally for maximum GI effect."},
+  {category:"Skin & Hair",emoji:"✨",name:"The Glow Stack",peptides:"GHK-Cu + BPC-157",goal:"Skin rejuvenation + collagen + wound healing",mechanism:"GHK-Cu upregulates collagen I/III, glycosaminoglycans, and antioxidant enzymes; BPC-157 accelerates tissue repair and angiogenesis",dose:"GHK-Cu: 1–2mg 3×/week SQ; BPC-157: 250mcg daily SQ",cycle:"8–12 weeks",frequency:"GHK-Cu: 3×/week; BPC-157: daily",timing:"Any time SQ",available:"✅ GHK-Cu (CU50/CU100)\n✅ BPC-157 (BC5/BC10)\n✅ GLOW Formula (BBG70)",difficulty:"Beginner",notes:"Best skin peptide combination. Clinical studies show GHK-Cu reduces fine lines by 35%, improves skin density."},
+  {category:"Skin & Hair",emoji:"✨",name:"The Anti-Aging Skin Stack",peptides:"GHK-Cu + Glutathione",goal:"Skin brightening + antioxidant protection + collagen",mechanism:"GHK-Cu drives collagen synthesis; Glutathione reduces oxidative damage to skin cells and inhibits melanin (skin brightening)",dose:"GHK-Cu: 2mg 3×/week; Glutathione: 300–600mg IM 2–3×/week",cycle:"8–12 weeks",frequency:"GHK-Cu: 3×/week; Glutathione: 2–3×/week",timing:"Any time IM/SQ",available:"✅ GHK-Cu (CU50/CU100)\n✅ Glutathione (GTT1500/GTT600)",difficulty:"Beginner",notes:"Popular beauty protocol. Glutathione provides systemic skin brightening; GHK-Cu targets structural collagen improvement."},
+  {category:"Skin & Hair",emoji:"✨",name:"The Full Beauty Stack",peptides:"GHK-Cu + TB-500 + Glutathione",goal:"Comprehensive skin, hair, collagen, and tissue regeneration",mechanism:"GHK-Cu: collagen + elastin synthesis; TB-500: hair follicle activation, systemic repair; Glutathione: antioxidant, skin brightening",dose:"GHK-Cu: 2mg 3×/week; TB-500: 2.5mg 1×/week; Glutathione: 600mg 3×/week",cycle:"8–12 weeks",frequency:"As above",timing:"Any time SQ/IM",available:"✅ GHK-Cu (CU50/CU100)\n✅ TB-500 (BT5)\n✅ Glutathione (GTT1500)\n✅ GLOW Formula (BBG70)",difficulty:"Intermediate",notes:"Comprehensive aesthetic protocol. TB-500's role in hair growth is supported by research on thymosin beta-4 in hair follicle stem cell activation."},
+  {category:"Skin & Hair",emoji:"✨",name:"The Tan & Skin Stack",peptides:"Melanotan 2 + GHK-Cu",goal:"Skin tanning + collagen + libido (MT2 side effect)",mechanism:"Melanotan 2 activates melanocortin receptors stimulating melanogenesis; GHK-Cu improves skin texture and collagen alongside tanning effect",dose:"MT2: 0.5–1mg 3–5×/week (loading); GHK-Cu: 1–2mg 3×/week",cycle:"4–8 weeks loading; GHK-Cu ongoing",frequency:"As above",timing:"MT2: evening (reduces nausea); GHK-Cu: any time",available:"✅ Melanotan 2 (check stock)\n✅ GHK-Cu (CU50/CU100)",difficulty:"Intermediate",notes:"MT2 provides cosmetic tanning effect. Note: MT2 also activates libido (shares receptor with PT-141). Start with 250mcg and titrate up."},
+  {category:"Anti-Aging",emoji:"🕰",name:"The Longevity Foundation",peptides:"Epitalon + GHK-Cu",goal:"Telomere support + cellular aging reversal + skin",mechanism:"Epitalon activates telomerase lengthening telomeres and regulates pineal function/melatonin; GHK-Cu combats cellular aging through collagen synthesis and DNA repair signaling",dose:"Epitalon: 10mg/day for 10 consecutive days (2–4× yearly); GHK-Cu: 2mg 3×/week ongoing",cycle:"Epitalon: 10-day cycles 2–4×/year; GHK-Cu: 8–12 week cycles",frequency:"As above",timing:"Epitalon: pre-bed; GHK-Cu: any time",available:"✅ GHK-Cu (CU50/CU100)\n(Epitalon: confirm stock)",difficulty:"Intermediate",notes:"Most evidence-backed anti-aging stack. Epitalon has human and animal data showing increased lifespan and improved immune function."},
+  {category:"Anti-Aging",emoji:"🕰",name:"The NAD+ Longevity Stack",peptides:"NAD+ + Epitalon + GHK-Cu",goal:"Comprehensive cellular anti-aging and longevity",mechanism:"NAD+ restores declining coenzyme levels; Epitalon activates telomerase; GHK-Cu supports tissue integrity — addresses 3 core aging pillars",dose:"NAD+: 100–500mg IM monthly; Epitalon: 10mg/day × 10 days quarterly; GHK-Cu: 2mg 3×/week",cycle:"NAD+: monthly; Epitalon: quarterly; GHK-Cu: continuous",frequency:"Per individual peptide",timing:"NAD+: any time; Epitalon: pre-bed; GHK-Cu: any time",available:"✅ NAD+ (NJ500)\n✅ GHK-Cu (CU50/CU100)\n(Epitalon: confirm stock)",difficulty:"Advanced",notes:"Comprehensive longevity protocol. Addresses mitochondrial aging (NAD+), chromosomal aging (Epitalon), and tissue aging (GHK-Cu)."},
+  {category:"Anti-Aging",emoji:"🕰",name:"The GH Anti-Aging Stack",peptides:"CJC-1295 + Ipamorelin + Epitalon",goal:"GH optimization + cellular longevity + body recomp",mechanism:"CJC/Ipa restore age-declining GH levels — improving body composition, sleep, cognitive function; Epitalon adds telomere protection and circadian regulation",dose:"CJC-1295: 300mcg + Ipamorelin: 300mcg nightly; Epitalon: 10mg × 10 days quarterly",cycle:"CJC/Ipa: 12–16 weeks on/off; Epitalon: quarterly",frequency:"CJC/Ipa: nightly; Epitalon: quarterly cycle",timing:"CJC/Ipa: pre-bed; Epitalon: pre-bed during cycle",available:"✅ CJC-1295 No DAC (CND5/10)\n✅ Ipamorelin (IP10)\n✅ Premix (CP10)\n(Epitalon: confirm stock)",difficulty:"Intermediate",notes:"Anti-aging GH protocol. GH naturally declines ~14% per decade after 30. CJC/Ipa restore youthful GH pulsatility."},
+  {category:"Anti-Aging",emoji:"🕰",name:"The Skin & Longevity Stack",peptides:"GHK-Cu + MOTS-c + Glutathione",goal:"Visible anti-aging + metabolic health + antioxidant defense",mechanism:"GHK-Cu reverses skin aging biomarkers; MOTS-c improves metabolic flexibility and mitochondrial health; Glutathione addresses oxidative stress accumulation",dose:"GHK-Cu: 2mg 3×/week; MOTS-c: 10mg 2×/week; Glutathione: 600mg 2–3×/week",cycle:"8–12 weeks",frequency:"As above",timing:"Any time IM/SQ",available:"✅ GHK-Cu (CU50/CU100)\n✅ MOTS-c (MS10/MS40)\n✅ Glutathione (GTT1500/GTT600)",difficulty:"Intermediate",notes:"Comprehensive visible + internal anti-aging protocol. Addresses all major aging pathways: structural (GHK-Cu), metabolic (MOTS-c), oxidative (Glutathione)."}
+];
+
+const CAT_META=[{cat:'all',label:'All'},{cat:'Weight Loss',label:'⚖ Weight Loss',pill:'pill-weight'},{cat:'Hormones & GH',label:'📈 Hormones',pill:'pill-hormones'},{cat:'Healing & Recovery',label:'🩹 Healing',pill:'pill-healing'},{cat:'Cognitive & Neuro',label:'🧠 Cognitive',pill:'pill-cognitive'},{cat:'Energy & Mitochondria',label:'⚡ Energy',pill:'pill-energy'},{cat:'Sexual Health',label:'💛 Sexual Health',pill:'pill-sexual'},{cat:'Immune',label:'🛡 Immune',pill:'pill-immune'},{cat:'Skin & Hair',label:'✨ Skin & Hair',pill:'pill-skin'},{cat:'Anti-Aging',label:'🕰 Anti-Aging',pill:'pill-antiaging'}];
+const DIFF_META=[{diff:'all',label:'All Levels'},{diff:'Beginner',label:'🟢 Beginner'},{diff:'Intermediate',label:'🟡 Intermediate'},{diff:'Advanced',label:'🔴 Advanced'}];
+function pillClass(cat){return CAT_META.find(c=>c.cat===cat)?.pill||'pill-healing';}
+function catShort(cat){const m={"Weight Loss":"WEIGHT LOSS","Hormones & GH":"HORMONES","Healing & Recovery":"HEALING","Cognitive & Neuro":"COGNITIVE","Energy & Mitochondria":"ENERGY","Sexual Health":"SEXUAL HEALTH","Immune":"IMMUNE","Skin & Hair":"SKIN & HAIR","Anti-Aging":"ANTI-AGING"};return m[cat]||cat.toUpperCase();}
+function diffChip(d){if(!d)return'';const dl=d.toLowerCase();if(dl.includes('beginner'))return`<span class="diff-chip diff-green">🟢 ${d}</span>`;if(dl.includes('intermediate'))return`<span class="diff-chip diff-gold">🟡 ${d}</span>`;if(dl.includes('advanced'))return`<span class="diff-chip diff-red">🔴 ${d}</span>`;return'';}
+function renderAvail(raw){if(!raw)return'<span style="color:var(--muted)">—</span>';return'<div class="avail-list">'+raw.split('\n').map(l=>{l=l.trim();const soft=!l.startsWith('✅')||l.includes('confirm')||l.includes('check');return`<div class="${soft?'avail-soft':'avail-yes'}">${l}</div>`;}).join('')+'</div>';}
+function renderMAvail(raw){if(!raw)return'';return'<div class="m-avail-list">'+raw.split('\n').map(l=>{l=l.trim();const soft=!l.startsWith('✅')||l.includes('confirm')||l.includes('check');return`<div class="${soft?'m-avail-soft':'m-avail-yes'}">${l}</div>`;}).join('')+'</div>';}
+
+let view='grid',activeCat='all',activeDiff='all',searchQ='';
+
+function buildMobileFilters(){document.getElementById('mobile-cat-filters').innerHTML=CAT_META.map((c,i)=>`<button class="fchip ${i===0?'active':''}" data-mcat="${c.cat}" onclick="setMobileCat('${c.cat}',this)">${c.label}</button>`).join('');document.getElementById('mobile-diff-filters').innerHTML=DIFF_META.map((d,i)=>`<button class="fchip ${i===0?'active':''}" data-mdiff="${d.diff}" onclick="setMobileDiff('${d.diff}',this)">${d.label}</button>`).join('');}
+function setMobileCat(cat,btn){activeCat=cat;document.querySelectorAll('#mobile-cat-filters .fchip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function setMobileDiff(diff,btn){activeDiff=diff;document.querySelectorAll('#mobile-diff-filters .fchip').forEach(b=>b.classList.remove('active'));btn.classList.add('active');render();}
+function onSearch(q){searchQ=q;render();}
+function setView(v){view=v;document.getElementById('btnGrid').classList.toggle('active',v==='grid');document.getElementById('btnList').classList.toggle('active',v==='list');render();}
+function toggleCard(el){el.classList.toggle('open');}
+function filtered(){const qlo=searchQ.toLowerCase().trim();return STACKS.filter(s=>{if(activeCat!=='all'&&s.category!==activeCat)return false;if(activeDiff!=='all'&&!s.difficulty.toLowerCase().includes(activeDiff.toLowerCase()))return false;if(qlo){const hay=[s.name,s.peptides,s.goal,s.mechanism,s.notes,s.category].join(' ').toLowerCase();return qlo.split(' ').every(w=>hay.includes(w));}return true;});}
+function buildDesktopCard(s,i){return`<div class="card" style="animation-delay:${Math.min(i*0.035,0.45)}s"><div class="card-top"><div class="card-row1"><div class="card-name">${s.name}</div><span class="cat-tag">${catShort(s.category)}</span></div><div class="card-peptides">${s.peptides}</div><div class="card-goal">${s.goal}</div><div class="diff-row">${diffChip(s.difficulty)}</div></div><div class="card-footer" onclick="toggleCard(this.closest('.card'))"><span class="view-details-btn">View Details</span><div style="display:flex;align-items:center;gap:14px"><div class="footer-meta"><div class="fmeta"><span class="fmeta-key">Cycle</span><span class="fmeta-val">${s.cycle||'—'}</span></div></div><div class="footer-meta"><div class="fmeta"><span class="fmeta-key">Freq.</span><span class="fmeta-val">${s.frequency||'—'}</span></div></div><span class="expand-icon">▾</span></div></div><div class="card-detail"><div class="detail-grid"><div class="dblock full"><span class="dkey">Mechanism / How It Works</span><span class="dval">${s.mechanism}</span></div><div class="d-divider"></div><div class="dblock"><span class="dkey">Dose Range</span><span class="dval">${s.dose||'—'}</span></div><div class="dblock"><span class="dkey">Cycle Length</span><span class="dval">${s.cycle||'—'}</span></div><div class="dblock"><span class="dkey">Frequency</span><span class="dval">${s.frequency||'—'}</span></div><div class="dblock"><span class="dkey">Best Timing</span><span class="dval">${s.timing||'—'}</span></div><div class="dblock full"><span class="dkey">Available at Bio Linked</span>${renderAvail(s.available)}</div></div><div class="notes-box"><div class="dkey">Research Notes &amp; Synergies</div><div class="dval">${s.notes}</div></div></div></div>`;}
+function buildMobileCard(s,i){const pClass=pillClass(s.category);return`<div class="m-card" style="animation-delay:${Math.min(i*0.025,0.4)}s"><div class="m-card-header"><div class="m-card-row1"><div class="m-card-name">${s.name}</div><span class="m-cat-pill ${pClass}">${catShort(s.category)}</span></div></div><div class="m-card-peptides">${s.peptides}</div><div class="m-card-goal">${s.goal}</div><div class="m-card-stats"><div class="m-stat"><div class="m-stat-lbl">Level</div><div class="m-stat-val">${s.difficulty}</div></div><div class="m-stat"><div class="m-stat-lbl">Cycle</div><div class="m-stat-val">${s.cycle||'—'}</div></div><div class="m-stat"><div class="m-stat-lbl">Freq.</div><div class="m-stat-val">${s.frequency?.split(';')[0]||'—'}</div></div></div><div class="m-card-toggle" onclick="toggleCard(this.closest('.m-card'))"><span class="m-toggle-lbl">View Mechanism &amp; Details</span><span class="m-toggle-icon">▾</span></div><div class="m-card-detail"><div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${s.mechanism}</div></div><div class="m-detail-section"><div class="m-detail-label">Dose Range</div><div class="m-detail-text">${s.dose||'—'}</div></div><div class="m-detail-2col"><div><div class="m-detail-label">Timing</div><div class="m-detail-text">${s.timing||'—'}</div></div><div><div class="m-detail-label">Frequency</div><div class="m-detail-text">${s.frequency||'—'}</div></div></div><div class="m-avail"><div class="m-detail-label">Available at Bio Linked</div>${renderMAvail(s.available)}</div><div class="m-notes"><div class="m-detail-label">Research Notes &amp; Synergies</div><div class="m-detail-text" style="font-size:11.5px">${s.notes}</div></div></div></div>`;}
+function render(){const list=filtered();document.getElementById('countNum').textContent=list.length;document.getElementById('liveCount').textContent=list.length;const desktopEl=document.getElementById('desktop-content');const mobileEl=document.getElementById('mobile-content');const emptyEl=document.getElementById('empty-state');if(!list.length){desktopEl.innerHTML='';mobileEl.innerHTML='';emptyEl.style.display='block';return;}emptyEl.style.display='none';const grouped=activeCat==='all'&&!searchQ.trim();if(grouped){const groups={},order=[];list.forEach(s=>{if(!groups[s.category]){groups[s.category]=[];order.push(s.category);}groups[s.category].push(s);});let idx=0;desktopEl.innerHTML=order.map(c=>{const stacks=groups[c];return`<div class="cat-section"><div class="cat-heading"><span class="cat-icon">${stacks[0].emoji}</span><span class="cat-name">${c}</span><span class="cat-count">${stacks.length} Stack${stacks.length>1?'s':''}</span></div><div class="${view==='grid'?'cards-grid':'cards-list'}">${stacks.map(s=>buildDesktopCard(s,idx++)).join('')}</div></div>`;}).join('');mobileEl.innerHTML=order.map((c,gi)=>{const stacks=groups[c];return`<div class="m-cat-section"><div class="m-cat-heading"><span class="m-cat-icon">${stacks[0].emoji}</span><span class="m-cat-name">${c}</span><span class="m-cat-count">${stacks.length}</span></div>${stacks.map((s,i)=>buildMobileCard(s,gi*10+i)).join('')}</div>`;}).join('');}else{desktopEl.innerHTML=`<div class="${view==='grid'?'cards-grid':'cards-list'}">${list.map((s,i)=>buildDesktopCard(s,i)).join('')}</div>`;mobileEl.innerHTML=list.map((s,i)=>buildMobileCard(s,i)).join('');}}
+buildMobileFilters();
+document.getElementById('searchInput').addEventListener('input',e=>{searchQ=e.target.value;render();});
+document.querySelectorAll('.filter-row .fchip[data-cat]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-row .fchip[data-cat]').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeCat=b.dataset.cat;render();}));
+document.querySelectorAll('.filter-row .fchip[data-diff]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.filter-row .fchip[data-diff]').forEach(x=>x.classList.remove('active'));b.classList.add('active');activeDiff=b.dataset.diff;render();}));
+document.getElementById('siteNavBtn').addEventListener('click',function(){document.getElementById('siteNavMenu').classList.toggle('open');});
+render();
+</script>
+</body>
+</html>
