@@ -160,6 +160,47 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 }
 .btn-demo:hover{border-color:var(--silver);color:var(--silver);}
 
+/* LAB UPLOAD ZONE */
+.lab-upload-zone{
+  border:2px dashed var(--border-gold);border-radius:var(--radius);
+  padding:22px 18px;text-align:center;cursor:pointer;transition:all .2s;
+  background:var(--gold-dim);position:relative;
+}
+.lab-upload-zone:hover,.lab-upload-zone.drag{border-color:var(--gold);background:rgba(212,175,55,0.11);}
+.lab-upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.lab-upload-icon{font-size:26px;margin-bottom:6px;}
+.lab-upload-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.lab-upload-sub{font-size:11px;color:var(--text-2);margin-bottom:10px;line-height:1.6;}
+.lab-upload-btn{
+  display:inline-block;background:var(--gold);color:#0d0d0e;
+  font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  padding:8px 20px;border-radius:6px;cursor:pointer;border:none;transition:background .15s;
+  pointer-events:none;
+}
+.lab-upload-zone:hover .lab-upload-btn{background:var(--gold-lt);}
+.lab-upload-formats{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;justify-content:center;}
+.lab-upload-parsing{
+  display:none;padding:14px;background:var(--gold-dim);border:1px solid var(--border-gold);
+  border-radius:var(--radius);margin-top:10px;text-align:center;
+}
+.lab-upload-parsing.show{display:block;}
+.lab-parse-spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border-gold);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lab-parse-text{font-size:11px;color:var(--gold);font-weight:600;vertical-align:middle;}
+.lab-upload-result{
+  display:none;padding:12px 14px;background:var(--green-bg);border:1px solid var(--green-bdr);
+  border-radius:var(--radius);margin-top:10px;
+}
+.lab-upload-result.show{display:flex;align-items:flex-start;gap:9px;}
+.lab-result-icon{font-size:16px;flex-shrink:0;}
+.lab-result-text{font-size:11px;color:var(--green);font-weight:600;line-height:1.5;}
+.lab-result-sub{font-size:10px;color:var(--text-3);font-weight:400;margin-top:1px;}
+.lab-upload-error{
+  display:none;padding:10px 13px;background:var(--red-bg);border:1px solid var(--red-bdr);
+  border-radius:var(--radius);margin-top:10px;font-size:11px;color:var(--red);
+}
+.lab-upload-error.show{display:block;}
+
 /* UPLOAD ZONE */
 .upload-zone{
   border:2px dashed var(--border-gold);border-radius:var(--radius);
@@ -482,6 +523,34 @@ canvas{display:block;}
               </select>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Upload Lab Report</h2><p>AI auto-fills your values from a PDF or photo</p></div>
+        <div class="card-body">
+          <div class="lab-upload-zone" id="labDropZone">
+            <input type="file" id="labFileInput" accept=".pdf,image/*" onchange="handleLabUpload(this.files[0])">
+            <div class="lab-upload-icon">📄</div>
+            <div class="lab-upload-title">Drop Lab Report Here</div>
+            <div class="lab-upload-sub">PDF or photo of your results — Claude AI reads and fills all fields automatically</div>
+            <span class="lab-upload-btn">Select File</span>
+            <div class="lab-upload-formats">
+              <span class="pchip">PDF</span><span class="pchip">JPG / PNG</span><span class="pchip">HEIC</span><span class="pchip">Screenshot</span>
+            </div>
+          </div>
+          <div class="lab-upload-parsing" id="labParsing">
+            <span class="lab-parse-spinner"></span>
+            <span class="lab-parse-text">Reading your lab report…</span>
+          </div>
+          <div class="lab-upload-result" id="labResult">
+            <span class="lab-result-icon">✅</span>
+            <div>
+              <div class="lab-result-text" id="labResultText">Lab values extracted</div>
+              <div class="lab-result-sub" id="labResultSub">Scroll down to review and adjust before analyzing</div>
+            </div>
+          </div>
+          <div class="lab-upload-error" id="labError"></div>
         </div>
       </div>
 
@@ -1407,6 +1476,98 @@ function dnaRender(map){
   }
   draw();
 })();
+
+
+// ══════════════════════════════════════════════════════
+// LAB REPORT UPLOAD → AI PARSE
+// ══════════════════════════════════════════════════════
+const labDz = document.getElementById('labDropZone');
+labDz.addEventListener('dragover', e => { e.preventDefault(); labDz.classList.add('drag'); });
+labDz.addEventListener('dragleave', () => labDz.classList.remove('drag'));
+labDz.addEventListener('drop', e => { e.preventDefault(); labDz.classList.remove('drag'); const f = e.dataTransfer.files[0]; if (f) handleLabUpload(f); });
+
+async function handleLabUpload(file) {
+  const parsing = document.getElementById('labParsing');
+  const result  = document.getElementById('labResult');
+  const err     = document.getElementById('labError');
+  parsing.classList.remove('show'); result.classList.remove('show'); err.classList.remove('show');
+
+  if (!file) return;
+  const allowed = /\.(pdf|jpg|jpeg|png|gif|webp|heic|heif|bmp|tiff?)$/i;
+  if (!allowed.test(file.name) && !file.type.startsWith('image/') && file.type !== 'application/pdf') {
+    err.textContent = 'Please upload a PDF or image file (JPG, PNG, HEIC, etc.)';
+    err.classList.add('show'); return;
+  }
+
+  parsing.classList.add('show');
+
+  try {
+    const base64 = await fileToBase64(file);
+    const isPdf  = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    const mediaType = isPdf ? 'application/pdf' : (file.type || 'image/jpeg');
+
+    const contentBlock = isPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
+      : { type: 'image',    source: { type: 'base64', media_type: mediaType,           data: base64 } };
+
+    const prompt = `You are reading a blood work / lab report. Extract every numeric lab value you can find and return ONLY a JSON object mapping field IDs to numeric values. Use ONLY these field IDs (skip any not found in the report):
+
+bw-age, bw-glucose, bw-hba1c, bw-insulin, bw-homa, bw-tc, bw-hdl, bw-ldl, bw-trig, bw-crp, bw-homo, bw-wbc, bw-fibrin, bw-ttest, bw-ftest, bw-dhea, bw-cortisol, bw-igf1, bw-tsh, bw-e2, bw-prl, bw-alt, bw-ast, bw-ggt, bw-alb, bw-creat, bw-egfr, bw-ua, bw-bili, bw-hgb, bw-rbc, bw-plt, bw-mcv, bw-vitd, bw-b12, bw-ferr, bw-mag
+
+Return ONLY raw JSON, no markdown, no explanation. Example: {"bw-glucose":92,"bw-hba1c":5.2}`;
+
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: [contentBlock, { type: 'text', text: prompt }] }]
+      })
+    });
+
+    const data = await resp.json();
+    parsing.classList.remove('show');
+
+    if (!resp.ok || !data.content) throw new Error(data.error?.message || 'API error');
+
+    const raw = data.content.find(b => b.type === 'text')?.text?.trim() || '';
+    const clean = raw.replace(/```json|```/g, '').trim();
+    const values = JSON.parse(clean);
+
+    let filled = 0;
+    for (const [id, val] of Object.entries(values)) {
+      const el = document.getElementById(id);
+      if (el && val !== null && val !== undefined) {
+        el.value = val;
+        el.style.borderColor = 'var(--border-gold)';
+        el.style.background   = 'rgba(154,123,47,0.06)';
+        filled++;
+      }
+    }
+
+    if (filled === 0) throw new Error('No recognizable lab values found in this file.');
+
+    document.getElementById('labResultText').textContent = `${filled} lab value${filled !== 1 ? 's' : ''} auto-filled`;
+    document.getElementById('labResultSub').textContent  = 'Scroll down to review — highlighted fields were populated from your report';
+    result.classList.add('show');
+    showToast(`✅ ${filled} biomarkers extracted from your lab report`);
+
+  } catch (e) {
+    parsing.classList.remove('show');
+    err.textContent = '⚠ ' + (e.message || 'Could not parse lab report. Try a clearer image or PDF.');
+    err.classList.add('show');
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(',')[1]);
+    r.onerror = () => rej(new Error('File read failed'));
+    r.readAsDataURL(file);
+  });
+}
 
 function showToast(msg){
   const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
