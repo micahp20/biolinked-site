@@ -16,7 +16,6 @@
   const tools = [
     {href:'/peptide-tracker.html', label:'Peptide Tracker'},
     {href:'/stack-analyzer.html', label:'Stack Analyzer'},
-    {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
   ];
 
   const navHTML = `
