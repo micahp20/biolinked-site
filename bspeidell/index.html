@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brad Speidell — BioLinked Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #8B7335;
+    --gold-light: #A08840;
+    --gold-dim: rgba(139,115,53,0.10);
+    --gold-border: rgba(139,115,53,0.30);
+    --bg: #f5f5f5;
+    --bg-card: #ffffff;
+    --bg-card2: #f0f0f0;
+    --white: #1a1a1a;
+    --text: #1a1a1a;
+    --text-muted: #666666;
+    --border: rgba(0,0,0,0.10);
+    --green: #3a7a5a;
+    --green-dim: rgba(58,122,90,0.2);
+  }
+  body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+  .header {
+    background: #ffffff;
+    border-bottom: 1px solid var(--gold-border);
+    padding: 4rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .header-logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .header-logo::before, .header-logo::after { content: ''; width: 40px; height: 1px; background: var(--gold-border); }
+  .header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 6vw, 58px); color: var(--white); font-weight: 400; line-height: 1.1; margin-bottom: 0.5rem; letter-spacing: 0.02em; }
+  .header h1 em { color: var(--gold); font-style: italic; }
+  .header-sub { color: var(--text-muted); font-size: 12px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0.5rem; }
+  .header-meta { display: flex; justify-content: center; gap: 0; margin-top: 2.5rem; flex-wrap: wrap; border: 1px solid var(--gold-border); border-radius: 2px; overflow: hidden; max-width: 700px; margin-left: auto; margin-right: auto; }
+  .meta-item { flex: 1; min-width: 120px; text-align: center; padding: 1rem 1.25rem; border-right: 1px solid var(--gold-border); }
+  .meta-item:last-child { border-right: none; }
+  .meta-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .meta-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); font-weight: 600; }
+  .nav-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    border-bottom: 1px solid var(--gold-border);
+    background: #ffffff;
+    position: sticky;
+    top: 56px;
+    z-index: 100;
+  }
+  .nav-tab { padding: 1rem 2rem; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Montserrat', sans-serif; }
+  .nav-tab:hover { color: var(--gold); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .section { margin-top: 4rem; }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gold-border); }
+  .section-icon { width: 34px; height: 34px; border-radius: 2px; border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-icon svg { width: 16px; height: 16px; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--white); letter-spacing: 0.02em; }
+  .intro-card { background: var(--bg-card); border: 1px solid var(--gold-border); border-left: 3px solid var(--gold); padding: 1.5rem 2rem; margin-top: 3rem; border-radius: 2px; }
+  .intro-card p { font-size: 15px; color: #333330; line-height: 1.85; font-weight: 300; }
+  .intro-card strong { font-weight: 600; color: var(--gold-light); }
+  .peptide-grid { display: grid; gap: 1.5rem; }
+  .peptide-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; transition: border-color 0.2s; }
+  .peptide-card:hover { border-color: var(--gold-border); }
+  .peptide-header { padding: 1.5rem 1.75rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; background: var(--bg-card2); }
+  .peptide-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--white); margin-bottom: 4px; letter-spacing: 0.02em; }
+  .peptide-tagline { font-size: 10px; color: var(--gold); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+  .peptide-price { background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; padding: 6px 16px; border-radius: 2px; white-space: nowrap; }
+  .peptide-body { padding: 1.5rem 1.75rem; display: grid; gap: 1.25rem; }
+  .peptide-section-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+  .peptide-text { font-size: 14px; color: #444440; line-height: 1.75; font-weight: 300; }
+  .peptide-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 0.75rem; }
+  .detail-box { background: #fafafa; border: 1px solid var(--border); border-radius: 2px; padding: 0.875rem 1rem; }
+  .detail-box .label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .detail-box .value { font-size: 14px; font-weight: 500; color: var(--text); }
+  .recon-steps { counter-reset: step; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .recon-steps li { counter-increment: step; display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: #444440; line-height: 1.65; font-weight: 300; }
+  .recon-steps li::before { content: counter(step); min-width: 22px; height: 22px; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .week-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--gold-border); border-radius: 2px; overflow: hidden; }
+  .week-cell { background: var(--bg-card); padding: 1rem 0.75rem; text-align: center; }
+  .week-cell.header { background: #f0f0f0; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); font-weight: 600; padding: 0.875rem; }
+  .week-cell .wk { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500; }
+  .week-cell .phase { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600; color: var(--gold-light); }
+  .week-cell .note { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.5; font-weight: 300; }
+  .week-cell.phase-ramp { background: #f0f5f0; }
+  .week-cell.phase-full { background: #eaf2eb; }
+  .week-cell.phase-taper { background: #f5f3ec; }
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .schedule-table th { background: #f0f0f0; color: var(--gold); padding: 10px 14px; text-align: left; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--gold-border); }
+  .schedule-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: #444440; vertical-align: top; font-weight: 300; }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .schedule-table tr td { background: var(--bg-card); }
+  .schedule-table tr:nth-child(even) td { background: var(--bg-card2); }
+  .peptide-pill { display: inline-block; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold-light); font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 99px; margin: 2px 3px 2px 0; letter-spacing: 0.03em; }
+  .storage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .storage-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1.25rem 1.5rem; }
+  .storage-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 0.5rem; color: var(--gold-light); letter-spacing: 0.03em; }
+  .storage-card p { font-size: 13px; color: #444440; line-height: 1.7; font-weight: 300; }
+  .monitor-list { display: grid; gap: 8px; }
+  .monitor-item { display: flex; gap: 14px; align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; font-size: 14px; color: #444440; line-height: 1.65; font-weight: 300; }
+  .monitor-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .dot-normal { background: #3a7a5a; }
+  .dot-watch { background: var(--gold); }
+  .price-table { background: var(--bg-card); border: 1px solid var(--gold-border); border-radius: 2px; overflow: hidden; }
+  .price-row { display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 1.75rem; border-bottom: 1px solid var(--border); }
+  .price-row:last-child { border-bottom: none; }
+  .price-row.total { background: #f0f0f0; border-top: 1px solid var(--gold-border); }
+  .price-row .item { font-size: 15px; color: var(--text); font-weight: 400; }
+  .price-row .qty { font-size: 12px; color: var(--text-muted); margin-top: 2px; font-weight: 300; }
+  .price-row .amt { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--gold-light); }
+  .price-row.total .item { color: var(--white); font-size: 16px; font-weight: 600; letter-spacing: 0.03em; }
+  .price-row.total .qty { color: var(--text-muted); }
+  .price-row.total .amt { font-size: 26px; color: var(--gold); }
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--gold-border); }
+  .timeline-item { position: relative; margin-bottom: 2rem; }
+  .timeline-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); border: 2px solid var(--bg); }
+  .timeline-week { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 4px; }
+  .timeline-text { font-size: 14px; color: #444440; line-height: 1.75; font-weight: 300; }
+  .disclaimer { background: #f8f8f8; border: 1px solid rgba(201,168,76,0.2); border-radius: 2px; padding: 1.25rem 1.75rem; margin-top: 3.5rem; font-size: 13px; color: #6a5a30; line-height: 1.75; font-weight: 300; }
+  .disclaimer strong { font-weight: 600; color: var(--gold); }
+  .footer { text-align: center; padding: 2rem; margin-top: 2rem; border-top: 1px solid var(--gold-border); font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .footer strong { color: var(--gold); font-weight: 600; }
+  #tab-tracker .section { margin-top: 2rem; }
+  .tracker-top { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+  .tracker-stat { background: var(--bg-card); border: 1px solid var(--gold-border); border-radius: 2px; padding: 1.25rem; text-align: center; }
+  .tracker-stat .ts-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .tracker-stat .ts-value { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold); font-weight: 600; }
+  .tracker-stat .ts-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .week-selector { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1.5rem; justify-content: center; }
+  .week-nav-btn { width: 36px; height: 36px; background: var(--bg-card); border: 1px solid var(--gold-border); color: var(--gold); border-radius: 2px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .week-nav-btn:hover { background: var(--gold-dim); }
+  .week-label { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--white); font-weight: 600; min-width: 120px; text-align: center; }
+  .tracker-grid-wrap { display: grid; grid-template-columns: 130px 1fr; gap: 6px; margin-bottom: 3px; }
+  .tracker-compound-label { display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+  .compound-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; color: var(--gold); text-align: right; line-height: 1.3; }
+  .compound-badge span { display: block; color: var(--text-muted); font-weight: 400; font-size: 9px; letter-spacing: 0.08em; }
+  .day-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day-header-row { display: grid; grid-template-columns: 130px 1fr; gap: 6px; margin-bottom: 2px; }
+  .day-headers-inner { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day-header { text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 8px 4px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 2px 2px 0 0; }
+  .day-header.rest-day { color: #aaaaaa; }
+  .dose-cell { background: var(--bg-card); border: 1px solid var(--border); border-top: none; padding: 6px 4px; text-align: center; cursor: pointer; transition: all 0.15s; position: relative; min-height: 38px; display: flex; align-items: center; justify-content: center; }
+  .dose-cell:last-child { border-radius: 0 0 2px 2px; }
+  .dose-cell.scheduled { cursor: pointer; }
+  .dose-cell.scheduled:hover { background: var(--gold-dim); }
+  .dose-cell.taken { background: var(--green-dim); border-color: rgba(58,122,90,0.4); }
+  .dose-cell.taken::after { content: '✓'; color: #5ab87a; font-size: 16px; font-weight: 700; }
+  .dose-cell.scheduled:not(.taken)::after { content: '○'; color: var(--gold-border); font-size: 14px; }
+  .dose-cell.rest { background: transparent; border-color: transparent; cursor: default; }
+  .dose-cell.rest::after { content: '—'; color: #cccccc; font-size: 12px; }
+  .notes-area { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; margin-top: 1.5rem; }
+  .notes-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+  .notes-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; padding: 0.75rem 1rem; color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 300; resize: vertical; min-height: 70px; outline: none; transition: border-color 0.2s; }
+  .notes-input:focus { border-color: var(--gold-border); }
+  .notes-input::placeholder { color: var(--text-muted); }
+  .tracker-actions { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .action-btn { flex: 1; min-width: 160px; padding: 0.875rem 1.5rem; border: 1px solid var(--gold-border); background: var(--gold-dim); color: var(--gold-light); font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: all 0.2s; text-align: center; }
+  .action-btn:hover { background: rgba(201,168,76,0.25); border-color: var(--gold); color: var(--gold); }
+  .action-btn.primary { background: var(--gold); color: #ffffff; border-color: var(--gold); }
+  .action-btn.primary:hover { background: var(--gold-light); }
+  .progress-bar-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; margin-top: 1rem; }
+  .progress-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; transition: width 0.4s ease; }
+  .cycle-start-row { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; flex-wrap: wrap; }
+  .cycle-start-row label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  .cycle-start-row input[type="date"] { background: var(--bg); border: 1px solid var(--gold-border); border-radius: 2px; padding: 6px 12px; color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 13px; outline: none; color-scheme: light; }
+  .save-badge { display: inline-block; background: var(--green-dim); border: 1px solid rgba(58,122,90,0.5); color: #5ab87a; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 99px; opacity: 0; transition: opacity 0.3s; }
+  .save-badge.show { opacity: 1; }
+  .ios-download-banner { background: rgba(139,115,53,0.04); border: 1px solid var(--gold-border); border-left: 3px solid var(--gold); border-radius: 2px; padding: 1.25rem 1.75rem; margin-top: 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .ios-banner-text { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+  .ios-banner-text strong { color: var(--gold-light); font-weight: 600; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .container > * { animation: fadeUp 0.5s ease both; }
+  @media (max-width: 600px) {
+    .week-grid { grid-template-columns: repeat(2, 1fr); }
+    .storage-grid { grid-template-columns: 1fr; }
+    .peptide-header { flex-direction: column; }
+    .header-meta { flex-direction: column; }
+    .meta-item { border-right: none; border-bottom: 1px solid var(--gold-border); }
+    .tracker-top { grid-template-columns: 1fr 1fr; }
+    .nav-tab { padding: 0.875rem 1rem; font-size: 10px; }
+    .tracker-grid-wrap { grid-template-columns: 90px 1fr; }
+    .day-header-row { grid-template-columns: 90px 1fr; }
+    .compound-badge { font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Brad <em>Speidell</em></h1>
+  <div class="header-sub">Cognitive Recovery &amp; Neural Restoration Protocol</div>
+  <div class="header-meta">
+    <div class="meta-item"><span class="meta-label">Cycle Length</span><span class="meta-value">8 Weeks</span></div>
+    <div class="meta-item"><span class="meta-label">Compounds</span><span class="meta-value">5 Peptides</span></div>
+    <div class="meta-item"><span class="meta-label">Total Investment</span><span class="meta-value">$680</span></div>
+    <div class="meta-item"><span class="meta-label">Prepared by</span><span class="meta-value">BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('protocol')">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('tracker')">Daily Tracker</button>
+</div>
+
+<div class="container">
+
+  <div id="tab-protocol" class="tab-content active">
+    <div class="intro-card">
+      <p>Brad, this protocol is built specifically around <strong>cognitive restoration, neurological healing, and reducing dependency on stimulants and sedatives</strong>. After years of high-pressure performance, your brain has taken a real hit — dopamine dysregulation, mitochondrial stress, elevated cortisol, and neural inflammation are all in play. These five compounds work synergistically to repair what's been depleted, calm your nervous system without sedation, and rebuild your mental edge naturally. <strong>This is your reset.</strong></p>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#C9A84C" stroke-width="1.2"/></svg></div>
+        <div class="section-title">Your Protocol — 5 Compounds</div>
+      </div>
+      <div class="peptide-grid">
+
+        <div class="peptide-card">
+          <div class="peptide-header"><div><div class="peptide-name">MOTS-C</div><div class="peptide-tagline">Mitochondrial Restoration &amp; Metabolic Reset</div></div><div class="peptide-price">$140</div></div>
+          <div class="peptide-body">
+            <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">MOTS-C is a mitochondria-derived peptide that activates AMPK, restoring cellular energy production, reducing inflammation, and improving metabolic resilience. This is the foundation — nothing else works well if your mitochondria are depleted. It also supports insulin sensitivity and has shown promise in reducing neuroinflammation. The 5-days-on / 2-days-off schedule allows for cellular adaptation while maximizing benefit across the full 8-week cycle.</div></div>
+            <div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 vials × 40 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">2 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">5 days on / 2 days off</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Morning, fasted</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div></div></div>
+            <div><div class="peptide-section-label">Reconstitution (40 mg vial — 3 mL BAC)</div><ol class="recon-steps"><li>Add 3 mL bacteriostatic (BAC) water per vial — run slowly down the vial wall. 3 mL into 40 mg = 13.3 mg/mL; draw <strong>15 units (0.15 mL) = 2 mg dose</strong>.</li><li>Never squirt directly onto the powder — gently swirl until fully dissolved</li><li>Solution should be clear with no particles — yields 20 doses per vial</li><li>Draw 15 units (0.15 mL) per 2 mg dose using an insulin syringe (29–31 gauge)</li><li>Refrigerate — good for 30 days after reconstitution</li></ol></div>
+          </div>
+        </div>
+
+        <div class="peptide-card">
+          <div class="peptide-header"><div><div class="peptide-name">Semax</div><div class="peptide-tagline">Cognitive Enhancement &amp; BDNF Upregulation</div></div><div class="peptide-price">$45</div></div>
+          <div class="peptide-body">
+            <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Semax dramatically increases Brain-Derived Neurotrophic Factor (BDNF) — the key protein responsible for neuroplasticity, memory formation, and rebuilding damaged neural pathways. It sharpens focus and working memory acutely while the longer-term healing happens underneath. Dosed Monday / Wednesday / Friday to allow receptor sensitivity to be maintained and avoid desensitization over the 8-week cycle.</div></div>
+            <div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 vials × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">1 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Mon / Wed / Fri</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Morning</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div></div></div>
+            <div><div class="peptide-section-label">Reconstitution (10 mg vial — 2 mL BAC)</div><ol class="recon-steps"><li>Add 2 mL BAC water per vial — 1 mL = 5 mg; draw <strong>10 units (0.1 mL) = 500 mcg dose</strong>.</li><li>Swirl gently until fully dissolved — do not shake</li><li>Draw 10 units (0.1 mL) into a 29–31 gauge insulin syringe</li><li>Inject SubQ into abdomen or outer thigh</li><li>Refrigerate — discard 30 days after reconstitution</li></ol></div>
+          </div>
+        </div>
+
+        <div class="peptide-card">
+          <div class="peptide-header"><div><div class="peptide-name">Selank</div><div class="peptide-tagline">Anxiolytic, Stress Relief &amp; GABA Modulation</div></div><div class="peptide-price">$45</div></div>
+          <div class="peptide-body">
+            <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Selank is a heptapeptide that modulates the GABAergic system without dependency, sedation, or systemic stress. It reduces anxiety and cortisol while simultaneously increasing serotonin and dopamine expression. Calm under fire, without the fog. Dosed Monday / Wednesday / Friday in alignment with Semax — the two work as a pair: Semax sharpens, Selank steadies.</div></div>
+            <div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 vials × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">1 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Mon / Wed / Fri</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Afternoon / pre-stress</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div></div></div>
+            <div><div class="peptide-section-label">Reconstitution (10 mg vial — 2 mL BAC)</div><ol class="recon-steps"><li>Add 2 mL BAC water per vial — 1 mL = 5 mg; draw <strong>10 units (0.1 mL) = 500 mcg dose</strong>.</li><li>Swirl gently until clear — do not shake</li><li>Draw 10 units (0.1 mL) into a 29–31 gauge insulin syringe</li><li>Inject SubQ — can be used before high-stress events or consistently each afternoon on dose days</li><li>Refrigerate — good for 30 days reconstituted</li></ol></div>
+          </div>
+        </div>
+
+        <div class="peptide-card">
+          <div class="peptide-header"><div><div class="peptide-name">SS-31 (Elamipretide)</div><div class="peptide-tagline">Mitochondrial Membrane Repair &amp; Oxidative Stress</div></div><div class="peptide-price">$45</div></div>
+          <div class="peptide-body">
+            <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">SS-31 works at the mitochondrial membrane level — binding directly to cardiolipin in the inner mitochondrial membrane to reduce oxidative stress and restore electron transport chain function. It repairs mitochondrial damage at the source. Users often report a noticeable increase in mental and physical energy within the first two weeks. The 5-days-on / 2-days-off schedule mirrors MOTS-C for a powerful dual mitochondrial stack.</div></div>
+            <div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 vials × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">500 mcg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">5 days on / 2 days off</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Morning with MOTS-C</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div></div></div>
+            <div><div class="peptide-section-label">Reconstitution (10 mg vial — 2 mL BAC)</div><ol class="recon-steps"><li>Add 2 mL BAC water per vial — 1 mL = 5 mg; draw <strong>10 units</strong> (0.1 mL) = 500 mcg dose</li><li>Swirl gently until fully dissolved — clear solution</li><li>Draw 10 units (0.1 mL) into insulin syringe and inject SubQ into abdomen or outer thigh</li><li>Rotate injection sites to avoid buildup</li><li>Refrigerate — use within 30 days of reconstitution</li></ol></div>
+          </div>
+        </div>
+
+        <div class="peptide-card">
+          <div class="peptide-header"><div><div class="peptide-name">NAD+</div><div class="peptide-tagline">Cellular Energy, DNA Repair &amp; Recovery</div></div><div class="peptide-price">$65 × 2</div></div>
+          <div class="peptide-body">
+            <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">NAD+ is the backbone of this entire stack. It's a coenzyme essential for every energy-producing reaction in the body — without adequate NAD+, none of the other peptides work at full capacity. Beyond energy, NAD+ has a well-documented role in recovery: it directly supports dopamine receptor repair, reduces cravings, improves mood stability, and activates sirtuins — proteins responsible for DNA repair and longevity. Dosed 2x per week to complete the full 8-week cycle with 2 × 500 mg vials.</div></div>
+            <div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 vials × 500 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">100 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">2x per week (e.g. Tue/Sat)</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Morning, fasted</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div></div></div>
+            <div><div class="peptide-section-label">Reconstitution (500 mg vial)</div><ol class="recon-steps"><li>Add 3 mL BAC water per vial — 1 mL = 166.7 mg; draw <strong>60 units (0.6 mL) = 100 mg dose</strong>.</li><li>Swirl gently until fully dissolved — NAD+ is water-soluble and dissolves quickly</li><li>Start at a half dose (30 units / 0.3 mL / ~50 mg) for the first 1–2 sessions to assess tolerance</li><li>NAD+ can cause flushing if injected too fast — inject slowly over 30–60 seconds SubQ</li><li>Refrigerate immediately — use within 14 days for best potency. Two vials × 500 mg = 1,000 mg total; at 100 mg/dose × 2x/week × 8 weeks = 16 doses total covered.</li></ol></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#C9A84C" stroke-width="0.8"/></svg></div>
+        <div class="section-title">8-Week Cycle Overview</div>
+      </div>
+      <div class="week-grid">
+        <div class="week-cell header">Week</div><div class="week-cell header">Phase</div><div class="week-cell header">Focus</div><div class="week-cell header">Notes</div>
+        <div class="week-cell phase-ramp"><div class="wk">Week 1</div></div><div class="week-cell phase-ramp"><div class="phase">Ramp-up</div></div><div class="week-cell phase-ramp"><div class="note">Baseline</div></div><div class="week-cell phase-ramp"><div class="note">Start all compounds. NAD+ at half dose. Log sleep &amp; energy daily.</div></div>
+        <div class="week-cell phase-ramp"><div class="wk">Week 2</div></div><div class="week-cell phase-ramp"><div class="phase">Ramp-up</div></div><div class="week-cell phase-ramp"><div class="note">Adaptation</div></div><div class="week-cell phase-ramp"><div class="note">Increase NAD+ to full dose. Monitor energy and sleep quality.</div></div>
+        <div class="week-cell phase-full"><div class="wk">Weeks 3–6</div></div><div class="week-cell phase-full"><div class="phase">Full Protocol</div></div><div class="week-cell phase-full"><div class="note">Peak healing</div></div><div class="week-cell phase-full"><div class="note">All compounds at full dose. Peak cognitive improvement weeks 4–5.</div></div>
+        <div class="week-cell phase-taper"><div class="wk">Week 7</div></div><div class="week-cell phase-taper"><div class="phase">Consolidation</div></div><div class="week-cell phase-taper"><div class="note">Lock in gains</div></div><div class="week-cell phase-taper"><div class="note">Assess results. Review energy, focus, and cravings metrics.</div></div>
+        <div class="week-cell phase-taper"><div class="wk">Week 8</div></div><div class="week-cell phase-taper"><div class="phase">Wind-down</div></div><div class="week-cell phase-taper"><div class="note">Off-ramp</div></div><div class="week-cell phase-taper"><div class="note">Taper Semax and Selank. Evaluate next cycle needs.</div></div>
+      </div>
+      <div style="margin-top: 1.5rem;">
+        <div class="peptide-section-label" style="margin-bottom: 0.75rem;">Weekly schedule — full protocol (weeks 3–6)</div>
+        <table class="schedule-table">
+          <thead><tr><th>Day</th><th>Compound(s)</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:var(--text)">Mon / Wed / Fri</strong></td><td><span class="peptide-pill">MOTS-C</span><span class="peptide-pill">SS-31</span><span class="peptide-pill">Semax</span><span class="peptide-pill">Selank</span></td><td>MOTS-C + SS-31 + Semax in the morning fasted. Selank in the afternoon or pre-meeting. All SubQ.</td></tr>
+            <tr><td><strong style="color:var(--text)">Tue / Thu</strong></td><td><span class="peptide-pill">MOTS-C</span><span class="peptide-pill">SS-31</span></td><td>MOTS-C and SS-31 continue on 5-days-on schedule (Mon–Fri). Semax and Selank are off these days.</td></tr>
+            <tr><td><strong style="color:var(--text)">Tue or Sat</strong></td><td><span class="peptide-pill">NAD+</span></td><td>NAD+ 2x per week, spaced ~3 days apart. Suggested Tue + Sat or Mon + Thu. Inject slowly SubQ over 30–60 seconds to minimize flushing.</td></tr>
+            <tr><td><strong style="color:var(--text)">Sat / Sun</strong></td><td>—</td><td>MOTS-C and SS-31 rest days (2 days off). Semax and Selank off. NAD+ on one of these days if on Sat schedule.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M3 12L6 8L9 10L13 4" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="section-title">What to Expect — Week by Week</div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="timeline-week">Weeks 1–2</div><div class="timeline-text">Initial phase. You may feel more tired than usual as your body begins clearing accumulated oxidative stress. Sleep may deepen noticeably. Some users notice mood improvement by end of week 2 as NAD+ begins restoring dopamine pathways. Mild flushing with NAD+ is normal — slow your injection speed.</div></div>
+        <div class="timeline-item"><div class="timeline-week">Weeks 3–4</div><div class="timeline-text">Cognitive clarity starts emerging. Working memory, verbal fluency, and focus begin sharpening — critical for high-pressure performance. Physical energy improves as the mitochondrial compounds take full hold. This is when most clients first notice a meaningful shift in how they feel under pressure.</div></div>
+        <div class="timeline-item"><div class="timeline-week">Weeks 5–6</div><div class="timeline-text">Peak protocol window. Most clients report their best cognitive performance during this phase. Anxiety under pressure should be noticeably lower. You may also notice improved sleep architecture, better resilience to stress, and less reliance on stimulants to perform at your best.</div></div>
+        <div class="timeline-item"><div class="timeline-week">Weeks 7–8</div><div class="timeline-text">Consolidation phase. The neurological gains from weeks 3–6 begin to stabilize. Results should feel natural and integrated. End-of-cycle check: How is sleep? Focus? Stress tolerance? This determines whether a repeat cycle or maintenance protocol makes sense going forward.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="#C9A84C" stroke-width="1.2"/><path d="M6 6H10M6 9H8" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        <div class="section-title">Storage &amp; Handling</div>
+      </div>
+      <div class="storage-grid">
+        <div class="storage-card"><h4>Before reconstitution (dry powder)</h4><p>Store all vials in the refrigerator at 36–46°F (2–8°C). Keep away from light and moisture. Do not freeze. Shelf life is typically 12–24 months unopened.</p></div>
+        <div class="storage-card"><h4>After reconstitution</h4><p>All reconstituted vials must be refrigerated. Use within 30 days (NAD+ within 14 days for best potency). Never freeze a reconstituted peptide. Always use a fresh insulin syringe for each draw.</p></div>
+        <div class="storage-card"><h4>Bacteriostatic water (BAC water)</h4><p>Use sterile BAC water for all five injectable compounds in this protocol. BAC water's benzyl alcohol preservative extends shelf life of reconstituted peptides. Do not substitute plain sterile water.</p></div>
+        <div class="storage-card"><h4>Syringes &amp; injection sites</h4><p>Use 29–31 gauge insulin syringes (0.5 mL or 1 mL). Never reuse a syringe. Dispose in a sharps container. Rotate injection sites daily — abdomen, outer thigh, and glute all work well.</p></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#C9A84C" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V9.5" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.5" fill="#C9A84C"/></svg></div>
+        <div class="section-title">What to Monitor</div>
+      </div>
+      <div class="monitor-list">
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Mild flushing or warmth with NAD+ — slow injection speed to 30–60 seconds. Resolves after week 1–2.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Small injection site redness or minor bruising — rotate sites daily and use proper SubQ technique.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Vivid dreams or slightly disrupted sleep in week 1 as your nervous system begins recalibrating.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Persistent headaches beyond week 2 — reduce Semax dose by half and contact BioLinked Solutions.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Worsening anxiety or significant mood swings — pause Semax, continue Selank, reach out to your consultant.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Injection site hot, swollen, or red beyond 24 hours — may indicate technique issue or contamination. Do not reuse that vial.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#C9A84C" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+        <div class="section-title">Protocol Investment &mdash; Choose Your Level</div>
+      </div>
+
+      <div style="display:flex;border:1px solid var(--gold-border);border-radius:2px 2px 0 0;overflow:hidden;">
+        <button onclick="showLevel(1,this)" id="ltab1" style="flex:1;padding:1rem 0.5rem;background:#f0f0f0;border:none;border-right:1px solid var(--gold-border);cursor:pointer;text-align:center;"><span style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:Montserrat,sans-serif;font-weight:600;">Level 1</span><span style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);display:block;">Full Stack</span><span style="font-size:10px;display:block;color:var(--text-muted);margin-top:2px;font-family:Montserrat,sans-serif;">All 5 compounds &middot; $680</span></button>
+        <button onclick="showLevel(2,this)" id="ltab2" style="flex:1;padding:1rem 0.5rem;background:var(--bg-card2);border:none;border-right:1px solid var(--gold-border);cursor:pointer;text-align:center;"><span style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:Montserrat,sans-serif;font-weight:600;">Level 2</span><span style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);display:block;">Core Stack</span><span style="font-size:10px;display:block;color:var(--text-muted);margin-top:2px;font-family:Montserrat,sans-serif;">3 compounds &middot; $460</span></button>
+        <button onclick="showLevel(3,this)" id="ltab3" style="flex:1;padding:1rem 0.5rem;background:var(--bg-card2);border:none;cursor:pointer;text-align:center;"><span style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:Montserrat,sans-serif;font-weight:600;">Level 3</span><span style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);display:block;">Starter</span><span style="font-size:10px;display:block;color:var(--text-muted);margin-top:2px;font-family:Montserrat,sans-serif;">2 compounds &middot; $440</span></button>
+      </div>
+
+      <div id="level1" class="price-table" style="border-top:none;border-radius:0 0 2px 2px;">
+        <div style="background:rgba(201,168,76,0.08);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">Maximum results &mdash; all 5 compounds working synergistically. Mitochondrial repair, cognitive boost, stress relief, membrane restoration, and cellular energy fully covered.</div>
+        <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">2 &times; 40 mg vials &mdash; $140/vial &mdash; 5 days on / 2 days off</div></div><div class="amt">$280</div></div>
+        <div class="price-row"><div><div class="item">Semax</div><div class="qty">2 &times; 10 mg vials &mdash; $45/vial &mdash; Mon / Wed / Fri</div></div><div class="amt">$90</div></div>
+        <div class="price-row"><div><div class="item">Selank</div><div class="qty">2 &times; 10 mg vials &mdash; $45/vial &mdash; Mon / Wed / Fri</div></div><div class="amt">$90</div></div>
+        <div class="price-row"><div><div class="item">SS-31 (Elamipretide)</div><div class="qty">2 &times; 10 mg vials &mdash; $45/vial &mdash; 5 days on / 2 days off</div></div><div class="amt">$90</div></div>
+        <div class="price-row"><div><div class="item">NAD+</div><div class="qty">2 &times; 500 mg vials &mdash; $65/vial &mdash; 2x per week</div></div><div class="amt">$130</div></div>
+        <div class="price-row total"><div><div class="item">Total &mdash; Level 1 Full Stack</div><div class="qty">All 5 compounds &middot; 8-week supply</div></div><div class="amt">$680</div></div>
+      </div>
+      <div id="level2" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+        <div style="background:rgba(201,168,76,0.08);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">Removes NAD+ and SS-31. Retains the cognitive core (Semax + Selank) and the mitochondrial foundation (MOTS-C). Solid 8-week results at a more accessible price point.</div>
+        <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">2 &times; 40 mg vials &mdash; $140/vial</div></div><div class="amt">$280</div></div>
+        <div class="price-row"><div><div class="item">Semax</div><div class="qty">2 &times; 10 mg vials &mdash; $45/vial</div></div><div class="amt">$90</div></div>
+        <div class="price-row"><div><div class="item">Selank</div><div class="qty">2 &times; 10 mg vials &mdash; $45/vial</div></div><div class="amt">$90</div></div>
+        <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">SS-31 (Elamipretide)</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+        <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">NAD+</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+        <div class="price-row total"><div><div class="item">Total &mdash; Level 2 Core Stack</div><div class="qty">3 compounds &middot; 8-week supply</div></div><div class="amt">$460</div></div>
+      </div>
+      <div id="level3" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+        <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">MOTS-C + KLOW — mitochondrial restoration paired with the BioLinked recovery blend. Cellular energy, inflammation reduction, and tissue repair in one clean stack. Best entry point &mdash; easy to add Semax, Selank, SS-31, or NAD+ mid-cycle.</div>
+        <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">2 &times; 40 mg vials &mdash; $140/vial &mdash; 5 days on / 2 days off</div></div><div class="amt">$280</div></div>
+        <div class="price-row"><div><div class="item">KLOW Recovery Blend</div><div class="qty">2 &times; 80 units &mdash; $80/vial &mdash; 5 days on / 2 days off</div></div><div class="amt">$160</div></div>
+        <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">Semax</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+        <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">Selank</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+        <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">SS-31 (Elamipretide)</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+        <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">NAD+</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+        <div class="price-row total"><div><div class="item">Total &mdash; Level 3 Starter</div><div class="qty">2 compounds &middot; 8-week supply</div></div><div class="amt">$440</div></div>
+      </div>
+      <script>
+      function showLevel(n,btn){
+        ["level1","level2","level3"].forEach(function(id){document.getElementById(id).style.display="none";});
+        ["ltab1","ltab2","ltab3"].forEach(function(id){document.getElementById(id).style.background="var(--bg-card2)";});
+        document.getElementById("level"+n).style.display="block";
+        btn.style.background="#f0f0f0";
+      }
+      </script>
+    </div>
+
+    <div class="disclaimer"><strong>Important Notice:</strong> This protocol has been prepared by BioLinked Solutions for educational and informational purposes only. It does not constitute medical advice, diagnosis, or treatment. Peptides discussed in this document are research compounds. Always consult with a licensed healthcare provider before beginning any new supplement or compound protocol. BioLinked Solutions is not responsible for adverse outcomes resulting from misuse or improper administration. If you experience any adverse reactions, discontinue use immediately and seek medical attention.</div>
+  </div>
+
+  <div id="tab-tracker" class="tab-content">
+    <div class="section" style="margin-top:2rem;">
+      <div class="section-header">
+        <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="section-title">Daily Dose Tracker</div>
+      </div>
+      <div class="cycle-start-row">
+        <label>Cycle Start Date</label>
+        <input type="date" id="cycleStartDate" onchange="setCycleStart(this.value)">
+        <span class="save-badge" id="saveBadge">Saved ✓</span>
+      </div>
+      <div class="tracker-top" id="trackerStats">
+        <div class="tracker-stat"><div class="ts-label">Cycle Progress</div><div class="ts-value" id="statWeek">—</div><div class="ts-sub" id="statDay">Set start date above</div></div>
+        <div class="tracker-stat"><div class="ts-label">Doses Taken</div><div class="ts-value" id="statDoses">0</div><div class="ts-sub">this week</div></div>
+        <div class="tracker-stat"><div class="ts-label">Completion</div><div class="ts-value" id="statPct">0%</div><div class="ts-sub">overall cycle</div></div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-label"><span>8-Week Cycle Overall</span><span id="progressLabel">0 / 56 days</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+      <div class="week-selector">
+        <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+        <div class="week-label" id="weekLabel">Week 1</div>
+        <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+      </div>
+      <div id="trackerGrid"></div>
+      <div class="notes-area">
+        <div class="notes-label">Weekly Notes — How are you feeling?</div>
+        <textarea class="notes-input" id="weekNotes" placeholder="Energy levels, sleep quality, mood, cravings, side effects..." oninput="saveNotes()"></textarea>
+      </div>
+      <div class="tracker-actions">
+        <button class="action-btn" onclick="markAllToday()">✓ Mark All Today</button>
+        <button class="action-btn" onclick="clearWeek()">Clear This Week</button>
+        <button class="action-btn primary" onclick="downloadTracker()">⬇ Download for iOS</button>
+      </div>
+      <div class="ios-download-banner">
+        <div class="ios-banner-text"><strong>Save to iPhone</strong> — Tap <em>Download for iOS</em> above, then open the file in Safari on your iPhone. Tap the Share button → <em>Add to Home Screen</em> to install as a standalone app. Your dose log saves locally to the device.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Personalized Protocol for Brad Speidell &nbsp;·&nbsp; 8-Week Cycle</div>
+
+<script>
+const COMPOUNDS = [
+  {id:'motsc',name:'MOTS-C',sub:'2 mg SubQ',type:'weekdays',days:[1,2,3,4,5]},
+  {id:'semax',name:'Semax',sub:'2 mg SubQ',type:'mwf',days:[1,3,5]},
+  {id:'selank',name:'Selank',sub:'2 mg SubQ',type:'mwf',days:[1,3,5]},
+  {id:'ss31',name:'SS-31',sub:'2 mg SubQ',type:'weekdays',days:[1,2,3,4,5]},
+  {id:'nad',name:'NAD+',sub:'100 mg SubQ',type:'twiceweek',days:[2,6]}
+];
+const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let currentWeek=1,state={},cycleStartDate=null;
+
+function loadState(){try{const s=localStorage.getItem('bradProtocolState');if(s)state=JSON.parse(s);const d=localStorage.getItem('bradCycleStart');if(d){cycleStartDate=new Date(d);document.getElementById('cycleStartDate').value=d;}}catch(e){}updateStats();}
+function saveState(){try{localStorage.setItem('bradProtocolState',JSON.stringify(state));const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}catch(e){}}
+function saveNotes(){const n=document.getElementById('weekNotes').value;if(!state[currentWeek])state[currentWeek]={};state[currentWeek].__notes=n;saveState();}
+function setCycleStart(val){cycleStartDate=val?new Date(val):null;try{localStorage.setItem('bradCycleStart',val);}catch(e){}updateStats();const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}
+function isScheduled(c,dow){return c.days.includes(dow);}
+function getWeekDates(wn){if(!cycleStartDate)return null;const s=new Date(cycleStartDate);s.setDate(s.getDate()+(wn-1)*7);const d=[];for(let i=0;i<7;i++){const dd=new Date(s);dd.setDate(dd.getDate()+i);d.push(dd);}return d;}
+function toggleDose(wn,cid,di){if(!state[wn])state[wn]={};if(!state[wn][cid])state[wn][cid]={};state[wn][cid][di]=!state[wn][cid][di];saveState();renderGrid();updateStats();}
+function isDoseTaken(wn,cid,di){return!!(state[wn]&&state[wn][cid]&&state[wn][cid][di]);}
+function renderGrid(){
+  const c=document.getElementById('trackerGrid');
+  const wd=getWeekDates(currentWeek);
+  let h='<div class="day-header-row"><div></div><div class="day-headers-inner">';
+  for(let d=0;d<7;d++){const dn=DAY_NAMES[(d+1)%7];const ds=wd?wd[d].getDate():'';const ir=COMPOUNDS.every(cc=>!isScheduled(cc,(d+1)%7));h+=`<div class="day-header${ir?' rest-day':''}">${dn}${ds?'<br><span style="font-size:9px;font-weight:300;color:#555">'+ds+'</span>':''}</div>`;}
+  h+='</div></div>';
+  COMPOUNDS.forEach(cc=>{
+    h+=`<div class="tracker-grid-wrap"><div class="tracker-compound-label"><div class="compound-badge">${cc.name}<span>${cc.sub}</span></div></div><div class="day-row">`;
+    for(let d=0;d<7;d++){const dw=(d+1)%7;const sc=isScheduled(cc,dw);const tk=isDoseTaken(currentWeek,cc.id,d);if(!sc)h+='<div class="dose-cell rest"></div>';else if(tk)h+=`<div class="dose-cell scheduled taken" onclick="toggleDose(${currentWeek},'${cc.id}',${d})"></div>`;else h+=`<div class="dose-cell scheduled" onclick="toggleDose(${currentWeek},'${cc.id}',${d})"></div>`;}
+    h+='</div></div>';
+  });
+  c.innerHTML=h;
+  document.getElementById('weekNotes').value=(state[currentWeek]&&state[currentWeek].__notes)||'';
+  document.getElementById('weekLabel').textContent='Week '+currentWeek;
+}
+function changeWeek(d){const n=currentWeek+d;if(n<1||n>8)return;currentWeek=n;renderGrid();}
+function markAllToday(){const dow=new Date().getDay();let di=-1;for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}if(di<0)return;if(!state[currentWeek])state[currentWeek]={};COMPOUNDS.forEach(cc=>{if(isScheduled(cc,dow)){if(!state[currentWeek][cc.id])state[currentWeek][cc.id]={};state[currentWeek][cc.id][di]=true;}});saveState();renderGrid();updateStats();}
+function clearWeek(){if(!confirm('Clear all dose logs for Week '+currentWeek+'?'))return;if(state[currentWeek]){const n=state[currentWeek].__notes;state[currentWeek]={};if(n)state[currentWeek].__notes=n;}saveState();renderGrid();updateStats();}
+function updateStats(){
+  let wt='Week '+currentWeek,dt='of 8-week cycle';
+  if(cycleStartDate){const now=new Date();const d=Math.floor((now-cycleStartDate)/(1000*60*60*24));const cw=Math.min(8,Math.max(1,Math.floor(d/7)+1));wt='Week '+cw;dt='Day '+Math.min(d+1,56)+' of 56';if(currentWeek===1&&cw>1)currentWeek=cw;const p=Math.min(100,Math.round((d/56)*100));document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressLabel').textContent=Math.min(d+1,56)+' / 56 days';document.getElementById('statPct').textContent=p+'%';}
+  document.getElementById('statWeek').textContent=wt;document.getElementById('statDay').textContent=dt;
+  let dc=0,sc=0;for(let d=0;d<7;d++){const dw=(d+1)%7;COMPOUNDS.forEach(cc=>{if(isScheduled(cc,dw)){sc++;if(isDoseTaken(currentWeek,cc.id,d))dc++;}});}
+  document.getElementById('statDoses').textContent=dc+'/'+sc;
+}
+function switchTab(tab){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  event.target.classList.add('active');
+  if(tab==='tracker'){renderGrid();updateStats();}
+}
+function downloadTracker(){
+  const sv=document.getElementById('cycleStartDate').value||'';
+  const trackerHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Brad Protocol">
+<title>Brad Speidell — Peptide Tracker</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);--bg:#f5f5f5;--bg-card:#111;--bg-card2:#f0f0f0;--white:#fff;--text:#1a1a1a;--text-muted:#666666;--border:rgba(0,0,0,0.10);--green-dim:rgba(58,122,90,0.2)}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);font-size:14px;padding-bottom:env(safe-area-inset-bottom)}
+.hdr{background:#0d0d0d;border-bottom:1px solid var(--gold-border);padding:max(1.5rem,env(safe-area-inset-top)) 1rem 1rem;text-align:center}
+.hdr h1{font-size:22px;color:var(--white);font-weight:300}
+.hdr h1 em{color:var(--gold);font-style:normal}
+.hdr p{font-size:10px;color:var(--text-muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px}
+.wrap{max-width:600px;margin:0 auto;padding:1rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.stat{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:4px;padding:12px 8px;text-align:center}
+.stat .val{font-size:22px;color:var(--gold);font-weight:600}
+.stat .lbl{font-size:9px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}
+.prog-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:1rem}
+.prog-top{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-bottom:8px}
+.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.3s}
+.week-sel{display:flex;align-items:center;justify-content:center;gap:12px;margin:1rem 0}
+.wnav{width:40px;height:40px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:4px;font-size:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wlbl{font-size:20px;color:var(--white);font-weight:300;min-width:100px;text-align:center}
+.grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:1rem}
+.tracker-table{width:100%;border-collapse:collapse;min-width:340px}
+.tracker-table th{background:#111;color:var(--gold);padding:8px 4px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--gold-border)}
+.tracker-table th.compound-col{text-align:left;padding-left:8px;min-width:90px}
+.tracker-table td{padding:4px;text-align:center;border-bottom:1px solid var(--border)}
+.tracker-table td.compound-name{text-align:left;padding-left:8px;font-size:11px;font-weight:600;color:var(--gold-light);white-space:nowrap}
+.tracker-table td.compound-name span{display:block;font-size:9px;font-weight:400;color:var(--text-muted)}
+.tracker-table tr:nth-child(even) td{background:var(--bg-card2)}
+.dose-btn{width:36px;height:36px;border-radius:4px;border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:16px;transition:all 0.1s}
+.dose-btn.taken{background:var(--green-dim);border-color:rgba(58,122,90,0.5)}
+.dose-btn.rest{background:transparent;border-color:transparent;cursor:default;color:#333;font-size:12px}
+.dose-btn:active{transform:scale(0.9)}
+.notes-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:1rem}
+.notes-lbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.notes-ta{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px;color:var(--text);font-family:-apple-system,sans-serif;font-size:13px;resize:vertical;min-height:60px;outline:none}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.btn{padding:14px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold-light);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center}
+.btn:active{background:rgba(201,168,76,0.3)}
+.footer-note{text-align:center;font-size:11px;color:var(--text-muted);padding:1rem;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="hdr"><h1>Brad <em>Speidell</em> — Peptide Tracker</h1><p>BioLinked Solutions · 8-Week Protocol</p></div>
+<div class="wrap">
+  <div class="stats"><div class="stat"><div class="val" id="sWeek">—</div><div class="lbl">Current Week</div></div><div class="stat"><div class="val" id="sDoses">0</div><div class="lbl">Doses This Week</div></div><div class="stat"><div class="val" id="sPct">0%</div><div class="lbl">Cycle Complete</div></div></div>
+  <div class="prog-wrap"><div class="prog-top"><span>8-Week Cycle</span><span id="pLabel">0/56 days</span></div><div class="prog-bar"><div class="prog-fill" id="pFill" style="width:0%"></div></div></div>
+  <div class="week-sel"><div class="wnav" onclick="chWk(-1)">‹</div><div class="wlbl" id="wLabel">Week 1</div><div class="wnav" onclick="chWk(1)">›</div></div>
+  <div class="grid-wrap"><table class="tracker-table"><thead><tr><th class="compound-col">Compound</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead><tbody id="tBody"></tbody></table></div>
+  <div class="notes-wrap"><div class="notes-lbl">Weekly Notes</div><textarea class="notes-ta" id="wNotes" placeholder="Energy, sleep, mood, side effects..." oninput="svNotes()"></textarea></div>
+  <div class="btns"><div class="btn" onclick="markToday()">✓ Mark All Today</div><div class="btn" onclick="clrWeek()">Clear Week</div></div>
+  <div class="footer-note">Tap any circle to log a dose. Green = taken. Dash = rest day.<br>Data saves automatically to this device.</div>
+</div>
+<script>
+const CMPS=[{id:'motsc',name:'MOTS-C',sub:'2 mg SubQ',days:[1,2,3,4,5]},{id:'semax',name:'Semax',sub:'2 mg SubQ',days:[1,3,5]},{id:'selank',name:'Selank',sub:'2 mg SubQ',days:[1,3,5]},{id:'ss31',name:'SS-31',sub:'2 mg SubQ',days:[1,2,3,4,5]},{id:'nad',name:'NAD+',sub:'100 mg SubQ',days:[2,6]}];
+let cw=1,st={};
+const SD='${sv}';
+function ls(){try{const s=localStorage.getItem('bpState2');if(s)st=JSON.parse(s);}catch(e){}upd();}
+function sv2(){try{localStorage.setItem('bpState2',JSON.stringify(st));}catch(e){}}
+function svNotes(){if(!st[cw])st[cw]={};st[cw].__notes=document.getElementById('wNotes').value;sv2();}
+function isSched(c,dow){return c.days.includes(dow);}
+function isTaken(w,cid,di){return!!(st[w]&&st[w][cid]&&st[w][cid][di]);}
+function toggle(w,cid,di){if(!st[w])st[w]={};if(!st[w][cid])st[w][cid]={};st[w][cid][di]=!st[w][cid][di];sv2();render();upd();}
+function render(){const tb=document.getElementById('tBody');let html='';CMPS.forEach(c=>{html+='<tr><td class="compound-name">'+c.name+'<span>'+c.sub+'</span></td>';for(let d=0;d<7;d++){const dow=(d+1)%7;if(!isSched(c,dow)){html+='<td><div class="dose-btn rest">—</div></td>';}else if(isTaken(cw,c.id,d)){html+='<td><div class="dose-btn taken" onclick="toggle('+cw+',\''+c.id+'\','+d+')">✓</div></td>';}else{html+='<td><div class="dose-btn" onclick="toggle('+cw+',\''+c.id+'\','+d+')">○</div></td>';}}html+='</tr>';});tb.innerHTML=html;document.getElementById('wLabel').textContent='Week '+cw;const n=st[cw]&&st[cw].__notes?st[cw].__notes:'';document.getElementById('wNotes').value=n;}
+function chWk(d){const n=cw+d;if(n<1||n>8)return;cw=n;render();upd();}
+function markToday(){const dow=new Date().getDay();let di=-1;for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}if(di<0)return;if(!st[cw])st[cw]={};CMPS.forEach(c=>{if(isSched(c,dow)){if(!st[cw][c.id])st[cw][c.id]={};st[cw][c.id][di]=true;}});sv2();render();upd();}
+function clrWeek(){if(!confirm('Clear Week '+cw+' dose logs?'))return;const n=st[cw]&&st[cw].__notes;st[cw]={};if(n)st[cw].__notes=n;sv2();render();upd();}
+function upd(){let wk='—',pct=0;if(SD){const now=new Date(),start=new Date(SD),diff=Math.floor((now-start)/(86400000));const cywk=Math.min(8,Math.max(1,Math.floor(diff/7)+1));wk='Week '+cywk;pct=Math.min(100,Math.round((diff/56)*100));document.getElementById('pFill').style.width=pct+'%';document.getElementById('pLabel').textContent=Math.min(diff+1,56)+'/56 days';}document.getElementById('sWeek').textContent=wk;document.getElementById('sPct').textContent=pct+'%';let dc=0,sc=0;for(let d=0;d<7;d++){const dow=(d+1)%7;CMPS.forEach(c=>{if(isSched(c,dow)){sc++;if(isTaken(cw,c.id,d))dc++;}});}document.getElementById('sDoses').textContent=dc+'/'+sc;}
+ls();render();
+</' + 'script>
+
+</body>
+</html>`;
+  const blob=new Blob([trackerHTML],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='Brad_Speidell_Peptide_Tracker.html';
+  document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+loadState();
+renderGrid();
+</script>
+
+<style>
+.bl-nav{background:#fff!important;border-bottom:1px solid #eaeaea!important}
+.bl-nav-logo-main{color:#1a1a1a!important}.bl-nav-logo-sub{color:#777!important}
+.bl-nav-link{color:#444!important}.bl-nav-link:hover,.bl-nav-link.active{color:#8B7335!important;background:rgba(139,115,53,0.07)!important}
+.bl-nav-dropdown-menu{background:#fff!important;border-color:#eaeaea!important}
+.bl-nav-dropdown-item{color:#444!important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8!important;color:#8B7335!important}
+.bl-nav-mobile-menu{background:#fff!important}.bl-nav-mobile-link{color:#444!important;border-bottom-color:#eaeaea!important}
+.bl-nav-mobile-btn{color:#1a1a1a!important}.bl-nav-mobile-section{color:#8B7335!important}
+</style>
+<script src="/nav.js" defer></script>
+</body>
+</html>
