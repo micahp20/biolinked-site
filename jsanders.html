@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Justin Sanders — BioLinked Protocol</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);
+  --bg:#f5f5f5;--bg-card:#ffffff;--bg-card2:#f0f0f0;--white:#1a1a1a;
+  --text:#1a1a1a;--text-muted:#888880;--border:rgba(0,0,0,0.10);
+  --green:#2d6a4f;--green-dim:rgba(45,106,79,0.12);--green-light:#3a9a5a;
+  --rose:#c9607a;--rose-dim:rgba(176,48,96,0.06);--rose-border:rgba(176,48,96,0.20);
+  --blue:#1d5a9a;--blue-dim:rgba(29,90,154,0.08);--blue-light:#2d7dd2;--blue-border:rgba(29,90,154,0.22);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px;}
+
+.header{background:#ffffff;border-bottom:1px solid var(--gold-border);padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.header-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(139,115,53,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,115,53,0.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+.header-logo{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;}
+.header-logo::before,.header-logo::after{content:'';width:40px;height:1px;background:var(--gold-border);}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,6vw,58px);color:var(--white);font-weight:400;line-height:1.1;margin-bottom:0.5rem;letter-spacing:0.02em;position:relative;}
+.header h1 em{color:var(--gold);font-style:italic;}
+.header-focus{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--blue-light);font-style:italic;letter-spacing:0.04em;margin-bottom:0.5rem;position:relative;}
+.header-sub{color:var(--text-muted);font-size:12px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;position:relative;}
+.header-meta{display:flex;justify-content:center;gap:0;margin-top:2.5rem;flex-wrap:wrap;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;max-width:840px;margin-left:auto;margin-right:auto;position:relative;}
+.meta-item{flex:1;min-width:100px;text-align:center;padding:1rem 0.75rem;border-right:1px solid var(--gold-border);}
+.meta-item:last-child{border-right:none;}
+.meta-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:4px;}
+.meta-value{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;}
+
+.nav-tabs{display:flex;justify-content:center;gap:0;border-bottom:1px solid var(--gold-border);background:#ffffff;position:sticky;top:56px;z-index:100;}
+.nav-tab{padding:1rem 1.75rem;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Montserrat',sans-serif;}
+.nav-tab:hover{color:var(--gold-light);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+.container{max-width:920px;margin:0 auto;padding:0 1.5rem 5rem;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.section{margin-top:3.5rem;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid var(--gold-border);}
+.section-icon{width:34px;height:34px;border-radius:2px;border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--gold-dim);}
+.section-icon svg{width:16px;height:16px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);}
+
+.intro-card{background:#ffffff;border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:1.75rem 2rem;margin-top:2.5rem;border-radius:2px;}
+.intro-card p{font-size:15px;color:#333330;line-height:1.9;font-weight:300;}
+.intro-card strong{font-weight:600;color:var(--gold);}
+
+.note-card{border-radius:2px;padding:1.25rem 1.75rem;margin-top:1.25rem;}
+.note-card h4{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:8px;}
+.note-card p{font-size:13px;line-height:1.7;font-weight:300;}
+.note-green{background:rgba(45,106,79,0.06);border:1px solid rgba(45,106,79,0.18);border-left:3px solid var(--green-light);}
+.note-green h4{color:var(--green-light);}
+.note-green p{color:rgba(45,106,79,0.80);}
+.note-gold{background:rgba(139,115,53,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);}
+.note-gold h4{color:var(--gold);}
+.note-gold p{color:var(--text-muted);}
+.note-blue{background:var(--blue-dim);border:1px solid var(--blue-border);border-left:3px solid var(--blue-light);}
+.note-blue h4{color:var(--blue-light);}
+.note-blue p{color:rgba(29,90,154,0.80);}
+.note-rose{background:var(--rose-dim);border:1px solid var(--rose-border);border-left:3px solid var(--rose);}
+.note-rose h4{color:var(--rose);}
+.note-rose p{color:rgba(176,48,96,0.75);}
+
+.goal-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:1.5rem;}
+.goal-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:1px solid;}
+.chip-rec{background:rgba(29,90,154,0.08);border-color:rgba(29,90,154,0.25);color:#2d7dd2;}
+.chip-long{background:rgba(45,106,79,0.08);border-color:rgba(45,106,79,0.22);color:#2d6a4f;}
+.chip-muscle{background:rgba(239,148,55,0.08);border-color:rgba(239,148,55,0.22);color:#d4832a;}
+
+.cat-badge{display:inline-block;padding:2px 9px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border:1px solid;}
+.cat-rec{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue-light);}
+.cat-long{background:rgba(45,106,79,0.08);border-color:rgba(45,106,79,0.18);color:#2d6a4f;}
+.cat-horm{background:var(--rose-dim);border-color:var(--rose-border);color:var(--rose);}
+.cat-ener{background:rgba(139,115,53,0.10);border-color:rgba(139,115,53,0.25);color:var(--gold);}
+.cat-muscle{background:rgba(239,148,55,0.08);border-color:rgba(239,148,55,0.20);color:#d4832a;}
+.cat-epigen{background:rgba(176,48,96,0.06);border-color:rgba(176,48,96,0.18);color:var(--rose);}
+.cat-met{background:rgba(29,90,154,0.08);border-color:rgba(29,90,154,0.20);color:var(--blue-light);}
+
+.peptide-grid{display:grid;gap:1.5rem;}
+.peptide-card{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;transition:border-color 0.2s;}
+.peptide-card:hover{border-color:var(--gold-border);}
+.peptide-header{padding:1.5rem 1.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;background:#f8f8f8;}
+.peptide-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--white);margin-bottom:5px;}
+.peptide-tagline{font-size:10px;color:var(--gold);font-weight:500;letter-spacing:0.12em;text-transform:uppercase;}
+.peptide-price{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;padding:6px 16px;border-radius:2px;white-space:nowrap;text-align:right;}
+.peptide-price span{display:block;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;font-family:'Montserrat',sans-serif;}
+.peptide-body{padding:1.5rem 1.75rem;display:grid;gap:1.25rem;}
+.peptide-section-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;}
+.peptide-text{font-size:14px;color:#555550;line-height:1.8;font-weight:300;}
+.peptide-details{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:0.75rem;}
+.detail-box{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.875rem 1rem;}
+.detail-box .label{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;}
+.detail-box .value{font-size:14px;font-weight:500;color:var(--text);}
+.recon-steps{counter-reset:step;list-style:none;display:flex;flex-direction:column;gap:9px;}
+.recon-steps li{counter-increment:step;display:flex;align-items:flex-start;gap:12px;font-size:14px;color:#555550;line-height:1.65;font-weight:300;}
+.recon-steps li::before{content:counter(step);min-width:22px;height:22px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+.schedule-table{width:100%;border-collapse:collapse;font-size:13px;}
+.schedule-table th{background:#f0f0f0;color:var(--gold);padding:10px 14px;text-align:left;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--gold-border);}
+.schedule-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:#555550;vertical-align:top;font-weight:300;font-size:13px;}
+.schedule-table tr:last-child td{border-bottom:none;}
+.schedule-table tr td{background:#ffffff;}
+.schedule-table tr:nth-child(even) td{background:#f8f8f8;}
+.peptide-pill{display:inline-block;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;margin:2px 3px 2px 0;letter-spacing:0.03em;}
+.peptide-pill.pm{background:rgba(29,90,154,0.06);border-color:rgba(29,90,154,0.18);color:var(--blue-light);}
+.peptide-pill.epig{background:rgba(176,48,96,0.06);border-color:rgba(176,48,96,0.18);color:var(--rose);}
+.peptide-pill.wknd{background:rgba(45,106,79,0.06);border-color:rgba(45,106,79,0.15);color:var(--green);}
+.peptide-pill.horm{background:var(--rose-dim);border-color:var(--rose-border);color:var(--rose);}
+
+.week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.week-cell{background:#ffffff;padding:1rem 0.75rem;text-align:center;}
+.week-cell.header{background:#f0f0f0;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:600;padding:0.875rem;}
+.week-cell .wk{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:500;}
+.week-cell .phase{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--gold);}
+.week-cell .note{font-size:11px;color:#888880;margin-top:4px;line-height:1.5;font-weight:300;}
+.phase-1{background:#f5f8fc;}
+.phase-2{background:#f5faf6;}
+.phase-3{background:#fafaf5;}
+.phase-4{background:#faf8f5;}
+
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:1px;background:var(--gold-border);}
+.timeline-item{position:relative;margin-bottom:2.25rem;}
+.timeline-item::before{content:'';position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);}
+.timeline-week{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
+.timeline-text{font-size:14px;color:#555550;line-height:1.8;font-weight:300;}
+
+.monitor-list{display:grid;gap:8px;}
+.monitor-item{display:flex;gap:14px;align-items:flex-start;background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;font-size:14px;color:#555550;line-height:1.65;font-weight:300;}
+.monitor-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+.dot-ok{background:var(--green-light);}
+.dot-watch{background:var(--gold);}
+
+.price-table{background:#ffffff;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.75rem;border-bottom:1px solid var(--border);}
+.price-row:last-child{border-bottom:none;}
+.price-row.total{background:#f0f0f0;border-top:1px solid var(--gold-border);}
+.price-row .item{font-size:15px;color:var(--text);font-weight:400;}
+.price-row .qty{font-size:12px;color:var(--text-muted);margin-top:2px;font-weight:300;}
+.price-row .amt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);}
+.price-row.total .item{color:var(--text);font-size:16px;font-weight:600;}
+.price-row.total .amt{font-size:26px;color:var(--gold);}
+.price-row.dimmed{opacity:0.3;}
+.price-row.dimmed .item{text-decoration:line-through;color:var(--text-muted);}
+
+.level-tabs{display:flex;border:1px solid var(--gold-border);border-radius:2px 2px 0 0;overflow:hidden;}
+.ltab{flex:1;padding:0.875rem 0.35rem;background:#f0f0f0;border:none;border-right:1px solid var(--gold-border);cursor:pointer;text-align:center;}
+.ltab:last-child{border-right:none;}
+.ltab.active{background:#ffffff;}
+.ltab-eyebrow{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:'Montserrat',sans-serif;font-weight:600;}
+.ltab-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--white);display:block;}
+.ltab-sub{font-size:9px;display:block;color:var(--text-muted);margin-top:2px;font-family:'Montserrat',sans-serif;}
+
+.venmo-section{background:linear-gradient(135deg,#f8f8f8 0%,#f0f0f0 100%);border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:2rem;margin-top:3rem;text-align:center;}
+.venmo-section h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);font-weight:400;margin-bottom:0.5rem;}
+.venmo-section h3 em{color:var(--gold);font-style:italic;}
+.venmo-section p{font-size:13px;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6;}
+.venmo-btn{display:inline-block;background:var(--gold);color:#ffffff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:16px 40px;border-radius:2px;text-decoration:none;transition:background 0.2s;}
+.venmo-btn:hover{background:var(--gold-light);}
+.venmo-handle{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;margin-top:12px;display:block;}
+
+.storage-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.storage-card{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1.25rem 1.5rem;}
+.storage-card h4{font-size:13px;font-weight:600;margin-bottom:0.5rem;color:var(--gold);}
+.storage-card p{font-size:13px;color:#555550;line-height:1.7;font-weight:300;}
+
+.disclaimer{background:#f8f5f0;border:1px solid rgba(139,115,53,0.18);border-radius:2px;padding:1.25rem 1.75rem;margin-top:3.5rem;font-size:13px;color:#6a5a30;line-height:1.75;font-weight:300;}
+.disclaimer strong{font-weight:600;color:var(--gold);}
+
+.footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--gold-border);font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.footer strong{color:var(--gold);font-weight:600;}
+
+.tracker-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:2rem;}
+.tracker-stat{background:#ffffff;border:1px solid var(--gold-border);border-radius:2px;padding:1.25rem;text-align:center;}
+.tracker-stat .ts-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.tracker-stat .ts-value{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);font-weight:600;}
+.tracker-stat .ts-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.week-selector{display:flex;align-items:center;gap:1rem;margin:2rem 0 1.5rem;justify-content:center;}
+.week-nav-btn{width:36px;height:36px;background:#ffffff;border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.week-nav-btn:hover{background:var(--gold-dim);}
+.week-label{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--white);font-weight:600;min-width:120px;text-align:center;}
+.day-header-row{display:grid;grid-template-columns:130px 1fr;gap:6px;margin-bottom:2px;}
+.day-headers-inner{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.day-header{text-align:center;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:8px 2px;background:#f0f0f0;border:1px solid var(--border);border-radius:2px 2px 0 0;}
+.day-header.rest-day{color:#aaaaaa;}
+.tracker-grid-wrap{display:grid;grid-template-columns:130px 1fr;gap:6px;margin-bottom:3px;}
+.tracker-compound-label{display:flex;align-items:center;justify-content:flex-end;padding-right:6px;}
+.compound-badge{font-size:10px;font-weight:600;letter-spacing:0.04em;color:var(--gold);text-align:right;line-height:1.3;}
+.compound-badge span{display:block;color:var(--text-muted);font-weight:400;font-size:9px;letter-spacing:0.06em;}
+.day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.dose-cell{background:#ffffff;border:1px solid var(--border);border-top:none;padding:4px 2px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:36px;display:flex;align-items:center;justify-content:center;}
+.dose-cell.scheduled:hover{background:var(--gold-dim);}
+.dose-cell.taken{background:rgba(45,106,79,0.12);border-color:rgba(45,106,79,0.35);}
+.dose-cell.taken::after{content:'✓';color:var(--green-light);font-size:15px;font-weight:700;}
+.dose-cell.scheduled:not(.taken)::after{content:'○';color:var(--gold-border);font-size:13px;}
+.dose-cell.rest{background:transparent;border-color:transparent;cursor:default;}
+.dose-cell.rest::after{content:'—';color:#cccccc;font-size:12px;}
+.dose-cell.prn{background:rgba(236,72,153,0.03);border-color:var(--border);cursor:pointer;}
+.dose-cell.prn:not(.taken)::after{content:'·';color:#bbb;font-size:20px;line-height:1;}
+.notes-area{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;margin-top:1.5rem;}
+.notes-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px;}
+.notes-input{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:300;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s;}
+.notes-input:focus{border-color:var(--gold-border);}
+.notes-input::placeholder{color:var(--text-muted);}
+.tracker-actions{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;}
+.action-btn{flex:1;min-width:160px;padding:0.875rem 1.5rem;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;text-align:center;}
+.action-btn:hover{background:rgba(139,115,53,0.18);border-color:var(--gold);}
+.action-btn.primary{background:var(--gold);color:#ffffff;border-color:var(--gold);}
+.action-btn.primary:hover{background:var(--gold-light);}
+.progress-bar-wrap{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;margin-top:1rem;}
+.progress-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s ease;}
+.cycle-start-row{display:flex;align-items:center;gap:1rem;margin-top:1.5rem;background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;flex-wrap:wrap;}
+.cycle-start-row label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
+.cycle-start-row input[type="date"]{background:#fafafa;border:1px solid var(--gold-border);border-radius:2px;padding:6px 12px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;}
+.save-badge{display:inline-block;background:rgba(45,106,79,0.10);border:1px solid rgba(45,106,79,0.40);color:var(--green-light);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.save-badge.show{opacity:1;}
+.ios-download-banner{background:#f0f0f0;border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:1.25rem 1.75rem;margin-top:2.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.ios-banner-text{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.ios-banner-text strong{color:var(--gold);font-weight:600;}
+
+.checklist-wrap{background:#f8f8f8;border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.5rem 1.75rem;margin-top:2rem;}
+.checklist-title{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1rem;}
+.checklist-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#555550;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;}
+.checklist-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.checklist-link{color:var(--gold);font-size:10px;font-weight:600;letter-spacing:0.08em;text-decoration:none;white-space:nowrap;}
+.order-btn{display:inline-block;background:var(--gold);color:#ffffff;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:10px 20px;border-radius:2px;text-decoration:none;}
+.order-btn:hover{background:var(--gold-light);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.container>*{animation:fadeUp 0.5s ease both;}
+
+@media(max-width:640px){
+  .week-grid{grid-template-columns:repeat(2,1fr);}
+  .storage-grid{grid-template-columns:1fr;}
+  .peptide-header{flex-direction:column;}
+  .header-meta{flex-direction:column;}
+  .meta-item{border-right:none;border-bottom:1px solid var(--gold-border);}
+  .meta-item:last-child{border-bottom:none;}
+  .tracker-top{grid-template-columns:1fr 1fr;}
+  .nav-tab{padding:0.875rem 0.75rem;font-size:10px;}
+  .tracker-grid-wrap{grid-template-columns:90px 1fr;}
+  .day-header-row{grid-template-columns:90px 1fr;}
+  .compound-badge{font-size:9px;}
+  .level-tabs{flex-wrap:wrap;}
+  .ltab{min-width:calc(33% - 1px);}
+}
+</style>
+  <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+
+<script>
+(function(){
+  const path = window.location.pathname;
+  const isActive = (href) => {
+    const clean = href.replace('.html','');
+    if(clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
+    return path.includes(clean.replace('/',''));
+  };
+
+  const links = [
+    {href:'/index.html', label:'Home'},
+    {href:'/peptide-index.html', label:'Index'},
+    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
+    {href:'/stacks-blends.html', label:'Stacks & Blends'},
+  ];
+
+  const tools = [
+    {href:'/peptide-tracker.html', label:'Peptide Tracker'},
+    {href:'/stack-analyzer.html', label:'Stack Analyzer'},
+    {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
+  ];
+
+  const navHTML = `
+<nav class="bl-nav" id="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="/index.html" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BIO LINKED</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      ${links.map(l=>`<a href="${l.href}" class="bl-nav-link${isActive(l.href)?' active':''}">${l.label}</a>`).join('')}
+      <div class="bl-nav-dropdown" id="bl-dropdown">
+        <button class="bl-nav-link bl-dropdown-btn">Tools ▾</button>
+        <div class="bl-nav-dropdown-menu" id="bl-dropdown-menu">
+          ${tools.map(t=>`<a href="${t.href}" class="bl-nav-dropdown-item${isActive(t.href)?' active':''}">${t.label}</a>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    ${links.map(l=>`<a href="${l.href}" class="bl-nav-mobile-link">${l.label}</a>`).join('')}
+    <div class="bl-nav-mobile-section">Tools</div>
+    ${tools.map(t=>`<a href="${t.href}" class="bl-nav-mobile-link bl-nav-mobile-sub">${t.label}</a>`).join('')}
+  </div>
+</nav>`;
+
+  const navCSS = `<style>
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Outfit',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.1em}
+.bl-nav-logo-sub{font-size:8px;color:#777;letter-spacing:0.18em;text-transform:uppercase;margin-top:2px}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:11.5px;color:#444;text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown{position:relative}
+.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:#fff;border:1px solid #eaeaea;border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
+.bl-nav-dropdown:hover .bl-nav-dropdown-menu,.bl-nav-dropdown-menu:hover{display:block}
+.bl-nav-dropdown-btn{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bl-nav-dropdown:hover .bl-dropdown-btn{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:#444;text-decoration:none;transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8;color:#9A7B2F;padding-left:20px}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:#1a1a1a;padding:8px}
+.bl-nav-mobile-menu{display:none;border-top:1px solid #eaeaea;background:#fff;padding:12px 20px 20px}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:10px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Outfit',sans-serif}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
+.bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#9A7B2F;font-family:'Outfit',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
+@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
+</style>`;
+
+  document.head.insertAdjacentHTML('beforeend', navCSS);
+  document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+  // Mobile toggle
+  document.getElementById('bl-mobile-btn').addEventListener('click', function(){
+    const menu = document.getElementById('bl-mobile-menu');
+    menu.classList.toggle('open');
+    this.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  // Fix dropdown - keep open when moving mouse between button and menu
+  const dropdown = document.getElementById('bl-dropdown');
+  const menu = document.getElementById('bl-dropdown-menu');
+  let closeTimer;
+  dropdown.addEventListener('mouseenter', () => { clearTimeout(closeTimer); menu.style.display='block'; });
+  dropdown.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+  menu.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  menu.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+
+})();
+
+</script>
+
+<div class="header">
+  <div class="header-grid"></div>
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Justin <em>Sanders</em></h1>
+  <div class="header-focus">Veteran's Recovery · Rebuild · Longevity Protocol</div>
+  <div class="header-sub">Recovery &amp; Healing · Muscle Building · Longevity &amp; Anti-Aging · 8-Week Cycle</div>
+  <div class="header-meta">
+    <div class="meta-item"><span class="meta-label">Age</span><span class="meta-value">36</span></div>
+    <div class="meta-item"><span class="meta-label">Sex</span><span class="meta-value">Male</span></div>
+    <div class="meta-item"><span class="meta-label">Weight</span><span class="meta-value">150 lbs</span></div>
+    <div class="meta-item"><span class="meta-label">Goal Weight</span><span class="meta-value">150 lbs</span></div>
+    <div class="meta-item"><span class="meta-label">Cycle Length</span><span class="meta-value">8 Weeks</span></div>
+    <div class="meta-item"><span class="meta-label">Compounds</span><span class="meta-value">9 Total</span></div>
+    <div class="meta-item"><span class="meta-label">Prepared by</span><span class="meta-value">BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('protocol',event)">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('supplies',event)">Supplies</button>
+  <button class="nav-tab" onclick="switchTab('tracker',event)">Daily Tracker</button>
+</div>
+
+<div class="container">
+
+<!-- PROTOCOL TAB -->
+<div id="tab-protocol" class="tab-content active">
+
+  <div class="goal-chips">
+    <span class="goal-chip chip-rec">🔧 Recovery &amp; Healing</span>
+    <span class="goal-chip chip-muscle">💪 Muscle Building</span>
+    <span class="goal-chip chip-long">✨ Longevity &amp; Anti-Aging</span>
+  </div>
+
+  <div class="intro-card">
+    <p>Justin, you served. You carried a rifle, a rucksack, and a mission — and somewhere in the middle of all of it, your arm and shoulder paid the price. Now you're home, you've got two little girls counting on you to show up strong, and you're doing exactly that. But the pain in that arm and shoulder is still there — a daily reminder of what you gave, and a real obstacle to the strength and performance you know you're capable of. <strong>This protocol is built for the man you are right now: a veteran, a father, and someone who takes the long view on his health.</strong> Your goal isn't to lose weight — you're maintaining at 150 and building lean tissue. This is about repairing the damage at the cellular level, building durable strength, and laying down a biological foundation that keeps you performing well into your 40s, 50s, and beyond. <strong>KLOW Blend and SS-31 go directly to work on tissue repair and cellular recovery — including that shoulder and arm. CJC + Ipamorelin and HGH are your muscle-building and fat-to-muscle recomposition drivers. MOTS-C ensures your metabolism is working for you, not against you. Epitalon and Pinealon are two of the most powerful longevity peptides available — they reset your epigenetic clock and support deep sleep and systemic recovery.</strong> This is not a shortcut. This is what taking care of your biology with the same discipline you brought to service actually looks like.</p>
+  </div>
+
+  <div class="note-card note-blue" style="margin-top:1.25rem;">
+    <h4>🆕 First-Time Injector — What You Need to Know</h4>
+    <p>You've never injected before, and that's completely fine — thousands of people learn SubQ technique every year and get comfortable within the first 2–3 injections. SubQ (subcutaneous) means the needle goes into the fat layer just below the skin, not into muscle. The abdomen (2–3 inches from the belly button) is the easiest site. Pinch an inch of skin, insert the needle at a 45° angle, inject slowly, withdraw. The needles are tiny — 29 to 31 gauge, about half an inch long — and the injections are nearly painless. Start with one compound on Day 1 (KLOW is a good first injection), add the others from Day 2 onward. Your supplies page has everything you need. You'll feel confident by Week 2.</p>
+  </div>
+
+  <div class="note-card note-gold" style="margin-top:1rem;">
+    <h4>💡 Protocol Design Philosophy — Three Simultaneous Vectors</h4>
+    <p>This stack hits three goals without overlap or interference. Recovery/Repair (KLOW Blend, SS-31, BPC-157 within KLOW) targets your arm and shoulder directly while rebuilding tissue system-wide. Muscle Building / Body Recomposition (CJC+Ipamorelin, HGH, HCG, MOTS-C) drives lean tissue gain and preserves muscle during the longevity phase. Longevity / Epigenetic Reset (Epitalon, Pinealon, NAD+) works at the cellular level to slow biological aging, improve sleep architecture, and create a system that performs better year after year. Everything compounds on everything else.</p>
+  </div>
+
+  <!-- COMPOUND CARDS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#8B7335" stroke-width="1.2"/><path d="M5 8.5C5.5 8.5 6.5 10.5 8 10.5C9.5 10.5 10.5 8.5 10.5 8.5" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6.5" r="0.75" fill="#8B7335"/><circle cx="10" cy="6.5" r="0.75" fill="#8B7335"/></svg>
+      </div>
+      <div class="section-title">Your Protocol — 9 Compounds</div>
+    </div>
+    <div class="peptide-grid">
+
+      <!-- 1. KLOW BLEND -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">1 &nbsp;·&nbsp; KLOW Blend</div>
+            <div class="peptide-tagline">TB-500 · BPC-157 · GHK-Cu · KPV — Quad Recovery &nbsp;<span class="cat-badge cat-rec">Recovery</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$160</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">KLOW is the most directly targeted compound for your arm and shoulder injuries — and it's doing four simultaneous jobs in one injection. <strong>TB-500 (Thymosin Beta-4)</strong> is the tissue remodeling peptide. It promotes cell migration into damaged sites, accelerates repair of connective tissue, tendons, and musculature, and reduces fibrotic scar formation — which is critical for a service injury that may have healed with some scar tissue accumulation. <strong>BPC-157</strong> is arguably the most powerful healing peptide available. It promotes angiogenesis (new blood vessel growth) at injury sites, repairs tendon-to-bone connections, reduces systemic inflammation, and accelerates tissue regeneration. Your shoulder specifically will benefit enormously from BPC-157's tendon healing mechanism. <strong>GHK-Cu</strong> activates repair gene expression throughout the body and supports collagen synthesis and connective tissue rebuilding. <strong>KPV</strong> suppresses NF-κB inflammatory signaling, reducing the chronic low-grade inflammation that slows healing in old injuries. Run KLOW every weekday morning — this is your most important compound.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">80 units × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">4 units</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 80-unit vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 80-unit vial. Run water slowly down the inner glass wall — never squirt directly onto powder.</li>
+              <li>Swirl gently until fully dissolved. Do not shake. Solution should be clear.</li>
+              <li>Draw <strong>10 units = 4-unit dose</strong> using a 29–31 gauge insulin syringe.</li>
+              <li>Each vial = 20 doses. Two vials = 40 doses. At 5 on / 2 off × 8 weeks = 40 doses — both vials cover the full cycle exactly.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. CJC + IPAMORELIN -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">2 &nbsp;·&nbsp; CJC + Ipamorelin</div>
+            <div class="peptide-tagline">GHRH + GHRP · GH Pulse · Muscle Growth · Recovery &nbsp;<span class="cat-badge cat-muscle">Muscle &amp; GH</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$90</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">CJC-1295 and Ipamorelin are the gold standard GH-stimulating peptide stack — they work synergistically through two different receptor pathways to produce a clean, sustained GH pulse. <strong>CJC-1295</strong> is a GHRH analog that lengthens the GH release window, while <strong>Ipamorelin</strong> is a selective GHRP that triggers the pulse without the cortisol or prolactin spike you get from older peptides like GHRP-6. The result is a natural-feeling GH pulse that drives: accelerated muscle protein synthesis, enhanced fat oxidation, significantly faster tissue repair, and improved sleep quality when dosed in the evening. For a 36-year-old male who wants to build lean muscle and maintain weight, CJC+Ipa is one of the highest-leverage compounds available.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">5mg+5mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">250 mcg each</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM &amp; PM fasted</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 5mg+5mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the combo vial → concentration = <strong>2.5 mg/mL per component</strong></li>
+              <li>Run water down the glass wall slowly, swirl gently until dissolved. Do not shake.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 250 mcg of each component per injection</strong></li>
+              <li>Dose AM fasted (no food for 30–60 min before or after). If running twice daily, also dose PM at least 2 hours after your last meal and 30 min before sleep. Each vial = 20 doses. Two vials = 40 doses over the cycle.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. MOTS-C -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">3 &nbsp;·&nbsp; MOTS-C</div>
+            <div class="peptide-tagline">Mitochondrial Activation · Metabolic Efficiency · AMPK Pathway &nbsp;<span class="cat-badge cat-met">Metabolic</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$70</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">MOTS-C is a mitochondria-derived peptide that activates AMPK — the master cellular switch for energy utilization and metabolic efficiency. For your goals, this matters in a specific way: you're not trying to lose weight, you're trying to recompose — gain lean muscle while holding 150 lbs. MOTS-C directly improves insulin sensitivity, which means more of your carbohydrates go toward muscle glycogen and anabolic processes rather than adipose storage. It also dramatically amplifies the benefit of your workouts by increasing mitochondrial function — your muscles produce more power per unit of fuel, recover faster between sessions, and drive more hypertrophic signaling. In combination with CJC+Ipamorelin and HGH, MOTS-C creates a potent three-vector anabolic and metabolic environment that makes recomposition at 36 genuinely achievable.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">10 mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">1 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 10 mg vial → concentration = <strong>5 mg/mL</strong></li>
+              <li>Swirl gently until fully dissolved — clear solution expected. Do not shake.</li>
+              <li>Draw <strong>10 units = 1 mg dose</strong> using a 29–31 gauge insulin syringe.</li>
+              <li>Inject SubQ into abdomen, fasted. Each vial = ~20 doses. Two vials = ~40 doses. At 5 on / 2 off × 8 weeks = 40 doses total — full cycle covered.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. EPITALON -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">4 &nbsp;·&nbsp; Epitalon</div>
+            <div class="peptide-tagline">Telomere Extension · Epigenetic Reset · Pineal Regulation &nbsp;<span class="cat-badge cat-long">Longevity</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$130</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Epitalon is one of the most well-studied longevity peptides in existence — a tetrapeptide derived from the pineal gland that has been in clinical research since the 1980s in Russia. Its primary mechanism: Epitalon activates telomerase, the enzyme responsible for maintaining telomere length. Telomeres are the protective caps on chromosomes, and their shortening is one of the fundamental biological drivers of cellular aging. Beyond telomere extension, Epitalon normalizes circadian melatonin production, which means significant sleep quality improvements, better HPA axis regulation, and reduced nighttime cortisol. For you at 36 — especially with a history of military service that likely accelerated cellular stress — Epitalon is an investment in how you age. It's run every day for the first 20 days of the cycle, then complete.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">20 mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">2 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">Every day × 20 days</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">PM</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 20 mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 20 mg vial → concentration = <strong>10 mg/mL</strong></li>
+              <li>Swirl gently until dissolved. Clear solution expected.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 2 mg dose</strong></li>
+              <li>Inject PM (evening), ideally at the same time each day. Each vial = 10 doses. Two vials = 20 doses. Run daily for 20 consecutive days, then stop.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. PINEALON -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">5 &nbsp;·&nbsp; Pinealon</div>
+            <div class="peptide-tagline">Neuroprotection · Sleep Architecture · Brain Anti-Aging &nbsp;<span class="cat-badge cat-long">Longevity</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$130</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Pinealon is Epitalon's neurological complement — a tripeptide that works in the brain and central nervous system where Epitalon works in the genome. It targets neuronal mitochondria, reducing oxidative stress in brain tissue, supporting dopaminergic and serotonergic neurotransmission, and improving sleep architecture at the neurological level. For a former military man, Pinealon's neuroprotective properties are particularly relevant — service-related exposure to blast overpressure, high-stress neurological environments, and sleep deprivation all leave a mark on brain tissue over time. Practically speaking, you'll likely notice better cognitive clarity, more consistent sleep quality, and improved mood stability by weeks 2–3. Run Pinealon daily AM for the same 20-day window as Epitalon — they work synergistically.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">20 mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">2 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">Every day × 20 days</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 20 mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 20 mg vial → concentration = <strong>10 mg/mL</strong></li>
+              <li>Swirl gently until dissolved. Clear solution expected.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 2 mg dose</strong></li>
+              <li>Inject AM. Run concurrently with Epitalon for the same 20 consecutive days. Each vial = 10 doses. Two vials = 20 doses — exact coverage.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. NAD+ -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">6 &nbsp;·&nbsp; NAD+</div>
+            <div class="peptide-tagline">Cellular Energy · DNA Repair · Sirtuin Activation · Anti-Aging &nbsp;<span class="cat-badge cat-ener">Energy</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$130</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">NAD+ is the universal cellular energy currency — every mitochondrion in your body needs it to run the citric acid cycle and generate ATP. NAD+ levels decline with age and accelerate their decline under high-stress conditions (military service, sleep deprivation, chronic physical stress). Injectable NAD+ restores this at the cellular level in a way oral NMN or NR simply cannot match. NAD+ pairs powerfully with MOTS-C to amplify mitochondrial function from two directions simultaneously — MOTS-C activates biogenesis (more mitochondria), NAD+ fuels them more efficiently. It also activates sirtuin pathways, which are central to both longevity and muscle preservation. Two sessions per week fasted — most people describe a sustained, clean energy that doesn't crash within 2 weeks.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">500 mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">100 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">3 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">60 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">2× per week</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 500 mg vial + 3 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 3 mL BAC water to the 500 mg vial → concentration = <strong>166.7 mg/mL</strong></li>
+              <li>Swirl gently — NAD+ dissolves well. Clear to faint-yellow solution is normal.</li>
+              <li>Draw <strong>60 units (0.60 mL) = 100 mg dose</strong></li>
+              <li>Inject SubQ slowly over 30 seconds. NAD+ can cause brief flushing or warmth — this is normal and resolves quickly. Each vial = 5 doses. Two vials = 10 doses. At 2× per week × 8 weeks = 16 doses needed — plan a small top-up at week 6.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. SS-31 -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">7 &nbsp;·&nbsp; SS-31</div>
+            <div class="peptide-tagline">Elamipretide · Mitochondrial Membrane · Cellular Recovery &nbsp;<span class="cat-badge cat-long">Longevity</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$90</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">SS-31 (Elamipretide) is a targeted mitochondrial membrane peptide that homes specifically to the inner mitochondrial membrane where it stabilizes cardiolipin, scavenges reactive oxygen species (ROS) generated during ATP production, and preserves the integrity of the electron transport chain. The practical result: reduced cellular aging, better energy output per mitochondria, significantly less oxidative damage accumulation, and — critically — improved cellular resilience in muscle tissue under recovery demand. This matters for your shoulder and arm in a direct way: damaged tissue generates high levels of ROS during the repair process. SS-31 reduces the oxidative burden at the cellular level, meaning your tissue heals in a cleaner, more efficient biochemical environment.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">10 mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">500 mcg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 10 mg vial → concentration = <strong>5 mg/mL (5000 mcg/mL)</strong></li>
+              <li>Swirl gently until dissolved. Clear solution expected.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 500 mcg dose</strong></li>
+              <li>Inject SubQ AM alongside KLOW and MOTS-C — use separate syringes for each compound. Each vial = 20 doses. Two vials = 40 doses. 5 on / 2 off × 8 weeks = 40 doses — exact full cycle coverage.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. HGH -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">8 &nbsp;·&nbsp; HGH 10 IU</div>
+            <div class="peptide-tagline">Human Growth Hormone · Lean Muscle · Fat Oxidation · Tissue Repair &nbsp;<span class="cat-badge cat-muscle">Muscle &amp; Recovery</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$300</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">HGH is the most powerful compound in this stack — and it's here for good reason. At 2 IU per dose, 5 days on / 2 off, you're running a conservative therapeutic dose designed for tissue repair, body recomposition, and longevity. HGH at this dose drives IGF-1 production in the liver, which is the primary driver of muscle protein synthesis, accelerated tissue repair, and fat mobilization. The combination of HGH with CJC+Ipamorelin is synergistic — the peptides stimulate your pituitary to pulse GH naturally, and exogenous HGH adds on top of that signal. The result is a GH environment significantly above baseline that drives lean muscle accrual, accelerates healing in your arm and shoulder, and shifts body composition toward muscle at your maintenance weight.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">10 IU × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">2 IU</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted / Pre-sleep</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 10 IU vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 10 IU vial → concentration = <strong>5 IU/mL</strong></li>
+              <li>Run water slowly down the glass wall. Swirl very gently — do not shake HGH vigorously as it degrades the protein structure.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 2 IU dose</strong></li>
+              <li>AM dosing: inject fasted, wait 30–60 min before eating. Pre-sleep dosing: inject 30 min before bed, fasted for 2+ hours. Each vial = 5 doses at 2 IU. Two vials = 10 doses. Plan to reorder at the start of week 4.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. HCG -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">9 &nbsp;·&nbsp; HCG (5000 IU)</div>
+            <div class="peptide-tagline">LH Analog · Testosterone Support · Testicular Function &nbsp;<span class="cat-badge cat-horm">Hormonal</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$308</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">HCG (Human Chorionic Gonadotropin) is included here to support endogenous testosterone production and testicular function, particularly while running HGH. HGH at therapeutic doses can affect the HPG axis over time, and HCG acts as an LH analog — it signals the Leydig cells in the testes to maintain testosterone production and keep testicular volume and function intact. At 500 IU taken 2–3 times per week, this is a protective and supportive dose. Practical benefits: improved energy and libido, maintained muscle-building testosterone levels, and the assurance that running HGH in this cycle is not suppressing your natural hormonal axis.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">5000 IU × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">500 IU</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">2–3× per week</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 5000 IU vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 5000 IU vial → concentration = <strong>2500 IU/mL</strong></li>
+              <li>Swirl gently until dissolved. Clear solution expected.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 500 IU dose</strong></li>
+              <li>Inject SubQ AM on Mon / Wed / Fri for 3× per week (or Mon / Thu for 2× per week). Each vial = 10 doses. Two vials = 20 doses. Plan a top-up near week 7 if running 3× per week.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /peptide-grid -->
+  </div>
+
+  <!-- WEEKLY SCHEDULE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#8B7335" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#8B7335" stroke-width="0.8"/></svg>
+      </div>
+      <div class="section-title">Weekly Injection Schedule</div>
+    </div>
+    <table class="schedule-table">
+      <thead><tr><th>Day</th><th>AM (fasted)</th><th>PM / Pre-Sleep</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Monday</strong></td>
+          <td><span class="peptide-pill">KLOW 4u</span><span class="peptide-pill">CJC+Ipa 250mcg</span><span class="peptide-pill">MOTS-C 1mg</span><span class="peptide-pill">SS-31 500mcg</span><span class="peptide-pill">NAD+ 100mg</span><span class="peptide-pill">HGH 2IU</span><span class="peptide-pill">HCG 500IU</span><span class="peptide-pill epig">Pinealon 2mg</span></td>
+          <td><span class="peptide-pill pm">CJC+Ipa 250mcg (PM)</span><span class="peptide-pill epig">Epitalon 2mg (PM)</span></td>
+          <td>Biggest day. AM cluster first. Epitalon &amp; Pinealon run days 1–20 only. NAD+ Mon fasted. HCG Mon/Wed/Fri.</td>
+        </tr>
+        <tr>
+          <td><strong>Tuesday</strong></td>
+          <td><span class="peptide-pill">KLOW 4u</span><span class="peptide-pill">CJC+Ipa 250mcg</span><span class="peptide-pill">MOTS-C 1mg</span><span class="peptide-pill">SS-31 500mcg</span><span class="peptide-pill">HGH 2IU</span><span class="peptide-pill epig">Pinealon 2mg</span></td>
+          <td><span class="peptide-pill pm">CJC+Ipa 250mcg (PM)</span><span class="peptide-pill epig">Epitalon 2mg (PM)</span></td>
+          <td>No NAD+ or HCG today. Otherwise full stack.</td>
+        </tr>
+        <tr>
+          <td><strong>Wednesday</strong></td>
+          <td><span class="peptide-pill">KLOW 4u</span><span class="peptide-pill">CJC+Ipa 250mcg</span><span class="peptide-pill">MOTS-C 1mg</span><span class="peptide-pill">SS-31 500mcg</span><span class="peptide-pill">HGH 2IU</span><span class="peptide-pill">HCG 500IU</span><span class="peptide-pill epig">Pinealon 2mg</span></td>
+          <td><span class="peptide-pill pm">CJC+Ipa 250mcg (PM)</span><span class="peptide-pill epig">Epitalon 2mg (PM)</span></td>
+          <td>Mid-week HCG. No NAD+ today.</td>
+        </tr>
+        <tr>
+          <td><strong>Thursday</strong></td>
+          <td><span class="peptide-pill">KLOW 4u</span><span class="peptide-pill">CJC+Ipa 250mcg</span><span class="peptide-pill">MOTS-C 1mg</span><span class="peptide-pill">SS-31 500mcg</span><span class="peptide-pill">NAD+ 100mg</span><span class="peptide-pill">HGH 2IU</span><span class="peptide-pill epig">Pinealon 2mg</span></td>
+          <td><span class="peptide-pill pm">CJC+Ipa 250mcg (PM)</span><span class="peptide-pill epig">Epitalon 2mg (PM)</span></td>
+          <td>Second NAD+ day. No HCG today.</td>
+        </tr>
+        <tr>
+          <td><strong>Friday</strong></td>
+          <td><span class="peptide-pill">KLOW 4u</span><span class="peptide-pill">CJC+Ipa 250mcg</span><span class="peptide-pill">MOTS-C 1mg</span><span class="peptide-pill">SS-31 500mcg</span><span class="peptide-pill">HGH 2IU</span><span class="peptide-pill">HCG 500IU</span><span class="peptide-pill epig">Pinealon 2mg</span></td>
+          <td><span class="peptide-pill pm">CJC+Ipa 250mcg (PM)</span><span class="peptide-pill epig">Epitalon 2mg (PM)</span></td>
+          <td>Finish the week strong. Third HCG of the week.</td>
+        </tr>
+        <tr><td><strong>Saturday</strong></td><td>—</td><td>—</td><td>Full rest day. All 5on/2off compounds off. Recover and eat well.</td></tr>
+        <tr><td><strong>Sunday</strong></td><td>—</td><td>—</td><td>Second rest day. Prep syringes for Monday's AM cluster if desired.</td></tr>
+      </tbody>
+    </table>
+    <div class="note-card note-gold" style="margin-top:1.25rem;">
+      <h4>📌 Epitalon &amp; Pinealon — Days 1–20 Only</h4>
+      <p>Epitalon and Pinealon run daily for the first 20 days of your 8-week cycle (approximately weeks 1 through the middle of week 3), then you stop them. This is intentional — they are most effective as a concentrated front-loaded cycle, not a continuous daily compound. After day 20, the longevity foundations they've laid continue to work. Do not redose them for the remainder of this cycle.</p>
+    </div>
+    <div class="note-card note-blue" style="margin-top:1rem;">
+      <h4>💉 First-Timer Tip — Start Slow, Build Confidence</h4>
+      <p>Your first injection, do just one compound (KLOW is ideal — small draw, easy to handle). By day 3, you'll be running the full AM cluster without hesitation. Lay out your syringes and label them the night before on heavy AM days. Use the abdomen, rotate sides, and always inject slowly. You've endured harder things — this is nothing.</p>
+    </div>
+  </div>
+
+  <!-- 8-WEEK TIMELINE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 12L6 8L9 10L13 4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="section-title">8-Week Cycle — What to Expect</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-cell header">Weeks</div>
+      <div class="week-cell header">Phase</div>
+      <div class="week-cell header">Primary Focus</div>
+      <div class="week-cell header">Key Changes</div>
+      <div class="week-cell phase-1"><div class="wk">Wks 1–2</div></div>
+      <div class="week-cell phase-1"><div class="phase">Foundation</div></div>
+      <div class="week-cell phase-1"><div class="note">Cellular Reset + Learn Injections</div></div>
+      <div class="week-cell phase-1"><div class="note">Sleep deepens noticeably (Epitalon + Pinealon). First injection experience. Shoulder/arm may feel a mild inflammatory uptick as KLOW begins repair process — this is normal.</div></div>
+      <div class="week-cell phase-2"><div class="wk">Wks 3–4</div></div>
+      <div class="week-cell phase-2"><div class="phase">Activation</div></div>
+      <div class="week-cell phase-2"><div class="note">Epigenetic Reset Completes · GH Building</div></div>
+      <div class="week-cell phase-2"><div class="note">Epitalon/Pinealon finish at day 20. GH axis fully activated. Energy and workout performance noticeably higher. Shoulder beginning to feel meaningfully better.</div></div>
+      <div class="week-cell phase-3"><div class="wk">Wks 5–6</div></div>
+      <div class="week-cell phase-3"><div class="phase">Peak Window</div></div>
+      <div class="week-cell phase-3"><div class="note">Full Synergy — All Systems Firing</div></div>
+      <div class="week-cell phase-3"><div class="note">Most significant muscle accrual and strength gains. Shoulder and arm functionality improving week to week. Energy is sustained and high. Sleep quality excellent.</div></div>
+      <div class="week-cell phase-4"><div class="wk">Wks 7–8</div></div>
+      <div class="week-cell phase-4"><div class="phase">Consolidation</div></div>
+      <div class="week-cell phase-4"><div class="note">Lock In · Assess · Plan Cycle 2</div></div>
+      <div class="week-cell phase-4"><div class="note">Gains consolidating. Strength benchmarks highest of the cycle. Assess shoulder/arm improvement. Most clients run cycle 2 with same stack 2–4 weeks post-cycle.</div></div>
+    </div>
+    <div class="timeline" style="margin-top:2rem;">
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 1–2 — The Cellular Foundation</div>
+        <div class="timeline-text">Your first week is about learning the protocol, building injection confidence, and letting the biochemistry begin its work. The very first thing most people notice is sleep quality — Epitalon and Pinealon act on the pineal gland and begin improving sleep architecture within days 3–7. Simultaneously, KLOW Blend begins its tissue work on your arm and shoulder. Some people experience a very mild inflammatory sensation in old injury sites in week 1 — this is BPC-157 increasing blood flow and signaling cellular repair at dormant injury sites. It typically resolves by day 5–7 and is followed by noticeable improvement.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 3–4 — The Epigenetic Reset Completes</div>
+        <div class="timeline-text">Day 20 marks the end of your Epitalon and Pinealon cycle. Your GH axis is now fully activated by CJC+Ipamorelin operating in sync with the HGH doses, and IGF-1 levels will be meaningfully elevated above your baseline. This is where you start noticing real changes in the gym: workouts feel stronger, recovery between sessions is significantly faster, and the mirror starts showing the beginning of the recomposition effect. If you haven't yet, this is the week to get aggressive with your training — the biochemical environment is fully primed for muscle protein synthesis.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 5–6 — Peak Protocol Window</div>
+        <div class="timeline-text">All nine compounds are in full synergy. Weeks 5 and 6 typically produce the most dramatic single-cycle results. For your shoulder and arm: the combination of BPC-157, TB-500, GHK-Cu (all in KLOW), SS-31, and HGH-driven IGF-1 over 5+ weeks of consistent dosing will have produced meaningful, measurable improvement in both pain and range of motion. Strength gains will be most pronounced here. Your energy levels through your days with the girls should also be noticeably better — less afternoon fatigue, better mood, more present.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 7–8 — Consolidate, Assess, Plan</div>
+        <div class="timeline-text">Final stretch. The gains you've built consolidate here and become your new baseline. Take stock: How does the shoulder and arm feel compared to day 1? How much lean tissue have you added? Document it all — photos, measurements, strength numbers — because cycle 2, starting 2–4 weeks post-cycle, will build on an already-elevated baseline. Plan your next order at week 6 to avoid a gap. You've done something most people won't — you made the investment in your biology. That compounds just like interest does.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORAGE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="#8B7335" stroke-width="1.2"/><path d="M6 6H10M6 9H8" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Storage &amp; Handling</div>
+    </div>
+    <div class="storage-grid">
+      <div class="storage-card"><h4>Dry powder vials (before reconstitution)</h4><p>Store all lyophilized vials refrigerated at 36–46°F (2–8°C). Keep away from light. Do not freeze. Shelf life is 12–24 months unopened. Only reconstitute what you plan to use within 30 days. HGH is the most sensitive — treat it with extra care.</p></div>
+      <div class="storage-card"><h4>After reconstitution</h4><p>All reconstituted vials must be refrigerated immediately and used within 30 days. Never freeze a reconstituted peptide — this destroys the structure. Use a fresh syringe for every draw. HGH reconstituted vials should always be stored horizontally to minimize protein aggregation.</p></div>
+      <div class="storage-card"><h4>Bacteriostatic water (BAC water)</h4><p>Use sterile BAC water for all 9 compounds. The benzyl alcohol preservative allows safe multi-draw use over 30 days. Do not substitute plain sterile water. With 9 compounds you'll need at least 10 BAC water vials — see your supplies checklist.</p></div>
+      <div class="storage-card"><h4>Syringes &amp; injection technique</h4><p>29–31 gauge insulin syringes (0.5 mL or 1 mL barrel). Never reuse — one syringe per injection, always. Dispose in sharps container immediately. Rotate injection sites: abdomen is preferred for all SubQ injections. Pinch skin, 45° angle, slow injection. Wipe vial stopper and skin with alcohol prep pad before every use.</p></div>
+    </div>
+  </div>
+
+  <!-- WHAT TO MONITOR -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#8B7335" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V9.5" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.5" fill="#8B7335"/></svg></div>
+      <div class="section-title">What to Monitor</div>
+    </div>
+    <div class="monitor-list">
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Noticeably deeper and more restorative sleep from days 3–7 — Epitalon and Pinealon acting on pineal melatonin regulation. This is the intended effect.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Mild warmth at the injection site or brief flushing within 30–60 min of NAD+ — inject slowly over 30 seconds to minimize this. Normal vasodilatory response, resolves in minutes.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Possible mild inflammatory sensation in the arm/shoulder during week 1 of KLOW. This is BPC-157 initiating cellular repair at dormant injury sites — increased blood flow and signaling. Resolves by day 5–7, followed by improvement.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Small injection site redness or minor bruising, especially early in the cycle as you learn technique. Rotate sites every 2–3 days to prevent accumulation.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Slightly elevated fasting blood glucose in weeks 2–4 as HGH ramps up — this is transient and expected. It typically normalizes as MOTS-C improves insulin sensitivity concurrently.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Increased hunger, especially in weeks 3–6 as GH and metabolic rate increase. Lean into this — prioritize protein at 0.8–1g per pound of bodyweight.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Persistent nausea after NAD+ beyond week 2 — reduce to 50 mg (30 units) and notify BioLinked. NAD+ tolerance builds but some people need a longer ramp on their first cycle.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Water retention or joint swelling from HGH — at 2 IU this is uncommon but possible. If you notice significant puffiness in fingers or joints, consider spacing HGH to every other day for 1–2 weeks.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Injection site infection (not just redness — look for heat, swelling, spreading redness, or pus). If any of these occur: stop injecting that site, clean it, and contact BioLinked. Sterile technique prevents this almost entirely.</div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B7335" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Protocol Investment — Choose Your Level</div>
+    </div>
+
+    <div class="level-tabs">
+      <button class="ltab active" id="ltab1" onclick="showLevel(1,this)"><span class="ltab-eyebrow">Level 1</span><span class="ltab-name">Presidential</span><span class="ltab-sub">All 9 · $1,408</span></button>
+      <button class="ltab" id="ltab2" onclick="showLevel(2,this)"><span class="ltab-eyebrow">Level 2</span><span class="ltab-name">Platinum</span><span class="ltab-sub">5 compounds · $540</span></button>
+      <button class="ltab" id="ltab3" onclick="showLevel(3,this)"><span class="ltab-eyebrow">Level 3</span><span class="ltab-name">Optimum</span><span class="ltab-sub">3 compounds · $320</span></button>
+      <button class="ltab" id="ltab4" onclick="showLevel(4,this)"><span class="ltab-eyebrow">Level 4</span><span class="ltab-name">Deluxe</span><span class="ltab-sub">2 compounds · $250</span></button>
+      <button class="ltab" id="ltab5" onclick="showLevel(5,this)"><span class="ltab-eyebrow">Level 5</span><span class="ltab-name">Starter</span><span class="ltab-sub">1 compound · $160</span></button>
+    </div>
+
+    <div id="level1" class="price-table" style="border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The complete protocol — all three goals firing simultaneously at maximum intensity. This is the stack built for a man who served at the highest level and wants to recover, rebuild, and stay biologically young for decades.</div>
+      <div class="price-row"><div><div class="item">KLOW Blend</div><div class="qty">80 units × 2 vials · $80/vial · 5 on / 2 off · AM</div></div><div class="amt">$160</div></div>
+      <div class="price-row"><div><div class="item">CJC + Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · AM &amp; PM fasted</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">10mg × 2 vials · $35/vial · 5 on / 2 off · AM fasted</div></div><div class="amt">$70</div></div>
+      <div class="price-row"><div><div class="item">Epitalon</div><div class="qty">20mg × 2 vials · $65/vial · Every day × 20 days · PM</div></div><div class="amt">$130</div></div>
+      <div class="price-row"><div><div class="item">Pinealon</div><div class="qty">20mg × 2 vials · $65/vial · Every day × 20 days · AM</div></div><div class="amt">$130</div></div>
+      <div class="price-row"><div><div class="item">NAD+</div><div class="qty">500mg × 2 vials · $65/vial · 2× per week · AM fasted</div></div><div class="amt">$130</div></div>
+      <div class="price-row"><div><div class="item">SS-31</div><div class="qty">10mg × 2 vials · $45/vial · 5 on / 2 off · AM</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">HGH 10 IU</div><div class="qty">10 IU × 2 vials · $150/vial · 5 on / 2 off · AM fasted / Pre-sleep</div></div><div class="amt">$300</div></div>
+      <div class="price-row"><div><div class="item">HCG (5000 IU)</div><div class="qty">5000 IU × 2 vials · $154/vial · 2–3× per week · AM</div></div><div class="amt">$308</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 1 Presidential</div><div class="qty">All 9 compounds · 8-week cycle</div></div><div class="amt">$1,408</div></div>
+    </div>
+
+    <div id="level2" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Platinum stack is built around your two highest priorities — recovery/healing and metabolic muscle building — with the cellular longevity layer kept intact through NAD+ and SS-31.</div>
+      <div class="price-row"><div><div class="item">KLOW Blend</div><div class="qty">80 units × 2 vials · $80/vial · 5 on / 2 off · AM</div></div><div class="amt">$160</div></div>
+      <div class="price-row"><div><div class="item">CJC + Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · AM &amp; PM fasted</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">10mg × 2 vials · $35/vial · 5 on / 2 off · AM fasted</div></div><div class="amt">$70</div></div>
+      <div class="price-row"><div><div class="item">NAD+</div><div class="qty">500mg × 2 vials · $65/vial · 2× per week · AM fasted</div></div><div class="amt">$130</div></div>
+      <div class="price-row"><div><div class="item">SS-31</div><div class="qty">10mg × 2 vials · $45/vial · 5 on / 2 off · AM</div></div><div class="amt">$90</div></div>
+      <div class="price-row dimmed"><div><div class="item">Epitalon · Pinealon · HGH · HCG</div><div class="qty">Not included at this level — recommended for cycle 2</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 2 Platinum</div><div class="qty">5 compounds · 8-week cycle</div></div><div class="amt">$540</div></div>
+    </div>
+
+    <div id="level3" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Optimum stack keeps your three most impactful compounds working together — KLOW Blend for direct shoulder and arm tissue repair, CJC+Ipamorelin to stimulate the GH axis, and MOTS-C to ensure your metabolism is partitioning energy toward muscle tissue and recovery.</div>
+      <div class="price-row"><div><div class="item">KLOW Blend</div><div class="qty">80 units × 2 vials · $80/vial · 5 on / 2 off · AM</div></div><div class="amt">$160</div></div>
+      <div class="price-row"><div><div class="item">CJC + Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · AM &amp; PM fasted</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">10mg × 2 vials · $35/vial · 5 on / 2 off · AM fasted</div></div><div class="amt">$70</div></div>
+      <div class="price-row dimmed"><div><div class="item">NAD+ · SS-31 · Epitalon · Pinealon · HGH · HCG</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 3 Optimum</div><div class="qty">3 compounds · 8-week cycle</div></div><div class="amt">$320</div></div>
+    </div>
+
+    <div id="level4" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Deluxe stack leads with your most pressing need — healing your arm and shoulder — and pairs it with the GH-stimulating peptide that drives both recovery and muscle growth.</div>
+      <div class="price-row"><div><div class="item">KLOW Blend</div><div class="qty">80 units × 2 vials · $80/vial · 5 on / 2 off · AM</div></div><div class="amt">$160</div></div>
+      <div class="price-row"><div><div class="item">CJC + Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · AM &amp; PM fasted</div></div><div class="amt">$90</div></div>
+      <div class="price-row dimmed"><div><div class="item">MOTS-C · NAD+ · SS-31 · Epitalon · Pinealon · HGH · HCG</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 4 Deluxe</div><div class="qty">2 compounds · 8-week cycle</div></div><div class="amt">$250</div></div>
+    </div>
+
+    <div id="level5" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Starter stack leads with the single most impactful compound for your number one goal — healing. KLOW Blend contains BPC-157, TB-500, GHK-Cu, and KPV: a four-in-one tissue repair and anti-inflammatory stack that addresses your arm and shoulder injury directly.</div>
+      <div class="price-row"><div><div class="item">KLOW Blend</div><div class="qty">80 units × 2 vials · $80/vial · 5 on / 2 off · AM</div></div><div class="amt">$160</div></div>
+      <div class="price-row dimmed"><div><div class="item">CJC+Ipa · MOTS-C · NAD+ · SS-31 · Epitalon · Pinealon · HGH · HCG</div><div class="qty">Not included at this level — add in cycle 2</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 5 Starter</div><div class="qty">1 compound · 8-week cycle</div></div><div class="amt">$160</div></div>
+    </div>
+
+    <script>
+    function showLevel(n,btn){
+      [1,2,3,4,5].forEach(i=>{document.getElementById('level'+i).style.display='none';});
+      ['ltab1','ltab2','ltab3','ltab4','ltab5'].forEach(id=>{document.getElementById(id).classList.remove('active');});
+      document.getElementById('level'+n).style.display='block';
+      btn.classList.add('active');
+    }
+    </script>
+  </div>
+
+  <!-- VENMO -->
+  <div class="venmo-section">
+    <h3>Ready to <em>Order?</em></h3>
+    <p>Send payment via Venmo and your protocol ships within 24–48 hours.<br>Include your name and level in the note field.</p>
+    <a href="https://venmo.com/micahp20" class="venmo-btn">Pay on Venmo</a>
+    <span class="venmo-handle">@micahp20</span>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Important Notice:</strong> This protocol has been prepared by BioLinked Solutions for educational and informational purposes only. It does not constitute medical advice, diagnosis, or treatment. Peptides discussed in this document are research compounds not approved by the FDA for human use unless otherwise noted. Always consult with a licensed healthcare provider before beginning any new supplement or compound protocol. BioLinked Solutions is not responsible for adverse outcomes resulting from misuse or improper administration. If you experience any adverse reactions, discontinue use immediately and seek medical attention.
+  </div>
+
+</div><!-- /tab-protocol -->
+
+
+<!-- SUPPLIES TAB -->
+<div id="tab-supplies" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-1 9H3L2 3Z" stroke="#8B7335" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 3V2a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#8B7335" stroke-width="1.2"/><path d="M6 7h4M8 5v4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Supplies — Order Before Day 1</div>
+    </div>
+    <div class="intro-card" style="margin-top:1rem;">
+      <p>Five items, all available on Amazon Prime. Order them together before your cycle begins. As a first-time injector, having all your supplies organized and ready before Day 1 makes the learning curve significantly smoother. With 9 compounds at the Presidential level, stock up — don't run short mid-cycle.</p>
+    </div>
+    <div class="peptide-grid" style="margin-top:1.5rem;">
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Insulin Syringes</div><div class="peptide-tagline">29–31 Gauge · 1 mL · 100-pack minimum</div></div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">With up to 7–8 injections on a heavy Monday, you'll go through syringes quickly. Never reuse — one per injection, always. As a first-timer, having extra on hand removes any anxiety about running out. 100-pack covers the full cycle with room to practice your technique early on.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Bacteriostatic Water (BAC Water)</div><div class="peptide-tagline">30 mL Sterile Glass Vials · Order 10+</div></div>
+          <a href="https://www.amazon.com/30-Premium-Glass-Vials-Pack/dp/B0FH2C4JM8/" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">9 vials to reconstitute means you need at least 10 BAC water vials. Order them all at once — BAC water is the one supply you absolutely cannot skip. Each compound gets its own dedicated BAC water vial at reconstitution.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Alcohol Prep Pads</div><div class="peptide-tagline">70% Isopropyl · Sterile · 200-pack</div></div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">Wipe the vial stopper before every draw and the injection site before every injection. Your most important defense against contamination. Go through them generously — they're cheap insurance. 200-pack covers the full cycle.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Sharps Container</div><div class="peptide-tagline">FDA-Cleared · Puncture-Proof · 1 Quart</div></div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">Used needles go directly into the sharps container — no exceptions. Over 8 weeks at the Presidential level you'll accumulate 100–150+ syringes. When full, drop off free at any CVS or Walgreens pharmacy. Critical with two little girls in the house.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Peptide Organizer / Cold Storage</div><div class="peptide-tagline">Insulated · Multi-vial · Keeps compounds organized</div></div>
+          <a href="https://a.co/d/07HthwLz" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">With 9 active vials in the fridge, organization matters — especially as a first-time injector learning each compound. A dedicated peptide container prevents mix-ups, protects from light, and keeps everything locked away safely. A non-negotiable with kids in the home.</div></div>
+      </div>
+    </div>
+    <div class="checklist-wrap">
+      <div class="checklist-title">Quick Order Checklist — All 5 Items</div>
+      <div class="checklist-row"><span>1 — Insulin Syringes (29–31G · 1 mL · 100-pack)</span><a href="https://a.co/d/04JCzBqF" target="_blank" class="checklist-link">a.co/d/04JCzBqF →</a></div>
+      <div class="checklist-row"><span>2 — BAC Water (30 mL sterile glass vials · order 10+)</span><a href="https://www.amazon.com/30-Premium-Glass-Vials-Pack/dp/B0FH2C4JM8/" target="_blank" class="checklist-link">Amazon →</a></div>
+      <div class="checklist-row"><span>3 — Alcohol Prep Pads (70% IPA · 200-pack)</span><a href="https://a.co/d/0fnbd8VV" target="_blank" class="checklist-link">a.co/d/0fnbd8VV →</a></div>
+      <div class="checklist-row"><span>4 — Sharps Container (1 quart · FDA-cleared)</span><a href="https://a.co/d/0jhnMLPg" target="_blank" class="checklist-link">a.co/d/0jhnMLPg →</a></div>
+      <div class="checklist-row"><span>5 — Peptide Organizer / Cold Storage</span><a href="https://a.co/d/07HthwLz" target="_blank" class="checklist-link">a.co/d/07HthwLz →</a></div>
+    </div>
+  </div>
+</div><!-- /tab-supplies -->
+
+
+<!-- TRACKER TAB -->
+<div id="tab-tracker" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#8B7335" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="section-title">Daily Dose Tracker — 8-Week Cycle</div>
+    </div>
+
+    <div style="background:#f8f8f8;border:1px solid var(--gold-border);border-radius:2px;padding:1.25rem 1.75rem;margin-bottom:1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem;">
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">KLOW Blend</div><div style="font-size:11px;font-weight:500;color:var(--text);">4u · 10u draw · AM · 5on/2off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">CJC+Ipa (AM)</div><div style="font-size:11px;font-weight:500;color:var(--text);">250mcg · 10u · AM fasted</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">CJC+Ipa (PM)</div><div style="font-size:11px;font-weight:500;color:var(--text);">250mcg · 10u · PM fasted</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">MOTS-C</div><div style="font-size:11px;font-weight:500;color:var(--text);">1mg · 10u · AM fasted</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Epitalon ★20 days</div><div style="font-size:11px;font-weight:500;color:var(--text);">2mg · 20u · PM · days 1–20</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Pinealon ★20 days</div><div style="font-size:11px;font-weight:500;color:var(--text);">2mg · 20u · AM · days 1–20</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">NAD+</div><div style="font-size:11px;font-weight:500;color:var(--text);">100mg · 60u · Mon/Thu fasted</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">SS-31</div><div style="font-size:11px;font-weight:500;color:var(--text);">500mcg · 10u · AM · 5on/2off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">HGH</div><div style="font-size:11px;font-weight:500;color:var(--text);">2IU · 20u · AM fasted · 5on/2off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">HCG</div><div style="font-size:11px;font-weight:500;color:var(--text);">500IU · 20u · AM · Mon/Wed/Fri</div></div>
+    </div>
+
+    <div class="note-card note-blue" style="margin-top:0;">
+      <h4>★ Epitalon &amp; Pinealon — Days 1–20 Only</h4>
+      <p>Track these in the tracker for weeks 1–3 (first 20 days). After day 20, stop logging them — they're complete for this cycle.</p>
+    </div>
+
+    <div class="cycle-start-row">
+      <label>Cycle Start Date</label>
+      <input type="date" id="cycleStartDate" onchange="setCycleStart(this.value)">
+      <span class="save-badge" id="saveBadge">Saved ✓</span>
+    </div>
+
+    <div class="tracker-top">
+      <div class="tracker-stat"><div class="ts-label">Cycle Progress</div><div class="ts-value" id="statWeek">—</div><div class="ts-sub" id="statDay">Set start date above</div></div>
+      <div class="tracker-stat"><div class="ts-label">Doses This Week</div><div class="ts-value" id="statDoses">0</div><div class="ts-sub">logged</div></div>
+      <div class="tracker-stat"><div class="ts-label">Cycle Complete</div><div class="ts-value" id="statPct">0%</div><div class="ts-sub">overall</div></div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label"><span>8-Week Cycle</span><span id="progressLabel">0 / 56 days</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="week-selector">
+      <button class="week-nav-btn" onclick="changeWeek(-1)">&#8249;</button>
+      <div class="week-label" id="weekLabel">Week 1</div>
+      <button class="week-nav-btn" onclick="changeWeek(1)">&#8250;</button>
+    </div>
+
+    <div id="trackerGrid"></div>
+
+    <div class="notes-area">
+      <div class="notes-label">Weekly Notes — Strength, shoulder/arm feel, energy, sleep, how you feel overall</div>
+      <textarea class="notes-input" id="weekNotes" placeholder="e.g. Shoulder feels noticeably looser. Sleep way deeper since day 4. Hit a PR on bench Thursday..." oninput="saveNotes()"></textarea>
+    </div>
+
+    <div class="tracker-actions">
+      <button class="action-btn" onclick="markAllToday()">✓ Mark All Today</button>
+      <button class="action-btn" onclick="clearWeek()">Clear This Week</button>
+      <button class="action-btn primary" onclick="downloadTracker()">⬇ Download for iOS</button>
+    </div>
+
+    <div class="ios-download-banner">
+      <div class="ios-banner-text">
+        <strong>Save to iPhone / iPad</strong> — Tap Download for iOS, open in Safari on your device. Tap the Share button → Add to Home Screen to install as a standalone app. All dose logs save locally to your device.
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-tracker -->
+
+</div><!-- /container -->
+
+<div class="footer">
+  Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Justin Sanders &nbsp;·&nbsp; Veteran's Recovery · Rebuild · Longevity Protocol &nbsp;·&nbsp; 8-Week Cycle
+</div>
+
+<script>
+const COMPOUNDS = [
+  {id:'klow',     name:'KLOW Blend',    sub:'4u · AM · 5on/2off',        days:[1,2,3,4,5], prn:false},
+  {id:'cjcam',    name:'CJC+Ipa AM',    sub:'250mcg · AM fasted',         days:[1,2,3,4,5], prn:false},
+  {id:'cjcpm',    name:'CJC+Ipa PM',    sub:'250mcg · PM fasted',         days:[1,2,3,4,5], prn:false},
+  {id:'motsc',    name:'MOTS-C',        sub:'1mg · AM fasted',            days:[1,2,3,4,5], prn:false},
+  {id:'epitalon', name:'Epitalon ★',    sub:'2mg · PM · days 1–20',       days:[0,1,2,3,4,5,6], prn:false},
+  {id:'pinealon', name:'Pinealon ★',    sub:'2mg · AM · days 1–20',       days:[0,1,2,3,4,5,6], prn:false},
+  {id:'nad',      name:'NAD+',          sub:'100mg · AM fasted',          days:[1,4],       prn:false},
+  {id:'ss31',     name:'SS-31',         sub:'500mcg · AM',                days:[1,2,3,4,5], prn:false},
+  {id:'hgh',      name:'HGH',           sub:'2IU · AM fasted',            days:[1,2,3,4,5], prn:false},
+  {id:'hcg',      name:'HCG',           sub:'500IU · AM',                 days:[1,3,5],     prn:false},
+];
+const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const TOTAL_WEEKS=8,TOTAL_DAYS=56;
+let currentWeek=1,state={},cycleStartDate=null;
+
+function loadState(){
+  try{const s=localStorage.getItem('justinProtocolState');if(s)state=JSON.parse(s);}catch(e){}
+  try{const d=localStorage.getItem('justinCycleStart');if(d){cycleStartDate=new Date(d);document.getElementById('cycleStartDate').value=d;}}catch(e){}
+  updateStats();
+}
+function saveState(){
+  try{localStorage.setItem('justinProtocolState',JSON.stringify(state));const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}catch(e){}
+}
+function saveNotes(){if(!state[currentWeek])state[currentWeek]={};state[currentWeek].__notes=document.getElementById('weekNotes').value;saveState();}
+function setCycleStart(val){cycleStartDate=val?new Date(val):null;try{localStorage.setItem('justinCycleStart',val);}catch(e){}updateStats();const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}
+function isScheduled(c,dow){return c.days.includes(dow);}
+function isDoseTaken(w,cid,di){return!!(state[w]&&state[w][cid]&&state[w][cid][di]);}
+function toggleDose(w,cid,di){if(!state[w])state[w]={};if(!state[w][cid])state[w][cid]={};state[w][cid][di]=!state[w][cid][di];saveState();renderGrid();updateStats();}
+
+function renderGrid(){
+  const container=document.getElementById('trackerGrid');
+  const weekDates=getWeekDates(currentWeek);
+  let html='';
+  html+='<div class="day-header-row"><div></div><div class="day-headers-inner">';
+  for(let d=0;d<7;d++){
+    const dow=(d+1)%7;
+    const dayName=DAY_NAMES[dow];
+    const dateStr=weekDates?weekDates[d].getDate():'';
+    const allRest=COMPOUNDS.filter(c=>!c.prn).every(c=>!isScheduled(c,dow));
+    html+='<div class="day-header'+(allRest?' rest-day':'')+'">' +dayName+(dateStr?'<br><span style="font-size:9px;font-weight:300;color:#888">'+dateStr+'</span>':'')+'</div>';
+  }
+  html+='</div></div>';
+  COMPOUNDS.forEach(c=>{
+    html+='<div class="tracker-grid-wrap"><div class="tracker-compound-label"><div class="compound-badge">'+c.name+'<span>'+c.sub+'</span></div></div><div class="day-row">';
+    for(let d=0;d<7;d++){
+      const dow=(d+1)%7;
+      const taken=isDoseTaken(currentWeek,c.id,d);
+      if(c.prn){html+='<div class="dose-cell prn'+(taken?' taken':'')+'" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+d+')"></div>';}
+      else if(!isScheduled(c,dow)){html+='<div class="dose-cell rest"></div>';}
+      else if(taken){html+='<div class="dose-cell scheduled taken" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+d+')"></div>';}
+      else{html+='<div class="dose-cell scheduled" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+d+')"></div>';}
+    }
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  document.getElementById('weekNotes').value=state[currentWeek]&&state[currentWeek].__notes?state[currentWeek].__notes:'';
+  document.getElementById('weekLabel').textContent='Week '+currentWeek;
+}
+
+function getWeekDates(w){
+  if(!cycleStartDate)return null;
+  const start=new Date(cycleStartDate);
+  start.setDate(start.getDate()+(w-1)*7);
+  const dates=[];
+  for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);dates.push(d);}
+  return dates;
+}
+function changeWeek(delta){const n=currentWeek+delta;if(n<1||n>TOTAL_WEEKS)return;currentWeek=n;renderGrid();}
+function markAllToday(){
+  const dow=new Date().getDay();let di=-1;
+  for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}
+  if(di<0)return;
+  if(!state[currentWeek])state[currentWeek]={};
+  COMPOUNDS.filter(c=>!c.prn).forEach(c=>{if(isScheduled(c,dow)){if(!state[currentWeek][c.id])state[currentWeek][c.id]={};state[currentWeek][c.id][di]=true;}});
+  saveState();renderGrid();updateStats();
+}
+function clearWeek(){
+  if(!confirm('Clear all dose logs for Week '+currentWeek+'?'))return;
+  const notes=state[currentWeek]&&state[currentWeek].__notes;
+  state[currentWeek]={};if(notes)state[currentWeek].__notes=notes;
+  saveState();renderGrid();updateStats();
+}
+function updateStats(){
+  let weekText='Week '+currentWeek,dayText='of 8-week cycle';
+  if(cycleStartDate){
+    const now=new Date(),diff=Math.floor((now-cycleStartDate)/86400000);
+    const cw=Math.min(TOTAL_WEEKS,Math.max(1,Math.floor(diff/7)+1));
+    weekText='Week '+cw;dayText='Day '+Math.min(diff+1,TOTAL_DAYS)+' of '+TOTAL_DAYS;
+    if(currentWeek===1&&cw>1){currentWeek=cw;}
+    const pct=Math.min(100,Math.round((diff/TOTAL_DAYS)*100));
+    document.getElementById('progressFill').style.width=pct+'%';
+    document.getElementById('progressLabel').textContent=Math.min(diff+1,TOTAL_DAYS)+' / '+TOTAL_DAYS+' days';
+    document.getElementById('statPct').textContent=pct+'%';
+  }
+  document.getElementById('statWeek').textContent=weekText;
+  document.getElementById('statDay').textContent=dayText;
+  let dc=0,sc=0;
+  for(let d=0;d<7;d++){const dow=(d+1)%7;COMPOUNDS.filter(c=>!c.prn).forEach(c=>{if(isScheduled(c,dow)){sc++;if(isDoseTaken(currentWeek,c.id,d))dc++;}});}
+  document.getElementById('statDoses').textContent=dc+'/'+sc;
+}
+function switchTab(tab,event){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(event)event.target.classList.add('active');
+  if(tab==='tracker'){renderGrid();updateStats();}
+}
+function downloadTracker(){
+  const startVal=document.getElementById('cycleStartDate').value||'';
+  const trackerHTML='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Justin Tracker"><title>Justin Sanders — Peptide Tracker</title><style>*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}:root{--gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);--bg:#f5f5f5;--bg-card:#fff;--bg-card2:#f0f0f0;--text:#1a1a1a;--text-muted:#888880;--border:rgba(0,0,0,0.10);--green-dim:rgba(45,106,79,0.12);--green:#3a9a5a}body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);font-size:13px;padding-bottom:env(safe-area-inset-bottom)}.hdr{background:#fff;border-bottom:1px solid var(--gold-border);padding:max(1.5rem,env(safe-area-inset-top)) 1rem 1rem;text-align:center}.hdr h1{font-size:20px;color:var(--text);font-weight:300;letter-spacing:0.04em}.hdr h1 em{color:var(--gold);font-style:normal}.hdr p{font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px}.wrap{max-width:600px;margin:0 auto;padding:1rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}.stat{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:4px;padding:10px 6px;text-align:center}.stat .val{font-size:20px;color:var(--gold);font-weight:600}.stat .lbl{font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}.prog-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:1rem}.prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}.week-sel{display:flex;align-items:center;justify-content:center;gap:12px;margin:1rem 0}.wnav{width:38px;height:38px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:4px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}.wlbl{font-size:18px;color:var(--text);font-weight:300;min-width:80px;text-align:center}.grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:1rem}.tt{width:100%;border-collapse:collapse;min-width:380px}.tt th{background:#f0f0f0;color:var(--gold);padding:6px 2px;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--gold-border)}.tt th.cn{text-align:left;padding-left:6px;min-width:90px}.tt td{padding:2px;text-align:center;border-bottom:1px solid var(--border)}.tt td.cn{text-align:left;padding-left:6px;font-size:10px;font-weight:600;color:var(--gold);white-space:nowrap}.tt td.cn span{display:block;font-size:8px;font-weight:400;color:var(--text-muted)}.tt tr:nth-child(even) td{background:#f8f8f8}.db{width:30px;height:30px;border-radius:3px;border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;font-size:13px}.db.taken{background:var(--green-dim);border-color:rgba(45,106,79,0.35)}.db.rest{background:transparent;border-color:transparent;cursor:default;color:#ccc;font-size:10px}.db:active{transform:scale(0.88)}.notes-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:1rem}.notes-lbl{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}.notes-ta{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:4px;padding:8px;color:var(--text);font-family:-apple-system,sans-serif;font-size:12px;resize:vertical;min-height:56px;outline:none}.notes-ta:focus{border-color:var(--gold-border)}.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}.btn{padding:12px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;cursor:pointer;text-align:center}.venmo-row{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:4px;padding:12px;text-align:center;margin-bottom:1rem}.venmo-row a{color:var(--gold);font-size:12px;font-weight:600;text-decoration:none}.foot{text-align:center;font-size:10px;color:var(--text-muted);padding:1rem;line-height:1.5}</style>  <link rel="icon" type="image/png" href="/favicon.png">
+</head><body><div class="hdr"><h1>Justin <em>Sanders</em> — Tracker</h1><p>BioLinked Solutions · Veteran Recovery · Rebuild · Longevity · 8 Weeks</p></div><div class="wrap"><div class="stats"><div class="stat"><div class="val" id="sW">—</div><div class="lbl">Week</div></div><div class="stat"><div class="val" id="sD">0</div><div class="lbl">Doses</div></div><div class="stat"><div class="val" id="sP">0%</div><div class="lbl">Complete</div></div></div><div class="prog-wrap"><div class="prog-top"><span>8-Week Cycle</span><span id="pL">0/56 days</span></div><div class="prog-bar"><div class="prog-fill" id="pF" style="width:0%"></div></div></div><div class="week-sel"><div class="wnav" onclick="cW(-1)">‹</div><div class="wlbl" id="wL">Week 1</div><div class="wnav" onclick="cW(1)">›</div></div><div class="grid-wrap"><table class="tt"><thead><tr><th class="cn">Compound</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead><tbody id="tB"></tbody></table></div><div class="notes-wrap"><div class="notes-lbl">Weekly Notes</div><textarea class="notes-ta" id="wN" placeholder="Shoulder feel · Strength · Sleep · Energy..." oninput="svN()"></textarea></div><div class="btns"><div class="btn" onclick="mT()">✓ Mark All Today</div><div class="btn" onclick="cWk()">Clear Week</div></div><div class="venmo-row"><a href="https://venmo.com/micahp20">Reorder · Venmo @micahp20</a></div><div class="foot">Tap circle = dose taken. — = rest day. ★ Epitalon & Pinealon run days 1–20 only.</div></div><script>const C=[{id:"klow",n:"KLOW",s:"4u·AM",d:[1,2,3,4,5]},{id:"cjcam",n:"CJC AM",s:"250mcg",d:[1,2,3,4,5]},{id:"cjcpm",n:"CJC PM",s:"250mcg",d:[1,2,3,4,5]},{id:"motsc",n:"MOTS-C",s:"1mg",d:[1,2,3,4,5]},{id:"epitalon",n:"Epitalon★",s:"2mg·days1-20",d:[0,1,2,3,4,5,6]},{id:"pinealon",n:"Pinealon★",s:"2mg·days1-20",d:[0,1,2,3,4,5,6]},{id:"nad",n:"NAD+",s:"100mg",d:[1,4]},{id:"ss31",n:"SS-31",s:"500mcg",d:[1,2,3,4,5]},{id:"hgh",n:"HGH",s:"2IU",d:[1,2,3,4,5]},{id:"hcg",n:"HCG",s:"500IU",d:[1,3,5]}];const TD=56,TW=8,SD="'+startVal+'";let cw=1,st={};function ls(){try{const s=localStorage.getItem("jSt");if(s)st=JSON.parse(s);}catch(e){}upd();}function sv(){try{localStorage.setItem("jSt",JSON.stringify(st));}catch(e){}}function svN(){if(!st[cw])st[cw]={};st[cw].__n=document.getElementById("wN").value;sv();}function isSch(c,dow){return c.d.includes(dow);}function isTk(w,ci,di){return!!(st[w]&&st[w][ci]&&st[w][ci][di]);}function tog(w,ci,di){if(!st[w])st[w]={};if(!st[w][ci])st[w][ci]={};st[w][ci][di]=!st[w][ci][di];sv();ren();upd();}function ren(){const tb=document.getElementById("tB");let h="";C.forEach(c=>{h+="<tr><td class=\'cn\'>"+c.n+"<span>"+c.s+"</span></td>";for(let d=0;d<7;d++){const dow=(d+1)%7;const tk=isTk(cw,c.id,d);if(!isSch(c,dow)){h+="<td><div class=\'db rest\'>—</div></td>";}else{h+="<td><div class=\'db"+(tk?" taken":"")+"' onclick=\'tog("+cw+",\\\""+c.id+"\\\","+d+")\'>\"+(tk?\"✓\":\"○\")+\"</div></td>\";}}h+="</tr>";});tb.innerHTML=h;document.getElementById("wL").textContent="Week "+cw;document.getElementById("wN").value=st[cw]&&st[cw].__n?st[cw].__n:"";}function cW(d){const n=cw+d;if(n<1||n>TW)return;cw=n;ren();upd();}function mT(){const dow=new Date().getDay();let di=-1;for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}if(di<0)return;if(!st[cw])st[cw]={};C.forEach(c=>{if(isSch(c,dow)){if(!st[cw][c.id])st[cw][c.id]={};st[cw][c.id][di]=true;}});sv();ren();upd();}function cWk(){if(!confirm("Clear Week "+cw+"?"))return;const n=st[cw]&&st[cw].__n;st[cw]={};if(n)st[cw].__n=n;sv();ren();upd();}function upd(){let wt="—",dt="",pct=0,pr="0/56";if(SD){const now=new Date(),start=new Date(SD),diff=Math.floor((now-start)/86400000);const cywk=Math.min(TW,Math.max(1,Math.floor(diff/7)+1));wt="Wk "+cywk;dt="Day "+Math.min(diff+1,TD)+"/"+TD;pct=Math.min(100,Math.round((diff/TD)*100));pr=Math.min(diff+1,TD)+"/"+TD+" days";}document.getElementById("sW").textContent=wt;document.getElementById("sP").textContent=pct+"%";document.getElementById("pF").style.width=pct+"%";document.getElementById("pL").textContent=pr;let dc=0,sc=0;for(let d=0;d<7;d++){const dow=(d+1)%7;C.forEach(c=>{if(isSch(c,dow)){sc++;if(isTk(cw,c.id,d))dc++;}});}document.getElementById("sD").textContent=dc+"/"+sc;}ls();ren();<\/script></body></html>';
+  const blob=new Blob([trackerHTML],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='Justin_Sanders_Peptide_Tracker.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+loadState();
+renderGrid();
+</script>
+</body>
+</html>
