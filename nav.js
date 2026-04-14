@@ -112,7 +112,7 @@
 </div>`;
 
   document.head.insertAdjacentHTML('beforeend', navCSS);
-  document.body.insertAdjacentHTML('afterbegin', ctaBar + navHTML);
+  document.body.insertAdjacentHTML('afterbegin', navHTML + ctaBar);
   document.body.insertAdjacentHTML('beforeend', siteFooter);
 
   // Mobile toggle
