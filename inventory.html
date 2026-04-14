@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<title>Inventory — Bio Linked Peptide Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f5f5f5; --surface: #ffffff; --surface2: #f0f0f0; --surface3: #e8e8e8;
+  --gold: #8B7335; --gold2: #a08840;
+  --gold-glow: rgba(139,115,53,0.08); --gold-border: rgba(139,115,53,0.20);
+  --gold-border-bright: rgba(139,115,53,0.45);
+  --text: #1a1a1a; --text2: #4a4a4a; --muted: #888888; --muted2: #cccccc;
+  --green: #2e7d5e; --green-bg: rgba(46,125,94,0.07); --green-border: rgba(46,125,94,0.22);
+  --red: #c0392b; --red-bg: rgba(192,57,43,0.07); --red-border: rgba(192,57,43,0.22);
+  --amber: #b8780a; --amber-bg: rgba(184,120,10,0.07); --amber-border: rgba(184,120,10,0.22);
+  --blue: #2563a8; --blue-bg: rgba(37,99,168,0.07);
+}
+html { height: 100%; font-size: 16px; }
+body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100%; overflow-x: hidden; }
+body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; opacity: 0.5; }
+.topbar { position: sticky; top: 56px; z-index: 50; height: 64px; background: rgba(255,255,255,0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; }
+.topbar::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, var(--gold), transparent 60%); }
+.topbar-brand { display: flex; align-items: center; gap: 12px; }
+.brand-icon { width: 36px; height: 36px; background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.04)); border: 1px solid var(--gold-border-bright); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.brand-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: #1a1a1a; }
+.brand-name em { font-style: italic; color: var(--gold); }
+.brand-sub { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-top: 1px; }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.sync-status { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
+.sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted2); transition: background 0.3s; }
+.sync-dot.syncing { background: var(--amber); animation: pulse 1s infinite; }
+.sync-dot.synced { background: var(--green); }
+.sync-dot.error { background: var(--red); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.btn { display: inline-flex; align-items: center; gap: 7px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 9px 18px; border-radius: 4px; cursor: pointer; transition: all 0.18s; border: 1px solid transparent; -webkit-tap-highlight-color: transparent; }
+.btn-primary { background: var(--gold); color: #000; }
+.btn-primary:hover { background: var(--gold2); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(212,175,55,0.25); }
+.btn-ghost { background: transparent; color: var(--gold); border-color: var(--gold-border-bright); }
+.btn-ghost:hover { background: var(--gold-glow); border-color: var(--gold); }
+.btn-sm { padding: 8px 14px; font-size: 12px; min-height: 40px; }
+.btn-danger { background: transparent; color: var(--red); border-color: var(--red-border); }
+.btn-danger:hover { background: var(--red-bg); }
+.btn-success { background: transparent; color: var(--green); border-color: var(--green-border); }
+.btn-success:hover { background: var(--green-bg); }
+.wrapper { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 40px 28px 80px; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+.page-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+.page-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--gold); }
+.page-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px, 5vw, 52px); font-weight: 400; color: #1a1a1a; line-height: 1.05; }
+.page-title em { font-style: italic; color: var(--gold); }
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 32px; }
+.stat-card { background: var(--surface); border: 1px solid var(--gold-border); border-radius: 8px; padding: 18px 20px; transition: border-color 0.2s; }
+.stat-card:hover { border-color: var(--gold-border-bright); }
+.stat-card-label { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+.stat-card-val { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 600; color: var(--gold); line-height: 1; }
+.stat-card-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+.search-wrap input { width: 100%; background: var(--surface); border: 1px solid var(--gold-border); border-radius: 6px; padding: 9px 14px 9px 36px; font-family: 'Outfit', sans-serif; font-size: 16px; color: var(--text); outline: none; transition: border-color 0.18s; min-height: 44px; }
+.search-wrap input:focus { border-color: var(--gold); }
+.search-wrap input::placeholder { color: var(--muted); }
+.search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--muted); pointer-events: none; }
+.filter-tabs { display: flex; gap: 5px; flex-wrap: wrap; }
+.filter-tab { background: var(--surface); border: 1px solid var(--gold-border); border-radius: 20px; padding: 8px 16px; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; min-height: 40px; display: flex; align-items: center; }
+.filter-tab.active, .filter-tab:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+.inv-table-wrap { background: var(--surface); border: 1px solid var(--gold-border); border-radius: 10px; overflow: hidden; }
+.inv-table { width: 100%; border-collapse: collapse; }
+.inv-table th { background: var(--surface2); border-bottom: 1px solid var(--gold-border); padding: 12px 16px; text-align: left; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.inv-table th:last-child { text-align: center; }
+.inv-row { border-bottom: 1px solid rgba(212,175,55,0.06); transition: background 0.15s; }
+.inv-row:last-child { border-bottom: none; }
+.inv-row:hover { background: rgba(212,175,55,0.025); }
+.inv-row td { padding: 14px 16px; vertical-align: middle; }
+.peptide-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: #1a1a1a; }
+.peptide-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.vials-cell { font-size: 14px; color: var(--text); font-weight: 500; }
+.status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; }
+.status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+.status-in-stock { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+.status-in-stock::before { background: var(--green); }
+.status-low { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+.status-low::before { background: var(--amber); }
+.status-out { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+.status-out::before { background: var(--red); }
+.status-ordered { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,155,213,0.25); }
+.status-ordered::before { background: var(--blue); }
+.vial-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.vial-bar-bg { flex: 1; height: 5px; background: var(--surface3); border-radius: 3px; overflow: hidden; min-width: 60px; }
+.vial-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+.bar-green { background: var(--green); } .bar-amber { background: var(--amber); } .bar-red { background: var(--red); }
+.vial-count-text { font-size: 13px; color: var(--text); font-weight: 600; min-width: 28px; }
+.row-actions { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.qty-edit-wrap { display: none; align-items: center; gap: 6px; }
+.qty-edit-wrap.show { display: flex; }
+.qty-spinner { display: flex; align-items: center; background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 6px; overflow: hidden; }
+.qty-spinner button { background: none; border: none; color: var(--text); width: 36px; height: 36px; font-size: 16px; cursor: pointer; transition: background 0.15s; font-family: 'Outfit', sans-serif; -webkit-tap-highlight-color: transparent; }
+.qty-spinner button:hover { background: var(--gold-glow); color: var(--gold); }
+.qty-spinner input { width: 48px; text-align: center; background: none; border: none; outline: none; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); padding: 0; }
+.qty-note-input { background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 6px; padding: 5px 9px; font-family: 'Outfit', sans-serif; font-size: 11px; color: var(--text); outline: none; width: 110px; transition: border-color 0.15s; }
+.qty-note-input:focus { border-color: var(--gold); }
+.qty-note-input::placeholder { color: var(--muted); }
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border: 1px solid var(--gold-border-bright); border-radius: 12px; padding: 36px 32px 28px; width: 100%; max-width: 480px; position: relative; animation: modal-in 0.22s ease; box-shadow: 0 40px 100px rgba(0,0,0,0.15); }
+@keyframes modal-in { from{opacity:0;transform:translateY(20px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+.modal::before { content: ''; position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; color: #1a1a1a; margin-bottom: 22px; }
+.modal-title em { font-style: italic; color: var(--gold); }
+.modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; transition: color 0.15s; }
+.modal-close:hover { color: var(--text); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.form-col { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+.form-input, .form-select { background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 6px; padding: 11px 13px; font-family: 'Outfit', sans-serif; font-size: 16px; color: var(--text); outline: none; transition: border-color 0.18s; width: 100%; min-height: 48px; }
+.form-input:focus, .form-select:focus { border-color: var(--gold); }
+.form-input::placeholder { color: var(--muted); }
+.form-select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+.form-select option { background: #fff; color: #1a1a1a; }
+.kit-hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.form-actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 22px; }
+.log-panel { margin-top: 28px; background: var(--surface); border: 1px solid var(--gold-border); border-radius: 10px; overflow: hidden; }
+.log-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--gold-border); background: var(--surface2); cursor: pointer; user-select: none; }
+.log-header-title { font-size: 12px; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+.log-chevron { color: var(--muted); transition: transform 0.2s; font-size: 12px; }
+.log-chevron.open { transform: rotate(180deg); }
+.log-entries { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.log-entries.open { max-height: 500px; overflow-y: auto; }
+.log-entry { display: flex; align-items: flex-start; gap: 12px; padding: 11px 20px; border-bottom: 1px solid rgba(212,175,55,0.04); font-size: 12px; }
+.log-entry:last-child { border-bottom: none; }
+.log-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.log-time { color: var(--muted); min-width: 80px; }
+.log-text { color: var(--text2); flex: 1; }
+.log-empty { padding: 20px; text-align: center; font-size: 12px; color: var(--muted); }
+.note-tag { display: inline-block; background: var(--gold-glow); border: 1px solid var(--gold-border); border-radius: 12px; padding: 2px 9px; font-size: 11px; color: var(--text2); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-state-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.4; }
+.empty-state-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--text2); margin-bottom: 7px; }
+.empty-state-sub { font-size: 13px; color: var(--muted); }
+.loading-wrap { text-align: center; padding: 60px 20px; }
+.spinner { width: 36px; height: 36px; border: 2px solid var(--gold-border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.loading-text { font-size: 13px; color: var(--muted); letter-spacing: 0.1em; }
+.bottom-sheet-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 90; align-items: flex-end; }
+.bottom-sheet-overlay.open { display: flex; }
+.bottom-sheet { background: #ffffff; border: 1px solid rgba(139,115,53,0.28); border-bottom: none; border-radius: 20px 20px 0 0; padding: 8px 22px 52px; width: 100%; animation: sheetUp 0.3s cubic-bezier(0.32,0.72,0,1); max-height: 92vh; overflow-y: auto; }
+@keyframes sheetUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.sheet-handle { width: 44px; height: 5px; background: rgba(212,175,55,0.25); border-radius: 3px; margin: 14px auto 22px; }
+.sheet-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
+.sheet-sub { font-size: 13px; color: var(--muted); margin-bottom: 26px; }
+.sheet-qty-row { display: flex; align-items: center; justify-content: center; background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 12px; overflow: hidden; margin-bottom: 18px; }
+.sheet-spin-btn { width: 72px; height: 72px; background: none; border: none; font-size: 32px; color: var(--gold); cursor: pointer; display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent; transition: background 0.12s; flex-shrink: 0; }
+.sheet-spin-btn:active { background: var(--gold-glow); }
+.sheet-qty-display { font-family: 'Cormorant Garamond', serif; font-size: 48px; font-weight: 700; color: var(--gold); flex: 1; text-align: center; background: none; border: none; outline: none; min-width: 90px; padding: 8px 0; }
+.sheet-field-label { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-bottom: 8px; margin-top: 18px; }
+.sheet-note-input { width: 100%; background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 10px; padding: 15px 16px; font-family: 'Outfit', sans-serif; font-size: 16px; color: var(--text); outline: none; margin-bottom: 4px; }
+.sheet-note-input::placeholder { color: var(--muted); }
+.sheet-note-input:focus { border-color: var(--gold); }
+.sheet-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 24px; }
+.sheet-status-btn { padding: 16px 10px; border-radius: 10px; border: 1px solid var(--gold-border); background: var(--surface2); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); cursor: pointer; transition: all 0.15s; -webkit-tap-highlight-color: transparent; text-align: center; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.sheet-status-btn:active { transform: scale(0.96); }
+.ss-active-stock { background: rgba(76,175,125,0.14); color: var(--green); border-color: rgba(76,175,125,0.4); }
+.ss-active-low { background: rgba(224,154,46,0.14); color: var(--amber); border-color: rgba(224,154,46,0.4); }
+.ss-active-out { background: rgba(224,92,92,0.14); color: var(--red); border-color: rgba(224,92,92,0.4); }
+.ss-active-ordered { background: rgba(91,155,213,0.14); color: var(--blue); border-color: rgba(91,155,213,0.4); }
+.sheet-save-btn { width: 100%; padding: 18px; background: var(--gold); border: none; border-radius: 12px; font-family: 'Outfit', sans-serif; font-size: 15px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: #000; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: background 0.15s; min-height: 58px; }
+.sheet-save-btn:active { background: var(--gold2); }
+.sheet-cancel-link { display: block; text-align: center; margin-top: 16px; font-size: 14px; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 10px; }
+@media (max-width: 768px) {
+  .wrapper { padding: 20px 12px 100px; }
+  .topbar { padding: 0 14px; height: 58px; }
+  .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+  .stat-card { padding: 14px; }
+  .stat-card-val { font-size: 28px !important; }
+  .page-title { font-size: clamp(24px, 7vw, 36px) !important; }
+  .toolbar { gap: 8px; flex-direction: column; align-items: stretch; }
+  .search-wrap { max-width: 100%; }
+  .inv-table th, .inv-table td { padding: 11px 10px; font-size: 13px; }
+  .peptide-name { font-size: 15px !important; }
+  .col-note, .col-ordered, .col-size { display: none; }
+  .row-actions { flex-direction: column; gap: 6px; }
+  .btn-sm { font-size: 12px !important; padding: 10px 14px !important; min-height: 42px; width: 100%; justify-content: center; }
+  .modal-overlay { padding: 0; align-items: flex-end; }
+  .modal { border-radius: 18px 18px 0 0 !important; padding: 28px 18px 44px !important; max-width: 100% !important; max-height: 88vh; overflow-y: auto; }
+  .form-grid { grid-template-columns: 1fr !important; }
+  .form-col { grid-column: 1 !important; }
+  .form-actions { flex-direction: column-reverse; gap: 10px; }
+  .form-actions .btn { width: 100%; justify-content: center; font-size: 14px !important; padding: 16px !important; min-height: 52px; }
+  .qty-edit-wrap { display: none !important; }
+  .sync-label { display: none; }
+}
+@media (max-width: 520px) { .col-status { display: none; } .stats-row { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 769px) { .bottom-sheet-overlay { display: none !important; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="brand-icon">📦</div>
+    <div>
+      <div class="brand-name">Bio Linked <em>Inventory</em></div>
+      <div class="brand-sub">Peptide Stock Tracker</div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span class="sync-label" id="syncLabel">Loading…</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ Export</button>
+    <button class="btn btn-primary btn-sm" onclick="openModal()">＋ Add Item</button>
+  </div>
+</div>
+
+<div class="wrapper">
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Stock Management</div>
+      <h1 class="page-title">Peptide <em>Inventory</em></h1>
+    </div>
+    <div style="font-size:12px;color:var(--muted);text-align:right;">Last synced: <span id="lastUpdated">—</span></div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-card-label">Total Items</div><div class="stat-card-val" id="statTotal">—</div><div class="stat-card-sub">compounds tracked</div></div>
+    <div class="stat-card"><div class="stat-card-label">Total Vials</div><div class="stat-card-val" id="statVials">—</div><div class="stat-card-sub">in stock</div></div>
+    <div class="stat-card"><div class="stat-card-label">Low Stock</div><div class="stat-card-val" id="statLow" style="color:var(--amber)">—</div><div class="stat-card-sub">items ≤ 3 vials</div></div>
+    <div class="stat-card"><div class="stat-card-label">Out of Stock</div><div class="stat-card-val" id="statOut" style="color:var(--red)">—</div><div class="stat-card-sub">items empty</div></div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search peptide..." oninput="renderTable()">
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-tab" onclick="setFilter('in-stock',this)">In Stock</button>
+      <button class="filter-tab" onclick="setFilter('low',this)">Low</button>
+      <button class="filter-tab" onclick="setFilter('out',this)">Out</button>
+      <button class="filter-tab" onclick="setFilter('ordered',this)">Ordered</button>
+    </div>
+  </div>
+
+  <div class="inv-table-wrap">
+    <div class="loading-wrap" id="loadingState">
+      <div class="spinner"></div>
+      <div class="loading-text">Connecting to Supabase…</div>
+    </div>
+    <table class="inv-table" id="invTable" style="display:none;">
+      <thead><tr>
+        <th>Peptide / Compound</th>
+        <th>Vials Remaining</th>
+        <th class="col-size">Vial Size</th>
+        <th class="col-ordered">Kit Size</th>
+        <th class="col-status">Status</th>
+        <th class="col-note">Note</th>
+        <th>Actions</th>
+      </tr></thead>
+      <tbody id="invBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-state-icon">🧪</div>
+      <div class="empty-state-title">No items found</div>
+      <div class="empty-state-sub">Add your first compound above</div>
+    </div>
+  </div>
+
+  <div class="log-panel">
+    <div class="log-header" onclick="toggleLog()">
+      <div class="log-header-title">📋 Activity Log</div>
+      <div class="log-chevron" id="logChevron">▼</div>
+    </div>
+    <div class="log-entries" id="logEntries"><div class="log-empty">No activity yet.</div></div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title" id="modalTitle">Add <em>New Item</em></div>
+    <div class="form-grid">
+      <div class="form-col form-group"><label class="form-label">Compound Name *</label><input class="form-input" id="fName" placeholder="e.g. BPC-157, NAD+, Testosterone (TRT)" /></div>
+      <div class="form-group"><label class="form-label">Quantity</label><input class="form-input" id="fKits" type="number" inputmode="numeric" min="0" value="1" /></div>
+      <div class="form-group"><label class="form-label">Entry Type</label><select class="form-select" id="fKitType" onchange="updateKitHint()"><option value="kit">Kits (1 kit = 10 vials)</option><option value="vials">Vials (individual count)</option></select><div class="kit-hint" id="kitHint">1 kit = 10 × 3mL vials</div></div>
+      <div class="form-group"><label class="form-label">Vial Size</label><select class="form-select" id="fSize"><option value="3mL">3mL</option><option value="5mL">5mL</option><option value="10mL">10mL</option><option value="2mL">2mL</option><option value="1mL">1mL</option><option value="Custom">Custom</option></select></div>
+      <div class="form-col form-group"><label class="form-label">Note / Lot / Date (optional)</label><input class="form-input" id="fNote" placeholder="e.g. Ordered 03/12/26, Lot #A12" /></div>
+      <div class="form-col form-group"><label class="form-label">Status</label><select class="form-select" id="fStatus"><option value="in-stock">In Stock</option><option value="ordered">Ordered / In Transit</option><option value="low">Low Stock</option><option value="out">Out of Stock</option></select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modalSaveBtn" onclick="saveItem()">Add to Inventory</button>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM SHEET -->
+<div class="bottom-sheet-overlay" id="bottomSheetOverlay" onclick="closeSheetOutside(event)">
+  <div class="bottom-sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetTitle">Update Vials</div>
+    <div class="sheet-sub" id="sheetSub">Tap − / + to adjust quantity</div>
+    <div class="sheet-qty-row">
+      <button class="sheet-spin-btn" onclick="sheetSpin(-1)" ontouchstart="startRepeat(-1)" ontouchend="stopRepeat()" ontouchcancel="stopRepeat()">−</button>
+      <input class="sheet-qty-display" type="number" id="sheetQtyInput" value="0" min="0" inputmode="numeric" pattern="[0-9]*">
+      <button class="sheet-spin-btn" onclick="sheetSpin(1)" ontouchstart="startRepeat(1)" ontouchend="stopRepeat()" ontouchcancel="stopRepeat()">+</button>
+    </div>
+    <div class="sheet-field-label">Note (optional)</div>
+    <input class="sheet-note-input" id="sheetNoteInput" placeholder="Lot number, date, or any note…">
+    <div class="sheet-field-label">Status</div>
+    <div class="sheet-status-grid">
+      <button class="sheet-status-btn" id="ss-in-stock" onclick="selectSheetStatus('in-stock')">✅ In Stock</button>
+      <button class="sheet-status-btn" id="ss-low" onclick="selectSheetStatus('low')">⚠️ Low Stock</button>
+      <button class="sheet-status-btn" id="ss-out" onclick="selectSheetStatus('out')">❌ Out of Stock</button>
+      <button class="sheet-status-btn" id="ss-ordered" onclick="selectSheetStatus('ordered')">📦 Ordered</button>
+    </div>
+    <button class="sheet-save-btn" onclick="saveSheet()">Save Changes</button>
+    <div class="sheet-cancel-link" onclick="closeSheet()">Cancel</div>
+  </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmOverlay" style="z-index:200;">
+  <div class="modal" style="max-width:360px;text-align:center;padding:32px 28px 24px;">
+    <div class="modal-title" id="confirmMsg" style="font-size:18px;margin-bottom:20px;">Are you sure?</div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmYes()">Remove</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SUPABASE CONFIG ──
+const SUPA_URL = 'https://bfjydzealeethhcpdfxl.supabase.co';
+const SUPA_KEY = 'sb_publishable_dodGRCNAFskYIaE6C_-LyA_ubvEnB4X';
+
+async function supa(table, method, body, query='') {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${table}${query}`, {
+    method,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method==='POST' ? 'return=representation' : 'return=representation'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) { const err = await res.text(); throw new Error(err); }
+  const text = await res.text();
+  return text ? JSON.parse(text) : [];
+}
+
+let items = [], activeFilter = 'all', editId = null, logEntries = [];
+
+function setSyncStatus(state, label) {
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
+  document.getElementById('syncLabel').textContent = label;
+}
+
+// ── LOAD ──
+async function loadFromSupabase() {
+  setSyncStatus('syncing', 'Loading…');
+  try {
+    const data = await supa('inventory', 'GET', null, '?order=name.asc');
+    items = data.map(r => ({
+      id: r.id,
+      name: r.name,
+      vials: r.vials || 0,
+      vialSize: r.vial_size || '3mL',
+      kitQty: r.kit_qty || 1,
+      note: r.note || '',
+      status: r.status || 'in-stock',
+      addedAt: new Date(r.created_at).getTime()
+    }));
+    setSyncStatus('synced', 'Synced');
+    updateLastUpdated();
+  } catch(e) {
+    console.error(e);
+    setSyncStatus('error', 'Connection error');
+  }
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('invTable').style.display = 'table';
+  renderTable();
+}
+
+// ── SAVE (upsert single item) ──
+async function saveToSupabase(item) {
+  setSyncStatus('syncing', 'Saving…');
+  try {
+    const row = {
+      id: item.id,
+      name: item.name,
+      vials: item.vials,
+      vial_size: item.vialSize,
+      kit_qty: item.kitQty,
+      note: item.note || null,
+      status: item.status
+    };
+    if (typeof item.id === 'number') {
+      // existing row — update
+      await supa('inventory', 'PATCH', row, `?id=eq.${item.id}`);
+    } else {
+      // new row — insert, get back id
+      delete row.id;
+      const res = await supa('inventory', 'POST', row);
+      if (res && res[0]) item.id = res[0].id;
+    }
+    setSyncStatus('synced', 'Saved ✓');
+    updateLastUpdated();
+  } catch(e) {
+    console.error(e);
+    setSyncStatus('error', 'Sync failed');
+  }
+}
+
+async function deleteFromSupabase(id) {
+  try { await supa('inventory', 'DELETE', null, `?id=eq.${id}`); }
+  catch(e) { console.error(e); }
+}
+
+function getStatus(item) {
+  if (item.status==='ordered') return 'ordered';
+  if (item.vials===0) return 'out';
+  if (item.vials<=3) return 'low';
+  return 'in-stock';
+}
+function statusLabel(s){return{'in-stock':'In Stock',low:'Low Stock',out:'Out of Stock',ordered:'Ordered'}[s]||s;}
+function statusClass(s){return{'in-stock':'status-in-stock',low:'status-low',out:'status-out',ordered:'status-ordered'}[s]||'';}
+function barClass(s){return{'in-stock':'bar-green',low:'bar-amber',out:'bar-red',ordered:'bar-green'}[s]||'bar-green';}
+
+function renderTable() {
+  const tbody=document.getElementById('invBody'), empty=document.getElementById('emptyState');
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  let filtered=items.filter(item=>item.name.toLowerCase().includes(search)&&(activeFilter==='all'||getStatus(item)===activeFilter));
+  if(!filtered.length){tbody.innerHTML='';empty.style.display='block';updateStats();return;}
+  empty.style.display='none';
+  const order={out:0,low:1,'in-stock':2,ordered:3};
+  filtered.sort((a,b)=>order[getStatus(a)]-order[getStatus(b)]);
+  tbody.innerHTML=filtered.map(item=>{
+    const st=getStatus(item), maxV=Math.max(item.kitQty*10,item.vials,10), pct=Math.min((item.vials/maxV)*100,100);
+    return `<tr class="inv-row" id="row-${item.id}">
+      <td><div class="peptide-name">${escHtml(item.name)}</div><div class="peptide-meta">${item.kitQty} kit${item.kitQty!==1?'s':''} ordered</div></td>
+      <td>
+        <div class="vial-bar-wrap"><div class="vial-bar-bg"><div class="vial-bar-fill ${barClass(st)}" style="width:${pct}%"></div></div><span class="vial-count-text">${item.vials}</span></div>
+        <div class="qty-edit-wrap" id="edit-${item.id}">
+          <div class="qty-spinner"><button onclick="spinVial('${item.id}',-1)">−</button><input type="number" id="vialinput-${item.id}" value="${item.vials}" min="0" onchange="directEdit('${item.id}')"><button onclick="spinVial('${item.id}',1)">+</button></div>
+          <input class="qty-note-input" id="noteinput-${item.id}" placeholder="Note…" value="${escHtml(item.note||'')}">
+          <button class="btn btn-success btn-sm" onclick="saveInlineEdit('${item.id}')">✓</button>
+          <button class="btn btn-ghost btn-sm" onclick="cancelEdit('${item.id}')">✕</button>
+        </div>
+      </td>
+      <td class="col-size vials-cell">${item.vialSize}</td>
+      <td class="col-ordered vials-cell">${item.kitQty}x kit</td>
+      <td class="col-status"><span class="status-badge ${statusClass(st)}">${statusLabel(st)}</span></td>
+      <td class="col-note">${item.note?`<span class="note-tag" title="${escHtml(item.note)}">${escHtml(item.note)}</span>`:'<span style="color:var(--muted2);font-size:11px;">—</span>'}</td>
+      <td><div class="row-actions" id="actions-${item.id}">
+        <button class="btn btn-ghost btn-sm" onclick="startEdit('${item.id}')">✏ Edit</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">✕ Remove</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  updateStats();
+}
+
+function updateStats(){
+  document.getElementById('statTotal').textContent=items.length;
+  document.getElementById('statVials').textContent=items.reduce((a,i)=>a+i.vials,0);
+  document.getElementById('statLow').textContent=items.filter(i=>getStatus(i)==='low').length;
+  document.getElementById('statOut').textContent=items.filter(i=>getStatus(i)==='out').length;
+}
+function updateLastUpdated(){document.getElementById('lastUpdated').textContent=new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});}
+
+function startEdit(id){
+  if(window.innerWidth<=768){openSheet(id);return;}
+  if(editId&&editId!==id)cancelEdit(editId);
+  editId=id;
+  document.getElementById(`edit-${id}`).classList.add('show');
+  document.getElementById(`actions-${id}`).style.display='none';
+  document.getElementById(`vialinput-${id}`).focus();
+}
+function cancelEdit(id){
+  const el=document.getElementById(`edit-${id}`);if(!el)return;
+  el.classList.remove('show');
+  const a=document.getElementById(`actions-${id}`);if(a)a.style.display='flex';
+  editId=null;
+}
+function spinVial(id,delta){const inp=document.getElementById(`vialinput-${id}`);inp.value=Math.max(0,parseInt(inp.value||0)+delta);}
+function directEdit(id){const inp=document.getElementById(`vialinput-${id}`);if(parseInt(inp.value)<0)inp.value=0;}
+async function saveInlineEdit(id){
+  const item=items.find(i=>i.id==id);if(!item)return;
+  const nv=Math.max(0,parseInt(document.getElementById(`vialinput-${id}`).value)||0);
+  const nn=document.getElementById(`noteinput-${id}`).value.trim();
+  const ov=item.vials; item.vials=nv; item.note=nn;
+  if(item.status!=='ordered')item.status=nv===0?'out':nv<=3?'low':'in-stock';
+  editId=null; renderTable();
+  addLog(`${item.name}: ${ov} → ${nv} vials${nn?' · "'+nn+'"':''}`,nv<ov?'var(--red)':'var(--green)');
+  await saveToSupabase(item);
+}
+
+async function deleteItem(id){
+  const item=items.find(i=>i.id==id);if(!item)return;
+  showConfirm(`Remove "${item.name}" from inventory?`,async()=>{
+    addLog(`Removed: ${item.name}`,'var(--red)');
+    await deleteFromSupabase(id);
+    items=items.filter(i=>i.id!=id); renderTable();
+  });
+}
+
+function setFilter(f,el){activeFilter=f;document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));el.classList.add('active');renderTable();}
+
+let modalMode='add',modalEditId=null;
+function openModal(editItemId){
+  if(editItemId){
+    const item=items.find(i=>i.id==editItemId);if(!item)return;
+    modalMode='edit';modalEditId=editItemId;
+    document.getElementById('modalTitle').innerHTML='Edit <em>Item</em>';
+    document.getElementById('modalSaveBtn').textContent='Save Changes';
+    document.getElementById('fName').value=item.name;
+    document.getElementById('fKits').value=item.kitQty||1;
+    document.getElementById('fKitType').value='kit';
+    document.getElementById('fSize').value=item.vialSize||'3mL';
+    document.getElementById('fNote').value=item.note||'';
+    document.getElementById('fStatus').value=item.status||'in-stock';
+  } else {
+    modalMode='add';modalEditId=null;
+    document.getElementById('modalTitle').innerHTML='Add <em>New Item</em>';
+    document.getElementById('modalSaveBtn').textContent='Add to Inventory';
+    ['fName','fNote'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('fKits').value='1';
+    document.getElementById('fKitType').value='kit';
+    document.getElementById('fSize').value='3mL';
+    document.getElementById('fStatus').value='in-stock';
+  }
+  updateKitHint();
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('fName').focus(),100);
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+function updateKitHint(){
+  const t=document.getElementById('fKitType').value, q=parseInt(document.getElementById('fKits').value)||1;
+  document.getElementById('kitHint').textContent=t==='kit'?`${q} kit${q!==1?'s':''}=${q*10} × 3mL vials`:`${q} individual vial${q!==1?'s':''}`;
+}
+document.addEventListener('DOMContentLoaded',()=>{const el=document.getElementById('fKits');if(el)el.addEventListener('input',updateKitHint);});
+
+async function saveItem(){
+  const name=document.getElementById('fName').value.trim();if(!name){document.getElementById('fName').focus();return;}
+  const kitType=document.getElementById('fKitType').value, qty=Math.max(0,parseInt(document.getElementById('fKits').value)||0);
+  const vials=kitType==='kit'?qty*10:qty, kitQty=kitType==='kit'?qty:Math.ceil(qty/10);
+  const vialSize=document.getElementById('fSize').value, note=document.getElementById('fNote').value.trim(), status=document.getElementById('fStatus').value;
+  if(modalMode==='edit'&&modalEditId){
+    const item=items.find(i=>i.id==modalEditId);if(item)Object.assign(item,{name,vials,kitQty,vialSize,note,status});
+    addLog(`Edited: ${name} — ${vials} vials`,'var(--blue)');
+    await saveToSupabase(item);
+  } else {
+    const newItem={id:'_new',name,vials,kitQty,vialSize,note,status,addedAt:Date.now()};
+    await saveToSupabase(newItem);
+    items.push(newItem);
+    addLog(`Added: ${name} — ${vials} vials`,'var(--green)');
+  }
+  closeModal(); renderTable();
+}
+
+let sheetItemId=null,sheetStatusVal='in-stock',repeatTimer=null,repeatInterval=null;
+function openSheet(id){
+  const item=items.find(i=>i.id==id);if(!item)return;
+  sheetItemId=id;
+  document.getElementById('sheetTitle').textContent=item.name;
+  document.getElementById('sheetSub').textContent=`Current stock: ${item.vials} vial${item.vials!==1?'s':''}`;
+  document.getElementById('sheetQtyInput').value=item.vials;
+  document.getElementById('sheetNoteInput').value=item.note||'';
+  selectSheetStatus(getStatus(item));
+  document.getElementById('bottomSheetOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSheet(){document.getElementById('bottomSheetOverlay').classList.remove('open');document.body.style.overflow='';sheetItemId=null;}
+function closeSheetOutside(e){if(e.target===document.getElementById('bottomSheetOverlay'))closeSheet();}
+function sheetSpin(delta){
+  const inp=document.getElementById('sheetQtyInput'), newVal=Math.max(0,parseInt(inp.value||0)+delta);
+  inp.value=newVal;
+  if(sheetStatusVal!=='ordered'){if(newVal===0)selectSheetStatus('out');else if(newVal<=3)selectSheetStatus('low');else selectSheetStatus('in-stock');}
+}
+function startRepeat(delta){stopRepeat();repeatTimer=setTimeout(()=>{repeatInterval=setInterval(()=>sheetSpin(delta),80);},380);}
+function stopRepeat(){clearTimeout(repeatTimer);clearInterval(repeatInterval);}
+function selectSheetStatus(s){
+  sheetStatusVal=s;
+  const map={'in-stock':'ss-active-stock','low':'ss-active-low','out':'ss-active-out','ordered':'ss-active-ordered'};
+  ['in-stock','low','out','ordered'].forEach(st=>{const btn=document.getElementById('ss-'+st);if(!btn)return;btn.className='sheet-status-btn';if(st===s)btn.classList.add(map[s]);});
+}
+async function saveSheet(){
+  if(!sheetItemId)return;
+  const item=items.find(i=>i.id==sheetItemId);if(!item)return;
+  const oldV=item.vials;
+  item.vials=Math.max(0,parseInt(document.getElementById('sheetQtyInput').value)||0);
+  item.note=document.getElementById('sheetNoteInput').value.trim();
+  item.status=sheetStatusVal;
+  addLog(`${item.name}: ${oldV} → ${item.vials} vials · ${statusLabel(sheetStatusVal)}`,item.vials<oldV?'var(--red)':'var(--green)');
+  closeSheet(); renderTable(); await saveToSupabase(item);
+}
+
+let logOpen=false;
+function addLog(text,color){logEntries.unshift({time:Date.now(),text,color:color||'var(--gold)'});if(logEntries.length>50)logEntries.pop();renderLog();}
+function toggleLog(){logOpen=!logOpen;document.getElementById('logEntries').classList.toggle('open',logOpen);document.getElementById('logChevron').classList.toggle('open',logOpen);}
+function renderLog(){
+  const container=document.getElementById('logEntries');
+  if(!logEntries.length){container.innerHTML='<div class="log-empty">No activity yet.</div>';return;}
+  container.innerHTML=logEntries.map(e=>{
+    const d=new Date(e.time),t=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',month:'short',day:'numeric'});
+    return `<div class="log-entry"><div class="log-dot" style="background:${e.color}"></div><div class="log-time">${t}</div><div class="log-text">${escHtml(e.text)}</div></div>`;
+  }).join('');
+}
+
+function exportCSV(){
+  const h=['Name','Vials','Vial Size','Kits Ordered','Status','Note','Added'];
+  const r=items.map(i=>[i.name,i.vials,i.vialSize,i.kitQty,getStatus(i),i.note||'',new Date(i.addedAt).toLocaleDateString()]);
+  const csv=[h,...r].map(row=>row.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`biolinked-inventory-${new Date().toISOString().slice(0,10)}.csv`;a.click();
+}
+
+function escHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();closeSheet();}
+  if(e.key==='Enter'&&document.getElementById('modalOverlay').classList.contains('open')){if(document.activeElement.tagName!=='BUTTON')saveItem();}
+});
+
+let _confirmCallback=null;
+function showConfirm(msg,cb){_confirmCallback=cb;document.getElementById('confirmMsg').textContent=msg;document.getElementById('confirmOverlay').classList.add('open');}
+function confirmYes(){closeConfirm();if(_confirmCallback)_confirmCallback();_confirmCallback=null;}
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');}
+
+window.addEventListener('load', loadFromSupabase);
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
