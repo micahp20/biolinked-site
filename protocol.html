@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioLinked  Protocol Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --gold: #8B7335; --gold-light: #A08840; --gold-dim: rgba(139,115,53,0.10);
+  --gold-border: rgba(139,115,53,0.30); --bg: #f5f5f5; --bg-card: #ffffff;
+  --bg-card2: #f0f0f0; --bg-input: #fafafa; --white: #1a1a1a; --text: #1a1a1a;
+  --text-muted: #888880; --border: rgba(0,0,0,0.10);
+  --green: #2d6a4f; --green-dim: rgba(45,106,79,0.12); --green-light: #3a9a5a;
+  --red-dim: rgba(192,57,43,0.06); --red: #c0392b;
+  --blue-dim: rgba(37,99,235,0.08); --blue: #2563eb;
+}
+body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.7; }
+
+.header { background: #ffffff; border-bottom: 1px solid var(--gold-border); padding: 2rem 2rem 1.75rem; position: relative; overflow: hidden; }
+.header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+/* WIDER: 980 →  1400 */
+.header-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.header-eyebrow { font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+.header-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; color: var(--white); }
+.header-title em { color: var(--gold); font-style: italic; }
+.header-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; letter-spacing: 0.06em; }
+.header-badge { background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 2px; padding: 0.6rem 1.25rem; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); }
+
+/* WIDER: 980 →  1400 */
+.main { max-width: 1400px; margin: 0 auto; padding: 2rem 1.5rem 6rem; }
+
+.block { margin-bottom: 2rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.block-header { background: var(--bg-card2); border-bottom: 1px solid var(--border); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 10px; }
+.block-num { width: 26px; height: 26px; border-radius: 50%; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.block-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: var(--white); }
+.block-subtitle { font-size: 10px; color: var(--text-muted); margin-left: auto; letter-spacing: 0.08em; }
+.block-body { padding: 1.5rem; display: grid; gap: 1.25rem; }
+
+.field-group { display: grid; gap: 6px; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.field-row.three { grid-template-columns: 1fr 1fr 1fr; }
+.field-row.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+.field-label { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+.field-hint { font-size: 10px; color: var(--text-muted); font-style: italic; margin-top: 3px; }
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: 2px;
+  padding: 0.75rem 1rem; color: var(--text); font-family: 'Montserrat', sans-serif;
+  font-size: 13px; font-weight: 300; outline: none; transition: border-color 0.18s; -webkit-appearance: none;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--gold-border); background: #f0f0f0; }
+input::placeholder, textarea::placeholder { color: var(--text-muted); }
+select { cursor: pointer; }
+select option { background: #ffffff; color: var(--text); }
+textarea { resize: vertical; min-height: 80px; line-height: 1.7; }
+
+/* AI Generation Button */
+.ai-field-wrap { display: grid; gap: 6px; }
+.ai-field-row { display: flex; gap: 8px; align-items: flex-end; }
+.ai-field-row input { flex: 1; }
+.ai-gen-btn { flex-shrink: 0; padding: 0.75rem 1rem; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 2px; color: var(--gold-light); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.2s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.ai-gen-btn:hover { background: rgba(139,115,53,0.20); border-color: var(--gold); }
+.ai-gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.ai-gen-btn .btn-icon { font-size: 14px; }
+.ai-note { font-size: 10px; color: var(--text-muted); font-style: italic; background: var(--gold-dim); border: 1px solid rgba(139,115,53,0.12); border-radius: 2px; padding: 6px 10px; display: flex; align-items: center; gap: 6px; }
+
+/* Compound Table  wider, no overflow-x needed */
+.compound-table-wrap { width: 100%; overflow-x: auto; }
+.compound-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+.compound-table th { font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); padding: 0.5rem 0.75rem; text-align: left; border-bottom: 1px solid var(--gold-border); white-space: nowrap; }
+.compound-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.compound-table tr:last-child td { border-bottom: none; }
+.compound-table tr:hover td { background: rgba(139,115,53,0.05); }
+.compound-table input, .compound-table select { padding: 0.5rem 0.75rem; font-size: 12px; }
+.compound-row-num { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; width: 28px; }
+.remove-btn { width: 28px; height: 28px; background: var(--red-dim); border: 1px solid rgba(224,92,92,0.3); border-radius: 2px; color: var(--red); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+.remove-btn:hover { background: rgba(224,92,92,0.25); }
+.add-compound-btn { display: flex; align-items: center; gap: 8px; margin-top: 0.75rem; padding: 0.625rem 1rem; background: var(--gold-dim); border: 1px dashed var(--gold-border); border-radius: 2px; color: var(--gold); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; width: 100%; justify-content: center; }
+.add-compound-btn:hover { background: rgba(139,115,53,0.18); border-color: var(--gold); }
+td.price-col input { background: rgba(139,115,53,0.07); border-color: rgba(139,115,53,0.22); color: var(--gold-light); font-weight: 500; }
+td.price-col input:focus { background: rgba(139,115,53,0.10); border-color: var(--gold); }
+
+/* Price Calc */
+.price-calc { background: var(--bg-input); border: 1px solid var(--border); border-radius: 2px; padding: 1.25rem; }
+.price-line { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.price-line:last-child { border-bottom: none; }
+.price-line.total { font-weight: 700; color: var(--white); font-size: 15px; padding-top: 10px; margin-top: 4px; border-top: 1px solid var(--gold-border); border-bottom: none; }
+.price-line .p-name { color: var(--text); }
+.price-line .p-amt { font-family: 'Cormorant Garamond', serif; font-size: 16px; color: var(--gold-light); }
+.price-line.total .p-amt { font-size: 22px; color: var(--gold); }
+
+/* Pricing Levels */
+.levels-controls { display: flex; align-items: center; gap: 12px; margin-bottom: 1rem; }
+.add-level-btn { padding: 8px 16px; background: var(--gold-dim); border: 1px solid var(--gold-border); border-radius: 2px; color: var(--gold); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px; }
+.add-level-btn:hover { background: rgba(139,115,53,0.20); }
+.levels-hint { font-size: 10px; color: var(--text-muted); font-style: italic; }
+.level-block { background: var(--bg-input); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 1rem; }
+.level-block:last-child { margin-bottom: 0; }
+.level-header { background: var(--bg-card2); border-bottom: 1px solid var(--border); padding: 0.875rem 1.25rem; display: flex; align-items: center; gap: 10px; }
+.level-num { width: 22px; height: 22px; border-radius: 50%; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.level-name-input { flex: 1; background: transparent; border: none; border-bottom: 1px solid var(--border); border-radius: 0; padding: 4px 6px; color: var(--white); font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; }
+.level-name-input:focus { border-bottom-color: var(--gold); background: transparent; }
+.level-total-display { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold); font-weight: 600; padding: 0 4px; white-space: nowrap; }
+.remove-level-btn { width: 26px; height: 26px; background: var(--red-dim); border: 1px solid rgba(224,92,92,0.3); border-radius: 2px; color: var(--red); font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.remove-level-btn:hover { background: rgba(224,92,92,0.25); }
+.level-body { padding: 1rem 1.25rem; }
+.level-body-top { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.level-compounds-section { margin-top: 0.5rem; }
+.level-compounds-label { font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+/* WIDER checklist grid: minmax 160px, more columns */
+.compounds-checklist { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 5px; }
+
+/* FIX: compound-check-item  removed onclick from label, handled by JS change event */
+.compound-check-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; cursor: pointer; transition: all 0.15s; user-select: none; position: relative; }
+.compound-check-item:hover { border-color: var(--gold-border); background: rgba(139,115,53,0.06); }
+.compound-check-item.checked { background: rgba(139,115,53,0.08); border-color: var(--gold-border); }
+/* Real checkbox  visually hidden but still interactive via label */
+.compound-check-item input[type="checkbox"] {
+  position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none;
+}
+.check-indicator { width: 14px; height: 14px; border: 1px solid var(--border); border-radius: 2px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+.compound-check-item.checked .check-indicator { background: var(--gold); border-color: var(--gold); }
+.check-indicator::after { content: '✓ '; font-size: 9px; color: #ffffff; display: none; }
+.compound-check-item.checked .check-indicator::after { display: block; }
+.check-label { font-size: 11px; color: var(--text-muted); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.compound-check-item.checked .check-label { color: var(--text); }
+.check-price { font-family: 'Cormorant Garamond', serif; font-size: 13px; color: var(--gold); flex-shrink: 0; }
+.no-compounds-hint { font-size: 11px; color: var(--text-muted); font-style: italic; padding: 8px 0; }
+.level-desc-input { width: 100%; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 8px 12px; color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 300; outline: none; resize: vertical; min-height: 60px; }
+.level-desc-input:focus { border-color: var(--gold-border); }
+.level-desc-input::placeholder { color: var(--text-muted); }
+
+/* Pill selector */
+.pill-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 99px; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.15s; user-select: none; }
+.pill:hover { border-color: var(--gold-border); color: var(--text); }
+.pill.active { background: var(--gold-dim); border-color: var(--gold-border); color: var(--gold-light); }
+.pill input { display: none; }
+
+/* Output */
+.output-wrap { background: rgba(245,245,245,0.97); border: 1px solid var(--gold-border); border-radius: 3px; overflow: hidden; }
+.output-header { background: #ffffff; border-bottom: 1px solid var(--gold-border); padding: 1rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.output-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--white); }
+.output-body { padding: 1.25rem 1.5rem; }
+#outputText { width: 100%; background: transparent; border: none; color: #7a9a7a; font-family: 'Courier New', monospace; font-size: 12px; line-height: 1.8; resize: none; outline: none; min-height: 320px; }
+
+.btn { padding: 0.875rem 1.75rem; border: 1px solid var(--gold-border); background: var(--gold-dim); color: var(--gold-light); font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: all 0.2s; }
+.btn:hover { background: rgba(139,115,53,0.18); border-color: var(--gold); color: var(--gold); }
+.btn.primary { background: var(--gold); color: #ffffff; border-color: var(--gold); }
+.btn.primary:hover { background: var(--gold-light); }
+.btn.green { background: var(--green-dim); border-color: rgba(58,122,90,0.5); color: var(--green-light); }
+.btn.green:hover { background: rgba(58,122,90,0.25); }
+.btn-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; }
+.copy-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; color: var(--green-light); opacity: 0; transition: opacity 0.3s; padding: 6px 14px; background: var(--green-dim); border: 1px solid rgba(58,122,90,0.4); border-radius: 2px; }
+.copy-badge.show { opacity: 1; }
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: #e8e8e8; border: 1px solid var(--gold-border); border-radius: 4px; padding: 1rem 2rem; font-size: 13px; color: var(--text); transition: transform 0.3s ease; z-index: 9999; box-shadow: 0 8px 32px rgba(0,0,0,0.6); }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast strong { color: var(--gold); }
+
+.ai-spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid rgba(139,115,53,0.30); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.info-box { background: var(--blue-dim); border: 1px solid var(--blue-bdr, rgba(96,165,250,0.2)); border-left: 3px solid var(--blue); border-radius: 2px; padding: 10px 14px; font-size: 11px; color: rgba(96,165,250,0.8); line-height: 1.65; }
+.info-box strong { color: var(--blue); }
+
+hr { border: none; border-top: 1px solid var(--border); }
+
+@media (max-width: 900px) {
+  .field-row, .field-row.three, .field-row.four { grid-template-columns: 1fr 1fr; }
+  .level-body-top { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .field-row, .field-row.three, .field-row.four { grid-template-columns: 1fr; }
+  .header-inner { flex-direction: column; align-items: flex-start; }
+  .compounds-checklist { grid-template-columns: 1fr 1fr; }
+  .ai-field-row { flex-direction: column; }
+}
+</style>
+<script src="/nav.js"></script>
+<style>body { padding-top: 56px; }</style>
+</head>
+<body>
+
+<div id="toast" class="toast">✓  <strong>Copied!</strong> Now paste into Claude.</div>
+
+<div class="header">
+  <div class="header-inner">
+    <div>
+      <div class="header-eyebrow">Bio Linked Peptide Solutions</div>
+      <div class="header-title">Protocol <em>Builder</em></div>
+      <div class="header-sub">Fill out after reviewing client intake · Paste output to Claude</div>
+    </div>
+    <div class="header-badge">Internal Use Only</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- BLOCK 1 -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">1</div>
+      <div class="block-title">Client Information</div>
+      <div class="block-subtitle">From intake form</div>
+    </div>
+    <div class="block-body">
+      <div class="field-row">
+        <div class="field-group">
+          <div class="field-label">First Name</div>
+          <input type="text" id="firstName" placeholder="e.g. John" oninput="updateOutput()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Last Name</div>
+          <input type="text" id="lastName" placeholder="e.g. Smith" oninput="updateOutput()">
+        </div>
+      </div>
+      <div class="field-row three">
+        <div class="field-group">
+          <div class="field-label">Age</div>
+          <input type="number" id="age" placeholder="e.g. 42" oninput="updateOutput()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Sex</div>
+          <select id="sex" onchange="updateOutput()">
+            <option value="">Select...</option>
+            <option>Male</option>
+            <option>Female</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Cycle Length (weeks)</div>
+          <select id="cycleWeeks" onchange="updateOutput()">
+            <option value="8">8 Weeks</option>
+            <option value="12">12 Weeks</option>
+            <option value="16">16 Weeks</option>
+            <option value="4">4 Weeks</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <div class="field-label">Current Weight (lbs)</div>
+          <input type="text" id="weight" placeholder="e.g. 210 lbs" oninput="updateOutput()">
+        </div>
+        <div class="field-group">
+          <div class="field-label">Goal Weight (lbs)</div>
+          <input type="text" id="goalWeight" placeholder="e.g. 185 lbs" oninput="updateOutput()">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 2 -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">2</div>
+      <div class="block-title">Goals &amp; Protocol Focus</div>
+      <div class="block-subtitle">Select all that apply</div>
+    </div>
+    <div class="block-body">
+      <div class="field-group">
+        <div class="field-label">Primary Goals (select all)</div>
+        <div class="pill-grid" id="goalPills">
+          <label class="pill"><input type="checkbox" value="Fat Loss" onchange="updateOutput()"><span>⚖ ️ Fat Loss</span></label>
+          <label class="pill"><input type="checkbox" value="Cognitive Enhancement" onchange="updateOutput()"><span>? ? Cognitive Enhancement</span></label>
+          <label class="pill"><input type="checkbox" value="Recovery &amp; Healing" onchange="updateOutput()"><span>? ? Recovery &amp; Healing</span></label>
+          <label class="pill"><input type="checkbox" value="Longevity &amp; Anti-Aging" onchange="updateOutput()"><span>⏳  Longevity &amp; Anti-Aging</span></label>
+          <label class="pill"><input type="checkbox" value="Sexual Health &amp; Libido" onchange="updateOutput()"><span>✨  Sexual Health</span></label>
+          <label class="pill"><input type="checkbox" value="Muscle Building" onchange="updateOutput()"><span>? ? Muscle Building</span></label>
+          <label class="pill"><input type="checkbox" value="Sleep &amp; Stress Relief" onchange="updateOutput()"><span>? ? Sleep &amp; Stress</span></label>
+          <label class="pill"><input type="checkbox" value="Hormonal Balance" onchange="updateOutput()"><span>⚡  Hormonal Balance</span></label>
+          <label class="pill"><input type="checkbox" value="Mitochondrial Health" onchange="updateOutput()"><span>? ? Mitochondrial Health</span></label>
+          <label class="pill"><input type="checkbox" value="Skin, Hair &amp; Aesthetics" onchange="updateOutput()"><span>✦  Skin &amp; Aesthetics</span></label>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Personalized Intro Context</div>
+        <textarea id="introContext" placeholder="e.g. Works 10-hour days in healthcare, two kids in sports, high stress job, brain fog in afternoons, wants to lean out 20 lbs while improving mental clarity and energy..." oninput="updateOutput()"></textarea>
+        <div class="field-hint">Raw notes  Claude will turn this into a polished paragraph</div>
+      </div>
+      <div class="ai-field-wrap">
+        <div class="field-label">Protocol Focus Line (for header)</div>
+        <div class="info-box" style="margin-bottom:6px;">
+          <strong>✨  AI-Generated:</strong> Fill in the intro context above and your goals, then click Generate  Claude will write a compelling protocol focus line automatically.
+        </div>
+        <div class="ai-field-row">
+          <input type="text" id="protocolFocus" placeholder="Click Generate →  or type manually..." oninput="updateOutput()">
+          <button class="ai-gen-btn" id="genFocusBtn" onclick="generateFocusLine()">
+            <span class="btn-icon">✦ </span> Generate
+          </button>
+        </div>
+        <div class="field-hint">Appears prominently under the client name on the protocol page</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 3 -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">3</div>
+      <div class="block-title">Health &amp; Lifestyle Notes</div>
+      <div class="block-subtitle">From intake form</div>
+    </div>
+    <div class="block-body">
+      <div class="field-row">
+        <div class="field-group">
+          <div class="field-label">Current Medications / Supplements</div>
+          <textarea id="medications" placeholder="e.g. TRT 200mg/wk, creatine, vitamin D..." oninput="updateOutput()"></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Known Allergies</div>
+          <input type="text" id="allergies" placeholder="e.g. None / penicillin / benzyl alcohol" oninput="updateOutput()">
+          <div class="field-label" style="margin-top:0.75rem;">Injection Experience</div>
+          <select id="injectExp" onchange="updateOutput()">
+            <option value="">Select...</option>
+            <option>Never injected before</option>
+            <option>Some experience (a few cycles)</option>
+            <option>Experienced (regular injector)</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row three">
+        <div class="field-group">
+          <div class="field-label">Sleep Quality (15)</div>
+          <select id="sleepQuality" onchange="updateOutput()">
+            <option value="">Select...</option>
+            <option value="1">1  Very Poor</option>
+            <option value="2">2  Poor</option>
+            <option value="3">3  Average</option>
+            <option value="4">4  Good</option>
+            <option value="5">5  Excellent</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Stress Level (15)</div>
+          <select id="stressLevel" onchange="updateOutput()">
+            <option value="">Select...</option>
+            <option value="1">1  Very Low</option>
+            <option value="2">2  Low</option>
+            <option value="3">3  Moderate</option>
+            <option value="4">4  High</option>
+            <option value="5">5  Extreme</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Alcohol Use</div>
+          <select id="alcohol" onchange="updateOutput()">
+            <option value="">Select...</option>
+            <option>None / Rarely</option>
+            <option>12 drinks / week</option>
+            <option>37 drinks / week</option>
+            <option>Daily or heavy use</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="field-label">Exercise Frequency</div>
+        <select id="exercise" onchange="updateOutput()">
+          <option value="">Select...</option>
+          <option>Sedentary (little to none)</option>
+          <option>Light (12x per week)</option>
+          <option>Moderate (34x per week)</option>
+          <option>Active (5+ days per week)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 4: COMPOUNDS  full width -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">4</div>
+      <div class="block-title">Compounds &amp; Dosing</div>
+      <div class="block-subtitle">Prices auto-fill from product line · always editable</div>
+    </div>
+    <div class="block-body">
+      <div class="compound-table-wrap">
+        <table class="compound-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th style="min-width:220px;">Compound</th>
+              <th style="min-width:90px;">Vial Size</th>
+              <th style="min-width:60px;">Qty</th>
+              <th style="min-width:100px;">Dose</th>
+              <th style="min-width:80px;">BAC Water</th>
+              <th style="min-width:65px;">Units</th>
+              <th style="min-width:170px;">Schedule</th>
+              <th style="min-width:130px;">Timing</th>
+              <th style="min-width:85px;color:var(--gold-light);">$/vial ✏ ️</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="compoundRows"></tbody>
+        </table>
+      </div>
+      <button class="add-compound-btn" onclick="addCompound()">+ Add Compound</button>
+
+      <hr style="margin-top:1.5rem;">
+
+      <div style="margin-top:1rem;">
+        <div class="field-label" style="margin-bottom:0.75rem;">Live Price Calculator</div>
+        <div class="price-calc">
+          <div id="priceLines"></div>
+          <div class="price-line total"><span class="p-name">Total  Full Stack</span><span class="p-amt" id="totalPrice">$0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 5: PRICING LEVELS -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">5</div>
+      <div class="block-title">Pricing Levels</div>
+      <div class="block-subtitle">Add 16 levels · check compounds to include in each</div>
+    </div>
+    <div class="block-body">
+      <div class="levels-controls">
+        <button class="add-level-btn" onclick="addLevel()">+ Add Level</button>
+        <span class="levels-hint">Checkmark the compounds included in each package  totals auto-calculate</span>
+      </div>
+      <div id="levelsContainer"></div>
+    </div>
+  </div>
+
+  <!-- BLOCK 6 -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">6</div>
+      <div class="block-title">Special Notes for Claude</div>
+      <div class="block-subtitle">Anything extra to personalize</div>
+    </div>
+    <div class="block-body">
+      <div class="field-group">
+        <div class="field-label">Additional context / instructions</div>
+        <textarea id="specialNotes" placeholder="e.g. Client is nervous about injections  add extra guidance. Emphasize sleep benefits. Client is a nurse so can handle technical language..." oninput="updateOutput()" style="min-height:100px;"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <div class="field-label">Prior peptide experience</div>
+          <textarea id="priorPeptides" placeholder="e.g. Has used BPC-157 before, first time with NAD+" oninput="updateOutput()"></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Previous reactions / side effects</div>
+          <textarea id="reactions" placeholder="e.g. None reported / mild headache with Semax previously" oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OUTPUT -->
+  <div class="block">
+    <div class="block-header">
+      <div class="block-num">✦ </div>
+      <div class="block-title">Claude Prompt  Ready to Paste</div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:1rem;">
+        <span class="copy-badge" id="copyBadge">Copied ✓ </span>
+        <button class="btn green" onclick="copyOutput()">Copy to Clipboard</button>
+      </div>
+    </div>
+    <div class="output-wrap" style="border:none;border-radius:0;">
+      <div class="output-body">
+        <textarea id="outputText" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn primary" onclick="copyOutput()">? ? Copy Prompt</button>
+    <button class="btn" onclick="clearAll()">↺  Clear All Fields</button>
+    <button class="btn" onclick="saveToLocal()">? ? Save Draft</button>
+    <button class="btn" onclick="loadFromLocal()">? ? Load Draft</button>
+  </div>
+
+  <div style="margin-top:1.5rem;padding:1rem 1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;font-size:12px;color:var(--text-muted);line-height:1.8;">
+    <strong style="color:var(--gold-light);">How to use:</strong> Fill out sections 16. The Protocol Focus Line generates via AI after you fill in the intro context and goals. Compound prices auto-fill from the product line  override any by typing in the $/vial column. Pricing levels let you check which compounds are in each package  totals calculate automatically. When ready, hit <strong style="color:var(--text);">Copy Prompt</strong> and paste into Claude.
+  </div>
+
+</div>
+
+<script>
+const PRESETS = {
+  'Tirzepatide (10mg)':      { vial:'10mg',     dose:'0.5mg',      bac:'2mL',  units:'10', schedule:'3x per week',              timing:'AM',                 price:60   },
+  'Tirzepatide (20mg)':      { vial:'20mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'2x per week',              timing:'AM',                 price:90   },
+  'Tirzepatide (30mg)':      { vial:'30mg',     dose:'1mg',        bac:'3mL',  units:'10', schedule:'2x per week',              timing:'AM',                 price:130  },
+  'Retatrutide (10mg)':      { vial:'10mg',     dose:'0.5mg',      bac:'2mL',  units:'10', schedule:'3-4x per week',            timing:'AM',                 price:45   },
+  'Retatrutide (20mg)':      { vial:'20mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'3-4x per week',            timing:'AM',                 price:90   },
+  'Retatrutide (30mg)':      { vial:'30mg',     dose:'1mg',        bac:'3mL',  units:'10', schedule:'3-4x per week',            timing:'AM',                 price:150  },
+  'Semaglutide':             { vial:'3mg',      dose:'250mcg',     bac:'2mL',  units:'17', schedule:'Once per week',            timing:'AM',                 price:65   },
+  'Cagrilintide':            { vial:'10mg',     dose:'0.5mg',      bac:'2mL',  units:'10', schedule:'Once per week',            timing:'AM',                 price:115  },
+  'AOD-9604':                { vial:'5mg',      dose:'300mcg',     bac:'2mL',  units:'11', schedule:'5 days on / 2 off',        timing:'AM fasted',          price:45   },
+  'Tesamorelin':             { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM/PM',              price:55   },
+  'BPC-157 (5mg)':           { vial:'5mg',      dose:'250mcg',     bac:'2mL',  units:'10', schedule:'Every day',                timing:'AM/PM',              price:20   },
+  'BPC-157 (10mg)':          { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'Every day',                timing:'AM/PM',              price:40   },
+  'TB-500':                  { vial:'5mg',      dose:'500mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:23   },
+  'Wolverine (BPC+TB)':      { vial:'5mg+5mg',  dose:'500mcg ea',  bac:'2mL',  units:'10', schedule:'Every day',                timing:'AM/PM',              price:50   },
+  'GLOW Blend':              { vial:'70mg',     dose:'1.75mg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:70   },
+  'KLOW Blend':              { vial:'80 units', dose:'4 units',    bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:80   },
+  'SS-31':                   { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:45   },
+  'Thymosin Alpha-1':        { vial:'10mg',     dose:'1.5mg',      bac:'2mL',  units:'30', schedule:'5 days on / 2 off',        timing:'AM',                 price:65   },
+  'HGH 10 IU':               { vial:'10 IU',    dose:'2 IU',       bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM fasted/pre-sleep',price:150  },
+  'HGH 15 IU':               { vial:'15 IU',    dose:'2 IU',       bac:'3mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM fasted/pre-sleep',price:200  },
+  'Ipamorelin':              { vial:'10mg',     dose:'300mcg',     bac:'3mL',  units:'9',  schedule:'5 days on / 2 off',        timing:'AM/PM',              price:40   },
+  'CJC-1295 No DAC (5mg)':   { vial:'5mg',      dose:'100mcg',     bac:'2mL',  units:'4',  schedule:'5 days on / 2 off',        timing:'AM/PM',              price:45   },
+  'CJC-1295 No DAC (10mg)':  { vial:'10mg',     dose:'100mcg',     bac:'3mL',  units:'3',  schedule:'5 days on / 2 off',        timing:'AM/PM',              price:90   },
+  'CJC-1295 with DAC':       { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'40', schedule:'2x per week',              timing:'AM',                 price:50   },
+  'CJC + Ipamorelin':        { vial:'5mg+5mg',  dose:'250mcg ea',  bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM/PM fasted',       price:45   },
+  'Sermorelin':              { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'Pre-sleep',          price:80   },
+  'IGF-1 LR3':               { vial:'1mg',      dose:'50mcg',      bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'Post-workout',       price:50   },
+  'HCG (5000 IU)':           { vial:'5000 IU',  dose:'500 IU',     bac:'2mL',  units:'20', schedule:'2-3x per week',            timing:'AM',                 price:154  },
+  'HCG (10000 IU)':          { vial:'10000 IU', dose:'500 IU',     bac:'3mL',  units:'15', schedule:'2-3x per week',            timing:'AM',                 price:220  },
+  'Hexarelin Acetate':       { vial:'5mg',      dose:'200mcg',     bac:'2mL',  units:'8',  schedule:'5 days on / 2 off',        timing:'AM fasted/pre-sleep',price:40   },
+  'Testosterone Cypionate':  { vial:'200mg/mL 10mL', dose:'100mg',bac:'',    units:'50', schedule:'2x per week',              timing:'AM',                 price:85   },
+  'Testosterone Enanthate':  { vial:'200mg/mL 10mL', dose:'100mg',bac:'',    units:'50', schedule:'2x per week',              timing:'AM',                 price:85   },
+  'Testosterone Propionate': { vial:'100mg/mL 10mL', dose:'50mg', bac:'',    units:'50', schedule:'3x per week',              timing:'AM',                 price:75   },
+  'Tadalafil (Cialis)':      { vial:'30 × 20mg tabs', dose:'10-20mg',bac:'', units:'',  schedule:'As needed / daily 5mg',    timing:'30-60 min before',   price:35   },
+  'Kisspeptin-10':           { vial:'5mg',      dose:'125mcg',     bac:'2mL',  units:'5',  schedule:'Every day',                timing:'1hr before bed',     price:55   },
+  'Epitalon':                { vial:'20mg',     dose:'2mg',        bac:'2mL',  units:'20', schedule:'Every day × 20 days',      timing:'PM',                 price:65   },
+  'Semax':                   { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'Mon / Wed / Fri',          timing:'Morning',            price:45   },
+  'Selank':                  { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'As needed',                timing:'Afternoon',          price:45   },
+  'DSIP':                    { vial:'5mg',      dose:'250mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'1-3 hrs before bed', price:45   },
+  'Dihexa':                  { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'40', schedule:'3x per week',              timing:'Morning',            price:75   },
+  'NAD+':                    { vial:'500mg',    dose:'100mg',      bac:'3mL',  units:'60', schedule:'2x per week',              timing:'AM fasted',          price:65   },
+  'Glutathione (600mg)':     { vial:'600mg',    dose:'600mg',      bac:'3mL',  units:'',  schedule:'Weekly',                   timing:'AM',                 price:28   },
+  'Glutathione (1500mg)':    { vial:'1500mg',   dose:'600mg',      bac:'5mL',  units:'',  schedule:'Weekly',                   timing:'AM',                 price:40   },
+  'MOTS-C (10mg)':           { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM fasted',          price:35   },
+  'MOTS-C (40mg)':           { vial:'40mg',     dose:'2mg',        bac:'3mL',  units:'15', schedule:'5 days on / 2 off',        timing:'AM fasted',          price:140  },
+  '5-Amino-1MQ':             { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM',                 price:25   },
+  'SLU-PP-332':              { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM',                 price:60   },
+  'PT-141':                  { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'As needed',                timing:'30 min before',      price:55   },
+  'Melanotan II':            { vial:'10mg',     dose:'250mcg',     bac:'2mL',  units:'5',  schedule:'Daily loading then maint', timing:'PM',                 price:45   },
+  'GHK-Cu (50mg)':           { vial:'50mg',     dose:'1.7mg',      bac:'3mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:55   },
+  'GHK-Cu (100mg)':          { vial:'100mg',    dose:'2mg',        bac:'5mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:90   },
+  'Custom':                  { vial:'',         dose:'',           bac:'',     units:'',   schedule:'',                         timing:'',                   price:0    },
+};
+
+let compoundCount = 0;
+let levelCount = 0;
+
+// ─ ─ COMPOUND TABLE ──────────────────────────────────────────
+function addCompound(preset) {
+  compoundCount++;
+  const tbody = document.getElementById('compoundRows');
+  const row = document.createElement('tr');
+  row.id = 'cRow_' + compoundCount;
+  row.dataset.id = compoundCount;
+  const presetName = preset || '';
+  const p = (presetName && PRESETS[presetName]) ? PRESETS[presetName] : PRESETS['Custom'];
+  const options = Object.keys(PRESETS).map(k =>
+    `<option value="${k}" ${k === presetName ? 'selected' : ''}>${k}</option>`).join('');
+  row.innerHTML = `
+    <td class="compound-row-num">${compoundCount}</td>
+    <td>
+      <select onchange="applyPreset(this,${compoundCount})" style="margin-bottom:4px;"><option value=""> Select preset </option>${options}</select>
+      <input type="text" placeholder="Or custom name" value="${presetName}" id="cName_${compoundCount}" oninput="updateOutput();calcPrices();refreshLevelChecklists()">
+    </td>
+    <td><input type="text" value="${p.vial}" id="cVial_${compoundCount}" placeholder="e.g. 10mg" oninput="updateOutput()"></td>
+    <td><input type="number" value="2" min="1" max="20" id="cQty_${compoundCount}" oninput="updateOutput();calcPrices()"></td>
+    <td><input type="text" value="${p.dose}" id="cDose_${compoundCount}" placeholder="e.g. 500mcg" oninput="updateOutput()"></td>
+    <td><input type="text" value="${p.bac}" id="cBac_${compoundCount}" placeholder="e.g. 2mL" oninput="updateOutput()"></td>
+    <td><input type="text" value="${p.units}" id="cUnits_${compoundCount}" placeholder="units" oninput="updateOutput()"></td>
+    <td><input type="text" value="${p.schedule}" id="cSched_${compoundCount}" placeholder="e.g. Mon/Wed/Fri" oninput="updateOutput()"></td>
+    <td><input type="text" value="${p.timing}" id="cTiming_${compoundCount}" placeholder="e.g. AM fasted" oninput="updateOutput()"></td>
+    <td class="price-col"><input type="number" value="${p.price}" min="0" step="1" id="cPrice_${compoundCount}" oninput="updateOutput();calcPrices();refreshLevelTotals()" title="$/vial  always editable"></td>
+    <td><button class="remove-btn" onclick="removeCompound(${compoundCount})" title="Remove">×</button></td>`;
+  tbody.appendChild(row);
+  if (p.price === 0) setTimeout(() => document.getElementById('cPrice_' + compoundCount)?.focus(), 50);
+  updateOutput(); calcPrices(); refreshLevelChecklists();
+}
+
+function applyPreset(sel, id) {
+  const name = sel.value; if (!name) return;
+  const p = PRESETS[name] || PRESETS['Custom'];
+  document.getElementById('cName_'  + id).value   = name;
+  document.getElementById('cVial_'  + id).value   = p.vial;
+  document.getElementById('cDose_'  + id).value   = p.dose;
+  document.getElementById('cBac_'   + id).value   = p.bac;
+  document.getElementById('cUnits_' + id).value   = p.units;
+  document.getElementById('cSched_' + id).value   = p.schedule;
+  document.getElementById('cTiming_'+ id).value   = p.timing;
+  document.getElementById('cPrice_' + id).value   = p.price;
+  updateOutput(); calcPrices(); refreshLevelChecklists();
+}
+
+function removeCompound(id) {
+  document.getElementById('cRow_' + id)?.remove();
+  updateOutput(); calcPrices(); refreshLevelChecklists();
+}
+
+function getCompounds() {
+  return Array.from(document.querySelectorAll('#compoundRows tr')).map(row => {
+    const id = row.dataset.id;
+    return {
+      id,
+      name:   document.getElementById('cName_'  + id)?.value?.trim() || '',
+      vial:   document.getElementById('cVial_'  + id)?.value || '',
+      qty:    parseInt(document.getElementById('cQty_'   + id)?.value) || 2,
+      dose:   document.getElementById('cDose_'  + id)?.value || '',
+      bac:    document.getElementById('cBac_'   + id)?.value || '',
+      units:  document.getElementById('cUnits_' + id)?.value || '',
+      sched:  document.getElementById('cSched_' + id)?.value || '',
+      timing: document.getElementById('cTiming_'+ id)?.value || '',
+      price:  parseFloat(document.getElementById('cPrice_' + id)?.value) || 0,
+    };
+  }).filter(c => c.name);
+}
+
+function calcPrices() {
+  const compounds = getCompounds();
+  const lines = document.getElementById('priceLines');
+  let total = 0;
+  lines.innerHTML = compounds.map(c => {
+    const lt = c.qty * c.price; total += lt;
+    return `<div class="price-line"><span class="p-name">${c.name} <span style="color:var(--text-muted);font-size:11px;">${c.qty} vial${c.qty!==1?'s':''} × $${c.price}</span></span><span class="p-amt">$${lt}</span></div>`;
+  }).join('');
+  document.getElementById('totalPrice').textContent = '$' + total;
+  refreshLevelTotals();
+}
+
+// ─ ─ PRICING LEVELS ──────────────────────────────────────────
+function addLevel() {
+  if (levelCount >= 6) { showToast('Maximum 6 pricing levels.'); return; }
+  levelCount++;
+  const container = document.getElementById('levelsContainer');
+  const div = document.createElement('div');
+  div.className = 'level-block';
+  div.id = 'level_' + levelCount;
+  div.dataset.levelId = levelCount;
+  const levelNames = ['Full Stack','Core Stack','Starter','Essential','Basic','Trial'];
+  const defaultName = levelNames[levelCount - 1] || ('Level ' + levelCount);
+
+  div.innerHTML = `
+    <div class="level-header">
+      <div class="level-num">${levelCount}</div>
+      <input class="level-name-input" type="text" placeholder="Level name" value="${defaultName}" id="lName_${levelCount}" oninput="updateOutput()">
+      <div class="level-total-display" id="lTotal_${levelCount}">$0</div>
+      <button class="remove-level-btn" onclick="removeLevel(${levelCount})" title="Remove level">×</button>
+    </div>
+    <div class="level-body">
+      <div class="level-body-top">
+        <div class="field-group">
+          <div class="field-label">Level Description for Claude</div>
+          <textarea class="level-desc-input" id="lDesc_${levelCount}" placeholder="e.g. The complete protocol  all goals covered..." oninput="updateOutput()"></textarea>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Why This Package (Claude will expand on this)</div>
+          <textarea class="level-desc-input" id="lReason_${levelCount}" placeholder="e.g. Removes NAD+ and SS-31 to reduce cost while keeping the cognitive and fat loss pillars intact..." oninput="updateOutput()"></textarea>
+        </div>
+      </div>
+      <div class="level-compounds-section">
+        <div class="level-compounds-label">Included Compounds  click to toggle</div>
+        <div class="compounds-checklist" id="lChecklist_${levelCount}">
+          ${buildChecklist(levelCount)}
+        </div>
+      </div>
+    </div>`;
+  container.appendChild(div);
+  updateOutput();
+}
+
+function buildChecklist(levelId) {
+  const compounds = getCompounds();
+  if (!compounds.length) return '<div class="no-compounds-hint">Add compounds in Step 4 first  they\\'ll appear here as checkboxes.</div>';
+  return compounds.map(c => {
+    const lineTotal = c.qty * c.price;
+    // NO onclick on label  handled by change event on the checkbox below
+    return `<label class="compound-check-item" data-level="${levelId}" data-cid="${c.id}">
+      <input type="checkbox" value="${c.id}">
+      <div class="check-indicator"></div>
+      <span class="check-label" title="${c.name}">${c.name}</span>
+      <span class="check-price">$${lineTotal}</span>
+    </label>`;
+  }).join('');
+}
+
+// FIX: use a single delegated change listener  no double-fire
+document.addEventListener('change', function(e) {
+  // Goal pills
+  if (e.target.closest && e.target.closest('.pill')) {
+    e.target.closest('.pill').classList.toggle('active', e.target.checked);
+    updateOutput();
+    return;
+  }
+  // Compound checklist items
+  if (e.target.type === 'checkbox' && e.target.closest('.compound-check-item')) {
+    const label = e.target.closest('.compound-check-item');
+    label.classList.toggle('checked', e.target.checked);
+    const levelId = label.dataset.level;
+    if (levelId) { refreshLevelTotal(levelId); updateOutput(); }
+  }
+});
+
+function refreshLevelChecklists() {
+  document.querySelectorAll('.level-block').forEach(lb => {
+    const lid = lb.dataset.levelId;
+    const cl = document.getElementById('lChecklist_' + lid);
+    if (!cl) return;
+    const compounds = getCompounds();
+    if (!compounds.length) { cl.innerHTML = '<div class="no-compounds-hint">Add compounds in Step 4 first.</div>'; return; }
+    // Preserve which compound IDs were checked
+    const checkedIds = new Set(
+      Array.from(cl.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+    );
+    cl.innerHTML = compounds.map(c => {
+      const lineTotal = c.qty * c.price;
+      const isChecked = checkedIds.has(c.id);
+      return `<label class="compound-check-item ${isChecked ? 'checked' : ''}" data-level="${lid}" data-cid="${c.id}">
+        <input type="checkbox" value="${c.id}" ${isChecked ? 'checked' : ''}>
+        <div class="check-indicator"></div>
+        <span class="check-label" title="${c.name}">${c.name}</span>
+        <span class="check-price">$${lineTotal}</span>
+      </label>`;
+    }).join('');
+    refreshLevelTotal(lid);
+  });
+}
+
+function refreshLevelTotal(levelId) {
+  const cl = document.getElementById('lChecklist_' + levelId);
+  if (!cl) return;
+  const checkedIds = new Set(
+    Array.from(cl.querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+  );
+  const compounds = getCompounds();
+  let total = 0;
+  compounds.forEach(c => { if (checkedIds.has(c.id)) total += c.qty * c.price; });
+  const td = document.getElementById('lTotal_' + levelId);
+  if (td) td.textContent = '$' + total;
+}
+
+function refreshLevelTotals() {
+  document.querySelectorAll('.level-block').forEach(lb => refreshLevelTotal(lb.dataset.levelId));
+}
+
+function removeLevel(id) {
+  document.getElementById('level_' + id)?.remove();
+  updateOutput();
+}
+
+function getLevels() {
+  return Array.from(document.querySelectorAll('.level-block')).map(lb => {
+    const lid = lb.dataset.levelId;
+    const cl = document.getElementById('lChecklist_' + lid);
+    const checkedIds = new Set(
+      Array.from((cl || document).querySelectorAll('input[type="checkbox"]:checked')).map(cb => cb.value)
+    );
+    const compounds = getCompounds();
+    const included = compounds.filter(c => checkedIds.has(c.id));
+    let total = 0; included.forEach(c => total += c.qty * c.price);
+    return {
+      name:     document.getElementById('lName_'  + lid)?.value || ('Level ' + lid),
+      desc:     document.getElementById('lDesc_'  + lid)?.value || '',
+      reason:   document.getElementById('lReason_'+ lid)?.value || '',
+      included: included.map(c => c.name),
+      total,
+    };
+  });
+}
+
+function getGoals() {
+  return Array.from(document.querySelectorAll('#goalPills input:checked')).map(i => i.value);
+}
+
+// ─ ─ AI FOCUS LINE ──────────────────────────────────────────
+async function generateFocusLine() {
+  const intro = document.getElementById('introContext').value.trim();
+  const goals = getGoals();
+  const firstName = document.getElementById('firstName').value.trim();
+  if (!intro && !goals.length) { showToast('Fill in the Intro Context and/or Goals first.'); return; }
+  const btn = document.getElementById('genFocusBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ai-spinner"></span> Generating...';
+  try {
+    const prompt = `You are writing the Protocol Focus Line for a BioLinked personalized peptide protocol.
+This is a short, compelling headline (8-16 words max) that goes under the client's name at the top of their protocol page.
+It should capture their specific goals and personal situation in a motivating, elegant way.
+Do NOT use generic phrases like "comprehensive protocol" or "complete stack".
+
+Client: ${firstName || 'Client'}
+Goals: ${goals.join(', ') || 'General optimization'}
+Context: ${intro}
+
+Write ONLY the focus line  nothing else. No quotes. No explanation. Just the headline.
+Examples of good format:
+"Fat Loss · Mental Clarity · Reclaim Your Energy Without the Burnout"
+"Cognitive Sharpness · GH Optimization · The Working Dad's Anti-Aging Protocol"
+"Sleep Deep. Think Clear. Lean Out. The Mom Stack That Actually Works."`;
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 100,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await response.json();
+    const text = data.content?.[0]?.text?.trim() || '';
+    if (text) {
+      document.getElementById('protocolFocus').value = text;
+      updateOutput();
+      showToast('✓  Focus line generated!');
+    } else {
+      showToast('Generation failed  type manually or try again.');
+    }
+  } catch(err) {
+    console.error(err);
+    showToast('API error  type the focus line manually for now.');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<span class="btn-icon">✦ </span> Generate';
+}
+
+// ─ ─ OUTPUT ─────────────────────────────────────────────────
+function updateOutput() {
+  const v = id => document.getElementById(id)?.value || '';
+  const compounds = getCompounds();
+  const goals = getGoals();
+  const levels = getLevels();
+  const total = compounds.reduce((s, c) => s + c.qty * c.price, 0);
+  const compoundList = compounds.map((c, i) =>
+    `  ${i+1}. ${c.name}\\n     Vial: ${c.vial} × ${c.qty} vials | Dose: ${c.dose} | BAC Water: ${c.bac} | Draw: ${c.units} units\\n     Schedule: ${c.sched} | Timing: ${c.timing} | Price: $${c.price}/vial ($${c.qty * c.price} total)`
+  ).join('\\n\\n');
+  const levelsBlock = levels.length ? levels.map((l, i) =>
+    `Level ${i+1}  ${l.name}: $${l.total}\\n  Compounds: ${l.included.join(', ') || ''}\\n  Description: ${l.desc || ''}\\n  Package Rationale: ${l.reason || ''}`
+  ).join('\\n\\n') : ' No pricing levels defined yet ';
+
+  const output =
+`New client protocol  please build a complete personalized protocol HTML file using the BioLinked template.
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CLIENT INFORMATION
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name: ${v('firstName')} ${v('lastName')}
+Age: ${v('age') || ''} | Sex: ${v('sex') || ''}
+Current Weight: ${v('weight') || ''} | Goal Weight: ${v('goalWeight') || ''}
+Cycle Length: ${v('cycleWeeks')} weeks
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GOALS & PROTOCOL FOCUS
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Goals: ${goals.length ? goals.join(', ') : ''}
+Protocol Focus (header): ${v('protocolFocus') || ''}
+Intro Context (write personalized intro from this):
+${v('introContext') || ''}
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+HEALTH & LIFESTYLE
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Medications / Supplements: ${v('medications') || 'None reported'}
+Allergies: ${v('allergies') || 'None'}
+Injection Experience: ${v('injectExp') || ''}
+Sleep Quality: ${v('sleepQuality') ? v('sleepQuality') + '/5' : ''}
+Stress Level: ${v('stressLevel') ? v('stressLevel') + '/5' : ''}
+Alcohol Use: ${v('alcohol') || ''}
+Exercise: ${v('exercise') || ''}
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+COMPOUNDS (${compounds.length} total)
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${compoundList || ' No compounds added yet '}
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PRICING LEVELS (${levels.length} levels)
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Full Stack Total (all ${compounds.length} compounds): $${total}
+
+${levelsBlock}
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPECIAL NOTES FOR CLAUDE
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Prior Peptide Experience: ${v('priorPeptides') || 'None reported'}
+Previous Reactions: ${v('reactions') || 'None reported'}
+Additional Instructions: ${v('specialNotes') || 'None'}
+
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BUILD INSTRUCTIONS
+━ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Please build a complete personalized protocol HTML file using the BioLinked protocol template. Include:
+1. Personalized intro paragraph based on intro context above
+2. Full compound cards with "Why it's in your protocol" tailored to their specific goals
+3. Correct reconstitution math for each compound
+4. Weekly schedule table based on compound schedules
+5. Week-by-week timeline tailored to their goals
+6. All ${levels.length} pricing levels with the exact compounds listed, correct totals, and Claude-written rationale for why each package was curated based on the client's goals and notes
+7. Daily tracker pre-loaded with all compounds and their schedules
+8. iOS download button for the tracker`;
+
+  const ta = document.getElementById('outputText');
+  ta.value = output;
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+}
+
+// ─ ─ COPY ──────────────────────────────────────────────────
+function copyOutput() {
+  const text = document.getElementById('outputText').value;
+  if (!text.trim()) { showToast('Nothing to copy yet  fill out the form first.'); return; }
+  const ta = document.getElementById('outputText');
+  ta.removeAttribute('readonly'); ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch(e) {}
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => { ta.setAttribute('readonly',true); showCopySuccess(); })
+    .catch(() => { ta.setAttribute('readonly',true); if (ok) showCopySuccess(); else showToast('Text selected  press Cmd+C / Ctrl+C to copy.'); });
+  } else { ta.setAttribute('readonly',true); if (ok) showCopySuccess(); else showToast('Text selected  press Cmd+C / Ctrl+C to copy.'); }
+}
+function showCopySuccess() {
+  const b = document.getElementById('copyBadge'); b.classList.add('show'); setTimeout(()=>b.classList.remove('show'),2500);
+  showToast('✓  Copied! Open Claude and paste.');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.innerHTML = msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000);
+}
+
+// ─ ─ SAVE / LOAD ────────────────────────────────────────────
+function clearAll() {
+  if (!confirm('Clear all fields?')) return;
+  document.querySelectorAll('input[type="text"], input[type="number"], textarea').forEach(el => el.value='');
+  document.querySelectorAll('select').forEach(el => el.value = el.options[0]?.value || '');
+  document.querySelectorAll('.pill input').forEach(cb => { cb.checked=false; cb.closest('.pill').classList.remove('active'); });
+  document.getElementById('compoundRows').innerHTML = '';
+  document.getElementById('levelsContainer').innerHTML = '';
+  compoundCount = 0; levelCount = 0;
+  updateOutput(); calcPrices();
+}
+
+function saveToLocal() {
+  const fields = ['firstName','lastName','age','sex','cycleWeeks','weight','goalWeight','protocolFocus','introContext','medications','allergies','injectExp','sleepQuality','stressLevel','alcohol','exercise','specialNotes','priorPeptides','reactions'];
+  const data = {};
+  fields.forEach(f => { data[f] = document.getElementById(f)?.value || ''; });
+  data.goals = Array.from(document.querySelectorAll('#goalPills input:checked')).map(i => i.value);
+  data.compounds = getCompounds();
+  data.levels = getLevels().map((l, i) => {
+    const lid = document.querySelectorAll('.level-block')[i]?.dataset.levelId;
+    return { ...l, name: document.getElementById('lName_' + lid)?.value || l.name, desc: document.getElementById('lDesc_' + lid)?.value || '', reason: document.getElementById('lReason_' + lid)?.value || '' };
+  });
+  data.savedAt = new Date().toLocaleString();
+  try { localStorage.setItem('blBuilderDraft', JSON.stringify(data)); showToast('✓  Draft saved: ' + data.savedAt); }
+  catch(e) { showToast('Save failed  localStorage unavailable.'); }
+}
+
+function loadFromLocal() {
+  let raw; try { raw = localStorage.getItem('blBuilderDraft'); } catch(e) {}
+  if (!raw) { showToast('No saved draft found.'); return; }
+  const d = JSON.parse(raw);
+  if (!confirm('Load draft from ' + d.savedAt + '?')) return;
+  const fields = ['firstName','lastName','age','sex','cycleWeeks','weight','goalWeight','protocolFocus','introContext','medications','allergies','injectExp','sleepQuality','stressLevel','alcohol','exercise','specialNotes','priorPeptides','reactions'];
+  fields.forEach(f => { const el = document.getElementById(f); if (el && d[f] !== undefined) el.value = d[f]; });
+  document.querySelectorAll('#goalPills input').forEach(cb => { cb.checked = d.goals?.includes(cb.value); cb.closest('.pill').classList.toggle('active', cb.checked); });
+  document.getElementById('compoundRows').innerHTML = '';
+  document.getElementById('levelsContainer').innerHTML = '';
+  compoundCount = 0; levelCount = 0;
+  if (d.compounds) d.compounds.forEach(c => {
+    compoundCount++;
+    const tbody = document.getElementById('compoundRows');
+    const row = document.createElement('tr');
+    row.id = 'cRow_' + compoundCount; row.dataset.id = compoundCount;
+    const opts = Object.keys(PRESETS).map(k => `<option value="${k}" ${k===c.name?'selected':''}>${k}</option>`).join('');
+    row.innerHTML = `<td class="compound-row-num">${compoundCount}</td><td><select onchange="applyPreset(this,${compoundCount})" style="margin-bottom:4px;"><option value=""> Select </option>${opts}</select><input type="text" value="${c.name}" id="cName_${compoundCount}" oninput="updateOutput();calcPrices();refreshLevelChecklists()"></td><td><input type="text" value="${c.vial}" id="cVial_${compoundCount}" oninput="updateOutput()"></td><td><input type="number" value="${c.qty}" id="cQty_${compoundCount}" oninput="updateOutput();calcPrices()"></td><td><input type="text" value="${c.dose}" id="cDose_${compoundCount}" oninput="updateOutput()"></td><td><input type="text" value="${c.bac}" id="cBac_${compoundCount}" oninput="updateOutput()"></td><td><input type="text" value="${c.units}" id="cUnits_${compoundCount}" oninput="updateOutput()"></td><td><input type="text" value="${c.sched}" id="cSched_${compoundCount}" oninput="updateOutput()"></td><td><input type="text" value="${c.timing}" id="cTiming_${compoundCount}" oninput="updateOutput()"></td><td class="price-col"><input type="number" value="${c.price}" id="cPrice_${compoundCount}" oninput="updateOutput();calcPrices();refreshLevelTotals()"></td><td><button class="remove-btn" onclick="removeCompound(${compoundCount})">×</button></td>`;
+    tbody.appendChild(row);
+  });
+  updateOutput(); calcPrices(); showToast('✓  Draft loaded.');
+}
+
+updateOutput(); calcPrices();
+</script>
+</body>
+</html>
