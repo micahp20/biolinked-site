@@ -41,7 +41,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;font-weight:300;min-height:100vh;line-height:1.5;}
+body{padding-top:56px;background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;font-weight:300;min-height:100vh;line-height:1.5;}
 
 /* TABS */
 .tabs-bar{
@@ -113,7 +113,7 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
   font-size:17px;font-weight:500;color:var(--text);margin-bottom:1px;
 }
 .card-head p{font-size:10px;color:var(--text-3);}
-.card-body{padding:16px 20px;}
+.card-body{padding-top:56px;padding:16px 20px;}
 
 /* BLOOD WORK INPUTS */
 .bw-section-title{
@@ -246,7 +246,7 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 }
 .es-icon{font-size:44px;margin-bottom:16px;opacity:.35;}
 .es-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:400;color:var(--text);margin-bottom:8px;}
-.es-body{font-size:12px;color:var(--text-3);max-width:300px;line-height:1.7;}
+.es-body{padding-top:56px;font-size:12px;color:var(--text-3);max-width:300px;line-height:1.7;}
 
 .processing-state{
   display:none;background:var(--surface);border:1px solid var(--border);
@@ -475,6 +475,70 @@ body{background:var(--bg);color:var(--text);font-family:'Montserrat',sans-serif;
 /* DNA CANVAS */
 .dna-canvas-wrap{display:flex;align-items:center;justify-content:center;padding:10px 0;}
 canvas{display:block;}
+
+/* AI PROTOCOL SECTION */
+.ai-protocol-wrap { margin-top: 8px; }
+.ai-protocol-btn {
+  width: 100%; padding: 14px; background: var(--gold); color: #fff;
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase; border: none; border-radius: var(--radius);
+  cursor: pointer; transition: all .15s; display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 8px;
+}
+.ai-protocol-btn:hover { background: var(--gold-lt); transform: translateY(-1px); }
+.ai-protocol-btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+.ai-protocol-loading {
+  display: none; padding: 20px; text-align: center;
+  background: var(--gold-dim); border: 1px solid var(--border-gold);
+  border-radius: var(--radius); margin-top: 8px;
+}
+.ai-protocol-loading.show { display: block; }
+.ai-protocol-loading p { font-size: 11px; color: var(--gold); font-weight: 600; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+.ai-protocol-output {
+  display: none; background: var(--surface); border: 1px solid var(--border-gold);
+  border-left: 3px solid var(--gold); border-radius: var(--radius);
+  padding: 20px 22px; margin-top: 8px;
+}
+.ai-protocol-output.show { display: block; }
+.ai-protocol-output h4 {
+  font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500;
+  color: var(--text); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+}
+.ai-protocol-output .protocol-text {
+  font-size: 12.5px; color: var(--text-2); line-height: 1.85; white-space: pre-wrap;
+}
+.ai-protocol-output .protocol-text strong { color: var(--text); font-weight: 600; }
+.ai-protocol-disclaimer {
+  font-size: 10px; color: var(--text-3); margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid var(--border); line-height: 1.6;
+}
+
+/* DOWNLOAD BUTTON */
+.download-report-btn {
+  width: 100%; padding: 12px; background: none;
+  border: 1px solid var(--border-silver); border-radius: var(--radius);
+  font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 600;
+  color: var(--text-3); cursor: pointer; transition: all .15s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 6px;
+}
+.download-report-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* PRINT STYLES */
+@media print {
+  .tabs-bar, .col-left, .hero-strip, .site-footer,
+  .btn-primary, .btn-demo, .ai-protocol-btn, .download-report-btn,
+  .ai-protocol-loading, .processing-state { display: none !important; }
+  body { background: #fff; padding: 0; font-size: 11px; }
+  .main-wrap { grid-template-columns: 1fr; padding: 16px; }
+  .col-right { display: block !important; }
+  .panel { display: block !important; }
+  .card, .bm-section, .pathway-section, .recs-section,
+  .bio-age-card, .score-card, .report-header { page-break-inside: avoid; }
+  .ai-protocol-output { display: block !important; border: 1px solid #ccc; }
+}
+
 </style>
 </head>
 <body>
@@ -529,12 +593,12 @@ canvas{display:block;}
       <div class="card">
         <div class="card-head"><h2>Upload Lab Report</h2><p>AI auto-fills your values from a PDF or photo</p></div>
         <div class="card-body">
-          <div class="lab-upload-zone" id="labDropZone">
-            <input type="file" id="labFileInput" accept=".pdf,image/*" onchange="handleLabUpload(this.files[0])">
+          <div class="lab-upload-zone" id="labDropZone" onclick="document.getElementById('labFileInput').click()">
+            <input type="file" id="labFileInput" accept=".pdf,image/*" onchange="handleLabUpload(this.files[0])" style="display:none;">
             <div class="lab-upload-icon">📄</div>
             <div class="lab-upload-title">Drop Lab Report Here</div>
             <div class="lab-upload-sub">PDF or photo of your results — Claude AI reads and fills all fields automatically</div>
-            <span class="lab-upload-btn">Select File</span>
+            <button class="lab-upload-btn" type="button" onclick="event.stopPropagation();document.getElementById('labFileInput').click()">📎 Select File</button>
             <div class="lab-upload-formats">
               <span class="pchip">PDF</span><span class="pchip">JPG / PNG</span><span class="pchip">HEIC</span><span class="pchip">Screenshot</span>
             </div>
@@ -691,12 +755,12 @@ canvas{display:block;}
       <div class="card">
         <div class="card-head"><h2>Upload Raw DNA File</h2><p>23andMe · AncestryDNA · MyHeritage · FamilyTreeDNA</p></div>
         <div class="card-body">
-          <div class="upload-zone" id="dropZone">
-            <input type="file" id="fileInput" accept=".txt,.zip,.csv" onchange="handleFile(this.files[0])">
+          <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <input type="file" id="fileInput" accept=".txt,.zip,.csv" onchange="handleFile(this.files[0])" style="display:none;">
             <div class="upload-icon">🧬</div>
             <div class="upload-title">Drop Your Raw Data File</div>
             <div class="upload-sub">Download from your provider → Account → Raw Data</div>
-            <label class="upload-btn" for="fileInput">Select File</label>
+            <button class="upload-btn" type="button" onclick="event.stopPropagation();document.getElementById('fileInput').click()">🧬 Select File</button>
             <div class="provider-chips">
               <span class="pchip">23andMe .txt</span><span class="pchip">AncestryDNA .txt</span>
               <span class="pchip">MyHeritage .csv</span><span class="pchip">.zip supported</span>
@@ -1203,7 +1267,30 @@ function bwRenderResults(entered, chronAge, sex, goal){
     col.appendChild(recEl);
   }
 
-  showToast(`Analysis complete — biological age: ${bioAge||'N/A'}, ${scored} markers processed`);
+  // AI PROTOCOL SECTION
+  const aiWrap = document.createElement('div');
+  aiWrap.setAttribute('data-bwresult','1');
+  aiWrap.className = 'ai-protocol-wrap fade-in-d3';
+  aiWrap.innerHTML = `
+    <div class="recs-head" style="margin-bottom:8px;">
+      <h3>🤖 AI-Generated Research Protocol</h3>
+      <p>Claude analyzes your specific biomarkers and generates a personalized research compound protocol</p>
+    </div>
+    <button class="ai-protocol-btn" id="bwAiBtn" onclick="generateBwProtocol()">✨ Generate My Personalized Protocol</button>
+    <div class="ai-protocol-loading" id="bwAiLoading"><p>⚡ Claude is analyzing your biomarkers and building your protocol…</p></div>
+    <div class="ai-protocol-output" id="bwAiOutput">
+      <h4>Your Personalized Research Protocol</h4>
+      <div class="protocol-text" id="bwAiText"></div>
+      <div class="ai-protocol-disclaimer">⚠ This protocol is generated for research and educational purposes only. All compounds are research chemicals not approved for human use. Consult a licensed physician before beginning any protocol.</div>
+    </div>
+    <button class="download-report-btn" id="bwDownloadBtn" onclick="downloadBwReport()" style="display:none">⬇ Download Full Report (PDF)</button>
+  `;
+  col.appendChild(aiWrap);
+
+  showToast(\`Analysis complete — biological age: \${bioAge||'N/A'}, \${scored} markers processed\`);
+
+  // Store results for AI use
+  window._bwResults = { entered, chronAge, sex, goal, bioAge, diff, overallScore, scoreLabel, sortedPeps };
 }
 
 function calcBarPct(val,bm){
@@ -1441,7 +1528,30 @@ function dnaRender(map){
     recSec.innerHTML=`<div class="recs-head"><h3>🎯 Prioritized Protocol Recommendations</h3><p>${sortedRecs.length} compounds identified across your genetic profile</p></div><div class="rec-grid">${sortedRecs.slice(0,12).map(([name,d],i)=>{const bc=d.priority==='high'?'badge-high':d.priority==='moderate'?'badge-mod':'badge-typ';return `<div class="rec-item"><div class="rec-rank ${i<3?'rec-top':''}">${i+1}</div><div style="flex:1"><div class="rec-name">${name}</div><div class="rec-reason">Flagged by: ${d.snps.slice(0,4).join(', ')}${d.snps.length>4?` +${d.snps.length-4} more`:''}</div></div><div><span class="badge ${bc}">${d.priority}</span></div></div>`;}).join('')}</div>`;
     col.appendChild(recSec);
   }
+  // AI PROTOCOL SECTION
+  const dnaAiWrap = document.createElement('div');
+  dnaAiWrap.setAttribute('data-dna','1');
+  dnaAiWrap.className = 'ai-protocol-wrap fade-in-d3';
+  dnaAiWrap.innerHTML = `
+    <div class="recs-head" style="margin-bottom:8px;">
+      <h3>🤖 AI-Generated Genetic Protocol</h3>
+      <p>Claude reads your SNP variants and writes a targeted research compound protocol matched to your genetic profile</p>
+    </div>
+    <button class="ai-protocol-btn" id="dnaAiBtn" onclick="generateDnaProtocol()">✨ Generate My Genetic Protocol</button>
+    <div class="ai-protocol-loading" id="dnaAiLoading"><p>⚡ Claude is mapping your variants to research protocols…</p></div>
+    <div class="ai-protocol-output" id="dnaAiOutput">
+      <h4>Your Genetic Research Protocol</h4>
+      <div class="protocol-text" id="dnaAiText"></div>
+      <div class="ai-protocol-disclaimer">⚠ This protocol is generated for research and educational purposes only. All compounds are research chemicals not approved for human use. Consult a licensed physician before beginning any protocol.</div>
+    </div>
+    <button class="download-report-btn" id="dnaDownloadBtn" onclick="downloadDnaReport()" style="display:none">⬇ Download Full Report (PDF)</button>
+  `;
+  col.appendChild(dnaAiWrap);
+
   showToast(`Genome decoded — ${found} SNPs, ${sortedRecs.length} compounds flagged`);
+
+  // Store for AI use
+  window._dnaResults = { found, total, highCount, modCount, sortedRecs, results };
 }
 
 // DNA HELIX
@@ -1476,6 +1586,292 @@ function dnaRender(map){
   }
   draw();
 })();
+
+
+
+// ══════════════════════════════════════════════════════
+// AI PROTOCOL GENERATION — BLOOD WORK
+// ══════════════════════════════════════════════════════
+async function generateBwProtocol() {
+  const btn = document.getElementById('bwAiBtn');
+  const loading = document.getElementById('bwAiLoading');
+  const output = document.getElementById('bwAiOutput');
+  const textEl = document.getElementById('bwAiText');
+  const dlBtn = document.getElementById('bwDownloadBtn');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+  loading.classList.add('show');
+  output.classList.remove('show');
+
+  const r = window._bwResults;
+  if (!r) { loading.classList.remove('show'); btn.disabled=false; btn.textContent='✨ Generate My Personalized Protocol'; return; }
+
+  // Build a detailed summary of abnormal markers
+  const flagged = [];
+  for (const bm of BM_DB) {
+    const val = r.entered[bm.id];
+    if (val === undefined) continue;
+    let status;
+    if (bm.inverted) {
+      if (val >= bm.optLow && val <= bm.optHigh) status = 'optimal';
+      else if (val < bm.optLow) status = 'low';
+      else if (val > bm.high) status = 'high';
+      else status = 'elevated';
+    } else {
+      if (val >= bm.optLow && val <= bm.optHigh) status = 'optimal';
+      else if (val < bm.optLow) status = 'low';
+      else if (val > bm.critHigh) status = 'critical';
+      else if (val > bm.high) status = 'high';
+      else status = 'elevated';
+    }
+    if (status !== 'optimal') flagged.push(`${bm.name}: ${val} ${bm.unit} [${status.toUpperCase()}]`);
+  }
+
+  const prompt = `You are a BioLinked Peptide Solutions research consultant writing a personalized research protocol.
+
+CLIENT PROFILE:
+- Age: ${r.chronAge || 'unknown'}, Sex: ${r.sex || 'unknown'}
+- Biological Age: ${r.bioAge || 'N/A'} (${r.diff > 0 ? '+'+r.diff : r.diff} years vs chronological)
+- Overall Blood Work Score: ${r.overallScore}/100 (${r.scoreLabel})
+- Primary Goal: ${(r.goal||'').replace('_',' ')}
+
+FLAGGED BIOMARKERS (non-optimal):
+${flagged.length ? flagged.join('\n') : 'All markers in optimal range'}
+
+TOP COMPOUND RECOMMENDATIONS FROM DATABASE:
+${(r.sortedPeps||[]).slice(0,10).map(([name,d],i) => `${i+1}. ${name} — flagged by ${d.markers.slice(0,3).join(', ')}`).join('\n')}
+
+Write a personalized 8-week research protocol. Structure it as:
+
+**PROTOCOL OVERVIEW**
+2-3 sentences on why this specific protocol was selected for this client's biomarker profile.
+
+**RECOMMENDED COMPOUNDS & RATIONALE**
+For each of the top 4-6 compounds: name, suggested research dose range, timing/frequency, and 1-2 sentences on why it addresses their specific biomarker findings.
+
+**CYCLE STRUCTURE**
+Week-by-week guidance (which compounds to start with, when to add others).
+
+**MONITORING**
+Which biomarkers to retest and when.
+
+Keep it clinical but accessible. Use research/educational framing throughout. Do not recommend medical treatment.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    loading.classList.remove('show');
+    if (!resp.ok || !data.content) throw new Error(data.error?.message || 'API error');
+
+    let text = data.content.find(b => b.type === 'text')?.text || '';
+    // Format markdown bold to HTML
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    textEl.innerHTML = text;
+    output.classList.add('show');
+    dlBtn.style.display = 'flex';
+    dlBtn.style.justifyContent = 'center';
+    btn.textContent = '✅ Protocol Generated';
+    showToast('✅ Your personalized protocol is ready');
+  } catch(e) {
+    loading.classList.remove('show');
+    btn.disabled = false;
+    btn.textContent = '✨ Generate My Personalized Protocol';
+    showToast('⚠ Protocol generation failed — ' + (e.message || 'try again'));
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// AI PROTOCOL GENERATION — DNA
+// ══════════════════════════════════════════════════════
+async function generateDnaProtocol() {
+  const btn = document.getElementById('dnaAiBtn');
+  const loading = document.getElementById('dnaAiLoading');
+  const output = document.getElementById('dnaAiOutput');
+  const textEl = document.getElementById('dnaAiText');
+  const dlBtn = document.getElementById('dnaDownloadBtn');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+  loading.classList.add('show');
+  output.classList.remove('show');
+
+  const r = window._dnaResults;
+  if (!r) { loading.classList.remove('show'); btn.disabled=false; return; }
+
+  // Build variant summary
+  const highVariants = r.results.filter(s => s.found && s.risk === 'high')
+    .map(s => `${s.gene} (${s.rsid}): ${s.vi?.label} — ${s.vi?.effect?.substring(0,100)}`);
+  const modVariants = r.results.filter(s => s.found && s.risk === 'moderate')
+    .map(s => `${s.gene} (${s.rsid}): ${s.vi?.label}`);
+
+  const prompt = `You are a BioLinked Peptide Solutions research consultant writing a genetic research protocol.
+
+GENETIC ANALYSIS SUMMARY:
+- SNPs Detected: ${r.found} of ${r.total}
+- High-Impact Variants: ${r.highCount}
+- Moderate Variants: ${r.modCount}
+
+HIGH-IMPACT VARIANTS FOUND:
+${highVariants.length ? highVariants.join('\n') : 'None identified'}
+
+MODERATE VARIANTS:
+${modVariants.slice(0,8).join('\n') || 'None'}
+
+TOP PROTOCOL RECOMMENDATIONS FROM GENETIC ANALYSIS:
+${(r.sortedRecs||[]).slice(0,10).map(([name,d],i) => `${i+1}. ${name} — priority: ${d.priority}, flagged by: ${d.snps.slice(0,3).join(', ')}`).join('\n')}
+
+Write a personalized genetic research protocol. Structure it as:
+
+**GENETIC PROFILE SUMMARY**
+2-3 sentences summarizing the most significant findings and what they mean for this person's biology.
+
+**HIGHEST-PRIORITY COMPOUNDS & GENETIC RATIONALE**
+For each of the top 4-6 compounds: name, suggested research dose range, timing, and 1-2 sentences explaining which specific gene variant(s) make it relevant.
+
+**PATHWAY PRIORITIES**
+Which biological pathways need the most attention based on the variant profile.
+
+**LIFESTYLE SYNERGIES**
+2-3 lifestyle factors that work synergistically with this genetic protocol.
+
+Keep it research-focused and educational. Do not recommend medical treatment.`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1200,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    const data = await resp.json();
+    loading.classList.remove('show');
+    if (!resp.ok || !data.content) throw new Error(data.error?.message || 'API error');
+
+    let text = data.content.find(b => b.type === 'text')?.text || '';
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    textEl.innerHTML = text;
+    output.classList.add('show');
+    dlBtn.style.display = 'flex';
+    dlBtn.style.justifyContent = 'center';
+    btn.textContent = '✅ Protocol Generated';
+    showToast('✅ Your genetic protocol is ready');
+  } catch(e) {
+    loading.classList.remove('show');
+    btn.disabled = false;
+    btn.textContent = '✨ Generate My Genetic Protocol';
+    showToast('⚠ Protocol generation failed — ' + (e.message || 'try again'));
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// DOWNLOAD REPORT
+// ══════════════════════════════════════════════════════
+function buildReportHTML(title, contentHTML) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>${title} — BioLinked</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{padding-top:56px;font-family:'Montserrat',sans-serif;font-size:11px;color:#1a1a1a;background:#fff;padding:32px;max-width:900px;margin:0 auto}
+h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;margin-bottom:4px}
+h1 em{color:#9A7B2F;font-style:italic}
+.meta{font-size:10px;color:#777;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #eee}
+.section{margin-bottom:20px;padding:16px;border:1px solid #eee;border-radius:8px;page-break-inside:avoid}
+.section h3{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;margin-bottom:8px;color:#1a1a1a}
+.badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-right:4px}
+.badge-high{background:rgba(192,57,43,.1);color:#c0392b}
+.badge-mod{background:rgba(154,123,47,.1);color:#9A7B2F}
+.badge-ok{background:rgba(46,125,50,.1);color:#2e7d32}
+.protocol{background:rgba(154,123,47,.05);border-left:3px solid #9A7B2F;padding:14px 16px;border-radius:0 8px 8px 0;line-height:1.85;white-space:pre-wrap;font-size:11.5px}
+.protocol strong{color:#1a1a1a;font-weight:600}
+.disclaimer{font-size:9.5px;color:#999;margin-top:20px;padding-top:12px;border-top:1px solid #eee;line-height:1.6}
+.header-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.logo{font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:.1em;color:#9A7B2F;font-weight:600}
+@media print{body{padding-top:56px;padding:16px}.section{page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="header-bar">
+  <div class="logo">BIOLINKED PEPTIDE SOLUTIONS</div>
+  <div style="font-size:10px;color:#aaa">Generated ${new Date().toLocaleDateString()} · Research Reference Only</div>
+</div>
+${contentHTML}
+<div class="disclaimer">⚠ This report is generated for research and educational purposes only. All compounds referenced are research chemicals not approved by the FDA for human use. This does not constitute medical advice. Always consult a licensed healthcare provider before beginning any protocol. BioLinked Peptide Solutions assumes no liability for outcomes resulting from use of this information.</div>
+</body></html>`;
+}
+
+function downloadBwReport() {
+  const r = window._bwResults;
+  if (!r) return;
+  const aiText = document.getElementById('bwAiText')?.innerHTML || '';
+  const flagged = [];
+  for (const bm of BM_DB) {
+    const val = r.entered[bm.id];
+    if (val === undefined) continue;
+    let status;
+    if (bm.inverted) { status = (val>=bm.optLow&&val<=bm.optHigh)?'optimal':val<bm.optLow?'low':val>bm.high?'high':'elevated'; }
+    else { status = (val>=bm.optLow&&val<=bm.optHigh)?'optimal':val<bm.optLow?'low':val>bm.critHigh?'critical':val>bm.high?'high':'elevated'; }
+    const cls = status==='optimal'?'badge-ok':status==='low'||status==='elevated'?'badge-mod':'badge-high';
+    flagged.push(`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f5f5f5"><span>${bm.name}</span><span><strong>${val} ${bm.unit}</strong> <span class="badge ${cls}">${status}</span></span></div>`);
+  }
+  const content = `
+<h1>Blood Work <em>Analysis Report</em></h1>
+<div class="meta">Age: ${r.chronAge||'—'} · Biological Age: ${r.bioAge||'N/A'} · Score: ${r.overallScore}/100 (${r.scoreLabel}) · Goal: ${(r.goal||'').replace('_',' ')}</div>
+<div class="section">
+  <h3>Biomarker Summary</h3>
+  <div style="columns:2;gap:16px">${flagged.join('')}</div>
+</div>
+<div class="section">
+  <h3>Top Protocol Recommendations</h3>
+  ${(r.sortedPeps||[]).slice(0,10).map(([name,d],i)=>`<div style="padding:5px 0;border-bottom:1px solid #f5f5f5"><strong>${i+1}. ${name}</strong> — ${d.markers.slice(0,3).join(', ')}</div>`).join('')}
+</div>
+${aiText ? `<div class="section"><h3>AI-Generated Research Protocol</h3><div class="protocol">${aiText}</div></div>` : ''}`;
+  const blob = new Blob([buildReportHTML('Blood Work Analysis', content)], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `BioLinked-BloodWork-Report-${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+  showToast('📄 Report downloaded');
+}
+
+function downloadDnaReport() {
+  const r = window._dnaResults;
+  if (!r) return;
+  const aiText = document.getElementById('dnaAiText')?.innerHTML || '';
+  const highV = (r.results||[]).filter(s=>s.found&&s.risk==='high').map(s=>`<div style="padding:5px 0;border-bottom:1px solid #f5f5f5"><strong>${s.gene}</strong> ${s.rsid} <span class="badge badge-high">HIGH</span><br><span style="color:#555;font-size:10px">${s.vi?.label} — ${s.vi?.effect?.substring(0,120)}</span></div>`).join('');
+  const modV = (r.results||[]).filter(s=>s.found&&s.risk==='moderate').map(s=>`<div style="padding:4px 0;border-bottom:1px solid #f5f5f5"><strong>${s.gene}</strong> ${s.rsid} <span class="badge badge-mod">MOD</span> — ${s.vi?.label}</div>`).join('');
+  const content = `
+<h1>Genetic <em>Protocol Report</em></h1>
+<div class="meta">${r.found} of ${r.total} SNPs detected · ${r.highCount} high-impact variants · ${r.modCount} moderate variants</div>
+${highV ? `<div class="section"><h3>High-Impact Variants</h3>${highV}</div>` : ''}
+${modV ? `<div class="section"><h3>Moderate Variants</h3>${modV}</div>` : ''}
+<div class="section">
+  <h3>Prioritized Protocol Recommendations</h3>
+  ${(r.sortedRecs||[]).slice(0,10).map(([name,d],i)=>`<div style="padding:5px 0;border-bottom:1px solid #f5f5f5"><strong>${i+1}. ${name}</strong> <span class="badge badge-${d.priority==='high'?'high':'mod'}">${d.priority}</span> — ${d.snps.slice(0,3).join(', ')}</div>`).join('')}
+</div>
+${aiText ? `<div class="section"><h3>AI-Generated Genetic Protocol</h3><div class="protocol">${aiText}</div></div>` : ''}`;
+  const blob = new Blob([buildReportHTML('Genetic Protocol Report', content)], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `BioLinked-Genetic-Report-${new Date().toISOString().slice(0,10)}.html`;
+  a.click();
+  showToast('📄 Report downloaded');
+}
 
 
 // ══════════════════════════════════════════════════════
@@ -1574,6 +1970,100 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),3500);
 }
 </script>
-<script src="/nav.js"></script>
+<script>
+(function(){
+  const path = window.location.pathname;
+  const isActive = (href) => {
+    const clean = href.replace('.html','');
+    if(clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
+    return path.includes(clean.replace('/',''));
+  };
+
+  const links = [
+    {href:'/index.html', label:'Home'},
+    {href:'/peptide-index.html', label:'Index'},
+    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
+    {href:'/stacks-blends.html', label:'Stacks & Blends'},
+  ];
+
+  const tools = [
+    {href:'/peptide-tracker.html', label:'Peptide Tracker'},
+    {href:'/stack-analyzer.html', label:'Stack Analyzer'},
+    {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
+  ];
+
+  const navHTML = `
+<nav class="bl-nav" id="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="/index.html" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BIO LINKED</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      ${links.map(l=>`<a href="${l.href}" class="bl-nav-link${isActive(l.href)?' active':''}">${l.label}</a>`).join('')}
+      <div class="bl-nav-dropdown" id="bl-dropdown">
+        <button class="bl-nav-link bl-dropdown-btn">Tools ▾</button>
+        <div class="bl-nav-dropdown-menu" id="bl-dropdown-menu">
+          ${tools.map(t=>`<a href="${t.href}" class="bl-nav-dropdown-item${isActive(t.href)?' active':''}">${t.label}</a>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    ${links.map(l=>`<a href="${l.href}" class="bl-nav-mobile-link">${l.label}</a>`).join('')}
+    <div class="bl-nav-mobile-section">Tools</div>
+    ${tools.map(t=>`<a href="${t.href}" class="bl-nav-mobile-link bl-nav-mobile-sub">${t.label}</a>`).join('')}
+  </div>
+</nav>`;
+
+  const navCSS = `<style>
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Outfit',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.1em}
+.bl-nav-logo-sub{font-size:8px;color:#777;letter-spacing:0.18em;text-transform:uppercase;margin-top:2px}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:11.5px;color:#444;text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown{position:relative}
+.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:#fff;border:1px solid #eaeaea;border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
+.bl-nav-dropdown:hover .bl-nav-dropdown-menu,.bl-nav-dropdown-menu:hover{display:block}
+.bl-nav-dropdown-btn{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bl-nav-dropdown:hover .bl-dropdown-btn{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:#444;text-decoration:none;transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8;color:#9A7B2F;padding-left:20px}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:#1a1a1a;padding:8px}
+.bl-nav-mobile-menu{display:none;border-top:1px solid #eaeaea;background:#fff;padding:12px 20px 20px}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:10px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Outfit',sans-serif}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
+.bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#9A7B2F;font-family:'Outfit',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
+@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
+</style>`;
+
+  document.head.insertAdjacentHTML('beforeend', navCSS);
+  document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+  // Mobile toggle
+  document.getElementById('bl-mobile-btn').addEventListener('click', function(){
+    const menu = document.getElementById('bl-mobile-menu');
+    menu.classList.toggle('open');
+    this.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  // Fix dropdown - keep open when moving mouse between button and menu
+  const dropdown = document.getElementById('bl-dropdown');
+  const menu = document.getElementById('bl-dropdown-menu');
+  let closeTimer;
+  dropdown.addEventListener('mouseenter', () => { clearTimeout(closeTimer); menu.style.display='block'; });
+  dropdown.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+  menu.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  menu.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+
+})();
+
+</script>
 </body>
 </html>
