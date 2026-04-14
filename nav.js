@@ -69,8 +69,51 @@
 @media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
 </style>`;
 
+  const ctaBar = `<div style="background:#e8e8e8;border-bottom:1px solid rgba(0,0,0,0.08);">
+  <div style="max-width:1100px;margin:0 auto;padding:10px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:15px;">🩸</span>
+      <span style="font-size:12px;color:#444440;font-weight:300;font-family:'Montserrat',sans-serif;">Curious what your blood work actually means? <strong style="font-weight:600;color:#1a1a1a;">Upload your labs · Get a personalized peptide protocol</strong></span>
+    </div>
+    <a href="/biomarker-landing.html" style="flex-shrink:0;background:#8B7335;color:#fff;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:8px 20px;text-decoration:none;white-space:nowrap;">Run Your Analysis →</a>
+  </div>
+</div>`;
+
+  const siteFooter = `<div style="background:#f0f0f0;border-top:1px solid rgba(0,0,0,0.10);padding:40px 32px;margin-top:auto;">
+  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex-wrap:wrap;">
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
+      <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Peptide Solutions</div>
+      <p style="font-size:11px;color:#888880;font-weight:300;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
+    </div>
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Resources</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <a href="/index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Home</a>
+        <a href="/peptide-index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Peptide Index</a>
+        <a href="/cheat-sheet.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Cheat Sheet</a>
+        <a href="/stacks-blends.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stacks & Blends</a>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Tools & Services</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <a href="/peptide-tracker.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Peptide Tracker</a>
+        <a href="/stack-analyzer.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stack Analyzer</a>
+        <a href="/biomarker-landing.html" style="font-size:11px;color:#8B7335;text-decoration:none;font-weight:600;">Biomarker Analysis →</a>
+        <a href="/intake.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Client Intake</a>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1100px;margin:24px auto 0;padding-top:20px;border-top:1px solid rgba(0,0,0,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+    <div style="font-size:10px;color:#aaaaaa;">© 2025 BioLinked Peptide Solutions · Research & Educational Use Only · Not Medical Advice</div>
+    <a href="/biomarker-landing.html" style="font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;background:#8B7335;padding:7px 18px;text-decoration:none;">Get Your Protocol →</a>
+  </div>
+</div>`;
+
   document.head.insertAdjacentHTML('beforeend', navCSS);
-  document.body.insertAdjacentHTML('afterbegin', navHTML);
+  document.body.insertAdjacentHTML('afterbegin', ctaBar + navHTML);
+  document.body.insertAdjacentHTML('beforeend', siteFooter);
 
   // Mobile toggle
   document.getElementById('bl-mobile-btn').addEventListener('click', function(){
