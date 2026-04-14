@@ -208,7 +208,7 @@ body{padding-top:56px;background:var(--bg);color:var(--text);font-family:'Montse
   background:var(--gold-dim);position:relative;
 }
 .upload-zone:hover,.upload-zone.drag{border-color:var(--gold);background:rgba(212,175,55,0.11);}
-.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone input:not([style*="display:none"]){position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .upload-icon{font-size:28px;margin-bottom:8px;}
 .upload-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:var(--text);margin-bottom:5px;}
 .upload-sub{font-size:11px;color:var(--text-2);margin-bottom:12px;line-height:1.6;}
@@ -540,38 +540,12 @@ canvas{display:block;}
 }
 
 
-/* API KEY BANNER */
-.api-key-banner{
-  background:#fff;border-bottom:1px solid rgba(154,123,47,0.2);
-  padding:10px 32px;display:flex;align-items:center;gap:10px;
-  position:sticky;top:56px;z-index:85;
-}
-@media(max-width:768px){.api-key-banner{padding:10px 16px;flex-wrap:wrap;}}
-.api-key-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;flex-shrink:0;}
-.api-key-input{
-  flex:1;min-width:200px;max-width:420px;
-  background:var(--surface2);border:1px solid var(--border);border-radius:6px;
-  padding:7px 12px;font-family:'Montserrat',sans-serif;font-size:11px;color:var(--text);
-  outline:none;transition:border-color .15s;
-}
-.api-key-input:focus{border-color:var(--border-gold);}
-.api-key-input::placeholder{color:var(--text-3);}
-.api-key-note{font-size:10px;color:var(--text-3);line-height:1.5;}
-.api-key-status{font-size:10px;font-weight:600;padding:4px 10px;border-radius:4px;white-space:nowrap;}
-.api-key-status.set{background:rgba(46,125,50,.1);color:var(--green);}
-.api-key-status.unset{background:var(--gold-dim);color:var(--gold);}
-/* Shift tabs-bar below the key banner when it's sticky */
-.tabs-bar{top:calc(56px + 41px) !important;}
+
 
 </style>
 </head>
 <body>
-<div class="api-key-banner" id="apiKeyBanner">
-  <span class="api-key-label">🔑 Anthropic API Key</span>
-  <input class="api-key-input" id="apiKeyInput" type="password" placeholder="sk-ant-..." oninput="updateApiKey(this.value)" autocomplete="off">
-  <span class="api-key-note">Required for AI analysis. Key stays in memory only — never stored or sent anywhere except Anthropic.</span>
-  <span class="api-key-status unset" id="apiKeyStatus">Not set</span>
-</div>
+
 
 <div class="tabs-bar">
   <div class="tabs-bar-inner">
@@ -863,35 +837,6 @@ canvas{display:block;}
 <div class="toast" id="toast"></div>
 
 <script>
-
-// ── API KEY MANAGEMENT ──────────────────────────────────
-let _apiKey = '';
-function updateApiKey(val) {
-  _apiKey = val.trim();
-  const status = document.getElementById('apiKeyStatus');
-  if (_apiKey.startsWith('sk-ant-') && _apiKey.length > 20) {
-    status.textContent = '✓ Key set';
-    status.className = 'api-key-status set';
-  } else if (_apiKey.length > 0) {
-    status.textContent = '⚠ Check format';
-    status.className = 'api-key-status unset';
-  } else {
-    status.textContent = 'Not set';
-    status.className = 'api-key-status unset';
-  }
-}
-function getApiHeaders() {
-  if (!_apiKey) {
-    showToast('⚠ Enter your Anthropic API key at the top of the page');
-    throw new Error('No API key — enter your Anthropic API key at the top of the page');
-  }
-  return {
-    'Content-Type': 'application/json',
-    'x-api-key': _apiKey,
-    'anthropic-version': '2023-06-01',
-    'anthropic-dangerous-direct-browser-access': 'true'
-  };
-}
 
 // ══════════════════════════════════════════════════════
 // TAB SWITCHING
@@ -1721,7 +1666,7 @@ Keep it clinical but accessible. Use research/educational framing throughout. Do
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: getApiHeaders(),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1200,
@@ -1807,7 +1752,7 @@ Keep it research-focused and educational. Do not recommend medical treatment.`;
   try {
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: getApiHeaders(),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1200,
@@ -1973,7 +1918,7 @@ Return ONLY raw JSON, no markdown, no explanation. Example: {"bw-glucose":92,"bw
 
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: getApiHeaders(),
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1000,
