@@ -17,6 +17,8 @@
     {href:'/peptide-tracker.html', label:'Peptide Tracker'},
     {href:'/stack-analyzer.html', label:'Stack Analyzer'},
     {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
+    {href:'https://biolinkedsolutions.com/inventory', label:'Inventory'},
+    {href:'https://biolinkedsolutions.com/profit-loss', label:'P&L Tracker'},
   ];
 
   const navHTML = `
