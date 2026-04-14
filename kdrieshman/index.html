@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keith Drieshman — BioLinked Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);
+  --bg:#f5f5f5;--bg-card:#ffffff;--bg-card2:#f0f0f0;--white:#1a1a1a;
+  --text:#1a1a1a;--text-muted:#666666;--border:rgba(0,0,0,0.10);
+  --blue:#63b3ed;--blue-dim:rgba(99,179,237,0.1);--blue-border:rgba(99,179,237,0.25);
+  --green:#5ab87a;--green-dim:rgba(58,122,90,0.15);--green-border:rgba(58,122,90,0.25);
+  --sky:#38bdf8;--sky-dim:rgba(56,189,248,0.1);
+  --orange:#f6ad55;--orange-dim:rgba(246,173,85,0.1);--orange-border:rgba(246,173,85,0.3);
+  --red:#fc8181;--red-dim:rgba(252,129,129,0.1);--red-border:rgba(252,129,129,0.3);
+  --purple:#b794f4;--purple-dim:rgba(183,148,244,0.1);--purple-border:rgba(183,148,244,0.25);
+  --strike:#aaaaaa;
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;}
+
+/* HEADER */
+.header{background:#ffffff;border-bottom:1px solid var(--gold-border);padding:3rem 2rem 2.5rem;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.header-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(139,115,53,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,115,53,0.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+.header-logo{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;}
+.header-logo::before,.header-logo::after{content:'';width:36px;height:1px;background:var(--gold-border);}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,48px);color:var(--white);font-weight:400;line-height:1.1;margin-bottom:0.3rem;position:relative;}
+.header h1 em{color:var(--gold);font-style:italic;}
+.header-focus{font-size:10px;color:var(--text-muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.3rem;}
+.inv-badge-row{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:1.25rem;}
+.inv-badge{background:var(--bg-card);border:1px solid var(--gold-border);padding:0.5rem 1.25rem;border-radius:2px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);}
+.inv-badge span{color:var(--gold);font-weight:600;}
+
+/* NAV */
+.nav-tabs{display:flex;justify-content:center;border-bottom:1px solid var(--gold-border);background:#ffffff;position:sticky;top:56px;z-index:100;}
+.nav-tab{padding:0.9rem 1.5rem;font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Montserrat',sans-serif;}
+.nav-tab:hover{color:var(--gold-light);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* LAYOUT */
+.container{max-width:860px;margin:0 auto;padding:0 1.5rem 5rem;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* SHARED */
+.section{margin-top:2.5rem;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--gold-border);}
+.section-icon{width:28px;height:28px;border-radius:2px;border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--gold-dim);}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);}
+.note{border-radius:2px;padding:1rem 1.5rem;margin-top:1rem;}
+.note h4{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:6px;}
+.note p{font-size:12px;line-height:1.75;font-weight:300;}
+.note-gold{background:rgba(201,168,76,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);}
+.note-gold h4{color:var(--gold);}
+.note-gold p{color:var(--text-muted);}
+.note-blue{background:var(--blue-dim);border:1px solid var(--blue-border);border-left:3px solid var(--blue);}
+.note-blue h4{color:var(--blue);}
+.note-blue p{color:rgba(99,179,237,0.85);}
+
+/* INVOICE */
+.bundle-banner{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.06));border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.25rem 1.5rem;margin-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.bundle-banner-left h3{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);font-weight:400;margin-bottom:2px;}
+.bundle-banner-left h3 em{color:var(--gold);font-style:italic;}
+.bundle-banner-left p{font-size:11px;color:var(--text-muted);font-weight:300;}
+.bundle-pill{background:var(--gold);color:#ffffff;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:8px 18px;border-radius:2px;white-space:nowrap;}
+.line-items{display:flex;flex-direction:column;gap:3px;margin-top:1.25rem;}
+.li-row{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1.1rem 1.5rem;display:grid;grid-template-columns:1fr auto;gap:1rem;transition:border-color 0.2s;}
+.li-row:hover{border-color:var(--gold-border);}
+.li-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--white);margin-bottom:2px;}
+.li-sub{font-size:10px;color:var(--text-muted);font-weight:300;letter-spacing:0.04em;}
+.li-price-col{text-align:right;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;}
+.li-original{font-size:11px;color:var(--strike);text-decoration:line-through;font-weight:300;}
+.li-your{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);}
+.li-save{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:8px;font-weight:700;letter-spacing:0.08em;padding:2px 7px;border-radius:99px;text-transform:uppercase;}
+.totals-block{margin-top:3px;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.tot-row{display:flex;justify-content:space-between;align-items:center;padding:0.875rem 1.5rem;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted);}
+.tot-row:last-child{border-bottom:none;}
+.tot-row.grand{background:var(--gold-dim);padding:1.1rem 1.5rem;border-top:1px solid var(--gold-border);}
+.tot-row.grand .tl{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--white);font-weight:600;}
+.tot-row.grand .tv{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);font-weight:600;}
+.tot-row .tl{font-size:12px;}
+.tot-row .tv{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--text);}
+
+/* COMPOUND CARDS */
+.cmp-grid{display:grid;gap:1.1rem;margin-top:1.25rem;}
+.cmp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.cmp-head{background:var(--bg-card2);padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;}
+.cmp-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);}
+.cmp-tag{font-size:9px;color:var(--gold);font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
+.cmp-body{padding:1.25rem 1.5rem;display:grid;gap:0.875rem;}
+.plabel{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
+.ptext{font-size:13px;color:#555550;line-height:1.8;font-weight:300;}
+.deets{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.5rem;}
+.dbox{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.6rem 0.75rem;}
+.dbox .dlbl{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:2px;}
+.dbox .dval{font-size:13px;font-weight:500;color:var(--text);}
+.phase-badge{display:inline-block;background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px;}
+.recon{list-style:none;display:flex;flex-direction:column;gap:7px;counter-reset:step;}
+.recon li{counter-increment:step;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#555550;line-height:1.6;font-weight:300;}
+.recon li::before{content:counter(step);min-width:20px;height:20px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:50%;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* SCHEDULE TABLE */
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:9px 12px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--gold-border);}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:#555550;font-weight:300;vertical-align:top;}
+.sched-table tr:nth-child(odd) td{background:var(--bg-card);}
+.sched-table tr:nth-child(even) td{background:var(--bg-card2);}
+.sched-table tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold-light);font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;margin:1px 2px 1px 0;}
+.pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#aaa;font-weight:400;}
+
+/* VENMO */
+.venmo{background:linear-gradient(135deg,#f5f5f5 0%,#efefef 100%);border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.75rem;margin-top:2.5rem;text-align:center;}
+.venmo h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--white);font-weight:400;margin-bottom:0.4rem;}
+.venmo h3 em{color:var(--gold);font-style:italic;}
+.venmo p{font-size:12px;color:var(--text-muted);margin-bottom:1.25rem;}
+.venmo-btn{display:inline-block;background:var(--gold);color:#ffffff;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:14px 36px;border-radius:2px;text-decoration:none;}
+.venmo-btn:hover{background:var(--gold-light);}
+.venmo-handle{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;margin-top:10px;display:block;}
+
+/* SUPPLIES */
+.supply-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;margin-bottom:0.75rem;display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;gap:1rem;transition:border-color 0.2s;}
+.supply-card:hover{border-color:var(--gold-border);}
+.supply-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.supply-sub{font-size:11px;color:var(--text-muted);font-weight:300;}
+.order-btn{display:inline-block;background:var(--gold);color:#ffffff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:8px 16px;border-radius:2px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.order-btn:hover{background:var(--gold-light);}
+
+/* TRACKER */
+.tracker-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem;margin-top:1.75rem;}
+.ts{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:2px;padding:1rem;text-align:center;}
+.ts .tv{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);font-weight:600;}
+.ts .tl{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-top:3px;}
+.prog-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:0.875rem 1.125rem;margin-top:0.875rem;}
+.prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s;}
+.week-sel{display:flex;align-items:center;gap:1rem;margin:1.5rem 0 1.25rem;justify-content:center;}
+.wnav{width:34px;height:34px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.wnav:hover{background:var(--gold-dim);}
+.wlbl{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);font-weight:600;min-width:90px;text-align:center;}
+.dhr{display:grid;grid-template-columns:110px 1fr;gap:5px;margin-bottom:2px;}
+.dhi{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.dh{text-align:center;font-size:8px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);padding:6px 2px;background:var(--bg-card2);border:1px solid var(--border);border-radius:2px 2px 0 0;}
+.tgw{display:grid;grid-template-columns:110px 1fr;gap:5px;margin-bottom:2px;}
+.tcl{display:flex;align-items:center;justify-content:flex-end;padding-right:5px;}
+.cbadge{font-size:9px;font-weight:600;color:var(--gold);text-align:right;line-height:1.3;}
+.cbadge span{display:block;color:var(--text-muted);font-weight:400;font-size:8px;}
+.drow{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.dc{background:var(--bg-card);border:1px solid var(--border);border-top:none;min-height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s;font-size:13px;}
+.dc.sched:hover{background:var(--gold-dim);}
+.dc.taken{background:var(--green-dim);border-color:var(--green-border);}
+.dc.taken::after{content:'✓';color:var(--green);font-weight:700;font-size:14px;}
+.dc.sched:not(.taken)::after{content:'○';color:var(--gold-border);font-size:12px;}
+.dc.rest{background:transparent;border-color:transparent;cursor:default;}
+.dc.rest::after{content:'—';color:#cccccc;font-size:11px;}
+.notes-area{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:0.875rem 1.125rem;margin-top:1.25rem;}
+.nlbl{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;}
+.ta{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.625rem 0.875rem;color:var(--text);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:300;resize:vertical;min-height:60px;outline:none;transition:border-color 0.2s;}
+.ta:focus{border-color:var(--gold-border);}
+.ta::placeholder{color:var(--text-muted);}
+.tact{display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap;}
+.abtn{flex:1;min-width:140px;padding:0.8rem 1.25rem;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold-light);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.18s;text-align:center;}
+.abtn:hover{background:rgba(201,168,76,0.22);border-color:var(--gold);}
+.abtn.install-btn{background:rgba(99,179,237,0.1);border-color:var(--blue-border);color:var(--blue);}
+.abtn.install-btn:hover{background:rgba(99,179,237,0.2);}
+.cycle-row{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:0.875rem 1.125rem;flex-wrap:wrap;}
+.cycle-row label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);}
+.cycle-row input[type="date"]{background:var(--bg);border:1px solid var(--gold-border);border-radius:2px;padding:5px 10px;color:var(--text);font-size:12px;outline:none;color-scheme:light;}
+.sbadge{display:inline-flex;align-items:center;gap:4px;background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:9px;font-weight:600;letter-spacing:0.08em;padding:3px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.sbadge.show{opacity:1;}
+
+/* CALENDAR BANNER */
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.07),rgba(99,179,237,0.03));border:1px solid var(--blue-border);border-left:3px solid var(--blue);border-radius:2px;padding:1.1rem 1.5rem;margin-top:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.cal-banner-left h4{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--blue);margin-bottom:5px;}
+.cal-banner-left p{font-size:11px;color:rgba(99,179,237,0.8);font-weight:300;line-height:1.6;}
+.cal-dl-btn{background:var(--blue);color:#ffffff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 20px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;flex-shrink:0;}
+.cal-dl-btn:hover{opacity:0.88;}
+.abtn.cal-btn{background:rgba(99,179,237,0.1);border-color:var(--blue-border);color:var(--blue);}
+.abtn.cal-btn:hover{background:rgba(99,179,237,0.2);}
+
+.phase-block{background:var(--blue-dim);border:1px solid var(--blue-border);border-left:3px solid var(--blue);border-radius:2px;padding:1rem 1.5rem;margin-top:1rem;}
+.phase-block h4{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--blue);margin-bottom:6px;}
+.phase-block p{font-size:12px;line-height:1.75;font-weight:300;color:rgba(99,179,237,0.9);}
+
+.disc{background:#f8f8f8;border:1px solid rgba(139,115,53,0.18);border-radius:2px;padding:1.1rem 1.5rem;margin-top:3rem;font-size:11px;color:#666655;line-height:1.75;font-weight:300;}
+.disc strong{color:var(--gold);font-weight:600;}
+.footer{text-align:center;padding:1.75rem;margin-top:1.5rem;border-top:1px solid var(--gold-border);font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.footer strong{color:var(--gold);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.container>*{animation:fadeUp 0.4s ease both;}
+
+@media(max-width:600px){
+  .deets{grid-template-columns:1fr 1fr;}
+  .dhr{grid-template-columns:80px 1fr;}
+  .tgw{grid-template-columns:80px 1fr;}
+  .bundle-banner,.cal-banner{flex-direction:column;}
+  .supply-card{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-grid"></div>
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Keith <em>Drieshman</em></h1>
+  <div class="header-focus">Cognitive Enhancement · Recovery &amp; Healing · Blood Regulation · 8-Week Cycle</div>
+  <div class="inv-badge-row">
+    <div class="inv-badge">Date: <span>March 2026</span></div>
+    <div class="inv-badge">Ref: <span>BLS-KD-0326</span></div>
+    <div class="inv-badge">Compounds: <span>4</span></div>
+    <div class="inv-badge">Cycle: <span>8 Weeks</span></div>
+    <div class="inv-badge">By: <span>BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('invoice',this)">Invoice</button>
+  <button class="nav-tab" onclick="switchTab('protocol',this)">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('supplies',this)">Supplies</button>
+  <button class="nav-tab" onclick="switchTab('tracker',this)">Daily Tracker</button>
+</div>
+
+<div class="container">
+
+<!-- INVOICE TAB -->
+<div id="tab-invoice" class="tab-content active">
+  <div class="bundle-banner">
+    <div class="bundle-banner-left">
+      <h3>Bundle <em>Discount</em> Applied</h3>
+      <p>All 4 compounds ordered together — you're saving $130 off regular pricing.</p>
+    </div>
+    <div class="bundle-pill">🎁 Save $130 · Bundle Deal</div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#C9A84C" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="section-title">Order Summary</div>
+    </div>
+    <div class="line-items">
+      <div class="li-row">
+        <div>
+          <div class="li-name">MOTS-c</div>
+          <div class="li-sub">2 vials · Mitochondrial Function · Cognitive Clarity · Energy</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$280 regular (2 × $140)</div>
+          <div class="li-your">$200</div>
+          <div class="li-save">Save $80</div>
+        </div>
+      </div>
+      <div class="li-row" style="border-color:rgba(99,179,237,0.2);">
+        <div>
+          <div class="li-name">SS-31 <span style="font-size:12px;color:var(--blue);font-family:'Montserrat',sans-serif;font-weight:500;">— 4 vials (Loading Phase)</span></div>
+          <div class="li-sub">4 vials · Mitochondrial Protection · Cardiolipin Stabilization · Required Loading Phase</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$180 regular (4 × $45)</div>
+          <div class="li-your">$140</div>
+          <div class="li-save">Save $40</div>
+        </div>
+      </div>
+      <div class="li-row">
+        <div>
+          <div class="li-name">KLOW Blend</div>
+          <div class="li-sub">2 vials · BPC-157 · GHK-Cu · TB-500 · KPV · Shoulder Recovery</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$160 regular (2 × $80)</div>
+          <div class="li-your">$120</div>
+          <div class="li-save">Save $40</div>
+        </div>
+      </div>
+      <div class="li-row">
+        <div>
+          <div class="li-name">Tirzepatide</div>
+          <div class="li-sub">2 vials · GLP-1 / GIP Dual Agonist · Blood Sugar Regulation · MWF dosing</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$100 regular (2 × $50)</div>
+          <div class="li-your">$80</div>
+          <div class="li-save">Save $20</div>
+        </div>
+      </div>
+    </div>
+    <div class="totals-block" style="margin-top:3px;">
+      <div class="tot-row"><span class="tl">MOTS-c × 2 vials</span><span class="tv">$200</span></div>
+      <div class="tot-row"><span class="tl">SS-31 × 4 vials</span><span class="tv">$140</span></div>
+      <div class="tot-row"><span class="tl">KLOW Blend × 2 vials</span><span class="tv">$120</span></div>
+      <div class="tot-row"><span class="tl">Tirzepatide × 2 vials</span><span class="tv">$80</span></div>
+      <div class="tot-row" style="background:var(--green-dim);border-top:1px solid var(--green-border);">
+        <span class="tl" style="color:var(--green);font-weight:500;">Bundle Savings</span>
+        <span class="tv" style="color:var(--green);">−$130</span>
+      </div>
+      <div class="tot-row grand">
+        <span class="tl">Total — 8-Week Cycle</span>
+        <span class="tv">$540</span>
+      </div>
+    </div>
+    <div class="note note-blue" style="margin-top:1.25rem;">
+      <h4>💊 Why 4 vials of SS-31 — The Loading Phase Explained</h4>
+      <p>SS-31 works by accumulating at the inner mitochondrial membrane where it binds cardiolipin and neutralizes oxidative stress. Unlike peptides that produce a single-dose effect, <strong>SS-31 requires a saturation phase</strong> to reach therapeutic membrane concentrations. Each vial = 10 doses (Mon–Fri per week). 4 vials = 40 doses = exactly 8 weeks of Mon–Fri dosing — zero waste, perfect coverage. The first 4 weeks build the mitochondrial reservoir while MOTS-c is already running; weeks 5–8 maintain that protection while Tirzepatide steps up to its full 6mg/week. SS-31 as the foundation, everything else amplified on top.</p>
+    </div>
+  </div>
+  <div class="venmo">
+    <h3>Ready to <em>Order?</em></h3>
+    <p>Send $540 via Venmo — include your name in the note. Ships within 24–48 hours.</p>
+    <a href="https://venmo.com/micahp20" class="venmo-btn">Pay $540 on Venmo</a>
+    <span class="venmo-handle">@micahp20</span>
+  </div>
+  <div class="disc">
+    <strong>Important Notice:</strong> This invoice is for educational and research purposes only and does not constitute medical advice. All compounds are research peptides. Tirzepatide directly affects blood glucose — physician coordination required if on existing diabetes medication. Discontinue and seek medical attention if adverse reactions occur.
+  </div>
+</div>
+
+<!-- PROTOCOL TAB -->
+<div id="tab-protocol" class="tab-content">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 8.5C5.5 8.5 6.5 10.5 8 10.5C9.5 10.5 10.5 8.5 10.5 8.5" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6.5" r="0.75" fill="#C9A84C"/><circle cx="10" cy="6.5" r="0.75" fill="#C9A84C"/></svg>
+      </div>
+      <div class="section-title">Your Compounds</div>
+    </div>
+    <div class="cmp-grid">
+
+      <!-- SS-31 -->
+      <div class="cmp-card" style="border-color:rgba(99,179,237,0.2);">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">SS-31</div>
+            <div class="cmp-tag">Start First · Mitochondrial Protection · Cardiolipin Stabilization · Loading Phase</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--blue);font-weight:600;">$140</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">4 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="phase-badge">⚡ Start Here — Weeks 1–4 Load, Weeks 5–8 Maintain</div>
+            <div class="plabel">Why it leads the protocol</div>
+            <div class="ptext">SS-31 is your foundation — it has to run first and consistently before MOTS-c is introduced. MOTS-c drives mitochondrial energy signaling and pushes cells toward higher metabolic output. If the mitochondria aren't adequately protected from the resulting oxidative stress before that demand is applied, you're accelerating wear on an unshielded engine. SS-31 homes to the inner mitochondrial membrane, stabilizes cardiolipin (the structural fat that organizes the electron transport chain), and neutralizes reactive oxygen species at the source. Four vials covers a true loading phase (weeks 1–4, daily) followed by maintained protection (weeks 5–8). Protect first, then amplify.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">3mg × 4</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">1mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">20 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon – Fri</div></div>
+              <div class="dbox"><div class="dlbl">Both Phases</div><div class="dval">5 on / 2 off</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">AM</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to each vial → concentration = <strong>5 mg/mL (5,000 mcg/mL)</strong></li>
+              <li>Swirl gently until clear. Do not shake.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 1mg per dose</strong></li>
+              <li>Each vial = 10 doses at 20u draw. 4 vials = 40 doses total. Mon–Fri × 8 weeks = 40 injection days — full cycle covered exactly. Schedule is identical weeks 1–8, no change at week 5.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOTS-c -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">MOTS-c</div>
+            <div class="cmp-tag">Mitochondrial Peptide · Cognitive Clarity · Metabolic Energy · Begins Week 1</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$200</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">2 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol</div>
+            <div class="ptext">MOTS-c is a mitochondria-derived peptide that activates AMPK — the master metabolic switch that controls cellular energy balance, glucose uptake, and fat utilization. For your goals of cleaner focus and better energy, MOTS-c is directly on point: it improves how efficiently your cells generate and use ATP, which translates into sustained mental clarity and physical energy rather than peaks and crashes from impaired mitochondrial function. It also improves insulin sensitivity, which works synergistically with Tirzepatide's blood glucose regulation. SS-31's loading phase ensures the mitochondria are protected and primed before MOTS-c starts pushing output.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">3mg × 2</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">1mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">3 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon – Fri</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">AM fasted</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>3 mL BAC water</strong> to each vial → concentration = <strong>~3.33 mg/mL</strong></li>
+              <li>Swirl gently until dissolved. Do not shake.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 1mg per dose</strong></li>
+              <li>Each vial = ~30 doses at 10u draw. Two vials = ~60 doses. Mon–Fri × 8 weeks = 40 injection days — full cycle covered with buffer.</li>
+            </ol>
+          </div>
+          <div class="note note-gold" style="margin:0;">
+            <h4>🧠 What to Expect</h4>
+            <p>Most clients notice cleaner, more sustained energy within 7–14 days of MOTS-c. Mental clarity improves progressively — cognitive fog reduces and task engagement sharpens. Physical energy becomes more consistent through the day. These effects compound over 8 weeks and are significantly enhanced when paired with SS-31's mitochondrial protection.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- KLOW -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">KLOW Blend</div>
+            <div class="cmp-tag">BPC-157 · GHK-Cu · TB-500 · KPV — Quad Recovery · Shoulder Healing</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$120</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">2 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol — Shoulder Focus</div>
+            <div class="ptext">KLOW is a four-compound recovery blend designed for exactly this situation. <strong>BPC-157</strong> drives angiogenesis (new blood vessel formation into damaged tissue) and directly accelerates connective tissue, tendon, and ligament repair. <strong>TB-500</strong> is systemically the most powerful soft tissue healer in the stack — it upregulates actin, the protein that drives cellular migration into wound sites. <strong>GHK-Cu</strong> activates over 4,000 genes involved in repair and stimulates collagen synthesis — critical for rebuilding shoulder joint integrity. <strong>KPV</strong> suppresses the NF-κB inflammatory pathway that drives chronic shoulder inflammation and pain. Together: reduce inflammation, rebuild tissue, restore joint function.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">3mL × 2</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">4mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">3 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">15 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">5 on / 2 off</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">AM</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add 3 mL BAC water to each 3mL vial → concentration calibrated for a <strong>4mg dose per draw</strong></li>
+              <li>Swirl gently until clear. Do not shake.</li>
+              <li>Draw <strong>15 units (0.15 mL) = 4mg dose</strong></li>
+              <li>Each vial = ~20 doses at this draw volume. Two vials = ~40 doses. Full 8-week cycle at 5on/2off (40 injection days) exactly covered.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIRZEPATIDE -->
+      <div class="cmp-card" style="border-color:rgba(246,173,85,0.2);">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">Tirzepatide</div>
+            <div class="cmp-tag">GIP / GLP-1 Dual Agonist · Blood Regulation · MWF Dosing</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$80</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">2 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol</div>
+            <div class="ptext">Tirzepatide is the most clinically advanced blood glucose regulation compound available. As a dual GIP and GLP-1 receptor agonist, it directly improves insulin sensitivity, reduces postprandial glucose spikes, and drives meaningful fat loss from the visceral compartment. MWF dosing provides consistent coverage without daily injections. It works synergistically with MOTS-c's AMPK activation to create a significantly better metabolic environment across the whole cycle.</div>
+          </div>
+          <div class="note" style="background:var(--orange-dim);border:1px solid var(--orange-border);border-left:3px solid var(--orange);margin:0 0 0.5rem 0;">
+            <h4 style="color:var(--orange);">⚠️ Coordinate with Your Physician</h4>
+            <p style="color:rgba(246,173,85,0.85);">Tirzepatide directly lowers blood glucose. If you're currently on any diabetes medication, physician oversight is required to avoid hypoglycemia. Do not combine with insulin without medical supervision.</p>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">3mL × 2</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon / Wed / Fri</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">3 mL</div></div>
+              <div class="dbox"><div class="dlbl">Wks 1–4 Draw</div><div class="dval">20 units</div></div>
+              <div class="dbox"><div class="dlbl">Wks 5–8 Draw</div><div class="dval">40 units</div></div>
+              <div class="dbox"><div class="dlbl">Wks 5–8 Total</div><div class="dval">~6mg / week</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution &amp; Titration</div>
+            <ol class="recon">
+              <li>Add 3 mL BAC water to each 3mL vial → concentration = <strong>5 mg/mL</strong></li>
+              <li>Swirl gently until clear. Do not shake.</li>
+              <li><strong>Weeks 1–4 (Ramp Phase):</strong> Inject Mon / Wed / Fri — draw <strong>20 units (0.20 mL) = 1mg per injection</strong> = 3mg/week total. GI side effects (nausea, reduced appetite) are common in weeks 1–2 and resolve as your body adapts. Eat smaller, slower meals.</li>
+              <li><strong>Weeks 5–8 (Full Dose):</strong> Increase to <strong>40 units (0.40 mL) = 2mg per injection</strong> = 6mg/week total. Ramp only if weeks 1–4 were well tolerated.</li>
+              <li>Each vial = ~25 doses at 20U draw. Vial 1 covers weeks 1–4 (12 injections at 20u); vial 2 covers weeks 5–8 (12 injections at 40u). Two vials cover the full 8-week cycle.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#C9A84C" stroke-width="0.8"/></svg>
+      </div>
+      <div class="section-title">Weekly Injection Schedule</div>
+    </div>
+    <div class="phase-block">
+      <h4>💊 Two-Phase Protocol — Tirz Ramps at Week 5, Everything Else Stays the Same</h4>
+      <p><strong>Weeks 1–4 (Ramp Phase):</strong> All 4 compounds Mon–Fri. Tirzepatide at 20u (1mg) Mon / Wed / Fri = 3mg/week. SS-31 and KLOW consistent M–F both phases — no change.<br><strong>Weeks 5–8 (Full Dose):</strong> Tirzepatide ramps to 40u (2mg) Mon / Wed / Fri = 6mg/week. Everything else identical. Sat &amp; Sun rest days all 8 weeks.</p>
+    </div>
+    <table class="sched-table" style="margin-top:1rem;">
+      <thead><tr><th>Day</th><th>AM (Weeks 1–4 · Tirz 20u)</th><th>AM (Weeks 5–8 · Tirz 40u)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:var(--text)">Monday</strong></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span><span class="pill" style="background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);">Tirz 1mg · 20u</span></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span><span class="pill" style="background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);">Tirz 2mg · 40u</span></td>
+        <td>All 4 compounds. Only Tirz dose changes at week 5.</td></tr>
+        <tr><td><strong style="color:var(--text)">Tuesday</strong></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span></td>
+        <td>No Tirz on Tue. SS-31 + MOTS-c + KLOW.</td></tr>
+        <tr><td><strong style="color:var(--text)">Wednesday</strong></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span><span class="pill" style="background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);">Tirz 1mg · 20u</span></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span><span class="pill" style="background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);">Tirz 2mg · 40u</span></td>
+        <td>All 4 compounds. Tirz dose only difference.</td></tr>
+        <tr><td><strong style="color:var(--text)">Thursday</strong></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span></td>
+        <td>No Tirz on Thu. SS-31 + MOTS-c + KLOW.</td></tr>
+        <tr><td><strong style="color:var(--text)">Friday</strong></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span><span class="pill" style="background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);">Tirz 1mg · 20u</span></td>
+        <td><span class="pill">SS-31 1mg</span><span class="pill">MOTS-c 1mg</span><span class="pill">KLOW 4mg</span><span class="pill" style="background:var(--orange-dim);border-color:var(--orange-border);color:var(--orange);">Tirz 2mg · 40u</span></td>
+        <td>All 4 compounds. Finish the week strong.</td></tr>
+        <tr><td><strong style="color:var(--text)">Saturday</strong></td>
+        <td><span class="pill off">All off</span></td><td><span class="pill off">All off</span></td>
+        <td>Full rest — all 8 weeks.</td></tr>
+        <tr><td><strong style="color:var(--text)">Sunday</strong></td>
+        <td><span class="pill off">All off</span></td><td><span class="pill off">All off</span></td>
+        <td>Full rest — all 8 weeks.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="disc">
+    <strong>Important Notice:</strong> This protocol is for educational and informational purposes only and does not constitute medical advice. All compounds are research peptides not approved by the FDA for human use unless otherwise noted. Tirzepatide directly affects blood glucose — physician oversight is required. Discontinue and seek medical attention if adverse reactions occur.
+  </div>
+</div>
+
+<!-- SUPPLIES TAB -->
+<div id="tab-supplies" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-1 9H3L2 3Z" stroke="#C9A84C" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 3V2a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#C9A84C" stroke-width="1.2"/></svg></div>
+      <div class="section-title">Supplies — Order Before Day 1</div>
+    </div>
+    <div class="note note-gold" style="margin-top:1rem;">
+      <h4>📦 Order These Now</h4>
+      <p>With 4 compounds and a loading phase that includes daily SS-31 injections, you'll burn through syringes quickly in weeks 1–4. Order a 200-pack minimum upfront.</p>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <div class="supply-card"><div><div class="supply-name">Insulin Syringes — 29–31G, 1 mL, 200-pack</div><div class="supply-sub">One per injection. Never reuse. Loading phase = up to 4 shots/day some mornings. Get 200.</div></div><a href="https://a.co/d/04JCzBqF" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card"><div><div class="supply-name">Bacteriostatic Water (BAC Water) — 30mL vials, 10-pack</div><div class="supply-sub">4 compounds to reconstitute. Order 10 vials minimum — one per peptide vial.</div></div><a href="https://www.amazon.com/30-Premium-Glass-Vials-Pack/dp/B0FH2C4JM8/" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card"><div><div class="supply-name">Alcohol Prep Pads — 70% IPA, 200-pack</div><div class="supply-sub">Wipe vial stopper and skin before every injection. 200-pack covers the full cycle.</div></div><a href="https://a.co/d/0fnbd8VV" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card"><div><div class="supply-name">Sharps Container — 1 Quart, FDA-Cleared</div><div class="supply-sub">Used needles go directly in here. Drop off free at any CVS or Walgreens when full.</div></div><a href="https://a.co/d/0jhnMLPg" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card"><div><div class="supply-name">Peptide Organizer / Cold Storage</div><div class="supply-sub">4 active vials + extras need organized cold storage. Prevents mix-ups and protects from light and temperature swings.</div></div><a href="https://a.co/d/07HthwLz" target="_blank" class="order-btn">Amazon →</a></div>
+    </div>
+    <div class="note note-gold" style="margin-top:1.5rem;">
+      <h4>❄️ Storage Reminder</h4>
+      <p>All vials refrigerated at 36–46°F before and after reconstitution. Never freeze. Use within 30 days of reconstitution. Fresh syringe every single draw — no exceptions.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKER TAB -->
+<div id="tab-tracker" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="section-title">Daily Dose Tracker — 8 Weeks</div>
+    </div>
+
+    <div class="cal-banner">
+      <div class="cal-banner-left">
+        <h4>📅 Download to Your Calendar</h4>
+        <p>Generates all 56 injection days as reminders — imports into Google Calendar (Android) or Apple Calendar (iOS). Set your cycle start date first, then download.</p>
+      </div>
+      <button class="cal-dl-btn" onclick="downloadICS()">⬇ Download Calendar (.ics)</button>
+    </div>
+
+    <div class="note note-blue" style="margin-top:0.75rem;">
+      <h4>💊 Auto-Saves on Every Tap — Two Phases</h4>
+      <p>Every dose you check saves instantly to your device. All 4 compounds run Mon–Fri both phases. Tirzepatide on Mon / Wed / Fri only. Sat &amp; Sun rest days all 8 weeks. Only change at week 5: Tirzepatide draw goes from 20u (1mg) to 40u (2mg).</p>
+    </div>
+
+    <div class="cycle-row">
+      <label>Cycle Start Date</label>
+      <input type="date" id="cycleStart" onchange="setCycleStart(this.value)">
+      <span class="sbadge" id="svBadge">✓ Saved</span>
+    </div>
+
+    <div class="tracker-stat-row">
+      <div class="ts"><div class="tv" id="stW">—</div><div class="tl">Week</div></div>
+      <div class="ts"><div class="tv" id="stD">0</div><div class="tl">Doses This Week</div></div>
+      <div class="ts"><div class="tv" id="stP">0%</div><div class="tl">Cycle Complete</div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-top"><span>8-Week Cycle</span><span id="pLbl">0 / 56 days</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+    </div>
+    <div class="week-sel">
+      <button class="wnav" onclick="changeWeek(-1)">&#8249;</button>
+      <div class="wlbl" id="wLabel">Week 1</div>
+      <button class="wnav" onclick="changeWeek(1)">&#8250;</button>
+    </div>
+    <div id="trackerGrid"></div>
+    <div class="notes-area">
+      <div class="nlbl">Weekly Notes — Energy · Focus · Shoulder · Blood Glucose · How You Feel</div>
+      <textarea class="ta" id="wkNotes" placeholder="e.g. Energy more consistent. Shoulder less inflamed. Tirz nausea mild week 1. Glucose trending down..." oninput="saveNotes()"></textarea>
+    </div>
+    <div class="tact">
+      <button class="abtn" onclick="markAllToday()">✓ Mark All Today</button>
+      <button class="abtn" onclick="clearWeek()">Clear This Week</button>
+      <button class="abtn cal-btn" onclick="downloadICS()">📅 Download Calendar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<div class="footer">Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Keith Drieshman &nbsp;·&nbsp; 8-Week Protocol · BLS-KD-0326</div>
+
+<script>
+// ICS CALENDAR GENERATOR
+function downloadICS(){
+  var startVal=document.getElementById('cycleStart').value;
+  if(!startVal){
+    alert('Please set your Cycle Start Date first, then download the calendar.');
+    return;
+  }
+  var parts=startVal.split('-');
+  var cycleStart=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsDate(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function makeUID(d,label){return icsDate(d)+'-'+label.replace(/\s+/g,'').replace(/[^a-zA-Z0-9]/g,'')+'-BLS-KD-0326@biolinkedsolutions.com';}
+  var events=[];
+  var dayOfWeekNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var mwf=[1,3,5];
+  var mf=[1,2,3,4,5];
+  for(var week=1;week<=8;week++){
+    var loading=(week<=4);
+    var weekOffset=(week-1)*7;
+    for(var d=0;d<7;d++){
+      var dayDate=new Date(cycleStart);
+      dayDate.setDate(dayDate.getDate()+weekOffset+d);
+      var dow=dayDate.getDay();
+      var compounds=[];
+      if(mf.indexOf(dow)>-1) compounds.push('SS-31 1mg (20u)');
+      if(mf.indexOf(dow)>-1) compounds.push('MOTS-c 1mg (10u)');
+      if(mf.indexOf(dow)>-1) compounds.push('KLOW 4mg (15u)');
+      if(mwf.indexOf(dow)>-1){
+        if(loading) compounds.push('Tirzepatide 1mg (20u) — Ramp');
+        else         compounds.push('Tirzepatide 2mg (40u) — Full Dose');
+      }
+      if(compounds.length===0) continue;
+      var phaseLabel=loading?'Wk'+week+' Load':'Wk'+week+' Maint';
+      var title='BLS Peptides · '+phaseLabel+' · '+dayOfWeekNames[dow];
+      var desc='Week '+week+' ('+(loading?'Loading':'Maintenance')+')\\n'+compounds.join('\\n')+'\\n\\nBioLinked Solutions — Keith Drieshman Protocol BLS-KD-0326';
+      events.push('BEGIN:VEVENT','UID:'+makeUID(dayDate,'W'+week+'D'+d),'DTSTAMP:'+icsDate(new Date())+'T080000Z','DTSTART;VALUE=DATE:'+icsDate(dayDate),'DTEND;VALUE=DATE:'+icsDate(dayDate),'SUMMARY:'+title,'DESCRIPTION:'+desc,'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:Time to inject — '+compounds.length+' compound'+(compounds.length>1?'s':''),'END:VALARM','END:VEVENT');
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked Solutions//Keith Drieshman Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Keith Drieshman 8-Week Protocol','X-WR-CALDESC:Peptide injection schedule — SS-31 · MOTS-c · KLOW · Tirzepatide','X-APPLE-CALENDAR-COLOR:#C9A84C'].concat(events).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='BLS-Keith-Drieshman-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+
+// TAB SWITCHING
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='tracker'){renderGrid();updateStats();}
+}
+
+// TRACKER STATE
+var COMPOUNDS=[
+  {id:'ss31',  name:'SS-31',          sub:'1mg · 20u · AM',         daysLoad:[1,2,3,4,5], daysMaint:[1,2,3,4,5]},
+  {id:'motsc', name:'MOTS-c',         sub:'1mg · 10u · AM fasted',  daysLoad:[1,2,3,4,5], daysMaint:[1,2,3,4,5]},
+  {id:'klow',  name:'KLOW',           sub:'4mg · 15u · AM',         daysLoad:[1,2,3,4,5], daysMaint:[1,2,3,4,5]},
+  {id:'tirz',  name:'Tirz (20u→40u)', sub:'MWF · ramps wk 5',      daysLoad:[1,3,5],     daysMaint:[1,3,5]},
+];
+var DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var TOTAL_WEEKS=8, TOTAL_DAYS=56;
+var currentWeek=1, state={}, cycleStartDate=null;
+
+function isLoadingPhase(w){return w<=4;}
+
+function loadState(){
+  try{var s=localStorage.getItem('keithKD_state');if(s)state=JSON.parse(s);}catch(e){}
+  try{var d=localStorage.getItem('keithKD_start');if(d){cycleStartDate=new Date(d);document.getElementById('cycleStart').value=d;}}catch(e){}
+  updateStats();
+}
+
+function saveState(){
+  try{localStorage.setItem('keithKD_state',JSON.stringify(state));showSaveBadge();}catch(e){}
+}
+
+function showSaveBadge(){
+  var b=document.getElementById('svBadge');
+  b.classList.add('show');
+  clearTimeout(b._tid);
+  b._tid=setTimeout(function(){b.classList.remove('show');},1200);
+}
+
+function saveNotes(){
+  if(!state[currentWeek])state[currentWeek]={};
+  state[currentWeek].__notes=document.getElementById('wkNotes').value;
+  saveState();
+}
+
+function setCycleStart(val){
+  cycleStartDate=val?new Date(val):null;
+  try{localStorage.setItem('keithKD_start',val);}catch(e){}
+  showSaveBadge();
+  updateStats();
+}
+
+function isDoseTaken(w,cid,di){return!!(state[w]&&state[w][cid]&&state[w][cid][di]);}
+
+function toggleDose(w,cid,di){
+  if(!state[w])state[w]={};
+  if(!state[w][cid])state[w][cid]={};
+  state[w][cid][di]=!state[w][cid][di];
+  saveState();
+  renderGrid();
+  updateStats();
+}
+
+function getActiveDays(c,w){return isLoadingPhase(w)?c.daysLoad:c.daysMaint;}
+
+function renderGrid(){
+  var container=document.getElementById('trackerGrid');
+  var weekDates=getWeekDates(currentWeek);
+  var loading=isLoadingPhase(currentWeek);
+  var phaseLabel=loading
+    ?'<span style="font-size:9px;color:var(--blue);font-weight:600;letter-spacing:0.08em;margin-left:8px;">· LOADING PHASE</span>'
+    :'<span style="font-size:9px;color:var(--green);font-weight:600;letter-spacing:0.08em;margin-left:8px;">· MAINTENANCE PHASE</span>';
+  var html='<div style="margin-bottom:8px;font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Week '+currentWeek+phaseLabel+'</div>';
+  html+='<div class="dhr"><div></div><div class="dhi">';
+  var dayOrder=[1,2,3,4,5,6,0];
+  dayOrder.forEach(function(dow,idx){
+    var dateStr='';
+    if(weekDates&&weekDates[idx])dateStr=weekDates[idx].getDate();
+    html+='<div class="dh">'+DAY_NAMES[dow]+(dateStr?'<br><span style="font-size:8px;font-weight:300;color:#555">'+dateStr+'</span>':'')+'</div>';
+  });
+  html+='</div></div>';
+  COMPOUNDS.forEach(function(c){
+    var activeDays=getActiveDays(c,currentWeek);
+    html+='<div class="tgw"><div class="tcl"><div class="cbadge">'+c.name+'<span>'+c.sub+'</span></div></div><div class="drow">';
+    dayOrder.forEach(function(dow,idx){
+      var taken=isDoseTaken(currentWeek,c.id,idx);
+      if(!activeDays.includes(dow)){
+        html+='<div class="dc rest"></div>';
+      }else{
+        html+='<div class="dc sched'+(taken?' taken':'')+'" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+idx+')"></div>';
+      }
+    });
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  document.getElementById('wkNotes').value=(state[currentWeek]&&state[currentWeek].__notes)||'';
+  document.getElementById('wLabel').textContent='Week '+currentWeek;
+}
+
+function getWeekDates(w){
+  if(!cycleStartDate)return null;
+  var start=new Date(cycleStartDate);
+  var day=start.getDay();
+  var diff=(day===0)?-6:(1-day);
+  start.setDate(start.getDate()+diff+(w-1)*7);
+  var dates=[];
+  for(var i=0;i<7;i++){var dd=new Date(start);dd.setDate(dd.getDate()+i);dates.push(dd);}
+  return dates;
+}
+
+function changeWeek(delta){
+  var n=currentWeek+delta;
+  if(n<1||n>TOTAL_WEEKS)return;
+  currentWeek=n;
+  renderGrid();
+}
+
+function markAllToday(){
+  var dow=new Date().getDay();
+  var dayOrder=[1,2,3,4,5,6,0];
+  var di=dayOrder.indexOf(dow);
+  if(di<0)return;
+  if(!state[currentWeek])state[currentWeek]={};
+  COMPOUNDS.forEach(function(c){
+    var activeDays=getActiveDays(c,currentWeek);
+    if(activeDays.includes(dow)){
+      if(!state[currentWeek][c.id])state[currentWeek][c.id]={};
+      state[currentWeek][c.id][di]=true;
+    }
+  });
+  saveState();renderGrid();updateStats();
+}
+
+function clearWeek(){
+  if(!confirm('Clear all logs for Week '+currentWeek+'?'))return;
+  var notes=(state[currentWeek]&&state[currentWeek].__notes)||'';
+  state[currentWeek]={};
+  if(notes)state[currentWeek].__notes=notes;
+  saveState();renderGrid();updateStats();
+}
+
+function updateStats(){
+  var weekText='—', pct=0;
+  if(cycleStartDate){
+    var now=new Date();
+    var diff=Math.floor((now-cycleStartDate)/86400000);
+    var cw=Math.min(TOTAL_WEEKS,Math.max(1,Math.floor(diff/7)+1));
+    weekText='Week '+cw;
+    if(currentWeek===1&&cw>1)currentWeek=cw;
+    pct=Math.min(100,Math.round((diff/TOTAL_DAYS)*100));
+    document.getElementById('pFill').style.width=pct+'%';
+    document.getElementById('pLbl').textContent=Math.min(diff+1,TOTAL_DAYS)+' / '+TOTAL_DAYS+' days';
+    document.getElementById('stP').textContent=pct+'%';
+  }
+  document.getElementById('stW').textContent=weekText;
+  var dc=0, sc=0;
+  var dayOrder=[1,2,3,4,5,6,0];
+  dayOrder.forEach(function(dow,idx){
+    COMPOUNDS.forEach(function(c){
+      var activeDays=getActiveDays(c,currentWeek);
+      if(activeDays.includes(dow)){sc++;if(isDoseTaken(currentWeek,c.id,idx))dc++;}
+    });
+  });
+  document.getElementById('stD').textContent=dc+'/'+sc;
+}
+
+loadState();
+if(document.getElementById('tab-tracker').classList.contains('active')){renderGrid();}
+</script>
+<style>
+.bl-nav{background:#fff!important;border-bottom:1px solid #eaeaea!important}
+.bl-nav-logo-main{color:#1a1a1a!important}.bl-nav-logo-sub{color:#777!important}
+.bl-nav-link{color:#444!important}.bl-nav-link:hover,.bl-nav-link.active{color:#8B7335!important;background:rgba(139,115,53,0.07)!important}
+.bl-nav-dropdown-menu{background:#fff!important;border-color:#eaeaea!important}
+.bl-nav-dropdown-item{color:#444!important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8!important;color:#8B7335!important}
+.bl-nav-mobile-menu{background:#fff!important}.bl-nav-mobile-link{color:#444!important;border-bottom-color:#eaeaea!important}
+.bl-nav-mobile-btn{color:#1a1a1a!important}.bl-nav-mobile-section{color:#8B7335!important}
+</style>
+<script src="/nav.js" defer></script>
+</body>
+</html>
