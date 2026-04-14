@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gabriele Padilla — BioLinked Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);
+  --bg:#f5f5f5;--bg-card:#ffffff;--bg-card2:#f0f0f0;--white:#1a1a1a;
+  --text:#1a1a1a;--text-muted:#666666;--border:rgba(0,0,0,0.10);
+  --green:#3a7a5a;--green-dim:rgba(58,122,90,0.2);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px;}
+.header{background:#ffffff;border-bottom:1px solid var(--gold-border);padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.header-logo{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:12px;}
+.header-logo::before,.header-logo::after{content:'';width:40px;height:1px;background:var(--gold-border);}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,6vw,58px);color:var(--white);font-weight:400;line-height:1.1;margin-bottom:0.5rem;letter-spacing:0.02em;}
+.header h1 em{color:var(--gold);font-style:italic;}
+.header-sub{color:var(--text-muted);font-size:12px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;margin-top:0.5rem;}
+.header-meta{display:flex;justify-content:center;gap:0;margin-top:2.5rem;flex-wrap:wrap;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;max-width:780px;margin-left:auto;margin-right:auto;}
+.meta-item{flex:1;min-width:110px;text-align:center;padding:1rem 1.25rem;border-right:1px solid var(--gold-border);}
+.meta-item:last-child{border-right:none;}
+.meta-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:4px;}
+.meta-value{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;}
+.nav-tabs{display:flex;justify-content:center;gap:0;border-bottom:1px solid var(--gold-border);background:#ffffff;position:sticky;top:56px;z-index:100;}
+.nav-tab{padding:1rem 2rem;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Montserrat',sans-serif;}
+.nav-tab:hover{color:var(--gold);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.container{max-width:900px;margin:0 auto;padding:0 1.5rem 5rem;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.section{margin-top:4rem;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--gold-border);}
+.section-icon{width:34px;height:34px;border-radius:2px;border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.section-icon svg{width:16px;height:16px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);letter-spacing:0.02em;}
+.intro-card{background:var(--bg-card);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:1.5rem 2rem;margin-top:3rem;border-radius:2px;}
+.intro-card p{font-size:15px;color:#333330;line-height:1.85;font-weight:300;}
+.intro-card strong{font-weight:600;color:var(--gold);}
+.first-injector-alert{background:rgba(99,179,237,0.07);border:1px solid rgba(99,179,237,0.2);border-left:3px solid #63b3ed;border-radius:2px;padding:1.25rem 1.75rem;margin-top:1.5rem;}
+.first-injector-alert h4{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#63b3ed;margin-bottom:8px;}
+.first-injector-alert p{font-size:13px;color:rgba(99,179,237,0.8);line-height:1.7;font-weight:300;}
+.peptide-grid{display:grid;gap:1.5rem;}
+.peptide-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden;transition:border-color 0.2s;}
+.peptide-card:hover{border-color:var(--gold-border);}
+.peptide-header{padding:1.5rem 1.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;background:var(--bg-card2);}
+.peptide-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--white);margin-bottom:4px;letter-spacing:0.02em;}
+.peptide-tagline{font-size:10px;color:var(--gold);font-weight:500;letter-spacing:0.12em;text-transform:uppercase;}
+.peptide-price{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;padding:6px 16px;border-radius:2px;white-space:nowrap;}
+.peptide-body{padding:1.5rem 1.75rem;display:grid;gap:1.25rem;}
+.peptide-section-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;}
+.peptide-text{font-size:14px;color:#444440;line-height:1.75;font-weight:300;}
+.peptide-details{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:0.75rem;}
+.detail-box{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.875rem 1rem;}
+.detail-box .label{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;}
+.detail-box .value{font-size:14px;font-weight:500;color:var(--text);}
+.recon-steps{counter-reset:step;list-style:none;display:flex;flex-direction:column;gap:10px;}
+.recon-steps li{counter-increment:step;display:flex;align-items:flex-start;gap:12px;font-size:14px;color:#444440;line-height:1.65;font-weight:300;}
+.recon-steps li::before{content:counter(step);min-width:22px;height:22px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.week-cell{background:var(--bg-card);padding:1rem 0.75rem;text-align:center;}
+.week-cell.header{background:#f0f0f0;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:600;padding:0.875rem;}
+.week-cell .wk{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:500;}
+.week-cell .phase{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--gold);}
+.week-cell .note{font-size:11px;color:var(--text-muted);margin-top:4px;line-height:1.5;font-weight:300;}
+.week-cell.phase-ramp{background:#f0f5f0;}
+.week-cell.phase-full{background:#eaf2eb;}
+.week-cell.phase-taper{background:#f5f3ec;}
+.schedule-table{width:100%;border-collapse:collapse;font-size:13px;}
+.schedule-table th{background:#f0f0f0;color:var(--gold);padding:10px 14px;text-align:left;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--gold-border);}
+.schedule-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:#444440;vertical-align:top;font-weight:300;font-size:13px;}
+.schedule-table tr:last-child td{border-bottom:none;}
+.schedule-table tr td{background:var(--bg-card);}
+.schedule-table tr:nth-child(even) td{background:var(--bg-card2);}
+.peptide-pill{display:inline-block;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;margin:2px 3px 2px 0;letter-spacing:0.03em;}
+.storage-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.storage-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1.25rem 1.5rem;}
+.storage-card h4{font-size:13px;font-weight:600;margin-bottom:0.5rem;color:var(--gold);letter-spacing:0.03em;}
+.storage-card p{font-size:13px;color:#444440;line-height:1.7;font-weight:300;}
+.monitor-list{display:grid;gap:8px;}
+.monitor-item{display:flex;gap:14px;align-items:flex-start;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;font-size:14px;color:#444440;line-height:1.65;font-weight:300;}
+.monitor-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+.dot-normal{background:#3a7a5a;}
+.dot-watch{background:var(--gold);}
+.price-table{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.75rem;border-bottom:1px solid var(--border);}
+.price-row:last-child{border-bottom:none;}
+.price-row.total{background:#f0f0f0;border-top:1px solid var(--gold-border);}
+.price-row .item{font-size:15px;color:var(--text);font-weight:400;}
+.price-row .qty{font-size:12px;color:var(--text-muted);margin-top:2px;font-weight:300;}
+.price-row .amt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);}
+.price-row.total .item{color:var(--white);font-size:16px;font-weight:600;letter-spacing:0.03em;}
+.price-row.total .qty{color:var(--text-muted);}
+.price-row.total .amt{font-size:26px;color:var(--gold);}
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:1px;background:var(--gold-border);}
+.timeline-item{position:relative;margin-bottom:2rem;}
+.timeline-item::before{content:'';position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);}
+.timeline-week{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:4px;}
+.timeline-text{font-size:14px;color:#444440;line-height:1.75;font-weight:300;}
+.venmo-section{background:linear-gradient(135deg,#f5f5f5 0%,#efefef 100%);border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:2rem;margin-top:3rem;text-align:center;}
+.venmo-section h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--white);font-weight:400;margin-bottom:0.5rem;}
+.venmo-section h3 em{color:var(--gold);font-style:italic;}
+.venmo-section p{font-size:13px;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6;}
+.venmo-btn{display:inline-block;background:var(--gold);color:#ffffff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:16px 40px;border-radius:2px;text-decoration:none;transition:background 0.2s;}
+.venmo-btn:hover{background:var(--gold-light);}
+.venmo-handle{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;margin-top:12px;display:block;}
+.disclaimer{background:#f8f8f8;border:1px solid rgba(139,115,53,0.2);border-radius:2px;padding:1.25rem 1.75rem;margin-top:3.5rem;font-size:13px;color:#6a5a30;line-height:1.75;font-weight:300;}
+.disclaimer strong{font-weight:600;color:var(--gold);}
+.footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--gold-border);font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.footer strong{color:var(--gold);font-weight:600;}
+#tab-tracker .section{margin-top:2rem;}
+.tracker-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:2rem;}
+.tracker-stat{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:2px;padding:1.25rem;text-align:center;}
+.tracker-stat .ts-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.tracker-stat .ts-value{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);font-weight:600;}
+.tracker-stat .ts-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.week-selector{display:flex;align-items:center;gap:1rem;margin:2rem 0 1.5rem;justify-content:center;}
+.week-nav-btn{width:36px;height:36px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.week-nav-btn:hover{background:var(--gold-dim);}
+.week-label{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--white);font-weight:600;min-width:120px;text-align:center;}
+.day-header-row{display:grid;grid-template-columns:120px 1fr;gap:6px;margin-bottom:2px;}
+.day-headers-inner{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.day-header{text-align:center;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:8px 2px;background:var(--bg-card2);border:1px solid var(--border);border-radius:2px 2px 0 0;}
+.day-header.rest-day{color:#aaaaaa;}
+.tracker-grid-wrap{display:grid;grid-template-columns:120px 1fr;gap:6px;margin-bottom:3px;}
+.tracker-compound-label{display:flex;align-items:center;justify-content:flex-end;padding-right:6px;}
+.compound-badge{font-size:10px;font-weight:600;letter-spacing:0.04em;color:var(--gold);text-align:right;line-height:1.3;}
+.compound-badge span{display:block;color:var(--text-muted);font-weight:400;font-size:9px;letter-spacing:0.06em;}
+.day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.dose-cell{background:var(--bg-card);border:1px solid var(--border);border-top:none;padding:4px 2px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:36px;display:flex;align-items:center;justify-content:center;}
+.dose-cell:last-child{border-radius:0 0 2px 2px;}
+.dose-cell.scheduled:hover{background:var(--gold-dim);}
+.dose-cell.taken{background:var(--green-dim);border-color:rgba(58,122,90,0.4);}
+.dose-cell.taken::after{content:'✓';color:#3a7a5a;font-size:15px;font-weight:700;}
+.dose-cell.scheduled:not(.taken)::after{content:'○';color:var(--gold-border);font-size:13px;}
+.dose-cell.rest{background:transparent;border-color:transparent;cursor:default;}
+.dose-cell.rest::after{content:'—';color:#cccccc;font-size:12px;}
+.dose-cell.prn{background:rgba(139,115,53,0.04);border-color:var(--border);cursor:pointer;}
+.dose-cell.prn:not(.taken)::after{content:'·';color:#aaa;font-size:20px;line-height:1;}
+.notes-area{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;margin-top:1.5rem;}
+.notes-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px;}
+.notes-input{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:300;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s;}
+.notes-input:focus{border-color:var(--gold-border);}
+.notes-input::placeholder{color:var(--text-muted);}
+.tracker-actions{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;}
+.action-btn{flex:1;min-width:160px;padding:0.875rem 1.5rem;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;text-align:center;}
+.action-btn:hover{background:rgba(139,115,53,0.18);border-color:var(--gold);}
+.action-btn.primary{background:var(--gold);color:#ffffff;border-color:var(--gold);}
+.action-btn.primary:hover{background:var(--gold-light);}
+.progress-bar-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;margin-top:1rem;}
+.progress-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s ease;}
+.cycle-start-row{display:flex;align-items:center;gap:1rem;margin-top:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;flex-wrap:wrap;}
+.cycle-start-row label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
+.cycle-start-row input[type="date"]{background:#fafafa;border:1px solid var(--gold-border);border-radius:2px;padding:6px 12px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;color-scheme:light;}
+.save-badge{display:inline-block;background:var(--green-dim);border:1px solid rgba(58,122,90,0.5);color:#3a7a5a;font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.save-badge.show{opacity:1;}
+.supply-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:0;}
+.supply-card:hover{border-color:var(--gold-border);}
+.supply-hdr{background:var(--bg-card2);padding:1.25rem 1.75rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;}
+.supply-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);margin-bottom:3px;}
+.supply-sub{font-size:10px;color:var(--gold);font-weight:500;letter-spacing:0.12em;text-transform:uppercase;}
+.supply-body{padding:1.25rem 1.75rem;}
+.order-btn{display:inline-block;background:var(--gold);color:#ffffff;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:10px 20px;border-radius:2px;text-decoration:none;white-space:nowrap;}
+.order-btn:hover{background:var(--gold-light);}
+.supply-why{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px;}
+.supply-text{font-size:14px;color:#444440;line-height:1.75;font-weight:300;margin-bottom:1rem;}
+.supply-specs{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;}
+.spec-box{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;}
+.spec-label{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;}
+.spec-val{font-size:13px;font-weight:500;color:var(--text);}
+.checklist-wrap{background:#f8f8f8;border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.5rem 1.75rem;margin-top:2rem;}
+.checklist-title{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1rem;}
+.checklist-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#444440;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;}
+.checklist-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.checklist-link{color:var(--gold);font-size:10px;font-weight:600;letter-spacing:0.08em;text-decoration:none;white-space:nowrap;}
+.ios-download-banner{background:rgba(139,115,53,0.04);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:1.25rem 1.75rem;margin-top:2.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.ios-banner-text{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.ios-banner-text strong{color:var(--gold);font-weight:600;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.container>*{animation:fadeUp 0.5s ease both;}
+.container>*:nth-child(1){animation-delay:0.1s;}
+.container>*:nth-child(2){animation-delay:0.2s;}
+@media(max-width:600px){
+  .week-grid{grid-template-columns:repeat(2,1fr);}
+  .storage-grid{grid-template-columns:1fr;}
+  .peptide-header{flex-direction:column;}
+  .header-meta{flex-direction:column;}
+  .meta-item{border-right:none;border-bottom:1px solid var(--gold-border);}
+  .tracker-top{grid-template-columns:1fr 1fr;}
+  .nav-tab{padding:0.875rem 1rem;font-size:10px;}
+  .tracker-grid-wrap{grid-template-columns:80px 1fr;}
+  .day-header-row{grid-template-columns:80px 1fr;}
+  .compound-badge{font-size:9px;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Gabriele <em>Padilla</em></h1>
+  <div class="header-sub">Recovery &amp; Healing Protocol — Rebuild. Restore. Optimize.</div>
+  <div class="header-meta">
+    <div class="meta-item"><span class="meta-label">Age</span><span class="meta-value">41</span></div>
+    <div class="meta-item"><span class="meta-label">Cycle Length</span><span class="meta-value">8 Weeks</span></div>
+    <div class="meta-item"><span class="meta-label">Compounds</span><span class="meta-value">12 Total</span></div>
+    <div class="meta-item"><span class="meta-label">Goal Weight</span><span class="meta-value">175 lbs</span></div>
+    <div class="meta-item"><span class="meta-label">Prepared by</span><span class="meta-value">BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('protocol',event)">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('supplies',event)">Supply Order</button>
+  <button class="nav-tab" onclick="switchTab('tracker',event)">Daily Tracker</button>
+</div>
+
+<div class="container">
+
+<!-- ===== PROTOCOL TAB ===== -->
+<div id="tab-protocol" class="tab-content active">
+
+  <div class="intro-card">
+    <p>Gabe, you built your body through real work — years of competitive bodybuilding and daily hard labor have shaped who you are, but they've also put serious mileage on your joints, connective tissue, and recovery systems. The aches that stop you from training the way you used to aren't weakness — they're <strong>accumulated physical debt</strong> that the body can no longer clear on its own. You tried BPC-157 orally and felt nothing, which makes sense: oral peptides have extremely low bioavailability and rarely produce the results people expect. <strong>This protocol is injectable — a completely different experience.</strong> The compounds go directly into your system where they're needed, targeting the root causes: systemic inflammation, mitochondrial fatigue, tissue damage, and the hormonal decline that comes with years of hard use. This 8-week stack is designed to <strong>eliminate the pain, restore your ability to train, rebuild your physique, and reignite your energy and drive</strong> — from the inside out.</p>
+  </div>
+
+  <div class="first-injector-alert">
+    <h4>First-Time Injector — Start Here</h4>
+    <p>You noted you've never injected before — that's completely fine. All of these are <strong>subcutaneous (SubQ) injections</strong> — shallow injections just under the skin, not into muscle. Use a 29–31 gauge insulin syringe, pinch the skin on your abdomen or outer thigh, insert at a 45° angle, and inject slowly. It should be nearly painless. If it stings, slow down the injection speed. Rotate sites daily. You'll be a pro by week 2.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#8B7335" stroke-width="1.2"/><path d="M5.5 8.5C5.5 8.5 6.5 10.5 8 10.5C9.5 10.5 10.5 8.5 10.5 8.5" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6.5" r="0.75" fill="#8B7335"/><circle cx="10" cy="6.5" r="0.75" fill="#8B7335"/></svg></div>
+      <div class="section-title">Your Protocol — 12 Compounds</div>
+    </div>
+    <div class="peptide-grid">
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">MOTS-C</div><div class="peptide-tagline">Mitochondrial Restoration &amp; Metabolic Reset</div></div><div class="peptide-price">$280</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">The years of hard labor and heavy training have depleted your mitochondrial function — which is one of the biggest reasons your body hurts, recovers slowly, and feels like it's running on empty. MOTS-C is a mitochondria-derived peptide that activates AMPK, the master switch for cellular energy production. It reduces systemic inflammation, improves metabolic resilience, and helps insulin sensitivity — setting the foundation for everything else in this stack to work. Nothing heals well when the cells are running on fumes.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 40 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">2 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off (Mon–Fri)</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">15 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 40 mg vial + 3 mL BAC water</div><ol class="recon-steps"><li>Add 3 mL BAC water to each 40 mg vial → concentration = <strong>13.3 mg/mL</strong></li><li>Run water slowly down the inner wall of the vial — never squirt directly onto the powder</li><li>Gently swirl until fully dissolved — clear solution, no particles</li><li>Draw <strong>15 units (0.15 mL) = 2 mg dose</strong> using a 29–31 gauge insulin syringe</li><li>Each vial yields ~20 doses. Refrigerate — use within 30 days of reconstitution</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Semax</div><div class="peptide-tagline">Cognitive Enhancement &amp; BDNF Upregulation</div></div><div class="peptide-price">$90</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Hard physical labor day in, day out is mentally grinding — chronic pain and physical fatigue directly suppress cognitive function. Semax dramatically increases BDNF (Brain-Derived Neurotrophic Factor), the key protein responsible for mental clarity, neuroplasticity, and mood. It sharpens focus and working memory acutely while also supporting longer-term neurological health. Dosed Mon/Wed/Fri to maintain receptor sensitivity across the full 8 weeks.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">1 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Mon / Wed / Fri</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Morning</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water → concentration = <strong>5 mg/mL</strong></li><li>Swirl gently until dissolved — do not shake</li><li>Draw <strong>20 units (0.2 mL) = 1 mg dose</strong></li><li>Inject SubQ into abdomen or outer thigh</li><li>Refrigerate — discard 30 days after reconstitution. Each vial = 10 doses at 1 mg.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Selank</div><div class="peptide-tagline">Stress Relief, Anxiety &amp; GABA Modulation</div></div><div class="peptide-price">$90</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Living with chronic pain while doing demanding physical work creates a constant state of low-grade stress that damages recovery, sleep quality, and hormonal function. Selank modulates the GABAergic system and increases serotonin and dopamine expression — producing calm, focused mental states without sedation or dependency. Think of it as the nervous system counterpart to Semax: Semax sharpens, Selank steadies. No prescription, no crash, no withdrawal.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">1 mg per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Mon / Wed / Fri</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Afternoon</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water → concentration = <strong>5 mg/mL</strong></li><li>Swirl gently until clear — do not shake</li><li>Draw <strong>20 units (0.2 mL) = 1 mg dose</strong></li><li>Inject SubQ in afternoon — pairs well post-workday or before a stressful evening</li><li>Refrigerate — 30 days reconstituted. Each vial = 10 doses at 1 mg.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">SS-31 (Elamipretide)</div><div class="peptide-tagline">Mitochondrial Membrane Repair &amp; Oxidative Stress</div></div><div class="peptide-price">$90</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">SS-31 works directly at the mitochondrial membrane — binding to cardiolipin in the inner membrane to reduce reactive oxygen species (ROS) and restore electron transport chain function. Where MOTS-C resets energy metabolism, SS-31 repairs the physical damage at the membrane level. Together they form a dual mitochondrial stack that addresses both the functional and structural aspects of cellular energy. Most clients notice a tangible increase in physical and mental energy within the first two weeks.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">500 mcg</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off (Mon–Fri)</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM with MOTS-C</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water → concentration = <strong>5 mg/mL = 5,000 mcg/mL</strong></li><li>Swirl gently until fully dissolved</li><li>Draw <strong>10 units (0.1 mL) = 500 mcg dose</strong></li><li>Inject SubQ alongside MOTS-C in the morning — rotate sites between the two</li><li>Refrigerate — 30 days. Each vial yields 20 doses at 500 mcg.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">NAD+</div><div class="peptide-tagline">Cellular Energy, DNA Repair &amp; Systemic Recovery</div></div><div class="peptide-price">$130</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">NAD+ is the backbone coenzyme behind every energy-producing reaction in the body — and levels decline significantly with age and physical stress. Without adequate NAD+, recovery slows, muscle repair stalls, and every other compound in this stack operates at a fraction of its potential. Beyond energy, NAD+ activates sirtuins (longevity pathways), supports DNA repair, improves mood stability, and reduces the chronic inflammation that's been limiting your training. This is the engine behind the engine.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 500 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">100 mg</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">2× per week (Tue/Sat)</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">60 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 500 mg vial + 3 mL BAC water</div><ol class="recon-steps"><li>Add 3 mL BAC water → concentration = <strong>166.7 mg/mL</strong></li><li>Swirl gently — NAD+ is water-soluble and dissolves quickly</li><li>Draw <strong>60 units (0.6 mL) = 100 mg dose</strong></li><li><strong>Start at half dose (30 units = 50 mg) for first 1–2 sessions</strong> — mild flushing/warmth is normal, slow injection to 30–60 seconds SubQ</li><li>Refrigerate — use within 14 days for peak potency. 2 vials = 1,000 mg total → 16 doses at 100 mg covers 2×/week × 8 weeks.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">KLOW</div><div class="peptide-tagline">BioLinked Recovery Blend — The Healing Core</div></div><div class="peptide-price">$160</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">KLOW is Bio Linked's proprietary recovery blend — containing KPV (anti-inflammatory gut/tissue healing), LL-37 (antimicrobial tissue repair), and the Wolverine stack (BPC-157 + TB-500 injectable). This is the direct answer to why oral BPC-157 didn't work for you: <strong>oral BPC has dramatically poor bioavailability — injectable BPC-157 in KLOW goes directly into your bloodstream</strong> at full potency, targeting your tendons, ligaments, joints, and gut lining simultaneously. TB-500 handles systemic tissue repair while BPC-157 addresses local healing. This is the cornerstone of your pain relief.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 80 units</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">4 units</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off (Mon–Fri)</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 80-unit vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water to each vial. The vial contains 80 units of blend concentrate.</li><li>Each 10 units drawn = 4 units of active KLOW blend at this dilution</li><li>Draw <strong>10 units (0.1 mL) per dose</strong> using insulin syringe</li><li>Inject SubQ in the abdomen or near the area of primary discomfort (near injury = faster local healing)</li><li>Refrigerate — use within 30 days. 2 vials = ~40 doses, covers full 5-days-on/2-off schedule × 8 weeks.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">CJC-1295 / Ipamorelin</div><div class="peptide-tagline">Growth Hormone Optimization &amp; Muscle Rebuilding</div></div><div class="peptide-price">$110</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">You want to get back to building — and this is your GH optimization foundation. CJC-1295 extends the duration of natural GH pulses from the pituitary while Ipamorelin amplifies their amplitude — together they produce significantly more GH output than either compound alone, without affecting cortisol or prolactin. This translates to accelerated muscle repair, improved body composition, deeper sleep, and faster recovery from training. AM dose for body composition, PM dose for overnight recovery and muscle synthesis.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 5mg/5mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">250/250 mcg each injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off · AM + PM</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">Fasted AM · Pre-bed PM</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">10 units per injection</div></div></div></div><div><div class="peptide-section-label">Reconstitution — premixed 5mg/5mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water to the premixed vial → <strong>2.5 mg/mL each compound</strong></li><li>Swirl gently — do not shake</li><li>Draw <strong>10 units (0.1 mL) = 250 mcg CJC-1295 + 250 mcg Ipamorelin</strong></li><li>AM dose: fasted morning SubQ. PM dose: 30–60 min before bed for overnight GH pulse</li><li>Refrigerate — 30 days. Each vial = 20 doses. 2 vials × 20 = 40 doses covers 2× daily / 5 on / 2 off × 8 weeks.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">PT-141</div><div class="peptide-tagline">Sexual Health — Central Desire &amp; Libido Activation</div></div><div class="peptide-price">$110</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Unlike PDE5 inhibitors that work on blood flow mechanics, PT-141 (Bremelanotide) works directly on the brain — activating MC3R and MC4R melanocortin receptors to stimulate desire and arousal centrally. Physical fatigue and chronic pain suppress libido at the neurological level, and as testosterone declines with age, the problem compounds. PT-141 bypasses all of that and goes straight to the source. As-needed dosing means no daily commitment — take it 30–60 minutes before activity for maximum effect.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 10 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">500 mcg</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">As needed</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">30–60 min before</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water → concentration = <strong>5 mg/mL = 5,000 mcg/mL</strong></li><li>Swirl gently until dissolved</li><li>Draw <strong>10 units (0.1 mL) = 500 mcg dose</strong></li><li>Start at 500 mcg — if nausea occurs (common first 1–2 uses), drop to 250 mcg (5 units)</li><li>Refrigerate — use within 30 days. Max 8 uses per month. 2 vials = 40 doses at 500 mcg.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Kisspeptin-10</div><div class="peptide-tagline">Hormonal Axis Activation &amp; Testosterone Support</div></div><div class="peptide-price">$110</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Kisspeptin activates GPR54 — the master upstream regulator of the entire reproductive hormone cascade. It triggers GnRH release, which drives LH and FSH, which then stimulate natural testosterone and estrogen production. For Gabe at 41 with heavy physical demands, this addresses testosterone decline at the root — naturally, without suppressing your own production. Taken before bed, it aligns with your body's natural LH pulse timing and synergizes with the CJC/Ipamorelin GH pulse for optimal overnight anabolic recovery.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 5 mg</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">125 mcg</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Every day</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">1 hr before bed</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">5 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 5 mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water → concentration = <strong>2.5 mg/mL = 2,500 mcg/mL</strong></li><li>Swirl gently until clear — do not shake</li><li>Draw <strong>5 units (0.05 mL) = 125 mcg dose</strong> — use a 0.5 mL insulin syringe for accuracy</li><li>Inject SubQ 1 hour before bedtime — same time nightly for best hormonal entrainment</li><li>Refrigerate — 30 days. Each vial = 40 doses at 125 mcg. 2 vials = 80 doses covers full 8 weeks.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">HGH (Somatropin)</div><div class="peptide-tagline">Direct Growth Hormone — Muscle, Fat Loss &amp; Recovery</div></div><div class="peptide-price">$120</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Where CJC/Ipamorelin stimulates your pituitary to produce more GH naturally, HGH provides direct supplementation — filling in where natural production has declined with age. For a former bodybuilder trying to rebuild from 163 to 175 lbs, HGH is a powerful accelerant: it promotes protein synthesis, drives lipolysis (fat burning), supports collagen production in connective tissue, and dramatically improves recovery speed. Taken Mon/Wed/Fri fasted in the morning, it synergizes with IGF-1 LR3 for a complete anabolic and repair environment.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 15 IU</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">1 IU per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Mon / Wed / Fri</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 15 IU vial + 1.5 mL BAC water</div><ol class="recon-steps"><li>Add 1.5 mL BAC water → concentration = <strong>10 IU/mL</strong></li><li>Run water slowly down the vial wall — HGH powder is fragile, never shake</li><li>Swirl gently until fully dissolved — may take 1–2 minutes</li><li>Draw <strong>10 units (0.1 mL) = 1 IU dose</strong></li><li>Refrigerate immediately after reconstitution — use within 21 days. 2 vials = 30 IU total → 24 doses of 1 IU for 3×/week × 8 weeks = sufficient supply.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">L-Carnitine</div><div class="peptide-tagline">Fat Metabolism, Cellular Energy &amp; Muscle Recovery</div></div><div class="peptide-price">$120</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">L-Carnitine is essential for shuttling long-chain fatty acids into the mitochondria for oxidation — meaning it directly fuels fat burning as an energy source. For Gabe's goal of gaining lean muscle while managing body composition going from 163 to 175 lbs, L-Carnitine ensures fat is being mobilized for energy rather than stored, while supporting muscle protein recovery. Injectable L-Carnitine bypasses poor oral absorption (only ~15% absorption oral vs near-100% injectable) and delivers directly where it's needed. Daily dosing amplifies the mitochondrial stack (MOTS-C + SS-31) already in your protocol.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 20 mL</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">1 mL per injection</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Every day</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ or IM injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">100 units (1 mL)</div></div></div></div><div><div class="peptide-section-label">Usage — Pre-mixed liquid, no reconstitution needed</div><ol class="recon-steps"><li>L-Carnitine arrives as a <strong>ready-to-use liquid</strong> — no BAC water required</li><li>Draw <strong>100 units (1 mL)</strong> directly from the vial using a standard insulin or IM syringe</li><li>Inject SubQ (abdomen or thigh) or IM (outer thigh/glute) — IM delivers slightly faster absorption</li><li>Take AM fasted for maximum fat oxidation benefit before breakfast or training</li><li>Store refrigerated. 2 vials × 20 mL = 40 mL → 40 daily doses covering the full 8-week cycle (56 days). Take all 40 doses, then reassess.</li></ol></div></div></div>
+
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">IGF-1 LR3</div><div class="peptide-tagline">Extended IGF-1 — Muscle Growth &amp; Cellular Repair</div></div><div class="peptide-price">$120</div></div><div class="peptide-body"><div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">IGF-1 LR3 is the primary downstream mediator of HGH — it's the actual signal that HGH sends to muscle cells to grow. The LR3 modification gives it a ~20-hour half-life versus 20 minutes for native IGF-1, meaning it stays active all day from a single morning injection. Paired with your HGH on Mon/Wed/Fri, this creates a powerful anabolic signaling window: HGH drives IGF-1 production systemically while LR3 directly tells muscle cells to undergo hypertrophy and repair. This stack is what takes you from recovering your baseline to actually rebuilding your physique.</div></div><div><div class="peptide-section-label">Dosage &amp; schedule</div><div class="peptide-details"><div class="detail-box"><div class="label">Vials</div><div class="value">2 × 1 mg (1,000 mcg)</div></div><div class="detail-box"><div class="label">Dose</div><div class="value">40–80 mcg</div></div><div class="detail-box"><div class="label">Schedule</div><div class="value">Mon / Wed / Fri</div></div><div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted with HGH</div></div><div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div><div class="detail-box"><div class="label">Draw</div><div class="value">4 units (40 mcg)</div></div></div></div><div><div class="peptide-section-label">Reconstitution — 1 mg vial + 2 mL BAC water</div><ol class="recon-steps"><li>Add 2 mL BAC water to each 1 mg (1,000 mcg) vial → concentration = <strong>500 mcg/mL</strong></li><li>Swirl very gently — IGF-1 LR3 is sensitive to agitation. Do not shake.</li><li>Draw <strong>4 units (0.04 mL) = 20 mcg for first dose (week 1)</strong> — increase to 8 units (40 mcg) from week 2</li><li><strong>Monitor blood glucose</strong> — IGF-1 LR3 can cause hypoglycemia. Take with a small meal or glucose source if needed. Do not inject and skip eating.</li><li>Refrigerate — 30 days reconstituted. 2 vials = 2,000 mcg total → 25 doses at 80 mcg. More than sufficient for 3×/week × 8 weeks = 24 doses.</li></ol></div></div></div>
+
+    </div><!-- /peptide-grid -->
+  </div>
+
+  <!-- 8-WEEK SCHEDULE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#8B7335" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#8B7335" stroke-width="0.8"/></svg></div>
+      <div class="section-title">8-Week Cycle Overview</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-cell header">Week</div><div class="week-cell header">Phase</div><div class="week-cell header">Focus</div><div class="week-cell header">Notes</div>
+      <div class="week-cell phase-ramp"><div class="wk">Week 1</div></div><div class="week-cell phase-ramp"><div class="phase">Ramp-up</div></div><div class="week-cell phase-ramp"><div class="note">Baseline</div></div><div class="week-cell phase-ramp"><div class="note">Start all compounds. NAD+ at half dose. IGF-1 at 20 mcg. Log pain, energy, and sleep daily.</div></div>
+      <div class="week-cell phase-ramp"><div class="wk">Week 2</div></div><div class="week-cell phase-ramp"><div class="phase">Ramp-up</div></div><div class="week-cell phase-ramp"><div class="note">Adaptation</div></div><div class="week-cell phase-ramp"><div class="note">Increase NAD+ to 100 mg. Bring IGF-1 to 40 mcg. Pain signals should begin shifting.</div></div>
+      <div class="week-cell phase-full"><div class="wk">Weeks 3–6</div></div><div class="week-cell phase-full"><div class="phase">Full Protocol</div></div><div class="week-cell phase-full"><div class="note">Peak healing</div></div><div class="week-cell phase-full"><div class="note">All compounds full dose. Peak tissue repair and GH output. Resume cautious training by week 3–4.</div></div>
+      <div class="week-cell phase-taper"><div class="wk">Week 7</div></div><div class="week-cell phase-taper"><div class="phase">Build &amp; Assess</div></div><div class="week-cell phase-taper"><div class="note">Lock in gains</div></div><div class="week-cell phase-taper"><div class="note">Evaluate pain levels, strength, sleep. Can you train without pain? How is recovery?</div></div>
+      <div class="week-cell phase-taper"><div class="wk">Week 8</div></div><div class="week-cell phase-taper"><div class="phase">Wind-down</div></div><div class="week-cell phase-taper"><div class="note">Off-ramp</div></div><div class="week-cell phase-taper"><div class="note">Taper Semax + Selank. Evaluate next cycle. Consider adding BPC-157 standalone for any remaining joint issues.</div></div>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <div class="peptide-section-label" style="margin-bottom:0.75rem;">Full weekly schedule — weeks 3–6 (full protocol)</div>
+      <table class="schedule-table">
+        <thead><tr><th>Day</th><th>AM Fasted (upon waking)</th><th>Mid-Morning</th><th>Afternoon / PM</th><th>Bedtime</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--text)">Mon / Wed / Fri</strong></td><td><span class="peptide-pill">MOTS-C</span><span class="peptide-pill">SS-31</span><span class="peptide-pill">KLOW</span><span class="peptide-pill">CJC/Ipa (AM)</span><span class="peptide-pill">HGH</span><span class="peptide-pill">L-Carnitine</span><span class="peptide-pill">IGF-1 LR3</span></td><td><span class="peptide-pill">Semax</span></td><td><span class="peptide-pill">CJC/Ipa (PM)</span><span class="peptide-pill">Selank</span></td><td><span class="peptide-pill">Kisspeptin</span></td></tr>
+          <tr><td><strong style="color:var(--text)">Tue / Thu</strong></td><td><span class="peptide-pill">MOTS-C</span><span class="peptide-pill">SS-31</span><span class="peptide-pill">KLOW</span><span class="peptide-pill">CJC/Ipa (AM)</span><span class="peptide-pill">L-Carnitine</span></td><td>—</td><td><span class="peptide-pill">CJC/Ipa (PM)</span></td><td><span class="peptide-pill">Kisspeptin</span></td></tr>
+          <tr><td><strong style="color:var(--text)">Tuesday</strong></td><td><span class="peptide-pill">NAD+</span></td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td><strong style="color:var(--text)">Saturday</strong></td><td><span class="peptide-pill">NAD+</span><span class="peptide-pill">L-Carnitine</span></td><td>—</td><td>—</td><td><span class="peptide-pill">Kisspeptin</span></td></tr>
+          <tr><td><strong style="color:var(--text)">Sunday</strong></td><td><span class="peptide-pill">L-Carnitine</span></td><td>—</td><td>—</td><td><span class="peptide-pill">Kisspeptin</span></td></tr>
+          <tr><td><strong style="color:var(--text)">PT-141</strong></td><td colspan="3" style="color:#444440;">As needed — inject SubQ 30–60 min before activity. Max 8× per month. Not part of daily schedule.</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EXPECTED RESULTS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M3 12L6 8L9 10L13 4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="section-title">What to Expect — Week by Week</div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item"><div class="timeline-week">Weeks 1–2 — Ramp-up &amp; First Signals</div><div class="timeline-text">Your body begins clearing accumulated oxidative stress and inflammation. Some clients feel more fatigued in week 1 as cellular cleanup begins — this is normal and temporary. You may notice sleep deepening noticeably within the first 5–7 days from the CJC/Ipamorelin and Kisspeptin. Mild flushing with NAD+ is normal — slow down your injection. The joints and aches may not show dramatic change yet, but inflammation markers internally are already shifting.</div></div>
+      <div class="timeline-item"><div class="timeline-week">Weeks 3–4 — Pain Shifts, Energy Arrives</div><div class="timeline-text">This is usually when clients first notice meaningful changes. Joint discomfort and body aches should begin reducing noticeably as KLOW's BPC-157/TB-500 components reach full tissue penetration and the mitochondrial stack (MOTS-C + SS-31 + NAD+) kicks in fully. Physical energy improves — you may feel ready to test the gym again. Start light and controlled. The HGH + IGF-1 LR3 combination begins laying the groundwork for muscle rebuilding.</div></div>
+      <div class="timeline-item"><div class="timeline-week">Weeks 5–6 — Peak Protocol Window</div><div class="timeline-text">The stack is operating at full capacity. Tissue healing is deepest in this phase — tendons, ligaments, and joints benefit most from the sustained KLOW presence. Training should feel manageable and rewarding again. Most clients in your goals profile report noticeable strength gains, improved body composition, better sexual drive (Kisspeptin + PT-141 combination in effect), and mental sharpness from the Semax/Selank pair. This is the window to train consistently.</div></div>
+      <div class="timeline-item"><div class="timeline-week">Weeks 7–8 — Consolidation &amp; Evaluation</div><div class="timeline-text">The neurological and tissue gains begin to stabilize and feel natural. At end of week 8: how much pain are you in? How's training? Libido? Sleep? Energy? This 3-question assessment determines your next cycle. Many clients move from a full recovery cycle like this into a leaner maintenance protocol — keeping MOTS-C, CJC/Ipamorelin, and HGH while dropping some of the acute-phase healers.</div></div>
+    </div>
+  </div>
+
+  <!-- STORAGE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="#8B7335" stroke-width="1.2"/><path d="M6 6H10M6 9H8" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Storage &amp; Handling</div>
+    </div>
+    <div class="storage-grid">
+      <div class="storage-card"><h4>Dry powder vials (before reconstitution)</h4><p>Store all lyophilized (powder) vials refrigerated at 36–46°F (2–8°C). Keep away from light and moisture. Do not freeze. Shelf life is 12–24 months unopened. L-Carnitine is a liquid — refrigerate from day one.</p></div>
+      <div class="storage-card"><h4>After reconstitution</h4><p>All reconstituted vials must be refrigerated immediately. Use within 30 days — except NAD+ (14 days for best potency) and HGH (21 days). Never freeze a reconstituted peptide. Always use a fresh insulin syringe for every draw.</p></div>
+      <div class="storage-card"><h4>Bacteriostatic water (BAC water)</h4><p>Use sterile BAC water for all reconstitution except L-Carnitine (pre-mixed). BAC water's benzyl alcohol extends shelf life. Do not substitute plain sterile water — it lacks the preservative needed for multi-draw vials.</p></div>
+      <div class="storage-card"><h4>Syringes &amp; injection technique</h4><p>Use 29–31 gauge insulin syringes (0.5 mL or 1 mL). Never reuse. Dispose in a sharps container. Rotate injection sites — abdomen (preferred SubQ), outer thigh, or glute. Pinch 1 inch of skin, insert at 45°, inject slowly.</p></div>
+    </div>
+  </div>
+
+  <!-- WHAT TO MONITOR -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#8B7335" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V9.5" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.5" fill="#8B7335"/></svg></div>
+      <div class="section-title">What to Monitor</div>
+    </div>
+    <div class="monitor-list">
+      <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Mild flushing or warmth during NAD+ injection — slow your injection to 30–60 seconds. Resolves after week 1–2.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Small redness, minor bruising, or mild soreness at injection sites — rotate daily to prevent buildup.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Increased hunger during week 1–2 as metabolism activates — especially with the GH stack and L-Carnitine.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Mild nausea with first 1–2 PT-141 doses — reduce to 250 mcg (5 units) and titrate up.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold)">Monitor:</strong> Dizziness or shakiness after IGF-1 LR3 — this indicates low blood glucose. Eat a small meal or glucose source after your morning injection. Do not inject IGF-1 and fast all day.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold)">Monitor:</strong> Joint site hot, swollen, or red beyond 24 hours — stop using that site. May indicate technique issue. Contact BioLinked.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold)">Monitor:</strong> Water retention or tingling in extremities with HGH — if significant, reduce HGH dose from 1 IU to 0.5 IU and contact BioLinked Solutions.</div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B7335" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Protocol Investment — Choose Your Level</div>
+    </div>
+    <div style="display:flex;border:1px solid var(--gold-border);border-radius:2px 2px 0 0;overflow:hidden;">
+      <button onclick="showLevel(1,this)" id="ltab1" style="flex:1;padding:1rem 0.5rem;background:#f0f0f0;border:none;border-right:1px solid var(--gold-border);cursor:pointer;text-align:center;"><span style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:Montserrat,sans-serif;font-weight:600;">Level 1</span><span style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);display:block;">Full Stack</span><span style="font-size:10px;display:block;color:var(--text-muted);margin-top:2px;font-family:Montserrat,sans-serif;">All 12 compounds · $1,530</span></button>
+      <button onclick="showLevel(2,this)" id="ltab2" style="flex:1;padding:1rem 0.5rem;background:var(--bg-card2);border:none;border-right:1px solid var(--gold-border);cursor:pointer;text-align:center;"><span style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:Montserrat,sans-serif;font-weight:600;">Level 2</span><span style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);display:block;">Core Stack</span><span style="font-size:10px;display:block;color:var(--text-muted);margin-top:2px;font-family:Montserrat,sans-serif;">Compounds 1–7 · $950</span></button>
+      <button onclick="showLevel(3,this)" id="ltab3" style="flex:1;padding:1rem 0.5rem;background:var(--bg-card2);border:none;cursor:pointer;text-align:center;"><span style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:Montserrat,sans-serif;font-weight:600;">Level 3</span><span style="font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);display:block;">Starter</span><span style="font-size:10px;display:block;color:var(--text-muted);margin-top:2px;font-family:Montserrat,sans-serif;">KLOW only · $160</span></button>
+    </div>
+    <div id="level1" class="price-table" style="border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">Maximum results — all 12 compounds working synergistically. Full recovery, cognitive, hormonal, sexual health, and muscle-building stack covered.</div>
+      <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">2 × 40 mg · $140/vial · 5 days on / 2 off</div></div><div class="amt">$280</div></div>
+      <div class="price-row"><div><div class="item">Semax</div><div class="qty">2 × 10 mg · $45/vial · Mon/Wed/Fri</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">Selank</div><div class="qty">2 × 10 mg · $45/vial · Mon/Wed/Fri</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">SS-31 (Elamipretide)</div><div class="qty">2 × 10 mg · $45/vial · 5 days on / 2 off</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">NAD+</div><div class="qty">2 × 500 mg · $65/vial · 2× per week</div></div><div class="amt">$130</div></div>
+      <div class="price-row"><div><div class="item">KLOW Recovery Blend</div><div class="qty">2 × 80 units · $80/vial · 5 days on / 2 off</div></div><div class="amt">$160</div></div>
+      <div class="price-row"><div><div class="item">CJC-1295 / Ipamorelin</div><div class="qty">2 × 5mg/5mg · $55/vial · 5 days on / 2 off · AM + PM</div></div><div class="amt">$110</div></div>
+      <div class="price-row"><div><div class="item">PT-141</div><div class="qty">2 × 10 mg · $55/vial · As needed</div></div><div class="amt">$110</div></div>
+      <div class="price-row"><div><div class="item">Kisspeptin-10</div><div class="qty">2 × 5 mg · $55/vial · Daily before bed</div></div><div class="amt">$110</div></div>
+      <div class="price-row"><div><div class="item">HGH (Somatropin)</div><div class="qty">2 × 15 IU · $60/vial · Mon/Wed/Fri AM</div></div><div class="amt">$120</div></div>
+      <div class="price-row"><div><div class="item">L-Carnitine</div><div class="qty">2 × 20 mL · $60/vial · Daily AM fasted</div></div><div class="amt">$120</div></div>
+      <div class="price-row"><div><div class="item">IGF-1 LR3</div><div class="qty">2 × 1 mg · $60/vial · Mon/Wed/Fri AM</div></div><div class="amt">$120</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 1 Full Stack</div><div class="qty">All 12 compounds · 8-week supply</div></div><div class="amt">$1,530</div></div>
+    </div>
+    <div id="level2" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">Core recovery &amp; optimization stack — compounds 1–7. Covers mitochondrial repair, cognitive support, stress relief, direct tissue healing, and GH optimization.</div>
+      <div class="price-row"><div><div class="item">MOTS-C</div><div class="qty">2 × 40 mg · $140/vial</div></div><div class="amt">$280</div></div>
+      <div class="price-row"><div><div class="item">Semax</div><div class="qty">2 × 10 mg · $45/vial</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">Selank</div><div class="qty">2 × 10 mg · $45/vial</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">SS-31</div><div class="qty">2 × 10 mg · $45/vial</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">NAD+</div><div class="qty">2 × 500 mg · $65/vial</div></div><div class="amt">$130</div></div>
+      <div class="price-row"><div><div class="item">KLOW Recovery Blend</div><div class="qty">2 × 80 units · $80/vial</div></div><div class="amt">$160</div></div>
+      <div class="price-row"><div><div class="item">CJC-1295 / Ipamorelin</div><div class="qty">2 × 5mg/5mg · $55/vial · AM + PM</div></div><div class="amt">$110</div></div>
+      <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">PT-141 · Kisspeptin · HGH · L-Carnitine · IGF-1 LR3</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 2 Core Stack</div><div class="qty">7 compounds · 8-week supply</div></div><div class="amt">$950</div></div>
+    </div>
+    <div id="level3" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">KLOW only — the most direct entry point for pain and tissue healing. Injectable BPC-157 + TB-500 is a completely different experience from oral BPC-157. Best starting point — easy to upgrade mid-cycle.</div>
+      <div class="price-row"><div><div class="item">KLOW Recovery Blend</div><div class="qty">2 × 80 units · $80/vial · 5 days on / 2 off</div></div><div class="amt">$160</div></div>
+      <div class="price-row" style="opacity:0.3;"><div><div class="item" style="text-decoration:line-through;color:var(--text-muted);">All other compounds</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted);">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 3 Starter</div><div class="qty">KLOW only · 8-week supply</div></div><div class="amt">$160</div></div>
+    </div>
+    <script>
+    function showLevel(n,btn){
+      ["level1","level2","level3"].forEach(function(id){document.getElementById(id).style.display="none";});
+      ["ltab1","ltab2","ltab3"].forEach(function(id){document.getElementById(id).style.background="var(--bg-card2)";});
+      document.getElementById("level"+n).style.display="block";
+      btn.style.background="#f0f0f0";
+    }
+    </script>
+  </div>
+
+  <!-- VENMO -->
+  <div class="venmo-section">
+    <h3>Ready to <em>Order?</em></h3>
+    <p>Send payment via Venmo and your protocol ships within 24–48 hours. Include your name and level in the note.</p>
+    <a href="https://venmo.com/micahp20" class="venmo-btn">Pay on Venmo</a>
+    <span class="venmo-handle">@micahp20</span>
+  </div>
+
+  <div class="disclaimer"><strong>Important Notice:</strong> This protocol has been prepared by BioLinked Solutions for educational and informational purposes only. It does not constitute medical advice, diagnosis, or treatment. Peptides discussed in this document are research compounds not approved by the FDA for human use. Always consult with a licensed healthcare provider before beginning any new supplement or compound protocol. BioLinked Solutions is not responsible for adverse outcomes resulting from misuse or improper administration. If you experience any adverse reactions, discontinue use immediately and seek medical attention.</div>
+
+</div><!-- /tab-protocol -->
+
+<!-- ===== SUPPLIES TAB ===== -->
+<div id="tab-supplies" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-1 9H3L2 3Z" stroke="#8B7335" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 3V2a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#8B7335" stroke-width="1.2"/><path d="M6 7h4M8 5v4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Supplies — Order Before Day 1</div>
+    </div>
+    <div class="intro-card" style="margin-top:1rem;">
+      <p>These <strong>5 items</strong> are everything you need to start injecting. Order all of them on Amazon before your cycle begins — they ship Prime and total under $60 for the full 8 weeks.</p>
+    </div>
+    <div class="peptide-grid" style="margin-top:1.5rem;">
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Item 1 — Insulin Syringes</div><div class="peptide-tagline">29–31 Gauge · 1 mL · One per injection, never reuse</div></div><a href="https://a.co/d/04JCzBqF" target="_blank" class="order-btn">Order on Amazon →</a></div><div class="peptide-body"><div class="peptide-text">Every compound in your protocol requires a fresh insulin syringe per dose — never reuse. The 29–31 gauge needle is ultra-fine and nearly painless for SubQ injections. The 1 mL barrel handles every dose volume in your protocol. Buy a 100-pack — it covers the full 8-week cycle.</div><div style="margin-top:0.75rem;padding:0.75rem 1rem;background:#fafafa;border:1px solid var(--border);border-radius:2px;font-size:12px;color:var(--text-muted);">Amazon link: <strong style="color:var(--gold);">a.co/d/04JCzBqF</strong></div></div></div>
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Item 2 — Bacteriostatic Water (BAC Water)</div><div class="peptide-tagline">30 mL Sterile Glass Vials · Order at least 2</div></div><a href="https://www.amazon.com/30-Premium-Glass-Vials-Pack/dp/B0FH2C4JM8/" target="_blank" class="order-btn">Order on Amazon →</a></div><div class="peptide-body"><div class="peptide-text">Required to reconstitute every powder-form peptide in your protocol. BAC water contains 0.9% benzyl alcohol as a preservative — this keeps a reconstituted vial sterile and safe for multiple draws over 14–30 days. Do NOT substitute plain sterile water. Order 2 vials minimum.</div><div style="margin-top:0.75rem;padding:0.75rem 1rem;background:#fafafa;border:1px solid var(--border);border-radius:2px;font-size:12px;color:var(--text-muted);">Amazon link: <strong style="color:var(--gold);">amazon.com → 30ml BAC Water Glass Vials</strong></div></div></div>
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Item 3 — Alcohol Prep Pads</div><div class="peptide-tagline">70% Isopropyl · Sterile · 200-Pack</div></div><a href="https://a.co/d/0fnbd8VV" target="_blank" class="order-btn">Order on Amazon →</a></div><div class="peptide-body"><div class="peptide-text">Two essential uses every injection: (1) wipe the rubber stopper of every vial before inserting a needle to prevent contamination, and (2) wipe your skin at the injection site before each dose. Let the site air dry 10 seconds before injecting. 200-pack covers the full 8 weeks.</div><div style="margin-top:0.75rem;padding:0.75rem 1rem;background:#fafafa;border:1px solid var(--border);border-radius:2px;font-size:12px;color:var(--text-muted);">Amazon link: <strong style="color:var(--gold);">a.co/d/0fnbd8VV</strong></div></div></div>
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Item 4 — Sharps Container</div><div class="peptide-tagline">FDA-Cleared · Puncture-Proof · 1 Quart</div></div><a href="https://a.co/d/0jhnMLPg" target="_blank" class="order-btn">Order on Amazon →</a></div><div class="peptide-body"><div class="peptide-text">Used needles cannot go in regular trash. Drop each syringe straight in immediately after injecting. Over 8 weeks you will accumulate 80–120 used needles. A 1-quart container is exactly right for one full cycle. When full, drop it off for free at any CVS or Walgreens.</div><div style="margin-top:0.75rem;padding:0.75rem 1rem;background:#fafafa;border:1px solid var(--border);border-radius:2px;font-size:12px;color:var(--text-muted);">Amazon link: <strong style="color:var(--gold);">a.co/d/0jhnMLPg</strong></div></div></div>
+      <div class="peptide-card"><div class="peptide-header"><div><div class="peptide-name">Item 5 — Peptide Storage Container</div><div class="peptide-tagline">Insulated Cold Storage · Keep vials organized &amp; refrigerated</div></div><a href="https://a.co/d/07HthwLz" target="_blank" class="order-btn">Order on Amazon →</a></div><div class="peptide-body"><div class="peptide-text">All reconstituted peptide vials must stay refrigerated and organized throughout your 8-week cycle. A dedicated peptide storage container keeps your vials labeled, separated, and protected from light and temperature fluctuations. With 12 compounds to manage, staying organized is not optional. Keep this in your fridge and treat it as your protocol command center.</div><div style="margin-top:0.75rem;padding:0.75rem 1rem;background:#fafafa;border:1px solid var(--border);border-radius:2px;font-size:12px;color:var(--text-muted);">Amazon link: <strong style="color:var(--gold);">a.co/d/07HthwLz</strong></div></div></div>
+    </div>
+    <div class="checklist-wrap">
+      <div class="checklist-title">Quick Order Checklist — All 5 Items</div>
+      <div class="checklist-row"><span>1 — Insulin Syringes (29–31G · 1 mL · 100-pack)</span><a href="https://a.co/d/04JCzBqF" target="_blank" class="checklist-link">a.co/d/04JCzBqF →</a></div>
+      <div class="checklist-row"><span>2 — BAC Water (30 mL sterile glass vials · order 2)</span><a href="https://www.amazon.com/30-Premium-Glass-Vials-Pack/dp/B0FH2C4JM8/" target="_blank" class="checklist-link">Amazon →</a></div>
+      <div class="checklist-row"><span>3 — Alcohol Prep Pads (70% IPA · 200-pack)</span><a href="https://a.co/d/0fnbd8VV" target="_blank" class="checklist-link">a.co/d/0fnbd8VV →</a></div>
+      <div class="checklist-row"><span>4 — Sharps Container (1 quart · FDA-cleared)</span><a href="https://a.co/d/0jhnMLPg" target="_blank" class="checklist-link">a.co/d/0jhnMLPg →</a></div>
+      <div class="checklist-row"><span>5 — Peptide Storage Container</span><a href="https://a.co/d/07HthwLz" target="_blank" class="checklist-link">a.co/d/07HthwLz →</a></div>
+    </div>
+  </div>
+</div><!-- /tab-supplies -->
+
+<!-- ===== TRACKER TAB ===== -->
+<div id="tab-tracker" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#8B7335" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="section-title">Daily Dose Tracker — KLOW Starter Cycle</div>
+    </div>
+
+    <div style="background:var(--bg-card2);border:1px solid var(--gold-border);border-radius:2px;padding:1.25rem 1.75rem;margin-bottom:1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:0.75rem;">
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Blend</div><div style="font-size:12px;font-weight:500;color:var(--text);">GHK-Cu / BPC-157 / TB-500 / KPV</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Vial Size</div><div style="font-size:12px;font-weight:500;color:var(--text);">50mg / 10mg / 10mg / 10mg</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Recon</div><div style="font-size:12px;font-weight:500;color:var(--text);">2 mL BAC water</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Dose per injection</div><div style="font-size:12px;font-weight:500;color:var(--text);">2.5mg / 500mcg / 500mcg / 500mcg</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Draw</div><div style="font-size:12px;font-weight:500;color:var(--text);">10 units (0.1 mL)</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Timing</div><div style="font-size:12px;font-weight:500;color:var(--text);">AM or PM SubQ</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Schedule</div><div style="font-size:12px;font-weight:500;color:var(--text);">5 days on / 2 days off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Cycle</div><div style="font-size:12px;font-weight:500;color:var(--text);">8 wks on / 8 wks off</div></div>
+    </div>
+
+    <div class="cycle-start-row">
+      <label>Cycle Start Date</label>
+      <input type="date" id="cycleStartDate" onchange="setCycleStart(this.value)">
+      <span class="save-badge" id="saveBadge">Saved ✓</span>
+    </div>
+    <div class="tracker-top">
+      <div class="tracker-stat"><div class="ts-label">Cycle Progress</div><div class="ts-value" id="statWeek">—</div><div class="ts-sub" id="statDay">Set start date above</div></div>
+      <div class="tracker-stat"><div class="ts-label">Doses This Week</div><div class="ts-value" id="statDoses">0</div><div class="ts-sub">logged</div></div>
+      <div class="tracker-stat"><div class="ts-label">Cycle Complete</div><div class="ts-value" id="statPct">0%</div><div class="ts-sub">overall</div></div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-label"><span>8-Week Cycle</span><span id="progressLabel">0 / 56 days</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+    <div class="week-selector">
+      <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+      <div class="week-label" id="weekLabel">Week 1</div>
+      <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+    </div>
+    <div id="trackerGrid"></div>
+    <div class="notes-area">
+      <div class="notes-label">Weekly Notes — Pain levels, energy, sleep, how training feels</div>
+      <textarea class="notes-input" id="weekNotes" placeholder="e.g. Pain in left shoulder down to 4/10. Slept great. Trained Monday — no pain flare..." oninput="saveNotes()"></textarea>
+    </div>
+    <div class="tracker-actions">
+      <button class="action-btn" onclick="markAllToday()">✓ Mark All Today</button>
+      <button class="action-btn" onclick="clearWeek()">Clear This Week</button>
+      <button class="action-btn primary" onclick="downloadTracker()">⬇ Download for iOS</button>
+    </div>
+    <div class="ios-download-banner">
+      <div class="ios-banner-text"><strong>Save to iPhone / iPad</strong> — Tap <em>Download for iOS</em> above, open in Safari on your device. Tap the Share button → <em>Add to Home Screen</em> to install as a standalone app. Dose logs save locally to your device.</div>
+    </div>
+  </div>
+</div><!-- /tab-tracker -->
+
+</div><!-- /container -->
+
+<div class="footer">Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Personalized Protocol for Gabriele Padilla &nbsp;·&nbsp; 8-Week Recovery &amp; Rebuild Cycle</div>
+
+<script>
+const COMPOUNDS = [
+  {id:'klow', name:'KLOW Blend', sub:'10 units · AM or PM · 5 on / 2 off', days:[1,2,3,4,5], prn:false}
+];
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let currentWeek=1,state={},cycleStartDate=null;
+function loadState(){try{const s=localStorage.getItem('gabeProtocolState');if(s)state=JSON.parse(s);}catch(e){}try{const d=localStorage.getItem('gabeCycleStart');if(d){cycleStartDate=new Date(d);document.getElementById('cycleStartDate').value=d;}}catch(e){}updateStats();}
+function saveState(){try{localStorage.setItem('gabeProtocolState',JSON.stringify(state));const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}catch(e){}}
+function saveNotes(){if(!state[currentWeek])state[currentWeek]={};state[currentWeek].__notes=document.getElementById('weekNotes').value;saveState();}
+function setCycleStart(val){cycleStartDate=val?new Date(val):null;try{localStorage.setItem('gabeCycleStart',val);}catch(e){}updateStats();const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}
+function isScheduled(c,dow){return c.days.includes(dow);}
+function isDoseTaken(w,cid,di){return!!(state[w]&&state[w][cid]&&state[w][cid][di]);}
+function toggleDose(w,cid,di){if(!state[w])state[w]={};if(!state[w][cid])state[w][cid]={};state[w][cid][di]=!state[w][cid][di];saveState();renderGrid();updateStats();}
+function renderGrid(){
+  const container=document.getElementById('trackerGrid');
+  const wd=getWeekDates(currentWeek);
+  let html='<div class="day-header-row"><div></div><div class="day-headers-inner">';
+  for(let d=0;d<7;d++){const dn=DAY_NAMES[(d+1)%7];const ds=wd?wd[d].getDate():'';const ar=COMPOUNDS.filter(c=>!c.prn).every(c=>!isScheduled(c,(d+1)%7));html+=`<div class="day-header${ar?' rest-day':''}">${dn}${ds?'<br><span style="font-size:9px;font-weight:300;color:#aaa">'+ds+'</span>':''}</div>`;}
+  html+='</div></div>';
+  COMPOUNDS.forEach(c=>{
+    html+=`<div class="tracker-grid-wrap"><div class="tracker-compound-label"><div class="compound-badge">${c.name}<span>${c.sub}</span></div></div><div class="day-row">`;
+    for(let d=0;d<7;d++){const dow=(d+1)%7;const taken=isDoseTaken(currentWeek,c.id,d);if(!isScheduled(c,dow))html+='<div class="dose-cell rest"></div>';else if(taken)html+=`<div class="dose-cell scheduled taken" onclick="toggleDose(${currentWeek},'${c.id}',${d})"></div>`;else html+=`<div class="dose-cell scheduled" onclick="toggleDose(${currentWeek},'${c.id}',${d})"></div>`;}
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  document.getElementById('weekNotes').value=(state[currentWeek]&&state[currentWeek].__notes)||'';
+  document.getElementById('weekLabel').textContent='Week '+currentWeek;
+}
+function getWeekDates(w){if(!cycleStartDate)return null;const s=new Date(cycleStartDate);s.setDate(s.getDate()+(w-1)*7);const d=[];for(let i=0;i<7;i++){const dd=new Date(s);dd.setDate(dd.getDate()+i);d.push(dd);}return d;}
+function changeWeek(d){const n=currentWeek+d;if(n<1||n>8)return;currentWeek=n;renderGrid();}
+function markAllToday(){const dow=new Date().getDay();let di=-1;for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}if(di<0)return;if(!state[currentWeek])state[currentWeek]={};COMPOUNDS.forEach(c=>{if(!c.prn&&isScheduled(c,dow)){if(!state[currentWeek][c.id])state[currentWeek][c.id]={};state[currentWeek][c.id][di]=true;}});saveState();renderGrid();updateStats();}
+function clearWeek(){if(!confirm('Clear all dose logs for Week '+currentWeek+'?'))return;const n=state[currentWeek]&&state[currentWeek].__notes;state[currentWeek]={};if(n)state[currentWeek].__notes=n;saveState();renderGrid();updateStats();}
+function updateStats(){
+  let wt='Week '+currentWeek,dt='of 8-week cycle';
+  if(cycleStartDate){const now=new Date();const d=Math.floor((now-cycleStartDate)/86400000);const cw=Math.min(8,Math.max(1,Math.floor(d/7)+1));wt='Week '+cw;dt='Day '+Math.min(d+1,56)+' of 56';if(currentWeek===1&&cw>1)currentWeek=cw;const p=Math.min(100,Math.round((d/56)*100));document.getElementById('progressFill').style.width=p+'%';document.getElementById('progressLabel').textContent=Math.min(d+1,56)+' / 56 days';document.getElementById('statPct').textContent=p+'%';}
+  document.getElementById('statWeek').textContent=wt;document.getElementById('statDay').textContent=dt;
+  let dc=0,sc=0;for(let d=0;d<7;d++){const dow=(d+1)%7;COMPOUNDS.filter(c=>!c.prn).forEach(c=>{if(isScheduled(c,dow)){sc++;if(isDoseTaken(currentWeek,c.id,d))dc++;}});}
+  document.getElementById('statDoses').textContent=dc+'/'+sc;
+}
+function switchTab(tab,event){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(event&&event.target)event.target.classList.add('active');
+  if(tab==='tracker'){renderGrid();updateStats();}
+}
+function downloadTracker(){
+  const sv=document.getElementById('cycleStartDate').value||'';
+  const trackerHTML=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Gabe Protocol"><title>Gabe Padilla — Peptide Tracker</title><style>*{box-sizing:border-box;margin:0;padding:0}:root{--gold:#C9A84C;--gold-dim:rgba(201,168,76,0.15);--gold-border:rgba(201,168,76,0.3);--bg:#0a0a0a;--bg-card:#111;--bg-card2:#161616;--text:#e8e8e0;--text-muted:#888880;--border:rgba(255,255,255,0.08);--green-dim:rgba(58,122,90,0.2)}body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:13px;padding-bottom:env(safe-area-inset-bottom)}.hdr{background:#0d0d0d;border-bottom:1px solid var(--gold-border);padding:max(1.5rem,env(safe-area-inset-top)) 1rem 1rem;text-align:center}.hdr h1{font-size:20px;color:#fff;font-weight:300}.hdr h1 em{color:var(--gold);font-style:normal}.hdr p{font-size:10px;color:var(--text-muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px}.wrap{max-width:600px;margin:0 auto;padding:1rem}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}.stat{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:4px;padding:10px 6px;text-align:center}.stat .val{font-size:20px;color:var(--gold);font-weight:600}.stat .lbl{font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}.prog-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:1rem}.prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);margin-bottom:6px}.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),#E8C97A);border-radius:2px}.week-sel{display:flex;align-items:center;justify-content:center;gap:12px;margin:1rem 0}.wnav{width:38px;height:38px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:4px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}.wlbl{font-size:18px;color:#fff;font-weight:300;min-width:80px;text-align:center}.grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:1rem}.tt{width:100%;border-collapse:collapse;min-width:320px}.tt th{background:#111;color:var(--gold);padding:6px 3px;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--gold-border)}.tt th.cn{text-align:left;padding-left:6px;min-width:80px}.tt td{padding:3px;text-align:center;border-bottom:1px solid var(--border)}.tt td.cn{text-align:left;padding-left:6px;font-size:10px;font-weight:600;color:#E8C97A;white-space:nowrap}.tt td.cn span{display:block;font-size:8px;font-weight:400;color:var(--text-muted)}.tt tr:nth-child(even) td{background:var(--bg-card2)}.db{width:32px;height:32px;border-radius:3px;border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:14px}.db.taken{background:var(--green-dim);border-color:rgba(58,122,90,0.5)}.db.rest{background:transparent;border-color:transparent;cursor:default;color:#333;font-size:11px}.db:active{transform:scale(0.88)}.notes-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:1rem}.notes-lbl{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}.notes-ta{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:8px;color:var(--text);font-family:-apple-system,sans-serif;font-size:12px;resize:vertical;min-height:56px;outline:none}.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}.btn{padding:12px;border:1px solid var(--gold-border);background:var(--gold-dim);color:#E8C97A;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center}.btn:active{background:rgba(201,168,76,0.3)}.venmo-row{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:4px;padding:12px;text-align:center;margin-bottom:1rem}.venmo-row a{color:var(--gold);font-size:12px;font-weight:600;letter-spacing:0.06em;text-decoration:none}.foot{text-align:center;font-size:10px;color:var(--text-muted);padding:1rem;line-height:1.5}</style></head><body><div class="hdr"><h1>Gabe <em>Padilla</em> — Tracker</h1><p>BioLinked Solutions · 8-Week Recovery Protocol</p></div><div class="wrap"><div class="stats"><div class="stat"><div class="val" id="sW">—</div><div class="lbl">Week</div></div><div class="stat"><div class="val" id="sD">0</div><div class="lbl">Doses</div></div><div class="stat"><div class="val" id="sP">0%</div><div class="lbl">Complete</div></div></div><div class="prog-wrap"><div class="prog-top"><span>8-Week Cycle</span><span id="pL">0/56 days</span></div><div class="prog-bar"><div class="prog-fill" id="pF" style="width:0%"></div></div></div><div class="week-sel"><div class="wnav" onclick="cW(-1)">‹</div><div class="wlbl" id="wL">Week 1</div><div class="wnav" onclick="cW(1)">›</div></div><div class="grid-wrap"><table class="tt"><thead><tr><th class="cn">Compound</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead><tbody id="tB"></tbody></table></div><div class="notes-wrap"><div class="notes-lbl">Weekly Notes — Pain · Energy · Sleep · Training</div><textarea class="notes-ta" id="wN" placeholder="How does the body feel this week?" oninput="svN()"></textarea></div><div class="btns"><div class="btn" onclick="mT()">✓ Mark All Today</div><div class="btn" onclick="cWk()">Clear Week</div></div><div class="venmo-row"><a href="https://venmo.com/micahp20">Pay / Reorder via Venmo @micahp20</a></div><div class="foot">Tap circle = dose taken (green). Dash = rest day.<br>Data saves automatically to this device.</div></div><script>const C=[{id:'klow',n:'KLOW Blend',s:'10u AM or PM',d:[1,2,3,4,5]}];let cw=1,st={};const SD='${sv}';function ls(){try{const s=localStorage.getItem('gpSt');if(s)st=JSON.parse(s);}catch(e){}upd();}function sv2(){try{localStorage.setItem('gpSt',JSON.stringify(st));}catch(e){}}function svN(){if(!st[cw])st[cw]={};st[cw].__n=document.getElementById('wN').value;sv2();}function isSch(c,dow){return c.d.includes(dow);}function isTk(w,ci,di){return!!(st[w]&&st[w][ci]&&st[w][ci][di]);}function tog(w,ci,di){if(!st[w])st[w]={};if(!st[w][ci])st[w][ci]={};st[w][ci][di]=!st[w][ci][di];sv2();ren();upd();}function ren(){const tb=document.getElementById('tB');let h='';C.forEach(c=>{h+='<tr><td class="cn">'+c.n+'<span>'+c.s+'</span></td>';for(let d=0;d<7;d++){const dow=(d+1)%7;if(!isSch(c,dow)){h+='<td><div class="db rest">—</div></td>';}else if(isTk(cw,c.id,d)){h+='<td><div class="db taken" onclick="tog('+cw+',\''+c.id+'\','+d+')">✓</div></td>';}else{h+='<td><div class="db" onclick="tog('+cw+',\''+c.id+'\','+d+')">○</div></td>';}}h+='</tr>';});tb.innerHTML=h;document.getElementById('wL').textContent='Week '+cw;document.getElementById('wN').value=st[cw]&&st[cw].__n?st[cw].__n:'';}function cW(d){const n=cw+d;if(n<1||n>8)return;cw=n;ren();upd();}function mT(){const dow=new Date().getDay();let di=-1;for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}if(di<0)return;if(!st[cw])st[cw]={};C.forEach(c=>{if(isSch(c,dow)){if(!st[cw][c.id])st[cw][c.id]={};st[cw][c.id][di]=true;}});sv2();ren();upd();}function cWk(){if(!confirm('Clear Week '+cw+'?'))return;const n=st[cw]&&st[cw].__n;st[cw]={};if(n)st[cw].__n=n;sv2();ren();upd();}function upd(){let wt='—',pct=0,pr='0/56';if(SD){const now=new Date(),start=new Date(SD),diff=Math.floor((now-start)/86400000);const cywk=Math.min(8,Math.max(1,Math.floor(diff/7)+1));wt='Wk '+cywk;pct=Math.min(100,Math.round((diff/56)*100));pr=Math.min(diff+1,56)+'/56';}document.getElementById('sW').textContent=wt;document.getElementById('sP').textContent=pct+'%';document.getElementById('pF').style.width=pct+'%';document.getElementById('pL').textContent=pr+' days';let dc=0,sc=0;for(let d=0;d<7;d++){const dow=(d+1)%7;C.forEach(c=>{if(isSch(c,dow)){sc++;if(isTk(cw,c.id,d))dc++;}});}document.getElementById('sD').textContent=dc+'/'+sc;}ls();ren();<\/script></body></html>`;
+  const blob=new Blob([trackerHTML],{type:'text/html'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='Gabe_Padilla_Peptide_Tracker.html';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+loadState();
+renderGrid();
+</script>
+
+<style>
+.bl-nav{background:#fff!important;border-bottom:1px solid #eaeaea!important}
+.bl-nav-logo-main{color:#1a1a1a!important}.bl-nav-logo-sub{color:#777!important}
+.bl-nav-link{color:#444!important}.bl-nav-link:hover,.bl-nav-link.active{color:#8B7335!important;background:rgba(139,115,53,0.07)!important}
+.bl-nav-dropdown-menu{background:#fff!important;border-color:#eaeaea!important}
+.bl-nav-dropdown-item{color:#444!important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8!important;color:#8B7335!important}
+.bl-nav-mobile-menu{background:#fff!important}.bl-nav-mobile-link{color:#444!important;border-bottom-color:#eaeaea!important}
+.bl-nav-mobile-btn{color:#1a1a1a!important}.bl-nav-mobile-section{color:#8B7335!important}
+</style>
+<script src="/nav.js" defer></script>
+</body>
+</html>
