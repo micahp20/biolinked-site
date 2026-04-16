@@ -394,7 +394,6 @@ async function saveToSupabase(item) {
   setSyncStatus('syncing', 'Saving…');
   try {
     const row = {
-      id: item.id,
       name: item.name,
       vials: item.vials,
       vial_size: item.vialSize,
@@ -403,11 +402,10 @@ async function saveToSupabase(item) {
       status: item.status
     };
     if (typeof item.id === 'number') {
-      // existing row — update
+      // existing row — update (never include id in payload, column is GENERATED ALWAYS)
       await supa('inventory', 'PATCH', row, `?id=eq.${item.id}`);
     } else {
       // new row — insert, get back id
-      delete row.id;
       const res = await supa('inventory', 'POST', row);
       if (res && res[0]) item.id = res[0].id;
     }
