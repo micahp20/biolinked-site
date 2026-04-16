@@ -113,6 +113,8 @@
 
   document.head.insertAdjacentHTML('beforeend', navCSS);
   document.body.insertAdjacentHTML('afterbegin', navHTML + ctaBar);
+  // Remove any existing hardcoded footer before injecting ours
+  document.querySelectorAll('footer, .footer, [class*="footer"], [id*="footer"]').forEach(el => el.remove());
   document.body.insertAdjacentHTML('beforeend', siteFooter);
 
   // Mobile toggle
