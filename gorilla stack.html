@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioLinked Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#8B7335;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);--bg:#f5f5f5;--surface:#ffffff;--text:#1a1a1a;--muted:#888880;--border:rgba(0,0,0,0.10);}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:14px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+.invoice-wrap{max-width:680px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;overflow:hidden;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:9px;font-weight:600;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:9px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:11px;color:var(--muted);margin-top:4px;}
+.inv-body{padding:32px 36px;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.party-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.party-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.party-detail{font-size:12px;color:var(--muted);font-weight:300;line-height:1.7;}
+.items-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.items-table th{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);padding:8px 12px;border-bottom:1px solid var(--gold-border);text-align:left;}
+.items-table th:last-child{text-align:right;}
+.items-table td{padding:14px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.items-table tr:last-child td{border-bottom:none;}
+.item-name{font-size:14px;font-weight:500;color:var(--text);}
+.item-detail{font-size:11px;color:var(--muted);font-weight:300;margin-top:2px;}
+.item-qty{font-size:13px;color:var(--muted);text-align:center;}
+.item-unit{font-size:13px;color:var(--muted);text-align:right;}
+.item-total{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);text-align:right;}
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:16px 20px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;color:var(--muted);font-weight:300;}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:8px;padding-top:12px;font-size:16px;font-weight:600;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);}
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-bottom:24px;}
+.stack-card-title{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-child{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:4px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:12px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.stack-desc{font-size:12px;color:var(--muted);font-weight:300;line-height:1.65;}
+.stack-synergy{background:rgba(139,115,53,0.06);border:1px solid var(--gold-border);border-radius:2px;padding:13px 16px;margin-top:16px;font-size:12px;color:#5a4a20;line-height:1.75;font-weight:300;}
+.stack-synergy strong{font-weight:600;color:var(--gold);}
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:18px 20px;margin-bottom:24px;}
+.payment-title{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:18px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:13px;color:var(--text);font-weight:400;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);}
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.footer-disc{font-size:10px;color:var(--muted);line-height:1.6;font-weight:300;max-width:420px;}
+.footer-brand{font-size:10px;color:var(--gold);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:100%;max-width:680px;margin:20px auto 0;padding:14px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+@media print{body{background:#fff;padding:0}.print-btn{display:none}.invoice-wrap{border:none}}
+</style>
+</head>
+<body>
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Invoice</div>
+      <div class="inv-number">#BL-2026-041</div>
+      <div class="inv-date">April 15, 2026</div>
+    </div>
+  </div>
+
+  <div class="inv-body">
+
+    <div class="inv-parties">
+      <div>
+        <div class="party-label">From</div>
+        <div class="party-name">BioLinked Solutions</div>
+        <div class="party-detail">biolinkedsolutions.com<br>Venmo: @micahp20</div>
+      </div>
+      <div>
+        <div class="party-label">Billed To</div>
+        <div class="party-name">3 Stooges</div>
+        <div class="party-detail">Larry &middot; Moe &middot; Curly<br>8-Week Protocol Order<br>Due upon receipt</div>
+      </div>
+    </div>
+
+    <table class="items-table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th style="text-align:center">Qty</th>
+          <th style="text-align:right">Unit Price</th>
+          <th style="text-align:right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="item-name">HGH 24IU</div><div class="item-detail">Somatropin &middot; SubQ &middot; Mon/Wed/Fri</div></td>
+          <td class="item-qty">7</td><td class="item-unit">$125.00</td><td class="item-total">$875.00</td>
+        </tr>
+        <tr>
+          <td><div class="item-name">5-Amino-1MQ</div><div class="item-detail">NNMT Inhibitor &middot; NAD+ Restoration &middot; Daily</div></td>
+          <td class="item-qty">4</td><td class="item-unit">$50.00</td><td class="item-total">$200.00</td>
+        </tr>
+        <tr>
+          <td><div class="item-name">CJC-1295 / Ipamorelin</div><div class="item-detail">GH Secretagogue Blend &middot; 5 on / 2 off</div></td>
+          <td class="item-qty">2</td><td class="item-unit">$45.00</td><td class="item-total">$90.00</td>
+        </tr>
+        <tr>
+          <td><div class="item-name">L-Carnitine</div><div class="item-detail">Mitochondrial Transport &middot; Daily</div></td>
+          <td class="item-qty">4</td><td class="item-unit">$60.00</td><td class="item-total">$240.00</td>
+        </tr>
+        <tr>
+          <td><div class="item-name">IGF-1 LR3 (1mg)</div><div class="item-detail">Insulin-like Growth Factor &middot; Post-workout</div></td>
+          <td class="item-qty">3</td><td class="item-unit">$63.33</td><td class="item-total">$190.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="totals-block">
+      <div class="total-row"><span>HGH 24IU &times; 7</span><span>$875.00</span></div>
+      <div class="total-row"><span>5-Amino-1MQ &times; 4</span><span>$200.00</span></div>
+      <div class="total-row"><span>CJC/IPA &times; 2</span><span>$90.00</span></div>
+      <div class="total-row"><span>L-Carnitine &times; 4</span><span>$240.00</span></div>
+      <div class="total-row"><span>IGF-1 LR3 &times; 3</span><span>$190.00</span></div>
+      <div class="total-row grand"><span>Total Due</span><span class="val">$1,595.00</span></div>
+    </div>
+
+    <div class="stack-card">
+      <div class="stack-card-title">Protocol Overview &mdash; How This Stack Works Together</div>
+
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div class="stack-right">
+          <div class="stack-compound">HGH (Somatropin) 24IU</div>
+          <div class="stack-desc">The foundation of the entire stack. Human growth hormone directly drives protein synthesis, preferentially burns stored fat as fuel, and actively rebuilds lean muscle tissue. At conservative doses it also improves sleep architecture, collagen production, and tissue recovery speed. Everything else in this protocol either amplifies what HGH starts or ensures the byproducts of its action are fully utilized.</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div class="stack-right">
+          <div class="stack-compound">CJC-1295 / Ipamorelin</div>
+          <div class="stack-desc">A dual GH secretagogue blend that amplifies the body's own pulsatile growth hormone release from the pituitary gland. CJC-1295 extends the GH pulse window while Ipamorelin is the cleanest GHRP available &mdash; strong GH stimulus with virtually zero cortisol or prolactin elevation. Running this alongside exogenous HGH creates layered GH signaling from both external and internal sources, keeping anabolic activity elevated throughout the day.</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div class="stack-right">
+          <div class="stack-compound">IGF-1 LR3 (1mg)</div>
+          <div class="stack-desc">IGF-1 is the primary downstream mediator of HGH's anabolic effects &mdash; it's literally how growth hormone builds muscle at the cellular level. The LR3 variant has an extended half-life that keeps IGF-1 receptor activity elevated for 20&ndash;30 hours post-injection. Timed post-workout, it drives satellite cell activation and nutrient shuttling into muscle tissue at the moment of peak uptake, substantially amplifying HGH's protein synthesis signal and accelerating recovery between sessions.</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div class="stack-right">
+          <div class="stack-compound">5-Amino-1MQ</div>
+          <div class="stack-desc">An NNMT inhibitor that restores intracellular NAD+ levels. NAD+ is the coenzyme that powers mitochondrial energy production &mdash; it's what cells use to burn fat and generate ATP efficiently. As we age, NNMT activity increases and steadily depletes NAD+ reserves, reducing metabolic efficiency. 5-Amino-1MQ blocks this enzyme, raising NAD+ availability and enhancing the fat-oxidation output of the entire stack. It also activates dormant muscle satellite cells &mdash; the reserve pool of muscle-building cells that HGH and IGF-1 then recruit and put to work.</div>
+        </div>
+      </div>
+
+      <div class="stack-item">
+        <div class="stack-dot"></div>
+        <div class="stack-right">
+          <div class="stack-compound">L-Carnitine</div>
+          <div class="stack-desc">The essential transport molecule that physically carries fatty acids across the mitochondrial membrane so they can be burned as fuel. Without sufficient L-Carnitine, free fatty acids mobilized by HGH cannot be fully oxidized &mdash; they simply recirculate back into storage. Injectable L-Carnitine delivers near-complete bioavailability compared to roughly 15% from oral supplementation, ensuring that every fat molecule HGH liberates actually reaches the mitochondria and gets converted to energy rather than being re-deposited.</div>
+        </div>
+      </div>
+
+      <div class="stack-synergy">
+        <strong>Stack Synergy:</strong> HGH + CJC/Ipa create a layered GH environment that simultaneously drives muscle protein synthesis and fat mobilization. IGF-1 LR3 amplifies the downstream anabolic signal directly at the muscle cell level. 5-Amino-1MQ restores the NAD+ fuel required to oxidize liberated fat. L-Carnitine acts as the essential transport system ensuring mobilized fatty acids actually reach the mitochondria. Each compound addresses a distinct step in the muscle-building and fat-loss cascade &mdash; none are redundant, each one enables the next.
+      </div>
+    </div>
+
+    <div class="payment-block">
+      <div class="payment-title">Payment Instructions</div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128184;</div>
+        <div><div class="payment-text">Send via Venmo</div><div class="payment-handle">@micahp20</div></div>
+      </div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128221;</div>
+        <div class="payment-text">Include your name and order reference in the Venmo note</div>
+      </div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128230;</div>
+        <div class="payment-text">Ships within 24&ndash;48 hours of payment confirmation</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+</body>
+</html>
