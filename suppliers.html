@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supplier Price Comparison — BioLinked</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #8B7335;
+    --gold-light: #B8985A;
+    --gold-dark: #6B5826;
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface-alt: #fafafa;
+    --border: #e0e0e0;
+    --border-dark: #c0c0c0;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --text-soft: #999;
+    --silver: #c8c8c8;
+    --grey: #8a8a8a;
+    --grey-dark: #3a3a3a;
+    --highlight: #fff8e1;
+    --win-bg: #fef6dc;
+    --win-border: #8B7335;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.5; }
+
+  header.page {
+    background: var(--surface);
+    border-bottom: 2px solid var(--gold);
+    padding: 40px 24px 32px;
+    text-align: center;
+  }
+  header.page .eyebrow {
+    font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold); font-weight: 600; margin-bottom: 12px;
+  }
+  header.page h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 42px; font-weight: 500; color: var(--grey-dark);
+    letter-spacing: -0.02em; margin-bottom: 8px;
+  }
+  header.page h1 em { color: var(--gold); font-style: italic; font-weight: 600; }
+  header.page p { color: var(--text-muted); font-size: 13px; max-width: 640px; margin: 0 auto; }
+
+  .tabs-bar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex; gap: 0; overflow-x: auto;
+  }
+  .tab {
+    padding: 14px 20px; font-size: 13px; font-weight: 500; color: var(--text-muted);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    white-space: nowrap; letter-spacing: 0.05em; text-transform: uppercase;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: inherit;
+  }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab:hover:not(.active) { color: var(--grey-dark); }
+
+  main { max-width: 1600px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  /* Stats strip */
+  .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    padding: 16px 18px; border-left: 3px solid var(--gold);
+  }
+  .stat-card .label {
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
+  }
+  .stat-card .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px; font-weight: 600; color: var(--grey-dark);
+    line-height: 1.1;
+  }
+  .stat-card .sub { font-size: 11px; color: var(--text-soft); margin-top: 2px; }
+
+  /* Controls */
+  .controls {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    margin-bottom: 0;
+    display: grid;
+    gap: 16px;
+  }
+  .controls-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 12px; align-items: end;
+  }
+  @media (max-width: 900px) {
+    .controls-row { grid-template-columns: 1fr; }
+  }
+
+  .field label {
+    display: block; font-size: 10px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted);
+    font-weight: 600; margin-bottom: 6px;
+  }
+  .field input, .field select {
+    width: 100%; padding: 10px 12px; font-size: 14px;
+    border: 1px solid var(--border-dark); background: var(--surface);
+    color: var(--text); font-family: inherit;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus {
+    outline: none; border-color: var(--gold);
+  }
+  .field.search input {
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238B7335' stroke-width='2' stroke-linecap='round'><circle cx='11' cy='11' r='8'/><line x1='21' y1='21' x2='16.65' y2='16.65'/></svg>");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+    padding-left: 36px;
+  }
+
+  .supplier-filters {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 16px 24px;
+    background: var(--surface); border: 1px solid var(--border); border-top: none;
+  }
+  .supplier-chip {
+    padding: 6px 14px; font-size: 12px; font-weight: 500;
+    border: 1px solid var(--border-dark); background: var(--surface);
+    color: var(--text-muted); cursor: pointer;
+    letter-spacing: 0.05em; font-family: inherit;
+    transition: all 0.15s;
+  }
+  .supplier-chip.active {
+    background: var(--gold); border-color: var(--gold); color: #ffffff;
+  }
+  .supplier-chip:hover:not(.active) { border-color: var(--gold); color: var(--gold); }
+
+  /* Comparison table */
+  .table-wrap {
+    background: var(--surface); border: 1px solid var(--border); border-top: none;
+    overflow-x: auto;
+  }
+  table.compare {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+    min-width: 800px;
+  }
+  table.compare thead th {
+    background: var(--grey-dark); color: #fff;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-weight: 600; padding: 14px 10px; text-align: left;
+    position: sticky; top: 48px; z-index: 10; /* below tab bar */
+  }
+  table.compare thead th.supplier-col {
+    text-align: center;
+    border-left: 1px solid rgba(255,255,255,0.15);
+  }
+  table.compare tbody td {
+    padding: 12px 10px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.compare tbody tr:hover { background: var(--surface-alt); }
+  table.compare tbody tr.expanded { background: var(--surface-alt); }
+  table.compare .peptide-name {
+    font-weight: 600; color: var(--grey-dark); font-size: 14px;
+    cursor: pointer;
+  }
+  table.compare .peptide-name:hover { color: var(--gold); }
+  table.compare .dose {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px; font-weight: 500; color: var(--gold);
+    white-space: nowrap;
+  }
+  table.compare .price-cell {
+    text-align: center; border-left: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  table.compare .price-cell.empty { color: var(--text-soft); font-style: italic; }
+  table.compare .price-cell .kit-price {
+    font-weight: 600; font-size: 14px; color: var(--text);
+  }
+  table.compare .price-cell .per-mg {
+    font-size: 11px; color: var(--text-muted); margin-top: 2px;
+  }
+  table.compare .price-cell.best {
+    background: var(--win-bg);
+    border-left: 1px solid var(--gold);
+  }
+  table.compare .price-cell.best .kit-price { color: var(--gold-dark); }
+  table.compare .price-cell.best .per-mg { color: var(--gold); font-weight: 600; }
+  table.compare .price-cell .best-badge {
+    display: inline-block;
+    font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); font-weight: 700;
+    margin-top: 3px;
+  }
+
+  /* Tier detail row */
+  .tier-details {
+    background: var(--surface-alt);
+    padding: 14px 16px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .tier-details h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; font-weight: 600; color: var(--grey-dark);
+    margin-bottom: 10px; letter-spacing: 0.02em;
+  }
+  .tier-details .supplier-detail {
+    display: grid;
+    grid-template-columns: 140px 1fr auto;
+    gap: 12px; padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .tier-details .supplier-detail:last-child { border-bottom: none; }
+  .tier-details .supplier-name {
+    font-weight: 600; color: var(--grey-dark); font-size: 13px;
+  }
+  .tier-details .tier-grid {
+    display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px;
+  }
+  .tier-details .tier-pill {
+    padding: 4px 10px; background: var(--surface);
+    border: 1px solid var(--border-dark);
+    border-radius: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .tier-details .tier-pill strong { color: var(--gold-dark); }
+  .tier-details .supplier-notes {
+    font-size: 11px; color: var(--text-muted); font-style: italic; margin-top: 4px;
+  }
+  .tier-details .supplier-code {
+    font-size: 11px; color: var(--text-soft); font-family: monospace;
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 60px 20px; text-align: center; color: var(--text-muted);
+    font-family: 'Cormorant Garamond', serif; font-size: 22px;
+  }
+
+  /* Supplier summary tab */
+  .supplier-cards {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .supplier-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 20px;
+  }
+  .supplier-card h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 24px;
+    font-weight: 600; color: var(--grey-dark); margin-bottom: 4px;
+  }
+  .supplier-card .sub {
+    font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gold); font-weight: 600; margin-bottom: 14px;
+  }
+  .supplier-card .stat-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .supplier-card .stat-row:last-child { border-bottom: none; }
+  .supplier-card .stat-row .label { color: var(--text-muted); }
+  .supplier-card .stat-row .val { font-weight: 600; color: var(--grey-dark); }
+
+  /* Winners tab */
+  .winners-list {
+    background: var(--surface); border: 1px solid var(--border);
+  }
+  .winner-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 100px;
+    gap: 12px; padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    font-size: 13px;
+  }
+  .winner-row:last-child { border-bottom: none; }
+  .winner-row.header {
+    background: var(--grey-dark); color: #fff;
+    font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+    font-weight: 600;
+  }
+  .winner-row .peptide-label {
+    font-weight: 600; color: var(--grey-dark);
+  }
+  .winner-row .dose-label {
+    font-family: 'Cormorant Garamond', serif; color: var(--gold); font-size: 15px;
+  }
+  .winner-row .winner-badge {
+    display: inline-block;
+    padding: 4px 10px; background: var(--win-bg);
+    border: 1px solid var(--gold);
+    color: var(--gold-dark); font-weight: 600; font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .winner-row .savings {
+    color: #3a6a2a; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 720px) {
+    header.page h1 { font-size: 32px; }
+    .winner-row { grid-template-columns: 1fr 80px; font-size: 12px; }
+    .winner-row .dose-label, .winner-row .savings, .winner-row .winner-badge { display: none; }
+    .winner-row.header span:not(:first-child):not(:nth-child(5)) { display: none; }
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+</style>
+</head>
+<body>
+
+<header class="page">
+  <div class="eyebrow">BioLinked — Supplier Intelligence</div>
+  <h1>Peptide Price <em>Comparison</em></h1>
+  <p>Cross-reference pricing, dosage, and price-per-mg across all active suppliers. Identify the best source for every compound in your catalog.</p>
+</header>
+
+<nav class="tabs-bar">
+  <button class="tab active" data-view="compare">Compare Prices</button>
+  <button class="tab" data-view="winners">Best Deals</button>
+  <button class="tab" data-view="suppliers">Supplier Overview</button>
+</nav>
+
+<main>
+  <!-- COMPARE VIEW -->
+  <div class="view active" id="view-compare">
+    <div class="stats" id="stats-strip"></div>
+
+    <div class="controls">
+      <div class="controls-row">
+        <div class="field search">
+          <label>Search Peptide</label>
+          <input type="text" id="search" placeholder="e.g. BPC, Retatrutide, Tirz...">
+        </div>
+        <div class="field">
+          <label>Sort By</label>
+          <select id="sort-by">
+            <option value="name">Name (A–Z)</option>
+            <option value="best-price">Best Price (Low to High)</option>
+            <option value="biggest-gap">Biggest Price Gap</option>
+            <option value="most-available">Most Suppliers</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Price Tier</label>
+          <select id="price-tier">
+            <option value="1">1 Kit (Single Order)</option>
+            <option value="2">Mid Volume (3–10 Kits)</option>
+            <option value="3">High Volume (50+ Kits)</option>
+            <option value="4">Max Volume (100+ Kits)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>&nbsp;</label>
+          <button id="reset-btn" style="padding:10px 18px; background:var(--grey-dark); color:#fff; border:none; font-size:12px; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; font-family:inherit; font-weight:600;">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="supplier-filters" id="supplier-filters"></div>
+
+    <div class="table-wrap">
+      <table class="compare">
+        <thead>
+          <tr id="table-head"></tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- WINNERS VIEW -->
+  <div class="view" id="view-winners">
+    <div class="stats" style="margin-bottom:0;">
+      <div class="stat-card">
+        <div class="label">What This Shows</div>
+        <div class="value" style="font-size:18px; line-height:1.3;">Lowest price-per-mg<br>for each peptide</div>
+        <div class="sub">Across all suppliers at base (1-kit) pricing</div>
+      </div>
+    </div>
+    <div class="winners-list" id="winners-list" style="margin-top:20px;"></div>
+  </div>
+
+  <!-- SUPPLIERS VIEW -->
+  <div class="view" id="view-suppliers">
+    <div class="supplier-cards" id="supplier-cards"></div>
+  </div>
+</main>
+
+<script>
+  const DATA = [{"peptide":"5-amino-1mq","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"5AM","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"HYB":{"code":"5AM","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"Maddox":{"code":"5AM","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":25,"notes":"US Domestic 3-day"},"ZJ":{"code":"5AM","price":75,"tier2":72,"tier3":70,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"5-amino-1mq","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"10AM","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"5AM-10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"10AM","price":55,"tier2":53,"tier3":50,"tier4":47,"per_vial":null,"notes":""},"HYB":{"code":"10AM","price":55,"tier2":53,"tier3":50,"tier4":47,"per_vial":null,"notes":""},"Aurora":{"code":"","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"5-amino-1mq","dose":50,"unit":"mg","suppliers":{"Peptide Pole":{"code":"50AM","price":85,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"50AM","price":80,"tier2":78,"tier3":75,"tier4":72,"per_vial":null,"notes":""},"HYB":{"code":"50AM","price":80,"tier2":78,"tier3":75,"tier4":72,"per_vial":null,"notes":""},"ZJ":{"code":"AM50","price":130,"tier2":127,"tier3":125,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"AA Water","dose":3,"unit":"ml","suppliers":{"HYB":{"code":"AA03","price":10,"tier2":10,"tier3":10,"tier4":10,"per_vial":null,"notes":""}}},{"peptide":"ACE-031","dose":1,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AE1","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"AE1","price":79,"tier2":77,"tier3":75,"tier4":73,"per_vial":null,"notes":""},"HYB":{"code":"AE1","price":80,"tier2":78,"tier3":75,"tier4":73,"per_vial":null,"notes":""}}},{"peptide":"Adamax","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ADA5","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Adamax","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ADA10","price":135,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Adipotide/FTTP","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AP5","price":150,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"AP5","price":160,"tier2":155,"tier3":150,"tier4":145,"per_vial":null,"notes":""},"ZJ":{"code":"AP5","price":145,"tier2":142,"tier3":140,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Adipotide/FTTP","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AP10","price":230,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"AP10","price":260,"tier2":255,"tier3":250,"tier4":245,"per_vial":null,"notes":""}}},{"peptide":"AHK-Cu","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AU20","price":28,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"AHK-Cu","dose":50,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AU50","price":40,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"AU50","price":59,"tier2":57,"tier3":55,"tier4":52,"per_vial":null,"notes":""}}},{"peptide":"AHK-Cu","dose":100,"unit":"mg","suppliers":{"ERP":{"code":"AU100","price":75,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"AU100","price":80,"tier2":78,"tier3":75,"tier4":72,"per_vial":null,"notes":""}}},{"peptide":"AICAR","dose":50,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AR50","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"AR50","price":60,"tier2":58,"tier3":55,"tier4":50,"per_vial":null,"notes":""},"ZJ":{"code":"AR50","price":65,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"AICAR","dose":100,"unit":"mg","suppliers":{"Peptide Pole":{"code":"AR100","price":115,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"AOD9604","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"2AD","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"2AD","price":55,"tier2":50,"tier3":45,"tier4":45,"per_vial":null,"notes":""},"ZJ":{"code":"2AD","price":58,"tier2":55,"tier3":53,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"AOD9604","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"5AD","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"5AD","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"HYB":{"code":"5AD","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"Maddox":{"code":"5AD","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"5AD","price":105,"tier2":102,"tier3":100,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"AOD9604","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"10AD","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"ARA-290","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ARA10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"ARA10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"RA10","price":80,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"RA10","price":70,"tier2":65,"tier3":60,"tier4":55,"per_vial":null,"notes":""}}},{"peptide":"ARA-290","dose":16,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ARA16","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"B12","dose":1,"unit":"mg","suppliers":{"Peptide Pole":{"code":"","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"B1201","price":40,"tier2":35,"tier3":32,"tier4":30,"per_vial":null,"notes":""}}},{"peptide":"Bac Water","dose":3,"unit":"ml","suppliers":{"APS":{"code":"BAC3","price":15,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":8,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"WA3","price":37,"tier2":null,"tier3":null,"tier4":null,"per_vial":4,"notes":"US Domestic 3-day"}}},{"peptide":"Bac Water","dose":10,"unit":"ml","suppliers":{"APS":{"code":"BAC10","price":25,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"BA10","price":8,"tier2":8,"tier3":8,"tier4":8,"per_vial":null,"notes":""},"Aurora":{"code":"","price":22,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"WA10","price":39,"tier2":null,"tier3":null,"tier4":null,"per_vial":6,"notes":"US Domestic 3-day"}}},{"peptide":"Botulinum Toxin","dose":100,"unit":"iu","suppliers":{"Peptide Pole":{"code":"XT100","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"XT100","price":159,"tier2":155,"tier3":150,"tier4":145,"per_vial":null,"notes":""},"HYB":{"code":"XT100","price":155,"tier2":150,"tier3":145,"tier4":135,"per_vial":null,"notes":""}}},{"peptide":"BPC+TB500 Blend","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"BB10","price":115,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"5+5mg"},"APS":{"code":"BB10","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"5+5mg"},"ERP":{"code":"BB10","price":99,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":"5+5mg"},"HYB":{"code":"BB10","price":90,"tier2":88,"tier3":85,"tier4":80,"per_vial":null,"notes":"5+5mg"},"Maddox":{"code":"BB10","price":192,"tier2":null,"tier3":null,"tier4":null,"per_vial":50,"notes":"US Domestic 3-day"},"ZJ":{"code":"BB10","price":110,"tier2":107,"tier3":105,"tier4":null,"per_vial":null,"notes":"5+5mg"}}},{"peptide":"BPC+TB500 Blend","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"BB20","price":220,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"10+10mg"},"APS":{"code":"BB20","price":190,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"10+10mg"},"ERP":{"code":"BB20","price":179,"tier2":175,"tier3":170,"tier4":165,"per_vial":null,"notes":"10+10mg"},"HYB":{"code":"BB20","price":180,"tier2":175,"tier3":170,"tier4":165,"per_vial":null,"notes":"10+10mg"},"ZJ":{"code":"BB20","price":210,"tier2":207,"tier3":205,"tier4":null,"per_vial":null,"notes":"10+10mg"}}},{"peptide":"BPC+TB500 Blend","dose":30,"unit":"mg","suppliers":{"Peptide Pole":{"code":"BB30","price":300,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"15+15mg"}}},{"peptide":"BPC-157","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"BC5","price":40,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"BC5","price":39,"tier2":35,"tier3":33,"tier4":30,"per_vial":null,"notes":""},"HYB":{"code":"BC5","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"Maddox":{"code":"BC5","price":87,"tier2":null,"tier3":null,"tier4":null,"per_vial":20,"notes":"US Domestic 3-day"},"ZJ":{"code":"BC5","price":41,"tier2":38,"tier3":36,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"BPC-157","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"BC10","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"BPC10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"BC10","price":59,"tier2":55,"tier3":52,"tier4":50,"per_vial":null,"notes":""},"HYB":{"code":"BC10","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"MIX":{"code":"BPC157-10","price":90,"tier2":85,"tier3":80,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"BC10","price":115,"tier2":null,"tier3":null,"tier4":null,"per_vial":40,"notes":"US Domestic 3-day"},"ZJ":{"code":"BC10","price":65,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"BPC-157","dose":20,"unit":"mg","suppliers":{"HYB":{"code":"BC20","price":120,"tier2":115,"tier3":110,"tier4":105,"per_vial":null,"notes":""}}},{"peptide":"Cagri+Sema Blend","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CS10","price":130,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"5+5mg"},"HYB":{"code":"CS10","price":125,"tier2":120,"tier3":115,"tier4":110,"per_vial":null,"notes":"5+5mg"},"ZJ":{"code":"CS10","price":170,"tier2":167,"tier3":165,"tier4":null,"per_vial":null,"notes":"5+5mg"}}},{"peptide":"Cagri+Sema Blend","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CS20","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"10+10mg"}}},{"peptide":"Cagrilintide","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CGL2","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Cagrilintide","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CGL5","price":130,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"CAG5","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CGL5","price":89,"tier2":87,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"HYB":{"code":"CGL5","price":90,"tier2":88,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"ZJ":{"code":"CGL5","price":118,"tier2":115,"tier3":113,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Cagrilintide","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CGL10","price":195,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"CAG10","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CGL10","price":139,"tier2":135,"tier3":130,"tier4":125,"per_vial":null,"notes":""},"HYB":{"code":"CGL10","price":140,"tier2":135,"tier3":130,"tier4":125,"per_vial":null,"notes":""},"MIX":{"code":"Cagr-10","price":135,"tier2":125,"tier3":120,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":155,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"CGL10","price":380,"tier2":null,"tier3":null,"tier4":null,"per_vial":115,"notes":"US Domestic 3-day"},"ZJ":{"code":"CGL10","price":225,"tier2":222,"tier3":220,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Cagrilintide","dose":20,"unit":"mg","suppliers":{"ERP":{"code":"CGL20","price":245,"tier2":240,"tier3":235,"tier4":230,"per_vial":null,"notes":""},"HYB":{"code":"CGL20","price":245,"tier2":240,"tier3":235,"tier4":230,"per_vial":null,"notes":""}}},{"peptide":"Cardiogen","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Card10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Cardiogen","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Card20","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CAD","price":105,"tier2":100,"tier3":95,"tier4":90,"per_vial":null,"notes":""}}},{"peptide":"Cartalax","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Cart20","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Cerebrolysin","dose":60,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CBL60","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CBL60","price":90,"tier2":85,"tier3":80,"tier4":75,"per_vial":null,"notes":""},"HYB":{"code":"CBL60","price":50,"tier2":48,"tier3":45,"tier4":42,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295 DAC","dose":2,"unit":"mg","suppliers":{"HYB":{"code":"CD2","price":75,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"ZJ":{"code":"CD2","price":78,"tier2":75,"tier3":73,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295 DAC","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"CD5","price":150,"tier2":145,"tier3":140,"tier4":135,"per_vial":null,"notes":""},"HYB":{"code":"CD5","price":150,"tier2":145,"tier3":140,"tier4":135,"per_vial":null,"notes":""},"Maddox":{"code":"CD5","price":266,"tier2":null,"tier3":null,"tier4":null,"per_vial":50,"notes":"US Domestic 3-day"},"ZJ":{"code":"CD5","price":185,"tier2":182,"tier3":180,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295 no DAC","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CND2","price":40,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"CND2","price":40,"tier2":37,"tier3":35,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295 no DAC","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CND5","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"CJC5","price":85,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CND5","price":79,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"CND5","price":75,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"Aurora":{"code":"","price":88,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"CND5","price":130,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"CND5","price":90,"tier2":87,"tier3":85,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295 no DAC","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CND10","price":140,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"CJC10","price":135,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CND10","price":139,"tier2":135,"tier3":130,"tier4":125,"per_vial":null,"notes":""},"HYB":{"code":"CND10","price":140,"tier2":135,"tier3":130,"tier4":125,"per_vial":null,"notes":""},"Maddox":{"code":"CND10","price":230,"tier2":null,"tier3":null,"tier4":null,"per_vial":90,"notes":"US Domestic 3-day"},"ZJ":{"code":"CND10","price":180,"tier2":177,"tier3":175,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295+IPA Blend","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CP10","price":110,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"CJC no DAC 5+IPA 5"},"APS":{"code":"CP10","price":110,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CP10","price":109,"tier2":105,"tier3":100,"tier4":90,"per_vial":null,"notes":"CJC no DAC 5+IPA 5"},"HYB":{"code":"CP10","price":105,"tier2":100,"tier3":95,"tier4":90,"per_vial":null,"notes":""},"Maddox":{"code":"CP10","price":186,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"CP10","price":118,"tier2":115,"tier3":113,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"CJC-1295+IPA Blend","dose":20,"unit":"mg","suppliers":{"ERP":{"code":"CP20","price":179,"tier2":175,"tier3":170,"tier4":165,"per_vial":null,"notes":"CJC no DAC 10+IPA 10"}}},{"peptide":"Cortagen","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Cort20","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"COT","price":105,"tier2":100,"tier3":95,"tier4":90,"per_vial":null,"notes":""}}},{"peptide":"Crystagen","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Crys20","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CRY","price":105,"tier2":100,"tier3":95,"tier4":90,"per_vial":null,"notes":""}}},{"peptide":"Dermorphin","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"DP5","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"DR5","price":55,"tier2":53,"tier3":50,"tier4":47,"per_vial":null,"notes":""},"ZJ":{"code":"DR5","price":35,"tier2":32,"tier3":30,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Dermorphin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"DP10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"DR10","price":119,"tier2":115,"tier3":110,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Dihexa","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"DHA5","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""}}},{"peptide":"Dihexa","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"DHA10","price":130,"tier2":125,"tier3":120,"tier4":115,"per_vial":null,"notes":""}}},{"peptide":"DSIP","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"DS2","price":35,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"DSIP","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"DS5","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Dsip5","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"DS5","price":49,"tier2":47,"tier3":45,"tier4":42,"per_vial":null,"notes":""},"HYB":{"code":"DS5","price":40,"tier2":38,"tier3":36,"tier4":33,"per_vial":null,"notes":""},"ZJ":{"code":"DS5","price":46,"tier2":43,"tier3":41,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"DSIP","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"DS10","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Dsip10","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"DS10","price":75,"tier2":73,"tier3":70,"tier4":68,"per_vial":null,"notes":""},"HYB":{"code":"DS10","price":65,"tier2":63,"tier3":60,"tier4":57,"per_vial":null,"notes":""},"Aurora":{"code":"","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"DS10","price":90,"tier2":87,"tier3":85,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"DSIP","dose":15,"unit":"mg","suppliers":{"HYB":{"code":"DS15","price":90,"tier2":88,"tier3":85,"tier4":82,"per_vial":null,"notes":""}}},{"peptide":"Dulaglutide","dose":5,"unit":"mg","suppliers":{"HYB":{"code":"DL5","price":90,"tier2":87,"tier3":84,"tier4":80,"per_vial":null,"notes":""}}},{"peptide":"Dulaglutide","dose":10,"unit":"mg","suppliers":{"HYB":{"code":"DL10","price":165,"tier2":160,"tier3":155,"tier4":150,"per_vial":null,"notes":""}}},{"peptide":"Epithalon","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ET10","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"EPI10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"ET10","price":45,"tier2":48,"tier3":85,"tier4":42,"per_vial":null,"notes":""},"HYB":{"code":"ET10","price":45,"tier2":48,"tier3":45,"tier4":42,"per_vial":null,"notes":""},"Aurora":{"code":"","price":55,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"ET10","price":38,"tier2":35,"tier3":33,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Epithalon","dose":40,"unit":"mg","suppliers":{"HYB":{"code":"ET40","price":135,"tier2":130,"tier3":125,"tier4":120,"per_vial":null,"notes":""}}},{"peptide":"Epithalon","dose":50,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ET50","price":150,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"ET50","price":150,"tier2":148,"tier3":148,"tier4":140,"per_vial":null,"notes":""},"HYB":{"code":"ET50","price":150,"tier2":145,"tier3":140,"tier4":135,"per_vial":null,"notes":""},"ZJ":{"code":"ET50","price":170,"tier2":167,"tier3":165,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"EPO","dose":3000,"unit":"iu","suppliers":{"Peptide Pole":{"code":"E5K","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"E3K","price":110,"tier2":100,"tier3":90,"tier4":80,"per_vial":null,"notes":""}}},{"peptide":"FOXO4","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"F410","price":370,"tier2":365,"tier3":360,"tier4":355,"per_vial":null,"notes":""},"HYB":{"code":"F410","price":370,"tier2":365,"tier3":360,"tier4":355,"per_vial":null,"notes":""},"ZJ":{"code":"F410","price":375,"tier2":372,"tier3":370,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"FST-344","dose":1,"unit":"mg","suppliers":{"ERP":{"code":"FST 344","price":210,"tier2":205,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GDF-8","dose":1,"unit":"mg","suppliers":{"Peptide Pole":{"code":"F81","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"GDF-8","price":210,"tier2":205,"tier3":200,"tier4":195,"per_vial":null,"notes":""}}},{"peptide":"GHK-Cu","dose":50,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CU50","price":32,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"CU50","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CU50","price":39,"tier2":37,"tier3":35,"tier4":30,"per_vial":null,"notes":""},"HYB":{"code":"CU50","price":30,"tier2":29,"tier3":27,"tier4":25,"per_vial":null,"notes":""},"MIX":{"code":"GHK-cu","price":35,"tier2":35,"tier3":32.5,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"CU50","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":30,"notes":"US Domestic 3-day"},"ZJ":{"code":"CU50","price":37,"tier2":34,"tier3":32,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GHK-Cu","dose":100,"unit":"mg","suppliers":{"Peptide Pole":{"code":"CU100","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"CU100","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"CU100","price":59,"tier2":57,"tier3":55,"tier4":52,"per_vial":null,"notes":""},"HYB":{"code":"CU100","price":50,"tier2":58,"tier3":55,"tier4":52,"per_vial":null,"notes":""},"Aurora":{"code":"","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"CU100","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":60,"notes":"US Domestic 3-day"},"ZJ":{"code":"CU100","price":63,"tier2":60,"tier3":58,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GHRP-2","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"G25","price":45,"tier2":40,"tier3":35,"tier4":30,"per_vial":null,"notes":""},"HYB":{"code":"G25","price":30,"tier2":28,"tier3":25,"tier4":22,"per_vial":null,"notes":""},"ZJ":{"code":"G25","price":30,"tier2":27,"tier3":25,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GHRP-2","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"G210","price":65,"tier2":63,"tier3":60,"tier4":58,"per_vial":null,"notes":""},"HYB":{"code":"G210","price":46,"tier2":45,"tier3":43,"tier4":40,"per_vial":null,"notes":""},"ZJ":{"code":"G210","price":50,"tier2":47,"tier3":45,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GHRP-6","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"G65","price":35,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"G65","price":45,"tier2":40,"tier3":35,"tier4":30,"per_vial":null,"notes":""},"HYB":{"code":"G65","price":30,"tier2":28,"tier3":25,"tier4":22,"per_vial":null,"notes":""},"ZJ":{"code":"G65","price":30,"tier2":27,"tier3":25,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GHRP-6","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"G610","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"G610","price":65,"tier2":63,"tier3":60,"tier4":58,"per_vial":null,"notes":""},"HYB":{"code":"G610","price":46,"tier2":45,"tier3":43,"tier4":40,"per_vial":null,"notes":""},"ZJ":{"code":"G610","price":50,"tier2":47,"tier3":45,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GLOW Blend","dose":50,"unit":"mg","suppliers":{"APS":{"code":"Glow50","price":150,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"BBG50","price":170,"tier2":165,"tier3":160,"tier4":155,"per_vial":null,"notes":"GHK 35+TB 10+BPC 5"},"Aurora":{"code":"","price":155,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"GLOW Blend","dose":70,"unit":"mg","suppliers":{"Peptide Pole":{"code":"BBG70","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"BPC 10+GHK-Cu 50+TB500 10"},"APS":{"code":"Glow70","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"BBG70","price":185,"tier2":180,"tier3":175,"tier4":170,"per_vial":null,"notes":"GHK-Cu 50+TB500 10+BPC 10"},"HYB":{"code":"BBG70","price":200,"tier2":195,"tier3":190,"tier4":185,"per_vial":null,"notes":"GHK 50+TB 10+BPC 10"},"MIX":{"code":"Glow-70","price":160,"tier2":150,"tier3":145,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":177,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"BBG70","price":352,"tier2":null,"tier3":null,"tier4":null,"per_vial":70,"notes":"US Domestic 3-day"},"ZJ":{"code":"BBG70","price":220,"tier2":217,"tier3":215,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Glutathione","dose":600,"unit":"mg","suppliers":{"Peptide Pole":{"code":"GTT600","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"GTT600","price":75,"tier2":70,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"Maddox":{"code":"GTT600","price":102,"tier2":null,"tier3":null,"tier4":null,"per_vial":28,"notes":"US Domestic 3-day"}}},{"peptide":"Glutathione","dose":1500,"unit":"mg","suppliers":{"Peptide Pole":{"code":"GTT1500","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"GTT1500","price":89,"tier2":85,"tier3":80,"tier4":75,"per_vial":null,"notes":""},"HYB":{"code":"GTT","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"Maddox":{"code":"GTT1500","price":231,"tier2":null,"tier3":null,"tier4":null,"per_vial":40,"notes":"US Domestic 3-day"}}},{"peptide":"Gonadorelin","dose":2,"unit":"mg","suppliers":{"ERP":{"code":"GND2","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"GND2","price":30,"tier2":28,"tier3":25,"tier4":22,"per_vial":null,"notes":""},"ZJ":{"code":"GND2","price":40,"tier2":37,"tier3":35,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Gonadorelin","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"GND5","price":95,"tier2":93,"tier3":90,"tier4":85,"per_vial":null,"notes":""}}},{"peptide":"HCG","dose":2000,"unit":"iu","suppliers":{"Peptide Pole":{"code":"G2K","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HCG","dose":5000,"unit":"iu","suppliers":{"Peptide Pole":{"code":"G5K","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"G5K","price":75,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"G5k","price":70,"tier2":68,"tier3":65,"tier4":62,"per_vial":null,"notes":""},"Maddox":{"code":"GK5","price":154,"tier2":null,"tier3":null,"tier4":null,"per_vial":154,"notes":"US Domestic 3-day"},"ZJ":{"code":"G5K","price":83,"tier2":80,"tier3":78,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HCG","dose":10000,"unit":"iu","suppliers":{"Peptide Pole":{"code":"G10K","price":140,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"G10K","price":135,"tier2":133,"tier3":130,"tier4":125,"per_vial":null,"notes":""},"HYB":{"code":"G10K","price":130,"tier2":125,"tier3":120,"tier4":115,"per_vial":null,"notes":""},"Maddox":{"code":"G10K","price":220,"tier2":null,"tier3":null,"tier4":null,"per_vial":220,"notes":"US Domestic 3-day"},"ZJ":{"code":"G10K","price":135,"tier2":132,"tier3":130,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Hexarelin","dose":2,"unit":"mg","suppliers":{"ZJ":{"code":"HX2","price":39,"tier2":36,"tier3":34,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Hexarelin","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"HX5","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"HX5","price":110,"tier2":105,"tier3":100,"tier4":95,"per_vial":null,"notes":""},"Maddox":{"code":"HX5","price":154,"tier2":null,"tier3":null,"tier4":null,"per_vial":40,"notes":"US Domestic 3-day"},"ZJ":{"code":"HX5","price":85,"tier2":82,"tier3":80,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HGH","dose":10,"unit":"iu","suppliers":{"Peptide Pole":{"code":"H10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"H10","price":59,"tier2":57,"tier3":55,"tier4":50,"per_vial":null,"notes":""},"HYB":{"code":"H10","price":50,"tier2":48,"tier3":45,"tier4":42,"per_vial":null,"notes":""},"Maddox":{"code":"H10","price":150,"tier2":null,"tier3":null,"tier4":null,"per_vial":150,"notes":"US Domestic 3-day"},"ZJ":{"code":"M10","price":49,"tier2":46,"tier3":44,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HGH","dose":12,"unit":"iu","suppliers":{"ZJ":{"code":"M12","price":65,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HGH","dose":15,"unit":"iu","suppliers":{"Peptide Pole":{"code":"H15","price":85,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"H15","price":75,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"Maddox":{"code":"H15","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":200,"notes":"US Domestic 3-day"},"ZJ":{"code":"M15","price":80,"tier2":77,"tier3":75,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HGH","dose":24,"unit":"iu","suppliers":{"Peptide Pole":{"code":"H24","price":135,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"H24","price":109,"tier2":107,"tier3":105,"tier4":100,"per_vial":null,"notes":""},"HYB":{"code":"H24","price":100,"tier2":95,"tier3":91,"tier4":88,"per_vial":null,"notes":""},"ZJ":{"code":"M24","price":115,"tier2":112,"tier3":110,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HGH","dose":36,"unit":"iu","suppliers":{"Peptide Pole":{"code":"H36","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"H36","price":159,"tier2":157,"tier3":155,"tier4":150,"per_vial":null,"notes":""},"HYB":{"code":"H36","price":145,"tier2":140,"tier3":135,"tier4":130,"per_vial":null,"notes":""}}},{"peptide":"HGH Fragment 176-191","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"FR5","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"FR5","price":79,"tier2":77,"tier3":75,"tier4":70,"per_vial":null,"notes":""},"HYB":{"code":"FR5","price":80,"tier2":78,"tier3":75,"tier4":70,"per_vial":null,"notes":""}}},{"peptide":"HGH Fragment 176-191","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"FR10","price":160,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"FR10","price":159,"tier2":155,"tier3":150,"tier4":145,"per_vial":null,"notes":""}}},{"peptide":"HGH Fragment 176-191","dose":15,"unit":"mg","suppliers":{"Peptide Pole":{"code":"FR15","price":220,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"HMG","dose":75,"unit":"iu","suppliers":{"Peptide Pole":{"code":"G75","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"G75","price":79,"tier2":77,"tier3":75,"tier4":70,"per_vial":null,"notes":""},"HYB":{"code":"G75","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"ZJ":{"code":"G75","price":68,"tier2":65,"tier3":63,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Humanin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"HM10","price":270,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"HU10","price":220,"tier2":215,"tier3":210,"tier4":205,"per_vial":null,"notes":""}}},{"peptide":"IGF-1 LR3","dose":0.1,"unit":"mg","suppliers":{"Peptide Pole":{"code":"IF01","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"IG01","price":49,"tier2":47,"tier3":45,"tier4":42,"per_vial":null,"notes":""},"HYB":{"code":"IG01","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"ZJ":{"code":"IG01","price":45,"tier2":42,"tier3":40,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"IGF-1 LR3","dose":1,"unit":"mg","suppliers":{"Peptide Pole":{"code":"IF1","price":230,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"IGF-1","price":175,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"IG1","price":220,"tier2":215,"tier3":210,"tier4":205,"per_vial":null,"notes":""},"HYB":{"code":"IG1","price":200,"tier2":195,"tier3":190,"tier4":185,"per_vial":null,"notes":""},"Aurora":{"code":"","price":175,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"IG1","price":310,"tier2":null,"tier3":null,"tier4":null,"per_vial":50,"notes":"US Domestic 3-day"},"ZJ":{"code":"IG1","price":215,"tier2":212,"tier3":210,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Ipamorelin","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"IP2","price":22,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Ipamorelin","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"IP5","price":39,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"IP5","price":49,"tier2":47,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"HYB":{"code":"IP5","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"ZJ":{"code":"IP5","price":40,"tier2":37,"tier3":35,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Ipamorelin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"IP10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"IPA10","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"IP10","price":75,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"IP10","price":70,"tier2":68,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"Aurora":{"code":"","price":77,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"IP10","price":127,"tier2":null,"tier3":null,"tier4":null,"per_vial":40,"notes":"US Domestic 3-day"},"ZJ":{"code":"IP10","price":78,"tier2":75,"tier3":73,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Kisspeptin-10","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"KS5","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"KS5","price":65,"tier2":60,"tier3":55,"tier4":50,"per_vial":null,"notes":""},"HYB":{"code":"KS5","price":50,"tier2":48,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"ZJ":{"code":"KS5","price":62,"tier2":59,"tier3":57,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Kisspeptin-10","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"KS10","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"KS10","price":80,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"KS10","price":75,"tier2":70,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"ZJ":{"code":"KS10","price":125,"tier2":122,"tier3":120,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"KLOW Blend","dose":80,"unit":"mg","suppliers":{"Peptide Pole":{"code":"KLOW","price":210,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"BPC 10+GHK-Cu 50+TB500 10+KPV 10"},"APS":{"code":"Klow80","price":180,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"KL80","price":199,"tier2":195,"tier3":190,"tier4":185,"per_vial":null,"notes":"BPC 10+GHK-Cu 50+TB500 10+KPV 10"},"HYB":{"code":"KL80","price":240,"tier2":235,"tier3":230,"tier4":225,"per_vial":null,"notes":"GHK 50+TB 10+BPC 10+KPV 10"},"MIX":{"code":"Klow-80","price":175,"tier2":165,"tier3":160,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":188,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"KLOW","price":352,"tier2":null,"tier3":null,"tier4":null,"per_vial":90,"notes":"US Domestic 3-day"},"ZJ":{"code":"Klow80","price":245,"tier2":242,"tier3":240,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"KPV","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"KP5","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"KPV","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"KP10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"KPV10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"KP10","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"KP10","price":60,"tier2":58,"tier3":55,"tier4":50,"per_vial":null,"notes":""},"Aurora":{"code":"","price":55,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"KP10","price":80,"tier2":77,"tier3":75,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"L-carnitine","dose":200,"unit":"mg","suppliers":{"Peptide Pole":{"code":"LC200","price":35,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"LC200","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"L-carnitine","dose":400,"unit":"mg","suppliers":{"ERP":{"code":"LC400","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"L-carnitine","dose":600,"unit":"mg","suppliers":{"Peptide Pole":{"code":"LC600","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"LC600","price":80,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"ZJ":{"code":"LC600","price":40,"tier2":37,"tier3":35,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"L-carnitine","dose":1200,"unit":"mg","suppliers":{"Peptide Pole":{"code":"LC1200","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"LC1200","price":90,"tier2":85,"tier3":80,"tier4":75,"per_vial":null,"notes":""}}},{"peptide":"L-carnitine","dose":2000,"unit":"mg","suppliers":{"ERP":{"code":"LC2000","price":120,"tier2":115,"tier3":110,"tier4":105,"per_vial":null,"notes":""}}},{"peptide":"L-carnitine","dose":5000,"unit":"mg","suppliers":{"ERP":{"code":"LC5000","price":150,"tier2":145,"tier3":140,"tier4":135,"per_vial":null,"notes":""}}},{"peptide":"Lemon Bottle","dose":10,"unit":"ml","suppliers":{"Peptide Pole":{"code":"","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Lemon10","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"LB10","price":100,"tier2":98,"tier3":95,"tier4":90,"per_vial":null,"notes":""},"ZJ":{"code":"LB","price":87,"tier2":84,"tier3":82,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Lemon Bottle","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"LB10","price":70,"tier2":68,"tier3":65,"tier4":60,"per_vial":null,"notes":""}}},{"peptide":"Lipo-C","dose":10,"unit":"ml","suppliers":{"Peptide Pole":{"code":"","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"LC216","price":80,"tier2":77,"tier3":75,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Lipo-C (no B12)","dose":10,"unit":"ml","suppliers":{"ERP":{"code":"Lipo-C","price":70,"tier2":68,"tier3":65,"tier4":60,"per_vial":null,"notes":"Methonine+Choline+Carnitine+Dexpanthenol"}}},{"peptide":"Lipo-C (with B12)","dose":10,"unit":"ml","suppliers":{"ERP":{"code":"LC1201","price":90,"tier2":88,"tier3":85,"tier4":80,"per_vial":null,"notes":"Methonine+Choline+Carnitine+Dexpanthenol+B12"}}},{"peptide":"LL-37","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"LL5","price":99,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"HYB":{"code":"375","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"ZJ":{"code":"375","price":95,"tier2":92,"tier3":90,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Matrixyl","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MX10","price":40,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Mazdutide","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MDT5","price":140,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MDT5","price":119,"tier2":115,"tier3":110,"tier4":105,"per_vial":null,"notes":""},"HYB":{"code":"MDT5","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""}}},{"peptide":"Mazdutide","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MDT10","price":230,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"MAZ10","price":170,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MDT10","price":219,"tier2":215,"tier3":210,"tier4":200,"per_vial":null,"notes":""},"HYB":{"code":"MDT10","price":200,"tier2":195,"tier3":190,"tier4":185,"per_vial":null,"notes":""},"ZJ":{"code":"MDT10","price":185,"tier2":182,"tier3":180,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Melanotan 1","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MT10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"MT1-10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MT1","price":49,"tier2":47,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"HYB":{"code":"MT1","price":50,"tier2":48,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"Aurora":{"code":"","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"MT1","price":65,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Melanotan 2","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"ML10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"MT2-10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MT2","price":49,"tier2":47,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"HYB":{"code":"ML10","price":50,"tier2":48,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"Aurora":{"code":"","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"ML10","price":50,"tier2":47,"tier3":45,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Melatonin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MT10X","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MT10X","price":120,"tier2":115,"tier3":110,"tier4":105,"per_vial":null,"notes":""},"HYB":{"code":"MT10X","price":65,"tier2":63,"tier3":60,"tier4":57,"per_vial":null,"notes":""},"ZJ":{"code":"MT10X","price":70,"tier2":67,"tier3":65,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"MGF","dose":2,"unit":"mg","suppliers":{"ERP":{"code":"MF2","price":79,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"FM2","price":40,"tier2":38,"tier3":35,"tier4":30,"per_vial":null,"notes":""},"ZJ":{"code":"FM2","price":60,"tier2":57,"tier3":55,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"MIC (Lipo C + B12)","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"mic","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"MK677","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"","price":36,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"MOTS-c","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MS10","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"MOT10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MS10","price":59,"tier2":55,"tier3":50,"tier4":45,"per_vial":null,"notes":""},"HYB":{"code":"MS10","price":60,"tier2":55,"tier3":50,"tier4":45,"per_vial":null,"notes":""},"MIX":{"code":"Mots-c","price":60,"tier2":55,"tier3":50,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"MS10","price":123,"tier2":null,"tier3":null,"tier4":null,"per_vial":35,"notes":"US Domestic 3-day"},"ZJ":{"code":"MS10","price":68,"tier2":65,"tier3":63,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"MOTS-c","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MS20","price":135,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"MOTS-c","dose":40,"unit":"mg","suppliers":{"Peptide Pole":{"code":"MS40","price":220,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"MOT40","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"MS40","price":175,"tier2":173,"tier3":170,"tier4":165,"per_vial":null,"notes":""},"HYB":{"code":"MS40","price":180,"tier2":175,"tier3":170,"tier4":165,"per_vial":null,"notes":""},"Aurora":{"code":"","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"MS40","price":320,"tier2":null,"tier3":null,"tier4":null,"per_vial":140,"notes":"US Domestic 3-day"},"ZJ":{"code":"MS40","price":215,"tier2":212,"tier3":210,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"NAD+","dose":100,"unit":"mg","suppliers":{"Peptide Pole":{"code":"NJ100","price":40,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"NJ3100","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"ZJ":{"code":"NJ3100","price":48,"tier2":45,"tier3":43,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"NAD+","dose":500,"unit":"mg","suppliers":{"Peptide Pole":{"code":"NJ500","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"NAD500","price":85,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"NJ500","price":65,"tier2":63,"tier3":60,"tier4":58,"per_vial":null,"notes":""},"HYB":{"code":"NJ500","price":80,"tier2":78,"tier3":75,"tier4":72,"per_vial":null,"notes":""},"MIX":{"code":"NAD500","price":75,"tier2":70,"tier3":65,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":77,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"NJ500","price":152,"tier2":null,"tier3":null,"tier4":null,"per_vial":65,"notes":"US Domestic 3-day"},"ZJ":{"code":"NJ500","price":95,"tier2":92,"tier3":90,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"NAD+","dose":1000,"unit":"mg","suppliers":{"Peptide Pole":{"code":"NJ1000","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"NJ1000","price":119,"tier2":115,"tier3":110,"tier4":105,"per_vial":null,"notes":""},"HYB":{"code":"NJ1000","price":130,"tier2":125,"tier3":120,"tier4":115,"per_vial":null,"notes":""}}},{"peptide":"Orexin A","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"OREA10","price":460,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Orexin B","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"OREB5","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Orexin B","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"OREB10","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Oxytocin","dose":2,"unit":"mg","suppliers":{"ZJ":{"code":"OT2","price":40,"tier2":37,"tier3":35,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Oxytocin","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"OT5","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"OT5","price":70,"tier2":68,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"OT5","price":45,"tier2":43,"tier3":40,"tier4":37,"per_vial":null,"notes":""},"ZJ":{"code":"OT5","price":65,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Oxytocin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"OT10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"OT10","price":95,"tier2":90,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"HYB":{"code":"OT10","price":60,"tier2":58,"tier3":55,"tier4":52,"per_vial":null,"notes":""}}},{"peptide":"P21","dose":5,"unit":"mg","suppliers":{"ERP":{"code":"P21","price":290,"tier2":285,"tier3":280,"tier4":270,"per_vial":null,"notes":""}}},{"peptide":"PE-22-28","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"PE-5","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"PE-22-28","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"PE-10","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"PE10","price":80,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""}}},{"peptide":"PEG MGF","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"FMP2","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"FMP2","price":95,"tier2":93,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"HYB":{"code":"FMP2","price":90,"tier2":88,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"ZJ":{"code":"FMP2","price":95,"tier2":92,"tier3":90,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Pinealon","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Pin5","price":35,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"PIN5","price":55,"tier2":53,"tier3":50,"tier4":45,"per_vial":null,"notes":""}}},{"peptide":"Pinealon","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"Pin10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"PI10","price":89,"tier2":85,"tier3":80,"tier4":75,"per_vial":null,"notes":""},"HYB":{"code":"PIN10","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""}}},{"peptide":"Pinealon","dose":20,"unit":"mg","suppliers":{"HYB":{"code":"PIN20","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""}}},{"peptide":"PNC-27","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"pnc-27","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"PN5","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""}}},{"peptide":"PNC-27","dose":10,"unit":"mg","suppliers":{"HYB":{"code":"PN10","price":170,"tier2":165,"tier3":160,"tier4":155,"per_vial":null,"notes":""}}},{"peptide":"Pramlintide","dose":5,"unit":"mg","suppliers":{"HYB":{"code":"PL5","price":110,"tier2":105,"tier3":100,"tier4":95,"per_vial":null,"notes":""}}},{"peptide":"Pramlintide","dose":10,"unit":"mg","suppliers":{"HYB":{"code":"PL10","price":195,"tier2":190,"tier3":185,"tier4":175,"per_vial":null,"notes":""}}},{"peptide":"PT-141","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"P41","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"PT10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"P41","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"P41","price":65,"tier2":60,"tier3":55,"tier4":50,"per_vial":null,"notes":""},"Aurora":{"code":"","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"P41","price":109,"tier2":null,"tier3":null,"tier4":null,"per_vial":28,"notes":"US Domestic 3-day"},"ZJ":{"code":"P41","price":62,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Ret+Tirz Blend","dose":60,"unit":"mg","suppliers":{"Peptide Pole":{"code":"R+T 60","price":260,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":"Reta 20+Tirz 40"}}},{"peptide":"Retatrutide","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"RT5","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"R5","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"RT5","price":70,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"Aurora":{"code":"Reta5","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"RT5","price":77,"tier2":74,"tier3":72,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"RT10","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"R10","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"RT10","price":99,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"HYB":{"code":"RT10","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"MIX":{"code":"R-10","price":90,"tier2":75,"tier3":70,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"Reta10","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"RT10","price":209,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"RT10","price":120,"tier2":117,"tier3":115,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":15,"unit":"mg","suppliers":{"Peptide Pole":{"code":"RT15","price":140,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"RT15","price":135,"tier2":130,"tier3":125,"tier4":120,"per_vial":null,"notes":""},"HYB":{"code":"RT15","price":135,"tier2":130,"tier3":125,"tier4":120,"per_vial":null,"notes":""},"MIX":{"code":"R-15","price":120,"tier2":110,"tier3":105,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"RT15","price":155,"tier2":152,"tier3":150,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"RT20","price":180,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"R20","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"RT20","price":159,"tier2":155,"tier3":150,"tier4":145,"per_vial":null,"notes":""},"HYB":{"code":"RT20","price":155,"tier2":150,"tier3":145,"tier4":140,"per_vial":null,"notes":""},"Aurora":{"code":"Reta20","price":170,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"RT20","price":320,"tier2":null,"tier3":null,"tier4":null,"per_vial":90,"notes":"US Domestic 3-day"},"ZJ":{"code":"RT20","price":170,"tier2":167,"tier3":165,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":30,"unit":"mg","suppliers":{"Peptide Pole":{"code":"RT30","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"R30","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"RT30","price":189,"tier2":185,"tier3":180,"tier4":175,"per_vial":null,"notes":""},"HYB":{"code":"RT30","price":190,"tier2":185,"tier3":180,"tier4":175,"per_vial":null,"notes":""},"MIX":{"code":"R-30","price":210,"tier2":200,"tier3":195,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"Reta30","price":222,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"RT30","price":380,"tier2":null,"tier3":null,"tier4":null,"per_vial":150,"notes":"US Domestic 3-day"},"ZJ":{"code":"RT30","price":210,"tier2":207,"tier3":205,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":40,"unit":"mg","suppliers":{"ZJ":{"code":"RT40","price":325,"tier2":322,"tier3":320,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":50,"unit":"mg","suppliers":{"APS":{"code":"R50","price":320,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"RT50","price":290,"tier2":285,"tier3":280,"tier4":275,"per_vial":null,"notes":""},"MIX":{"code":"R-50","price":310,"tier2":300,"tier3":295,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"RT50","price":335,"tier2":332,"tier3":330,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":60,"unit":"mg","suppliers":{"Peptide Pole":{"code":"RT60","price":340,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"R60","price":370,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"RT60","price":299,"tier2":295,"tier3":290,"tier4":285,"per_vial":null,"notes":""},"HYB":{"code":"RT60","price":340,"tier2":335,"tier3":330,"tier4":325,"per_vial":null,"notes":""},"Aurora":{"code":"Reta60","price":366,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"RT60","price":340,"tier2":337,"tier3":335,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Retatrutide","dose":100,"unit":"mg","suppliers":{"APS":{"code":"R100","price":740,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Selank","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SK5","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SK5","price":39,"tier2":37,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"HYB":{"code":"SK5","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"Aurora":{"code":"","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"SK5","price":49,"tier2":46,"tier3":44,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Selank","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SK10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"SK10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SK10","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"SK10","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"Aurora":{"code":"","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"SK10","price":118,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"SK10","price":78,"tier2":75,"tier3":73,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Selank","dose":30,"unit":"mg","suppliers":{"HYB":{"code":"SK30","price":170,"tier2":165,"tier3":160,"tier4":155,"per_vial":null,"notes":""}}},{"peptide":"Semaglutide","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SM5","price":35,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SM5","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"HYB":{"code":"SM5","price":48,"tier2":45,"tier3":43,"tier4":40,"per_vial":null,"notes":""},"ZJ":{"code":"SM5","price":46,"tier2":45,"tier3":43,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semaglutide","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SM10","price":55,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"S10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SM10","price":59,"tier2":55,"tier3":50,"tier4":48,"per_vial":null,"notes":""},"HYB":{"code":"SM10","price":58,"tier2":55,"tier3":53,"tier4":50,"per_vial":null,"notes":""},"MIX":{"code":"Sema-10","price":65,"tier2":60,"tier3":55,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"SM10","price":70,"tier2":67,"tier3":65,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semaglutide","dose":15,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SM15","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"S15","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"SM15","price":78,"tier2":75,"tier3":73,"tier4":70,"per_vial":null,"notes":""},"ZJ":{"code":"SM15","price":86,"tier2":85,"tier3":83,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semaglutide","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SM20","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"S20","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SM15","price":85,"tier2":83,"tier3":80,"tier4":75,"per_vial":null,"notes":""},"HYB":{"code":"SM20","price":88,"tier2":85,"tier3":83,"tier4":80,"per_vial":null,"notes":""},"ZJ":{"code":"SM20","price":100,"tier2":97,"tier3":95,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semaglutide","dose":30,"unit":"mg","suppliers":{"APS":{"code":"S30","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SM20","price":109,"tier2":105,"tier3":100,"tier4":95,"per_vial":null,"notes":""},"HYB":{"code":"SM30","price":110,"tier2":105,"tier3":100,"tier4":95,"per_vial":null,"notes":""},"ZJ":{"code":"SM30","price":120,"tier2":116,"tier3":112,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semax","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SX5","price":45,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"XA5","price":39,"tier2":37,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"HYB":{"code":"XA5","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"Aurora":{"code":"","price":50,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"XA5","price":49,"tier2":46,"tier3":44,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semax","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SX10","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"SX10","price":65,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"XA10","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"XA10","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"Aurora":{"code":"","price":66,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"XA10","price":118,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"XA10","price":78,"tier2":75,"tier3":73,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Semax","dose":30,"unit":"mg","suppliers":{"HYB":{"code":"XA30","price":170,"tier2":165,"tier3":160,"tier4":155,"per_vial":null,"notes":""}}},{"peptide":"Sermorelin","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SML5","price":75,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Sermo5","price":85,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SMO5","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"SMO5","price":70,"tier2":68,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"ZJ":{"code":"SMO5","price":72,"tier2":69,"tier3":67,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Sermorelin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"SML10","price":145,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Sermo10","price":150,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SMO10","price":130,"tier2":128,"tier3":125,"tier4":120,"per_vial":null,"notes":""},"HYB":{"code":"SMO10","price":140,"tier2":135,"tier3":130,"tier4":125,"per_vial":null,"notes":""},"Aurora":{"code":"","price":144,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"SMO10","price":190,"tier2":null,"tier3":null,"tier4":null,"per_vial":80,"notes":"US Domestic 3-day"},"ZJ":{"code":"SMO10","price":150,"tier2":147,"tier3":145,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"SLU-PP-332","dose":5,"unit":"mg","suppliers":{"APS":{"code":"SLUPP332-5","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"SLU5","price":99,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"HYB":{"code":"332","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"Aurora":{"code":"","price":99,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"332 10","price":226,"tier2":null,"tier3":null,"tier4":null,"per_vial":60,"notes":"US Domestic 3-day"},"ZJ":{"code":"SLU5","price":100,"tier2":97,"tier3":95,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Snap-8","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"NP810","price":58,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Snap8-10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"NP810","price":49,"tier2":47,"tier3":45,"tier4":40,"per_vial":null,"notes":""},"HYB":{"code":"NP810","price":40,"tier2":38,"tier3":35,"tier4":32,"per_vial":null,"notes":""},"ZJ":{"code":"NP810","price":45,"tier2":42,"tier3":40,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Snap-8","dose":100,"unit":"mg","suppliers":{"Peptide Pole":{"code":"NP8100","price":240,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"SS-31","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"2S10","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"SS31-10","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"2S10","price":85,"tier2":83,"tier3":80,"tier4":75,"per_vial":null,"notes":""},"HYB":{"code":"2S10","price":90,"tier2":88,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"MIX":{"code":"SS-31","price":85,"tier2":80,"tier3":75,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":99,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"2S10","price":190,"tier2":null,"tier3":null,"tier4":null,"per_vial":45,"notes":"US Domestic 3-day"},"ZJ":{"code":"2S10","price":95,"tier2":92,"tier3":90,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"SS-31","dose":50,"unit":"mg","suppliers":{"Peptide Pole":{"code":"2S50","price":320,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"SS31-50","price":315,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"2S50","price":300,"tier2":295,"tier3":290,"tier4":280,"per_vial":null,"notes":""},"HYB":{"code":"2S50","price":350,"tier2":340,"tier3":330,"tier4":320,"per_vial":null,"notes":""},"Aurora":{"code":"","price":315,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"2S50","price":380,"tier2":377,"tier3":375,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Survodutide","dose":10,"unit":"mg","suppliers":{"ERP":{"code":"SUR10","price":249,"tier2":245,"tier3":240,"tier4":235,"per_vial":null,"notes":""},"HYB":{"code":"SUR10","price":250,"tier2":245,"tier3":240,"tier4":235,"per_vial":null,"notes":""},"ZJ":{"code":"SUR10","price":310,"tier2":307,"tier3":305,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"TB500","dose":2,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TB2","price":46,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"BT2","price":45,"tier2":42,"tier3":40,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"TB500","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TB5","price":90,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"BT5","price":79,"tier2":75,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"BT5","price":75,"tier2":73,"tier3":70,"tier4":65,"per_vial":null,"notes":""},"Maddox":{"code":"BT5","price":147,"tier2":null,"tier3":null,"tier4":null,"per_vial":23,"notes":"US Domestic 3-day"},"ZJ":{"code":"BT5","price":85,"tier2":82,"tier3":80,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"TB500","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TB10","price":150,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"TB10","price":115,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"BT10","price":129,"tier2":125,"tier3":120,"tier4":115,"per_vial":null,"notes":""},"HYB":{"code":"BT10","price":140,"tier2":135,"tier3":130,"tier4":120,"per_vial":null,"notes":""},"MIX":{"code":"TB500-10","price":100,"tier2":95,"tier3":90,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":122,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"BT10","price":165,"tier2":162,"tier3":160,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"TB500","dose":20,"unit":"mg","suppliers":{"HYB":{"code":"BT20","price":200,"tier2":195,"tier3":190,"tier4":185,"per_vial":null,"notes":""}}},{"peptide":"TB500 Frag","dose":10,"unit":"mg","suppliers":{"HYB":{"code":"B10F","price":90,"tier2":98,"tier3":95,"tier4":90,"per_vial":null,"notes":""}}},{"peptide":"Tesamorelin","dose":2,"unit":"mg","suppliers":{"ZJ":{"code":"TSM2","price":58,"tier2":55,"tier3":53,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tesamorelin","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TSM5","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Tesa5","price":110,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TSM5","price":99,"tier2":90,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"HYB":{"code":"TSM5","price":90,"tier2":88,"tier3":85,"tier4":80,"per_vial":null,"notes":""},"ZJ":{"code":"TSM5","price":108,"tier2":105,"tier3":103,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tesamorelin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TSM10","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"Tesa10","price":155,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TSM10","price":159,"tier2":155,"tier3":150,"tier4":145,"per_vial":null,"notes":""},"HYB":{"code":"TSM10","price":160,"tier2":155,"tier3":150,"tier4":145,"per_vial":null,"notes":""},"MIX":{"code":"Tesa-10","price":150,"tier2":140,"tier3":135,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"","price":155,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"TSM10","price":323,"tier2":null,"tier3":null,"tier4":null,"per_vial":55,"notes":"US Domestic 3-day"},"ZJ":{"code":"TSM10","price":210,"tier2":207,"tier3":205,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tesamorelin","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TSM20","price":310,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TSM20","price":299,"tier2":290,"tier3":280,"tier4":270,"per_vial":null,"notes":""},"HYB":{"code":"TSM20","price":300,"tier2":295,"tier3":290,"tier4":280,"per_vial":null,"notes":""}}},{"peptide":"Thymalin","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TY10","price":64,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TY10","price":69,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"HYB":{"code":"TY10","price":70,"tier2":65,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"ZJ":{"code":"TY10","price":65,"tier2":62,"tier3":60,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Thymosin Alpha-1","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TA5","price":105,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"TA1-5","price":100,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TA5","price":100,"tier2":95,"tier3":90,"tier4":85,"per_vial":null,"notes":""},"HYB":{"code":"TA5","price":90,"tier2":85,"tier3":75,"tier4":60,"per_vial":null,"notes":""},"Aurora":{"code":"","price":99,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"TA5","price":105,"tier2":102,"tier3":100,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Thymosin Alpha-1","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TA10","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TA10","price":180,"tier2":175,"tier3":170,"tier4":165,"per_vial":null,"notes":""},"HYB":{"code":"TA10","price":165,"tier2":160,"tier3":150,"tier4":140,"per_vial":null,"notes":""},"ZJ":{"code":"TA10","price":170,"tier2":167,"tier3":165,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":5,"unit":"mg","suppliers":{"HYB":{"code":"TR5","price":45,"tier2":43,"tier3":40,"tier4":37,"per_vial":null,"notes":""},"ZJ":{"code":"TR5","price":48,"tier2":45,"tier3":43,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TR10","price":60,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"T10","price":55,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TR10","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"HYB":{"code":"TR10","price":65,"tier2":63,"tier3":60,"tier4":55,"per_vial":null,"notes":""},"Aurora":{"code":"Tirze10","price":55,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"TR10","price":130,"tier2":null,"tier3":null,"tier4":null,"per_vial":60,"notes":"US Domestic 3-day"},"ZJ":{"code":"TR10","price":68,"tier2":65,"tier3":63,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":15,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TR15","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"T15","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TR15","price":75,"tier2":70,"tier3":67,"tier4":65,"per_vial":null,"notes":""},"HYB":{"code":"TR15","price":70,"tier2":67,"tier3":65,"tier4":60,"per_vial":null,"notes":""},"Aurora":{"code":"Tirze15","price":70,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"TR15","price":80,"tier2":77,"tier3":75,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":20,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TR20","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"T20","price":85,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TR20","price":89,"tier2":85,"tier3":80,"tier4":70,"per_vial":null,"notes":""},"HYB":{"code":"TR20","price":80,"tier2":77,"tier3":75,"tier4":70,"per_vial":null,"notes":""},"Maddox":{"code":"TR20","price":180,"tier2":null,"tier3":null,"tier4":null,"per_vial":90,"notes":"US Domestic 3-day"},"ZJ":{"code":"TR20","price":95,"tier2":92,"tier3":90,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":30,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TR30","price":130,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"T30","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TR30","price":109,"tier2":100,"tier3":95,"tier4":90,"per_vial":null,"notes":""},"HYB":{"code":"TR30","price":110,"tier2":105,"tier3":100,"tier4":95,"per_vial":null,"notes":""},"MIX":{"code":"T-30","price":90,"tier2":85,"tier3":80,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"Tirze30","price":95,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"Maddox":{"code":"TR30","price":239,"tier2":null,"tier3":null,"tier4":null,"per_vial":130,"notes":"US Domestic 3-day"},"ZJ":{"code":"TR30","price":120,"tier2":116,"tier3":113,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":40,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TR40","price":165,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"T40","price":120,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TR40","price":149,"tier2":145,"tier3":140,"tier4":135,"per_vial":null,"notes":""},"HYB":{"code":"TR40","price":150,"tier2":145,"tier3":140,"tier4":140,"per_vial":null,"notes":""},"MIX":{"code":"T-40","price":120,"tier2":115,"tier3":110,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"TR40","price":150,"tier2":147,"tier3":145,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":50,"unit":"mg","suppliers":{"HYB":{"code":"TR50","price":180,"tier2":175,"tier3":170,"tier4":165,"per_vial":null,"notes":""},"ZJ":{"code":"TR50","price":165,"tier2":162,"tier3":160,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":60,"unit":"mg","suppliers":{"Peptide Pole":{"code":"TR60","price":230,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"APS":{"code":"T60","price":200,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"TR60","price":209,"tier2":205,"tier3":200,"tier4":190,"per_vial":null,"notes":""},"HYB":{"code":"TR60","price":210,"tier2":205,"tier3":200,"tier4":195,"per_vial":null,"notes":""},"MIX":{"code":"T-60","price":180,"tier2":175,"tier3":170,"tier4":null,"per_vial":null,"notes":""},"Aurora":{"code":"Tirze60","price":185,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"TR60","price":210,"tier2":208,"tier3":206,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":70,"unit":"mg","suppliers":{"APS":{"code":"T70","price":220,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"TR70","price":225,"tier2":222,"tier3":220,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":80,"unit":"mg","suppliers":{"ZJ":{"code":"TR80","price":255,"tier2":252,"tier3":250,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":90,"unit":"mg","suppliers":{"ZJ":{"code":"TR90","price":275,"tier2":272,"tier3":270,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":100,"unit":"mg","suppliers":{"HYB":{"code":"TR100","price":330,"tier2":325,"tier3":320,"tier4":310,"per_vial":null,"notes":""},"ZJ":{"code":"TR100","price":315,"tier2":312,"tier3":310,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Tirzepatide","dose":120,"unit":"mg","suppliers":{"APS":{"code":"T120","price":380,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ZJ":{"code":"TR120","price":330,"tier2":327,"tier3":323,"tier4":null,"per_vial":null,"notes":""}}},{"peptide":"Vesugen","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"VG10","price":64,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"VG10","price":105,"tier2":100,"tier3":95,"tier4":90,"per_vial":null,"notes":""}}},{"peptide":"VIP","dose":5,"unit":"mg","suppliers":{"Peptide Pole":{"code":"VP5","price":80,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"VP5","price":85,"tier2":82,"tier3":80,"tier4":75,"per_vial":null,"notes":""},"HYB":{"code":"VP5","price":85,"tier2":82,"tier3":79,"tier4":75,"per_vial":null,"notes":""}}},{"peptide":"VIP","dose":10,"unit":"mg","suppliers":{"Peptide Pole":{"code":"VP10","price":135,"tier2":null,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"ERP":{"code":"VP10","price":180,"tier2":140,"tier3":null,"tier4":null,"per_vial":null,"notes":""},"HYB":{"code":"VP10","price":145,"tier2":140,"tier3":135,"tier4":130,"per_vial":null,"notes":""},"ZJ":{"code":"VP10","price":185,"tier2":182,"tier3":180,"tier4":null,"per_vial":null,"notes":""}}}];
+
+  const SUPPLIERS = ["Peptide Pole", "APS", "ERP", "HYB", "MIX", "Aurora", "Maddox", "ZJ"];
+
+  const SUPPLIER_NOTES = {
+    "Peptide Pole": "Hong Kong • Broad catalog",
+    "APS": "Andy Peps China Warehouse",
+    "ERP": "Shanghai ERP • Tiered pricing",
+    "HYB": "Yura • US warehouse option",
+    "MIX": "Curated core catalog",
+    "Aurora": "Shenzhen Aurora Biotech",
+    "Maddox": "US Domestic • 3-day ship",
+    "ZJ": "Zenith Jove • Tirz up to 120mg"
+  };
+
+  let state = {
+    search: "",
+    sortBy: "name",
+    tier: "1",
+    activeSuppliers: new Set(SUPPLIERS),
+    expandedRow: null,
+  };
+
+  // --- Helpers ---
+  function getPriceForTier(s, tier) {
+    if (!s) return null;
+    if (tier === "1") return s.price;
+    if (tier === "2") return s.tier2 ?? s.price;
+    if (tier === "3") return s.tier3 ?? s.tier2 ?? s.price;
+    if (tier === "4") return s.tier4 ?? s.tier3 ?? s.tier2 ?? s.price;
+    return s.price;
+  }
+
+  function pricePerMg(price, dose, unit) {
+    if (unit !== "mg" || !price || !dose) return null;
+    return price / dose;
+  }
+
+  function fmtPrice(p) { return p == null ? "—" : "$" + Number(p).toFixed(p % 1 === 0 ? 0 : 2); }
+  function fmtPerMg(v) { return v == null ? "" : "$" + v.toFixed(2) + "/mg"; }
+
+  function getBestSupplier(row, tier) {
+    let best = null;
+    for (const sName of SUPPLIERS) {
+      if (!state.activeSuppliers.has(sName)) continue;
+      const s = row.suppliers[sName];
+      if (!s) continue;
+      const price = getPriceForTier(s, tier);
+      if (price == null) continue;
+      const perMg = pricePerMg(price, row.dose, row.unit);
+      // For non-mg items (iu, ml), use price directly
+      const metric = perMg ?? price;
+      if (best == null || metric < best.metric) {
+        best = { supplier: sName, price, perMg, metric };
+      }
+    }
+    return best;
+  }
+
+  // --- Render ---
+  function renderTabs() {
+    document.querySelectorAll(".tab").forEach(t => {
+      t.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        document.querySelectorAll(".view").forEach(x => x.classList.remove("active"));
+        t.classList.add("active");
+        document.getElementById("view-" + t.dataset.view).classList.add("active");
+        if (t.dataset.view === "winners") renderWinners();
+        if (t.dataset.view === "suppliers") renderSupplierCards();
+      });
+    });
+  }
+
+  function renderStats() {
+    const total = DATA.length;
+    const totalEntries = DATA.reduce((sum, r) => sum + Object.keys(r.suppliers).length, 0);
+    const avgSuppliers = (totalEntries / total).toFixed(1);
+
+    // Count unique peptides (ignore dose variants)
+    const uniquePeptides = new Set(DATA.map(r => r.peptide));
+
+    document.getElementById("stats-strip").innerHTML = `
+      <div class="stat-card">
+        <div class="label">Active Suppliers</div>
+        <div class="value">${SUPPLIERS.length}</div>
+        <div class="sub">Across HK, China, US sources</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Unique Peptides</div>
+        <div class="value">${uniquePeptides.size}</div>
+        <div class="sub">${total} dose variants tracked</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total SKUs</div>
+        <div class="value">${totalEntries}</div>
+        <div class="sub">Avg ${avgSuppliers} sources per item</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Price Tiers</div>
+        <div class="value">4</div>
+        <div class="sub">From single kit to 100+ volume</div>
+      </div>
+    `;
+  }
+
+  function renderSupplierFilters() {
+    const container = document.getElementById("supplier-filters");
+    container.innerHTML = SUPPLIERS.map(s =>
+      `<button class="supplier-chip ${state.activeSuppliers.has(s) ? 'active' : ''}" data-sup="${s}">${s}</button>`
+    ).join("");
+    container.querySelectorAll(".supplier-chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const sup = btn.dataset.sup;
+        if (state.activeSuppliers.has(sup)) state.activeSuppliers.delete(sup);
+        else state.activeSuppliers.add(sup);
+        renderSupplierFilters();
+        renderTable();
+      });
+    });
+  }
+
+  function renderTable() {
+    const head = document.getElementById("table-head");
+    const body = document.getElementById("table-body");
+
+    const activeSuppliers = SUPPLIERS.filter(s => state.activeSuppliers.has(s));
+
+    head.innerHTML = `
+      <th style="min-width:180px;">Peptide</th>
+      <th style="min-width:80px;">Dose</th>
+      ${activeSuppliers.map(s => `<th class="supplier-col">${s}</th>`).join("")}
+    `;
+
+    // Filter + sort
+    let rows = DATA.filter(r => {
+      const q = state.search.toLowerCase().trim();
+      if (q && !r.peptide.toLowerCase().includes(q)) return false;
+      // Must have at least one active supplier with data
+      const hasActive = activeSuppliers.some(s => r.suppliers[s]);
+      return hasActive;
+    });
+
+    if (state.sortBy === "name") {
+      rows.sort((a, b) => a.peptide.localeCompare(b.peptide) || a.dose - b.dose);
+    } else if (state.sortBy === "best-price") {
+      rows.sort((a, b) => {
+        const ba = getBestSupplier(a, state.tier);
+        const bb = getBestSupplier(b, state.tier);
+        if (!ba) return 1; if (!bb) return -1;
+        return ba.price - bb.price;
+      });
+    } else if (state.sortBy === "biggest-gap") {
+      rows.sort((a, b) => {
+        const getGap = (r) => {
+          const prices = activeSuppliers
+            .map(s => r.suppliers[s] ? getPriceForTier(r.suppliers[s], state.tier) : null)
+            .filter(p => p != null);
+          if (prices.length < 2) return 0;
+          return Math.max(...prices) - Math.min(...prices);
+        };
+        return getGap(b) - getGap(a);
+      });
+    } else if (state.sortBy === "most-available") {
+      rows.sort((a, b) => {
+        const ca = activeSuppliers.filter(s => a.suppliers[s]).length;
+        const cb = activeSuppliers.filter(s => b.suppliers[s]).length;
+        return cb - ca;
+      });
+    }
+
+    if (rows.length === 0) {
+      body.innerHTML = `<tr><td colspan="${activeSuppliers.length + 2}"><div class="empty-state">No products match your filters.</div></td></tr>`;
+      return;
+    }
+
+    body.innerHTML = rows.map((r, i) => {
+      const best = getBestSupplier(r, state.tier);
+      const rowId = `${r.peptide}-${r.dose}${r.unit}`;
+      const isExpanded = state.expandedRow === rowId;
+
+      const supplierCells = activeSuppliers.map(sName => {
+        const s = r.suppliers[sName];
+        if (!s) return `<td class="price-cell empty">—</td>`;
+        const price = getPriceForTier(s, state.tier);
+        const perMg = pricePerMg(price, r.dose, r.unit);
+        const isBest = best && best.supplier === sName;
+        return `
+          <td class="price-cell ${isBest ? 'best' : ''}">
+            <div class="kit-price">${fmtPrice(price)}</div>
+            ${perMg ? `<div class="per-mg">${fmtPerMg(perMg)}</div>` : ''}
+            ${isBest && activeSuppliers.length > 1 ? '<div class="best-badge">★ Best</div>' : ''}
+          </td>
+        `;
+      }).join("");
+
+      let detailHtml = "";
+      if (isExpanded) {
+        const detailContent = SUPPLIERS
+          .filter(sName => state.activeSuppliers.has(sName) && r.suppliers[sName])
+          .map(sName => {
+            const s = r.suppliers[sName];
+            const tiers = [];
+            if (s.price != null) tiers.push(`<span class="tier-pill">1 kit: <strong>$${s.price}</strong></span>`);
+            if (s.tier2 != null) tiers.push(`<span class="tier-pill">Tier 2: <strong>$${s.tier2}</strong></span>`);
+            if (s.tier3 != null) tiers.push(`<span class="tier-pill">Tier 3: <strong>$${s.tier3}</strong></span>`);
+            if (s.tier4 != null) tiers.push(`<span class="tier-pill">Tier 4: <strong>$${s.tier4}</strong></span>`);
+            if (s.per_vial != null) tiers.push(`<span class="tier-pill">Per vial: <strong>$${s.per_vial}</strong></span>`);
+            return `
+              <div class="supplier-detail">
+                <div>
+                  <div class="supplier-name">${sName}</div>
+                  ${s.code ? `<div class="supplier-code">${s.code}</div>` : ''}
+                </div>
+                <div>
+                  <div class="tier-grid">${tiers.join("")}</div>
+                  ${s.notes ? `<div class="supplier-notes">${s.notes}</div>` : ''}
+                </div>
+                <div></div>
+              </div>
+            `;
+          }).join("");
+        detailHtml = `
+          <tr>
+            <td colspan="${activeSuppliers.length + 2}" style="padding:0;">
+              <div class="tier-details">
+                <h4>${r.peptide} — ${r.dose}${r.unit} • All Tier Pricing</h4>
+                ${detailContent}
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      return `
+        <tr class="${isExpanded ? 'expanded' : ''}" data-row-id="${rowId}">
+          <td><span class="peptide-name">${r.peptide}</span></td>
+          <td><span class="dose">${r.dose}${r.unit}</span></td>
+          ${supplierCells}
+        </tr>
+        ${detailHtml}
+      `;
+    }).join("");
+
+    // Click handler for expanding rows
+    body.querySelectorAll("tr[data-row-id]").forEach(tr => {
+      tr.addEventListener("click", () => {
+        const id = tr.dataset.rowId;
+        state.expandedRow = state.expandedRow === id ? null : id;
+        renderTable();
+      });
+    });
+  }
+
+  function renderWinners() {
+    const container = document.getElementById("winners-list");
+    const rows = DATA.map(r => {
+      const best = getBestSupplier(r, "1");
+      if (!best) return null;
+      // Calc max price among active suppliers for savings %
+      const prices = SUPPLIERS
+        .filter(s => state.activeSuppliers.has(s))
+        .map(s => r.suppliers[s] ? getPriceForTier(r.suppliers[s], "1") : null)
+        .filter(p => p != null);
+      const max = prices.length > 1 ? Math.max(...prices) : null;
+      const savings = max && max > best.price ? ((max - best.price) / max * 100).toFixed(0) : null;
+      return { ...r, best, max, savings };
+    }).filter(x => x != null);
+
+    // Sort by biggest savings
+    rows.sort((a, b) => {
+      const sa = a.savings == null ? -1 : Number(a.savings);
+      const sb = b.savings == null ? -1 : Number(b.savings);
+      return sb - sa;
+    });
+
+    container.innerHTML = `
+      <div class="winner-row header">
+        <span>Peptide</span>
+        <span>Dose</span>
+        <span>Cheapest Supplier</span>
+        <span>Best Price</span>
+        <span>Savings</span>
+      </div>
+      ${rows.map(r => `
+        <div class="winner-row">
+          <div class="peptide-label">${r.peptide}</div>
+          <div class="dose-label">${r.dose}${r.unit}</div>
+          <div style="color:var(--grey-dark); font-weight:600;">${r.best.supplier}</div>
+          <div><span class="winner-badge">${fmtPrice(r.best.price)}${r.best.perMg ? ` · ${fmtPerMg(r.best.perMg)}` : ''}</span></div>
+          <div class="savings">${r.savings != null ? r.savings + '% off' : (r.max == null ? 'Only source' : '—')}</div>
+        </div>
+      `).join("")}
+    `;
+  }
+
+  function renderSupplierCards() {
+    const container = document.getElementById("supplier-cards");
+    container.innerHTML = SUPPLIERS.map(sName => {
+      // Compute stats
+      const entries = DATA.filter(r => r.suppliers[sName]);
+      const catalogSize = entries.length;
+      // Avg price per mg (only for mg items with valid perMg)
+      const perMgs = entries
+        .map(r => {
+          const s = r.suppliers[sName];
+          const price = getPriceForTier(s, "1");
+          return pricePerMg(price, r.dose, r.unit);
+        })
+        .filter(v => v != null);
+      const avgPerMg = perMgs.length ? (perMgs.reduce((a, b) => a + b, 0) / perMgs.length).toFixed(2) : "—";
+
+      // How many "best price" wins
+      let wins = 0;
+      DATA.forEach(r => {
+        const best = getBestSupplier(r, "1");
+        if (best && best.supplier === sName) wins++;
+      });
+
+      return `
+        <div class="supplier-card">
+          <h3>${sName}</h3>
+          <div class="sub">${SUPPLIER_NOTES[sName] || ''}</div>
+          <div class="stat-row"><span class="label">Catalog Size</span><span class="val">${catalogSize} items</span></div>
+          <div class="stat-row"><span class="label">Avg $/mg</span><span class="val">${avgPerMg === "—" ? "—" : "$" + avgPerMg}</span></div>
+          <div class="stat-row"><span class="label">Lowest-Price Wins</span><span class="val">${wins}</span></div>
+          <div class="stat-row"><span class="label">Win Rate</span><span class="val">${((wins / DATA.length) * 100).toFixed(0)}%</span></div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  // --- Wire up controls ---
+  document.getElementById("search").addEventListener("input", (e) => {
+    state.search = e.target.value;
+    renderTable();
+  });
+  document.getElementById("sort-by").addEventListener("change", (e) => {
+    state.sortBy = e.target.value;
+    renderTable();
+  });
+  document.getElementById("price-tier").addEventListener("change", (e) => {
+    state.tier = e.target.value;
+    renderTable();
+  });
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    state = {
+      search: "", sortBy: "name", tier: "1",
+      activeSuppliers: new Set(SUPPLIERS), expandedRow: null,
+    };
+    document.getElementById("search").value = "";
+    document.getElementById("sort-by").value = "name";
+    document.getElementById("price-tier").value = "1";
+    renderSupplierFilters();
+    renderTable();
+  });
+
+  // --- Initial render ---
+  renderTabs();
+  renderStats();
+  renderSupplierFilters();
+  renderTable();
+</script>
+
+</body>
+</html>
