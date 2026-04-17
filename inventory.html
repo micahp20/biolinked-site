@@ -70,6 +70,12 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .inv-table { width: 100%; border-collapse: collapse; }
 .inv-table th { background: var(--surface2); border-bottom: 1px solid var(--gold-border); padding: 12px 16px; text-align: left; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .inv-table th:last-child { text-align: center; }
+.inv-table th.sortable { cursor: pointer; user-select: none; transition: color 0.15s, background 0.15s; position: relative; padding-right: 28px; }
+.inv-table th.sortable:hover { color: var(--gold); background: rgba(212,175,55,0.06); }
+.inv-table th.sortable::after { content: '⇅'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; opacity: 0.4; letter-spacing: 0; }
+.inv-table th.sortable.sort-asc::after { content: '↑'; opacity: 1; color: var(--gold); font-size: 13px; font-weight: 700; }
+.inv-table th.sortable.sort-desc::after { content: '↓'; opacity: 1; color: var(--gold); font-size: 13px; font-weight: 700; }
+.inv-table th.sortable.sort-asc, .inv-table th.sortable.sort-desc { color: var(--gold); }
 .inv-row { border-bottom: 1px solid rgba(212,175,55,0.06); transition: background 0.15s; }
 .inv-row:last-child { border-bottom: none; }
 .inv-row:hover { background: rgba(212,175,55,0.025); }
@@ -171,11 +177,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .sheet-cancel-link { display: block; text-align: center; margin-top: 16px; font-size: 14px; color: var(--muted); cursor: pointer; -webkit-tap-highlight-color: transparent; padding: 10px; }
 @media (max-width: 768px) {
   .wrapper { padding: 20px 12px 100px; }
-  .topbar { padding: 10px 14px; height: auto; min-height: 58px; flex-direction: column; align-items: stretch; gap: 10px; }
-  .topbar-brand { justify-content: flex-start; }
-  .topbar-actions { justify-content: space-between; width: 100%; gap: 8px; }
-  .topbar-actions .btn-sm { flex: 1; width: auto; }
-  .sync-status { flex-shrink: 0; }
+  .topbar { padding: 0 14px; height: 58px; }
   .stats-row { grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
   .stat-card { padding: 14px; }
   .stat-card-val { font-size: 28px !important; }
@@ -186,7 +188,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   .peptide-name { font-size: 15px !important; }
   .col-note, .col-ordered, .col-size { display: none; }
   .row-actions { flex-direction: column; gap: 6px; }
-  .row-actions .btn-sm { width: 100%; justify-content: center; }
+  .btn-sm { font-size: 12px !important; padding: 10px 14px !important; min-height: 42px; width: 100%; justify-content: center; }
   .modal-overlay { padding: 0; align-items: flex-end; }
   .modal { border-radius: 18px 18px 0 0 !important; padding: 28px 18px 44px !important; max-width: 100% !important; max-height: 88vh; overflow-y: auto; }
   .form-grid { grid-template-columns: 1fr !important; }
@@ -257,11 +259,11 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     </div>
     <table class="inv-table" id="invTable" style="display:none;">
       <thead><tr>
-        <th>Peptide / Compound</th>
-        <th>Vials Remaining</th>
-        <th class="col-size">Vial Size</th>
-        <th class="col-ordered">Kit Size</th>
-        <th class="col-status">Status</th>
+        <th class="sortable" data-col="name" data-type="text">Peptide / Compound</th>
+        <th class="sortable" data-col="vials" data-type="num">Vials Remaining</th>
+        <th class="col-size sortable" data-col="vialSize" data-type="text">Vial Size</th>
+        <th class="col-ordered sortable" data-col="kitQty" data-type="num">Kit Size</th>
+        <th class="col-status sortable" data-col="status" data-type="text">Status</th>
         <th class="col-note">Note</th>
         <th>Actions</th>
       </tr></thead>
@@ -342,7 +344,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 <script>
 // ── SUPABASE CONFIG ──
 const SUPA_URL = 'https://bfjydzealeethhcpdfxl.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
+const SUPA_KEY = 'sb_publishable_dodGRCNAFskYIaE6C_-LyA_ubvEnB4X';
 
 async function supa(table, method, body, query='') {
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}${query}`, {
@@ -398,6 +400,7 @@ async function saveToSupabase(item) {
   setSyncStatus('syncing', 'Saving…');
   try {
     const row = {
+      id: item.id,
       name: item.name,
       vials: item.vials,
       vial_size: item.vialSize,
@@ -406,10 +409,11 @@ async function saveToSupabase(item) {
       status: item.status
     };
     if (typeof item.id === 'number') {
-      // existing row — update (never include id in payload, column is GENERATED ALWAYS)
+      // existing row — update
       await supa('inventory', 'PATCH', row, `?id=eq.${item.id}`);
     } else {
       // new row — insert, get back id
+      delete row.id;
       const res = await supa('inventory', 'POST', row);
       if (res && res[0]) item.id = res[0].id;
     }
@@ -436,14 +440,60 @@ function statusLabel(s){return{'in-stock':'In Stock',low:'Low Stock',out:'Out of
 function statusClass(s){return{'in-stock':'status-in-stock',low:'status-low',out:'status-out',ordered:'status-ordered'}[s]||'';}
 function barClass(s){return{'in-stock':'bar-green',low:'bar-amber',out:'bar-red',ordered:'bar-green'}[s]||'bar-green';}
 
+// ── SORT STATE ──
+const sortState = { col: null, dir: 'asc' };
+
+function applySortIndicators() {
+  document.querySelectorAll('.inv-table th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    if (sortState.col === th.dataset.col) {
+      th.classList.add(sortState.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+
+document.addEventListener('click', (e) => {
+  const th = e.target.closest('.inv-table th.sortable');
+  if (!th) return;
+  const col = th.dataset.col;
+  if (sortState.col === col) {
+    sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortState.col = col;
+    sortState.dir = (th.dataset.type === 'num') ? 'desc' : 'asc';
+  }
+  renderTable();
+});
+
 function renderTable() {
   const tbody=document.getElementById('invBody'), empty=document.getElementById('emptyState');
   const search=document.getElementById('searchInput').value.toLowerCase();
   let filtered=items.filter(item=>item.name.toLowerCase().includes(search)&&(activeFilter==='all'||getStatus(item)===activeFilter));
   if(!filtered.length){tbody.innerHTML='';empty.style.display='block';updateStats();return;}
   empty.style.display='none';
-  const order={out:0,low:1,'in-stock':2,ordered:3};
-  filtered.sort((a,b)=>order[getStatus(a)]-order[getStatus(b)]);
+
+  if (sortState.col) {
+    // User-selected sort
+    const getters = {
+      name:     i => i.name.toLowerCase(),
+      vials:    i => i.vials,
+      vialSize: i => i.vialSize || '',
+      kitQty:   i => i.kitQty || 0,
+      status:   i => getStatus(i)
+    };
+    const get = getters[sortState.col];
+    filtered.sort((a, b) => {
+      const va = get(a), vb = get(b);
+      if (typeof va === 'string' && typeof vb === 'string') return va.localeCompare(vb);
+      return (va || 0) - (vb || 0);
+    });
+    if (sortState.dir === 'desc') filtered.reverse();
+  } else {
+    // Default sort: out → low → in-stock → ordered
+    const order={out:0,low:1,'in-stock':2,ordered:3};
+    filtered.sort((a,b)=>order[getStatus(a)]-order[getStatus(b)]);
+  }
+
   tbody.innerHTML=filtered.map(item=>{
     const st=getStatus(item), maxV=Math.max(item.kitQty*10,item.vials,10), pct=Math.min((item.vials/maxV)*100,100);
     return `<tr class="inv-row" id="row-${item.id}">
@@ -468,6 +518,7 @@ function renderTable() {
     </tr>`;
   }).join('');
   updateStats();
+  applySortIndicators();
 }
 
 function updateStats(){
