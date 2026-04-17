@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Hub — BioLinked</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #8B7335;
+    --gold-light: #B8985A;
+    --gold-dark: #6B5826;
+    --gold-glow: rgba(139,115,53,0.08);
+    --gold-border: rgba(139,115,53,0.3);
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface-alt: #fafafa;
+    --border: #e0e0e0;
+    --border-dark: #c0c0c0;
+    --text: #1a1a1a;
+    --text-muted: #666;
+    --text-soft: #999;
+    --grey-dark: #3a3a3a;
+    --shadow: 0 2px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+  }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(ellipse at top left, rgba(139,115,53,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(58,58,58,0.06) 0%, transparent 55%),
+      linear-gradient(180deg, #ededed 0%, #f5f5f5 40%, #efefef 100%);
+    background-attachment: fixed;
+    position: relative;
+  }
+  /* Subtle grain overlay for texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* Decorative gold corner accent */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0; right: 0;
+    width: 380px; height: 380px;
+    background: radial-gradient(circle at top right, rgba(184,152,90,0.12) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  header.page, main, footer.admin-foot { position: relative; z-index: 1; }
+
+  /* ── LOGIN GATE ── */
+  .gate-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+  }
+  .gate-overlay.hidden { display: none; }
+  .gate-card {
+    background: var(--surface);
+    border: 1px solid var(--gold-border);
+    border-top: 3px solid var(--gold);
+    padding: 48px 40px 40px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    text-align: center;
+  }
+  .gate-brand {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+  .gate-brand em { color: var(--gold); font-style: italic; }
+  .gate-sub {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 32px;
+  }
+  .gate-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    color: var(--grey-dark);
+    margin-bottom: 6px;
+  }
+  .gate-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+  .gate-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border-dark);
+    font-size: 16px;
+    font-family: inherit;
+    background: var(--surface);
+    color: var(--text);
+    letter-spacing: 0.05em;
+    transition: border-color 0.15s;
+    margin-bottom: 12px;
+  }
+  .gate-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px var(--gold-glow);
+  }
+  .gate-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--gold);
+    color: #fff;
+    border: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .gate-btn:hover { background: var(--gold-dark); }
+  .gate-error {
+    color: #b03030;
+    font-size: 12px;
+    margin-top: 10px;
+    min-height: 18px;
+  }
+
+  /* ── HEADER ── */
+  header.page {
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 44px 24px 40px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 1px 0 rgba(139,115,53,0.15);
+  }
+  header.page::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+    opacity: 0.5;
+  }
+  header.page .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  header.page .eyebrow::before,
+  header.page .eyebrow::after {
+    content: '';
+    width: 28px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+  header.page h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 52px);
+    font-weight: 500;
+    color: var(--grey-dark);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  header.page h1 em {
+    color: var(--gold);
+    font-style: italic;
+    font-weight: 600;
+  }
+  header.page p {
+    color: var(--text-muted);
+    font-size: 13px;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 24px;
+    padding: 7px 14px;
+    background: transparent;
+    border: 1px solid var(--border-dark);
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .logout-btn:hover {
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+
+  /* ── CARDS GRID ── */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 900px) {
+    .cards-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 540px) {
+    .cards-grid { grid-template-columns: 1fr; gap: 14px; }
+    main { padding: 28px 16px 60px; }
+  }
+
+  .tool-card {
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--gold);
+    padding: 32px 28px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, var(--gold-glow), transparent);
+    transition: left 0.5s;
+  }
+  .tool-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--gold-border);
+  }
+  .tool-card:hover::before { left: 100%; }
+
+  .tool-icon {
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, var(--gold-glow), rgba(139,115,53,0.02));
+    border: 1px solid var(--gold-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    border-radius: 2px;
+  }
+  .tool-name {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--grey-dark);
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+  }
+  .tool-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    font-weight: 400;
+  }
+  .tool-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .tool-tag {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+  }
+  .tool-arrow {
+    font-size: 18px;
+    color: var(--gold);
+    transition: transform 0.2s;
+  }
+  .tool-card:hover .tool-arrow { transform: translateX(4px); }
+  .tool-card.coming-soon {
+    opacity: 0.65;
+    pointer-events: none;
+    border-top-color: var(--border-dark);
+  }
+  .tool-card.coming-soon .tool-tag { color: var(--text-soft); }
+
+  /* ── FOOTER ── */
+  footer.admin-foot {
+    text-align: center;
+    padding: 24px 20px 40px;
+    font-size: 11px;
+    color: var(--text-soft);
+    letter-spacing: 0.05em;
+  }
+  footer.admin-foot strong { color: var(--gold); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN GATE ── -->
+<div class="gate-overlay" id="gate">
+  <div class="gate-card">
+    <div class="gate-brand">Bio<em>Linked</em></div>
+    <div class="gate-sub">Admin Access</div>
+    <div class="gate-title">Enter Password</div>
+    <div class="gate-hint">Authorized access only.</div>
+    <form id="gateForm" autocomplete="off">
+      <input
+        type="password"
+        id="gateInput"
+        class="gate-input"
+        placeholder="••••••••"
+        autofocus
+      >
+      <button type="submit" class="gate-btn">Unlock Admin Hub</button>
+      <div class="gate-error" id="gateError"></div>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN ADMIN HUB ── -->
+<header class="page">
+  <button class="logout-btn" onclick="logout()">Log Out</button>
+  <div class="eyebrow">Admin Command Center</div>
+  <h1>Admin <em>Hub</em></h1>
+  <p>Quick access to every internal tool. Click a card to open.</p>
+</header>
+
+<main>
+  <div class="cards-grid">
+
+    <a href="https://biolinkedsolutions.com/inventory" class="tool-card">
+      <div class="tool-icon">📦</div>
+      <div class="tool-name">Inventory</div>
+      <div class="tool-desc">Peptide stock tracker with Supabase sync. Monitor vials, low-stock alerts, and reorder status.</div>
+      <div class="tool-footer">
+        <span class="tool-tag">Live · Supabase</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="https://biolinkedsolutions.com/profit-loss" class="tool-card">
+      <div class="tool-icon">📊</div>
+      <div class="tool-name">Profit &amp; Loss</div>
+      <div class="tool-desc">Revenue, expenses, and margin tracking across all BioLinked sales and supplier costs.</div>
+      <div class="tool-footer">
+        <span class="tool-tag">Live · Supabase</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="https://biolinkedsolutions.com/supplier-comparison" class="tool-card">
+      <div class="tool-icon">🏭</div>
+      <div class="tool-name">Suppliers</div>
+      <div class="tool-desc">Side-by-side price, dosage, and $/mg comparison across all 8 active suppliers.</div>
+      <div class="tool-footer">
+        <span class="tool-tag">8 Sources Tracked</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card coming-soon" onclick="return false;">
+      <div class="tool-icon">📋</div>
+      <div class="tool-name">Invoices</div>
+      <div class="tool-desc">Generate, track, and manage client invoices. Venmo payments, invoice history, status tracking.</div>
+      <div class="tool-footer">
+        <span class="tool-tag">Coming Soon</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card coming-soon" onclick="return false;">
+      <div class="tool-icon">💊</div>
+      <div class="tool-name">Protocols</div>
+      <div class="tool-desc">Reusable protocol templates (Gorilla Stack, GLP-1 Starter) you can clone and customize per client.</div>
+      <div class="tool-footer">
+        <span class="tool-tag">Coming Soon</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="#" class="tool-card coming-soon" onclick="return false;">
+      <div class="tool-icon">🏷️</div>
+      <div class="tool-name">Product Line</div>
+      <div class="tool-desc">Your public product catalog with pricing — what you sell to clients and retail.</div>
+      <div class="tool-footer">
+        <span class="tool-tag">Coming Soon</span>
+        <span class="tool-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+</main>
+
+<footer class="admin-foot">
+  <strong>BioLinked Solutions</strong> · Internal Admin Hub · Authorized Access Only
+</footer>
+
+<script>
+  // ─── PASSWORD GATE ───
+  const PASSWORD = '1Giuliana$';
+  const SESSION_KEY = 'biolinked_admin_auth';
+
+  // Check session on load
+  function checkAuth() {
+    const auth = sessionStorage.getItem(SESSION_KEY);
+    if (auth === 'granted') {
+      document.getElementById('gate').classList.add('hidden');
+    }
+  }
+
+  document.getElementById('gateForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('gateInput').value;
+    const errorEl = document.getElementById('gateError');
+
+    if (input === PASSWORD) {
+      sessionStorage.setItem(SESSION_KEY, 'granted');
+      document.getElementById('gate').classList.add('hidden');
+      errorEl.textContent = '';
+    } else {
+      errorEl.textContent = 'Incorrect password.';
+      document.getElementById('gateInput').value = '';
+      document.getElementById('gateInput').focus();
+    }
+  });
+
+  function logout() {
+    sessionStorage.removeItem(SESSION_KEY);
+    location.reload();
+  }
+
+  checkAuth();
+</script>
+
+</body>
+</html>
