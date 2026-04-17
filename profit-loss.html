@@ -121,6 +121,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   .form-grid2 { grid-template-columns: 1fr; } .modal { padding: 28px 18px 36px; }
   .hide-mob { display: none; } .data-table th, .data-table td { padding: 10px 10px; font-size: 12px; }
 }
+.form-input.field-error,.form-select.field-error{border-color:#c0392b!important;box-shadow:0 0 0 2px rgba(192,57,43,0.12)!important;background:#fdf4f3!important}
 </style>
 </head>
 <body>
@@ -590,8 +591,9 @@ function openOrderModal(){
   sel.innerHTML=products.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
   fillOrderCost();
   document.getElementById('oDate').value=today();
-  document.getElementById('oQty').value='';
+  document.getElementById('oQty').value='1';
   document.getElementById('oNote').value='';
+  clearFieldErrors(['oProduct','oDate','oQty']);
   openModal('orderModal');
 }
 function fillOrderCost(){const id=document.getElementById('oProduct').value;const p=products.find(p=>String(p.id)===String(id));if(p&&p.cost)document.getElementById('oUnitCost').value=p.cost;}
@@ -601,7 +603,12 @@ async function saveOrder(){
   const qty=parseInt(document.getElementById('oQty').value)||0;
   const unitCost=parseFloat(document.getElementById('oUnitCost').value)||0;
   const note=document.getElementById('oNote').value.trim();
-  if(!productId||!date||!qty)return;
+  const missing=[];
+  if(!productId)missing.push('oProduct');
+  if(!date)missing.push('oDate');
+  if(!qty)missing.push('oQty');
+  clearFieldErrors(['oProduct','oDate','oQty']);
+  if(missing.length){markFieldErrors(missing);return;}
   setSyncStatus('syncing','Saving…');
   try{
     const res=await supa('pl_orders','POST',{product_id:productId,date,qty,unit_cost:unitCost,note:note||null});
@@ -624,8 +631,9 @@ function openSaleModal(){
   sel.innerHTML=products.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
   fillSalePrice();
   document.getElementById('sDate').value=today();
-  document.getElementById('sQty').value='';
+  document.getElementById('sQty').value='1';
   document.getElementById('sNote').value='';
+  clearFieldErrors(['sProduct','sDate','sQty']);
   openModal('saleModal');
 }
 function fillSalePrice(){const id=document.getElementById('sProduct').value;const p=products.find(p=>String(p.id)===String(id));if(p&&p.sale)document.getElementById('sPrice').value=p.sale;}
@@ -635,7 +643,12 @@ async function saveSale(){
   const qty=parseInt(document.getElementById('sQty').value)||0;
   const price=parseFloat(document.getElementById('sPrice').value)||0;
   const note=document.getElementById('sNote').value.trim();
-  if(!productId||!date||!qty)return;
+  const missing=[];
+  if(!productId)missing.push('sProduct');
+  if(!date)missing.push('sDate');
+  if(!qty)missing.push('sQty');
+  clearFieldErrors(['sProduct','sDate','sQty']);
+  if(missing.length){markFieldErrors(missing);return;}
   setSyncStatus('syncing','Saving…');
   try{
     const res=await supa('pl_sales','POST',{product_id:productId,date,qty,price,note:note||null});
@@ -664,6 +677,8 @@ function fmt(n){return'$'+(parseFloat(n)||0).toFixed(2).replace(/\B(?=(\d{3})+(?
 function fmtDate(d){if(!d)return'—';const dt=new Date(d+'T12:00:00');return isNaN(dt)?d:dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 function today(){return new Date().toISOString().slice(0,10);}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function markFieldErrors(ids){ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;el.classList.add('field-error');const clear=()=>el.classList.remove('field-error');el.addEventListener('input',clear,{once:true});el.addEventListener('change',clear,{once:true});});const first=document.getElementById(ids[0]);if(first)first.focus();}
+function clearFieldErrors(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.remove('field-error');});}
 function emptyRow(cols,icon,title,sub){return`<tr><td colspan="${cols}"><div class="empty-state"><div class="empty-icon">${icon}</div><div class="empty-title">${title}</div><div class="empty-sub">${sub}</div></div></td></tr>`;}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')['productModal','orderModal','saleModal'].forEach(closeModal);});
 window.addEventListener('load',loadAll);
