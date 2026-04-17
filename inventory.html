@@ -399,8 +399,10 @@ async function loadFromSupabase() {
 async function saveToSupabase(item) {
   setSyncStatus('syncing', 'Saving…');
   try {
+    // Note: id is GENERATED ALWAYS in Postgres — never include it in the body.
+    // For PATCH, the id is already in the query string (?id=eq.X).
+    // For POST, the DB generates the id and returns it.
     const row = {
-      id: item.id,
       name: item.name,
       vials: item.vials,
       vial_size: item.vialSize,
@@ -413,7 +415,6 @@ async function saveToSupabase(item) {
       await supa('inventory', 'PATCH', row, `?id=eq.${item.id}`);
     } else {
       // new row — insert, get back id
-      delete row.id;
       const res = await supa('inventory', 'POST', row);
       if (res && res[0]) item.id = res[0].id;
     }
