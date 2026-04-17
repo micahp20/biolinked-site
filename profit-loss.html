@@ -69,6 +69,12 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th { background: var(--surface2); border-bottom: 1px solid var(--gold-border); padding: 12px 16px; text-align: left; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
 .data-table th:last-child { text-align: center; }
+.data-table th.sortable { cursor: pointer; user-select: none; transition: color 0.15s, background 0.15s; position: relative; padding-right: 28px; }
+.data-table th.sortable:hover { color: var(--gold); background: rgba(212,175,55,0.06); }
+.data-table th.sortable::after { content: '⇅'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; opacity: 0.4; letter-spacing: 0; }
+.data-table th.sortable.sort-asc::after { content: '↑'; opacity: 1; color: var(--gold); font-size: 13px; font-weight: 700; }
+.data-table th.sortable.sort-desc::after { content: '↓'; opacity: 1; color: var(--gold); font-size: 13px; font-weight: 700; }
+.data-table th.sortable.sort-asc, .data-table th.sortable.sort-desc { color: var(--gold); }
 .data-table td { padding: 13px 16px; vertical-align: middle; font-size: 13px; border-bottom: 1px solid rgba(212,175,55,0.05); }
 .data-table tr:last-child td { border-bottom: none; }
 .data-table tr:hover td { background: rgba(212,175,55,0.02); }
@@ -170,7 +176,14 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Product</th><th>Units Sold</th><th>Revenue</th><th>COGS</th><th>Gross Profit</th><th>Margin</th></tr></thead>
+          <thead><tr>
+            <th class="sortable" data-table="overview" data-col="name" data-type="text">Product</th>
+            <th class="sortable" data-table="overview" data-col="units" data-type="num">Units Sold</th>
+            <th class="sortable" data-table="overview" data-col="rev" data-type="num">Revenue</th>
+            <th class="sortable" data-table="overview" data-col="cogs" data-type="num">COGS</th>
+            <th class="sortable" data-table="overview" data-col="profit" data-type="num">Gross Profit</th>
+            <th class="sortable" data-table="overview" data-col="margin" data-type="num">Margin</th>
+          </tr></thead>
           <tbody id="overviewBody"></tbody>
         </table>
       </div>
@@ -182,7 +195,13 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Product Name</th><th>Your Cost / Vial</th><th>Sale Price / Vial</th><th>Margin</th><th style="text-align:center;">Actions</th></tr></thead>
+          <thead><tr>
+            <th class="sortable" data-table="products" data-col="name" data-type="text">Product Name</th>
+            <th class="sortable" data-table="products" data-col="cost" data-type="num">Your Cost / Vial</th>
+            <th class="sortable" data-table="products" data-col="sale" data-type="num">Sale Price / Vial</th>
+            <th class="sortable" data-table="products" data-col="margin" data-type="num">Margin</th>
+            <th style="text-align:center;">Actions</th>
+          </tr></thead>
           <tbody id="productsBody"></tbody>
         </table>
       </div>
@@ -194,7 +213,15 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Product</th><th>Date</th><th>Qty (Vials)</th><th>Unit Cost</th><th>Total Cost</th><th class="hide-mob">Note</th><th style="text-align:center;">Del</th></tr></thead>
+          <thead><tr>
+            <th class="sortable" data-table="orders" data-col="name" data-type="text">Product</th>
+            <th class="sortable" data-table="orders" data-col="date" data-type="date">Date</th>
+            <th class="sortable" data-table="orders" data-col="qty" data-type="num">Qty (Vials)</th>
+            <th class="sortable" data-table="orders" data-col="unitCost" data-type="num">Unit Cost</th>
+            <th class="sortable" data-table="orders" data-col="total" data-type="num">Total Cost</th>
+            <th class="hide-mob">Note</th>
+            <th style="text-align:center;">Del</th>
+          </tr></thead>
           <tbody id="ordersBody"></tbody>
         </table>
       </div>
@@ -206,7 +233,15 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       </div>
       <div class="table-wrap">
         <table class="data-table">
-          <thead><tr><th>Product</th><th>Date</th><th>Qty (Vials)</th><th>Price / Vial</th><th>Total Revenue</th><th class="hide-mob">Note</th><th style="text-align:center;">Del</th></tr></thead>
+          <thead><tr>
+            <th class="sortable" data-table="sales" data-col="name" data-type="text">Product</th>
+            <th class="sortable" data-table="sales" data-col="date" data-type="date">Date</th>
+            <th class="sortable" data-table="sales" data-col="qty" data-type="num">Qty (Vials)</th>
+            <th class="sortable" data-table="sales" data-col="price" data-type="num">Price / Vial</th>
+            <th class="sortable" data-table="sales" data-col="total" data-type="num">Total Revenue</th>
+            <th class="hide-mob">Note</th>
+            <th style="text-align:center;">Del</th>
+          </tr></thead>
           <tbody id="salesBody"></tbody>
         </table>
       </div>
@@ -321,7 +356,59 @@ async function loadAll(){
   renderAll();
 }
 
-function renderAll(){renderStats();renderOverview();renderProducts();renderOrders();renderSales();}
+function renderAll(){renderStats();renderOverview();renderProducts();renderOrders();renderSales();updateSortIndicators();}
+
+// ── SORT STATE ──
+const sortState = {
+  overview: { col: null, dir: 'asc' },
+  products: { col: null, dir: 'asc' },
+  orders:   { col: 'date', dir: 'desc' },
+  sales:    { col: 'date', dir: 'desc' }
+};
+
+function sortRows(rows, table, getters) {
+  const s = sortState[table];
+  if (!s.col) return rows;
+  const get = getters[s.col];
+  if (!get) return rows;
+  const sorted = [...rows].sort((a, b) => {
+    const va = get(a), vb = get(b);
+    if (typeof va === 'string' && typeof vb === 'string') {
+      return va.localeCompare(vb);
+    }
+    return (va || 0) - (vb || 0);
+  });
+  return s.dir === 'desc' ? sorted.reverse() : sorted;
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll('th.sortable').forEach(th => {
+    th.classList.remove('sort-asc', 'sort-desc');
+    const t = th.dataset.table, c = th.dataset.col;
+    const s = sortState[t];
+    if (s && s.col === c) {
+      th.classList.add(s.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+  });
+}
+
+function handleSortClick(th) {
+  const t = th.dataset.table, c = th.dataset.col;
+  const s = sortState[t];
+  if (s.col === c) {
+    s.dir = s.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    s.col = c;
+    s.dir = (th.dataset.type === 'num' || th.dataset.type === 'date') ? 'desc' : 'asc';
+  }
+  renderAll();
+}
+
+// Attach click handlers once DOM is ready
+document.addEventListener('click', (e) => {
+  const th = e.target.closest('th.sortable');
+  if (th) handleSortClick(th);
+});
 
 function inRange(d){
   const from=document.getElementById('filterFrom')?.value,to=document.getElementById('filterTo')?.value;
@@ -350,7 +437,7 @@ function renderOverview(){
   const tbody=document.getElementById('overviewBody');
   if(!products.length){tbody.innerHTML=emptyRow(6,'📊','No products yet','Add products first');return;}
   const fs=sales.filter(s=>inRange(s.date)),fo=orders.filter(o=>inRange(o.date));
-  const rows=products.map(p=>{
+  let rows=products.map(p=>{
     const ps=fs.filter(s=>String(s.productId)===String(p.id)),po=fo.filter(o=>String(o.productId)===String(p.id));
     const rev=ps.reduce((a,s)=>a+s.price*s.qty,0);
     const cogs=po.reduce((a,o)=>a+o.unitCost*o.qty,0);
@@ -358,6 +445,14 @@ function renderOverview(){
     return{p,rev,cogs,profit,margin,units};
   }).filter(r=>r.rev>0||r.cogs>0);
   if(!rows.length){tbody.innerHTML=emptyRow(6,'📈','No activity yet','Log orders and sales to see your P&L');return;}
+  rows = sortRows(rows, 'overview', {
+    name:   r => r.p.name.toLowerCase(),
+    units:  r => r.units,
+    rev:    r => r.rev,
+    cogs:   r => r.cogs,
+    profit: r => r.profit,
+    margin: r => r.margin
+  });
   tbody.innerHTML=rows.map(r=>`<tr>
     <td><div class="cell-name">${esc(r.p.name)}</div></td>
     <td style="font-weight:600;color:var(--text);">${r.units}</td>
@@ -371,8 +466,17 @@ function renderOverview(){
 function renderProducts(){
   const tbody=document.getElementById('productsBody');
   if(!products.length){tbody.innerHTML=emptyRow(5,'🧪','No products yet','Add a product to get started');return;}
-  tbody.innerHTML=products.map(p=>{
-    const margin=p.sale?((p.sale-p.cost)/p.sale)*100:0;
+  let rows = products.map(p => ({
+    p,
+    margin: p.sale ? ((p.sale - p.cost) / p.sale) * 100 : 0
+  }));
+  rows = sortRows(rows, 'products', {
+    name:   r => r.p.name.toLowerCase(),
+    cost:   r => r.p.cost || 0,
+    sale:   r => r.p.sale || 0,
+    margin: r => r.margin
+  });
+  tbody.innerHTML=rows.map(({p, margin})=>{
     return`<tr>
       <td><div class="cell-name">${esc(p.name)}</div></td>
       <td class="cell-money c-red">${p.cost?fmt(p.cost):'—'}</td>
@@ -389,7 +493,15 @@ function renderProducts(){
 function renderOrders(){
   const tbody=document.getElementById('ordersBody');
   if(!orders.length){tbody.innerHTML=emptyRow(7,'📦','No orders logged','Log purchase orders to track your COGS');return;}
-  tbody.innerHTML=[...orders].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(o=>{
+  let rows = orders.map(o => ({ ...o, total: o.unitCost * o.qty, name: pName(o.productId).toLowerCase() }));
+  rows = sortRows(rows, 'orders', {
+    name:     r => r.name,
+    date:     r => new Date(r.date).getTime(),
+    qty:      r => r.qty,
+    unitCost: r => r.unitCost,
+    total:    r => r.total
+  });
+  tbody.innerHTML=rows.map(o=>{
     const total=o.unitCost*o.qty;
     return`<tr>
       <td><div class="cell-name">${esc(pName(o.productId))}</div></td>
@@ -406,7 +518,15 @@ function renderOrders(){
 function renderSales(){
   const tbody=document.getElementById('salesBody');
   if(!sales.length){tbody.innerHTML=emptyRow(7,'💰','No sales logged','Log a sale to start tracking revenue');return;}
-  tbody.innerHTML=[...sales].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(s=>{
+  let rows = sales.map(s => ({ ...s, total: s.price * s.qty, name: pName(s.productId).toLowerCase() }));
+  rows = sortRows(rows, 'sales', {
+    name:  r => r.name,
+    date:  r => new Date(r.date).getTime(),
+    qty:   r => r.qty,
+    price: r => r.price,
+    total: r => r.total
+  });
+  tbody.innerHTML=rows.map(s=>{
     const total=s.price*s.qty;
     return`<tr>
       <td><div class="cell-name">${esc(pName(s.productId))}</div></td>
