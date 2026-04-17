@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Protocols — BioLinked</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #8B7335;
+    --gold-light: #B8985A;
+    --gold-dark: #6B5826;
+    --gold-glow: rgba(139,115,53,0.08);
+    --gold-border: rgba(139,115,53,0.3);
+    --bg: #f5f5f5;
+    --surface: #ffffff;
+    --surface-alt: #fafafa;
+    --border: #e0e0e0;
+    --border-dark: #c0c0c0;
+    --text: #1a1a1a;
+    --text-muted: #555;
+    --text-soft: #888;
+    --grey-dark: #3a3a3a;
+    --warn-bg: #fdf8f0;
+    --warn-border: rgba(154,123,47,0.3);
+    --info-bg: #f0f7fc;
+    --info-border: rgba(40,110,170,0.2);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(ellipse at top left, rgba(139,115,53,0.06) 0%, transparent 55%),
+      linear-gradient(180deg, #ededed 0%, #f5f5f5 40%, #efefef 100%);
+    background-attachment: fixed;
+  }
+
+  /* ── NAV BAR ── */
+  .bl-nav { background: #fff; border-bottom: 1px solid #eaeaea; position: sticky; top: 0; z-index: 600; font-family: 'Montserrat', sans-serif; }
+  .bl-nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .bl-nav-logo { text-decoration: none; display: flex; flex-direction: column; line-height: 1; }
+  .bl-nav-logo-main { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.08em; }
+  .bl-nav-logo-sub { font-size: 9px; color: var(--gold); letter-spacing: 0.2em; text-transform: uppercase; margin-top: 3px; font-weight: 700; }
+  .bl-nav-links { display: flex; align-items: center; gap: 2px; }
+  .bl-nav-link { font-size: 12px; color: #333; text-decoration: none; padding: 8px 12px; border-radius: 3px; transition: all .18s; white-space: nowrap; font-weight: 500; }
+  .bl-nav-link:hover { color: var(--gold); background: var(--gold-glow); }
+  .bl-nav-mobile-btn { display: none; background: none; border: none; font-size: 22px; color: #333; cursor: pointer; padding: 4px 8px; }
+  .bl-nav-mobile-menu { display: none; background: #fff; border-bottom: 1px solid #eaeaea; }
+  .bl-nav-mobile-menu.open { display: block; }
+  .bl-nav-mobile-link { display: block; padding: 12px 24px; font-size: 14px; color: #333; text-decoration: none; border-bottom: 1px solid #f5f5f5; font-weight: 500; }
+  .bl-nav-mobile-link:hover { background: #f8f8f8; color: var(--gold); }
+  @media (max-width: 820px) { .bl-nav-links { display: none; } .bl-nav-mobile-btn { display: block; } }
+
+  /* ── PAGE HEADER ── */
+  header.page {
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 48px 24px 40px;
+    text-align: center;
+    position: relative;
+  }
+  header.page::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--gold) 50%, transparent 100%);
+    opacity: 0.5;
+  }
+  header.page .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  header.page .eyebrow::before, header.page .eyebrow::after {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+  header.page h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(36px, 5vw, 54px);
+    font-weight: 500;
+    color: var(--grey-dark);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  header.page h1 em {
+    color: var(--gold);
+    font-style: italic;
+    font-weight: 600;
+  }
+  header.page p.lead {
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ── ATTRIBUTION BAR ── */
+  .attribution-bar {
+    background: linear-gradient(135deg, #f8f5ee, #f2ede0);
+    border-bottom: 1px solid var(--gold-border);
+    padding: 18px 24px;
+  }
+  .attribution-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+  }
+  .attribution-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .attribution-text {
+    flex: 1;
+    color: var(--grey-dark);
+    line-height: 1.6;
+  }
+  .attribution-text strong { color: var(--gold-dark); font-weight: 700; }
+  .attribution-text a { color: var(--gold-dark); font-weight: 600; text-decoration: underline; text-decoration-color: var(--gold-border); }
+  .attribution-text a:hover { text-decoration-color: var(--gold); }
+
+  /* ── TABS ── */
+  .tabs-bar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    position: sticky;
+    top: 56px;
+    z-index: 40;
+  }
+  .tabs-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 0;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 18px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  .tab-btn:hover { color: var(--grey-dark); }
+  .tab-btn.active {
+    color: var(--gold);
+    border-bottom-color: var(--gold);
+  }
+  .tab-icon { font-size: 18px; }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  @media (max-width: 640px) {
+    main { padding: 32px 18px 60px; }
+    .tab-btn { font-size: 10px; padding: 14px 10px; letter-spacing: 0.1em; }
+    .tab-icon { font-size: 15px; }
+  }
+
+  .tab-pane { display: none; }
+  .tab-pane.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── CONTENT STYLES ── */
+  .section {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  }
+  @media (max-width: 640px) { .section { padding: 22px 20px; } }
+
+  h2.section-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 30px;
+    font-weight: 600;
+    color: var(--grey-dark);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  h2.section-title em { color: var(--gold); font-style: italic; font-weight: 500; }
+  .section-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .section-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    margin: 14px 0 22px;
+    opacity: 0.6;
+  }
+
+  h3.subhead {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--grey-dark);
+    margin-top: 24px;
+    margin-bottom: 10px;
+    letter-spacing: -0.005em;
+  }
+  h4.minihead {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 18px;
+    margin-bottom: 8px;
+  }
+
+  p { margin-bottom: 12px; color: var(--text); }
+  .section ul, .section ol { padding-left: 22px; margin-bottom: 14px; }
+  .section li { margin-bottom: 6px; color: var(--text); }
+
+  strong { font-weight: 700; color: var(--grey-dark); }
+  em { font-style: italic; }
+
+  /* Compound card */
+  .compound-card {
+    background: linear-gradient(135deg, var(--surface-alt), #fff);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    border-radius: 3px;
+    padding: 22px 24px;
+    margin-bottom: 20px;
+  }
+  .compound-card h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--grey-dark);
+    margin-bottom: 4px;
+  }
+  .compound-card .compound-tag {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: block;
+  }
+  .compound-specs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px 18px;
+    padding: 12px 0;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+    margin: 14px 0;
+  }
+  .spec-item { display: flex; flex-direction: column; gap: 2px; }
+  .spec-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-soft); font-weight: 700; }
+  .spec-value { font-size: 14px; color: var(--grey-dark); font-weight: 600; }
+  .compound-why { font-size: 14px; color: var(--text); line-height: 1.65; }
+
+  /* Callout boxes */
+  .callout {
+    padding: 16px 20px;
+    border-radius: 3px;
+    margin: 18px 0;
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+  .callout-warn {
+    background: var(--warn-bg);
+    border-left: 3px solid var(--gold);
+    color: #5a4a20;
+  }
+  .callout-warn strong { color: var(--gold-dark); }
+  .callout-info {
+    background: var(--info-bg);
+    border-left: 3px solid #4a8ab8;
+    color: #2a4a65;
+  }
+  .callout-info strong { color: #2a4a65; }
+  .callout-danger {
+    background: #fef4f4;
+    border-left: 3px solid #b04040;
+    color: #6a2828;
+  }
+  .callout-danger strong { color: #6a2828; }
+  .callout-icon { font-size: 16px; margin-right: 6px; }
+
+  /* Summary table */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 13px;
+  }
+  .summary-table th {
+    background: var(--grey-dark);
+    color: #fff;
+    padding: 12px 10px;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-align: left;
+  }
+  .summary-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:nth-child(even) { background: var(--surface-alt); }
+  .summary-table .compound-name { font-weight: 700; color: var(--grey-dark); }
+  .summary-table .compound-subtype { font-size: 11px; color: var(--text-soft); font-style: italic; margin-top: 2px; }
+  .table-wrap { overflow-x: auto; }
+
+  /* Formula block */
+  .formula {
+    background: var(--info-bg);
+    border: 1px solid var(--info-border);
+    border-radius: 3px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    color: #2a4a65;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  /* Example box */
+  .example-box {
+    background: #fdfcf7;
+    border: 1px solid var(--gold-border);
+    border-radius: 3px;
+    padding: 20px 22px;
+    margin: 18px 0;
+  }
+  .example-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .example-specs { margin-bottom: 12px; }
+  .example-specs li { margin-bottom: 3px; font-size: 13.5px; }
+  .example-result {
+    background: var(--gold-glow);
+    border-left: 3px solid var(--gold);
+    padding: 10px 14px;
+    font-weight: 600;
+    color: var(--gold-dark);
+    font-size: 14px;
+    margin-top: 10px;
+  }
+
+  /* Step list */
+  .steps-list { counter-reset: step; list-style: none; padding-left: 0; }
+  .steps-list > li {
+    position: relative;
+    padding-left: 52px;
+    margin-bottom: 20px;
+    counter-increment: step;
+  }
+  .steps-list > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--gold);
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+  .steps-list li strong { display: block; margin-bottom: 4px; font-size: 15px; color: var(--grey-dark); }
+
+  /* Resources */
+  .resource-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background: #fff;
+    transition: all 0.15s;
+  }
+  .resource-item:hover {
+    border-color: var(--gold-border);
+    background: var(--surface-alt);
+  }
+  .resource-name { font-weight: 600; color: var(--grey-dark); }
+  .resource-sub { font-size: 12px; color: var(--text-soft); margin-top: 2px; }
+  .resource-link {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid var(--gold-border);
+    border-radius: 2px;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .resource-link:hover {
+    background: var(--gold);
+    color: #fff;
+  }
+
+  .discount-box {
+    background: linear-gradient(135deg, #f8f5ee, #f2ede0);
+    border: 1px solid var(--gold-border);
+    border-left: 3px solid var(--gold);
+    border-radius: 3px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  .discount-label {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .discount-code {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--gold-dark);
+    letter-spacing: 0.08em;
+    margin: 4px 0;
+  }
+  .discount-note { font-size: 13px; color: var(--text-muted); }
+
+  /* Footer disclaimer */
+  .final-disclaimer {
+    background: #fef4e8;
+    border: 1px solid #e0c5a0;
+    border-radius: 3px;
+    padding: 18px 22px;
+    font-size: 12.5px;
+    color: #5a3a15;
+    line-height: 1.65;
+    margin-top: 30px;
+  }
+  .final-disclaimer strong { color: #3a2008; }
+
+  footer.page-foot {
+    text-align: center;
+    padding: 32px 20px 48px;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  footer.page-foot strong { color: var(--gold); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+      <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-link">Stack Analyzer</a>
+      <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-link">Biomarkers</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+    <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-mobile-link">Stack Analyzer</a>
+    <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-mobile-link">Biomarkers</a>
+  </div>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<header class="page">
+  <div class="eyebrow">Educational Reference Library</div>
+  <h1>Advanced <em>Protocols</em></h1>
+  <p class="lead">Summary notes and protocol overviews adapted from publicly available education by Hunter Williams. Shared here as a reference hub for clients and research review.</p>
+</header>
+
+<!-- ── ATTRIBUTION BAR ── -->
+<div class="attribution-bar">
+  <div class="attribution-inner">
+    <div class="attribution-icon">📚</div>
+    <div class="attribution-text">
+      <strong>Original methodology &amp; research by Hunter Williams</strong> — peptide educator and founder of BioLongevity Labs. The summaries below are BioLinked's condensed interpretations of his published guides. For the full originals, videos, and additional content, visit <a href="https://biolongevitylabs.com" target="_blank" rel="noopener">biolongevitylabs.com</a>.
+    </div>
+  </div>
+</div>
+
+<!-- ── TABS ── -->
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab-btn active" data-tab="fatloss">
+      <span class="tab-icon">🔥</span>
+      <span>Fat Loss Stack</span>
+    </button>
+    <button class="tab-btn" data-tab="reconstitution">
+      <span class="tab-icon">🧪</span>
+      <span>Reconstitution Guide</span>
+    </button>
+  </div>
+</div>
+
+<main>
+
+<!-- ══════════════════════════════════════ -->
+<!-- FAT LOSS STACK TAB                      -->
+<!-- ══════════════════════════════════════ -->
+<div class="tab-pane active" id="tab-fatloss">
+
+  <div class="section">
+    <span class="section-eyebrow">Overview</span>
+    <h2 class="section-title">Advanced <em>Fat Loss</em> Stack</h2>
+    <div class="section-divider"></div>
+    <p>This is BioLinked's summary of a six-compound fat-loss protocol outlined by Hunter Williams. The approach targets fat loss through multiple mechanisms simultaneously — appetite suppression, metabolic acceleration, visceral fat targeting, and cellular-level fat oxidation — rather than relying on any single pathway.</p>
+    <p>Each compound plays a distinct role, and the stack is designed so the compounds complement rather than duplicate each other. Below is a condensed overview of each, followed by a summary table and a synergy note.</p>
+    <div class="callout callout-warn">
+      <strong>⚠ Research Use Only.</strong> Several compounds in this protocol are investigational research agents not approved for general human use. This is educational reference material only — not medical advice. Any use should be under the supervision of a qualified healthcare provider.
+    </div>
+  </div>
+
+  <!-- ═══ RETATRUTIDE ═══ -->
+  <div class="section">
+    <div class="compound-card">
+      <h3>Retatrutide</h3>
+      <span class="compound-tag">GLP-1 / GIP / Glucagon Triple Agonist</span>
+      <div class="compound-specs">
+        <div class="spec-item"><span class="spec-label">Dose</span><span class="spec-value">1–2 mg</span></div>
+        <div class="spec-item"><span class="spec-label">Frequency</span><span class="spec-value">3× / week (M/W/F AM)</span></div>
+        <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-value">12–16 weeks</span></div>
+        <div class="spec-item"><span class="spec-label">Route</span><span class="spec-value">Subcutaneous</span></div>
+      </div>
+      <p class="compound-why"><strong>Why it's in the stack:</strong> Retatrutide is a next-generation GLP-1 class compound that targets three metabolic pathways at once — appetite suppression, insulin regulation, and caloric burn. Hunter cites clinical trial data showing roughly 23–24% body weight reduction at higher doses over 11 months, and striking improvements in liver fat markers. Its primary role in the stack is appetite control and metabolic reset.</p>
+    </div>
+
+    <h4 class="minihead">Administration Notes</h4>
+    <p>Typical research-grade vial is 10 mg lyophilized powder. Reconstitute with 2 mL of bacteriostatic water, yielding a 5 mg/mL concentration. On a U-100 insulin syringe, <strong>20 units = 1 mg dose</strong>. Gentle swirl to mix (never shake), store refrigerated after mixing, and rotate injection sites.</p>
+
+    <h4 class="minihead">Side Effect Profile</h4>
+    <p>Mainly gastrointestinal — nausea, vomiting, diarrhea — especially in the first weeks. These usually subside as the body adapts. Contraindicated in anyone with a history of medullary thyroid carcinoma or MEN2.</p>
+  </div>
+
+  <!-- ═══ MOTS-c ═══ -->
+  <div class="section">
+    <div class="compound-card">
+      <h3>MOTS-c</h3>
+      <span class="compound-tag">Mitochondrial Peptide — Exercise Mimetic</span>
+      <div class="compound-specs">
+        <div class="spec-item"><span class="spec-label">Dose</span><span class="spec-value">1 mg</span></div>
+        <div class="spec-item"><span class="spec-label">Frequency</span><span class="spec-value">5× / week (M–F AM)</span></div>
+        <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-value">12–16 weeks</span></div>
+        <div class="spec-item"><span class="spec-label">Route</span><span class="spec-value">Subcutaneous</span></div>
+      </div>
+      <p class="compound-why"><strong>Why it's in the stack:</strong> MOTS-c is a mitochondrial-derived peptide sometimes called the "exercise signal" — your muscles naturally release it during workouts. It activates AMPK and shifts cells toward burning fat for fuel and improving insulin sensitivity. Hunter's framing: it mimics some of the metabolic benefits of exercise at the cellular level, which pairs well with Retatrutide's appetite-side action.</p>
+    </div>
+
+    <h4 class="minihead">Administration Notes</h4>
+    <p>Same math as Retatrutide — 10 mg vial + 2 mL BAC water = 5 mg/mL, so 20 units on a U-100 insulin syringe equals 1 mg. Inject in the morning to align with natural circadian energy patterns and avoid any sleep disruption from AMPK-driven stimulation.</p>
+
+    <h4 class="minihead">Side Effect Profile</h4>
+    <p>Generally mild — some users report transient increases in heart rate, occasional jitteriness, and injection site irritation. Banned in competitive sports (WADA). Formal safety data in humans is limited, so medical supervision is wise.</p>
+  </div>
+
+  <!-- ═══ TESAMORELIN ═══ -->
+  <div class="section">
+    <div class="compound-card">
+      <h3>Tesamorelin</h3>
+      <span class="compound-tag">GHRH Analog — FDA-Approved</span>
+      <div class="compound-specs">
+        <div class="spec-item"><span class="spec-label">Dose</span><span class="spec-value">1 mg</span></div>
+        <div class="spec-item"><span class="spec-label">Frequency</span><span class="spec-value">5× / week (M–F PM)</span></div>
+        <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-value">12–16 weeks</span></div>
+        <div class="spec-item"><span class="spec-label">Route</span><span class="spec-value">Subcutaneous, bedtime</span></div>
+      </div>
+      <p class="compound-why"><strong>Why it's in the stack:</strong> Tesamorelin (brand name Egrifta) stimulates your pituitary to release more growth hormone, which preferentially targets visceral fat — the deep belly fat around your organs. It's the only FDA-approved compound in this stack. Hunter uses it specifically to address stubborn abdominal fat and to help preserve lean muscle during the caloric deficit created by the other compounds.</p>
+    </div>
+
+    <h4 class="minihead">Administration Notes</h4>
+    <p>Same reconstitution as above. <strong>Night dosing is strategic</strong> — natural GH pulses are highest during sleep, so bedtime injections closely mimic physiology and may improve sleep quality. Avoid carb-heavy meals in the 1–2 hours before injection to maximize GH release.</p>
+
+    <h4 class="minihead">Side Effect Profile</h4>
+    <p>Most common issue is injection site reactions (up to ~25% of users). GH's fluid-retention effects can cause edema, joint stiffness, or tingling. Can mildly raise blood glucose (A1C +0.3–0.5%). <strong>Contraindicated in anyone with active cancer or cancer history</strong> due to IGF-1 elevation.</p>
+  </div>
+
+  <!-- ═══ 5-AMINO-1MQ ═══ -->
+  <div class="section">
+    <div class="compound-card">
+      <h3>5-Amino-1MQ</h3>
+      <span class="compound-tag">NNMT Inhibitor — Cellular Metabolism</span>
+      <div class="compound-specs">
+        <div class="spec-item"><span class="spec-label">Dose</span><span class="spec-value">1 mg (research) or capsules</span></div>
+        <div class="spec-item"><span class="spec-label">Frequency</span><span class="spec-value">5× / week (M–F AM)</span></div>
+        <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-value">12–16 weeks (8-week break optional)</span></div>
+        <div class="spec-item"><span class="spec-label">Route</span><span class="spec-value">Oral or SubQ</span></div>
+      </div>
+      <p class="compound-why"><strong>Why it's in the stack:</strong> 5-Amino-1MQ blocks NNMT, an enzyme in fat cells that slows metabolism and encourages fat storage. Blocking it raises NAD+ levels and shifts fat cells from hoarding energy to burning it. Preclinical data showed mice losing fat mass and gaining insulin sensitivity without changes to diet or activity. Hunter's framing: it's a cellular-level metabolic enhancer that complements the hormonal action of the other compounds.</p>
+    </div>
+
+    <h4 class="minihead">Administration Notes</h4>
+    <p>Often available in both oral capsule form and research-grade powder for reconstitution. Oral has decent bioavailability. Take in the morning, ideally with breakfast to avoid mild stomach upset.</p>
+
+    <h4 class="minihead">Side Effect Profile</h4>
+    <p>Generally mild — light nausea, occasional fatigue or dizziness during initial adjustment. No stimulant-like effects. Long-term human safety data is still limited.</p>
+  </div>
+
+  <!-- ═══ SLU-PP-332 ═══ -->
+  <div class="section">
+    <div class="compound-card">
+      <h3>SLU-PP-332</h3>
+      <span class="compound-tag">ERR Agonist — Exercise Mimetic (Oral)</span>
+      <div class="compound-specs">
+        <div class="spec-item"><span class="spec-label">Dose</span><span class="spec-value">250–500 µg</span></div>
+        <div class="spec-item"><span class="spec-label">Frequency</span><span class="spec-value">Daily (morning)</span></div>
+        <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-value">12–16 weeks</span></div>
+        <div class="spec-item"><span class="spec-label">Route</span><span class="spec-value">Oral capsule</span></div>
+      </div>
+      <p class="compound-why"><strong>Why it's in the stack:</strong> SLU-PP-332 activates ERR (Estrogen-Related Receptors), turning on the same genes that endurance training activates — essentially tricking the body into "training for a marathon" at the cellular level. In animal studies it increased resting calorie burn and endurance without appetite suppression. Hunter uses it as a non-stimulant way to raise baseline metabolism, pairing with Retatrutide (eat less) to maximize the "burn more" side.</p>
+    </div>
+
+    <h4 class="minihead">Administration Notes</h4>
+    <p>Oral only — no reconstitution needed. Take on an empty stomach in the morning for best absorption. Typically comes in capsules from research suppliers.</p>
+
+    <h4 class="minihead">Side Effect Profile</h4>
+    <p>No serious side effects observed in animal testing. Not a stimulant — no jitters or heart rate spikes. Possible mild digestive shifts as fuel utilization changes.</p>
+  </div>
+
+  <!-- ═══ ATX-304 ═══ -->
+  <div class="section">
+    <div class="compound-card">
+      <h3>ATX-304</h3>
+      <span class="compound-tag">Pan-AMPK Activator — Energy Expenditure</span>
+      <div class="compound-specs">
+        <div class="spec-item"><span class="spec-label">Dose</span><span class="spec-value">100–200 mg</span></div>
+        <div class="spec-item"><span class="spec-label">Frequency</span><span class="spec-value">Daily (morning)</span></div>
+        <div class="spec-item"><span class="spec-label">Duration</span><span class="spec-value">12–16 weeks</span></div>
+        <div class="spec-item"><span class="spec-label">Route</span><span class="spec-value">Oral capsule</span></div>
+      </div>
+      <p class="compound-why"><strong>Why it's in the stack:</strong> ATX-304 is a pan-AMPK activator — essentially a more powerful, pharmacological version of what metformin and exercise do to cellular metabolism. AMPK is the cell's master energy sensor; activating it tells the body to burn stored fuel rather than store more. Hunter points to animal data showing near-complete reduction in body fat with treated mice eating normally. Its role in the stack is to dramatically raise energy expenditure while the other compounds handle appetite and visceral fat.</p>
+    </div>
+
+    <h4 class="minihead">Administration Notes</h4>
+    <p>Oral capsule, morning dosing. Start with 100 mg; some users move up to 200 mg after tolerance is established. Take with water, with or without food.</p>
+
+    <h4 class="minihead">Side Effect Profile</h4>
+    <p>Early human testing (~150 people) has been favorable. Possible transient fatigue or lightheadedness from rapid blood sugar uptake. Watch for hypoglycemia symptoms if also on diabetes meds. Long-term safety still being studied.</p>
+  </div>
+
+  <!-- ═══ SUMMARY TABLE ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Quick Reference</span>
+    <h2 class="section-title">Stack <em>Summary</em></h2>
+    <div class="section-divider"></div>
+    <div class="table-wrap">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Compound</th>
+            <th>Dose &amp; Schedule</th>
+            <th>Primary Role</th>
+            <th>Route</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="compound-name">Retatrutide</div><div class="compound-subtype">GLP-1/GIP/Glucagon Tri-Agonist</div></td>
+            <td>1–2 mg, 3× / week AM</td>
+            <td>Appetite suppression &amp; metabolic reset</td>
+            <td>SubQ</td>
+          </tr>
+          <tr>
+            <td><div class="compound-name">MOTS-c</div><div class="compound-subtype">Mitochondrial Peptide</div></td>
+            <td>1 mg, 5× / week AM</td>
+            <td>Exercise-mimetic fat burning</td>
+            <td>SubQ</td>
+          </tr>
+          <tr>
+            <td><div class="compound-name">Tesamorelin</div><div class="compound-subtype">GHRH Analog</div></td>
+            <td>1 mg, 5× / week PM</td>
+            <td>Visceral fat targeting &amp; muscle sparing</td>
+            <td>SubQ (bedtime)</td>
+          </tr>
+          <tr>
+            <td><div class="compound-name">5-Amino-1MQ</div><div class="compound-subtype">NNMT Inhibitor</div></td>
+            <td>1 mg, 5× / week AM</td>
+            <td>Cellular fat cell metabolism</td>
+            <td>Oral / SubQ</td>
+          </tr>
+          <tr>
+            <td><div class="compound-name">SLU-PP-332</div><div class="compound-subtype">ERR Agonist</div></td>
+            <td>250–500 µg daily AM</td>
+            <td>Cardio-mimetic, calorie burn</td>
+            <td>Oral</td>
+          </tr>
+          <tr>
+            <td><div class="compound-name">ATX-304</div><div class="compound-subtype">Pan-AMPK Activator</div></td>
+            <td>100–200 mg daily AM</td>
+            <td>Energy expenditure amplifier</td>
+            <td>Oral</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h4 class="minihead">How they work together</h4>
+    <p>The stack design is deliberate — no compound is redundant. Retatrutide handles appetite, Tesamorelin targets visceral fat and preserves muscle, MOTS-c and SLU-PP-332 mimic different aspects of exercise (AMPK vs ERR pathways), 5-Amino-1MQ optimizes fat cells at the enzyme level, and ATX-304 amplifies whole-body energy expenditure. Together they hit every major lever of weight management: <strong>eat less, burn more, store less, mobilize fat, and preserve muscle.</strong></p>
+
+    <div class="callout callout-warn">
+      <strong>⚠ Important:</strong> Introduce one compound at a time when starting a stack like this — not all six on day one. That way you can identify tolerance and attribute any side effects correctly. Regular bloodwork (lipids, glucose, liver enzymes, IGF-1) before and mid-cycle is strongly advised.
+    </div>
+  </div>
+
+  <!-- ═══ SOURCE / WHERE TO BUY ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Source</span>
+    <h2 class="section-title">Where Hunter <em>Sources</em></h2>
+    <div class="section-divider"></div>
+    <p>Hunter Williams sources the compounds in this protocol through BioLongevity Labs, which he owns and operates. If you want to purchase any of the above, his direct links and product names are listed here for convenience.</p>
+
+    <div class="discount-box">
+      <div class="discount-label">Hunter's Discount Code</div>
+      <div class="discount-code">HUNTERW</div>
+      <div class="discount-note">15% off everything at BioLongevity Labs</div>
+    </div>
+
+    <div class="resource-item">
+      <div>
+        <div class="resource-name">GLP-3 (Retatrutide)</div>
+        <div class="resource-sub">10 mg vial · triple agonist</div>
+      </div>
+      <a href="https://biolongevitylabs.com" target="_blank" rel="noopener" class="resource-link">Visit →</a>
+    </div>
+    <div class="resource-item">
+      <div>
+        <div class="resource-name">MOTS-c</div>
+        <div class="resource-sub">10 mg vial · mitochondrial peptide</div>
+      </div>
+      <a href="https://biolongevitylabs.com" target="_blank" rel="noopener" class="resource-link">Visit →</a>
+    </div>
+    <div class="resource-item">
+      <div>
+        <div class="resource-name">Tesamorelin</div>
+        <div class="resource-sub">10 mg vial · GHRH analog</div>
+      </div>
+      <a href="https://biolongevitylabs.com" target="_blank" rel="noopener" class="resource-link">Visit →</a>
+    </div>
+    <div class="resource-item">
+      <div>
+        <div class="resource-name">5-Amino-1MQ</div>
+        <div class="resource-sub">10 mg vial · NNMT inhibitor</div>
+      </div>
+      <a href="https://biolongevitylabs.com" target="_blank" rel="noopener" class="resource-link">Visit →</a>
+    </div>
+    <div class="resource-item">
+      <div>
+        <div class="resource-name">SHRED (SLU-PP-332)</div>
+        <div class="resource-sub">Capsules · exercise-mimetic</div>
+      </div>
+      <a href="https://biolongevitylabs.com" target="_blank" rel="noopener" class="resource-link">Visit →</a>
+    </div>
+    <div class="resource-item">
+      <div>
+        <div class="resource-name">BioAmp (ATX-304)</div>
+        <div class="resource-sub">Capsules · pan-AMPK activator</div>
+      </div>
+      <a href="https://biolongevitylabs.com" target="_blank" rel="noopener" class="resource-link">Visit →</a>
+    </div>
+
+    <div class="final-disclaimer">
+      <strong>Educational Reference Only.</strong> The content above is a condensed summary of Hunter Williams' published educational material, written in BioLinked's own words and shared here as a reference. For the complete original guide, Hunter's video explanations, and his ongoing education, visit biolongevitylabs.com directly. Several of the compounds discussed are investigational research agents not approved for general medical use. This is not medical advice. Consult a qualified healthcare professional before considering any protocol.
+    </div>
+  </div>
+
+</div>
+<!-- END FAT LOSS TAB -->
+
+
+<!-- ══════════════════════════════════════ -->
+<!-- RECONSTITUTION TAB                      -->
+<!-- ══════════════════════════════════════ -->
+<div class="tab-pane" id="tab-reconstitution">
+
+  <div class="section">
+    <span class="section-eyebrow">Overview</span>
+    <h2 class="section-title">Peptide <em>Reconstitution</em> Guide</h2>
+    <div class="section-divider"></div>
+    <p>This is BioLinked's summary of Hunter Williams' guide to peptide reconstitution — the process of turning freeze-dried peptide powder into a usable injectable solution. Hunter's central argument: learning this skill yourself removes one of the biggest barriers to using peptides effectively, and the math is much simpler than it first appears.</p>
+    <div class="callout callout-info">
+      <strong>💡 Hunter's core point:</strong> The biggest difference between people who get results with peptides and people who don't is simply learning how to reconstitute and then actually doing it. It's forgiving, the needles are tiny, and the math reduces to basic ratios once you see it.
+    </div>
+  </div>
+
+  <!-- ═══ SUPPLIES ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Step 1</span>
+    <h2 class="section-title">Gather Your <em>Supplies</em></h2>
+    <div class="section-divider"></div>
+    <p>Set up a clean workspace and have everything laid out before you start. You'll need:</p>
+
+    <h3 class="subhead">Peptide Vial</h3>
+    <p>Small glass vial with freeze-dried powder. Check the label for the peptide name and total amount (e.g., 5 mg Tesamorelin, 10 mg BPC-157).</p>
+
+    <h3 class="subhead">Bacteriostatic Water (BAC Water)</h3>
+    <p>Sterile water with 0.9% benzyl alcohol added to prevent bacterial growth. This lets you use the reconstituted vial multiple times over weeks if refrigerated.</p>
+
+    <h3 class="subhead">Mixing / Withdrawing Syringe</h3>
+    <p>Larger 3 mL or 5 mL syringe with a 21–23 gauge needle. Used to measure BAC water and transfer it into the peptide vial.</p>
+
+    <h3 class="subhead">Insulin Syringes (U-100)</h3>
+    <p>Small 0.3 mL, 0.5 mL, or 1 mL syringes with fine short needles. Marked in "Units" where 100 units = 1 mL. These are what you'll use for the actual injection.</p>
+
+    <h3 class="subhead">Alcohol Swabs &amp; Sharps Container</h3>
+    <p>Individually wrapped sterile swabs to clean vial tops and injection sites. A puncture-proof sharps container is non-negotiable for safe needle disposal.</p>
+  </div>
+
+  <!-- ═══ BAC WATER VOLUME ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Step 2</span>
+    <h2 class="section-title">Choose Your <em>Water Volume</em></h2>
+    <div class="section-divider"></div>
+    <p>Hunter's guideline for how much BAC water to add — not strict rules, just starting points that keep your injection volumes in an easy-to-measure range (usually 10–40 units on a U-100 insulin syringe):</p>
+
+    <div class="table-wrap">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Vial Contains</th>
+            <th>Add This Much BAC Water</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1–5 mg</td><td>1 mL</td></tr>
+          <tr><td>6–10 mg</td><td>2 mL</td></tr>
+          <tr><td>More than 10 mg</td><td>3 mL</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-info">
+      <strong>🥤 The Kool-Aid analogy:</strong> Think of the peptide powder as Kool-Aid powder and BAC water as the water you mix it with. Adding more or less water doesn't change how much Kool-Aid powder you started with — it just changes how strong each sip is. Same with peptides: <strong>the amount of water you add doesn't change the total peptide in the vial, only the concentration.</strong>
+    </div>
+  </div>
+
+  <!-- ═══ RECONSTITUTION STEPS ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Step 3</span>
+    <h2 class="section-title">The <em>Mixing</em> Process</h2>
+    <div class="section-divider"></div>
+
+    <ol class="steps-list">
+      <li>
+        <strong>Prep the vials</strong>
+        Pop off the plastic caps. Wipe both rubber stoppers with alcohol swabs. Let them air dry.
+      </li>
+      <li>
+        <strong>Draw the BAC water</strong>
+        Use your larger mixing syringe. Pull back the plunger to draw in air equal to your water volume. Stick the needle through the BAC water vial stopper, flip upside down, push the air in, then pull back the plunger to draw your water. Tap out any bubbles.
+      </li>
+      <li>
+        <strong>Add water to the peptide</strong>
+        Insert the needle through the peptide vial stopper at an angle. <strong>Stream the water down the glass wall</strong> — don't blast it directly onto the powder. Some peptides are delicate.
+      </li>
+      <li>
+        <strong>Mix gently — never shake</strong>
+        Remove the needle. Gently swirl the vial in circles or roll it between your hands until the powder fully dissolves and the liquid is clear. Shaking can damage some peptides.
+      </li>
+      <li>
+        <strong>Label and refrigerate</strong>
+        Write the reconstitution date on the vial. Store in the refrigerator between 2–8°C (36–46°F). Do not freeze unless specifically instructed.
+      </li>
+    </ol>
+  </div>
+
+  <!-- ═══ DOSE CALCULATION ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Step 4</span>
+    <h2 class="section-title">Calculate Your <em>Dose</em></h2>
+    <div class="section-divider"></div>
+
+    <p>Hunter's most-repeated point about dosing: <strong>the units on your insulin syringe are NOT your dose.</strong> Units measure volume (liquid). Your dose is an amount (milligrams or micrograms). Your job is to figure out how many units of volume give you the right amount of peptide.</p>
+
+    <h4 class="minihead">The Units</h4>
+    <ul>
+      <li><strong>mg / mcg</strong> — weight/amount of peptide (1 mg = 1000 mcg). This is your dose.</li>
+      <li><strong>mL</strong> — volume of liquid. Used when adding BAC water.</li>
+      <li><strong>Units (IU)</strong> on a U-100 insulin syringe — volume marking. 100 units = 1 mL, so 10 units = 0.1 mL.</li>
+    </ul>
+
+    <h4 class="minihead">The Formula</h4>
+    <div class="formula">
+      Desired Dose ÷ Total Peptide in Vial = Volume to Inject ÷ Total BAC Water Added
+    </div>
+    <p>Solve for "Volume to Inject" and you have how many units to draw. Keep units consistent on both sides (mcg for amounts, units for volumes works cleanly).</p>
+
+    <div class="example-box">
+      <span class="example-label">Example 1 — Tesamorelin</span>
+      <ul class="example-specs">
+        <li><strong>Vial:</strong> 10 mg Tesamorelin (10,000 mcg)</li>
+        <li><strong>Water added:</strong> 2 mL (200 units)</li>
+        <li><strong>Desired dose:</strong> 1 mg (1,000 mcg)</li>
+      </ul>
+      <p>1,000 ÷ 10,000 = X ÷ 200 → X = 20</p>
+      <div class="example-result">Draw 20 units on your insulin syringe = 1 mg dose</div>
+    </div>
+
+    <div class="example-box">
+      <span class="example-label">Example 2 — BPC-157</span>
+      <ul class="example-specs">
+        <li><strong>Vial:</strong> 5 mg BPC-157 (5,000 mcg)</li>
+        <li><strong>Water added:</strong> 1 mL (100 units)</li>
+        <li><strong>Desired dose:</strong> 250 mcg</li>
+      </ul>
+      <p>250 ÷ 5,000 = X ÷ 100 → X = 5</p>
+      <div class="example-result">Draw 5 units on your insulin syringe = 250 mcg dose</div>
+    </div>
+
+    <div class="callout callout-info">
+      <strong>💡 Using peptide calculators:</strong> Online calculators can double-check your math, but understand the logic first. If you use one, make sure it's set to U-100 syringes and double-check your inputs.
+    </div>
+  </div>
+
+  <!-- ═══ INJECTION ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Step 5</span>
+    <h2 class="section-title">Subcutaneous <em>Injection</em></h2>
+    <div class="section-divider"></div>
+
+    <p>Most peptides are injected subcutaneously — under the skin into the fatty layer. With fine insulin needles, it's typically painless.</p>
+
+    <h4 class="minihead">Common Injection Sites</h4>
+    <ul>
+      <li><strong>Abdomen</strong> — at least an inch away from the belly button. Easiest for self-injection.</li>
+      <li><strong>Front or outer thigh</strong> — aim for the fatty area.</li>
+      <li><strong>Upper outer glute</strong> — harder to reach solo.</li>
+    </ul>
+    <p>Rotate sites each time to avoid irritation or lumps.</p>
+
+    <ol class="steps-list">
+      <li>
+        <strong>Clean the site</strong>
+        Wash hands. Swab the injection site with alcohol. Let it air dry (don't blow on it).
+      </li>
+      <li>
+        <strong>Draw your dose</strong>
+        Pull a fresh insulin syringe. Draw in a small amount of air equal to your dose, inject it into the peptide vial, flip upside down, and pull back just past your target volume (e.g., draw 11 or 12 units if you want 10).
+      </li>
+      <li>
+        <strong>Clear air bubbles</strong>
+        Needle pointing up, tap the syringe so bubbles rise. Push the plunger carefully until it reaches exactly your dose line.
+      </li>
+      <li>
+        <strong>Inject</strong>
+        Pinch up a fold of skin. Insert the needle fully (90° or 45° — 90° works with short insulin needles). Release the pinch. Slowly push the plunger all the way down. Wait a second. Pull straight out.
+      </li>
+      <li>
+        <strong>Aftercare</strong>
+        Light pressure with a cotton ball or tissue if there's any blood — don't rub. Used syringe straight into the sharps container. Never reuse needles.
+      </li>
+    </ol>
+  </div>
+
+  <!-- ═══ FINAL REMINDERS ═══ -->
+  <div class="section">
+    <span class="section-eyebrow">Key Takeaways</span>
+    <h2 class="section-title">Final <em>Reminders</em></h2>
+    <div class="section-divider"></div>
+
+    <h3 class="subhead">Be safe and clean</h3>
+    <p>Sterile technique every time. Wipe stoppers, clean injection sites, fresh needles.</p>
+
+    <h3 class="subhead">Know the distinction</h3>
+    <p>Dose is mg/mcg (amount of peptide). Volume is mL or units (amount of liquid). They're not the same thing.</p>
+
+    <h3 class="subhead">Water volume is flexible</h3>
+    <p>Hunter's 1/2/3 mL guidelines are starting points, not rules. What matters is calculating the correct injection volume for whatever concentration you end up with.</p>
+
+    <h3 class="subhead">Mindset matters</h3>
+    <p>Approach it confidently, not fearfully. Done sensibly, peptides carry relatively low risk. Practice makes the process second nature quickly.</p>
+
+    <div class="final-disclaimer">
+      <strong>Educational Reference Only.</strong> This guide is a BioLinked summary of Hunter Williams' published educational content, written in our own words as a reference for clients. For the complete original guide with all of Hunter's commentary and his video walkthroughs, visit biolongevitylabs.com. This is not medical advice. Peptide use carries potential risks and should be done under the guidance of a qualified healthcare professional familiar with peptide therapy.
+    </div>
+  </div>
+
+</div>
+<!-- END RECONSTITUTION TAB -->
+
+</main>
+
+<footer class="page-foot">
+  <strong>BioLinked Solutions</strong> · Educational Reference Library · Original Protocols by Hunter Williams
+</footer>
+
+<script>
+  // Mobile nav toggle
+  document.getElementById('bl-mobile-btn').addEventListener('click', function() {
+    document.getElementById('bl-mobile-menu').classList.toggle('open');
+  });
+
+  // Tab switching
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabPanes = document.querySelectorAll('.tab-pane');
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab;
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabPanes.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + target).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+</script>
+
+</body>
+</html>
