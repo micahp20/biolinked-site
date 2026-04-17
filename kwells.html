@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="/favicon.png">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kristin Wells — BioLinked Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --gold: #9A7B2F; --gold-light: #B8960C; --gold-dim: rgba(154,123,47,0.1);
+    --gold-border: rgba(154,123,47,0.22); --bg: #f5f5f5; --bg-card: #ffffff;
+    --bg-card2: #f2f2f2; --white: #1a1a1a; --text: #1a1a1a;
+    --text-muted: #777777; --border: rgba(0,0,0,0.08);
+    --green: #2d6a4f; --green-dim: rgba(45,106,79,0.15);
+  }
+  body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; font-size: 15px; }
+
+  /* HEADER */
+  .header { background: #ffffff; border-bottom: 1px solid var(--gold-border); padding: 4rem 2rem 3rem; text-align: center; position: relative; overflow: hidden; }
+  .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .header-logo { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 1.5rem; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 12px; }
+  .header-logo::before, .header-logo::after { content: ''; width: 40px; height: 1px; background: var(--gold-border); }
+  .header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 6vw, 58px); color: #1a1a1a; font-weight: 400; line-height: 1.1; margin-bottom: 0.5rem; }
+  .header h1 em { color: var(--gold); font-style: italic; }
+  .header-sub { color: var(--text-muted); font-size: 12px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0.5rem; }
+  .header-meta { display: flex; justify-content: center; gap: 0; margin-top: 2.5rem; flex-wrap: wrap; border: 1px solid var(--gold-border); border-radius: 2px; overflow: hidden; max-width: 700px; margin-left: auto; margin-right: auto; }
+  .meta-item { flex: 1; min-width: 120px; text-align: center; padding: 1rem 1.25rem; border-right: 1px solid var(--gold-border); }
+  .meta-item:last-child { border-right: none; }
+  .meta-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; }
+  .meta-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--gold); font-weight: 600; }
+
+  /* NAV TABS */
+  .nav-tabs { display: flex; justify-content: center; gap: 0; border-bottom: 1px solid var(--gold-border); background: #ffffff; position: sticky; top: 56px; z-index: 100; }
+  .nav-tab { padding: 1rem 2rem; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Outfit', sans-serif; }
+  .nav-tab:hover { color: var(--gold-light); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  /* CONTAINER */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 1.5rem 5rem; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* SECTION */
+  .section { margin-top: 4rem; }
+  .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--gold-border); }
+  .section-icon { width: 34px; height: 34px; border-radius: 2px; border: 1px solid var(--gold-border); background: rgba(154,123,47,0.05); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--white); letter-spacing: 0.02em; }
+
+  /* INTRO */
+  .intro-card { background: #ffffff; border: 1px solid var(--gold-border); border-left: 3px solid var(--gold); padding: 1.5rem 2rem; margin-top: 3rem; border-radius: 2px; }
+  .intro-card p { font-size: 15px; color: var(--text); line-height: 1.85; font-weight: 300; }
+  .intro-card strong { font-weight: 600; color: var(--gold); }
+
+  /* BUNDLE PRICING CARD */
+  .pricing-card { background: linear-gradient(135deg, #ffffff 0%, #fafaf7 100%); border: 1px solid var(--gold-border); border-left: 3px solid var(--gold); border-radius: 2px; padding: 1.75rem 2rem; margin-top: 1.75rem; position: relative; overflow: hidden; }
+  .pricing-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+  .pricing-card::after { content: '💰'; position: absolute; right: 1.5rem; top: 1.5rem; font-size: 48px; opacity: 0.06; }
+  .pricing-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .pricing-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: var(--white); margin-bottom: 4px; }
+  .pricing-title em { color: var(--gold); font-style: italic; }
+  .pricing-subtitle { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  .savings-badge { background: linear-gradient(135deg, #9A7B2F, #B8960C); color: #ffffff; padding: 8px 18px; border-radius: 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; white-space: nowrap; box-shadow: 0 2px 10px rgba(154,123,47,0.2); }
+  .pricing-lines { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; }
+  .pricing-line { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 14px; }
+  .pricing-line:last-child { border-bottom: none; }
+  .pl-name { color: var(--text); font-weight: 500; }
+  .pl-qty { font-size: 11px; color: var(--text-muted); font-weight: 300; margin-left: 8px; }
+  .pl-price { color: var(--text); font-weight: 500; font-family: 'Cormorant Garamond', serif; font-size: 17px; }
+  .pricing-totals { margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--gold-border); }
+  .total-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; font-size: 14px; }
+  .total-row.list { color: var(--text-muted); }
+  .total-row.list .tr-value { text-decoration: line-through; text-decoration-color: #c0392b; text-decoration-thickness: 2px; }
+  .total-row.discount { color: #2d7a4f; font-weight: 600; }
+  .total-row.bundle { padding-top: 12px; border-top: 1px solid var(--border); margin-top: 6px; }
+  .total-row.bundle .tr-label { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--white); }
+  .total-row.bundle .tr-value { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 600; color: var(--gold); }
+  .pricing-note { margin-top: 1rem; padding: 12px 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; font-size: 12px; color: var(--text-muted); line-height: 1.65; font-style: italic; }
+  .pricing-note strong { color: var(--gold); font-style: normal; font-weight: 600; }
+
+  /* PEPTIDE CARDS */
+  .peptide-grid { display: grid; gap: 1.5rem; }
+  .peptide-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; overflow: hidden; transition: border-color 0.2s; }
+  .peptide-card:hover { border-color: var(--gold-border); }
+  .peptide-header { padding: 1.5rem 1.75rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; background: var(--bg-card2); }
+  .peptide-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+  .peptide-tagline { font-size: 10px; color: var(--gold); font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+  .peptide-price { background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold-light); font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; padding: 6px 16px; border-radius: 2px; white-space: nowrap; }
+  .peptide-body { padding: 1.5rem 1.75rem; display: grid; gap: 1.25rem; }
+  .peptide-section-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+  .peptide-text { font-size: 14px; color: #444444; line-height: 1.75; font-weight: 300; }
+  .peptide-details { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 0.75rem; }
+  .detail-box { background: var(--bg); border: 1px solid var(--border); border-radius: 2px; padding: 0.875rem 1rem; }
+  .detail-box .label { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
+  .detail-box .value { font-size: 14px; font-weight: 500; color: var(--text); }
+
+  .recon-steps { counter-reset: step; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .recon-steps li { counter-increment: step; display: flex; align-items: flex-start; gap: 12px; font-size: 14px; color: #444444; line-height: 1.65; font-weight: 300; }
+  .recon-steps li::before { content: counter(step); min-width: 22px; height: 22px; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold); border-radius: 50%; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+
+  /* WEEK GRID */
+  .week-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--gold-border); border-radius: 2px; overflow: hidden; }
+  .week-cell { background: var(--bg-card); padding: 1rem 0.75rem; text-align: center; }
+  .week-cell.header { background: #f2f2f2; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); font-weight: 600; padding: 0.875rem; }
+  .week-cell .wk { font-size: 11px; color: #555555; margin-bottom: 4px; font-weight: 500; }
+  .week-cell .phase { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600; color: var(--gold); }
+  .week-cell .note { font-size: 11px; color: #555555; margin-top: 4px; line-height: 1.5; font-weight: 300; }
+  .week-cell.phase-ramp { background: #f0f7f2; }
+  .week-cell.phase-full { background: #e8f4eb; }
+  .week-cell.phase-taper { background: #fdf6e8; }
+
+  /* SCHEDULE TABLE */
+  .schedule-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .schedule-table th { background: #f2f2f2; color: var(--gold); padding: 10px 14px; text-align: left; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--gold-border); }
+  .schedule-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: #444444; vertical-align: top; font-weight: 300; }
+  .schedule-table tr:last-child td { border-bottom: none; }
+  .schedule-table tr td { background: #ffffff; }
+  .schedule-table tr:nth-child(even) td { background: #f2f2f2; }
+  .peptide-pill { display: inline-block; background: var(--gold-dim); border: 1px solid var(--gold-border); color: var(--gold-light); font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 99px; margin: 2px 3px 2px 0; }
+
+  /* STORAGE */
+  .storage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .storage-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1.25rem 1.5rem; }
+  .storage-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 0.5rem; color: var(--gold-light); }
+  .storage-card p { font-size: 13px; color: #444444; line-height: 1.7; font-weight: 300; }
+
+  /* MONITOR */
+  .monitor-list { display: grid; gap: 8px; }
+  .monitor-item { display: flex; gap: 14px; align-items: flex-start; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; font-size: 14px; color: #444444; line-height: 1.65; font-weight: 300; }
+  .monitor-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+  .dot-normal { background: #3a7a5a; }
+  .dot-watch { background: var(--gold); }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 2rem; }
+  .timeline::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 1px; background: var(--gold-border); }
+  .timeline-item { position: relative; margin-bottom: 2rem; }
+  .timeline-item::before { content: ''; position: absolute; left: -25px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); border: 2px solid var(--bg); }
+  .timeline-week { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 4px; }
+  .timeline-text { font-size: 14px; color: #444444; line-height: 1.75; font-weight: 300; }
+
+  /* STACK SYNERGY */
+  .synergy-card { background: linear-gradient(135deg, #fff9ed 0%, #ffffff 100%); border: 1px solid var(--gold-border); border-left: 3px solid var(--gold); border-radius: 2px; padding: 1.5rem 1.75rem; margin-top: 2rem; }
+  .synergy-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--gold); font-weight: 600; margin-bottom: 0.75rem; }
+  .synergy-card p { font-size: 14px; color: #444; line-height: 1.8; font-weight: 300; margin-bottom: 0.75rem; }
+  .synergy-card p:last-child { margin-bottom: 0; }
+  .synergy-card strong { color: var(--gold); font-weight: 600; }
+
+  /* DISCLAIMER */
+  .disclaimer { background: #fdf9f0; border: 1px solid rgba(154,123,47,0.2); border-radius: 2px; padding: 1.25rem 1.75rem; margin-top: 3.5rem; font-size: 13px; color: #6b5a30; line-height: 1.75; font-weight: 300; }
+  .disclaimer strong { font-weight: 600; color: var(--gold); }
+
+  /* FOOTER */
+  .footer { text-align: center; padding: 2rem; margin-top: 2rem; border-top: 1px solid var(--gold-border); background: #f5f5f5; font-size: 11px; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+  .footer strong { color: var(--gold); font-weight: 600; }
+
+  /* TRACKER */
+  #tab-tracker .section { margin-top: 2rem; }
+  .tracker-top { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-top: 2rem; }
+  .tracker-stat { background: var(--bg-card); border: 1px solid var(--gold-border); border-radius: 2px; padding: 1.25rem; text-align: center; }
+  .tracker-stat .ts-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+  .tracker-stat .ts-value { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: var(--gold); font-weight: 600; }
+  .tracker-stat .ts-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .week-selector { display: flex; align-items: center; gap: 1rem; margin: 2rem 0 1.5rem; justify-content: center; }
+  .week-nav-btn { width: 36px; height: 36px; background: var(--bg-card); border: 1px solid var(--gold-border); color: var(--gold); border-radius: 2px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .week-nav-btn:hover { background: var(--gold-dim); }
+  .week-label { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--white); font-weight: 600; min-width: 120px; text-align: center; }
+  .tracker-grid-wrap { display: grid; grid-template-columns: 130px 1fr; gap: 6px; margin-bottom: 3px; }
+  .tracker-compound-label { display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
+  .compound-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; color: var(--gold); text-align: right; line-height: 1.3; }
+  .compound-badge span { display: block; color: var(--text-muted); font-weight: 400; font-size: 9px; }
+  .day-row { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day-header-row { display: grid; grid-template-columns: 130px 1fr; gap: 6px; margin-bottom: 2px; }
+  .day-headers-inner { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .day-header { text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding: 8px 4px; background: var(--bg-card2); border: 1px solid var(--border); border-radius: 2px 2px 0 0; }
+  .day-header.rest-day { color: #555; }
+  .dose-cell { background: var(--bg-card); border: 1px solid var(--border); border-top: none; padding: 6px 4px; text-align: center; cursor: pointer; transition: all 0.15s; min-height: 38px; display: flex; align-items: center; justify-content: center; }
+  .dose-cell:last-child { border-radius: 0 0 2px 2px; }
+  .dose-cell.scheduled:hover { background: var(--gold-dim); }
+  .dose-cell.taken { background: var(--green-dim); border-color: rgba(58,122,90,0.4); }
+  .dose-cell.taken::after { content: '✓'; color: #5ab87a; font-size: 16px; font-weight: 700; }
+  .dose-cell.scheduled:not(.taken)::after { content: '○'; color: var(--gold-border); font-size: 14px; }
+  .dose-cell.rest { background: transparent; border-color: transparent; cursor: default; }
+  .dose-cell.rest::after { content: '—'; color: #333; font-size: 12px; }
+  .notes-area { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; margin-top: 1.5rem; }
+  .notes-label { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
+  .notes-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 2px; padding: 0.75rem 1rem; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 300; resize: vertical; min-height: 70px; outline: none; transition: border-color 0.2s; }
+  .notes-input:focus { border-color: var(--gold-border); }
+  .notes-input::placeholder { color: var(--text-muted); }
+  .tracker-actions { display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .action-btn { flex: 1; min-width: 160px; padding: 0.875rem 1.5rem; border: 1px solid var(--gold-border); background: var(--gold-dim); color: var(--gold-light); font-family: 'Outfit', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; cursor: pointer; border-radius: 2px; transition: all 0.2s; text-align: center; }
+  .action-btn:hover { background: rgba(154,123,47,0.25); border-color: var(--gold); color: var(--gold); }
+  .action-btn.primary { background: var(--gold); color: #ffffff; border-color: var(--gold); }
+  .action-btn.primary:hover { background: var(--gold-light); }
+  .progress-bar-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; margin-top: 1rem; }
+  .progress-label { font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); border-radius: 2px; transition: width 0.4s ease; }
+  .cycle-start-row { display: flex; align-items: center; gap: 1rem; margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 2px; padding: 1rem 1.25rem; flex-wrap: wrap; }
+  .cycle-start-row label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
+  .cycle-start-row input[type="date"] { background: var(--bg); border: 1px solid var(--gold-border); border-radius: 2px; padding: 6px 12px; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 13px; outline: none; }
+  .save-badge { display: inline-block; background: var(--green-dim); border: 1px solid rgba(58,122,90,0.5); color: #5ab87a; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; padding: 3px 10px; border-radius: 99px; opacity: 0; transition: opacity 0.3s; }
+  .save-badge.show { opacity: 1; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .container > * { animation: fadeUp 0.5s ease both; }
+
+  @media (max-width: 600px) {
+    .week-grid { grid-template-columns: repeat(2, 1fr); }
+    .storage-grid { grid-template-columns: 1fr; }
+    .peptide-header { flex-direction: column; }
+    .header-meta { flex-direction: column; }
+    .meta-item { border-right: none; border-bottom: 1px solid var(--gold-border); }
+    .tracker-top { grid-template-columns: 1fr 1fr; }
+    .nav-tab { padding: 0.875rem 1rem; font-size: 10px; }
+    .tracker-grid-wrap { grid-template-columns: 90px 1fr; }
+    .day-header-row { grid-template-columns: 90px 1fr; }
+    .compound-badge { font-size: 9px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Kristin <em>Wells</em></h1>
+  <div class="header-sub">Fat Loss, Recovery &amp; Metabolic Optimization Protocol</div>
+  <div class="header-meta">
+    <div class="meta-item"><span class="meta-label">Cycle Length</span><span class="meta-value">8 Weeks</span></div>
+    <div class="meta-item"><span class="meta-label">Compounds</span><span class="meta-value">5 Peptides</span></div>
+    <div class="meta-item"><span class="meta-label">Bundle Price</span><span class="meta-value">$495</span></div>
+    <div class="meta-item"><span class="meta-label">Prepared by</span><span class="meta-value">BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('protocol',event)">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('tracker',event)">Daily Tracker</button>
+  <button class="nav-tab" onclick="switchTab('calendar',event)">📅 Calendar</button>
+</div>
+
+<div class="container">
+
+  <!-- ===== PROTOCOL TAB ===== -->
+  <div id="tab-protocol" class="tab-content active">
+
+    <div class="intro-card">
+      <p>Kristin, this protocol was built for you with one clear goal in mind: <strong>the most complete peptide fat loss and metabolic stack possible before you leave for Arizona on July 2nd</strong>. You're running a high-pressure office manager role, managing personalities and stress all day, and sedentary most of the work week — so this stack is engineered to do the heavy lifting <em>for</em> your metabolism while also supporting recovery, cognition, and resilience to stress. <strong>Five compounds, each hitting a different mechanism of fat loss</strong>: Retatrutide for appetite and weight, SLU-PP-332 for "exercise-mimetic" mitochondrial activation, MOTS-C for metabolic flexibility and mitochondrial biogenesis, 5-Amino-1MQ for fat oxidation via NNMT inhibition, and Tesamorelin for visceral fat reduction and GH optimization. These work <strong>synergistically</strong> — together they cover every major fat loss pathway in the body.</p>
+    </div>
+
+    <!-- STACK SYNERGY EXPLAINER -->
+    <div class="synergy-card">
+      <h3>Why This Is The Ultimate Peptide Fat Loss Stack</h3>
+      <p>Most fat loss protocols rely on one or two compounds. This stack hits <strong>five distinct metabolic pathways simultaneously</strong> — which is why the combined effect is far greater than any single peptide alone:</p>
+      <p><strong>1. Appetite &amp; caloric intake (Retatrutide):</strong> Triple-agonist GLP-1/GIP/Glucagon receptor activation reduces hunger and slows gastric emptying. You eat less without thinking about it.</p>
+      <p><strong>2. Mitochondrial output (SLU-PP-332):</strong> Activates ERR receptors — the same pathway exercise activates. Your cells burn more fat even at rest. True "exercise mimetic."</p>
+      <p><strong>3. Metabolic flexibility (MOTS-C):</strong> Mitochondrial-derived peptide that enhances insulin sensitivity, glucose uptake, and fat oxidation. Improves the body's ability to switch between fuel sources.</p>
+      <p><strong>4. Fat cell metabolism (5-Amino-1MQ):</strong> Inhibits NNMT in fat cells, raising cellular NAD+ and activating thermogenesis and fat mobilization directly from adipose tissue.</p>
+      <p><strong>5. GH axis &amp; visceral fat (Tesamorelin):</strong> Most clinically-studied GH peptide for reducing visceral (belly) fat. Amplifies natural GH pulse during deep sleep for recovery, skin, and lean tissue.</p>
+      <p><strong>The result:</strong> appetite suppression + cellular energy burn + mitochondrial upregulation + direct fat cell metabolism + visceral fat targeting + GH-driven recovery. <strong>Nothing gets missed.</strong> This is as comprehensive as a non-prescription peptide fat loss stack gets — which is exactly the right tool for a focused 8-week sprint to an Arizona reset.</p>
+    </div>
+
+    <!-- BUNDLE PRICING CARD -->
+    <div class="pricing-card">
+      <div class="pricing-header">
+        <div>
+          <div class="pricing-subtitle">Full Stack Bundle</div>
+          <div class="pricing-title">Your <em>Fat Loss &amp; Recovery</em> Package</div>
+        </div>
+        <div class="savings-badge">Save $575 · 54% Off</div>
+      </div>
+
+      <div class="pricing-lines">
+        <div class="pricing-line">
+          <div><span class="pl-name">Retatrutide 30mg</span><span class="pl-qty">· 2 vials × $150</span></div>
+          <div class="pl-price">$300</div>
+        </div>
+        <div class="pricing-line">
+          <div><span class="pl-name">Tesamorelin 10mg</span><span class="pl-qty">· 4 vials × $55</span></div>
+          <div class="pl-price">$220</div>
+        </div>
+        <div class="pricing-line">
+          <div><span class="pl-name">MOTS-C 40mg</span><span class="pl-qty">· 2 vials × $125</span></div>
+          <div class="pl-price">$250</div>
+        </div>
+        <div class="pricing-line">
+          <div><span class="pl-name">SLU-PP-332 5mg</span><span class="pl-qty">· 3 vials × $60</span></div>
+          <div class="pl-price">$180</div>
+        </div>
+        <div class="pricing-line">
+          <div><span class="pl-name">5-Amino-1MQ 50mg</span><span class="pl-qty">· 2 vials × $60</span></div>
+          <div class="pl-price">$120</div>
+        </div>
+      </div>
+
+      <div class="pricing-totals">
+        <div class="total-row list">
+          <div class="tr-label">Individual Vial Pricing</div>
+          <div class="tr-value">$1,070</div>
+        </div>
+        <div class="total-row discount">
+          <div class="tr-label">BioLinked Bundle Discount</div>
+          <div class="tr-value">− $575</div>
+        </div>
+        <div class="total-row bundle">
+          <div class="tr-label">Your Bundle Price</div>
+          <div class="tr-value">$495</div>
+        </div>
+      </div>
+
+      <div class="pricing-note">
+        <strong>Kristin's exclusive bundle:</strong> 13 vials covering the full 8-week protocol — individual vial pricing totals $1,070 retail. As a friend-of-BioLinked discount, you're locked in at <strong>$495 for the complete stack</strong>. Payment via Venmo <strong>@micahp20</strong>. Everything shipped together, ready to run the full cycle through early July.
+      </div>
+    </div>
+
+    <!-- COMPOUND BREAKDOWN -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#9A7B2F" stroke-width="1.2"/><path d="M5.5 8.5C5.5 8.5 6.5 10.5 8 10.5C9.5 10.5 10.5 8.5 10.5 8.5" stroke="#9A7B2F" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6.5" r="0.75" fill="#9A7B2F"/><circle cx="10" cy="6.5" r="0.75" fill="#9A7B2F"/></svg>
+        </div>
+        <div class="section-title">Your Protocol — 5 Compounds</div>
+      </div>
+
+      <div class="peptide-grid">
+
+        <!-- RETATRUTIDE -->
+        <div class="peptide-card">
+          <div class="peptide-header">
+            <div>
+              <div class="peptide-name">Retatrutide</div>
+              <div class="peptide-tagline">Triple Agonist GLP-1 / GIP / Glucagon — Appetite &amp; Fat Loss</div>
+            </div>
+            <div class="peptide-price">$300</div>
+          </div>
+          <div class="peptide-body">
+            <div>
+              <div class="peptide-section-label">Why it's in your protocol</div>
+              <div class="peptide-text">Retatrutide is the <strong>most advanced weight-loss peptide available</strong> — it's a triple-receptor agonist hitting GLP-1 (appetite), GIP (insulin/satiety), and glucagon (energy expenditure and fat oxidation). Phase 2 trials showed <strong>average 24% body weight reduction at 48 weeks</strong>, which is significantly more than Tirzepatide or Semaglutide at comparable doses. For you, Kristin, the glucagon receptor activation is particularly valuable — it directly increases resting energy expenditure, which matters because your work is sedentary and you don't have time for heavy training. Retatrutide essentially boosts your metabolic rate while simultaneously reducing hunger and food noise. Dosed 3–4x per week in the morning to smooth out levels.</div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Dosage &amp; schedule</div>
+              <div class="peptide-details">
+                <div class="detail-box"><div class="label">Vials</div><div class="value">2 × 30 mg</div></div>
+                <div class="detail-box"><div class="label">Dose</div><div class="value">10 units (0.1 mL) = 1 mg</div></div>
+                <div class="detail-box"><div class="label">Schedule</div><div class="value">3–4× per week</div></div>
+                <div class="detail-box"><div class="label">Timing</div><div class="value">Morning</div></div>
+                <div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div>
+                <div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Reconstitution — 30 mg vial + 3 mL BAC water</div>
+              <ol class="recon-steps">
+                <li>Draw 3 mL of bacteriostatic (BAC) water and inject slowly down the wall of the Retatrutide vial — do not squirt directly onto the powder.</li>
+                <li>Swirl gently (do not shake) until fully dissolved. <strong>3 mL into 30 mg = 10 mg/mL concentration.</strong></li>
+                <li>Each dose = <strong>10 units (0.1 mL) = 1 mg Retatrutide</strong>.</li>
+                <li>Each 30 mg vial yields 30 doses. Two vials = 60 doses, more than enough for 3–4× per week over 8 weeks (24–32 doses needed).</li>
+                <li>Draw 10 units into a 29–31 gauge insulin syringe. Inject SubQ into abdomen, outer thigh, or back of upper arm. Rotate sites.</li>
+                <li>Refrigerate immediately — use within 30 days of reconstitution.</li>
+                <li><strong>Nausea tip:</strong> Start at 10 units and do not titrate up unless very well tolerated. Nausea is dose-dependent. Take with a small meal if needed in weeks 1–2.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- TESAMORELIN -->
+        <div class="peptide-card">
+          <div class="peptide-header">
+            <div>
+              <div class="peptide-name">Tesamorelin</div>
+              <div class="peptide-tagline">GHRH Analog — Visceral Fat Reduction &amp; GH Optimization</div>
+            </div>
+            <div class="peptide-price">$220</div>
+          </div>
+          <div class="peptide-body">
+            <div>
+              <div class="peptide-section-label">Why it's in your protocol</div>
+              <div class="peptide-text">Tesamorelin is the most clinically validated GHRH (growth hormone-releasing hormone) analog for <strong>visceral fat reduction</strong> — the dangerous deep belly fat that builds up under chronic stress and sedentary work. Studies show 15–20% reduction in visceral fat over 6 months. Unlike injecting HGH directly, Tesamorelin works with your own pituitary — amplifying your natural GH pulse during deep sleep. This means you get the fat-loss and recovery benefits of elevated GH <em>without</em> suppressing your endocrine system. Dosed 5 days on, 2 off, in the evening (or morning on a flexible schedule) — pre-bed dosing is ideal because that's when your natural GH pulse is largest. For someone working a stressful office role, the GH axis support also improves sleep quality, skin, and cognitive recovery — all undermined by chronic workplace stress.</div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Dosage &amp; schedule</div>
+              <div class="peptide-details">
+                <div class="detail-box"><div class="label">Vials</div><div class="value">4 × 10 mg</div></div>
+                <div class="detail-box"><div class="label">Dose</div><div class="value">20 units (0.2 mL) = 1 mg</div></div>
+                <div class="detail-box"><div class="label">Schedule</div><div class="value">5 days on / 2 off</div></div>
+                <div class="detail-box"><div class="label">Timing</div><div class="value">AM or pre-bed, fasted</div></div>
+                <div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div>
+                <div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Reconstitution — each 10 mg vial + 2 mL BAC water</div>
+              <ol class="recon-steps">
+                <li>Reconstitute one vial at a time. Draw 2 mL of BAC water and inject slowly down the vial wall. <strong>2 mL into 10 mg = 5 mg/mL concentration.</strong></li>
+                <li>Swirl gently until fully dissolved. Solution should be clear with no particles.</li>
+                <li>Each dose = <strong>20 units (0.2 mL) = 1 mg Tesamorelin</strong>.</li>
+                <li>Each 10 mg vial yields 10 doses. <strong>4 vials = 40 doses total = full 5-on/2-off schedule across all 8 weeks.</strong> Open and reconstitute one vial at a time as the previous one is used up.</li>
+                <li>Draw 20 units (0.2 mL) into insulin syringe. Inject SubQ into abdomen. For best GH response, inject fasted and 30–60 min before bed.</li>
+                <li>Refrigerate active vial — use within 30 days of reconstitution. Keep unreconstituted vials frozen.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOTS-C -->
+        <div class="peptide-card">
+          <div class="peptide-header">
+            <div>
+              <div class="peptide-name">MOTS-C</div>
+              <div class="peptide-tagline">Mitochondrial-Derived Peptide — Metabolic Flexibility &amp; Fat Oxidation</div>
+            </div>
+            <div class="peptide-price">$250</div>
+          </div>
+          <div class="peptide-body">
+            <div>
+              <div class="peptide-section-label">Why it's in your protocol</div>
+              <div class="peptide-text">MOTS-C is an encoded mitochondrial peptide that acts as a <strong>metabolic regulator at the cellular level</strong> — it's one of the most exciting compounds in the peptide space right now. Research shows MOTS-C enhances insulin sensitivity, increases glucose uptake into muscle, upregulates AMPK (the body's master metabolic switch), and improves mitochondrial biogenesis. Translation for you, Kristin: your cells become better at using fuel efficiently, your body switches more easily between burning carbs and fat, and you get more metabolic output without needing to exercise more. For someone sedentary most of the day managing a stressful office, MOTS-C is like giving your cells a subscription to a gym they can use 24/7. Dosed 5 days on, 2 off, morning fasted for maximum AMPK activation.</div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Dosage &amp; schedule</div>
+              <div class="peptide-details">
+                <div class="detail-box"><div class="label">Vials</div><div class="value">2 × 40 mg</div></div>
+                <div class="detail-box"><div class="label">Dose</div><div class="value">15 units (0.15 mL) = 2 mg</div></div>
+                <div class="detail-box"><div class="label">Schedule</div><div class="value">5 days on / 2 off</div></div>
+                <div class="detail-box"><div class="label">Timing</div><div class="value">Morning, fasted</div></div>
+                <div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div>
+                <div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Reconstitution — 40 mg vial + 3 mL BAC water</div>
+              <ol class="recon-steps">
+                <li>Draw 3 mL of BAC water and inject slowly down the vial wall. <strong>3 mL into 40 mg = 13.3 mg/mL concentration.</strong></li>
+                <li>Swirl gently until fully dissolved. Solution should be clear.</li>
+                <li>Each dose = <strong>15 units (0.15 mL) = 2 mg MOTS-C</strong>.</li>
+                <li>Each 40 mg vial yields 20 doses. Two vials = 40 doses — exactly enough for 5 days/week × 8 weeks = 40 doses.</li>
+                <li>Draw 15 units into insulin syringe. Inject SubQ into abdomen or thigh, morning fasted for best AMPK pathway activation.</li>
+                <li>Refrigerate — use within 30 days of reconstitution.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLU-PP-332 -->
+        <div class="peptide-card">
+          <div class="peptide-header">
+            <div>
+              <div class="peptide-name">SLU-PP-332</div>
+              <div class="peptide-tagline">ERR Agonist — Exercise Mimetic &amp; Endurance</div>
+            </div>
+            <div class="peptide-price">$180</div>
+          </div>
+          <div class="peptide-body">
+            <div>
+              <div class="peptide-section-label">Why it's in your protocol</div>
+              <div class="peptide-text">SLU-PP-332 is a true <strong>"exercise mimetic"</strong> — it activates estrogen-related receptors (ERRα, ERRβ, ERRγ) which are the same receptors upregulated by endurance training. In preclinical studies it increased fat oxidation, improved endurance, and produced body composition changes <em>without</em> exercise. This is especially valuable for you because of the sedentary office role — SLU-PP-332 essentially gives your cells the metabolic signal of "I'm training" even when you're at your desk. It upregulates mitochondrial biogenesis, increases oxidative capacity, and shifts fuel metabolism toward fat burning. Dosed 3 days per week in the morning. Think of it as the "cardio in a syringe" component of this stack — the piece that compensates for the fact that your schedule is stress-packed with little time to train.</div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Dosage &amp; schedule</div>
+              <div class="peptide-details">
+                <div class="detail-box"><div class="label">Vials</div><div class="value">3 × 5 mg</div></div>
+                <div class="detail-box"><div class="label">Dose</div><div class="value">20 units (0.2 mL) = 0.5 mg</div></div>
+                <div class="detail-box"><div class="label">Schedule</div><div class="value">3× per week (Mon/Wed/Fri)</div></div>
+                <div class="detail-box"><div class="label">Timing</div><div class="value">Morning</div></div>
+                <div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div>
+                <div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Reconstitution — each 5 mg vial + 2 mL BAC water</div>
+              <ol class="recon-steps">
+                <li>Reconstitute one vial at a time. Draw 2 mL of BAC water and inject slowly down the vial wall. <strong>2 mL into 5 mg = 2.5 mg/mL concentration.</strong></li>
+                <li>Swirl gently until fully dissolved. SLU-PP-332 solutions typically appear clear.</li>
+                <li>Each dose = <strong>20 units (0.2 mL) = 0.5 mg SLU-PP-332.</strong></li>
+                <li>Each 5 mg vial yields 10 doses at this concentration. <strong>3 vials × 10 doses = 30 doses total — covers 24 doses (3× per week × 8 weeks) with buffer for the full cycle.</strong></li>
+                <li>Draw 20 units into insulin syringe. Inject SubQ into abdomen or thigh on Mon / Wed / Fri mornings.</li>
+                <li>Refrigerate active vial — use within 30 days of reconstitution. Keep unreconstituted vials frozen until needed.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5-AMINO-1MQ -->
+        <div class="peptide-card">
+          <div class="peptide-header">
+            <div>
+              <div class="peptide-name">5-Amino-1MQ</div>
+              <div class="peptide-tagline">NNMT Inhibitor — Direct Fat Cell Thermogenesis &amp; NAD+</div>
+            </div>
+            <div class="peptide-price">$120</div>
+          </div>
+          <div class="peptide-body">
+            <div>
+              <div class="peptide-section-label">Why it's in your protocol</div>
+              <div class="peptide-text">5-Amino-1MQ is a small molecule NNMT (nicotinamide N-methyltransferase) inhibitor. NNMT is overexpressed in fat cells of overweight individuals and <strong>suppresses fat cell metabolism</strong>. By inhibiting NNMT, 5-Amino-1MQ does three powerful things: (1) raises cellular NAD+ levels inside adipocytes, (2) reactivates fat cell thermogenesis (converting "sleepy" fat to metabolically active fat), and (3) prevents new fat storage. In animal studies, 5-Amino-1MQ caused significant fat loss <em>without</em> any change in appetite or exercise — because it's working directly inside the fat cells themselves. This is the compound that addresses the fat cells directly, while the other four compounds address your appetite, mitochondria, insulin sensitivity, and GH axis. Dosed 3 days per week in the morning.</div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Dosage &amp; schedule</div>
+              <div class="peptide-details">
+                <div class="detail-box"><div class="label">Vials</div><div class="value">2 × 50 mg</div></div>
+                <div class="detail-box"><div class="label">Dose</div><div class="value">10 units (0.1 mL) = 1 mg</div></div>
+                <div class="detail-box"><div class="label">Schedule</div><div class="value">3× per week (Mon/Wed/Fri)</div></div>
+                <div class="detail-box"><div class="label">Timing</div><div class="value">Morning</div></div>
+                <div class="detail-box"><div class="label">Route</div><div class="value">SubQ injection</div></div>
+                <div class="detail-box"><div class="label">Cycle</div><div class="value">All 8 weeks</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="peptide-section-label">Reconstitution — each 50 mg vial + 5 mL BAC water</div>
+              <ol class="recon-steps">
+                <li>Reconstitute one vial at a time. Draw 5 mL of BAC water and inject slowly down the vial wall. <strong>5 mL into 50 mg = 10 mg/mL concentration.</strong></li>
+                <li>Swirl gently until fully dissolved. Clear solution.</li>
+                <li>Each dose = <strong>10 units (0.1 mL) = 1 mg 5-Amino-1MQ</strong>.</li>
+                <li>Each 50 mg vial yields 50 doses at this concentration. <strong>2 vials = 100 doses total — far more than needed.</strong> At 3× per week × 8 weeks = 24 doses, one vial alone covers the full cycle with buffer; the second vial is surplus for a future cycle or extended use.</li>
+                <li>Draw 10 units into insulin syringe. Inject SubQ into abdomen or thigh on Mon / Wed / Fri mornings.</li>
+                <li>Refrigerate active vial — use within 30 days of reconstitution. Keep unreconstituted vial frozen.</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 8-WEEK CYCLE OVERVIEW -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#9A7B2F" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#9A7B2F" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#9A7B2F" stroke-width="0.8"/></svg>
+        </div>
+        <div class="section-title">8-Week Cycle Overview</div>
+      </div>
+
+      <div class="week-grid">
+        <div class="week-cell header">Week</div>
+        <div class="week-cell header">Phase</div>
+        <div class="week-cell header">Focus</div>
+        <div class="week-cell header">Notes</div>
+        <div class="week-cell phase-ramp"><div class="wk">Week 1</div></div>
+        <div class="week-cell phase-ramp"><div class="phase">Ramp-up</div></div>
+        <div class="week-cell phase-ramp"><div class="note">Tolerance</div></div>
+        <div class="week-cell phase-ramp"><div class="note">Start Retatrutide at 10 units only. Introduce SLU-PP-332 + MOTS-C + 5-Amino-1MQ. Tesamorelin PM. Log energy, appetite, sleep.</div></div>
+        <div class="week-cell phase-ramp"><div class="wk">Week 2</div></div>
+        <div class="week-cell phase-ramp"><div class="phase">Adaptation</div></div>
+        <div class="week-cell phase-ramp"><div class="note">Stabilize</div></div>
+        <div class="week-cell phase-ramp"><div class="note">Assess Retatrutide tolerance — hold at 10 units if nausea. Metabolic pathways building. Sleep deepening from Tesamorelin.</div></div>
+        <div class="week-cell phase-full"><div class="wk">Weeks 3–6</div></div>
+        <div class="week-cell phase-full"><div class="phase">Full Protocol</div></div>
+        <div class="week-cell phase-full"><div class="note">Peak burn</div></div>
+        <div class="week-cell phase-full"><div class="note">All 5 compounds at full dose. Appetite reduction, visceral fat shift, energy uptick become noticeable. Body comp changes peak weeks 4–6.</div></div>
+        <div class="week-cell phase-taper"><div class="wk">Week 7</div></div>
+        <div class="week-cell phase-taper"><div class="phase">Consolidation</div></div>
+        <div class="week-cell phase-taper"><div class="note">Lock in</div></div>
+        <div class="week-cell phase-taper"><div class="note">Assess results. Photo + waist measurement + weight check. Review energy and stress tolerance.</div></div>
+        <div class="week-cell phase-taper"><div class="wk">Week 8</div></div>
+        <div class="week-cell phase-taper"><div class="phase">Pre-AZ Finish</div></div>
+        <div class="week-cell phase-taper"><div class="note">Arizona ready</div></div>
+        <div class="week-cell phase-taper"><div class="note">Final week. Cycle ends ~July 1 if you start early May. Arrive in AZ July 2 in peak metabolic state.</div></div>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <div class="peptide-section-label" style="margin-bottom: 0.75rem;">Weekly dose schedule — full protocol (weeks 3–6)</div>
+        <table class="schedule-table">
+          <thead><tr><th>Day</th><th>Compound(s)</th><th>Timing &amp; Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong style="color:var(--text)">Monday</strong></td>
+              <td>
+                <span class="peptide-pill">Retatrutide</span>
+                <span class="peptide-pill">SLU-PP-332</span>
+                <span class="peptide-pill">MOTS-C</span>
+                <span class="peptide-pill">5-Amino-1MQ</span>
+                <span class="peptide-pill">Tesamorelin</span>
+              </td>
+              <td>Morning (fasted): MOTS-C + 5-Amino-1MQ + SLU-PP-332. Retatrutide AM (on dosing day). Tesamorelin PM pre-bed.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Tuesday</strong></td>
+              <td>
+                <span class="peptide-pill">MOTS-C</span>
+                <span class="peptide-pill">Tesamorelin</span>
+              </td>
+              <td>Morning (fasted): MOTS-C. Tesamorelin AM or PM. No Retatrutide, no SLU-PP-332, no 5-Amino-1MQ today.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Wednesday</strong></td>
+              <td>
+                <span class="peptide-pill">Retatrutide</span>
+                <span class="peptide-pill">SLU-PP-332</span>
+                <span class="peptide-pill">MOTS-C</span>
+                <span class="peptide-pill">5-Amino-1MQ</span>
+                <span class="peptide-pill">Tesamorelin</span>
+              </td>
+              <td>Same as Monday. All 5 compounds — Retatrutide morning, MOTS stack morning, Tesamorelin PM.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Thursday</strong></td>
+              <td>
+                <span class="peptide-pill">MOTS-C</span>
+                <span class="peptide-pill">Tesamorelin</span>
+              </td>
+              <td>Same as Tuesday. Morning MOTS-C + Tesamorelin. No Retatrutide, no SLU-PP-332, no 5-Amino-1MQ.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Friday</strong></td>
+              <td>
+                <span class="peptide-pill">Retatrutide</span>
+                <span class="peptide-pill">SLU-PP-332</span>
+                <span class="peptide-pill">MOTS-C</span>
+                <span class="peptide-pill">5-Amino-1MQ</span>
+                <span class="peptide-pill">Tesamorelin</span>
+              </td>
+              <td>Final dose day of work week. Full stack — Retatrutide morning, morning trio, Tesamorelin PM.</td>
+            </tr>
+            <tr>
+              <td><strong style="color:var(--text)">Saturday &amp; Sunday</strong></td>
+              <td>
+                <span style="color:var(--text-muted);font-style:italic;font-size:13px;">Rest Days</span>
+              </td>
+              <td>All compounds off. Recovery days for mitochondrial and GH axis reset. Optional: 4th Retatrutide dose Saturday if spacing across week.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- EXPECTED RESULTS -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 12L6 8L9 10L13 4" stroke="#9A7B2F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="section-title">What to Expect — Week by Week</div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-week">Weeks 1–2</div>
+          <div class="timeline-text">Initial adaptation. Appetite reduction begins within first 1–2 doses of Retatrutide — this is expected and is the strongest felt effect. Mild nausea is normal, typically resolves by end of week 2. Sleep depth may improve from Tesamorelin. Energy may feel slightly flat in week 1 as metabolic pathways reorganize — this is temporary. Start logging weight, waist, and photos now for baseline.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-week">Weeks 3–4</div>
+          <div class="timeline-text">Fat loss becomes visible. Waist circumference starts shifting — a combination of Tesamorelin (visceral fat) and the MOTS-C / 5-Amino-1MQ / SLU-PP-332 trio driving cellular metabolism. Appetite suppression from Retatrutide is smoother now with less nausea. Energy should stabilize and improve by week 4 as mitochondrial biogenesis from MOTS-C and SLU-PP-332 kicks in. This is when many clients report feeling "lighter" mentally as well.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-week">Weeks 5–6</div>
+          <div class="timeline-text">Peak window. This is the most dramatic part of the cycle — body composition changes are most visible, clothes fit differently, energy is strong, sleep is deep, and stress resilience improves noticeably. If you're tracking weight, expect the largest shifts in this window. Mental clarity from the GH axis + metabolic uptick compounds. You should feel dramatically different from where you started.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-week">Weeks 7–8</div>
+          <div class="timeline-text">Consolidation and pre-Arizona prep. Results continue to refine. Take end-of-cycle photos and measurements to compare to baseline. Assess: how's your energy, appetite, waist, weight, skin, sleep? This becomes the benchmark for discussing next steps — whether to run a maintenance cycle, pause, or transition to a different stack. You should arrive in AZ on July 2nd feeling and looking genuinely different.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STORAGE -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="#9A7B2F" stroke-width="1.2"/><path d="M6 6H10M6 9H8" stroke="#9A7B2F" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="section-title">Storage &amp; Handling</div>
+      </div>
+      <div class="storage-grid">
+        <div class="storage-card">
+          <h4>Before reconstitution (dry powder)</h4>
+          <p>Store all vials in the refrigerator at 36–46°F (2–8°C). Keep away from light and moisture. Do not freeze. Shelf life is typically 12–24 months unopened. Label each vial clearly — Retatrutide, SLU-PP-332, MOTS-C, Tesamorelin, and 5-Amino-1MQ.</p>
+        </div>
+        <div class="storage-card">
+          <h4>After reconstitution</h4>
+          <p>All reconstituted vials must be refrigerated. Use all compounds within 30 days of reconstitution. Never freeze. Reconstitute only what you'll use within 30 days — if you stagger reconstitution, you extend effective shelf life of your supply.</p>
+        </div>
+        <div class="storage-card">
+          <h4>Bacteriostatic (BAC) water</h4>
+          <p>Use sterile BAC water for all five compounds. BAC water's benzyl alcohol preservative extends shelf life to 30 days. Do not substitute plain sterile water — it does not preserve reconstituted peptides and they'll break down faster.</p>
+        </div>
+        <div class="storage-card">
+          <h4>Syringes &amp; injection sites</h4>
+          <p>Use 29–31 gauge insulin syringes (0.5 mL or 1 mL barrel). Never reuse a syringe. Dispose in a sharps container. Rotate injection sites every day — abdomen, outer thigh, upper arm. Morning stack (SLU + MOTS + 5-Amino-1MQ + Retatrutide on dose days) can all go abdomen; Tesamorelin PM use a different site.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- MONITOR -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#9A7B2F" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V9.5" stroke="#9A7B2F" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.5" fill="#9A7B2F"/></svg>
+        </div>
+        <div class="section-title">What to Monitor</div>
+      </div>
+      <div class="monitor-list">
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Mild nausea with Retatrutide in weeks 1–2 — take first thing in the morning and eat a small meal within 30 min. Avoid heavy or fatty food on injection days.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Significant appetite reduction — this is the desired effect of Retatrutide. Focus on hitting protein target (0.7–1g per lb goal bodyweight) even when not hungry.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Deeper sleep and vivid dreams in week 1 from Tesamorelin — this is the GH pulse doing its job. Quality of rest improves over time.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-normal"></div><strong style="margin-right:6px;color:var(--text)">Normal:</strong> Slight injection site redness or bruising — rotate sites daily. Use short 29–31G pins and inject slowly at 45°.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Persistent nausea/vomiting beyond week 2 with Retatrutide — hold at 10 units, do not increase. Take with food. Contact BioLinked if severe.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Joint swelling, carpal-tunnel-like symptoms, or water retention — may be GH axis response to Tesamorelin. Reduce to 3×/week and monitor.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Extreme fatigue or blood sugar lows — possible interaction of Retatrutide + metabolic peptides. Eat small meal with morning stack. Report if ongoing.</div>
+        <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold-light)">Monitor:</strong> Elevated heart rate or palpitations — uncommon but possible with aggressive fat loss stacks. Reduce or pause and reach out to BioLinked.</div>
+      </div>
+    </div>
+
+    <div class="disclaimer">
+      <strong>Important Notice:</strong> This protocol has been prepared by BioLinked Solutions for educational and informational purposes only. It does not constitute medical advice, diagnosis, or treatment. Peptides and compounds discussed are research compounds. Always consult with a licensed healthcare provider before beginning any protocol. BioLinked Solutions is not responsible for adverse outcomes resulting from misuse or improper administration. If you experience any adverse reactions, discontinue use immediately and seek medical attention. <strong>This protocol is personalized for Kristin Wells only and should not be shared or substituted.</strong>
+    </div>
+
+  </div><!-- end tab-protocol -->
+
+
+  <!-- ===== TRACKER TAB ===== -->
+  <div id="tab-tracker" class="tab-content">
+    <div class="section" style="margin-top:2rem;">
+      <div class="section-header">
+        <div class="section-icon">
+          <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#9A7B2F" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#9A7B2F" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="section-title">Daily Dose Tracker</div>
+      </div>
+
+      <div class="cycle-start-row">
+        <label>Cycle Start Date</label>
+        <input type="date" id="cycleStartDate" onchange="setCycleStart(this.value)">
+        <span class="save-badge" id="saveBadge">Saved ✓</span>
+      </div>
+
+      <div class="tracker-top">
+        <div class="tracker-stat">
+          <div class="ts-label">Cycle Progress</div>
+          <div class="ts-value" id="statWeek">—</div>
+          <div class="ts-sub" id="statDay">Set start date above</div>
+        </div>
+        <div class="tracker-stat">
+          <div class="ts-label">Doses Taken</div>
+          <div class="ts-value" id="statDoses">0</div>
+          <div class="ts-sub">this week</div>
+        </div>
+        <div class="tracker-stat">
+          <div class="ts-label">Completion</div>
+          <div class="ts-value" id="statPct">0%</div>
+          <div class="ts-sub">overall cycle</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-label">
+          <span>8-Week Cycle Overall</span>
+          <span id="progressLabel">0 / 56 days</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="week-selector">
+        <button class="week-nav-btn" onclick="changeWeek(-1)">‹</button>
+        <div class="week-label" id="weekLabel">Week 1</div>
+        <button class="week-nav-btn" onclick="changeWeek(1)">›</button>
+      </div>
+
+      <div id="trackerGrid"></div>
+
+      <div class="notes-area">
+        <div class="notes-label">Weekly Notes — How are you feeling?</div>
+        <textarea class="notes-input" id="weekNotes" placeholder="Energy, appetite, waist measurement, sleep quality, side effects, stress at work..." oninput="saveNotes()"></textarea>
+      </div>
+
+      <div class="tracker-actions">
+        <button class="action-btn" onclick="markAllToday()">✓ Mark All Today</button>
+        <button class="action-btn" onclick="clearWeek()">Clear This Week</button>
+      </div>
+      <button class="action-btn primary" onclick="downloadiOS()" style="margin-top:12px;width:100%;">
+        ⬇ Download Tracker for iOS
+      </button>
+      <div style="background:var(--bg-card);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:1.25rem 1.75rem;margin-top:1.5rem;font-size:13px;color:var(--text-muted);line-height:1.65;">
+        <strong style="color:var(--gold-light);">Save to iPhone Home Screen:</strong> Tap <em>Download Tracker for iOS</em> above → open the downloaded file in Safari → tap the Share button → <em>Add to Home Screen</em>. Your dose log saves locally to the device.
+      </div>
+
+    </div>
+  </div><!-- end tab-tracker -->
+
+
+  <!-- =================== CALENDAR TAB =================== -->
+  <div id="tab-calendar" class="tab-content">
+    <style>
+      .cal-hero{background:linear-gradient(135deg,#ffffff 0%,#f8f8f8 100%);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:2rem 2rem 1.75rem;margin-top:2.5rem;position:relative;overflow:hidden}
+      .cal-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+      .cal-hero::after{content:'📅';position:absolute;right:1.5rem;top:50%;transform:translateY(-50%);font-size:52px;opacity:0.08}
+      .cal-hero h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:400;color:var(--white);margin-bottom:8px}
+      .cal-hero h2 em{color:var(--gold);font-style:italic}
+      .cal-hero p{font-size:14px;color:#b0b0a8;font-weight:300;line-height:1.8;max-width:560px}
+
+      .cal-setup{margin-top:2rem;background:var(--bg-card);border:1px solid var(--gold-border);border-radius:2px;overflow:hidden}
+      .cal-setup-header{background:#f2f2f2;padding:1rem 1.5rem;border-bottom:1px solid var(--gold-border);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:600}
+      .cal-setup-body{padding:1.5rem}
+      .cal-fields{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+      .cal-field label{display:block;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:8px}
+      .cal-field input{width:100%;background:var(--bg);border:1px solid var(--gold-border);border-radius:2px;padding:12px 14px;color:var(--text);font-family:Montserrat,sans-serif;font-size:14px;outline:none;color-scheme:light;transition:border-color 0.2s;-webkit-appearance:none}
+      .cal-field input:focus{border-color:var(--gold)}
+
+      .cal-preview{margin-top:1.5rem}
+      .cal-preview-title{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+      .cal-preview-title::after{content:'';flex:1;height:1px;background:var(--gold-border)}
+      .cal-week-grid{display:grid;grid-template-columns:90px repeat(7,1fr);gap:1px;background:var(--gold-border);border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;font-size:11px}
+      .cal-cell{background:var(--bg-card);padding:8px 6px;text-align:center}
+      .cal-cell.head{background:#f2f2f2;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);font-weight:600;padding:10px 6px}
+      .cal-cell.compound-lbl{background:var(--bg-card2);text-align:right;padding-right:10px;font-size:10px;font-weight:600;color:var(--gold-light);display:flex;align-items:center;justify-content:flex-end;line-height:1.3}
+      .cal-dot{width:10px;height:10px;border-radius:50%;margin:0 auto;display:block}
+      .dot-reta{background:#fc8181}
+      .dot-slu{background:#9A7B2F}
+      .dot-mots{background:#68d391}
+      .dot-tesa{background:#63b3ed}
+      .dot-amino{background:#b794f4}
+      .dot-empty{background:transparent;border:1px solid #ccc}
+
+      .cal-legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:1rem;padding:1rem 1.25rem;background:var(--bg-card2);border:1px solid var(--border);border-radius:2px}
+      .leg-item{display:flex;align-items:center;gap:7px;font-size:12px;color:#555;font-weight:300}
+      .leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+
+      .cal-summary{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:1.5rem}
+      .cal-sum-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1rem;text-align:center}
+      .cal-sum-card .cs-num{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--gold);line-height:1}
+      .cal-sum-card .cs-lbl{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-top:4px;line-height:1.4}
+
+      .cal-download-btn{width:100%;margin-top:1.75rem;padding:1.25rem 2rem;background:var(--gold);color:#ffffff;border:none;border-radius:2px;font-family:Outfit,sans-serif;font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:all 0.22s;display:flex;align-items:center;justify-content:center;gap:10px}
+      .cal-download-btn:hover{background:var(--gold-light);transform:translateY(-1px);box-shadow:0 8px 28px rgba(154,123,47,0.25)}
+      .cal-download-btn:active{transform:translateY(0)}
+      .cal-download-btn .btn-icon{font-size:18px}
+
+      .cal-steps{margin-top:1.75rem;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden}
+      .cal-steps-head{background:#f2f2f2;padding:1rem 1.5rem;border-bottom:1px solid var(--gold-border);font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:600}
+      .cal-steps-body{padding:1.5rem;display:flex;flex-direction:column;gap:0}
+      .cal-step{display:flex;gap:16px;align-items:flex-start;padding:1rem 0;border-bottom:1px solid var(--border)}
+      .cal-step:last-child{border-bottom:none;padding-bottom:0}
+      .cal-step-num{width:32px;height:32px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+      .cal-step-content h4{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+      .cal-step-content p{font-size:13px;color:#555;font-weight:300;line-height:1.65}
+      .cal-step-content strong{color:var(--gold-light);font-weight:600}
+
+      .notif-preview{margin-top:1.75rem;background:var(--bg-card2);border:1px solid var(--border);border-radius:2px;padding:1.5rem}
+      .notif-head{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1rem}
+      .notif-card{background:#f8f8f8;border:1px solid #eaeaea;border-radius:14px;padding:14px 16px;margin-bottom:10px;display:flex;gap:12px;align-items:flex-start;max-width:360px}
+      .notif-icon{width:36px;height:36px;border-radius:8px;background:var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+      .notif-body .notif-app{font-size:10px;color:#777;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.05em}
+      .notif-body .notif-title{font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:2px}
+      .notif-body .notif-msg{font-size:12px;color:#777;line-height:1.4}
+      .notif-time{font-size:10px;color:#999;margin-left:auto;flex-shrink:0}
+
+      @media(max-width:600px){
+        .cal-fields{grid-template-columns:1fr}
+        .cal-summary{grid-template-columns:1fr 1fr}
+        .cal-week-grid{grid-template-columns:70px repeat(7,1fr);font-size:9px}
+        .cal-cell{padding:6px 3px}
+      }
+    </style>
+
+    <div class="cal-hero">
+      <h2>Add Kristin's Protocol to Your <em>Calendar</em></h2>
+      <p>Generate the complete 8-week injection schedule with reminder alerts and add it directly to your iPhone Calendar in seconds. Every dose, every day — with 30-minute notifications so you never miss. Especially useful given the long workdays and office stress — let the phone remind you instead of relying on memory.</p>
+    </div>
+
+    <div class="cal-setup">
+      <div class="cal-setup-header">Step 1 — Set Your Schedule Details</div>
+      <div class="cal-setup-body">
+        <div class="cal-fields">
+          <div class="cal-field">
+            <label>Cycle Start Date</label>
+            <input type="date" id="calStart" oninput="updatePreview()"/>
+          </div>
+          <div class="cal-field">
+            <label>Morning Injection Time</label>
+            <input type="time" id="calAM" value="07:00" oninput="updatePreview()"/>
+          </div>
+        </div>
+
+        <div class="cal-preview">
+          <div class="cal-preview-title">Weekly Schedule Preview</div>
+          <div class="cal-week-grid">
+            <div class="cal-cell head">Compound</div>
+            <div class="cal-cell head">Mon</div>
+            <div class="cal-cell head">Tue</div>
+            <div class="cal-cell head">Wed</div>
+            <div class="cal-cell head">Thu</div>
+            <div class="cal-cell head">Fri</div>
+            <div class="cal-cell head">Sat</div>
+            <div class="cal-cell head">Sun</div>
+            <!-- Retatrutide -->
+            <div class="cal-cell compound-lbl">Retatrutide<br>10U · 1mg</div>
+            <div class="cal-cell"><span class="cal-dot dot-reta"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-reta"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-reta"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <!-- MOTS-C -->
+            <div class="cal-cell compound-lbl">MOTS-C<br>15U · 2mg</div>
+            <div class="cal-cell"><span class="cal-dot dot-mots"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-mots"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-mots"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-mots"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-mots"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <!-- SLU-PP-332 -->
+            <div class="cal-cell compound-lbl">SLU-PP-332<br>20U · 0.5mg</div>
+            <div class="cal-cell"><span class="cal-dot dot-slu"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-slu"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-slu"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <!-- Tesamorelin -->
+            <div class="cal-cell compound-lbl">Tesamorelin<br>20U · 1mg</div>
+            <div class="cal-cell"><span class="cal-dot dot-tesa"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-tesa"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-tesa"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-tesa"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-tesa"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <!-- 5-Amino-1MQ -->
+            <div class="cal-cell compound-lbl">5-Amino-1MQ<br>10U · 1mg</div>
+            <div class="cal-cell"><span class="cal-dot dot-amino"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-amino"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-amino"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+            <div class="cal-cell"><span class="cal-dot dot-empty"></span></div>
+          </div>
+
+          <div class="cal-legend">
+            <div class="leg-item"><span class="leg-dot" style="background:#fc8181"></span>Retatrutide — Mon / Wed / Fri AM</div>
+            <div class="leg-item"><span class="leg-dot" style="background:#68d391"></span>MOTS-C — Mon–Fri AM fasted</div>
+            <div class="leg-item"><span class="leg-dot" style="background:#9A7B2F"></span>SLU-PP-332 — Mon / Wed / Fri AM</div>
+            <div class="leg-item"><span class="leg-dot" style="background:#63b3ed"></span>Tesamorelin — Mon–Fri AM</div>
+            <div class="leg-item"><span class="leg-dot" style="background:#b794f4"></span>5-Amino-1MQ — Mon / Wed / Fri AM</div>
+          </div>
+        </div>
+
+        <div class="cal-summary">
+          <div class="cal-sum-card"><div class="cs-num">24</div><div class="cs-lbl">Retatrutide<br>Events</div></div>
+          <div class="cal-sum-card"><div class="cs-num">40</div><div class="cs-lbl">MOTS-C<br>Events</div></div>
+          <div class="cal-sum-card"><div class="cs-num">24</div><div class="cs-lbl">SLU-PP-332<br>Events</div></div>
+          <div class="cal-sum-card"><div class="cs-num">40</div><div class="cs-lbl">Tesamorelin<br>Events</div></div>
+          <div class="cal-sum-card"><div class="cs-num">24</div><div class="cs-lbl">5-Amino-1MQ<br>Events</div></div>
+        </div>
+
+        <div style="margin-top:1rem;padding:1rem 1.25rem;background:var(--bg);border:1px solid var(--border);border-radius:2px;font-size:13px;color:#555;font-weight:300;line-height:1.75;text-align:center;">
+          <strong style="color:var(--gold-light);">152 total calendar events</strong> · Each with a <strong style="color:var(--gold-light);">30-minute reminder</strong> notification · Spanning the full 8-week cycle
+        </div>
+
+        <button class="cal-download-btn" onclick="downloadCal()">
+          <span class="btn-icon">📅</span>
+          Generate &amp; Download Calendar (.ics)
+        </button>
+
+        <div id="calMsg" style="display:none;margin-top:1rem;padding:1rem 1.25rem;background:rgba(58,122,90,0.15);border:1px solid rgba(58,122,90,0.4);border-radius:2px;text-align:center;font-size:13px;color:#3a7a5a;font-weight:500;">
+          ✓ Calendar file downloaded! Open it on your iPhone to import all events.
+        </div>
+        <div id="calErr" style="display:none;margin-top:1rem;padding:1rem 1.25rem;background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.3);border-radius:2px;text-align:center;font-size:13px;color:#c04040;font-weight:500;">
+          Please enter your cycle start date first.
+        </div>
+      </div>
+    </div>
+
+    <div class="notif-preview">
+      <div class="notif-head">What Your Reminders Will Look Like</div>
+      <div class="notif-card">
+        <div class="notif-icon">💉</div>
+        <div class="notif-body">
+          <div class="notif-app">Calendar · 30 min reminder</div>
+          <div class="notif-title">💉 Retatrutide — 1 mg (10 units)</div>
+          <div class="notif-msg">SubQ injection · Abdomen or outer thigh · Mon/Wed/Fri AM</div>
+        </div>
+        <div class="notif-time">7:00 AM</div>
+      </div>
+      <div class="notif-card">
+        <div class="notif-icon">💉</div>
+        <div class="notif-body">
+          <div class="notif-app">Calendar · 30 min reminder</div>
+          <div class="notif-title">💉 MOTS-C — 2 mg (15 units)</div>
+          <div class="notif-msg">SubQ · Fasted before breakfast · Mon–Fri AM</div>
+        </div>
+        <div class="notif-time">7:00 AM</div>
+      </div>
+    </div>
+
+    <div class="cal-steps">
+      <div class="cal-steps-head">Step 2 — Add to iPhone Calendar</div>
+      <div class="cal-steps-body">
+        <div class="cal-step">
+          <div class="cal-step-num">1</div>
+          <div class="cal-step-content">
+            <h4>Enter your start date &amp; injection time above</h4>
+            <p>Target start is <strong>early May</strong> so your 8-week cycle finishes right before <strong>July 2</strong>, leaving you fresh for the Arizona trip. Set your preferred morning injection time (7:00 AM is pre-filled).</p>
+          </div>
+        </div>
+        <div class="cal-step">
+          <div class="cal-step-num">2</div>
+          <div class="cal-step-content">
+            <h4>Tap "Generate &amp; Download Calendar"</h4>
+            <p>A file called <strong>Kristin_Wells_BioLinked_Protocol.ics</strong> will download to your device with all 152 events for your full 8-week cycle.</p>
+          </div>
+        </div>
+        <div class="cal-step">
+          <div class="cal-step-num">3</div>
+          <div class="cal-step-content">
+            <h4>On iPhone — open the .ics file</h4>
+            <p>Find it in your <strong>Downloads</strong> folder (Files app) or tap it directly from your browser's download notification. iOS will automatically recognize it as a Calendar file.</p>
+          </div>
+        </div>
+        <div class="cal-step">
+          <div class="cal-step-num">4</div>
+          <div class="cal-step-content">
+            <h4>Tap "Add All Events"</h4>
+            <p>iOS will ask <em>"Add all 152 events to your calendar?"</em> — tap <strong>Add All</strong>. Every injection reminder imports instantly into your iPhone Calendar.</p>
+          </div>
+        </div>
+        <div class="cal-step">
+          <div class="cal-step-num">5</div>
+          <div class="cal-step-content">
+            <h4>Notifications start firing automatically</h4>
+            <p>A <strong>push notification 30 minutes before</strong> each scheduled dose — every day, for 8 weeks. No manual tracking required, even on the busiest office days.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1.25rem 1.75rem;font-size:12px;color:var(--text-muted);line-height:1.75;font-weight:300;font-style:italic;">
+      <strong style="color:var(--gold);font-style:normal;">Note:</strong> The calendar file adds events to your existing iPhone Calendar — it does not create a new app. You can delete individual events or the entire "BioLinked — Kristin Wells" calendar group at any time from Calendar settings. Android users: open the .ics file in Google Calendar for the same functionality.
+    </div>
+
+  </div><!-- end tab-calendar -->
+
+</div><!-- end container -->
+
+<div class="footer">
+  Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Personalized Protocol for Kristin Wells &nbsp;·&nbsp; 8-Week Cycle
+</div>
+
+<script>
+// ── COMPOUNDS ──
+const COMPOUNDS = [
+  { id:'reta',  name:'Retatrutide',   sub:'10 units SubQ AM',  days:[1,3,5] },       // Mon/Wed/Fri
+  { id:'motsc', name:'MOTS-C',        sub:'15 units SubQ AM',  days:[1,2,3,4,5] },   // Mon–Fri fasted
+  { id:'slupp', name:'SLU-PP-332',    sub:'20 units SubQ AM',  days:[1,3,5] },       // Mon/Wed/Fri
+  { id:'tesam', name:'Tesamorelin',   sub:'20 units SubQ AM',  days:[1,2,3,4,5] },   // Mon–Fri
+  { id:'amino', name:'5-Amino-1MQ',   sub:'10 units SubQ AM',  days:[1,3,5] },       // Mon/Wed/Fri
+];
+
+const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+let currentWeek = 1;
+let state = {};
+let cycleStartDate = null;
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('kristinProtocolState');
+    if (s) state = JSON.parse(s);
+    const d = localStorage.getItem('kristinCycleStart');
+    if (d) { cycleStartDate = new Date(d); document.getElementById('cycleStartDate').value = d; }
+  } catch(e) {}
+  updateStats();
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('kristinProtocolState', JSON.stringify(state));
+    const badge = document.getElementById('saveBadge');
+    badge.classList.add('show');
+    setTimeout(() => badge.classList.remove('show'), 1500);
+  } catch(e) {}
+}
+
+function saveNotes() {
+  if (!state[currentWeek]) state[currentWeek] = {};
+  state[currentWeek].__notes = document.getElementById('weekNotes').value;
+  saveState();
+}
+
+function setCycleStart(val) {
+  cycleStartDate = val ? new Date(val) : null;
+  try { localStorage.setItem('kristinCycleStart', val); } catch(e) {}
+  updateStats();
+  const badge = document.getElementById('saveBadge');
+  badge.classList.add('show');
+  setTimeout(() => badge.classList.remove('show'), 1500);
+}
+
+function isScheduled(compound, dayOfWeek) { return compound.days.includes(dayOfWeek); }
+
+function toggleDose(weekNum, compoundId, dayIdx) {
+  if (!state[weekNum]) state[weekNum] = {};
+  if (!state[weekNum][compoundId]) state[weekNum][compoundId] = {};
+  state[weekNum][compoundId][dayIdx] = !state[weekNum][compoundId][dayIdx];
+  saveState(); renderGrid(); updateStats();
+}
+
+function isDoseTaken(weekNum, compoundId, dayIdx) {
+  return !!(state[weekNum] && state[weekNum][compoundId] && state[weekNum][compoundId][dayIdx]);
+}
+
+function renderGrid() {
+  const container = document.getElementById('trackerGrid');
+  const weekDates = getWeekDates(currentWeek);
+  let html = '';
+
+  html += '<div class="day-header-row"><div></div><div class="day-headers-inner">';
+  for (let d = 0; d < 7; d++) {
+    const dayName = DAY_NAMES[(d + 1) % 7];
+    const dateStr = weekDates ? weekDates[d].getDate() : '';
+    const isRest = COMPOUNDS.every(c => !isScheduled(c, (d + 1) % 7));
+    html += `<div class="day-header${isRest ? ' rest-day' : ''}">${dayName}${dateStr ? '<br><span style="font-size:9px;font-weight:300;color:#555">' + dateStr + '</span>' : ''}</div>`;
+  }
+  html += '</div></div>';
+
+  COMPOUNDS.forEach(compound => {
+    html += '<div class="tracker-grid-wrap"><div class="tracker-compound-label"><div class="compound-badge">' + compound.name + '<span>' + compound.sub + '</span></div></div><div class="day-row">';
+    for (let d = 0; d < 7; d++) {
+      const realDOW = (d + 1) % 7;
+      const scheduled = isScheduled(compound, realDOW);
+      const taken = isDoseTaken(currentWeek, compound.id, d);
+      if (!scheduled) {
+        html += '<div class="dose-cell rest"></div>';
+      } else if (taken) {
+        html += `<div class="dose-cell scheduled taken" onclick="toggleDose(${currentWeek},'${compound.id}',${d})"></div>`;
+      } else {
+        html += `<div class="dose-cell scheduled" onclick="toggleDose(${currentWeek},'${compound.id}',${d})"></div>`;
+      }
+    }
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+  document.getElementById('weekLabel').textContent = 'Week ' + currentWeek;
+  const notes = state[currentWeek] && state[currentWeek].__notes ? state[currentWeek].__notes : '';
+  document.getElementById('weekNotes').value = notes;
+}
+
+function getWeekDates(weekNum) {
+  if (!cycleStartDate) return null;
+  const start = new Date(cycleStartDate);
+  start.setDate(start.getDate() + (weekNum - 1) * 7);
+  const dates = [];
+  for (let i = 0; i < 7; i++) { const d = new Date(start); d.setDate(d.getDate() + i); dates.push(d); }
+  return dates;
+}
+
+function changeWeek(delta) {
+  const n = currentWeek + delta;
+  if (n < 1 || n > 8) return;
+  currentWeek = n;
+  renderGrid();
+}
+
+function markAllToday() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  let dIdx = -1;
+  for (let d = 0; d < 7; d++) { if ((d + 1) % 7 === dayOfWeek) { dIdx = d; break; } }
+  if (dIdx < 0) return;
+  if (!state[currentWeek]) state[currentWeek] = {};
+  COMPOUNDS.forEach(compound => {
+    if (isScheduled(compound, dayOfWeek)) {
+      if (!state[currentWeek][compound.id]) state[currentWeek][compound.id] = {};
+      state[currentWeek][compound.id][dIdx] = true;
+    }
+  });
+  saveState(); renderGrid(); updateStats();
+}
+
+function clearWeek() {
+  if (!confirm('Clear all dose logs for Week ' + currentWeek + '?')) return;
+  const notes = state[currentWeek] && state[currentWeek].__notes;
+  state[currentWeek] = {};
+  if (notes) state[currentWeek].__notes = notes;
+  saveState(); renderGrid(); updateStats();
+}
+
+function updateStats() {
+  let weekText = 'Week ' + currentWeek, dayText = 'of 8-week cycle';
+  if (cycleStartDate) {
+    const now = new Date();
+    const diffDays = Math.floor((now - cycleStartDate) / (1000 * 60 * 60 * 24));
+    const cycleWeek = Math.min(8, Math.max(1, Math.floor(diffDays / 7) + 1));
+    weekText = 'Week ' + cycleWeek;
+    dayText = 'Day ' + Math.min(diffDays + 1, 56) + ' of 56';
+    if (currentWeek === 1 && cycleWeek > 1) currentWeek = cycleWeek;
+    const pct = Math.min(100, Math.round((diffDays / 56) * 100));
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = Math.min(diffDays + 1, 56) + ' / 56 days';
+    document.getElementById('statPct').textContent = pct + '%';
+  }
+  document.getElementById('statWeek').textContent = weekText;
+  document.getElementById('statDay').textContent = dayText;
+  let doseCount = 0, totalScheduled = 0;
+  for (let d = 0; d < 7; d++) {
+    const realDOW = (d + 1) % 7;
+    COMPOUNDS.forEach(compound => {
+      if (isScheduled(compound, realDOW)) {
+        totalScheduled++;
+        if (isDoseTaken(currentWeek, compound.id, d)) doseCount++;
+      }
+    });
+  }
+  document.getElementById('statDoses').textContent = doseCount + '/' + totalScheduled;
+}
+
+function switchTab(tab, event) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (event && event.target) event.target.classList.add('active');
+  if (tab === 'tracker') { renderGrid(); updateStats(); }
+}
+
+function downloadiOS() {
+  const startVal = document.getElementById('cycleStartDate').value || '';
+  const stateJSON = JSON.stringify(state);
+
+  const trackerHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kristin Protocol">
+<title>Kristin Wells — Peptide Tracker</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#9A7B2F;--gold-light:#B8960C;--gold-dim:rgba(154,123,47,0.15);--gold-border:rgba(154,123,47,0.3);--bg:#f8f8f8;--bg-card:#ffffff;--bg-card2:#f2f2f2;--white:#1a1a1a;--text:#1a1a1a;--muted:#777777;--border:rgba(0,0,0,0.08);--green-dim:rgba(45,106,79,0.15)}
+body{font-family:'Outfit',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);font-size:14px;padding-bottom:env(safe-area-inset-bottom,20px)}
+.hdr{background:#ffffff;border-bottom:1px solid var(--gold-border);padding:max(1.5rem,env(safe-area-inset-top,1.5rem)) 1rem 1rem;text-align:center;position:relative}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.hdr h1{font-size:20px;color:var(--white);font-weight:300;letter-spacing:0.04em}
+.hdr h1 em{color:var(--gold);font-style:normal}
+.hdr p{font-size:10px;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-top:4px}
+.wrap{max-width:600px;margin:0 auto;padding:1rem}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.stat{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:4px;padding:12px 8px;text-align:center}
+.stat .val{font-size:22px;color:var(--gold);font-weight:600;font-family:Georgia,serif}
+.stat .lbl{font-size:9px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}
+.prog-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:1rem}
+.prog-top{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px}
+.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.3s}
+.week-sel{display:flex;align-items:center;justify-content:center;gap:12px;margin:1rem 0}
+.wnav{width:44px;height:44px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:4px;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.wlbl{font-size:20px;color:var(--white);font-weight:300;min-width:100px;text-align:center;font-family:Georgia,serif}
+.grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:1rem;border-radius:6px;border:1px solid var(--gold-border)}
+.tracker-table{width:100%;border-collapse:collapse;min-width:420px}
+.tracker-table th{background:#f2f2f2;color:var(--gold);padding:9px 6px;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--gold-border)}
+.tracker-table th.compound-col{text-align:left;padding-left:10px;min-width:110px}
+.tracker-table td{padding:4px;text-align:center;border-bottom:1px solid var(--border)}
+.tracker-table td.cn{text-align:left;padding-left:10px;font-size:11px;font-weight:600;color:var(--gold-light);white-space:nowrap}
+.tracker-table td.cn span{display:block;font-size:9px;font-weight:400;color:var(--muted);margin-top:1px}
+.tracker-table tr:nth-child(even) td{background:var(--bg-card2)}
+.dbtn{width:38px;height:38px;border-radius:6px;border:1px solid var(--border);background:var(--bg-card);display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;-webkit-tap-highlight-color:transparent;font-size:17px;transition:all 0.1s}
+.dbtn.taken{background:var(--green-dim);border-color:rgba(58,122,90,0.5)}
+.dbtn.rest{background:transparent;border-color:transparent;cursor:default;color:#aaa;font-size:12px}
+.dbtn:active{transform:scale(0.88)}
+.notes-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:12px;margin-bottom:1rem}
+.notes-lbl{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;font-weight:600}
+.notes-ta{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:10px;color:var(--text);font-family:-apple-system,sans-serif;font-size:14px;resize:vertical;min-height:70px;outline:none;-webkit-appearance:none}
+.notes-ta:focus{border-color:var(--gold-border)}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}
+.btn{padding:15px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold-light);font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;text-align:center;min-height:52px;display:flex;align-items:center;justify-content:center}
+.btn:active{background:rgba(154,123,47,0.3)}
+.info{text-align:center;font-size:11px;color:var(--muted);padding:1rem;line-height:1.65}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <h1>Kristin <em>Wells</em> — Dose Tracker</h1>
+  <p>Bio Linked Solutions &middot; 8-Week Protocol</p>
+</div>
+<div class="wrap">
+  <div class="stats">
+    <div class="stat"><div class="val" id="sWk">—</div><div class="lbl">Current Week</div></div>
+    <div class="stat"><div class="val" id="sDoses">0</div><div class="lbl">Doses This Week</div></div>
+    <div class="stat"><div class="val" id="sPct">0%</div><div class="lbl">Cycle Complete</div></div>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-top"><span>8-Week Cycle</span><span id="pLbl">0/56 days</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+  </div>
+  <div class="week-sel">
+    <div class="wnav" onclick="chWk(-1)">‹</div>
+    <div class="wlbl" id="wLbl">Week 1</div>
+    <div class="wnav" onclick="chWk(1)">›</div>
+  </div>
+  <div class="grid-wrap">
+    <table class="tracker-table">
+      <thead><tr><th class="compound-col">Compound</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th></tr></thead>
+      <tbody id="tBody"></tbody>
+    </table>
+  </div>
+  <div class="notes-wrap">
+    <div class="notes-lbl">Weekly Notes</div>
+    <textarea class="notes-ta" id="wNotes" placeholder="Energy, waist, appetite, sleep, work stress, side effects..." oninput="svN()"></textarea>
+  </div>
+  <div class="btns">
+    <div class="btn" onclick="mkToday()">✓ Mark All Today</div>
+    <div class="btn" onclick="clrWk()">Clear This Week</div>
+  </div>
+  <div class="info">Tap any circle to log a dose. ✓ = taken. — = rest day.<br>Data saves automatically to this device.</div>
+</div>
+<` + `script>
+const CMPS=[
+  {id:'reta',  name:'Retatrutide',  sub:'10U AM',        days:[1,3,5]},
+  {id:'motsc', name:'MOTS-C',       sub:'15U AM fasted', days:[1,2,3,4,5]},
+  {id:'slupp', name:'SLU-PP-332',   sub:'20U AM',        days:[1,3,5]},
+  {id:'tesam', name:'Tesamorelin',  sub:'20U AM',        days:[1,2,3,4,5]},
+  {id:'amino', name:'5-Amino-1MQ',  sub:'10U AM',        days:[1,3,5]}
+];
+let cw=1,st={};
+const SD='${startVal}';
+function ls(){try{const s=localStorage.getItem('kristinState');if(s)st=JSON.parse(s);}catch(e){}upd();}
+function sv(){try{localStorage.setItem('kristinState',JSON.stringify(st));}catch(e){}}
+function svN(){if(!st[cw])st[cw]={};st[cw].__notes=document.getElementById('wNotes').value;sv();}
+function isSch(c,dow){return c.days.includes(dow);}
+function isTkn(w,cid,di){return!!(st[w]&&st[w][cid]&&st[w][cid][di]);}
+function tog(w,cid,di){if(!st[w])st[w]={};if(!st[w][cid])st[w][cid]={};st[w][cid][di]=!st[w][cid][di];sv();render();upd();}
+function render(){
+  let html='';
+  CMPS.forEach(c=>{
+    html+='<tr><td class="cn">'+c.name+'<span>'+c.sub+'</span></td>';
+    for(let d=0;d<7;d++){
+      const dow=(d+1)%7;
+      if(!isSch(c,dow)){html+='<td><div class="dbtn rest">—</div></td>';}
+      else if(isTkn(cw,c.id,d)){html+='<td><div class="dbtn taken" onclick="tog('+cw+',\''+c.id+'\','+d+')">✓</div></td>';}
+      else{html+='<td><div class="dbtn" onclick="tog('+cw+',\''+c.id+'\','+d+')">○</div></td>';}
+    }
+    html+='</tr>';
+  });
+  document.getElementById('tBody').innerHTML=html;
+  document.getElementById('wLbl').textContent='Week '+cw;
+  document.getElementById('wNotes').value=st[cw]&&st[cw].__notes?st[cw].__notes:'';
+}
+function chWk(d){const n=cw+d;if(n<1||n>8)return;cw=n;render();upd();}
+function mkToday(){
+  const dow=new Date().getDay();let di=-1;
+  for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}
+  if(di<0)return;
+  if(!st[cw])st[cw]={};
+  CMPS.forEach(c=>{if(isSch(c,dow)){if(!st[cw][c.id])st[cw][c.id]={};st[cw][c.id][di]=true;}});
+  sv();render();upd();
+}
+function clrWk(){
+  if(!confirm('Clear Week '+cw+' logs?'))return;
+  const n=st[cw]&&st[cw].__notes;st[cw]={};if(n)st[cw].__notes=n;sv();render();upd();
+}
+function upd(){
+  let wk='—',pct=0,prog='0/56';
+  if(SD){
+    const now=new Date(),start=new Date(SD),diff=Math.floor((now-start)/86400000);
+    const cycWk=Math.min(8,Math.max(1,Math.floor(diff/7)+1));
+    wk='Week '+cycWk;pct=Math.min(100,Math.round((diff/56)*100));
+    prog=Math.min(diff+1,56)+'/56';
+  }
+  document.getElementById('sWk').textContent=wk;
+  document.getElementById('sPct').textContent=pct+'%';
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pLbl').textContent=prog+' days';
+  let dc=0,sc=0;
+  for(let d=0;d<7;d++){const dow=(d+1)%7;CMPS.forEach(c=>{if(isSch(c,dow)){sc++;if(isTkn(cw,c.id,d))dc++;}});}
+  document.getElementById('sDoses').textContent=dc+'/'+sc;
+}
+ls();render();upd();
+<` + `/script>
+</body>
+</html>`;
+
+  const blob = new Blob([trackerHTML], {type:'text/html'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'Kristin_Wells_Peptide_Tracker.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── CALENDAR GENERATOR ────────────────────────────────────────────────────
+function updatePreview() { /* preview is static visual — no dynamic update needed */ }
+
+function downloadCal() {
+  const startVal = document.getElementById('calStart').value;
+  const amVal    = document.getElementById('calAM').value || '07:00';
+
+  if (!startVal) {
+    document.getElementById('calErr').style.display = 'block';
+    document.getElementById('calMsg').style.display = 'none';
+    setTimeout(() => document.getElementById('calErr').style.display = 'none', 3000);
+    return;
+  }
+  document.getElementById('calErr').style.display = 'none';
+
+  const startDate = new Date(startVal + 'T12:00:00');
+  const [amH, amM] = amVal.split(':').map(Number);
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function fmtDT(date, h, m){
+    return date.getFullYear().toString() +
+      pad(date.getMonth()+1) + pad(date.getDate()) +
+      'T' + pad(h) + pad(m) + '00';
+  }
+  function uid(){ return Date.now().toString(36) + Math.random().toString(36).substr(2,6) + '@biolinked.pro'; }
+  function foldLine(line){
+    const chunks = [];
+    while(line.length > 75){ chunks.push(line.substr(0,75)); line = ' ' + line.substr(75); }
+    chunks.push(line);
+    return chunks.join('\r\n');
+  }
+
+  // Compounds: days 0=Sun,1=Mon,...6=Sat
+  const compounds = [
+    { id:'reta',  name:'Retatrutide',   dose:'1 mg (10 units)',  note:'SubQ injection — abdomen or outer thigh. Triple agonist (GLP-1/GIP/Glucagon) for fat loss. Mon/Wed/Fri AM.',                                     dow:[1,3,5],     h:amH, m:amM },
+    { id:'motsc', name:'MOTS-C',        dose:'2 mg (15 units)',  note:'SubQ injection — FASTED, before breakfast. Mitochondrial-derived peptide for metabolic efficiency & fat oxidation. Mon–Fri AM.',               dow:[1,2,3,4,5], h:amH, m:amM },
+    { id:'slupp', name:'SLU-PP-332',    dose:'0.5 mg (20 units)',  note:'SubQ injection — abdomen. Exercise-mimetic activating ERRα for fat oxidation without the workout. Perfect for sedentary schedule. Mon / Wed / Fri AM.', dow:[1,3,5],     h:amH, m:amM },
+    { id:'tesam', name:'Tesamorelin',   dose:'1 mg (20 units)',  note:'SubQ injection — abdomen. GHRH analog targeting visceral fat + GH pulse for recovery & sleep quality. Mon–Fri AM.',                            dow:[1,2,3,4,5], h:amH, m:amM },
+    { id:'amino', name:'5-Amino-1MQ',   dose:'1 mg (10 units)',  note:'SubQ injection — abdomen or thigh. NNMT inhibitor — boosts NAD+, prevents fat storage, supports metabolic age. Mon / Wed / Fri AM.',                   dow:[1,3,5],     h:amH, m:amM },
+  ];
+
+  let lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Bio Linked Solutions//Kristin Wells Protocol//EN',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:BioLinked — Kristin Wells',
+    'X-WR-CALDESC:8-Week Peptide Protocol — Bio Linked Solutions',
+    'X-APPLE-CALENDAR-COLOR:#9A7B2F',
+  ];
+
+  compounds.forEach(function(c) {
+    for (let week = 0; week < 8; week++) {
+      for (let dayOff = 0; dayOff < 7; dayOff++) {
+        const d = new Date(startDate);
+        d.setDate(d.getDate() + week * 7 + dayOff);
+        const dow = d.getDay();
+        if (!c.dow.includes(dow)) continue;
+
+        const dtStart = fmtDT(d, c.h, c.m);
+        const endMin  = c.m + 15;
+        const endH    = c.h + Math.floor(endMin / 60);
+        const dtEnd   = fmtDT(d, endH, endMin % 60);
+        const wk = week + 1;
+
+        lines = lines.concat([
+          'BEGIN:VEVENT',
+          foldLine('UID:' + uid()),
+          'DTSTART:' + dtStart,
+          'DTEND:' + dtEnd,
+          foldLine('SUMMARY:\uD83D\uDC89 ' + c.name + ' \u2014 ' + c.dose),
+          foldLine('DESCRIPTION:Compound: ' + c.name + '\\nDose: ' + c.dose + '\\nWeek ' + wk + ' of 8\\n\\n' + c.note + '\\n\\nBio Linked Peptide Solutions \u2014 Kristin Wells Protocol'),
+          'LOCATION:Injection site \u2014 abdomen or outer thigh',
+          'STATUS:CONFIRMED',
+          'TRANSP:TRANSPARENT',
+          'BEGIN:VALARM',
+          'TRIGGER:-PT30M',
+          'ACTION:DISPLAY',
+          foldLine('DESCRIPTION:\u23F0 ' + c.name + ' in 30 min \u2014 ' + c.dose),
+          'END:VALARM',
+          'END:VEVENT',
+        ]);
+      }
+    }
+  });
+
+  lines.push('END:VCALENDAR');
+
+  const ics = lines.join('\r\n');
+  const blob = new Blob([ics], {type: 'text/calendar;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'Kristin_Wells_BioLinked_Protocol.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  document.getElementById('calMsg').style.display = 'block';
+  setTimeout(() => document.getElementById('calMsg').style.display = 'none', 5000);
+}
+
+loadState();
+renderGrid();
+</script>
+
+<style>
+.bl-nav{background:#fff!important;border-bottom:1px solid #eaeaea!important}
+.bl-nav-logo-main{color:#1a1a1a!important}.bl-nav-logo-sub{color:#777!important}
+.bl-nav-link{color:#444!important}.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F!important;background:rgba(154,123,47,0.07)!important}
+.bl-nav-dropdown-menu{background:#fff!important;border-color:#eaeaea!important}
+.bl-nav-dropdown-item{color:#444!important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8!important;color:#9A7B2F!important}
+.bl-nav-mobile-menu{background:#fff!important}.bl-nav-mobile-link{color:#444!important;border-bottom-color:#eaeaea!important}
+.bl-nav-mobile-btn{color:#1a1a1a!important}.bl-nav-mobile-section{color:#9A7B2F!important}
+</style>
+<script src="/nav.js" defer></script>
+</body>
+</html>
