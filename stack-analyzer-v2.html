@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack Analyzer v2 — Bio Linked Peptide Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f4f4f2;--surface:#ffffff;--surface2:#f0efed;--surface3:#e8e7e4;
+  --gold:#9A7B2F;--gold-l:#b8962e;--gold-dim:rgba(154,123,47,0.12);
+  --gold-glow:rgba(154,123,47,0.06);--gold-bdr:rgba(154,123,47,0.2);--gold-bdr-bright:rgba(154,123,47,0.4);
+  --text:#1a1a1a;--text2:#3d3d3d;--muted:#7a7a7a;--muted2:#b0b0b0;--border:#e0dedd;
+  --green:#1a7a4a;--green-bg:rgba(26,122,74,0.07);--green-bdr:rgba(26,122,74,0.25);
+  --amber:#9a6800;--amber-bg:rgba(154,104,0,0.07);--amber-bdr:rgba(154,104,0,0.28);
+  --red:#c0392b;--red-bg:rgba(192,57,43,0.06);--red-bdr:rgba(192,57,43,0.22);
+  --blue:#1a5fa0;--blue-bg:rgba(26,95,160,0.07);--blue-bdr:rgba(26,95,160,0.2);
+  --shadow:0 2px 16px rgba(0,0,0,0.07);--shadow-lg:0 8px 40px rgba(0,0,0,0.1);--r:6px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;font-size:14px;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit}
+
+.beta-banner{background:linear-gradient(90deg,rgba(184,120,10,0.12),rgba(184,120,10,0.06));border-bottom:1px solid var(--amber-bdr);padding:10px 20px;font-size:12px;line-height:1.5;color:var(--amber);font-weight:600;text-align:center}
+.beta-banner strong{letter-spacing:0.15em;text-transform:uppercase;font-weight:800;margin-right:8px}
+.beta-banner a{color:var(--amber);text-decoration:underline;font-weight:700}
+
+.warning-top{background:#fdf8f0;border-bottom:1px solid rgba(154,123,47,0.2);padding:10px 20px}
+.warning-top-inner{max-width:1400px;margin:0 auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.warning-top-badge{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-bdr-bright);padding:4px 10px;border-radius:3px;white-space:nowrap;flex-shrink:0}
+.warning-top-text{font-size:12px;color:var(--muted);line-height:1.5}
+
+.banner{background:var(--surface);border-bottom:1px solid var(--gold-bdr);padding:48px 40px 40px;position:relative;overflow:hidden}
+.banner::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.6}
+.banner::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(154,123,47,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(154,123,47,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.banner-inner{max-width:1400px;margin:0 auto;display:flex;align-items:flex-start;justify-content:space-between;gap:24px;position:relative;z-index:1}
+.banner-eyebrow{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.banner-eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--gold);opacity:.6}
+.banner-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5vw,54px);font-weight:400;color:var(--text);line-height:1.05;letter-spacing:-.01em}
+.banner-title em{font-style:italic;color:var(--gold);font-weight:300}
+.banner-sub{font-size:13px;font-weight:300;color:var(--muted);letter-spacing:.04em;margin-top:12px;line-height:1.8;max-width:640px}
+.banner-badge{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:20px 24px;text-align:center;flex-shrink:0}
+.hb-icon{font-size:28px;display:block;margin-bottom:6px}
+.hb-label{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.hb-version{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);font-weight:600;display:block;margin-top:2px}
+
+.app{max-width:1400px;margin:0 auto;padding:28px 40px 80px;display:grid;grid-template-columns:380px 1fr;gap:22px;align-items:start}
+.col-l{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px}
+.col-r{display:flex;flex-direction:column;gap:16px}
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.panel-head{padding:16px 20px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.panel-head h2{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);letter-spacing:.01em}
+.panel-head p{font-size:10px;color:var(--muted);margin-top:2px}
+.panel-body{padding:16px 18px 18px}
+
+.disc-bar{background:#fdf8f0;border:1px solid rgba(154,123,47,.28);border-radius:var(--r);padding:10px 14px;font-size:11px;color:var(--gold);line-height:1.6}
+
+.search-wrap{position:relative;margin-bottom:10px}
+.search-wrap input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 13px 10px 34px;font-size:12px;color:var(--text);outline:none;transition:border-color .15s,box-shadow .15s}
+.search-wrap input:focus{border-color:var(--gold-bdr-bright);box-shadow:0 0 0 3px var(--gold-glow)}
+.search-wrap input::placeholder{color:var(--muted2)}
+.s-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+.dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:6px;max-height:220px;overflow-y:auto;z-index:300;display:none;box-shadow:var(--shadow-lg)}
+.dropdown.open{display:block}
+.dropdown::-webkit-scrollbar{width:4px}
+.dropdown::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.dd-item{padding:9px 14px;font-size:11px;font-weight:500;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .1s;border-bottom:1px solid var(--border)}
+.dd-item:hover{background:var(--gold-glow);color:var(--text)}
+.dd-item:last-child{border-bottom:none}
+.dd-item.added{color:var(--muted);cursor:default}
+.dd-tag{font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;padding:2px 7px;border-radius:3px;border:1px solid var(--gold-bdr);color:var(--gold);background:var(--gold-glow)}
+.dd-tag.done{color:var(--green);border-color:var(--green-bdr);background:var(--green-bg)}
+
+.stack-list{display:flex;flex-direction:column;gap:6px;min-height:36px}
+.stack-item{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:9px 11px;transition:border-color .15s}
+.stack-item:hover{border-color:var(--gold-bdr-bright)}
+.si-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.si-name{font-size:12px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.si-cat{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-top:1px}
+.si-rm{background:none;border:none;color:var(--muted2);cursor:pointer;font-size:18px;padding:0 2px;line-height:1;transition:color .1s;flex-shrink:0}
+.si-rm:hover{color:var(--red)}
+.empty-hint{font-size:11px;color:var(--muted);font-style:italic;padding:4px 2px}
+
+.lbl{display:block;font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.field{margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 12px;font-size:12px;color:var(--text);outline:none;transition:border-color .15s}
+select:focus,textarea:focus{border-color:var(--gold-bdr-bright);box-shadow:0 0 0 3px var(--gold-glow)}
+textarea{resize:vertical;min-height:60px;line-height:1.55}
+
+.btn{width:100%;border:none;border-radius:5px;padding:13px;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:.12em;text-transform:uppercase;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;font-family:'Outfit',sans-serif}
+.btn-gold{background:var(--gold);color:#fff}
+.btn-gold:hover{background:var(--gold-l);transform:translateY(-1px);box-shadow:0 6px 24px rgba(154,123,47,.28)}
+.btn-gold:disabled{background:var(--muted2);color:#fff;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold-bdr-bright) !important}
+.btn-outline:hover{background:var(--gold-glow);transform:translateY(-1px)}
+
+/* SCORE */
+.score-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:28px 30px;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+.score-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold) 30%,var(--gold) 70%,transparent);opacity:.6}
+.score-top{display:flex;align-items:center;gap:28px;margin-bottom:18px}
+.score-num{font-family:'Cormorant Garamond',serif;font-size:88px;font-weight:700;line-height:.9;flex-shrink:0;letter-spacing:-0.02em}
+.score-info{flex:1}
+.score-lbl{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.score-title{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;margin-bottom:6px;line-height:1.1}
+.score-meta{font-size:12px;color:var(--text2);line-height:1.6}
+.score-bar-wrap{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;margin-top:4px}
+.score-bar-fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+
+/* BREAKDOWN */
+.bd-list{display:flex;flex-direction:column;gap:0}
+.bd-group{border-bottom:1px solid var(--border)}
+.bd-group:last-child{border-bottom:none}
+.bd-group-head{display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.bd-group-total{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600}
+.bd-entry{display:flex;align-items:flex-start;gap:12px;padding:10px 0 12px;font-size:12px}
+.bd-entry:not(:last-child){border-bottom:1px dashed var(--border)}
+.bd-pts{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;min-width:50px;text-align:right;line-height:1}
+.bd-pts.pos{color:var(--green)}
+.bd-pts.neg{color:var(--red)}
+.bd-pts.zero{color:var(--muted)}
+.bd-text{flex:1;color:var(--text2);line-height:1.55;padding-top:2px}
+.bd-cat{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:2px}
+.bd-base{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;margin-top:6px}
+.bd-base-lbl{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.bd-base-val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text)}
+.bd-total-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--gold-glow);border:1px solid var(--gold-bdr);border-radius:5px;margin-top:10px}
+.bd-total-lbl{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.bd-total-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--gold)}
+
+/* STATS */
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric-card{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:14px 16px}
+.metric-k{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.metric-v{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1}
+.metric-sub{font-size:10px;color:var(--muted);line-height:1.5;margin-top:5px}
+
+/* PAIR CARDS */
+.compat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+.compat-card{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px 16px;transition:border-color .15s}
+.compat-card:hover{border-color:var(--gold-bdr-bright)}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.cc-name{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text);line-height:1.25;flex:1}
+.cc-arrow{color:var(--gold);margin:0 6px;font-weight:400}
+.cc-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.badge{font-size:7px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;padding:3px 7px;border-radius:3px;border:1px solid;flex-shrink:0;white-space:nowrap}
+.b-synergy{background:var(--green-bg);border-color:var(--green-bdr);color:var(--green)}
+.b-neutral{background:var(--blue-bg);border-color:var(--blue-bdr);color:var(--blue)}
+.b-caution{background:var(--amber-bg);border-color:var(--amber-bdr);color:var(--amber)}
+.b-avoid{background:var(--red-bg);border-color:var(--red-bdr);color:var(--red)}
+.b-clinical{background:var(--green-bg);border-color:var(--green-bdr);color:var(--green)}
+.b-mechanistic{background:var(--blue-bg);border-color:var(--blue-bdr);color:var(--blue)}
+.b-anecdotal{background:var(--amber-bg);border-color:var(--amber-bdr);color:var(--amber)}
+.b-unknown{background:var(--surface3);border-color:var(--border);color:var(--muted)}
+.b-conf-high{background:var(--green-bg);border-color:var(--green-bdr);color:var(--green)}
+.b-conf-med{background:var(--amber-bg);border-color:var(--amber-bdr);color:var(--amber)}
+.b-conf-low{background:var(--red-bg);border-color:var(--red-bdr);color:var(--red)}
+.cc-body{font-size:11px;color:var(--text2);line-height:1.7;font-weight:300;margin-bottom:6px}
+.cc-meta{font-size:10px;color:var(--muted);line-height:1.6}
+.cc-meta strong{color:var(--text2);font-weight:600}
+
+/* SCHEDULE */
+.sched-table{width:100%;border-collapse:collapse;font-size:11px}
+.sched-table th{text-align:left;padding:9px 13px;font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--surface2);border-bottom:1px solid var(--border)}
+.sched-table td{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.sched-table tr:last-child td{border-bottom:none}
+.sched-table tr:hover td{background:var(--gold-glow)}
+.sn{font-weight:600;color:var(--text);font-size:12px}
+.sf{color:var(--gold);font-weight:600}
+
+/* FINDINGS */
+.finding{border-radius:6px;padding:12px 14px;border:1px solid transparent;display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.finding:last-child{margin-bottom:0}
+.f-good{background:var(--green-bg);border-color:var(--green-bdr)}
+.f-watch{background:var(--amber-bg);border-color:var(--amber-bdr)}
+.f-risk{background:var(--red-bg);border-color:var(--red-bdr)}
+.f-info{background:var(--blue-bg);border-color:var(--blue-bdr)}
+.f-icon{font-size:15px;flex-shrink:0;margin-top:1px}
+.f-title{font-size:11px;font-weight:700;color:var(--text);margin-bottom:3px}
+.f-body{font-size:11px;color:var(--text2);line-height:1.7}
+
+.section-div{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.section-div::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.empty-state{text-align:center;padding:56px 24px;color:var(--muted)}
+.es-icon{font-size:44px;display:block;margin-bottom:14px;opacity:.5}
+.es-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--text);margin-bottom:8px;font-weight:400}
+.es-body{font-size:12px;line-height:1.75;max-width:320px;margin:0 auto}
+
+.export-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.export-btn{flex:1;min-width:110px;background:transparent;border:1px solid var(--gold-bdr) !important;border-radius:5px;padding:9px 12px;font-size:10px;font-weight:700;color:var(--gold);cursor:pointer;letter-spacing:.08em;text-transform:uppercase;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Outfit',sans-serif}
+.export-btn:hover{background:var(--gold-glow);border-color:var(--gold) !important}
+.report-box{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:14px;font-size:10px;color:var(--text2);line-height:1.8;white-space:pre-wrap;max-height:280px;overflow-y:auto;font-family:monospace}
+
+.site-footer{background:var(--surface2);border-top:1px solid var(--border);padding:48px 40px 0}
+.site-footer-inner{max-width:1400px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:60px;padding-bottom:40px;border-bottom:1px solid var(--border)}
+.site-footer-logo{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);letter-spacing:.1em}
+.site-footer-tagline{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-top:4px}
+.site-footer-disclaimer{font-size:11px;color:var(--muted);line-height:1.65;font-weight:300;max-width:340px;margin-top:14px}
+.site-footer-links{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.site-footer-col-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:12px}
+.site-footer-col a{display:block;font-size:12px;color:var(--muted);margin-bottom:8px;transition:color .15s}
+.site-footer-col a:hover{color:var(--gold)}
+.site-footer-bottom{max-width:1400px;margin:0 auto;padding:18px 0;font-size:10px;color:var(--muted2)}
+.disclaimer{background:var(--surface2);border-top:1px solid var(--border);padding:14px 40px;text-align:center;font-size:11px;color:var(--muted)}
+
+.bl-nav{background:#fff !important;border-bottom:1px solid #eaeaea !important}
+.bl-nav-logo-main{color:#1a1a1a !important}.bl-nav-logo-sub{color:#777 !important}
+.bl-nav-link{color:#444 !important}.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F !important;background:rgba(154,123,47,0.07) !important}
+.bl-nav-dropdown-menu{background:#fff !important;border-color:#eaeaea !important}
+.bl-nav-dropdown-item{color:#444 !important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8 !important;color:#9A7B2F !important}
+.bl-nav-mobile-menu{background:#fff !important}.bl-nav-mobile-link{color:#444 !important;border-bottom-color:#eaeaea !important}
+.bl-nav-mobile-btn{color:#1a1a1a !important}.bl-nav-mobile-section{color:#9A7B2F !important}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .4s ease both}
+.fade-in-1{animation:fadeUp .4s .08s ease both}
+.fade-in-2{animation:fadeUp .4s .16s ease both}
+.fade-in-3{animation:fadeUp .4s .24s ease both}
+
+@media(max-width:1100px){.app{grid-template-columns:1fr;padding:20px 20px 60px}.col-l{position:static}}
+@media(max-width:768px){.banner{padding:36px 20px 32px}.banner-inner{flex-direction:column}.banner-badge{display:none}.metric-grid{grid-template-columns:1fr 1fr}.compat-grid{grid-template-columns:1fr}.score-top{flex-direction:column;align-items:flex-start;gap:12px}.score-num{font-size:64px}.site-footer{padding:36px 20px 0}.site-footer-inner{grid-template-columns:1fr;gap:28px}.site-footer-links{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="beta-banner"><strong>● v2 Preview</strong>New scoring engine — multi-factor breakdown. The <a href="stack-analyzer.html">old analyzer</a> is still live. Tell <em>me</em> what's off before we switch.</div>
+
+<div class="warning-top">
+  <div class="warning-top-inner">
+    <span class="warning-top-badge">⚠ Research Use Only</span>
+    <p class="warning-top-text"><strong>NOT FOR HUMAN USE.</strong> All information is strictly for educational &amp; scientific research reference. Not medical advice. Consult a licensed healthcare professional before any use.</p>
+  </div>
+</div>
+
+<div class="banner">
+  <div class="banner-inner">
+    <div>
+      <div class="banner-eyebrow">Bio Linked Peptide Solutions</div>
+      <h1 class="banner-title">Stack <em>Analyzer v2</em></h1>
+      <p class="banner-sub">Build a custom stack. Get a transparent compatibility score with a full point-by-point breakdown — class-level synergies and conflicts, goal alignment, experience-weighted complexity, risk-flag conflicts, and support-protocol completeness. No black-box AI — every point is explained.</p>
+    </div>
+    <div class="banner-badge">
+      <span class="hb-icon">⚗️</span>
+      <span class="hb-label">Scoring Engine</span>
+      <span class="hb-version">v2</span>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+  <div class="col-l">
+    <div class="disc-bar">⚠ <strong>Research use only.</strong> Not medical advice. Always consult a licensed healthcare professional before beginning any protocol.</div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Build Your Stack</h2><p>Add up to 8 compounds to analyze</p></div>
+      <div class="panel-body">
+        <label class="lbl">Search &amp; Add Compounds</label>
+        <div class="search-wrap">
+          <span class="s-icon">🔍</span>
+          <input type="text" id="stack-search" placeholder="Search 85+ compounds…" oninput="onSearch(this.value)" onfocus="openDD()" onblur="schedClose()" autocomplete="off">
+          <div class="dropdown" id="stack-dd"></div>
+        </div>
+        <label class="lbl" style="margin-top:12px">Your Stack (<span id="stack-count">0</span>/8)</label>
+        <div class="stack-list" id="stack-list">
+          <div class="empty-hint">Search above to add compounds</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Protocol Context</h2><p>Score factors in goal alignment, experience, and risk flags</p></div>
+      <div class="panel-body">
+        <div class="field">
+          <label class="lbl">Primary Goal</label>
+          <select id="goal-select">
+            <option value="">— Select goal —</option>
+            <option value="fat_loss">Fat Loss / Body Composition</option>
+            <option value="recovery">Recovery &amp; Injury Healing</option>
+            <option value="gh">GH Axis Optimization</option>
+            <option value="longevity">Longevity &amp; Anti-Aging</option>
+            <option value="cognitive">Cognitive Enhancement</option>
+            <option value="hormonal">Hormonal / TRT Support</option>
+            <option value="immune">Immune Modulation</option>
+            <option value="energy">Energy &amp; Mitochondrial</option>
+            <option value="sexual">Sexual Health</option>
+            <option value="skin">Skin &amp; Cosmetic</option>
+            <option value="muscle">Muscle Building</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Experience Level</label>
+          <select id="exp-select">
+            <option value="beginner">Beginner — new to peptides</option>
+            <option value="intermediate">Intermediate — some experience</option>
+            <option value="advanced">Advanced — experienced researcher</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Risk / Condition Flags</label>
+          <select id="risk-select">
+            <option value="">— None selected —</option>
+            <option value="glucose">Glucose / insulin sensitivity</option>
+            <option value="bp">Cardiovascular / blood pressure</option>
+            <option value="gi">GI sensitivity / nausea history</option>
+            <option value="fertility">Fertility preservation</option>
+            <option value="transplant">Organ transplant / immunosuppression</option>
+            <option value="ssri">SSRI / mood medication</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="lbl">Notes (optional)</label>
+          <textarea id="stack-notes" placeholder="Health conditions, medications, cycle duration, goals…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-gold" id="analyze-btn" onclick="analyzeStack()">⚗️ Analyze Stack</button>
+    <button class="btn btn-outline" onclick="loadDemo()">👁 Load Demo Stack</button>
+    <button class="btn btn-outline" onclick="clearStack()">🗑 Clear Stack</button>
+  </div>
+
+  <div class="col-r" id="results-col">
+    <div class="panel" id="empty-card">
+      <div class="panel-body">
+        <div class="empty-state">
+          <span class="es-icon">⚗️</span>
+          <h3 class="es-title">Stack Analyzer Ready</h3>
+          <p class="es-body">Add 2 or more compounds, optionally set your goal / experience / risk flags, then click <em>Analyze Stack</em> for a transparent multi-factor score with full breakdown.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="disclaimer">
+  <strong>© 2025 Bio Linked Peptide Solutions · Educational &amp; Research Reference Only · Not Medical Advice · Not for Human Consumption · Research Use Only</strong>
+</div>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div>
+      <div class="site-footer-logo">BIO LINKED</div>
+      <div class="site-footer-tagline">Peptide Research &amp; Education</div>
+      <p class="site-footer-disclaimer">For educational purposes only. Not medical advice. Always consult a qualified healthcare professional before beginning any peptide protocol.</p>
+    </div>
+    <div class="site-footer-links">
+      <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index.html">Peptide Index</a><a href="/cheat-sheet.html">Cheat Sheet</a><a href="/stacks-blends.html">Stacks &amp; Blends</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/peptide-tracker.html">Peptide Tracker</a><a href="/stack-analyzer.html">Stack Analyzer</a><a href="/biomarker-analysis.html">Biomarker Analysis</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Platform</div><a href="/index.html">Home</a></div>
+    </div>
+  </div>
+  <div class="site-footer-bottom">© 2025 Bio Linked Peptide Solutions. All rights reserved.</div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// PEPTIDES (catalog)
+// ═══════════════════════════════════════════════════════════════
+const PEPTIDES=[
+  {name:'BPC-157',cat:'Recovery',color:'#9A7B2F',group:'healing'},
+  {name:'TB-500',cat:'Recovery',color:'#9A7B2F',group:'healing'},
+  {name:'GHK-Cu',cat:'Recovery',color:'#9A7B2F',group:'healing'},
+  {name:'KPV',cat:'Recovery',color:'#9A7B2F',group:'anti-inflammatory'},
+  {name:'LL-37',cat:'Immune',color:'#c0392b',group:'immune'},
+  {name:'ARA-290',cat:'Recovery',color:'#9A7B2F',group:'healing'},
+  {name:'SS-31',cat:'Recovery',color:'#9A7B2F',group:'mitochondria'},
+  {name:'BPC-157 + TB-500 Blend',cat:'Blend',color:'#7a7a7a',group:'healing'},
+  {name:'Cartalax',cat:'Bioregulator',color:'#1a7a4a',group:'healing'},
+  {name:'PGPIPN',cat:'Recovery',color:'#9A7B2F',group:'healing'},
+  {name:'Tirzepatide',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'glp1'},
+  {name:'Semaglutide',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'glp1'},
+  {name:'Retatrutide',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'glp1'},
+  {name:'Cagrilintide',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'glp1'},
+  {name:'Survodutide',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'glp1'},
+  {name:'Liraglutide',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'glp1'},
+  {name:'AOD-9604',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'fatloss'},
+  {name:'HGH Fragment 176-191',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'fatloss'},
+  {name:'5-Amino-1MQ',cat:'Energy / NAD+',color:'#9a6800',group:'metabolic'},
+  {name:'AICAR',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'metabolic'},
+  {name:'Tesofensine',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'fatloss'},
+  {name:'Clenbuterol',cat:'GLP-1 / Metabolic',color:'#1a7a4a',group:'fatloss'},
+  {name:'CJC-1295',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'CJC-1295 + Ipamorelin',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Ipamorelin',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Sermorelin',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Tesamorelin',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'GHRP-2',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'GHRP-6',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Hexarelin',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Somatropin (HGH)',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'IGF-1 LR3',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'IGF-1 DES',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'MK-677',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Follistatin 344',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'PEG-MGF',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'MGF',cat:'Growth Hormone',color:'#1a5fa0',group:'gh'},
+  {name:'Cabergoline',cat:'Growth Hormone',color:'#1a5fa0',group:'hormonal'},
+  {name:'Semax',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'Selank',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'Dihexa',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'P21',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'PE-22-28',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'Cerebrolysin',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'DSIP',cat:'Cognitive',color:'#6b46a0',group:'sleep'},
+  {name:'Pinealon',cat:'Cognitive',color:'#6b46a0',group:'cognitive'},
+  {name:'Epithalon',cat:'Longevity',color:'#9a6800',group:'longevity'},
+  {name:'FOXO4-DRI',cat:'Longevity',color:'#9a6800',group:'longevity'},
+  {name:'Humanin',cat:'Longevity',color:'#9a6800',group:'longevity'},
+  {name:'MOTS-C',cat:'Energy / NAD+',color:'#1a7a4a',group:'mitochondria'},
+  {name:'NAD+',cat:'Energy / NAD+',color:'#1a7a4a',group:'mitochondria'},
+  {name:'Glutathione',cat:'Energy / NAD+',color:'#1a7a4a',group:'mitochondria'},
+  {name:'SLU-PP-332',cat:'Energy / NAD+',color:'#1a7a4a',group:'metabolic'},
+  {name:'L-Carnitine',cat:'Energy / NAD+',color:'#1a7a4a',group:'mitochondria'},
+  {name:'Thymosin Alpha-1',cat:'Immune',color:'#c0392b',group:'immune'},
+  {name:'Thymalin',cat:'Immune',color:'#c0392b',group:'immune'},
+  {name:'Thymagen',cat:'Immune',color:'#c0392b',group:'immune'},
+  {name:'Gonadorelin',cat:'Immune',color:'#c0392b',group:'hormonal'},
+  {name:'VIP',cat:'Immune',color:'#c0392b',group:'anti-inflammatory'},
+  {name:'PT-141',cat:'Sexual Health',color:'#9a3a6a',group:'sexual'},
+  {name:'Kisspeptin-10',cat:'Sexual Health',color:'#9a3a6a',group:'sexual'},
+  {name:'Oxytocin',cat:'Sexual Health',color:'#9a3a6a',group:'sexual'},
+  {name:'Melanotan 2',cat:'Sexual Health',color:'#9a3a6a',group:'sexual'},
+  {name:'Tadalafil (Cialis)',cat:'Hormonal',color:'#9a5000',group:'sexual'},
+  {name:'Testosterone (TRT)',cat:'Hormonal',color:'#9a5000',group:'hormonal'},
+  {name:'Enclomiphene',cat:'Hormonal',color:'#9a5000',group:'hormonal'},
+  {name:'HCG',cat:'Hormonal',color:'#9a5000',group:'hormonal'},
+  {name:'Triptorelin',cat:'Hormonal',color:'#9a5000',group:'hormonal'},
+  {name:'Cardiogen',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Bronchogen',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Chonluten',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Cortagen',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Livagen',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Prostamax',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Testagen',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'Vesugen',cat:'Bioregulator',color:'#1a7a4a',group:'bioregulator'},
+  {name:'GHK-Cu (Topical)',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'AHK-Cu',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'Argireline',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'Matrixyl',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'SNAP-8',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'Vialox',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'Syn-Ake',cat:'Skin',color:'#9a3a6a',group:'skin'},
+  {name:'GLOW Blend',cat:'Blend',color:'#7a7a7a',group:'blend'},
+  {name:'KLOW Blend',cat:'Blend',color:'#7a7a7a',group:'blend'},
+  {name:'TRI-HEAL Blend',cat:'Blend',color:'#7a7a7a',group:'blend'},
+  {name:'Ultimate Wolverine (BTMK)',cat:'Blend',color:'#7a7a7a',group:'blend'},
+];
+
+// ═══════════════════════════════════════════════════════════════
+// SYNERGY / CAUTION / AVOID PAIRS
+// ═══════════════════════════════════════════════════════════════
+const SYNERGY_DB={
+  'BPC-157+TB-500':{rating:'synergy',evidence:'mechanistic',confidence:88,note:'Classic healing stack. BPC-157 drives local tissue repair and angiogenesis via VEGF while TB-500 provides systemic healing through G-actin sequestration.',mechanism:'Complementary, non-overlapping pathways produce comprehensive repair superior to either alone.',monitor:'No specific monitoring required for healthy adults.'},
+  'BPC-157+KPV':{rating:'synergy',evidence:'mechanistic',confidence:84,note:'Repair plus anti-inflammatory.',mechanism:'BPC-157 promotes healing while KPV blocks NF-κB inflammation at the cellular level.',monitor:'None specifically required.'},
+  'BPC-157+GHK-Cu':{rating:'synergy',evidence:'mechanistic',confidence:82,note:'Tissue quality plus vascular repair.',mechanism:'BPC-157 drives angiogenesis and wound healing while GHK-Cu stimulates collagen and elastin synthesis.',monitor:'None specifically required.'},
+  'BPC-157+Thymosin Alpha-1':{rating:'synergy',evidence:'mechanistic',confidence:72,note:'Healing plus immune modulation.',mechanism:'BPC-157 drives local repair while Thymosin Alpha-1 calibrates the immune response.',monitor:'None specifically required.'},
+  'BPC-157+Cartalax':{rating:'synergy',evidence:'anecdotal',confidence:64,note:'Joint repair combination.',mechanism:'Cartalax targets cartilage gene expression while BPC-157 drives local vascular repair.',monitor:'None specifically required.'},
+  'KPV+VIP':{rating:'synergy',evidence:'mechanistic',confidence:79,note:'Dual anti-inflammatory for gut and MCAS.',mechanism:'KPV inhibits NF-κB intracellularly while VIP acts on VPAC receptors to suppress Th1 cytokines.',monitor:'Baseline tryptase if suspecting MCAS.'},
+  'SS-31+NAD+':{rating:'synergy',evidence:'mechanistic',confidence:83,note:'Dual mitochondrial support.',mechanism:'SS-31 protects the inner mitochondrial membrane while NAD+ fuels energy production pathways.',monitor:'None specifically required.'},
+  'SS-31+MOTS-C':{rating:'synergy',evidence:'mechanistic',confidence:81,note:'Comprehensive mitochondrial optimization.',mechanism:'SS-31 repairs the inner membrane while MOTS-C activates AMPK for metabolic flexibility and biogenesis.',monitor:'None specifically required.'},
+  'CJC-1295 + Ipamorelin+Somatropin (HGH)':{rating:'caution',evidence:'mechanistic',confidence:74,note:'Secretagogues plus exogenous HGH adds monitoring burden.',mechanism:'Both elevate GH axis — risk of supraphysiological IGF-1.',monitor:'IGF-1 every 4-6 weeks.'},
+  'CJC-1295+Ipamorelin':{rating:'synergy',evidence:'mechanistic',confidence:91,note:'Gold standard GH stack.',mechanism:'CJC-1295 extends natural GH pulse duration (GHRH) while Ipamorelin amplifies pulse amplitude (GHRP).',monitor:'IGF-1 at baseline and 8 weeks.'},
+  'CJC-1295 + Ipamorelin+IGF-1 LR3':{rating:'synergy',evidence:'mechanistic',confidence:71,note:'GH stimulation plus direct IGF-1 agonism.',mechanism:'Upstream GH axis activation with downstream IGF-1 receptor activation.',monitor:'IGF-1 every 4 weeks.'},
+  'Ipamorelin+Tesamorelin':{rating:'synergy',evidence:'mechanistic',confidence:83,note:'Dual GHRH/GHRP synergy.',mechanism:'Tesamorelin extends GH pulse duration while Ipamorelin amplifies amplitude.',monitor:'IGF-1 at baseline and 8 weeks.'},
+  'Somatropin (HGH)+IGF-1 LR3':{rating:'caution',evidence:'clinical',confidence:88,note:'Exogenous HGH already elevates IGF-1. Adding IGF-1 LR3 risks supraphysiological levels.',mechanism:'Additive IGF-1 signaling.',monitor:'IGF-1 every 4-6 weeks.'},
+  'IGF-1 LR3+PEG-MGF':{rating:'synergy',evidence:'anecdotal',confidence:58,note:'Systemic plus local muscle growth.',mechanism:'IGF-1 LR3 provides systemic anabolic stimulus while PEG-MGF activates satellite cells locally.',monitor:'IGF-1 monthly.'},
+  'MK-677+CJC-1295 + Ipamorelin':{rating:'caution',evidence:'mechanistic',confidence:82,note:'Oral plus injectable GH secretagogues.',mechanism:'Both drive GH release and may produce excessive IGF-1.',monitor:'IGF-1 every 4 weeks.'},
+  'Somatropin (HGH)+MK-677':{rating:'caution',evidence:'mechanistic',confidence:87,note:'Likely redundant and risky.',mechanism:'MK-677 already significantly raises GH and IGF-1. Adding exogenous HGH risks supraphysiological IGF-1.',monitor:'IGF-1 every 4 weeks, fasting glucose.'},
+  'GHRP-2+GHRP-6':{rating:'caution',evidence:'mechanistic',confidence:78,note:'Stacking two GHRPs — minimal benefit, compound cortisol/prolactin.',mechanism:'Same receptor class with additive side-effects.',monitor:'Cortisol and prolactin if persistent.'},
+  'Semax+Selank':{rating:'synergy',evidence:'anecdotal',confidence:79,note:'Classic cognitive balance.',mechanism:'Semax provides stimulating BDNF-driven focus while Selank provides anxiolytic calm.',monitor:'None specifically required.'},
+  'Semax+DSIP':{rating:'synergy',evidence:'anecdotal',confidence:58,note:'Daytime function plus sleep quality.',mechanism:'Semax enhances cognition via BDNF while DSIP promotes deep sleep for memory consolidation.',monitor:'None specifically required.'},
+  'Semax+Dihexa':{rating:'synergy',evidence:'anecdotal',confidence:62,note:'Dual neuroplasticity pathways.',mechanism:'Semax drives BDNF while Dihexa promotes synaptogenesis through HGF/c-Met.',monitor:'None specifically required.'},
+  'Pinealon+Epithalon':{rating:'synergy',evidence:'anecdotal',confidence:67,note:'Dual brain anti-aging.',mechanism:'Epithalon activates telomerase while Pinealon supports brain cortex gene expression.',monitor:'None specifically required.'},
+  'Tirzepatide+5-Amino-1MQ':{rating:'synergy',evidence:'mechanistic',confidence:68,note:'GLP-1 appetite suppression plus NAD+ restoration.',mechanism:'5-Amino-1MQ inhibits NNMT to raise NAD+ and drive adipocyte apoptosis — independent pathways.',monitor:'HbA1c if diabetic.'},
+  'Semaglutide+5-Amino-1MQ':{rating:'synergy',evidence:'mechanistic',confidence:66,note:'Complementary fat loss mechanisms.',mechanism:'GLP-1 reduces intake while NNMT inhibition promotes fat-cell reduction.',monitor:'HbA1c quarterly.'},
+  'Retatrutide+MOTS-C':{rating:'synergy',evidence:'mechanistic',confidence:70,note:'Triple incretin plus mitochondrial AMPK.',mechanism:'Retatrutide drives fat loss while MOTS-C improves insulin sensitivity.',monitor:'HbA1c, lipids.'},
+  'Tirzepatide+AOD-9604':{rating:'synergy',evidence:'mechanistic',confidence:72,note:'GLP-1 appetite suppression plus direct lipolysis.',mechanism:'AOD-9604 activates fat-cell lipolysis through hGH receptor binding.',monitor:'HbA1c if diabetic.'},
+  'Semaglutide+Cagrilintide':{rating:'synergy',evidence:'clinical',confidence:87,note:'GLP-1 + amylin dual pathway (CagriSema protocol).',mechanism:'GLP-1 from the gut and amylin from the brainstem — additive satiety.',monitor:'HbA1c quarterly.'},
+  'AICAR+MOTS-C':{rating:'synergy',evidence:'mechanistic',confidence:76,note:'Dual AMPK activation.',mechanism:'AICAR mimics low energy states while MOTS-C activates AMPK via mitochondrial signaling.',monitor:'None specifically required.'},
+  'Semaglutide+Tirzepatide':{rating:'avoid',evidence:'clinical',confidence:97,note:'DO NOT COMBINE. Both are GLP-1 agonists.',mechanism:'Doubles GLP-1 signaling — nausea, vomiting, gastroparesis, pancreatitis risk.',monitor:'Drop one.'},
+  'Semaglutide+Retatrutide':{rating:'avoid',evidence:'clinical',confidence:96,note:'DO NOT COMBINE.',mechanism:'Retatrutide already contains full GLP-1 agonism.',monitor:'Drop Semaglutide.'},
+  'Tirzepatide+Retatrutide':{rating:'avoid',evidence:'clinical',confidence:97,note:'DO NOT COMBINE.',mechanism:'Receptor overlap — no added benefit, major GI risk.',monitor:'Drop one.'},
+  'Clenbuterol+Tirzepatide':{rating:'caution',evidence:'mechanistic',confidence:73,note:'Cardiovascular overlap.',mechanism:'Clenbuterol raises HR via β2; GLP-1 agonists also modulate cardiac output.',monitor:'HR, BP weekly.'},
+  'NAD++MOTS-C':{rating:'synergy',evidence:'mechanistic',confidence:84,note:'Mitochondrial synergy.',mechanism:'NAD+ fuels sirtuin/PARP pathways while MOTS-C activates AMPK.',monitor:'None specifically required.'},
+  'NAD++Glutathione':{rating:'synergy',evidence:'mechanistic',confidence:80,note:'Master antioxidant synergy.',mechanism:'NAD+ regenerates oxidized glutathione; glutathione reduces ROS that deplete NAD+.',monitor:'None specifically required.'},
+  'Epithalon+Thymosin Alpha-1':{rating:'synergy',evidence:'anecdotal',confidence:61,note:'Longevity plus immune restoration.',mechanism:'Epithalon addresses telomere aging while Thymosin Alpha-1 restores thymic function.',monitor:'None specifically required.'},
+  'Epithalon+Thymalin':{rating:'synergy',evidence:'anecdotal',confidence:69,note:'Classic Khavinson anti-aging.',mechanism:'Pineal/telomere plus thymus/immune restoration.',monitor:'None specifically required.'},
+  'Humanin+MOTS-C':{rating:'synergy',evidence:'mechanistic',confidence:77,note:'Dual mitochondria-derived peptide synergy.',mechanism:'Both encoded in mitochondrial DNA — neuroprotection and metabolic optimization.',monitor:'None specifically required.'},
+  'HCG+Testosterone (TRT)':{rating:'synergy',evidence:'clinical',confidence:93,note:'Standard TRT support.',mechanism:'HCG maintains intratesticular testosterone and Leydig function during TRT-induced LH suppression.',monitor:'Testosterone, estradiol, hematocrit, LH, FSH.'},
+  'Gonadorelin+Testosterone (TRT)':{rating:'synergy',evidence:'clinical',confidence:86,note:'Modern TRT plus HPG axis preservation.',mechanism:'Gonadorelin stimulates natural LH/FSH preventing pituitary suppression.',monitor:'Testosterone, estradiol, LH, FSH.'},
+  'PT-141+Oxytocin':{rating:'synergy',evidence:'anecdotal',confidence:59,note:'Central desire plus bonding.',mechanism:'PT-141 activates MC3R/MC4R for desire; Oxytocin enhances bonding.',monitor:'BP after PT-141 dosing.'},
+  'Tadalafil (Cialis)+PT-141':{rating:'synergy',evidence:'clinical',confidence:86,note:'Complete sexual function stack.',mechanism:'PT-141 works centrally via MC4R; Tadalafil works peripherally via PDE5.',monitor:'BP at baseline.'},
+  'Kisspeptin-10+PT-141':{rating:'synergy',evidence:'mechanistic',confidence:68,note:'Hormonal axis plus CNS activation.',mechanism:'Kisspeptin activates HPG; PT-141 directly stimulates CNS desire pathways.',monitor:'BP after PT-141.'},
+  'Thymosin Alpha-1+Thymalin':{rating:'synergy',evidence:'anecdotal',confidence:66,note:'Dual immune anti-aging.',mechanism:'Thymosin Alpha-1 enhances active immune function while Thymalin supports thymic regeneration.',monitor:'None specifically required.'},
+  'GHK-Cu+Argireline':{rating:'synergy',evidence:'mechanistic',confidence:74,note:'Skin rejuvenation stack.',mechanism:'GHK-Cu drives collagen while Argireline reduces expression wrinkles via NMJ inhibition.',monitor:'None — topical use.'},
+  'Argireline+SNAP-8':{rating:'synergy',evidence:'mechanistic',confidence:72,note:'Enhanced NMJ inhibition.',mechanism:'Argireline (6AA) and SNAP-8 (8AA) inhibit the SNARE complex via additive mechanisms.',monitor:'None — topical use.'},
+  'Cardiogen+Vesugen':{rating:'synergy',evidence:'anecdotal',confidence:63,note:'Cardiovascular bioregulator pair.',mechanism:'Cardiogen supports cardiac muscle while Vesugen targets vascular endothelium.',monitor:'None specifically required.'},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SCHEDULE
+// ═══════════════════════════════════════════════════════════════
+const SCHED={
+  'BPC-157':{time:'AM + PM fasted',freq:'Daily',notes:'Inject near injury site or SQ for systemic use'},
+  'TB-500':{time:'Any time',freq:'2× weekly (loading)',notes:'Loading 4–6 wks, then 1×/week maintenance'},
+  'GHK-Cu':{time:'Any time',freq:'Daily',notes:'Injectable or topical'},
+  'KPV':{time:'AM or PM',freq:'1–2× daily',notes:'Oral for gut; SQ for systemic'},
+  'LL-37':{time:'Any time',freq:'Daily',notes:'50-day course then 4 wks off'},
+  'SS-31':{time:'Morning',freq:'Daily',notes:'Consistent daily timing recommended'},
+  'Tirzepatide':{time:'Same day weekly',freq:'Once weekly',notes:'Titrate slowly — 4 weeks per step'},
+  'Semaglutide':{time:'Same day weekly',freq:'Once weekly',notes:'Titrate over 5+ weeks'},
+  'Retatrutide':{time:'Same day weekly',freq:'Once weekly',notes:'Slowest titration of GLP-1 class'},
+  'Cagrilintide':{time:'Same day weekly',freq:'Once weekly',notes:'Pairs with Semaglutide for CagriSema'},
+  'AOD-9604':{time:'AM fasted',freq:'Daily',notes:'Fasted state critical for lipolysis effect'},
+  'HGH Fragment 176-191':{time:'AM fasted + pre-bed',freq:'2× daily',notes:'Both doses fasted'},
+  '5-Amino-1MQ':{time:'Morning',freq:'Daily oral',notes:'5 on / 2 off cycling works well'},
+  'AICAR':{time:'Pre-exercise or AM',freq:'Daily',notes:'Pairs with exercise for AMPK effect'},
+  'Clenbuterol':{time:'Morning',freq:'2 wks on / 2 wks off',notes:'Monitor HR — start lowest dose'},
+  'CJC-1295 + Ipamorelin':{time:'Pre-sleep fasted 2h+',freq:'1–3× daily',notes:'Fasted state essential for GH pulse'},
+  'CJC-1295':{time:'Pre-sleep fasted',freq:'1–3× daily',notes:'No carbs 2h prior'},
+  'Ipamorelin':{time:'Pre-sleep fasted',freq:'2–3× daily',notes:'Cleanest GHRP — no cortisol spike'},
+  'Sermorelin':{time:'Pre-sleep',freq:'Nightly',notes:'Mimics natural nocturnal GH pulse'},
+  'Tesamorelin':{time:'Pre-bed',freq:'Daily',notes:'Strongest data for visceral fat'},
+  'GHRP-2':{time:'Pre-bed / AM / pre-workout',freq:'2–3× daily',notes:'Monitor cortisol — moderate doses'},
+  'GHRP-6':{time:'Pre-workout / AM / pre-bed',freq:'2–3× daily',notes:'Significant appetite increase expected'},
+  'Somatropin (HGH)':{time:'AM or pre-bed',freq:'Daily',notes:'Morning for fat loss; pre-sleep for recovery'},
+  'IGF-1 LR3':{time:'Post-workout or AM',freq:'Daily',notes:'30 on / 30 off to prevent desensitization'},
+  'MK-677':{time:'Before bed',freq:'Daily oral',notes:'With food — increases appetite significantly'},
+  'Semax':{time:'AM intranasal',freq:'1–2× daily',notes:'Stimulating — avoid PM. 10–14 day cycles'},
+  'Selank':{time:'Any time',freq:'2–3× daily',notes:'Non-sedating — use as needed'},
+  'Dihexa':{time:'Morning',freq:'Once weekly',notes:'Extremely potent — very long half-life'},
+  'DSIP':{time:'30–60 min pre-bed',freq:'Nightly or 3–5×/wk',notes:'Sleep only — do not dose daytime'},
+  'Pinealon':{time:'Pre-bed',freq:'Daily × 10-day course',notes:'Quarterly courses'},
+  'Epithalon':{time:'Pre-bed',freq:'Daily × 10–20 days',notes:'Quarterly courses'},
+  'FOXO4-DRI':{time:'Any time',freq:'3×/week during course',notes:'1–3 week courses 2–3×/year'},
+  'Humanin':{time:'Any time',freq:'2–3× per week',notes:'8–12 week cycles'},
+  'MOTS-C':{time:'Morning',freq:'2–3× weekly',notes:'Morning aligns with natural signaling'},
+  'NAD+':{time:'Morning',freq:'2–3× weekly',notes:'Inject slowly. Mild flushing normal.'},
+  'Glutathione':{time:'Any time',freq:'Weekly',notes:'IV most effective; SQ also works'},
+  'Thymosin Alpha-1':{time:'Any time',freq:'2–5× weekly',notes:'8–12 week course typical'},
+  'Thymalin':{time:'Any time',freq:'Daily × 10-day course',notes:'Quarterly courses'},
+  'Gonadorelin':{time:'Morning',freq:'2–3× per week',notes:'Modern preference over HCG'},
+  'PT-141':{time:'45–60 min before activity',freq:'As needed (max 8×/mo)',notes:'Start 0.5mg — nausea common initially'},
+  'Kisspeptin-10':{time:'Evening',freq:'As needed / protocol',notes:'Addresses libido at hormonal root'},
+  'Oxytocin':{time:'Pre-activity',freq:'As needed',notes:'Intranasal 10–40 IU or SQ'},
+  'Tadalafil (Cialis)':{time:'Daily or 45–60 min before',freq:'Daily 5mg or PRN',notes:'Daily low-dose for cardiovascular benefit'},
+  'Testosterone (TRT)':{time:'Consistent day weekly',freq:'1–2× weekly',notes:'Cyp/Enan 2×/wk for stable levels'},
+  'HCG':{time:'Morning',freq:'2–3× per week',notes:'Standard TRT adjunct'},
+  'Melanotan 2':{time:'PM reduces nausea',freq:'Loading → maintenance',notes:'Start 0.25mg — titrate slowly'},
+  'Argireline':{time:'AM and PM',freq:'Daily topical',notes:'5–10% concentration in serum'},
+  'GHK-Cu (Topical)':{time:'AM and PM',freq:'Daily topical',notes:'Pair with Matrixyl or Argireline'},
+  'SNAP-8':{time:'PM',freq:'Daily topical',notes:'5–10% serum'},
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SCORING RULES
+// ═══════════════════════════════════════════════════════════════
+const BASE_SCORE = 50;
+
+const GROUP_RULES = [
+  {group:'glp1',       max:1, perOver:-12, msg:'GLP-1 agonist redundancy — receptor overlap increases side effects without added benefit'},
+  {group:'gh',         max:2, perOver:-6,  msg:'GH/IGF compound overlap — supraphysiological IGF-1 risk'},
+  {group:'cognitive',  max:2, perOver:-3,  msg:'Cognitive compound overlap — effect attribution becomes difficult'},
+  {group:'mitochondria', max:3, perOver:-3, msg:'Mitochondrial compound overlap — paying for redundancy'},
+  {group:'skin',       max:2, perOver:-2,  msg:'Skin compound overlap — formula redundancy likely'},
+  {group:'sexual',     max:2, perOver:-3,  msg:'Sexual-health compound overlap — additive CNS effects'},
+  {group:'fatloss',    max:2, perOver:-4,  msg:'Direct-lipolysis compound overlap — additive cardiovascular load'},
+];
+
+const CROSS_CLASS_BONUSES = [
+  {need:['gh','mitochondria'], pts:4, msg:'GH axis + mitochondrial support — anabolic-recovery synergy'},
+  {need:['hormonal','sexual'], pts:3, msg:'Hormonal + sexual health — addresses sexual function at the root'},
+  {need:['immune','healing'], pts:3, msg:'Immune modulation + healing — complementary recovery support'},
+  {need:['glp1','metabolic'], pts:3, msg:'GLP-1 + metabolic support — layered fat-loss stack'},
+  {need:['cognitive','sleep'], pts:3, msg:'Cognitive + sleep — 24h neural protocol'},
+  {need:['longevity','immune'], pts:2, msg:'Longevity + immune — Khavinson-style anti-aging'},
+];
+
+// Categories that align with each goal
+const GOAL_CATS = {
+  fat_loss:  ['GLP-1 / Metabolic','Energy / NAD+'],
+  recovery:  ['Recovery','Immune'],
+  gh:        ['Growth Hormone'],
+  longevity: ['Longevity','Energy / NAD+','Bioregulator','Immune'],
+  cognitive: ['Cognitive'],
+  hormonal:  ['Hormonal'],
+  immune:    ['Immune'],
+  energy:    ['Energy / NAD+'],
+  sexual:    ['Sexual Health','Hormonal'],
+  skin:      ['Skin'],
+  muscle:    ['Growth Hormone'],
+};
+
+const GOAL_LABEL = {
+  fat_loss:'Fat Loss', recovery:'Recovery', gh:'GH Axis', longevity:'Longevity',
+  cognitive:'Cognitive', hormonal:'Hormonal', immune:'Immune', energy:'Energy',
+  sexual:'Sexual Health', skin:'Skin', muscle:'Muscle',
+};
+
+// Compounds that conflict with each risk flag
+const RISK_CONFLICTS = {
+  bp:         {list:['Clenbuterol','Somatropin (HGH)','MK-677','Testosterone (TRT)','Melanotan 2','PT-141'], msg:'raises BP/HR or strains cardiovascular system'},
+  gi:         {list:['Semaglutide','Tirzepatide','Retatrutide','Survodutide','Liraglutide','Cagrilintide','MK-677','PT-141','Melanotan 2'], msg:'commonly causes GI side effects (nausea, motility)'},
+  glucose:    {list:['Somatropin (HGH)','MK-677','IGF-1 LR3','Clenbuterol'], msg:'affects glucose / insulin sensitivity'},
+  fertility:  {list:['Testosterone (TRT)','MK-677','Somatropin (HGH)','Triptorelin'], msg:'suppresses HPG axis'},
+  transplant: {list:['Thymosin Alpha-1','Thymalin','Thymagen','LL-37','Cortagen'], msg:'activates immune function — contraindicated with immunosuppression'},
+  ssri:       {list:['Semax','Selank','PT-141','Melanotan 2','Kisspeptin-10'], msg:'CNS/monoamine interaction with SSRIs'},
+};
+
+const RISK_LABEL = {
+  bp:'Blood Pressure', gi:'GI Sensitivity', glucose:'Glucose / Insulin',
+  fertility:'Fertility Preservation', transplant:'Organ Transplant', ssri:'SSRI / Mood Med',
+};
+
+// Support-protocol rules — stack-level completeness bonuses/penalties
+const SUPPORT_RULES = [
+  {
+    trigger:['Testosterone (TRT)'],
+    support:['HCG','Gonadorelin'],
+    withPts:+6, withMsg:'TRT with HCG/Gonadorelin — testicular support included (complete protocol)',
+    withoutPts:-8, withoutMsg:'TRT without HCG or Gonadorelin — progressive testicular atrophy risk'
+  },
+  {
+    trigger:['Semaglutide'],
+    support:['Cagrilintide'],
+    withPts:+3, withMsg:'Semaglutide + Cagrilintide (CagriSema) — dual-pathway fat loss'
+  },
+  {
+    trigger:['PT-141'],
+    support:['Tadalafil (Cialis)'],
+    withPts:+3, withMsg:'PT-141 + Tadalafil — complete sexual function (central + peripheral)'
+  },
+  {
+    trigger:['Epithalon'],
+    support:['Thymalin','Thymosin Alpha-1'],
+    withPts:+3, withMsg:'Epithalon + thymic peptide — Khavinson longevity protocol'
+  },
+  {
+    trigger:['Somatropin (HGH)'],
+    // Penalty if layered with other GH raisers
+    conflict:['MK-677','Sermorelin','CJC-1295','CJC-1295 + Ipamorelin','Ipamorelin','GHRP-2','GHRP-6','Tesamorelin'],
+    withConflictPts:-5, withConflictMsg:'HGH layered with GH secretagogue(s) — redundant, raises IGF-1 risk',
+    withoutConflictPts:+2, withoutConflictMsg:'HGH used cleanly without stacked secretagogues'
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
+// STATE + HELPERS
+// ═══════════════════════════════════════════════════════════════
+let stack = [];
+let lastReport = null;
+let ddTimer = null;
+
+const getPep = n => PEPTIDES.find(x => x.name === n);
+const getSyn = (a,b) => SYNERGY_DB[a+'+'+b] || SYNERGY_DB[b+'+'+a] || null;
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+// ═══════════════════════════════════════════════════════════════
+// SEARCH / STACK UI
+// ═══════════════════════════════════════════════════════════════
+function onSearch(q) { openDD(); renderDD(q.toLowerCase().trim()); }
+function openDD() { clearTimeout(ddTimer); renderDD(document.getElementById('stack-search').value.toLowerCase().trim()); document.getElementById('stack-dd').classList.add('open'); }
+function schedClose() { ddTimer = setTimeout(()=>document.getElementById('stack-dd').classList.remove('open'),180); }
+function renderDD(q) {
+  const dd = document.getElementById('stack-dd');
+  const filtered = PEPTIDES.filter(p => !q || p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q)).slice(0,20);
+  if (!filtered.length) { dd.innerHTML = `<div class="dd-item" style="color:var(--muted);cursor:default">No matches</div>`; return; }
+  dd.innerHTML = filtered.map(p => {
+    const added = stack.some(s=>s.name===p.name);
+    return `<div class="dd-item ${added?'added':''}" onmousedown="${added?'':`addToStack('${p.name.replace(/'/g,"\\'")}')`}">
+      <span>${esc(p.name)} <span style="color:var(--muted);font-size:9px;margin-left:6px">${esc(p.cat)}</span></span>
+      <span class="dd-tag ${added?'done':''}">${added?'Added':'+ Add'}</span>
+    </div>`;
+  }).join('');
+}
+function addToStack(name) {
+  if (stack.length >= 8 || stack.some(s=>s.name===name)) return;
+  const p = getPep(name); if (!p) return;
+  stack.push(p);
+  document.getElementById('stack-search').value = '';
+  document.getElementById('stack-dd').classList.remove('open');
+  renderStack();
+}
+function removeFromStack(name) { stack = stack.filter(s=>s.name!==name); renderStack(); }
+function clearStack() { stack = []; renderStack(); document.getElementById('results-col').innerHTML = document.getElementById('empty-card').outerHTML; }
+function renderStack() {
+  document.getElementById('stack-count').textContent = stack.length;
+  const list = document.getElementById('stack-list');
+  if (!stack.length) { list.innerHTML = '<div class="empty-hint">Search above to add compounds</div>'; return; }
+  list.innerHTML = stack.map(p=>`
+    <div class="stack-item">
+      <div class="si-dot" style="background:${p.color}"></div>
+      <div style="flex:1;min-width:0"><div class="si-name">${esc(p.name)}</div><div class="si-cat">${esc(p.cat)}</div></div>
+      <button class="si-rm" onclick="removeFromStack('${p.name.replace(/'/g,"\\'")}')">×</button>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SCORING ENGINE
+// ═══════════════════════════════════════════════════════════════
+function analyzeStack() {
+  if (stack.length < 2) { alert('Add at least 2 compounds to analyze.'); return; }
+  const names = stack.map(s=>s.name);
+  const goal = document.getElementById('goal-select').value;
+  const exp = document.getElementById('exp-select').value;
+  const risk = document.getElementById('risk-select').value;
+  const notes = document.getElementById('stack-notes').value;
+
+  const entries = []; // {points, category, reason, severity}
+  const pairs = [];
+
+  // Build all pairs
+  for (let i=0; i<names.length; i++) {
+    for (let j=i+1; j<names.length; j++) {
+      const s = getSyn(names[i], names[j]);
+      pairs.push({a:names[i], b:names[j], ...(s||{rating:'neutral',evidence:'unknown',confidence:34,note:'No documented synergy or conflict — likely neutral through independent pathways.',mechanism:'Not established.',monitor:'General baseline monitoring recommended.'})});
+    }
+  }
+
+  // ─── RULE 1: Pair-level interactions ───────────────────────────
+  pairs.forEach(p => {
+    if (p.rating === 'synergy') {
+      const pts = Math.round(8 * p.confidence / 100);
+      entries.push({points:+pts, category:'Pair Synergy', reason:`${p.a} + ${p.b} — ${p.evidence} (${p.confidence}% conf.)`, severity:'positive'});
+    } else if (p.rating === 'caution') {
+      const pts = -Math.round(8 * p.confidence / 100);
+      entries.push({points:pts, category:'Pair Caution', reason:`${p.a} + ${p.b} — monitor closely (${p.confidence}% conf.)`, severity:'negative'});
+    } else if (p.rating === 'avoid') {
+      const pts = -Math.round(22 * p.confidence / 100);
+      entries.push({points:pts, category:'Pair Conflict', reason:`${p.a} + ${p.b} — do not combine (${p.confidence}% conf.)`, severity:'negative'});
+    }
+  });
+
+  // ─── RULE 2: Class-level (group) overlap ───────────────────────
+  const groupCounts = {};
+  names.forEach(n => { const g = getPep(n)?.group; if (g) groupCounts[g] = (groupCounts[g]||0)+1; });
+  GROUP_RULES.forEach(r => {
+    const count = groupCounts[r.group] || 0;
+    if (count > r.max) {
+      const over = count - r.max;
+      const pts = r.perOver * over;
+      entries.push({points:pts, category:'Class Overlap', reason:`${count} ${r.group} compounds — ${r.msg}`, severity:'negative'});
+    }
+  });
+
+  // ─── RULE 3: Cross-class complementary bonuses ─────────────────
+  const hasGroup = g => (groupCounts[g]||0) > 0;
+  CROSS_CLASS_BONUSES.forEach(b => {
+    if (b.need.every(hasGroup)) {
+      entries.push({points:+b.pts, category:'Class Synergy', reason:b.msg, severity:'positive'});
+    }
+  });
+
+  // ─── RULE 4: Goal alignment ────────────────────────────────────
+  if (goal && GOAL_CATS[goal]) {
+    const wanted = GOAL_CATS[goal];
+    const matches = names.filter(n => wanted.includes(getPep(n)?.cat)).length;
+    const ratio = matches / names.length;
+    if (matches === 0) {
+      entries.push({points:-10, category:'Goal Alignment', reason:`No compounds aligned with "${GOAL_LABEL[goal]}" goal — pick a different goal or different compounds`, severity:'negative'});
+    } else {
+      const pts = Math.round((ratio - 0.5) * 12);
+      if (pts > 0) entries.push({points:+pts, category:'Goal Alignment', reason:`${matches}/${names.length} compounds aligned with "${GOAL_LABEL[goal]}" goal`, severity:'positive'});
+      else if (pts < 0) entries.push({points:pts, category:'Goal Alignment', reason:`Only ${matches}/${names.length} compounds align with "${GOAL_LABEL[goal]}" — stack unfocused`, severity:'negative'});
+    }
+  }
+
+  // ─── RULE 5: Experience × complexity ───────────────────────────
+  const n = names.length;
+  if (exp === 'beginner' && n >= 5) entries.push({points:-8, category:'Complexity', reason:`${n}-compound stack as beginner — attribution & tolerance issues likely`, severity:'negative'});
+  else if (exp === 'beginner' && n === 4) entries.push({points:-4, category:'Complexity', reason:`4 compounds as beginner — ramp up slowly, consider 2–3 to start`, severity:'negative'});
+  else if (exp === 'intermediate' && n >= 7) entries.push({points:-4, category:'Complexity', reason:`${n}-compound stack is heavy even for intermediate level`, severity:'negative'});
+  else if (exp === 'advanced' && n >= 3 && n <= 6) entries.push({points:+2, category:'Complexity', reason:'Stack size in advanced-researcher comfort range', severity:'positive'});
+
+  // ─── RULE 6: Risk-flag conflicts ───────────────────────────────
+  if (risk && RISK_CONFLICTS[risk]) {
+    const cfg = RISK_CONFLICTS[risk];
+    const hits = names.filter(x => cfg.list.includes(x));
+    if (hits.length) {
+      const pts = -5 * hits.length;
+      entries.push({points:pts, category:'Risk Flag', reason:`${hits.join(', ')} ${cfg.msg} — conflicts with "${RISK_LABEL[risk]}" flag`, severity:'negative'});
+    }
+  }
+
+  // ─── RULE 7: Support-protocol completeness ─────────────────────
+  SUPPORT_RULES.forEach(rule => {
+    const triggered = rule.trigger.some(t => names.includes(t));
+    if (!triggered) return;
+    if (rule.support) {
+      const hasSupport = rule.support.some(s => names.includes(s));
+      if (hasSupport && rule.withMsg) entries.push({points:+rule.withPts, category:'Support Protocol', reason:rule.withMsg, severity:'positive'});
+      else if (!hasSupport && rule.withoutMsg) entries.push({points:rule.withoutPts, category:'Support Protocol', reason:rule.withoutMsg, severity:'negative'});
+    }
+    if (rule.conflict) {
+      const hasConflict = rule.conflict.some(c => names.includes(c));
+      if (hasConflict && rule.withConflictMsg) entries.push({points:rule.withConflictPts, category:'Support Protocol', reason:rule.withConflictMsg, severity:'negative'});
+      else if (!hasConflict && rule.withoutConflictMsg) entries.push({points:+rule.withoutConflictPts, category:'Support Protocol', reason:rule.withoutConflictMsg, severity:'positive'});
+    }
+  });
+
+  // ─── FINAL SCORE ───────────────────────────────────────────────
+  const adjustment = entries.reduce((a,e)=>a+e.points, 0);
+  const rawScore = BASE_SCORE + adjustment;
+  const score = Math.max(0, Math.min(100, Math.round(rawScore)));
+
+  const scoreColor = score>=85?'var(--green)':score>=70?'var(--gold)':score>=55?'var(--amber)':'var(--red)';
+  const scoreLabel = score>=85?'Excellent':score>=70?'Strong':score>=55?'Good':score>=40?'Needs Work':'Significant Issues';
+
+  lastReport = {names, goal:GOAL_LABEL[goal]||'Not set', exp, risk:RISK_LABEL[risk]||'None', score, scoreLabel, entries, pairs, notes, adjustment};
+
+  render(score, scoreColor, scoreLabel, entries, pairs, adjustment, {goal, exp, risk});
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER RESULTS
+// ═══════════════════════════════════════════════════════════════
+function render(score, color, label, entries, pairs, adjustment, ctx) {
+  const col = document.getElementById('results-col');
+  col.innerHTML = '';
+
+  // SCORE BANNER
+  const syn = pairs.filter(p=>p.rating==='synergy').length;
+  const caut = pairs.filter(p=>p.rating==='caution').length;
+  const avd = pairs.filter(p=>p.rating==='avoid').length;
+  const neu = pairs.filter(p=>p.rating==='neutral').length;
+  const scoreEl = document.createElement('div');
+  scoreEl.className = 'score-card fade-in';
+  scoreEl.innerHTML = `
+    <div class="score-top">
+      <div class="score-num" style="color:${color}">${score}</div>
+      <div class="score-info">
+        <div class="score-lbl">Compatibility Score</div>
+        <div class="score-title" style="color:${color}">${label}</div>
+        <div class="score-meta">${stack.length} compounds · ${pairs.length} pairs · <span style="color:var(--green)">${syn} synergies</span> · <span style="color:var(--amber)">${caut} cautions</span> · <span style="color:var(--red)">${avd} conflicts</span> · <span style="color:var(--blue)">${neu} neutral</span></div>
+      </div>
+    </div>
+    <div class="score-bar-wrap"><div class="score-bar-fill" style="background:${color};width:${score}%"></div></div>
+  `;
+  col.appendChild(scoreEl);
+
+  // SCORE BREAKDOWN
+  const bdEl = document.createElement('div');
+  bdEl.className = 'panel fade-in-1';
+  // Group entries by category
+  const grouped = {};
+  entries.forEach(e => { (grouped[e.category] = grouped[e.category] || []).push(e); });
+  const categoryOrder = ['Pair Conflict','Pair Caution','Risk Flag','Class Overlap','Complexity','Goal Alignment','Support Protocol','Class Synergy','Pair Synergy'];
+  const sortedCats = Object.keys(grouped).sort((a,b) => {
+    const ai = categoryOrder.indexOf(a); const bi = categoryOrder.indexOf(b);
+    return (ai===-1?99:ai) - (bi===-1?99:bi);
+  });
+  let bdHtml = `<div class="panel-head"><h2>Score Breakdown</h2><p>Every point accounted for — how each factor moved your score</p></div>
+  <div class="panel-body">
+    <div class="bd-base">
+      <div class="bd-base-lbl">Starting Score</div>
+      <div class="bd-base-val">${BASE_SCORE}</div>
+    </div>
+    <div class="bd-list">`;
+  if (!sortedCats.length) {
+    bdHtml += `<div class="bd-entry"><div class="bd-pts zero">0</div><div class="bd-text"><div class="bd-cat">No factors triggered</div>Neutral pairs only. Score stays at the starting baseline.</div></div>`;
+  } else {
+    sortedCats.forEach(cat => {
+      const items = grouped[cat];
+      const totalPts = items.reduce((a,e)=>a+e.points, 0);
+      const totalSign = totalPts >= 0 ? '+' : '';
+      bdHtml += `<div class="bd-group">
+        <div class="bd-group-head"><span>${cat}</span><span class="bd-group-total" style="color:${totalPts>=0?'var(--green)':'var(--red)'}">${totalSign}${totalPts}</span></div>`;
+      items.forEach(e => {
+        const cls = e.points > 0 ? 'pos' : e.points < 0 ? 'neg' : 'zero';
+        const sign = e.points > 0 ? '+' : '';
+        bdHtml += `<div class="bd-entry">
+          <div class="bd-pts ${cls}">${sign}${e.points}</div>
+          <div class="bd-text">${esc(e.reason)}</div>
+        </div>`;
+      });
+      bdHtml += `</div>`;
+    });
+  }
+  const total = BASE_SCORE + adjustment;
+  const clamped = Math.max(0, Math.min(100, Math.round(total)));
+  bdHtml += `</div>
+    <div class="bd-total-row">
+      <div class="bd-total-lbl">Final Score ${total !== clamped ? `(clamped from ${total})` : ''}</div>
+      <div class="bd-total-val">${clamped}</div>
+    </div>
+  </div>`;
+  bdEl.innerHTML = bdHtml;
+  col.appendChild(bdEl);
+
+  // METRICS
+  const mEl = document.createElement('div');
+  mEl.className = 'panel fade-in-1';
+  const knownPairs = pairs.filter(p => p.evidence !== 'unknown');
+  mEl.innerHTML = `<div class="panel-head"><h2>Analysis Metrics</h2><p>What the engine looked at</p></div>
+    <div class="panel-body"><div class="metric-grid">
+      <div class="metric-card"><div class="metric-k">Pairs Reviewed</div><div class="metric-v">${pairs.length}</div><div class="metric-sub">Every compound combination scored.</div></div>
+      <div class="metric-card"><div class="metric-k">Documented</div><div class="metric-v">${knownPairs.length}</div><div class="metric-sub">Pairs with known clinical / mechanistic / anecdotal evidence.</div></div>
+      <div class="metric-card"><div class="metric-k">Factors Triggered</div><div class="metric-v">${entries.length}</div><div class="metric-sub">Rules that adjusted your score (see breakdown above).</div></div>
+      <div class="metric-card"><div class="metric-k">Net Adjustment</div><div class="metric-v" style="color:${adjustment>=0?'var(--green)':'var(--red)'}">${adjustment>=0?'+':''}${adjustment}</div><div class="metric-sub">Change from the ${BASE_SCORE} baseline.</div></div>
+    </div></div>`;
+  col.appendChild(mEl);
+
+  // PAIR COMPATIBILITY
+  const compatEl = document.createElement('div');
+  compatEl.className = 'panel fade-in-2';
+  const unknownPairs = pairs.filter(p => p.evidence === 'unknown');
+  const evMap = {clinical:'b-clinical',mechanistic:'b-mechanistic',anecdotal:'b-anecdotal',unknown:'b-unknown'};
+  const rMap = {synergy:'b-synergy',caution:'b-caution',avoid:'b-avoid',neutral:'b-neutral'};
+  const rLabel = {synergy:'✅ Synergy',caution:'⚠️ Caution',avoid:'🚫 Avoid',neutral:'ℹ️ Neutral'};
+  const confCls = c => c>=75?'b-conf-high':c>=50?'b-conf-med':'b-conf-low';
+  const card = p => `<div class="compat-card">
+    <div class="cc-top"><div class="cc-name">${esc(p.a)} <span class="cc-arrow">→</span> ${esc(p.b)}</div><span class="badge ${rMap[p.rating]}">${rLabel[p.rating]}</span></div>
+    <div class="cc-badges"><span class="badge ${evMap[p.evidence]}">${p.evidence}</span><span class="badge ${confCls(p.confidence)}">${p.confidence}% confidence</span></div>
+    <div class="cc-body">${esc(p.note)}</div>
+    ${p.mechanism?`<div class="cc-meta"><strong>Mechanism:</strong> ${esc(p.mechanism)}</div>`:''}
+    ${p.monitor?`<div class="cc-meta"><strong>Monitor:</strong> ${esc(p.monitor)}</div>`:''}
+  </div>`;
+  compatEl.innerHTML = `<div class="panel-head"><h2>Pair Interactions</h2><p>Every compound combination evaluated</p></div>
+    <div class="panel-body">
+      ${knownPairs.length?`<div class="section-div">Documented Interactions (${knownPairs.length})</div><div class="compat-grid">${knownPairs.map(card).join('')}</div>`:''}
+      ${unknownPairs.length?`<div class="section-div" style="margin-top:${knownPairs.length?18:0}px">No Documented Interaction (${unknownPairs.length})</div><div class="compat-grid">${unknownPairs.map(card).join('')}</div>`:''}
+    </div>`;
+  col.appendChild(compatEl);
+
+  // SCHEDULE
+  const schedRows = stack.map(p => SCHED[p.name] ? {name:p.name, ...SCHED[p.name]} : null).filter(Boolean);
+  if (schedRows.length) {
+    const sEl = document.createElement('div');
+    sEl.className = 'panel fade-in-3';
+    sEl.innerHTML = `<div class="panel-head"><h2>Scheduling Guide</h2><p>Time · frequency · administration notes</p></div>
+      <div class="panel-body" style="padding:0">
+        <table class="sched-table">
+          <thead><tr><th>Compound</th><th>Timing</th><th>Frequency</th><th>Notes</th></tr></thead>
+          <tbody>${schedRows.map(r=>`<tr><td class="sn">${esc(r.name)}</td><td class="sf">${esc(r.time)}</td><td>${esc(r.freq)}</td><td>${esc(r.notes)}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>`;
+    col.appendChild(sEl);
+  }
+
+  // EXPORT
+  const xEl = document.createElement('div');
+  xEl.className = 'panel fade-in-3';
+  xEl.innerHTML = `<div class="panel-head"><h2>Export Report</h2><p>Copy or save the full breakdown</p></div>
+    <div class="panel-body">
+      <div class="export-row">
+        <button class="export-btn" onclick="copyReport()">📋 Copy Text</button>
+        <button class="export-btn" onclick="downloadReport()">💾 Download .txt</button>
+        <button class="export-btn" onclick="window.print()">🖨 Print</button>
+      </div>
+      <div class="report-box" id="report-text">${esc(makeReportText(lastReport))}</div>
+    </div>`;
+  col.appendChild(xEl);
+}
+
+function makeReportText(r) {
+  if (!r) return '';
+  const lines = [];
+  lines.push('BIO LINKED STACK ANALYZER v2 — REPORT');
+  lines.push('='.repeat(50));
+  lines.push(`Date: ${new Date().toLocaleString()}`);
+  lines.push(`Stack: ${r.names.join(', ')}`);
+  lines.push(`Goal: ${r.goal}  ·  Experience: ${r.exp}  ·  Risk Flag: ${r.risk}`);
+  lines.push(`Notes: ${r.notes || '—'}`);
+  lines.push('');
+  lines.push(`COMPATIBILITY SCORE: ${r.score}/100 (${r.scoreLabel})`);
+  lines.push(`Base ${BASE_SCORE}${r.adjustment>=0?' + ':' '}${r.adjustment} adjustment = ${r.score}`);
+  lines.push('');
+  lines.push('─── SCORE BREAKDOWN ───');
+  const grouped = {};
+  r.entries.forEach(e => { (grouped[e.category] = grouped[e.category] || []).push(e); });
+  Object.keys(grouped).forEach(cat => {
+    const items = grouped[cat];
+    const total = items.reduce((a,e)=>a+e.points, 0);
+    lines.push(`\n${cat}  (${total>=0?'+':''}${total})`);
+    items.forEach(e => lines.push(`  ${e.points>=0?'+':''}${e.points}  ${e.reason}`));
+  });
+  lines.push('');
+  lines.push('─── PAIR INTERACTIONS ───');
+  r.pairs.forEach(p => {
+    lines.push(`${p.a} → ${p.b}  [${p.rating.toUpperCase()}] · ${p.evidence} · ${p.confidence}%`);
+    lines.push(`  ${p.note}`);
+  });
+  lines.push('');
+  lines.push('For research and educational reference only. Not medical advice.');
+  return lines.join('\n');
+}
+
+function copyReport() {
+  if (!lastReport) return;
+  navigator.clipboard.writeText(makeReportText(lastReport)).then(()=>alert('Report copied to clipboard.'));
+}
+function downloadReport() {
+  if (!lastReport) return;
+  const blob = new Blob([makeReportText(lastReport)], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `stack-report-${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+}
+
+function loadDemo() {
+  stack = [];
+  ['BPC-157','TB-500','NAD+','CJC-1295 + Ipamorelin','Semax','Epithalon'].forEach(n => {
+    const p = getPep(n); if (p) stack.push(p);
+  });
+  document.getElementById('goal-select').value = 'longevity';
+  document.getElementById('exp-select').value = 'intermediate';
+  renderStack();
+}
+</script>
+<script src="nav.js"></script>
+</body>
+</html>
