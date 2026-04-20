@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kay Matthiessen — BioLinked Invoice</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);
+  --bg:#f5f5f5;--bg-card:#ffffff;--bg-card2:#f0f0f0;--white:#1a1a1a;
+  --text:#1a1a1a;--text-muted:#666666;--border:rgba(0,0,0,0.10);
+  --blue:#63b3ed;--blue-dim:rgba(99,179,237,0.1);--blue-border:rgba(99,179,237,0.25);
+  --green:#5ab87a;--green-dim:rgba(58,122,90,0.15);--green-border:rgba(58,122,90,0.25);
+  --sky:#38bdf8;--sky-dim:rgba(56,189,248,0.1);
+  --orange:#f6ad55;--orange-dim:rgba(246,173,85,0.1);--orange-border:rgba(246,173,85,0.3);
+  --red:#fc8181;--red-dim:rgba(252,129,129,0.1);--red-border:rgba(252,129,129,0.3);
+  --purple:#b794f4;--purple-dim:rgba(183,148,244,0.1);--purple-border:rgba(183,148,244,0.25);
+  --pink:#f9a8d4;--pink-dim:rgba(249,168,212,0.12);--pink-border:rgba(249,168,212,0.3);
+  --strike:#aaaaaa;
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;font-size:14px;}
+
+/* HEADER */
+.header{background:#ffffff;border-bottom:1px solid var(--gold-border);padding:3rem 2rem 2.5rem;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.header-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(139,115,53,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,115,53,0.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+.header-logo{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;}
+.header-logo::before,.header-logo::after{content:'';width:36px;height:1px;background:var(--gold-border);}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,5vw,48px);color:var(--white);font-weight:400;line-height:1.1;margin-bottom:0.3rem;position:relative;}
+.header h1 em{color:var(--gold);font-style:italic;}
+.header-focus{font-size:10px;color:var(--text-muted);letter-spacing:0.14em;text-transform:uppercase;margin-bottom:0.3rem;}
+.inv-badge-row{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-top:1.25rem;}
+.inv-badge{background:var(--bg-card);border:1px solid var(--gold-border);padding:0.5rem 1.25rem;border-radius:2px;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-muted);}
+.inv-badge span{color:var(--gold);font-weight:600;}
+
+/* NAV */
+.nav-tabs{display:flex;justify-content:center;border-bottom:1px solid var(--gold-border);background:#ffffff;position:sticky;top:56px;z-index:100;}
+.nav-tab{padding:0.9rem 1.5rem;font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Montserrat',sans-serif;}
+.nav-tab:hover{color:var(--gold-light);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* LAYOUT */
+.container{max-width:860px;margin:0 auto;padding:0 1.5rem 5rem;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* SHARED */
+.section{margin-top:2.5rem;}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:1.25rem;padding-bottom:0.75rem;border-bottom:1px solid var(--gold-border);}
+.section-icon{width:28px;height:28px;border-radius:2px;border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--gold-dim);}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--white);}
+.note{border-radius:2px;padding:1rem 1.5rem;margin-top:1rem;}
+.note h4{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:6px;}
+.note p{font-size:12px;line-height:1.75;font-weight:300;}
+.note-gold{background:rgba(201,168,76,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);}
+.note-gold h4{color:var(--gold);}
+.note-gold p{color:var(--text-muted);}
+.note-blue{background:var(--blue-dim);border:1px solid var(--blue-border);border-left:3px solid var(--blue);}
+.note-blue h4{color:var(--blue);}
+.note-blue p{color:rgba(99,179,237,0.85);}
+.note-green{background:var(--green-dim);border:1px solid var(--green-border);border-left:3px solid var(--green);}
+.note-green h4{color:var(--green);}
+.note-green p{color:rgba(58,122,90,0.9);}
+
+/* INVOICE */
+.bundle-banner{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.06));border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.25rem 1.5rem;margin-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.bundle-banner-left h3{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);font-weight:400;margin-bottom:2px;}
+.bundle-banner-left h3 em{color:var(--gold);font-style:italic;}
+.bundle-banner-left p{font-size:11px;color:var(--text-muted);font-weight:300;}
+.bundle-pill{background:var(--gold);color:#ffffff;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:8px 18px;border-radius:2px;white-space:nowrap;}
+.line-items{display:flex;flex-direction:column;gap:3px;margin-top:1.25rem;}
+.li-row{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1.1rem 1.5rem;display:grid;grid-template-columns:1fr auto;gap:1rem;transition:border-color 0.2s;}
+.li-row:hover{border-color:var(--gold-border);}
+.li-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--white);margin-bottom:2px;}
+.li-sub{font-size:10px;color:var(--text-muted);font-weight:300;letter-spacing:0.04em;}
+.li-price-col{text-align:right;display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:3px;}
+.li-original{font-size:11px;color:var(--strike);text-decoration:line-through;font-weight:300;}
+.li-your{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);}
+.li-save{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:8px;font-weight:700;letter-spacing:0.08em;padding:2px 7px;border-radius:99px;text-transform:uppercase;}
+.li-free{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:8px;font-weight:700;letter-spacing:0.08em;padding:2px 7px;border-radius:99px;text-transform:uppercase;}
+.totals-block{margin-top:3px;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.tot-row{display:flex;justify-content:space-between;align-items:center;padding:0.875rem 1.5rem;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-muted);}
+.tot-row:last-child{border-bottom:none;}
+.tot-row.grand{background:var(--gold-dim);padding:1.1rem 1.5rem;border-top:1px solid var(--gold-border);}
+.tot-row.grand .tl{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--white);font-weight:600;}
+.tot-row.grand .tv{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);font-weight:600;}
+.tot-row .tl{font-size:12px;}
+.tot-row .tv{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--text);}
+
+/* COMPOUND CARDS */
+.cmp-grid{display:grid;gap:1.1rem;margin-top:1.25rem;}
+.cmp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.cmp-head{background:var(--bg-card2);padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;}
+.cmp-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);}
+.cmp-tag{font-size:9px;color:var(--gold);font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
+.cmp-body{padding:1.25rem 1.5rem;display:grid;gap:0.875rem;}
+.plabel{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
+.ptext{font-size:13px;color:#555550;line-height:1.8;font-weight:300;}
+.deets{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0.5rem;}
+.dbox{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.6rem 0.75rem;}
+.dbox .dlbl{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:2px;}
+.dbox .dval{font-size:13px;font-weight:500;color:var(--text);}
+.phase-badge{display:inline-block;background:var(--blue-dim);border:1px solid var(--blue-border);color:var(--blue);font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px;}
+.recon{list-style:none;display:flex;flex-direction:column;gap:7px;counter-reset:step;}
+.recon li{counter-increment:step;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#555550;line-height:1.6;font-weight:300;}
+.recon li::before{content:counter(step);min-width:20px;height:20px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:50%;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+/* SCHEDULE TABLE */
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:9px 12px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--gold-border);}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--border);color:#555550;font-weight:300;vertical-align:top;}
+.sched-table tr:nth-child(odd) td{background:var(--bg-card);}
+.sched-table tr:nth-child(even) td{background:var(--bg-card2);}
+.sched-table tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold-light);font-size:9px;font-weight:600;padding:2px 7px;border-radius:99px;margin:1px 2px 1px 0;}
+.pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#aaa;font-weight:400;}
+.pill.pm{background:var(--purple-dim);border-color:var(--purple-border);color:var(--purple);}
+.pill.glow{background:var(--pink-dim);border-color:var(--pink-border);color:#d968a2;}
+
+/* VENMO */
+.venmo{background:linear-gradient(135deg,#f5f5f5 0%,#efefef 100%);border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.75rem;margin-top:2.5rem;text-align:center;}
+.venmo h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--white);font-weight:400;margin-bottom:0.4rem;}
+.venmo h3 em{color:var(--gold);font-style:italic;}
+.venmo p{font-size:12px;color:var(--text-muted);margin-bottom:1.25rem;}
+.venmo-btn{display:inline-block;background:var(--gold);color:#ffffff;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:14px 36px;border-radius:2px;text-decoration:none;}
+.venmo-btn:hover{background:var(--gold-light);}
+.venmo-handle{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;margin-top:10px;display:block;}
+
+/* SUPPLIES */
+.supply-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;margin-bottom:0.75rem;display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;gap:1rem;transition:border-color 0.2s;}
+.supply-card:hover{border-color:var(--gold-border);}
+.supply-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px;}
+.supply-sub{font-size:11px;color:var(--text-muted);font-weight:300;}
+.order-btn{display:inline-block;background:var(--gold);color:#ffffff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:8px 16px;border-radius:2px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.order-btn:hover{background:var(--gold-light);}
+
+/* TRACKER */
+.tracker-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.875rem;margin-top:1.75rem;}
+.ts{background:var(--bg-card);border:1px solid var(--gold-border);border-radius:2px;padding:1rem;text-align:center;}
+.ts .tv{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--gold);font-weight:600;}
+.ts .tl{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-top:3px;}
+.prog-wrap{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:0.875rem 1.125rem;margin-top:0.875rem;}
+.prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s;}
+.week-sel{display:flex;align-items:center;gap:1rem;margin:1.5rem 0 1.25rem;justify-content:center;}
+.wnav{width:34px;height:34px;background:var(--bg-card);border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.wnav:hover{background:var(--gold-dim);}
+.wlbl{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--white);font-weight:600;min-width:90px;text-align:center;}
+.dhr{display:grid;grid-template-columns:110px 1fr;gap:5px;margin-bottom:2px;}
+.dhi{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.dh{text-align:center;font-size:8px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);padding:6px 2px;background:var(--bg-card2);border:1px solid var(--border);border-radius:2px 2px 0 0;}
+.tgw{display:grid;grid-template-columns:110px 1fr;gap:5px;margin-bottom:2px;}
+.tcl{display:flex;align-items:center;justify-content:flex-end;padding-right:5px;}
+.cbadge{font-size:9px;font-weight:600;color:var(--gold);text-align:right;line-height:1.3;}
+.cbadge span{display:block;color:var(--text-muted);font-weight:400;font-size:8px;}
+.drow{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.dc{background:var(--bg-card);border:1px solid var(--border);border-top:none;min-height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s;font-size:13px;}
+.dc.sched:hover{background:var(--gold-dim);}
+.dc.taken{background:var(--green-dim);border-color:var(--green-border);}
+.dc.taken::after{content:'✓';color:var(--green);font-weight:700;font-size:14px;}
+.dc.sched:not(.taken)::after{content:'○';color:var(--gold-border);font-size:12px;}
+.dc.rest{background:transparent;border-color:transparent;cursor:default;}
+.dc.rest::after{content:'—';color:#cccccc;font-size:11px;}
+.notes-area{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:0.875rem 1.125rem;margin-top:1.25rem;}
+.nlbl{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;}
+.ta{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.625rem 0.875rem;color:var(--text);font-family:'Montserrat',sans-serif;font-size:12px;font-weight:300;resize:vertical;min-height:60px;outline:none;transition:border-color 0.2s;}
+.ta:focus{border-color:var(--gold-border);}
+.ta::placeholder{color:var(--text-muted);}
+.tact{display:flex;gap:0.75rem;margin-top:1.25rem;flex-wrap:wrap;}
+.abtn{flex:1;min-width:140px;padding:0.8rem 1.25rem;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold-light);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.18s;text-align:center;}
+.abtn:hover{background:rgba(201,168,76,0.22);border-color:var(--gold);}
+.abtn.install-btn{background:rgba(99,179,237,0.1);border-color:var(--blue-border);color:var(--blue);}
+.abtn.install-btn:hover{background:rgba(99,179,237,0.2);}
+.cycle-row{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:0.875rem 1.125rem;flex-wrap:wrap;}
+.cycle-row label{font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);}
+.cycle-row input[type="date"]{background:var(--bg);border:1px solid var(--gold-border);border-radius:2px;padding:5px 10px;color:var(--text);font-size:12px;outline:none;color-scheme:light;}
+.sbadge{display:inline-flex;align-items:center;gap:4px;background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);font-size:9px;font-weight:600;letter-spacing:0.08em;padding:3px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.sbadge.show{opacity:1;}
+
+/* CALENDAR BANNER */
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.07),rgba(99,179,237,0.03));border:1px solid var(--blue-border);border-left:3px solid var(--blue);border-radius:2px;padding:1.1rem 1.5rem;margin-top:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;}
+.cal-banner-left h4{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--blue);margin-bottom:5px;}
+.cal-banner-left p{font-size:11px;color:rgba(99,179,237,0.8);font-weight:300;line-height:1.6;}
+.cal-dl-btn{background:var(--blue);color:#ffffff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 20px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;flex-shrink:0;}
+.cal-dl-btn:hover{opacity:0.88;}
+.abtn.cal-btn{background:rgba(99,179,237,0.1);border-color:var(--blue-border);color:var(--blue);}
+.abtn.cal-btn:hover{background:rgba(99,179,237,0.2);}
+
+.disc{background:#f8f8f8;border:1px solid rgba(139,115,53,0.18);border-radius:2px;padding:1.1rem 1.5rem;margin-top:3rem;font-size:11px;color:#666655;line-height:1.75;font-weight:300;}
+.disc strong{color:var(--gold);font-weight:600;}
+.footer{text-align:center;padding:1.75rem;margin-top:1.5rem;border-top:1px solid var(--gold-border);font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.footer strong{color:var(--gold);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.container>*{animation:fadeUp 0.4s ease both;}
+
+@media(max-width:600px){
+  .deets{grid-template-columns:1fr 1fr;}
+  .dhr{grid-template-columns:80px 1fr;}
+  .tgw{grid-template-columns:80px 1fr;}
+  .bundle-banner,.cal-banner{flex-direction:column;}
+  .supply-card{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-grid"></div>
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Kay <em>Matthiessen</em></h1>
+  <div class="header-focus">Skin &amp; Glow · Antioxidant Support · GH Pulse &amp; Recovery · 8-Week Cycle</div>
+  <div class="inv-badge-row">
+    <div class="inv-badge">Date: <span>April 2026</span></div>
+    <div class="inv-badge">Ref: <span>BLS-KM-0426</span></div>
+    <div class="inv-badge">Compounds: <span>3</span></div>
+    <div class="inv-badge">Cycle: <span>8 Weeks</span></div>
+    <div class="inv-badge">By: <span>BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('invoice',this)">Invoice</button>
+  <button class="nav-tab" onclick="switchTab('protocol',this)">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('supplies',this)">Supplies</button>
+  <button class="nav-tab" onclick="switchTab('tracker',this)">Daily Tracker</button>
+</div>
+
+<div class="container">
+
+<!-- INVOICE TAB -->
+<div id="tab-invoice" class="tab-content active">
+  <div class="bundle-banner">
+    <div class="bundle-banner-left">
+      <h3>Bundle <em>Plus</em> Free BAC Water</h3>
+      <p>All 3 compounds ordered together — 2× 10mL BAC water vials included at no charge ($20 value).</p>
+    </div>
+    <div class="bundle-pill">🎁 BAC Water Free · $20 Value</div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#C9A84C" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="section-title">Order Summary</div>
+    </div>
+    <div class="line-items">
+      <div class="li-row" style="border-color:rgba(249,168,212,0.25);">
+        <div>
+          <div class="li-name">GLOW Blend</div>
+          <div class="li-sub">2 vials · GHK-Cu · BPC-157 · TB-500 · Skin · Collagen · Tissue Repair</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-your">$140</div>
+          <div class="li-save">2 × $70</div>
+        </div>
+      </div>
+      <div class="li-row">
+        <div>
+          <div class="li-name">Glutathione</div>
+          <div class="li-sub">2 vials · Master Antioxidant · Liver Support · Skin Brightening · Detox</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-your">$80</div>
+          <div class="li-save">2 × $40</div>
+        </div>
+      </div>
+      <div class="li-row" style="border-color:rgba(183,148,244,0.2);">
+        <div>
+          <div class="li-name">CJC-1295 / Ipamorelin</div>
+          <div class="li-sub">2 vials · 5mg/5mg Blend · GH Pulse · Deep Sleep · Lean Recovery</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-your">$90</div>
+          <div class="li-save">2 × $45</div>
+        </div>
+      </div>
+      <div class="li-row" style="border-color:var(--green-border);background:rgba(90,184,122,0.04);">
+        <div>
+          <div class="li-name" style="color:var(--green);">Bacteriostatic Water — 10mL × 2</div>
+          <div class="li-sub">Included free · Reconstitution solvent for all 3 compounds · Sterile, preserved</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$20 regular</div>
+          <div class="li-your" style="color:var(--green);">FREE</div>
+          <div class="li-free">🎁 Gift</div>
+        </div>
+      </div>
+    </div>
+    <div class="totals-block" style="margin-top:3px;">
+      <div class="tot-row"><span class="tl">GLOW × 2 vials</span><span class="tv">$140</span></div>
+      <div class="tot-row"><span class="tl">Glutathione × 2 vials</span><span class="tv">$80</span></div>
+      <div class="tot-row"><span class="tl">CJC-1295 / Ipamorelin × 2 vials</span><span class="tv">$90</span></div>
+      <div class="tot-row" style="background:var(--green-dim);border-top:1px solid var(--green-border);">
+        <span class="tl" style="color:var(--green);font-weight:500;">2× 10mL BAC Water (gift)</span>
+        <span class="tv" style="color:var(--green);">FREE · $20 value</span>
+      </div>
+      <div class="tot-row grand">
+        <span class="tl">Total — 8-Week Cycle</span>
+        <span class="tv">$310</span>
+      </div>
+    </div>
+    <div class="note note-gold" style="margin-top:1.25rem;">
+      <h4>✨ Why This Stack Works Together</h4>
+      <p>Three compounds, three distinct lanes — all aimed at the same endpoint: visible skin quality, cleaner recovery, and better sleep-driven repair. <strong>GLOW</strong> drives direct dermal/connective tissue rebuild (GHK-Cu copper peptide for collagen, BPC-157 + TB-500 for tissue repair). <strong>Glutathione</strong> is the body's master antioxidant — it quenches the oxidative stress that ages skin, supports liver detox, and noticeably brightens tone over weeks. <strong>CJC-1295/Ipamorelin</strong> taken pre-bed amplifies the natural nocturnal growth hormone pulse — the same pulse that drives overnight cellular repair, deeper slow-wave sleep, and leaner body composition. Morning peptides for skin and antioxidant defense, evening GH pulse for repair — a clean day-night rhythm.</p>
+    </div>
+  </div>
+  <div class="venmo">
+    <h3>Ready to <em>Order?</em></h3>
+    <p>Send $310 via Venmo — include your name in the note. Ships within 24–48 hours.</p>
+    <a href="https://venmo.com/micahp20" class="venmo-btn">Pay $310 on Venmo</a>
+    <span class="venmo-handle">@micahp20</span>
+  </div>
+  <div class="disc">
+    <strong>Important Notice:</strong> This invoice is for educational and research purposes only and does not constitute medical advice. All compounds are research peptides. Glutathione and CJC-1295/Ipamorelin affect hormonal and metabolic pathways — coordinate with your physician if you are on thyroid, cortisol, or hormone-related medication. Discontinue and seek medical attention if adverse reactions occur.
+  </div>
+</div>
+
+<!-- PROTOCOL TAB -->
+<div id="tab-protocol" class="tab-content">
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 8.5C5.5 8.5 6.5 10.5 8 10.5C9.5 10.5 10.5 8.5 10.5 8.5" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6.5" r="0.75" fill="#C9A84C"/><circle cx="10" cy="6.5" r="0.75" fill="#C9A84C"/></svg>
+      </div>
+      <div class="section-title">Your Compounds</div>
+    </div>
+    <div class="cmp-grid">
+
+      <!-- GLOW -->
+      <div class="cmp-card" style="border-color:rgba(249,168,212,0.3);">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">GLOW</div>
+            <div class="cmp-tag">GHK-Cu · BPC-157 · TB-500 · Skin · Collagen · Tissue Repair</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$140</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">2 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol</div>
+            <div class="ptext">GLOW is a three-compound cosmetic and regenerative blend built around <strong>GHK-Cu</strong> — a copper peptide that activates over 4,000 genes involved in skin remodeling, collagen synthesis, and wound repair. It's widely considered the single most validated peptide for visible skin quality: firmer texture, improved elasticity, reduced fine lines, and faster healing. <strong>BPC-157</strong> layers in angiogenesis (new capillary formation into skin) and connective tissue repair. <strong>TB-500</strong> (Thymosin Beta-4) is the systemic soft-tissue healer — it drives actin-based cellular migration into areas that need repair. Together: rebuild the dermal matrix from underneath while healing at the cellular level. AM fasted dosing maximizes uptake on an empty stomach before the day's oxidative load begins.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">70mg × 2</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">2.5mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon – Fri</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">AM fasted</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to each 70mg vial. Angle the needle against the glass wall to protect the peptide.</li>
+              <li>Swirl gently until fully dissolved. Do not shake — shaking denatures peptides.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 2.5mg per dose</strong></li>
+              <li>Each vial = 20 doses at 10u draw. 2 vials = 40 doses. Mon–Fri × 8 weeks = 40 injection days — full cycle covered exactly.</li>
+              <li>Refrigerate between uses. Use within 30 days of reconstitution.</li>
+            </ol>
+          </div>
+          <div class="note note-gold" style="margin:0;">
+            <h4>✨ What to Expect</h4>
+            <p>Most clients notice skin hydration and tone changes in weeks 2–3, with collagen-driven texture and firmness improvements becoming visible by weeks 5–8. Any pre-existing minor inflammation (redness, irritation) often calms within the first 2 weeks as BPC-157 and TB-500 systemically reduce inflammatory load.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- GLUTATHIONE -->
+      <div class="cmp-card" style="border-color:rgba(58,122,90,0.25);">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">Glutathione</div>
+            <div class="cmp-tag">Master Antioxidant · Liver Support · Skin Brightening · Detox</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--green);font-weight:600;">$80</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">2 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol</div>
+            <div class="ptext">Glutathione is the body's master intracellular antioxidant — it's what your cells actually use to neutralize reactive oxygen species, recycle vitamins C and E, and drive Phase II liver detoxification. Oral glutathione is largely destroyed in the gut, which is why subcutaneous delivery at 180mg is a meaningful step up from supplements. For skin specifically, glutathione inhibits tyrosinase (the enzyme that drives melanin production in response to oxidative stress), which is why consistent dosing produces a visible evening of tone and brightness over 4–8 weeks. Mon/Fri dosing spaces out the 180mg bolus efficiently — higher, less frequent doses outperform daily micro-doses for systemic glutathione because of how it's distributed and reused across tissues.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">1500mg × 2</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">180mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">5 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">60 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon &amp; Fri</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">AM fasted</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>5 mL BAC water</strong> to each 1500mg vial → concentration = <strong>300 mg/mL</strong></li>
+              <li>Swirl gently until fully clear. Glutathione may appear slightly yellow-tinted — this is normal.</li>
+              <li>Draw <strong>60 units (0.60 mL) = 180mg per dose</strong></li>
+              <li>Each vial = ~8 doses. 2 vials = 16 doses. Mon + Fri × 8 weeks = 16 injection days — full cycle covered exactly.</li>
+              <li>Refrigerate. Discard if solution turns deeply orange or cloudy — glutathione is prone to oxidation.</li>
+            </ol>
+          </div>
+          <div class="note note-green" style="margin:0;">
+            <h4>💧 Pro Tip — Stay Hydrated</h4>
+            <p>Glutathione is a potent detox driver. Drink 16–20oz of water in the hour after injection to support Phase II liver clearance. Pair with 500mg vitamin C (oral) earlier in the morning — vitamin C recycles used glutathione back to its active form, noticeably extending its effect.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CJC-1295 / IPAMORELIN -->
+      <div class="cmp-card" style="border-color:rgba(183,148,244,0.25);">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">CJC-1295 / Ipamorelin</div>
+            <div class="cmp-tag">5mg / 5mg Blend · GH Pulse · Deep Sleep · Lean Recovery · PM</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--purple);font-weight:600;">$90</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">2 vials</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol</div>
+            <div class="ptext">CJC-1295/Ipamorelin is the gold-standard "GH pulse" peptide combo — and it works by two complementary mechanisms. <strong>CJC-1295</strong> is a GHRH (growth hormone releasing hormone) analog that tells the pituitary to produce more GH. <strong>Ipamorelin</strong> is a selective ghrelin receptor agonist that triggers the pituitary to <em>release</em> stored GH in a clean, pulsatile pattern — with minimal cortisol or prolactin spillover that older GHRPs caused. Combined, they amplify your body's own natural nighttime GH pulse. Taken pre-bed on an empty stomach, this drives deeper slow-wave (Stage 3/4) sleep, overnight cellular repair, and gradual improvements in body composition, skin quality, and recovery. Critically, this is <strong>not</strong> exogenous HGH — your pituitary is still in control, which is why it's far safer and doesn't shut down your own axis.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">5/5mg × 2</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">0.5mg blend</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon – Fri</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">Before bed</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to each vial → concentration = <strong>5 mg/mL total</strong> (2.5mg CJC + 2.5mg Ipa per mL)</li>
+              <li>Swirl gently until fully clear. Do not shake.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 0.5mg total blend</strong> (0.25mg CJC + 0.25mg Ipamorelin)</li>
+              <li>Each vial = 20 doses at 10u draw. 2 vials = 40 doses. Mon–Fri × 8 weeks = 40 injection days — full cycle covered exactly.</li>
+              <li><strong>Take on an empty stomach</strong> — ideally 2+ hours after last meal, right before bed. Carbs or fats within the hour blunt the GH pulse.</li>
+            </ol>
+          </div>
+          <div class="note note-blue" style="margin:0;">
+            <h4>😴 What to Expect — Pre-Bed Protocol</h4>
+            <p>Most clients report noticeably deeper sleep within the first week — you wake feeling genuinely rested rather than tired. Mild flushing or head-tingling for 5–10 minutes post-injection is normal (histamine-mediated, harmless). By weeks 3–4, morning recovery, skin quality, and lean body composition improvements compound. Dream vividness often increases — a hallmark of improved slow-wave / REM architecture.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCHEDULE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#C9A84C" stroke-width="0.8"/></svg>
+      </div>
+      <div class="section-title">Weekly Injection Schedule</div>
+    </div>
+    <div class="note note-gold">
+      <h4>🌅 AM Fasted · 🌙 PM Pre-Bed — Clean Day/Night Rhythm</h4>
+      <p><strong>Morning (AM fasted):</strong> GLOW daily Mon–Fri. Glutathione Mon &amp; Fri only. <strong>Evening (pre-bed, empty stomach):</strong> CJC/Ipa daily Mon–Fri. Weekends are full rest across all 8 weeks — this gives your body scheduled downtime and prevents receptor desensitization. Schedule is identical weeks 1–8 — no ramping, no titration.</p>
+    </div>
+    <table class="sched-table" style="margin-top:1rem;">
+      <thead><tr><th>Day</th><th>AM (Fasted)</th><th>PM (Pre-Bed)</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><strong style="color:var(--text)">Monday</strong></td>
+        <td><span class="pill glow">GLOW 2.5mg · 10u</span><span class="pill" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green);">Gluta 180mg · 60u</span></td>
+        <td><span class="pill pm">CJC/Ipa 0.5mg · 10u</span></td>
+        <td>Glutathione day. Heaviest AM. Hydrate well.</td></tr>
+        <tr><td><strong style="color:var(--text)">Tuesday</strong></td>
+        <td><span class="pill glow">GLOW 2.5mg · 10u</span></td>
+        <td><span class="pill pm">CJC/Ipa 0.5mg · 10u</span></td>
+        <td>GLOW morning, GH pulse at night.</td></tr>
+        <tr><td><strong style="color:var(--text)">Wednesday</strong></td>
+        <td><span class="pill glow">GLOW 2.5mg · 10u</span></td>
+        <td><span class="pill pm">CJC/Ipa 0.5mg · 10u</span></td>
+        <td>GLOW morning, GH pulse at night.</td></tr>
+        <tr><td><strong style="color:var(--text)">Thursday</strong></td>
+        <td><span class="pill glow">GLOW 2.5mg · 10u</span></td>
+        <td><span class="pill pm">CJC/Ipa 0.5mg · 10u</span></td>
+        <td>GLOW morning, GH pulse at night.</td></tr>
+        <tr><td><strong style="color:var(--text)">Friday</strong></td>
+        <td><span class="pill glow">GLOW 2.5mg · 10u</span><span class="pill" style="background:var(--green-dim);border-color:var(--green-border);color:var(--green);">Gluta 180mg · 60u</span></td>
+        <td><span class="pill pm">CJC/Ipa 0.5mg · 10u</span></td>
+        <td>Second Glutathione day. Close the week strong.</td></tr>
+        <tr><td><strong style="color:var(--text)">Saturday</strong></td>
+        <td><span class="pill off">All off</span></td><td><span class="pill off">All off</span></td>
+        <td>Full rest — receptor reset.</td></tr>
+        <tr><td><strong style="color:var(--text)">Sunday</strong></td>
+        <td><span class="pill off">All off</span></td><td><span class="pill off">All off</span></td>
+        <td>Full rest — receptor reset.</td></tr>
+      </tbody>
+    </table>
+    <div class="note note-blue" style="margin-top:1.25rem;">
+      <h4>💊 Full-Cycle Dose Count — Zero Waste</h4>
+      <p><strong>GLOW:</strong> 40 M–F doses over 8 weeks = exactly 2 vials @ 20 doses each. <strong>Glutathione:</strong> 16 Mon/Fri doses over 8 weeks = exactly 2 vials @ 8 doses each. <strong>CJC/Ipa:</strong> 40 M–F doses over 8 weeks = exactly 2 vials @ 20 doses each. Every vial lands cleanly at the end of the cycle — no waste, no shortage.</p>
+    </div>
+  </div>
+  <div class="disc">
+    <strong>Important Notice:</strong> This protocol is for educational and informational purposes only and does not constitute medical advice. All compounds are research peptides. CJC-1295/Ipamorelin affects pituitary GH output — not recommended if pregnant, nursing, or with active cancer. Glutathione affects liver enzymes and detox pathways — coordinate with your physician if on hepatic medications. Discontinue and seek medical attention if adverse reactions occur.
+  </div>
+</div>
+
+<!-- SUPPLIES TAB -->
+<div id="tab-supplies" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-1 9H3L2 3Z" stroke="#C9A84C" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 3V2a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#C9A84C" stroke-width="1.2"/></svg></div>
+      <div class="section-title">Supplies — Order Before Day 1</div>
+    </div>
+    <div class="note note-gold" style="margin-top:1rem;">
+      <h4>📦 Order These Now</h4>
+      <p>You already have BAC water covered — 2× 10mL included free with your order, which matches your reconstitution needs exactly (2mL GLOW + 5mL Gluta + 2mL CJC = 9mL per refill cycle). You'll need to supply your own syringes, alcohol pads, and sharps container. Order a 200-pack of syringes upfront — with morning and evening injections, you'll use ~56 syringes across the full cycle.</p>
+    </div>
+    <div style="margin-top:1.5rem;">
+      <div class="supply-card"><div><div class="supply-name">Insulin Syringes — 29–31G, 1 mL, 100-pack minimum</div><div class="supply-sub">One per injection. Never reuse. AM + PM dosing = up to 3 shots/day. 100 covers the cycle with buffer; get 200 if you want to stock for next cycle.</div></div><a href="https://a.co/d/04JCzBqF" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card" style="border-color:var(--green-border);background:rgba(90,184,122,0.04);">
+        <div>
+          <div class="supply-name" style="color:var(--green);">✓ Bacteriostatic Water — Included Free (2× 10mL)</div>
+          <div class="supply-sub">You're already covered. 2× 10mL = 20mL total. Reconstitution needs: 2mL GLOW × 2 + 5mL Gluta × 2 + 2mL CJC × 2 = 18mL. Perfect fit.</div>
+        </div>
+        <span class="order-btn" style="background:var(--green);cursor:default;">INCLUDED</span>
+      </div>
+      <div class="supply-card"><div><div class="supply-name">Alcohol Prep Pads — 70% IPA, 200-pack</div><div class="supply-sub">Wipe vial stopper and skin before every injection. 200-pack easily covers the full 8-week cycle.</div></div><a href="https://a.co/d/0fnbd8VV" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card"><div><div class="supply-name">Sharps Container — 1 Quart, FDA-Cleared</div><div class="supply-sub">Used needles go directly in here. Drop off free at any CVS or Walgreens when full.</div></div><a href="https://a.co/d/0jhnMLPg" target="_blank" class="order-btn">Amazon →</a></div>
+      <div class="supply-card"><div><div class="supply-name">Peptide Organizer / Cold Storage</div><div class="supply-sub">3 active vials + refills need organized cold storage. Prevents mix-ups and protects peptides from light and temperature swings.</div></div><a href="https://a.co/d/07HthwLz" target="_blank" class="order-btn">Amazon →</a></div>
+    </div>
+    <div class="note note-gold" style="margin-top:1.5rem;">
+      <h4>❄️ Storage Reminder</h4>
+      <p>All vials refrigerated at 36–46°F before and after reconstitution. Never freeze. Use within 30 days of reconstitution. Glutathione is especially oxidation-sensitive — keep it in the darkest, coldest part of your fridge. Fresh syringe every single draw — no exceptions.</p>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKER TAB -->
+<div id="tab-tracker" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#C9A84C" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#C9A84C" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="section-title">Daily Dose Tracker — 8 Weeks</div>
+    </div>
+
+    <div class="cal-banner">
+      <div class="cal-banner-left">
+        <h4>📅 Download to Your Calendar</h4>
+        <p>Generates all scheduled injection days as reminders — imports into Google Calendar (Android) or Apple Calendar (iOS). Set your cycle start date first, then download.</p>
+      </div>
+      <button class="cal-dl-btn" onclick="downloadICS()">⬇ Download Calendar (.ics)</button>
+    </div>
+
+    <div class="note note-blue" style="margin-top:0.75rem;">
+      <h4>💊 Auto-Saves on Every Tap</h4>
+      <p>Every dose you check saves instantly to your device. GLOW and CJC/Ipa run Mon–Fri. Glutathione Mon &amp; Fri only. Sat &amp; Sun rest days all 8 weeks. Schedule stays identical across weeks 1–8 — no ramps, no changes.</p>
+    </div>
+
+    <div class="cycle-row">
+      <label>Cycle Start Date</label>
+      <input type="date" id="cycleStart" onchange="setCycleStart(this.value)">
+      <span class="sbadge" id="svBadge">✓ Saved</span>
+    </div>
+
+    <div class="tracker-stat-row">
+      <div class="ts"><div class="tv" id="stW">—</div><div class="tl">Week</div></div>
+      <div class="ts"><div class="tv" id="stD">0</div><div class="tl">Doses This Week</div></div>
+      <div class="ts"><div class="tv" id="stP">0%</div><div class="tl">Cycle Complete</div></div>
+    </div>
+    <div class="prog-wrap">
+      <div class="prog-top"><span>8-Week Cycle</span><span id="pLbl">0 / 56 days</span></div>
+      <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:0%"></div></div>
+    </div>
+    <div class="week-sel">
+      <button class="wnav" onclick="changeWeek(-1)">&#8249;</button>
+      <div class="wlbl" id="wLabel">Week 1</div>
+      <button class="wnav" onclick="changeWeek(1)">&#8250;</button>
+    </div>
+    <div id="trackerGrid"></div>
+    <div class="notes-area">
+      <div class="nlbl">Weekly Notes — Skin · Sleep · Energy · Recovery · How You Feel</div>
+      <textarea class="ta" id="wkNotes" placeholder="e.g. Skin feels more hydrated week 2. Sleep noticeably deeper after CJC. Brightness visible by week 4..." oninput="saveNotes()"></textarea>
+    </div>
+    <div class="tact">
+      <button class="abtn" onclick="markAllToday()">✓ Mark All Today</button>
+      <button class="abtn" onclick="clearWeek()">Clear This Week</button>
+      <button class="abtn cal-btn" onclick="downloadICS()">📅 Download Calendar</button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+<div class="footer">Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Kay Matthiessen &nbsp;·&nbsp; 8-Week Protocol · BLS-KM-0426</div>
+
+<script>
+// ICS CALENDAR GENERATOR
+function downloadICS(){
+  var startVal=document.getElementById('cycleStart').value;
+  if(!startVal){
+    alert('Please set your Cycle Start Date first, then download the calendar.');
+    return;
+  }
+  var parts=startVal.split('-');
+  var cycleStart=new Date(parseInt(parts[0]),parseInt(parts[1])-1,parseInt(parts[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsDate(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function makeUID(d,label){return icsDate(d)+'-'+label.replace(/\s+/g,'').replace(/[^a-zA-Z0-9]/g,'')+'-BLS-KM-0426@biolinkedsolutions.com';}
+  var events=[];
+  var dayOfWeekNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var monFri=[1,5];
+  var mf=[1,2,3,4,5];
+  for(var week=1;week<=8;week++){
+    var weekOffset=(week-1)*7;
+    for(var d=0;d<7;d++){
+      var dayDate=new Date(cycleStart);
+      dayDate.setDate(dayDate.getDate()+weekOffset+d);
+      var dow=dayDate.getDay();
+      var amCompounds=[];
+      var pmCompounds=[];
+      if(mf.indexOf(dow)>-1) amCompounds.push('GLOW 2.5mg (10u) — AM fasted');
+      if(monFri.indexOf(dow)>-1) amCompounds.push('Glutathione 180mg (60u) — AM fasted');
+      if(mf.indexOf(dow)>-1) pmCompounds.push('CJC/Ipa 0.5mg (10u) — Before bed, empty stomach');
+      if(amCompounds.length===0 && pmCompounds.length===0) continue;
+      var title='BLS Peptides · Wk'+week+' · '+dayOfWeekNames[dow];
+      var allCompounds=[].concat(amCompounds).concat(pmCompounds);
+      var desc='Week '+week+'\\n\\nAM:\\n'+(amCompounds.join('\\n')||'(none)')+'\\n\\nPM:\\n'+(pmCompounds.join('\\n')||'(none)')+'\\n\\nBioLinked Solutions — Kay Matthiessen Protocol BLS-KM-0426';
+      events.push('BEGIN:VEVENT','UID:'+makeUID(dayDate,'W'+week+'D'+d),'DTSTAMP:'+icsDate(new Date())+'T080000Z','DTSTART;VALUE=DATE:'+icsDate(dayDate),'DTEND;VALUE=DATE:'+icsDate(dayDate),'SUMMARY:'+title,'DESCRIPTION:'+desc,'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:Time to inject — '+allCompounds.length+' compound'+(allCompounds.length>1?'s':''),'END:VALARM','END:VEVENT');
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked Solutions//Kay Matthiessen Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Kay Matthiessen 8-Week Protocol','X-WR-CALDESC:Peptide injection schedule — GLOW · Glutathione · CJC-1295/Ipamorelin','X-APPLE-CALENDAR-COLOR:#C9A84C'].concat(events).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='BLS-Kay-Matthiessen-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+
+// TAB SWITCHING
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.nav-tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='tracker'){renderGrid();updateStats();}
+}
+
+// TRACKER STATE
+var COMPOUNDS=[
+  {id:'glow',  name:'GLOW',    sub:'2.5mg · 10u · AM fasted',     days:[1,2,3,4,5]},
+  {id:'gluta', name:'Gluta',   sub:'180mg · 60u · Mon & Fri AM',  days:[1,5]},
+  {id:'cjcipa',name:'CJC/Ipa', sub:'0.5mg · 10u · PM pre-bed',    days:[1,2,3,4,5]},
+];
+var DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var TOTAL_WEEKS=8, TOTAL_DAYS=56;
+var currentWeek=1, state={}, cycleStartDate=null;
+
+function loadState(){
+  try{var s=localStorage.getItem('kayKM_state');if(s)state=JSON.parse(s);}catch(e){}
+  try{var d=localStorage.getItem('kayKM_start');if(d){cycleStartDate=new Date(d);document.getElementById('cycleStart').value=d;}}catch(e){}
+  updateStats();
+}
+
+function saveState(){
+  try{localStorage.setItem('kayKM_state',JSON.stringify(state));showSaveBadge();}catch(e){}
+}
+
+function showSaveBadge(){
+  var b=document.getElementById('svBadge');
+  b.classList.add('show');
+  clearTimeout(b._tid);
+  b._tid=setTimeout(function(){b.classList.remove('show');},1200);
+}
+
+function saveNotes(){
+  if(!state[currentWeek])state[currentWeek]={};
+  state[currentWeek].__notes=document.getElementById('wkNotes').value;
+  saveState();
+}
+
+function setCycleStart(val){
+  cycleStartDate=val?new Date(val):null;
+  try{localStorage.setItem('kayKM_start',val);}catch(e){}
+  showSaveBadge();
+  updateStats();
+}
+
+function isDoseTaken(w,cid,di){return!!(state[w]&&state[w][cid]&&state[w][cid][di]);}
+
+function toggleDose(w,cid,di){
+  if(!state[w])state[w]={};
+  if(!state[w][cid])state[w][cid]={};
+  state[w][cid][di]=!state[w][cid][di];
+  saveState();
+  renderGrid();
+  updateStats();
+}
+
+function renderGrid(){
+  var container=document.getElementById('trackerGrid');
+  var weekDates=getWeekDates(currentWeek);
+  var html='<div style="margin-bottom:8px;font-size:10px;color:var(--text-muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Week '+currentWeek+' <span style="font-size:9px;color:var(--gold);font-weight:600;letter-spacing:0.08em;margin-left:8px;">· 8-WEEK CYCLE</span></div>';
+  html+='<div class="dhr"><div></div><div class="dhi">';
+  var dayOrder=[1,2,3,4,5,6,0];
+  dayOrder.forEach(function(dow,idx){
+    var dateStr='';
+    if(weekDates&&weekDates[idx])dateStr=weekDates[idx].getDate();
+    html+='<div class="dh">'+DAY_NAMES[dow]+(dateStr?'<br><span style="font-size:8px;font-weight:300;color:#555">'+dateStr+'</span>':'')+'</div>';
+  });
+  html+='</div></div>';
+  COMPOUNDS.forEach(function(c){
+    html+='<div class="tgw"><div class="tcl"><div class="cbadge">'+c.name+'<span>'+c.sub+'</span></div></div><div class="drow">';
+    dayOrder.forEach(function(dow,idx){
+      var taken=isDoseTaken(currentWeek,c.id,idx);
+      if(!c.days.includes(dow)){
+        html+='<div class="dc rest"></div>';
+      }else{
+        html+='<div class="dc sched'+(taken?' taken':'')+'" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+idx+')"></div>';
+      }
+    });
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  document.getElementById('wkNotes').value=(state[currentWeek]&&state[currentWeek].__notes)||'';
+  document.getElementById('wLabel').textContent='Week '+currentWeek;
+}
+
+function getWeekDates(w){
+  if(!cycleStartDate)return null;
+  var start=new Date(cycleStartDate);
+  var day=start.getDay();
+  var diff=(day===0)?-6:(1-day);
+  start.setDate(start.getDate()+diff+(w-1)*7);
+  var dates=[];
+  for(var i=0;i<7;i++){var dd=new Date(start);dd.setDate(dd.getDate()+i);dates.push(dd);}
+  return dates;
+}
+
+function changeWeek(delta){
+  var n=currentWeek+delta;
+  if(n<1||n>TOTAL_WEEKS)return;
+  currentWeek=n;
+  renderGrid();
+}
+
+function markAllToday(){
+  var dow=new Date().getDay();
+  var dayOrder=[1,2,3,4,5,6,0];
+  var di=dayOrder.indexOf(dow);
+  if(di<0)return;
+  if(!state[currentWeek])state[currentWeek]={};
+  COMPOUNDS.forEach(function(c){
+    if(c.days.includes(dow)){
+      if(!state[currentWeek][c.id])state[currentWeek][c.id]={};
+      state[currentWeek][c.id][di]=true;
+    }
+  });
+  saveState();renderGrid();updateStats();
+}
+
+function clearWeek(){
+  if(!confirm('Clear all logs for Week '+currentWeek+'?'))return;
+  var notes=(state[currentWeek]&&state[currentWeek].__notes)||'';
+  state[currentWeek]={};
+  if(notes)state[currentWeek].__notes=notes;
+  saveState();renderGrid();updateStats();
+}
+
+function updateStats(){
+  var weekText='—', pct=0;
+  if(cycleStartDate){
+    var now=new Date();
+    var diff=Math.floor((now-cycleStartDate)/86400000);
+    var cw=Math.min(TOTAL_WEEKS,Math.max(1,Math.floor(diff/7)+1));
+    weekText='Week '+cw;
+    if(currentWeek===1&&cw>1)currentWeek=cw;
+    pct=Math.min(100,Math.round((diff/TOTAL_DAYS)*100));
+    document.getElementById('pFill').style.width=pct+'%';
+    document.getElementById('pLbl').textContent=Math.min(diff+1,TOTAL_DAYS)+' / '+TOTAL_DAYS+' days';
+    document.getElementById('stP').textContent=pct+'%';
+  }
+  document.getElementById('stW').textContent=weekText;
+  var dc=0, sc=0;
+  var dayOrder=[1,2,3,4,5,6,0];
+  dayOrder.forEach(function(dow,idx){
+    COMPOUNDS.forEach(function(c){
+      if(c.days.includes(dow)){sc++;if(isDoseTaken(currentWeek,c.id,idx))dc++;}
+    });
+  });
+  document.getElementById('stD').textContent=dc+'/'+sc;
+}
+
+loadState();
+if(document.getElementById('tab-tracker').classList.contains('active')){renderGrid();}
+</script>
+<style>
+.bl-nav{background:#fff!important;border-bottom:1px solid #eaeaea!important}
+.bl-nav-logo-main{color:#1a1a1a!important}.bl-nav-logo-sub{color:#777!important}
+.bl-nav-link{color:#444!important}.bl-nav-link:hover,.bl-nav-link.active{color:#8B7335!important;background:rgba(139,115,53,0.07)!important}
+.bl-nav-dropdown-menu{background:#fff!important;border-color:#eaeaea!important}
+.bl-nav-dropdown-item{color:#444!important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8!important;color:#8B7335!important}
+.bl-nav-mobile-menu{background:#fff!important}.bl-nav-mobile-link{color:#444!important;border-bottom-color:#eaeaea!important}
+.bl-nav-mobile-btn{color:#1a1a1a!important}.bl-nav-mobile-section{color:#8B7335!important}
+</style>
+<script src="/nav.js" defer></script>
+</body>
+</html>
