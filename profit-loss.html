@@ -100,11 +100,15 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .section-title { font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
 
 /* Tables (shared) */
-.table-wrap { background: var(--surface); border: 1px solid var(--gold-border); border-radius: 10px; overflow: hidden; margin-bottom: 24px; }
-.data-table { width: 100%; border-collapse: collapse; }
-.data-table th { background: var(--surface2); border-bottom: 1px solid var(--gold-border); padding: 12px 16px; text-align: left; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.table-wrap { background: var(--surface); border: 1px solid var(--gold-border); border-radius: 10px; margin-bottom: 24px; }
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.data-table th { background: var(--surface2); border-bottom: 1px solid var(--gold-border); padding: 12px 16px; text-align: left; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); font-weight: 600; position: sticky; top: 120px; z-index: 5; }
+.data-table thead tr:first-child th:first-child { border-top-left-radius: 10px; }
+.data-table thead tr:first-child th:last-child  { border-top-right-radius: 10px; }
+.data-table tbody tr:last-child td:first-child  { border-bottom-left-radius: 10px; }
+.data-table tbody tr:last-child td:last-child   { border-bottom-right-radius: 10px; }
 .data-table th:last-child { text-align: center; }
-.data-table th.sortable { cursor: pointer; user-select: none; transition: color 0.15s, background 0.15s; position: relative; padding-right: 28px; }
+.data-table th.sortable { cursor: pointer; user-select: none; transition: color 0.15s, background 0.15s; padding-right: 28px; }
 .data-table th.sortable:hover { color: var(--gold); background: rgba(212,175,55,0.06); }
 .data-table th.sortable::after { content: '⇅'; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11px; opacity: 0.4; letter-spacing: 0; }
 .data-table th.sortable.sort-asc::after { content: '↑'; opacity: 1; color: var(--gold); font-size: 13px; font-weight: 700; }
@@ -242,6 +246,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   .toolbar { gap: 8px; flex-direction: column; align-items: stretch; }
   .search-wrap { max-width: 100%; }
   .data-table th, .data-table td { padding: 11px 10px; font-size: 12px; }
+  .data-table th { top: 114px; }
   .cell-name { font-size: 15px; }
   .hide-mob { display: none !important; }
   .form-grid, .form-grid2 { grid-template-columns: 1fr; }
@@ -314,6 +319,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       <button class="tab-btn" data-tab="products" onclick="switchTab('products',this)">🧪 Products</button>
       <button class="tab-btn" data-tab="orders" onclick="switchTab('orders',this)">📥 Orders</button>
       <button class="tab-btn" data-tab="sales" onclick="switchTab('sales',this)">💰 Sales</button>
+      <button class="tab-btn" data-tab="reports" onclick="switchTab('reports',this)">📊 Reports</button>
     </div>
 
     <!-- INVENTORY TAB -->
@@ -399,13 +405,17 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 
     <!-- ORDERS TAB -->
     <div class="tab-panel" id="tab-orders">
-      <div class="section-header">
-        <div class="section-title">Purchase Orders (COGS)</div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="ordersSearch" placeholder="Search vendor, product, note…" oninput="renderOrders()">
+        </div>
       </div>
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
             <th class="sortable" data-table="orders" data-col="name" data-type="text">Product</th>
+            <th class="sortable" data-table="orders" data-col="vendor" data-type="text">Vendor</th>
             <th class="sortable" data-table="orders" data-col="date" data-type="date">Date</th>
             <th class="sortable" data-table="orders" data-col="qty" data-type="num">Qty</th>
             <th class="sortable hide-mob" data-table="orders" data-col="unitCost" data-type="num">Unit Cost</th>
@@ -420,13 +430,17 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 
     <!-- SALES TAB -->
     <div class="tab-panel" id="tab-sales">
-      <div class="section-header">
-        <div class="section-title">Sales Log</div>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="salesSearch" placeholder="Search customer, product, note…" oninput="renderSales()">
+        </div>
       </div>
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
             <th class="sortable" data-table="sales" data-col="name" data-type="text">Product</th>
+            <th class="sortable" data-table="sales" data-col="customer" data-type="text">Customer</th>
             <th class="sortable" data-table="sales" data-col="date" data-type="date">Date</th>
             <th class="sortable" data-table="sales" data-col="qty" data-type="num">Qty</th>
             <th class="sortable hide-mob" data-table="sales" data-col="price" data-type="num">Price</th>
@@ -435,6 +449,58 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
             <th style="text-align:center;">Del</th>
           </tr></thead>
           <tbody id="salesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS TAB -->
+    <div class="tab-panel" id="tab-reports">
+      <div class="filter-bar">
+        <span class="filter-label">From</span>
+        <input type="date" class="date-input" id="reportFrom" onchange="renderReports()">
+        <span class="filter-label">To</span>
+        <input type="date" class="date-input" id="reportTo" onchange="renderReports()">
+        <button class="btn btn-ghost btn-sm" onclick="clearReportDates()">Clear</button>
+      </div>
+
+      <div class="section-header"><div class="section-title">💰 Top Customers — Who's Spending Most With You</div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Customer</th>
+            <th>Orders</th>
+            <th>Vials</th>
+            <th>Total Spend</th>
+            <th class="hide-mob">Last Purchase</th>
+          </tr></thead>
+          <tbody id="topCustomersBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-header"><div class="section-title">📥 Top Vendors — Who You Spend Most With</div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Vendor</th>
+            <th>Orders</th>
+            <th>Vials</th>
+            <th>Total Paid</th>
+            <th class="hide-mob">Last Order</th>
+          </tr></thead>
+          <tbody id="topVendorsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-header"><div class="section-title">🧊 Dead Stock — On Hand, No Sales In Range</div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th>Item</th>
+            <th>Vials On Hand</th>
+            <th class="hide-mob">Vial Size</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="deadStockBody"></tbody>
         </table>
       </div>
     </div>
@@ -498,6 +564,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       <div class="form-group"><label class="form-label">Your Cost / Vial ($)</label><input class="form-input" id="pCost" type="number" min="0" step="0.01" placeholder="0.00"><div class="form-hint">What you pay</div></div>
       <div class="form-group"><label class="form-label">Sale Price / Vial ($)</label><input class="form-input" id="pSale" type="number" min="0" step="0.01" placeholder="0.00"><div class="form-hint">What you charge</div></div>
     </div>
+    <div class="form-group"><label class="form-label">Linked Inventory Item</label><select class="form-select" id="pInventory"><option value="">— None (don't auto-sync stock) —</option></select><div class="form-hint">When linked, logging a sale auto-decreases this inventory item; logging an order auto-increases it.</div></div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('productModal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveProduct()">Save Product</button>
@@ -511,12 +578,14 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     <button class="modal-close" onclick="closeModal('orderModal')">✕</button>
     <div class="modal-title">Log <em>Order</em></div>
     <div class="form-group"><label class="form-label">Product *</label><select class="form-select" id="oProduct" onchange="fillOrderCost()"></select></div>
+    <div class="form-group"><label class="form-label">Vendor</label><input class="form-input" id="oVendor" list="vendorList" placeholder="Supplier name"><datalist id="vendorList"></datalist></div>
     <div class="form-grid2">
       <div class="form-group"><label class="form-label">Date *</label><input class="form-input" id="oDate" type="date"></div>
       <div class="form-group"><label class="form-label">Qty (Vials) *</label><input class="form-input" id="oQty" type="number" min="1" placeholder="10"></div>
     </div>
     <div class="form-group"><label class="form-label">Unit Cost / Vial ($)</label><input class="form-input" id="oUnitCost" type="number" min="0" step="0.01" placeholder="Auto-fills from product"></div>
-    <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="oNote" placeholder="Vendor, lot #, etc."></div>
+    <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="oNote" placeholder="Lot #, PO #, etc."></div>
+    <div class="form-group" id="oSyncHint" style="font-size:11px;color:var(--muted);margin-top:-6px;">—</div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('orderModal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveOrder()">Log Order</button>
@@ -530,12 +599,14 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     <button class="modal-close" onclick="closeModal('saleModal')">✕</button>
     <div class="modal-title">Log <em>Sale</em></div>
     <div class="form-group"><label class="form-label">Product *</label><select class="form-select" id="sProduct" onchange="fillSalePrice()"></select></div>
+    <div class="form-group"><label class="form-label">Customer</label><input class="form-input" id="sCustomer" list="customerList" placeholder="Customer name"><datalist id="customerList"></datalist></div>
     <div class="form-grid2">
       <div class="form-group"><label class="form-label">Date *</label><input class="form-input" id="sDate" type="date"></div>
       <div class="form-group"><label class="form-label">Qty (Vials) *</label><input class="form-input" id="sQty" type="number" min="1" placeholder="1"></div>
     </div>
     <div class="form-group"><label class="form-label">Price / Vial ($)</label><input class="form-input" id="sPrice" type="number" min="0" step="0.01" placeholder="Auto-fills from product"></div>
-    <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="sNote" placeholder="Client name, order #, etc."></div>
+    <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="sNote" placeholder="Order #, lot, etc."></div>
+    <div class="form-group" id="sSyncHint" style="font-size:11px;color:var(--muted);margin-top:-6px;">—</div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('saleModal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSale()">Log Sale</button>
@@ -631,9 +702,9 @@ async function loadAll() {
       status: r.status || 'in-stock',
       addedAt: new Date(r.created_at).getTime()
     }));
-    products = prods.map(r => ({ id: r.id, name: r.name, cost: parseFloat(r.cost) || 0, sale: parseFloat(r.sale) || 0 }));
-    orders = ords.map(r => ({ id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, unitCost: parseFloat(r.unit_cost) || 0, note: r.note || '' }));
-    sales = sls.map(r => ({ id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, price: parseFloat(r.price) || 0, note: r.note || '' }));
+    products = prods.map(r => ({ id: r.id, name: r.name, cost: parseFloat(r.cost) || 0, sale: parseFloat(r.sale) || 0, inventoryId: r.inventory_id || null }));
+    orders = ords.map(r => ({ id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, unitCost: parseFloat(r.unit_cost) || 0, note: r.note || '', vendor: r.vendor || '' }));
+    sales = sls.map(r => ({ id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, price: parseFloat(r.price) || 0, note: r.note || '', customer: r.customer || '' }));
     setSyncStatus('synced', 'Synced');
     updateLastUpdated();
   } catch(e) {
@@ -669,9 +740,11 @@ function switchTab(name, btn) {
     overview:  '＋ Log Sale',
     products:  '＋ Add Product',
     orders:    '＋ Log Order',
-    sales:     '＋ Log Sale'
+    sales:     '＋ Log Sale',
+    reports:   '＋ Log Sale'
   };
   primary.textContent = labels[name] || '＋ Add';
+  primary.style.display = name === 'reports' ? 'none' : 'inline-flex';
 }
 
 function primaryActionClick() {
@@ -719,7 +792,7 @@ document.addEventListener('click', (e) => {
    MASTER RENDER
    ═══════════════════════════════════════════════ */
 function renderAll() { renderInventory(); renderPL(); }
-function renderPL()  { renderPLStats(); renderOverview(); renderProducts(); renderOrders(); renderSales(); updateSortIndicators(); }
+function renderPL()  { renderPLStats(); renderOverview(); renderProducts(); renderOrders(); renderSales(); renderReports(); updateSortIndicators(); }
 
 /* ═══════════════════════════════════════════════
    INVENTORY RENDERING
@@ -1106,10 +1179,14 @@ function renderProducts() {
 
 function renderOrders() {
   const tbody = document.getElementById('ordersBody');
-  if (!orders.length) { tbody.innerHTML = emptyRow(7, '📥', 'No orders logged', 'Log purchase orders to track your COGS'); return; }
+  const search = (document.getElementById('ordersSearch')?.value || '').toLowerCase().trim();
+  if (!orders.length) { tbody.innerHTML = emptyRow(8, '📥', 'No orders logged', 'Log purchase orders to track your COGS'); return; }
   let rows = orders.map(o => ({ ...o, total: o.unitCost * o.qty, name: pName(o.productId).toLowerCase() }));
+  if (search) rows = rows.filter(r => r.name.includes(search) || (r.vendor || '').toLowerCase().includes(search) || (r.note || '').toLowerCase().includes(search));
+  if (!rows.length) { tbody.innerHTML = emptyRow(8, '🔍', 'No matches', 'Try a different search term'); return; }
   rows = sortRows(rows, 'orders', {
     name:     r => r.name,
+    vendor:   r => (r.vendor || '').toLowerCase(),
     date:     r => new Date(r.date).getTime(),
     qty:      r => r.qty,
     unitCost: r => r.unitCost,
@@ -1117,6 +1194,7 @@ function renderOrders() {
   });
   tbody.innerHTML = rows.map(o => `<tr>
     <td><div class="cell-name">${esc(pName(o.productId))}</div></td>
+    <td style="font-weight:500;">${o.vendor ? esc(o.vendor) : '<span style="color:var(--muted2);">—</span>'}</td>
     <td style="color:var(--text2);">${fmtDate(o.date)}</td>
     <td style="font-weight:600;">${o.qty}</td>
     <td class="cell-money hide-mob">${fmt(o.unitCost)}</td>
@@ -1128,17 +1206,22 @@ function renderOrders() {
 
 function renderSales() {
   const tbody = document.getElementById('salesBody');
-  if (!sales.length) { tbody.innerHTML = emptyRow(7, '💰', 'No sales logged', 'Log a sale to start tracking revenue'); return; }
+  const search = (document.getElementById('salesSearch')?.value || '').toLowerCase().trim();
+  if (!sales.length) { tbody.innerHTML = emptyRow(8, '💰', 'No sales logged', 'Log a sale to start tracking revenue'); return; }
   let rows = sales.map(s => ({ ...s, total: s.price * s.qty, name: pName(s.productId).toLowerCase() }));
+  if (search) rows = rows.filter(r => r.name.includes(search) || (r.customer || '').toLowerCase().includes(search) || (r.note || '').toLowerCase().includes(search));
+  if (!rows.length) { tbody.innerHTML = emptyRow(8, '🔍', 'No matches', 'Try a different search term'); return; }
   rows = sortRows(rows, 'sales', {
-    name:  r => r.name,
-    date:  r => new Date(r.date).getTime(),
-    qty:   r => r.qty,
-    price: r => r.price,
-    total: r => r.total
+    name:     r => r.name,
+    customer: r => (r.customer || '').toLowerCase(),
+    date:     r => new Date(r.date).getTime(),
+    qty:      r => r.qty,
+    price:    r => r.price,
+    total:    r => r.total
   });
   tbody.innerHTML = rows.map(s => `<tr>
     <td><div class="cell-name">${esc(pName(s.productId))}</div></td>
+    <td style="font-weight:500;">${s.customer ? esc(s.customer) : '<span style="color:var(--muted2);">—</span>'}</td>
     <td style="color:var(--text2);">${fmtDate(s.date)}</td>
     <td style="font-weight:600;">${s.qty}</td>
     <td class="cell-money hide-mob">${fmt(s.price)}</td>
@@ -1149,8 +1232,112 @@ function renderSales() {
 }
 
 /* ═══════════════════════════════════════════════
+   REPORTS
+   ═══════════════════════════════════════════════ */
+function reportInRange(d) {
+  const from = document.getElementById('reportFrom')?.value;
+  const to = document.getElementById('reportTo')?.value;
+  if (!from && !to) return true;
+  const dt = new Date(d);
+  if (from && dt < new Date(from)) return false;
+  if (to && dt > new Date(to)) return false;
+  return true;
+}
+function clearReportDates() {
+  document.getElementById('reportFrom').value = '';
+  document.getElementById('reportTo').value = '';
+  renderReports();
+}
+
+function renderReports() {
+  renderTopCustomers();
+  renderTopVendors();
+  renderDeadStock();
+}
+
+function renderTopCustomers() {
+  const tbody = document.getElementById('topCustomersBody');
+  const fs = sales.filter(s => reportInRange(s.date) && s.customer);
+  if (!fs.length) { tbody.innerHTML = emptyRow(5, '💰', 'No customer data', 'Log sales with a customer name to see who\'s spending most'); return; }
+  const map = {};
+  fs.forEach(s => {
+    const key = s.customer.trim();
+    if (!map[key]) map[key] = { name: key, orders: 0, vials: 0, spend: 0, last: '' };
+    map[key].orders += 1;
+    map[key].vials += s.qty;
+    map[key].spend += s.qty * s.price;
+    if (!map[key].last || s.date > map[key].last) map[key].last = s.date;
+  });
+  const rows = Object.values(map).sort((a, b) => b.spend - a.spend);
+  tbody.innerHTML = rows.map(r => `<tr>
+    <td><div class="cell-name">${esc(r.name)}</div></td>
+    <td style="font-weight:600;">${r.orders}</td>
+    <td style="font-weight:600;">${r.vials}</td>
+    <td class="cell-money c-green">${fmt(r.spend)}</td>
+    <td class="hide-mob" style="color:var(--muted);">${fmtDate(r.last)}</td>
+  </tr>`).join('');
+}
+
+function renderTopVendors() {
+  const tbody = document.getElementById('topVendorsBody');
+  const fo = orders.filter(o => reportInRange(o.date) && o.vendor);
+  if (!fo.length) { tbody.innerHTML = emptyRow(5, '📥', 'No vendor data', 'Log orders with a vendor name to see who you spend most with'); return; }
+  const map = {};
+  fo.forEach(o => {
+    const key = o.vendor.trim();
+    if (!map[key]) map[key] = { name: key, orders: 0, vials: 0, spend: 0, last: '' };
+    map[key].orders += 1;
+    map[key].vials += o.qty;
+    map[key].spend += o.qty * o.unitCost;
+    if (!map[key].last || o.date > map[key].last) map[key].last = o.date;
+  });
+  const rows = Object.values(map).sort((a, b) => b.spend - a.spend);
+  tbody.innerHTML = rows.map(r => `<tr>
+    <td><div class="cell-name">${esc(r.name)}</div></td>
+    <td style="font-weight:600;">${r.orders}</td>
+    <td style="font-weight:600;">${r.vials}</td>
+    <td class="cell-money c-red">${fmt(r.spend)}</td>
+    <td class="hide-mob" style="color:var(--muted);">${fmtDate(r.last)}</td>
+  </tr>`).join('');
+}
+
+function renderDeadStock() {
+  const tbody = document.getElementById('deadStockBody');
+  if (!items.length) { tbody.innerHTML = emptyRow(4, '🧊', 'No inventory', 'Add inventory items first'); return; }
+  const fs = sales.filter(s => reportInRange(s.date));
+  const soldInvIds = new Set();
+  fs.forEach(s => {
+    const p = products.find(p => String(p.id) === String(s.productId));
+    if (p && p.inventoryId) soldInvIds.add(String(p.inventoryId));
+  });
+  const dead = items.filter(i => i.vials > 0 && !soldInvIds.has(String(i.id)));
+  if (!dead.length) { tbody.innerHTML = emptyRow(4, '✅', 'Nothing gathering dust', 'Every item with stock had at least one sale in range'); return; }
+  dead.sort((a, b) => b.vials - a.vials);
+  tbody.innerHTML = dead.map(i => {
+    const st = getStatus(i);
+    return `<tr>
+      <td><div class="cell-name">${esc(i.name)}</div></td>
+      <td style="font-weight:600;">${i.vials}</td>
+      <td class="hide-mob" style="color:var(--text2);">${esc(i.vialSize || '—')}</td>
+      <td><span class="status-badge ${statusClass(st)}">${statusLabel(st)}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
    P&L ACTIONS
    ═══════════════════════════════════════════════ */
+function populateInventorySelect(selectedId) {
+  const sel = document.getElementById('pInventory');
+  const opts = ['<option value="">— None (don\'t auto-sync stock) —</option>']
+    .concat(items
+      .slice()
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(i => `<option value="${i.id}">${esc(i.name)} (${i.vials} vials)</option>`));
+  sel.innerHTML = opts.join('');
+  sel.value = selectedId != null ? String(selectedId) : '';
+}
+
 function openProductModal(id) {
   editProductId = id || null;
   if (id) {
@@ -1159,11 +1346,13 @@ function openProductModal(id) {
     document.getElementById('pName').value = p.name;
     document.getElementById('pCost').value = p.cost || '';
     document.getElementById('pSale').value = p.sale || '';
+    populateInventorySelect(p.inventoryId);
   } else {
     document.getElementById('productModalTitle').innerHTML = 'Add <em>Product</em>';
     document.getElementById('pName').value = '';
     document.getElementById('pCost').value = '';
     document.getElementById('pSale').value = '';
+    populateInventorySelect(null);
   }
   openModal('productModal');
   setTimeout(() => document.getElementById('pName').focus(), 100);
@@ -1173,16 +1362,18 @@ async function saveProduct() {
   const name = document.getElementById('pName').value.trim();
   const cost = parseFloat(document.getElementById('pCost').value) || 0;
   const sale = parseFloat(document.getElementById('pSale').value) || 0;
+  const invVal = document.getElementById('pInventory').value;
+  const inventoryId = invVal ? (isNaN(parseInt(invVal)) ? invVal : parseInt(invVal)) : null;
   if (!name) { document.getElementById('pName').focus(); return; }
   setSyncStatus('syncing', 'Saving…');
   try {
     if (editProductId) {
-      await supa('pl_products', 'PATCH', { name, cost, sale }, `?id=eq.${editProductId}`);
+      await supa('pl_products', 'PATCH', { name, cost, sale, inventory_id: inventoryId }, `?id=eq.${editProductId}`);
       const p = products.find(p => String(p.id) === String(editProductId));
-      if (p) Object.assign(p, { name, cost, sale });
+      if (p) Object.assign(p, { name, cost, sale, inventoryId });
     } else {
-      const res = await supa('pl_products', 'POST', { name, cost, sale });
-      if (res && res[0]) products.push({ id: res[0].id, name, cost, sale });
+      const res = await supa('pl_products', 'POST', { name, cost, sale, inventory_id: inventoryId });
+      if (res && res[0]) products.push({ id: res[0].id, name, cost, sale, inventoryId });
     }
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
@@ -1208,17 +1399,32 @@ function openOrderModal() {
   fillOrderCost();
   document.getElementById('oDate').value = today();
   document.getElementById('oQty').value = '1';
+  document.getElementById('oVendor').value = '';
   document.getElementById('oNote').value = '';
+  const vlist = [...new Set(orders.map(o => o.vendor).filter(Boolean))].sort();
+  document.getElementById('vendorList').innerHTML = vlist.map(v => `<option value="${esc(v)}">`).join('');
   openModal('orderModal');
 }
 function fillOrderCost() {
   const id = document.getElementById('oProduct').value;
   const p = products.find(p => String(p.id) === String(id));
   if (p && p.cost) document.getElementById('oUnitCost').value = p.cost;
+  updateOrderSyncHint();
+}
+function updateOrderSyncHint() {
+  const id = document.getElementById('oProduct').value;
+  const p = products.find(p => String(p.id) === String(id));
+  const hint = document.getElementById('oSyncHint');
+  if (!p || !p.inventoryId) { hint.textContent = 'Not linked to inventory — stock won\'t auto-update. Edit product to link.'; hint.style.color = 'var(--muted)'; return; }
+  const item = items.find(i => String(i.id) === String(p.inventoryId));
+  if (!item) { hint.textContent = 'Linked inventory item missing.'; hint.style.color = 'var(--red)'; return; }
+  hint.textContent = `✓ Will add to inventory: ${item.name} (${item.vials} vials → +qty)`;
+  hint.style.color = 'var(--green)';
 }
 
 async function saveOrder() {
   const productId = document.getElementById('oProduct').value;
+  const vendor = document.getElementById('oVendor').value.trim();
   const date = document.getElementById('oDate').value;
   const qty = parseInt(document.getElementById('oQty').value) || 0;
   const unitCost = parseFloat(document.getElementById('oUnitCost').value) || 0;
@@ -1226,21 +1432,24 @@ async function saveOrder() {
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
   try {
-    const res = await supa('pl_orders', 'POST', { product_id: productId, date, qty, unit_cost: unitCost, note: note || null });
-    if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note });
+    const res = await supa('pl_orders', 'POST', { product_id: productId, date, qty, unit_cost: unitCost, note: note || null, vendor: vendor || null });
+    if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note, vendor });
+    await adjustInventoryForProduct(productId, +qty, `order +${qty}${vendor ? ' · ' + vendor : ''}`);
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
-  } catch(e) { setSyncStatus('error', 'Error'); }
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); }
   closeModal('orderModal');
-  renderPL();
+  renderAll();
 }
 
 async function deleteOrder(id) {
+  const o = orders.find(o => String(o.id) === String(id));
   showConfirm('Delete this order?', async () => {
     try {
       await supa('pl_orders', 'DELETE', null, `?id=eq.${id}`);
-      orders = orders.filter(o => String(o.id) !== String(id));
-      renderPL();
+      orders = orders.filter(x => String(x.id) !== String(id));
+      if (o) await adjustInventoryForProduct(o.productId, -o.qty, `order deleted (−${o.qty})`);
+      renderAll();
     } catch(e) { console.error(e); }
   });
 }
@@ -1252,17 +1461,32 @@ function openSaleModal() {
   fillSalePrice();
   document.getElementById('sDate').value = today();
   document.getElementById('sQty').value = '1';
+  document.getElementById('sCustomer').value = '';
   document.getElementById('sNote').value = '';
+  const clist = [...new Set(sales.map(s => s.customer).filter(Boolean))].sort();
+  document.getElementById('customerList').innerHTML = clist.map(c => `<option value="${esc(c)}">`).join('');
   openModal('saleModal');
 }
 function fillSalePrice() {
   const id = document.getElementById('sProduct').value;
   const p = products.find(p => String(p.id) === String(id));
   if (p && p.sale) document.getElementById('sPrice').value = p.sale;
+  updateSaleSyncHint();
+}
+function updateSaleSyncHint() {
+  const id = document.getElementById('sProduct').value;
+  const p = products.find(p => String(p.id) === String(id));
+  const hint = document.getElementById('sSyncHint');
+  if (!p || !p.inventoryId) { hint.textContent = 'Not linked to inventory — stock won\'t auto-update. Edit product to link.'; hint.style.color = 'var(--muted)'; return; }
+  const item = items.find(i => String(i.id) === String(p.inventoryId));
+  if (!item) { hint.textContent = 'Linked inventory item missing.'; hint.style.color = 'var(--red)'; return; }
+  hint.textContent = `✓ Will subtract from inventory: ${item.name} (${item.vials} vials → −qty)`;
+  hint.style.color = item.vials > 0 ? 'var(--green)' : 'var(--amber)';
 }
 
 async function saveSale() {
   const productId = document.getElementById('sProduct').value;
+  const customer = document.getElementById('sCustomer').value.trim();
   const date = document.getElementById('sDate').value;
   const qty = parseInt(document.getElementById('sQty').value) || 0;
   const price = parseFloat(document.getElementById('sPrice').value) || 0;
@@ -1270,23 +1494,43 @@ async function saveSale() {
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
   try {
-    const res = await supa('pl_sales', 'POST', { product_id: productId, date, qty, price, note: note || null });
-    if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note });
+    const res = await supa('pl_sales', 'POST', { product_id: productId, date, qty, price, note: note || null, customer: customer || null });
+    if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note, customer });
+    await adjustInventoryForProduct(productId, -qty, `sale −${qty}${customer ? ' · ' + customer : ''}`);
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
-  } catch(e) { setSyncStatus('error', 'Error'); }
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); }
   closeModal('saleModal');
-  renderPL();
+  renderAll();
 }
 
 async function deleteSale(id) {
+  const s = sales.find(s => String(s.id) === String(id));
   showConfirm('Delete this sale?', async () => {
     try {
       await supa('pl_sales', 'DELETE', null, `?id=eq.${id}`);
-      sales = sales.filter(s => String(s.id) !== String(id));
-      renderPL();
+      sales = sales.filter(x => String(x.id) !== String(id));
+      if (s) await adjustInventoryForProduct(s.productId, +s.qty, `sale deleted (+${s.qty})`);
+      renderAll();
     } catch(e) { console.error(e); }
   });
+}
+
+/* Shared: adjust linked inventory when a sale/order happens */
+async function adjustInventoryForProduct(productId, delta, reason) {
+  const p = products.find(p => String(p.id) === String(productId));
+  if (!p || !p.inventoryId) return;
+  const item = items.find(i => String(i.id) === String(p.inventoryId));
+  if (!item) return;
+  const oldV = item.vials;
+  item.vials = Math.max(0, item.vials + delta);
+  if (item.status !== 'ordered') {
+    item.status = item.vials === 0 ? 'out' : item.vials <= 3 ? 'low' : 'in-stock';
+  }
+  try {
+    await saveItemToSupabase(item);
+    addLog(`${item.name}: ${oldV} → ${item.vials} vials · ${reason}`, delta < 0 ? 'var(--red)' : 'var(--green)');
+  } catch(e) { console.error('Inventory sync failed', e); }
 }
 
 /* ═══════════════════════════════════════════════
