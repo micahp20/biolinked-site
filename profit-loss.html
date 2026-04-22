@@ -1541,9 +1541,29 @@ async function deleteSale(id) {
 /* Shared: adjust linked inventory when a sale/order happens */
 async function adjustInventoryForProduct(productId, delta, reason) {
   const p = products.find(p => String(p.id) === String(productId));
-  if (!p || !p.inventoryId) return;
-  const item = items.find(i => String(i.id) === String(p.inventoryId));
-  if (!item) return;
+  if (!p) { console.warn('adjustInventory: no product', productId); return; }
+  // Fallback: if no explicit link, try to match inventory by normalized name.
+  let item = null;
+  if (p.inventoryId) {
+    item = items.find(i => String(i.id) === String(p.inventoryId));
+  }
+  if (!item) {
+    const norm = s => (s || '').toLowerCase().replace(/[\s\-–—_:]+/g, '').replace(/\d+(\.\d+)?(mg|mcg|iu|ml)s?\b/g, '').trim();
+    const pn = norm(p.name);
+    if (pn) item = items.find(i => {
+      const n = norm(i.name);
+      return n && (n === pn || n.startsWith(pn) || pn.startsWith(n));
+    });
+    if (item && !p.inventoryId) {
+      // Opportunistically persist the link for next time
+      p.inventoryId = item.id;
+      supa('pl_products', 'PATCH', { inventory_id: item.id }, `?id=eq.${p.id}`).catch(() => {});
+    }
+  }
+  if (!item) {
+    alert(`⚠️ Sale saved, but inventory NOT adjusted.\n\nProduct "${p.name}" isn't linked to an inventory item and no matching name was found.\n\nFix: Products tab → Edit this product → pick from "Linked Inventory Item" → Save.`);
+    return;
+  }
   const oldV = item.vials;
   item.vials = Math.max(0, item.vials + delta);
   if (item.status !== 'ordered') {
@@ -1552,7 +1572,10 @@ async function adjustInventoryForProduct(productId, delta, reason) {
   try {
     await saveItemToSupabase(item);
     addLog(`${item.name}: ${oldV} → ${item.vials} vials · ${reason}`, delta < 0 ? 'var(--red)' : 'var(--green)');
-  } catch(e) { console.error('Inventory sync failed', e); }
+  } catch(e) {
+    console.error('Inventory sync failed', e);
+    alert(`⚠️ Sale saved, but inventory save failed.\n\nError: ${e.message || e}`);
+  }
 }
 
 /* ═══════════════════════════════════════════════
