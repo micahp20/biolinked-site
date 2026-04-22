@@ -703,8 +703,14 @@ async function loadAll() {
       addedAt: new Date(r.created_at).getTime()
     }));
     products = prods.map(r => ({ id: r.id, name: r.name, cost: parseFloat(r.cost) || 0, sale: parseFloat(r.sale) || 0, inventoryId: r.inventory_id || null }));
-    orders = ords.map(r => ({ id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, unitCost: parseFloat(r.unit_cost) || 0, note: r.note || '', vendor: r.vendor || '' }));
-    sales = sls.map(r => ({ id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, price: parseFloat(r.price) || 0, note: r.note || '', customer: r.customer || '' }));
+    orders = ords.map(r => {
+      const parsed = splitNote(r.note);
+      return { id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, unitCost: parseFloat(r.unit_cost) || 0, note: parsed.note, vendor: r.vendor || parsed.name };
+    });
+    sales = sls.map(r => {
+      const parsed = splitNote(r.note);
+      return { id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, price: parseFloat(r.price) || 0, note: parsed.note, customer: r.customer || parsed.name };
+    });
     setSyncStatus('synced', 'Synced');
     updateLastUpdated();
   } catch(e) {
@@ -1431,20 +1437,13 @@ async function saveOrder() {
   const note = document.getElementById('oNote').value.trim();
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
-  const full = { product_id: productId, date, qty, unit_cost: unitCost, note: note || null, vendor: vendor || null };
-  const fallback = { product_id: productId, date, qty, unit_cost: unitCost, note: note || null };
-  let res;
+  const body = { product_id: productId, date, qty, unit_cost: unitCost };
+  const fullNote = vendor ? (note ? `${vendor} · ${note}` : vendor) : (note || null);
+  if (fullNote) body.note = fullNote;
   try {
-    try {
-      res = await supa('pl_orders', 'POST', full);
-    } catch(e) {
-      if (String(e.message || '').toLowerCase().includes('vendor')) {
-        console.warn('vendor column missing, retrying without it');
-        res = await supa('pl_orders', 'POST', fallback);
-      } else { throw e; }
-    }
-    if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note, vendor });
-    else { throw new Error('Save returned empty response — likely an RLS policy blocked the insert.'); }
+    const res = await supa('pl_orders', 'POST', body);
+    if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note: fullNote || '', vendor });
+    else { throw new Error('Supabase returned empty response — likely RLS blocked the insert.'); }
     await adjustInventoryForProduct(productId, +qty, `order +${qty}${vendor ? ' · ' + vendor : ''}`);
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
@@ -1452,7 +1451,7 @@ async function saveOrder() {
   } catch(e) {
     console.error('Order save failed:', e);
     setSyncStatus('error', 'Error');
-    alert('❌ Order did not save.\n\nError: ' + (e.message || e) + '\n\n(Check Supabase RLS policies on pl_orders, or that the migration ran.)');
+    alert('❌ Order did not save.\n\n' + (e.message || e));
   }
   renderAll();
 }
@@ -1508,20 +1507,13 @@ async function saveSale() {
   const note = document.getElementById('sNote').value.trim();
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
-  const full = { product_id: productId, date, qty, price, note: note || null, customer: customer || null };
-  const fallback = { product_id: productId, date, qty, price, note: note || null };
-  let res;
+  const body = { product_id: productId, date, qty, price };
+  const fullNote = customer ? (note ? `${customer} · ${note}` : customer) : (note || null);
+  if (fullNote) body.note = fullNote;
   try {
-    try {
-      res = await supa('pl_sales', 'POST', full);
-    } catch(e) {
-      if (String(e.message || '').toLowerCase().includes('customer')) {
-        console.warn('customer column missing, retrying without it');
-        res = await supa('pl_sales', 'POST', fallback);
-      } else { throw e; }
-    }
-    if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note, customer });
-    else { throw new Error('Save returned empty response — likely an RLS policy blocked the insert.'); }
+    const res = await supa('pl_sales', 'POST', body);
+    if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note: fullNote || '', customer });
+    else { throw new Error('Supabase returned empty response — likely RLS blocked the insert.'); }
     await adjustInventoryForProduct(productId, -qty, `sale −${qty}${customer ? ' · ' + customer : ''}`);
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
@@ -1529,7 +1521,7 @@ async function saveSale() {
   } catch(e) {
     console.error('Sale save failed:', e);
     setSyncStatus('error', 'Error');
-    alert('❌ Sale did not save.\n\nError: ' + (e.message || e) + '\n\n(Check Supabase RLS policies on pl_sales, or that the migration ran.)');
+    alert('❌ Sale did not save.\n\n' + (e.message || e));
   }
   renderAll();
 }
@@ -1592,6 +1584,13 @@ function showConfirm(msg, cb) {
 function confirmYes() { closeConfirm(); if (_confirmCallback) _confirmCallback(); _confirmCallback = null; }
 function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
 
+function splitNote(raw) {
+  const s = (raw || '').trim();
+  if (!s) return { name: '', note: '' };
+  const idx = s.indexOf(' · ');
+  if (idx === -1) return { name: s, note: '' };
+  return { name: s.slice(0, idx).trim(), note: s.slice(idx + 3).trim() };
+}
 function fmt(n) { return '$' + (parseFloat(n) || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 function fmtDate(d) { if (!d) return '—'; const dt = new Date(d + 'T12:00:00'); return isNaN(dt) ? d : dt.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
 function today() { return new Date().toISOString().slice(0, 10); }
