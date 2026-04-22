@@ -467,11 +467,11 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
-            <th>Customer</th>
-            <th>Orders</th>
-            <th>Vials</th>
-            <th>Total Spend</th>
-            <th class="hide-mob">Last Purchase</th>
+            <th class="sortable" data-table="customers" data-col="name"   data-type="text">Customer</th>
+            <th class="sortable" data-table="customers" data-col="orders" data-type="num">Orders</th>
+            <th class="sortable" data-table="customers" data-col="vials"  data-type="num">Vials</th>
+            <th class="sortable" data-table="customers" data-col="spend"  data-type="num">Total Spend</th>
+            <th class="sortable hide-mob" data-table="customers" data-col="last" data-type="date">Last Purchase</th>
           </tr></thead>
           <tbody id="topCustomersBody"></tbody>
         </table>
@@ -481,11 +481,11 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
-            <th>Vendor</th>
-            <th>Orders</th>
-            <th>Vials</th>
-            <th>Total Paid</th>
-            <th class="hide-mob">Last Order</th>
+            <th class="sortable" data-table="vendors" data-col="name"   data-type="text">Vendor</th>
+            <th class="sortable" data-table="vendors" data-col="orders" data-type="num">Orders</th>
+            <th class="sortable" data-table="vendors" data-col="vials"  data-type="num">Vials</th>
+            <th class="sortable" data-table="vendors" data-col="spend"  data-type="num">Total Paid</th>
+            <th class="sortable hide-mob" data-table="vendors" data-col="last" data-type="date">Last Order</th>
           </tr></thead>
           <tbody id="topVendorsBody"></tbody>
         </table>
@@ -495,10 +495,10 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       <div class="table-wrap">
         <table class="data-table">
           <thead><tr>
-            <th>Item</th>
-            <th>Vials On Hand</th>
-            <th class="hide-mob">Vial Size</th>
-            <th>Status</th>
+            <th class="sortable" data-table="deadstock" data-col="name"   data-type="text">Item</th>
+            <th class="sortable" data-table="deadstock" data-col="vials"  data-type="num">Vials On Hand</th>
+            <th class="sortable hide-mob" data-table="deadstock" data-col="size" data-type="text">Vial Size</th>
+            <th class="sortable" data-table="deadstock" data-col="status" data-type="text">Status</th>
           </tr></thead>
           <tbody id="deadStockBody"></tbody>
         </table>
@@ -662,11 +662,14 @@ let editProductId = null;
 let logEntries = [];
 
 const sortState = {
-  inv:      { col: null, dir: 'asc' },
-  overview: { col: null, dir: 'asc' },
-  products: { col: null, dir: 'asc' },
-  orders:   { col: 'date', dir: 'desc' },
-  sales:    { col: 'date', dir: 'desc' }
+  inv:       { col: null, dir: 'asc' },
+  overview:  { col: null, dir: 'asc' },
+  products:  { col: null, dir: 'asc' },
+  orders:    { col: 'date', dir: 'desc' },
+  sales:     { col: 'date', dir: 'desc' },
+  customers: { col: 'spend', dir: 'desc' },
+  vendors:   { col: 'spend', dir: 'desc' },
+  deadstock: { col: 'vials', dir: 'desc' }
 };
 
 /* ═══════════════════════════════════════════════
@@ -791,6 +794,7 @@ document.addEventListener('click', (e) => {
   if (s.col === c) s.dir = s.dir === 'asc' ? 'desc' : 'asc';
   else { s.col = c; s.dir = (th.dataset.type === 'num' || th.dataset.type === 'date') ? 'desc' : 'asc'; }
   if (t === 'inv') renderInventory();
+  else if (t === 'customers' || t === 'vendors' || t === 'deadstock') renderReports();
   else renderPL();
 });
 
@@ -1274,7 +1278,14 @@ function renderTopCustomers() {
     map[key].spend += s.qty * s.price;
     if (!map[key].last || s.date > map[key].last) map[key].last = s.date;
   });
-  const rows = Object.values(map).sort((a, b) => b.spend - a.spend);
+  let rows = Object.values(map);
+  rows = sortRows(rows, 'customers', {
+    name:   r => r.name.toLowerCase(),
+    orders: r => r.orders,
+    vials:  r => r.vials,
+    spend:  r => r.spend,
+    last:   r => new Date(r.last).getTime()
+  });
   tbody.innerHTML = rows.map(r => `<tr>
     <td><div class="cell-name">${esc(r.name)}</div></td>
     <td style="font-weight:600;">${r.orders}</td>
@@ -1297,7 +1308,14 @@ function renderTopVendors() {
     map[key].spend += o.qty * o.unitCost;
     if (!map[key].last || o.date > map[key].last) map[key].last = o.date;
   });
-  const rows = Object.values(map).sort((a, b) => b.spend - a.spend);
+  let rows = Object.values(map);
+  rows = sortRows(rows, 'vendors', {
+    name:   r => r.name.toLowerCase(),
+    orders: r => r.orders,
+    vials:  r => r.vials,
+    spend:  r => r.spend,
+    last:   r => new Date(r.last).getTime()
+  });
   tbody.innerHTML = rows.map(r => `<tr>
     <td><div class="cell-name">${esc(r.name)}</div></td>
     <td style="font-weight:600;">${r.orders}</td>
@@ -1316,9 +1334,14 @@ function renderDeadStock() {
     const p = products.find(p => String(p.id) === String(s.productId));
     if (p && p.inventoryId) soldInvIds.add(String(p.inventoryId));
   });
-  const dead = items.filter(i => i.vials > 0 && !soldInvIds.has(String(i.id)));
+  let dead = items.filter(i => i.vials > 0 && !soldInvIds.has(String(i.id)));
   if (!dead.length) { tbody.innerHTML = emptyRow(4, '✅', 'Nothing gathering dust', 'Every item with stock had at least one sale in range'); return; }
-  dead.sort((a, b) => b.vials - a.vials);
+  dead = sortRows(dead, 'deadstock', {
+    name:   i => i.name.toLowerCase(),
+    vials:  i => i.vials,
+    size:   i => (i.vialSize || '').toLowerCase(),
+    status: i => getStatus(i)
+  });
   tbody.innerHTML = dead.map(i => {
     const st = getStatus(i);
     return `<tr>
