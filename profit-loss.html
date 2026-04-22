@@ -1431,14 +1431,29 @@ async function saveOrder() {
   const note = document.getElementById('oNote').value.trim();
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
+  const full = { product_id: productId, date, qty, unit_cost: unitCost, note: note || null, vendor: vendor || null };
+  const fallback = { product_id: productId, date, qty, unit_cost: unitCost, note: note || null };
+  let res;
   try {
-    const res = await supa('pl_orders', 'POST', { product_id: productId, date, qty, unit_cost: unitCost, note: note || null, vendor: vendor || null });
+    try {
+      res = await supa('pl_orders', 'POST', full);
+    } catch(e) {
+      if (String(e.message || '').toLowerCase().includes('vendor')) {
+        console.warn('vendor column missing, retrying without it');
+        res = await supa('pl_orders', 'POST', fallback);
+      } else { throw e; }
+    }
     if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note, vendor });
+    else { throw new Error('Save returned empty response — likely an RLS policy blocked the insert.'); }
     await adjustInventoryForProduct(productId, +qty, `order +${qty}${vendor ? ' · ' + vendor : ''}`);
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
-  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); }
-  closeModal('orderModal');
+    closeModal('orderModal');
+  } catch(e) {
+    console.error('Order save failed:', e);
+    setSyncStatus('error', 'Error');
+    alert('❌ Order did not save.\n\nError: ' + (e.message || e) + '\n\n(Check Supabase RLS policies on pl_orders, or that the migration ran.)');
+  }
   renderAll();
 }
 
@@ -1493,14 +1508,29 @@ async function saveSale() {
   const note = document.getElementById('sNote').value.trim();
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
+  const full = { product_id: productId, date, qty, price, note: note || null, customer: customer || null };
+  const fallback = { product_id: productId, date, qty, price, note: note || null };
+  let res;
   try {
-    const res = await supa('pl_sales', 'POST', { product_id: productId, date, qty, price, note: note || null, customer: customer || null });
+    try {
+      res = await supa('pl_sales', 'POST', full);
+    } catch(e) {
+      if (String(e.message || '').toLowerCase().includes('customer')) {
+        console.warn('customer column missing, retrying without it');
+        res = await supa('pl_sales', 'POST', fallback);
+      } else { throw e; }
+    }
     if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note, customer });
+    else { throw new Error('Save returned empty response — likely an RLS policy blocked the insert.'); }
     await adjustInventoryForProduct(productId, -qty, `sale −${qty}${customer ? ' · ' + customer : ''}`);
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
-  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); }
-  closeModal('saleModal');
+    closeModal('saleModal');
+  } catch(e) {
+    console.error('Sale save failed:', e);
+    setSyncStatus('error', 'Error');
+    alert('❌ Sale did not save.\n\nError: ' + (e.message || e) + '\n\n(Check Supabase RLS policies on pl_sales, or that the migration ran.)');
+  }
   renderAll();
 }
 
