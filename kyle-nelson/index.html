@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gorilla Stack — Kyle Nelson — BioLinked Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+
+/* TABS */
+.tab-bar{display:flex;background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
+.tab-btn{flex:1;padding:14px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-top:none;border-left:none;border-right:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.inv-body{padding:32px 36px;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.party-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.party-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.party-detail{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.items-table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+.items-table th{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);padding:8px 12px;border-bottom:1px solid var(--gold-border);text-align:left;}
+.items-table th:last-child{text-align:right;}
+.items-table td{padding:14px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.items-table tr:last-child td{border-bottom:none;}
+.item-name{font-size:16px;font-weight:600;color:var(--text);}
+.item-detail{font-size:13px;color:var(--muted);font-weight:400;margin-top:3px;}
+.item-qty{font-size:15px;color:var(--text);font-weight:500;text-align:center;}
+.item-unit{font-size:15px;color:var(--text);font-weight:500;text-align:right;}
+.item-total{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);text-align:right;}
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:18px 22px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:15px;color:var(--text);font-weight:400;}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:10px;padding-top:14px;font-size:18px;font-weight:700;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);}
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-bottom:24px;}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-child{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.stack-desc{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;margin-top:16px;font-size:14px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:20px 22px;margin-bottom:24px;}
+.payment-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:15px;color:var(--text);font-weight:500;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);}
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+.footer-disc{font-size:12px;color:var(--muted);line-height:1.65;font-weight:400;max-width:420px;}
+.footer-brand{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 0;padding:16px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+
+.warn-banner{background:linear-gradient(135deg,rgba(246,173,85,0.22),rgba(246,173,85,0.06));border:2px solid #d68a2e;border-left:5px solid #b27318;border-radius:3px;padding:16px 20px;margin:0 0 22px;}
+.warn-banner-title{font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8a5418;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.warn-banner-title .warn-icon{font-size:22px;line-height:1;}
+.warn-banner-body{font-size:14px;line-height:1.7;color:#3d2f10;font-weight:500;}
+.warn-banner-body strong{color:#8a5418;font-weight:700;}
+.warn-banner-body p + p{margin-top:8px;}
+.warn-banner-list{margin-top:10px;font-size:13px;line-height:1.75;color:#3d2f10;list-style:none;}
+.warn-banner-list li{padding:4px 0;display:flex;gap:10px;}
+.warn-banner-list li::before{content:'•';color:#b27318;font-weight:700;flex-shrink:0;}
+.warn-banner-list li strong{color:#8a5418;font-weight:700;}
+
+.bottle-card{padding:14px 18px;border-radius:2px;margin-top:14px;border:1px solid var(--border);}
+.bottle-card.main{background:rgba(122,101,48,0.06);border-left:4px solid var(--gold);}
+.bottle-card.taper{background:rgba(183,148,244,0.08);border-left:4px solid #8965cc;}
+.bottle-card-header{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.bottle-card.main .bottle-card-header{color:var(--gold);}
+.bottle-card.taper .bottle-card-header{color:#6f4fb8;}
+.bottle-card-header .bottle-title{font-family:'Cormorant Garamond',serif;font-size:17px;letter-spacing:0.02em;text-transform:none;font-weight:600;}
+.bottle-card.main .bottle-card-header .bottle-title{color:var(--gold);}
+.bottle-card.taper .bottle-card-header .bottle-title{color:#6f4fb8;}
+.bottle-card .cmp-details{margin-top:8px;}
+.bottle-dose-table{width:100%;margin-top:10px;border-collapse:collapse;font-size:12px;}
+.bottle-dose-table th{background:rgba(183,148,244,0.14);color:#6f4fb8;padding:7px 9px;text-align:left;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;font-weight:700;border-bottom:1px solid rgba(183,148,244,0.3);}
+.bottle-dose-table td{padding:8px 9px;border-bottom:1px solid var(--border);color:var(--text);font-weight:500;font-size:12px;}
+.bottle-dose-table tr:last-child td{border-bottom:none;}
+.bottle-dose-table tr:nth-child(even) td{background:rgba(183,148,244,0.04);}
+
+.sched-pill.taper{background:rgba(183,148,244,0.22);border-color:#8965cc;color:#6f4fb8;font-weight:700;}
+
+.total-row.subtot-line{font-weight:600;color:var(--text);}
+.total-row.credit{color:#3a7a5a;}
+.total-row.credit span:last-child{color:#3a7a5a;font-weight:700;}
+
+.program-intro{text-align:center;padding:20px 0 26px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.program-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--text);line-height:1.05;letter-spacing:0.01em;}
+.program-title em{font-style:italic;color:var(--gold);}
+.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
+.program-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:18px;}
+.program-badge{background:#f8f8f8;border:1px solid var(--border);padding:5px 11px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border-radius:2px;}
+.program-badge strong{color:var(--gold);font-weight:700;}
+
+.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.sec-divider.mt{margin-top:32px;}
+.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+
+.cmp-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:22px 24px;margin-bottom:18px;}
+.cmp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.cmp-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-bottom:2px;line-height:1.15;}
+.cmp-tag{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.06em;}
+.cmp-meta{text-align:right;}
+.cmp-meta-price{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;}
+.cmp-meta-sub{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-top:1px;}
+.cmp-section{margin-top:14px;}
+.cmp-label{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.cmp-body-text{font-size:14px;line-height:1.75;color:var(--text);font-weight:400;}
+.cmp-body-text + .cmp-body-text{margin-top:10px;}
+.cmp-body-text strong{font-weight:700;}
+.cmp-body-text em{font-style:italic;color:var(--muted);}
+.cmp-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-top:4px;}
+.cmp-dbox{background:#f8f8f8;border:1px solid var(--border);padding:9px 11px;border-radius:2px;}
+.cmp-dlbl{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.cmp-dval{font-size:13px;font-weight:600;color:var(--text);}
+.cmp-recon{list-style:none;counter-reset:step;margin-top:2px;}
+.cmp-recon li{counter-increment:step;display:flex;gap:10px;padding:5px 0;font-size:13px;color:var(--text);line-height:1.65;}
+.cmp-recon li::before{content:counter(step);flex-shrink:0;width:21px;height:21px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-top:2px;}
+.cmp-recon li strong{font-weight:700;}
+.cmp-note{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:12px 14px;border-radius:2px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.cmp-note strong{color:var(--gold);font-weight:700;}
+.cmp-note.warn{background:rgba(183,148,244,0.08);border-color:rgba(183,148,244,0.35);border-left-color:#8965cc;color:#3d2f10;}
+.cmp-note.warn strong{color:#6f4fb8;}
+
+.sched-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:16px;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-top:2px;}
+.sched-phase-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:5px 11px;border-radius:2px;white-space:nowrap;}
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);font-weight:400;vertical-align:top;font-size:12px;line-height:1.5;}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
+.sched-count{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.sched-count.light{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);}
+.sched-count.off{background:#eeeeee;color:#999;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
+.sched-pill.im{background:rgba(183,148,244,0.14);border-color:rgba(183,148,244,0.32);color:#7655b8;}
+.sched-pill.pm{background:rgba(99,179,237,0.12);border-color:rgba(99,179,237,0.32);color:#4278a8;}
+.sched-pill.post{background:rgba(90,184,122,0.12);border-color:rgba(90,184,122,0.32);color:#3a7a5a;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
+
+.supplies-wrap{margin-bottom:20px;}
+.supply-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:13px 16px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.supply-row:hover{border-color:var(--gold-border);}
+.supply-info{flex:1;min-width:220px;}
+.supply-info-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.supply-info-desc{font-size:12px;color:var(--muted);font-weight:400;line-height:1.6;}
+.supply-link{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.supply-link:hover{background:#5f4f26;}
+
+.storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
+.storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.storage-body{font-size:13px;line-height:1.75;color:#3d2f10;font-weight:400;}
+.storage-body p + p{margin-top:10px;}
+.storage-body strong{color:var(--text);font-weight:700;}
+
+/* TRACKER */
+.trk-intro{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;margin-bottom:16px;font-size:13px;line-height:1.7;color:#3d2f10;}
+.trk-intro strong{color:var(--gold);font-weight:700;}
+.trk-start{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.trk-start label{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
+.trk-start input[type=date]{background:#fafafa;border:1px solid var(--gold-border);border-radius:2px;padding:6px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.trk-saved{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#3a7a5a;background:rgba(90,184,122,0.12);border:1px solid rgba(90,184,122,0.32);padding:4px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.trk-saved.show{opacity:1;}
+.trk-dates{font-size:12px;color:var(--muted);line-height:1.7;padding:10px 18px;background:#f8f8f8;border:1px solid var(--border);border-radius:2px;margin-bottom:14px;}
+.trk-dates strong{color:var(--gold);font-weight:700;}
+.trk-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.trk-stat{background:#ffffff;border:1px solid var(--gold-border);border-radius:2px;padding:12px;text-align:center;}
+.trk-stat-v{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--gold);font-weight:700;line-height:1.1;}
+.trk-stat-l{font-size:8px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-top:4px;font-weight:700;}
+.trk-prog{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:10px 14px;margin-bottom:14px;}
+.trk-prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;font-weight:700;}
+.trk-prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.trk-prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s;}
+.trk-week-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0 14px;}
+.trk-wnav{width:36px;height:36px;background:#ffffff;border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.trk-wnav:hover{background:var(--gold-dim);}
+.trk-wnav:disabled{opacity:0.35;cursor:not-allowed;}
+.trk-wlbl{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--text);font-weight:700;min-width:180px;text-align:center;line-height:1.15;}
+.trk-wlbl small{display:block;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;color:var(--gold);letter-spacing:0.14em;text-transform:uppercase;margin-top:2px;}
+.trk-grid-wrap{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:14px;margin-bottom:14px;}
+.trk-dhr{display:grid;grid-template-columns:120px 1fr;gap:5px;margin-bottom:2px;}
+.trk-dhi{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.trk-dh{text-align:center;font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:6px 2px;background:#f8f8f8;border:1px solid var(--border);border-radius:2px 2px 0 0;}
+.trk-dh small{display:block;font-size:8px;font-weight:400;color:var(--text);margin-top:2px;}
+.trk-cmp-row{display:grid;grid-template-columns:120px 1fr;gap:5px;margin-bottom:3px;}
+.trk-cmp-lbl{display:flex;align-items:center;justify-content:flex-end;padding-right:4px;text-align:right;}
+.trk-cmp-lbl-name{font-size:10px;font-weight:700;color:var(--gold);line-height:1.2;}
+.trk-cmp-lbl-sub{font-size:8px;color:var(--muted);font-weight:400;display:block;margin-top:1px;}
+.trk-drow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.trk-dc{background:#fafafa;border:1px solid var(--border);border-top:none;min-height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s;font-size:13px;}
+.trk-dc.sched:hover{background:var(--gold-dim);}
+.trk-dc.taken{background:rgba(90,184,122,0.18);border-color:rgba(90,184,122,0.4);}
+.trk-dc.taken::after{content:'✓';color:#3a7a5a;font-weight:700;font-size:14px;}
+.trk-dc.sched:not(.taken)::after{content:'○';color:var(--gold-border);font-size:12px;}
+.trk-dc.rest{background:transparent;border-color:transparent;cursor:default;}
+.trk-dc.rest::after{content:'—';color:#cccccc;font-size:11px;}
+.trk-notes{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:12px 14px;margin-bottom:14px;}
+.trk-notes-lbl{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.trk-ta{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:8px 10px;font-size:12px;color:var(--text);font-family:'Montserrat',sans-serif;font-weight:400;resize:vertical;min-height:60px;outline:none;}
+.trk-ta:focus{border-color:var(--gold-border);}
+.trk-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.trk-abtn{flex:1;min-width:140px;padding:10px 14px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;border-radius:2px;text-align:center;transition:all 0.18s;}
+.trk-abtn:hover{background:rgba(122,101,48,0.2);border-color:var(--gold);}
+.trk-abtn.cal{background:rgba(99,179,237,0.1);border-color:rgba(99,179,237,0.35);color:#4278a8;}
+.trk-abtn.cal:hover{background:rgba(99,179,237,0.2);}
+.trk-cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.trk-cal-banner h4{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:4px;}
+.trk-cal-banner p{font-size:11px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.trk-cal-dl{background:#4278a8;color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.trk-cal-dl:hover{background:#345d85;}
+
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}}
+@media(max-width:1100px){
+  .invoice-wrap,.print-btn{width:90%;}
+}
+@media(max-width:820px){
+  .invoice-wrap,.print-btn{width:94%;}
+  body{padding:24px 10px;}
+  .inv-header{padding:22px 22px;}
+  .inv-body{padding:24px 22px;}
+  .inv-footer{padding:14px 22px;}
+}
+@media(max-width:640px){
+  .invoice-wrap,.print-btn{width:100%;}
+  body{padding:16px 8px;font-size:15px;}
+  .inv-header{flex-direction:column;gap:14px;padding:20px 18px;}
+  .inv-meta{text-align:left;}
+  .inv-brand-name{font-size:26px;}
+  .inv-body{padding:20px 16px;}
+  .inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}
+  .inv-parties{grid-template-columns:1fr;gap:16px;}
+  .items-table th,.items-table td{padding:8px 6px;font-size:12px;}
+  .item-name{font-size:14px;}
+  .item-detail{font-size:11px;}
+  .item-qty,.item-unit{font-size:13px;}
+  .item-total{font-size:16px;}
+  .total-row{font-size:13px;}
+  .total-row.grand .val{font-size:24px;}
+  .cmp-card{padding:18px 18px;}
+  .cmp-head{flex-direction:column;align-items:flex-start;gap:6px;}
+  .cmp-meta{text-align:left;}
+  .cmp-name{font-size:21px;}
+  .cmp-details{grid-template-columns:1fr 1fr;}
+  .cmp-body-text{font-size:13px;}
+  .cmp-recon li{font-size:12px;}
+  .program-title{font-size:30px;}
+  .program-intro{padding:14px 0 18px;}
+  .program-badge{font-size:8px;padding:4px 8px;}
+  .tab-bar{position:sticky;top:56px;}
+  .tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}
+  .sec-divider-title{font-size:19px;}
+  .sched-card{padding:16px 16px;}
+  .sched-card-title{font-size:17px;}
+  .sched-table{font-size:11px;}
+  .sched-table th{font-size:8px;padding:6px 4px;letter-spacing:0.08em;}
+  .sched-table td{padding:7px 4px;font-size:11px;}
+  .sched-pill{font-size:9px;padding:1px 5px;margin:1px 1px 1px 0;}
+  .supply-row{flex-direction:column;align-items:flex-start;padding:12px 14px;}
+  .supply-link{width:100%;text-align:center;padding:10px 14px;}
+  .storage-card{padding:14px 16px;}
+  .storage-body{font-size:12px;}
+  .payment-block{padding:16px 18px;}
+  .trk-dhr,.trk-cmp-row{grid-template-columns:78px 1fr;gap:3px;}
+  .trk-dhi,.trk-drow{gap:3px;}
+  .trk-cmp-lbl-name{font-size:9px;}
+  .trk-cmp-lbl-sub{font-size:7px;}
+  .trk-dc{min-height:30px;}
+  .trk-dh{font-size:7px;padding:5px 1px;}
+  .trk-grid-wrap{padding:10px;}
+  .trk-stat-row{gap:5px;}
+  .trk-stat{padding:10px 6px;}
+  .trk-stat-v{font-size:20px;}
+  .trk-stat-l{font-size:7px;letter-spacing:0.1em;}
+  .trk-start{flex-direction:column;align-items:stretch;gap:8px;}
+  .trk-start input[type=date]{width:100%;}
+  .trk-cal-banner{flex-direction:column;align-items:flex-start;}
+  .trk-cal-dl{width:100%;}
+  .trk-actions{flex-direction:column;}
+  .trk-abtn{width:100%;}
+}
+</style>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+      <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-link">Stack Analyzer</a>
+      <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-link">Biomarkers</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+    <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-mobile-link">Stack Analyzer</a>
+    <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-mobile-link">Biomarkers</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Invoice</div>
+      <div class="inv-number">#BL-2026-043</div>
+      <div class="inv-date">April 22, 2026</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('invoice',this)">Invoice</button>
+    <button class="tab-btn" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('tracker',this)">Daily Tracker</button>
+  </div>
+
+  <div class="inv-body">
+
+    <!-- ================ INVOICE TAB ================ -->
+    <div class="tab-content active" id="tab-invoice">
+
+      <div class="program-intro">
+        <div class="program-eyebrow">Protocol</div>
+        <div class="program-title">Gorilla Stack <em>Kyle Nelson</em></div>
+        <div class="program-tag">Personalized Gorilla Stack 2.0 · 16-Week Program</div>
+        <div class="program-badges">
+          <span class="program-badge"><strong>12-Week</strong> Cycle</span>
+          <span class="program-badge">+ <strong>4-Week</strong> HGH Taper</span>
+          <span class="program-badge"><strong>5</strong> Compounds</span>
+          <span class="program-badge"><strong>Mixed</strong> HGH Supply</span>
+        </div>
+      </div>
+
+      <div class="inv-parties">
+        <div>
+          <div class="party-label">From</div>
+          <div class="party-name">BioLinked Solutions</div>
+          <div class="party-detail">biolinkedsolutions.com<br>Venmo: @micahp20</div>
+        </div>
+        <div>
+          <div class="party-label">Billed To</div>
+          <div class="party-name">Kyle Nelson</div>
+          <div class="party-detail">Gorilla Stack 2.0 &middot; 16-Week Program<br>12-Week Cycle + 4-Week HGH Taper<br>Due upon receipt</div>
+        </div>
+      </div>
+
+      <div class="warn-banner">
+        <div class="warn-banner-title"><span class="warn-icon">&#9888;</span> Mixed HGH Supply &mdash; Two Different Bottles</div>
+        <div class="warn-banner-body">
+          <p>This order contains <strong>two different HGH concentrations</strong>. Read carefully &mdash; the bottles look similar but require different syringe marks. Mixing them up will cause under- or over-dosing.</p>
+          <ul class="warn-banner-list">
+            <li><strong>6 &times; 24 IU bottles</strong> &mdash; used for Weeks 1&ndash;12 main phase at <strong>20u = 2 IU</strong> per shot.</li>
+            <li><strong>1 &times; 36 IU bottle</strong> &mdash; used ONLY for Weeks 13&ndash;16 taper at <strong>13u or 8u</strong> depending on the week.</li>
+            <li><strong>Full dosing rules and unit marks are on the Protocol tab.</strong> When you transition to Week 13, store the old 24 IU bottles separately so there is no chance of reaching for the wrong one.</li>
+          </ul>
+        </div>
+      </div>
+
+      <table class="items-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="text-align:center">Qty</th>
+            <th style="text-align:right">Unit Price</th>
+            <th style="text-align:right">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="item-name">HGH 24 IU</div><div class="item-detail">Somatropin &middot; SubQ &middot; Weeks 1&ndash;12 Main Phase</div></td>
+            <td class="item-qty">6</td><td class="item-unit">$125.00</td><td class="item-total">$750.00</td>
+          </tr>
+          <tr>
+            <td><div class="item-name">HGH 36 IU</div><div class="item-detail">Somatropin &middot; SubQ &middot; Weeks 13&ndash;16 Taper</div></td>
+            <td class="item-qty">1</td><td class="item-unit">$190.00</td><td class="item-total">$190.00</td>
+          </tr>
+          <tr>
+            <td><div class="item-name">5-Amino-1MQ 50mg</div><div class="item-detail">NNMT Inhibitor &middot; NAD+ Restoration &middot; M/W/F &rarr; M&ndash;F</div></td>
+            <td class="item-qty">2</td><td class="item-unit">$100.00</td><td class="item-total">$200.00</td>
+          </tr>
+          <tr>
+            <td><div class="item-name">CJC-1295 / Ipamorelin 10mg</div><div class="item-detail">GH Secretagogue Blend &middot; Pre-Bed &middot; M&ndash;F</div></td>
+            <td class="item-qty">3</td><td class="item-unit">$45.00</td><td class="item-total">$135.00</td>
+          </tr>
+          <tr>
+            <td><div class="item-name">L-Carnitine 600mg / 10mL</div><div class="item-detail">Mitochondrial Transport &middot; IM &middot; Mon + Fri</div></td>
+            <td class="item-qty">5</td><td class="item-unit">$48.00</td><td class="item-total">$240.00</td>
+          </tr>
+          <tr>
+            <td><div class="item-name">IGF-1 LR3 1mg</div><div class="item-detail">Insulin-like Growth Factor &middot; Post-Workout &middot; M/W/F</div></td>
+            <td class="item-qty">2</td><td class="item-unit">$95.00</td><td class="item-total">$190.00</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="totals-block">
+        <div class="total-row"><span>HGH 24 IU &times; 6</span><span>$750.00</span></div>
+        <div class="total-row"><span>HGH 36 IU &times; 1</span><span>$190.00</span></div>
+        <div class="total-row"><span>5-Amino-1MQ 50mg &times; 2</span><span>$200.00</span></div>
+        <div class="total-row"><span>CJC-1295 / Ipamorelin &times; 3</span><span>$135.00</span></div>
+        <div class="total-row"><span>L-Carnitine 600mg &times; 5</span><span>$240.00</span></div>
+        <div class="total-row"><span>IGF-1 LR3 &times; 2</span><span>$190.00</span></div>
+        <div class="total-row subtot-line"><span>Subtotal</span><span>$1,705.00</span></div>
+        <div class="total-row credit"><span>Supply Adjustment Credit</span><span>&minus;$110.00</span></div>
+        <div class="total-row grand"><span>Total Due</span><span class="val">$1,595.00</span></div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-title">Protocol Overview &mdash; How This Stack Works Together</div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">HGH (Somatropin) 2 IU</div>
+            <div class="stack-desc">The foundation of the stack, dosed at a conservative anti-aging / recovery range. Drives protein synthesis, preferentially burns stored fat as fuel, and rebuilds lean tissue. Runs M&ndash;F for 12 weeks, then walks down across a 4-week taper (1.5 &rarr; 1 &rarr; 1 M/W/F) so your pituitary wakes back up gradually instead of crashing.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">CJC-1295 / Ipamorelin</div>
+            <div class="stack-desc">A dual GH secretagogue blend that amplifies endogenous GH release via two complementary mechanisms (GHRH + ghrelin-receptor). Runs pre-bed through all 12 weeks &mdash; stacked on top of HGH during the cycle, and keeping your own GH axis awake as exogenous HGH walks down.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">IGF-1 LR3</div>
+            <div class="stack-desc">The primary downstream anabolic mediator of GH signaling. LR3's 20&ndash;30 hour half-life keeps IGF-1 receptor activity elevated through the critical post-workout protein synthesis window. Dosed M/W/F within 30 minutes of finishing training, paired with a carb meal for insulin-IGF amplification.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">5-Amino-1MQ</div>
+            <div class="stack-desc">An NNMT inhibitor that restores intracellular NAD+ in adipose tissue and muscle. HGH pulls fat out of storage at a high rate &mdash; if NAD+ is low, those liberated fatty acids recirculate instead of being oxidized. 5-Amino-1MQ keeps adipose tissue receptive to burning what HGH has mobilized, and activates dormant muscle satellite cells as reserve for rebuilding.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">L-Carnitine (IM)</div>
+            <div class="stack-desc">The transport molecule that physically shuttles fatty acids across the mitochondrial membrane. Without sufficient carnitine at the site, mobilized fat gets recirculated. Injectable delivers near-complete bioavailability versus ~15% oral &mdash; so every fat molecule HGH liberates actually reaches the mitochondria and gets burned.</div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>Stack Synergy:</strong> HGH + CJC/Ipa create layered GH signaling that simultaneously drives protein synthesis and fat mobilization. IGF-1 LR3 amplifies the downstream anabolic response directly at the muscle cell, timed to the training window. 5-Amino-1MQ restores the NAD+ fuel needed to oxidize liberated fat at the mitochondrial level. L-Carnitine is the essential transport linking fat mobilization to fat oxidation. Each compound addresses a distinct step in the cascade &mdash; none are redundant, and each one enables the next.
+        </div>
+      </div>
+
+      <div class="payment-block">
+        <div class="payment-title">Payment Instructions</div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128184;</div>
+          <div><div class="payment-text">Send via Venmo</div><div class="payment-handle">@micahp20</div></div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128221;</div>
+          <div class="payment-text">Include your name and order reference in the Venmo note</div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128230;</div>
+          <div class="payment-text">Ships within 24&ndash;48 hours of payment confirmation</div>
+        </div>
+      </div>
+
+    </div><!-- /invoice tab -->
+
+    <!-- ================ PROTOCOL TAB ================ -->
+    <div class="tab-content" id="tab-protocol">
+
+      <div class="warn-banner">
+        <div class="warn-banner-title"><span class="warn-icon">&#9888;</span> Mixed HGH Supply &mdash; Read This Carefully</div>
+        <div class="warn-banner-body">
+          <p>Your HGH comes in <strong>two different concentrations</strong>. The bottles look alike but require <strong>different syringe marks</strong>. This is by far the easiest thing in the program to get wrong.</p>
+          <ul class="warn-banner-list">
+            <li><strong>Weeks 1&ndash;12 (Main Phase):</strong> 24 IU bottles &rarr; <strong>20 units</strong> per shot = 2 IU. Use all 6 of these bottles first.</li>
+            <li><strong>Weeks 13&ndash;16 (Taper):</strong> 36 IU bottle &rarr; <strong>13 units or 8 units</strong> depending on the week. Different concentration, different unit marks.</li>
+            <li><strong>When you start Week 13, physically separate the bottles.</strong> Move empty 24 IU vials to a ziplock in a different part of the fridge so there's no way to grab the wrong one at 6am.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Compound Detail</div>
+        <div class="sec-divider-title">Rationale &middot; Dosing &middot; Reconstitution</div>
+      </div>
+
+      <!-- HGH -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">HGH (Somatropin)</div>
+            <div class="cmp-tag">Foundation &middot; SubQ &middot; Mixed Supply &middot; 12 Weeks + 4-Week Taper</div>
+          </div>
+          <div class="cmp-meta">
+            <div class="cmp-meta-price">$940.00</div>
+            <div class="cmp-meta-sub">6 &times; 24 IU + 1 &times; 36 IU</div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Why it's the foundation</div>
+          <div class="cmp-body-text">HGH sits at the top of the stack. At 2 IU on weekdays, the dose is deliberately in the <strong>anti-aging / recovery range</strong> &mdash; well below the supraphysiological doses used in bodybuilding protocols. What this produces over 8&ndash;12 weeks is deeper sleep, improved skin quality, faster recovery between training sessions, and a gradual body composition shift driven by GH's preferential use of stored fat as fuel. Everything else in the program either amplifies what HGH starts (CJC/Ipa, IGF-1 LR3) or makes sure its byproducts are fully used (5-Amino-1MQ, L-Carnitine).</div>
+          <div class="cmp-body-text"><strong>The 4-week taper is deliberate.</strong> After 12 weeks of daily HGH, your pituitary has been reading elevated IGF-1 and has dialed its own GH output down via negative feedback. Stopping cold leaves endogenous GH suppressed for weeks while exogenous HGH clears &mdash; that's the "rebound crash." The taper walks the dose down (2 IU &rarr; 1.5 &rarr; 1 M&ndash;F &rarr; 1 M/W/F) so the axis reactivates gradually.</div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Why Two Different Bottles</div>
+          <div class="cmp-body-text">Your supply came as <strong>6 bottles at 24 IU + 1 bottle at 36 IU</strong> &mdash; a small stocking quirk, not a clinical decision. Rather than leave taper doses short, we reconstitute the 36 IU bottle at a slightly higher concentration (12 IU/mL vs 10 IU/mL) and use it exclusively for the 4-week taper. The <strong>unit marks change</strong> because the concentration changes. Delivered IU per shot lands within &plusmn;4% of the target dose at each taper step, which is well inside clinical tolerance.</div>
+        </div>
+
+        <!-- BOTTLE A: 24 IU -->
+        <div class="bottle-card main">
+          <div class="bottle-card-header">&#x1F7E1; <span class="bottle-title">Bottle A &middot; 24 IU &middot; Weeks 1&ndash;12 Main Phase</span></div>
+          <div class="cmp-details">
+            <div class="cmp-dbox"><div class="cmp-dlbl">Supply</div><div class="cmp-dval">24 IU &times; 6</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">2.4 mL each</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">10 IU/mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">2 IU</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Draw</div><div class="cmp-dval"><strong>20 units</strong></div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Schedule</div><div class="cmp-dval">Mon &ndash; Fri</div></div>
+          </div>
+          <ol class="cmp-recon" style="margin-top:10px;">
+            <li>Add <strong>2.4 mL BAC water</strong> to each 24 IU vial. Angle the needle against the glass wall.</li>
+            <li>Concentration: 24 IU &divide; 2.4 mL = <strong>10 IU/mL</strong>. Easy math: every 10 units = 1 IU.</li>
+            <li>Swirl gently, do not shake.</li>
+            <li>Draw <strong>20 units (0.20 mL) = 2 IU per shot</strong>, Mon&ndash;Fri.</li>
+            <li>Main phase total: 60 shots &times; 2 IU = 120 IU. Supply: 144 IU across 6 vials. Comfortable margin.</li>
+            <li>Refrigerate. Use each reconstituted vial within 30 days of mixing.</li>
+          </ol>
+        </div>
+
+        <!-- BOTTLE B: 36 IU -->
+        <div class="bottle-card taper">
+          <div class="bottle-card-header">&#x1F7E3; <span class="bottle-title">Bottle B &middot; 36 IU &middot; Weeks 13&ndash;16 Taper ONLY</span></div>
+          <div class="cmp-body-text" style="font-size:13px;margin-bottom:8px;"><strong>Do not open the 36 IU bottle until Week 13.</strong> The unit marks below are different from the 24 IU bottle because the concentration is different.</div>
+          <div class="cmp-details">
+            <div class="cmp-dbox"><div class="cmp-dlbl">Supply</div><div class="cmp-dval">36 IU &times; 1</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">3.0 mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">12 IU/mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ abdomen</div></div>
+          </div>
+          <table class="bottle-dose-table">
+            <thead>
+              <tr>
+                <th>Taper Phase</th>
+                <th>Target</th>
+                <th>Draw</th>
+                <th>Delivered</th>
+                <th>Schedule</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Weeks 13&ndash;14</strong></td><td>1.5 IU</td><td><strong>13 units</strong></td><td>1.56 IU</td><td>Mon &ndash; Fri</td></tr>
+              <tr><td><strong>Week 15</strong></td><td>1.0 IU</td><td><strong>8 units</strong></td><td>0.96 IU</td><td>Mon &ndash; Fri</td></tr>
+              <tr><td><strong>Week 16</strong></td><td>1.0 IU</td><td><strong>8 units</strong></td><td>0.96 IU</td><td>Mon / Wed / Fri</td></tr>
+            </tbody>
+          </table>
+          <ol class="cmp-recon" style="margin-top:12px;">
+            <li>At the start of Week 13, add <strong>3.0 mL BAC water</strong> to the 36 IU vial.</li>
+            <li>Concentration: 36 IU &divide; 3 mL = <strong>12 IU/mL</strong>. Units math: every 10 units = 1.2 IU (not 1 IU like Bottle A &mdash; <strong>this is why the syringe marks change</strong>).</li>
+            <li>Swirl gently, do not shake. Refrigerate.</li>
+            <li>Follow the table above for each taper phase. Total used: ~23.3 IU over 4 weeks; supply is 36 IU so there's healthy margin.</li>
+            <li>The 36 IU vial stays within the 30-day post-reconstitution window &mdash; the 4-week taper fits inside that window.</li>
+          </ol>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Timing &mdash; Why It Matters</div>
+          <div class="cmp-body-text">Shoot HGH either <strong>morning fasted</strong> or <strong>pre-bed, 2+ hours after last meal</strong>. Never with food. Insulin from a meal suppresses the GH pulse and accelerates GH clearance from circulation &mdash; you spend the cost of the injection without getting the full signal. Fasted timing lets the GH signal run clean.</div>
+        </div>
+
+        <div class="cmp-note">
+          <strong>What to Expect:</strong> <strong>Weeks 1&ndash;2:</strong> mild water retention in hands, feet, or face is normal and resolves by weeks 3&ndash;4. Sleep may deepen early. Occasional tingling or mild carpal tunnel symptoms occur in ~10&ndash;15% of users at 2 IU &mdash; usually resolves with reduced sodium or dose adjustment. <strong>Weeks 3&ndash;6:</strong> recovery noticeably faster, skin quality subtly improves. <strong>Weeks 7&ndash;12:</strong> body composition shift becomes visible &mdash; this is the slowest, steadiest effect in the stack. <strong>Weeks 13&ndash;16 (taper):</strong> gradual reactivation of your own GH axis. No acute crash.
+        </div>
+      </div>
+
+      <!-- 5-AMINO-1MQ -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">5-Amino-1MQ</div>
+            <div class="cmp-tag">NNMT Inhibitor &middot; SubQ &middot; M/W/F &rarr; M&ndash;F Ramp</div>
+          </div>
+          <div class="cmp-meta">
+            <div class="cmp-meta-price">$200.00</div>
+            <div class="cmp-meta-sub">2 &times; 50 mg</div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Why it's in the stack</div>
+          <div class="cmp-body-text">5-Amino-1MQ (5-Amino-1-methylquinolinium) selectively inhibits <strong>NNMT</strong> &mdash; an enzyme that consumes NAD+ and methyl groups in adipose tissue and muscle. NNMT activity rises with age and metabolic stress, and when it's high, NAD+ gets siphoned off before the mitochondria can use it to oxidize fat.</div>
+          <div class="cmp-body-text">In the Gorilla Stack 2.0 context this matters because HGH is pulling fat out of storage at an elevated rate. If NAD+ is low, those liberated fatty acids don't get burned in the mitochondria &mdash; they simply recirculate and re-deposit. Blocking NNMT raises intracellular NAD+ without needing to supplement NAD+ directly, keeping adipose tissue receptive to burning what HGH mobilizes.</div>
+          <div class="cmp-body-text">Secondary mechanism: 5-Amino-1MQ activates dormant muscle <strong>satellite cells</strong> &mdash; the reserve pool of muscle-building cells that HGH and IGF-1 then recruit. Amplifies both sides of the stack (fat oxidation + anabolic reserve).</div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Dosing &amp; Schedule</div>
+          <div class="cmp-details">
+            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">50 mg &times; 2</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">2.5 mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">20 mg/mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">2 mg (10u)</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ abdomen</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">AM (flexible)</div></div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Reconstitution &amp; Math</div>
+          <ol class="cmp-recon">
+            <li>Add <strong>2.5 mL BAC water</strong> to each 50 mg vial.</li>
+            <li>Concentration: 50 mg &divide; 2.5 mL = <strong>20 mg/mL</strong>.</li>
+            <li>Swirl gently. Do not shake.</li>
+            <li>Draw <strong>10 units (0.10 mL) = 2 mg per shot</strong>.</li>
+            <li><strong>Weeks 1&ndash;10: M/W/F</strong> (3 shots/week &times; 10 weeks = 30 shots).</li>
+            <li><strong>Weeks 11&ndash;12: M&ndash;F</strong> frequency ramp (5 shots/week &times; 2 weeks = 10 shots). Pushes harder through the final main-phase weeks where HGH-driven fat mobilization is peaking.</li>
+            <li>Total need: 80 mg. Supply: 100 mg (2 vials). Comfortable margin.</li>
+            <li>Reconstitute one vial first; open the second only when the first runs low &mdash; keeps the 30-day post-reconstitution clock short.</li>
+          </ol>
+        </div>
+
+        <div class="cmp-note">
+          <strong>What to Expect:</strong> Most users don't <em>feel</em> 5-Amino-1MQ directly &mdash; its effect is permissive (lets other processes work better). What you notice is the <strong>sum effect:</strong> cleaner fat loss curve, more consistent training energy, easier leanness at the end of the stack than a comparable HGH-only cycle would produce. The week 11&ndash;12 ramp often coincides with the most visible composition shifts of the cycle.
+        </div>
+      </div>
+
+      <!-- CJC-1295 / IPAMORELIN -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">CJC-1295 / Ipamorelin</div>
+            <div class="cmp-tag">GH Secretagogue Blend &middot; SubQ &middot; Pre-Bed &middot; M&ndash;F</div>
+          </div>
+          <div class="cmp-meta">
+            <div class="cmp-meta-price">$135.00</div>
+            <div class="cmp-meta-sub">3 &times; 10 mg</div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Why it's in the stack</div>
+          <div class="cmp-body-text">CJC/Ipa is the gold-standard dual GH secretagogue blend. <strong>CJC-1295</strong> is a GHRH analog that tells your pituitary to produce GH. <strong>Ipamorelin</strong> is a selective ghrelin receptor agonist that triggers stored GH <em>release</em> in a clean pulsatile pattern &mdash; minimal cortisol or prolactin spillover. Combined, they stack two independent "push" signals on your own nocturnal GH pulse.</div>
+          <div class="cmp-body-text">In the Gorilla Stack 2.0, CJC/Ipa does two jobs. <strong>During the HGH cycle</strong> it adds an endogenous GH pulse on top of the exogenous HGH, producing layered GH signaling. <strong>Through the full 12 weeks</strong> it keeps your own GH axis actively stimulated even while exogenous HGH is suppressing it &mdash; bridging smoothly into the taper, so as HGH walks down, your pituitary is already primed to take over again.</div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Dosing &amp; Schedule</div>
+          <div class="cmp-details">
+            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">10 mg &times; 3</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">2 mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">5 mg/mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">500 mcg (10u)</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ abdomen</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">Pre-bed, empty</div></div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Reconstitution &amp; Math</div>
+          <ol class="cmp-recon">
+            <li>Add <strong>2 mL BAC water</strong> to each 10 mg vial.</li>
+            <li>Concentration: 10 mg &divide; 2 mL = <strong>5 mg/mL</strong> (2.5 mg CJC + 2.5 mg Ipa per mL).</li>
+            <li>Swirl gently. Do not shake.</li>
+            <li>Draw <strong>10 units (0.10 mL) = 500 mcg total blend per shot</strong> (250 mcg CJC + 250 mcg Ipa).</li>
+            <li>Each vial = 20 doses. 3 vials = 60 doses. M&ndash;F &times; 12 weeks = <strong>60 shots &mdash; exact match, zero waste</strong>.</li>
+            <li>Refrigerate. Use within 30 days of reconstitution.</li>
+          </ol>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Timing &mdash; Why Pre-Bed &amp; Empty</div>
+          <div class="cmp-body-text">Shoot <strong>2+ hours after your last meal, right before bed</strong>. Carbs or fats within the hour blunt the GH pulse &mdash; insulin and circulating free fatty acids both dampen GH release at the pituitary. Empty-stomach pre-bed timing captures the deepest natural nocturnal GH pulse and amplifies it.</div>
+        </div>
+
+        <div class="cmp-note">
+          <strong>What to Expect:</strong> Mild flushing or head-tingling for 5&ndash;10 minutes post-injection is normal histamine response from Ipamorelin &mdash; harmless and typically fades within the first week or two. <strong>Deeper sleep within week 1.</strong> Some users report more vivid dreams &mdash; a marker of improved slow-wave / REM cycling. The body composition and recovery benefits compound with the HGH and IGF-1 action over the full 12 weeks.
+        </div>
+      </div>
+
+      <!-- L-CARNITINE -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">L-Carnitine</div>
+            <div class="cmp-tag">Mitochondrial Transport &middot; <strong>IM (not SubQ)</strong> &middot; Mon + Fri</div>
+          </div>
+          <div class="cmp-meta">
+            <div class="cmp-meta-price">$225.00</div>
+            <div class="cmp-meta-sub">5 &times; 600 mg / 10 mL</div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Why it's in the stack</div>
+          <div class="cmp-body-text">L-Carnitine isn't a peptide &mdash; it's the amino-acid derivative that <strong>physically shuttles fatty acids across the mitochondrial membrane</strong>. Without sufficient carnitine at the injection site, free fatty acids mobilized by HGH sit at the mitochondrial doorstep and get recirculated back into storage rather than burned.</div>
+          <div class="cmp-body-text">Oral L-Carnitine is limited by roughly 15% bioavailability and gut conversion to TMAO. Injectable L-Carnitine at 120 mg IM delivers near-complete bioavailability. Twice-weekly (Mon + Fri) is enough to maintain elevated muscle carnitine &mdash; saturation is slow-building and persistent. Timed pre-workout, you hit peak muscle carnitine concentration when mitochondrial fat oxidation demand is highest.</div>
+          <div class="cmp-body-text">Paired with HGH's upstream fat mobilization, the full chain &mdash; <em>liberation &rarr; transport &rarr; oxidation</em> &mdash; is covered.</div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Dosing &amp; Schedule</div>
+          <div class="cmp-details">
+            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">600 mg / 10 mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Pre-Mixed</div><div class="cmp-dval">60 mg/mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">120 mg = 2 mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">IM glute/thigh</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Needle</div><div class="cmp-dval">25G &times; 1.5&Prime;</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Syringe</div><div class="cmp-dval">3 mL Luer-lock</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Schedule</div><div class="cmp-dval">Mon + Fri</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">Pre-workout / AM</div></div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Draw &amp; Injection</div>
+          <ol class="cmp-recon">
+            <li>L-Carnitine is <strong>pre-mixed in solution</strong> &mdash; no reconstitution required. Draw directly from the vial.</li>
+            <li>Dose: <strong>120 mg = 2 mL (2 cc)</strong>. Some 3 mL syringes carry a secondary units scale where 2 mL = 200u; the primary marking is mL/cc.</li>
+            <li>Swap the draw needle for a fresh 25G &times; 1.5&Prime; before injecting.</li>
+            <li><strong>Route: IM</strong> &mdash; upper outer quadrant of the glute, or the vastus lateralis (outer thigh). Not SubQ.</li>
+            <li>Rotate sites every injection: glute left, glute right, thigh left, thigh right. Do not inject the same spot two shots in a row.</li>
+            <li>Inject slowly (30&ndash;60 seconds) to minimize burn and site reaction.</li>
+            <li>Total need: 24 shots (Mon + Fri &times; 12 weeks). Supply: 5 vials &times; 5 shots each = 25 shots. One extra shot of margin.</li>
+          </ol>
+        </div>
+
+        <div class="cmp-note warn">
+          <strong>Injection Reality Check:</strong> At 60 mg/mL the solution is concentrated. <strong>Occasional mild site reactions</strong> &mdash; small lump, transient bruise, brief burn during the injection &mdash; are normal and not a concern unless persistent beyond 24 hours. If a specific site feels sore at the next rotation, skip it and favor the other sites. Never inject IM into the same 1&Prime; spot twice in a row.
+        </div>
+      </div>
+
+      <!-- IGF-1 LR3 -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">IGF-1 LR3</div>
+            <div class="cmp-tag">Insulin-like Growth Factor &middot; SubQ &middot; Post-Workout M/W/F</div>
+          </div>
+          <div class="cmp-meta">
+            <div class="cmp-meta-price">$160.00</div>
+            <div class="cmp-meta-sub">2 &times; 1 mg</div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Why it's in the stack</div>
+          <div class="cmp-body-text">IGF-1 is the <strong>primary downstream anabolic signal</strong> from growth hormone &mdash; it's literally how GH builds tissue at the cellular level. The <strong>LR3</strong> variant has a 20&ndash;30 hour half-life (versus ~20 minutes for native IGF-1), so a single post-workout shot keeps IGF-1 receptor activity elevated through the critical 24-hour protein synthesis window after training.</div>
+          <div class="cmp-body-text">In Gorilla Stack 2.0, IGF-1 LR3 is dosed post-workout to capitalize on the anabolic opening training creates. Paired with a <strong>carb-containing post-workout meal</strong>, insulin amplifies IGF-1 receptor sensitivity and nutrient shuttling into muscle. The combined signal &mdash; HGH + IGF-1 + training + insulin &mdash; drives satellite cell activation, protein synthesis, and glycogen replenishment at the moment of maximum opportunity.</div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Dosing &amp; Schedule</div>
+          <div class="cmp-details">
+            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">1 mg &times; 2</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">1 mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">1000 mcg/mL</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">50 mcg (5u)</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ</div></div>
+            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">Post-workout +30m</div></div>
+          </div>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Reconstitution &amp; Math</div>
+          <ol class="cmp-recon">
+            <li>Add <strong>1 mL BAC water</strong> to each 1 mg vial.</li>
+            <li>Concentration: 1 mg &divide; 1 mL = <strong>1000 mcg/mL</strong>.</li>
+            <li>Swirl gently. Do not shake.</li>
+            <li>Draw <strong>5 units (0.05 mL) = 50 mcg per shot</strong>.</li>
+            <li>Each vial = 20 doses. 2 vials = 40 doses. M/W/F &times; 12 weeks = 36 shots. Comfortable margin (~4 extra shots).</li>
+            <li>Refrigerate. Use within 30 days of reconstitution. Reconstitute one vial at a time.</li>
+          </ol>
+        </div>
+
+        <div class="cmp-section">
+          <div class="cmp-label">Injection Window &amp; Pairing</div>
+          <div class="cmp-body-text">Inject <strong>within 30 minutes of finishing training</strong>. Follow the shot with a carb-containing meal (40&ndash;80 g carbs depending on training intensity). The insulin response amplifies IGF-1 receptor activation and drives nutrient uptake into the muscle at peak receptivity. SubQ anywhere is fine for systemic effect; injecting into the bi-lateral quads or delts of trained muscle groups concentrates the IGF-1 signal locally, which is a minor but real advantage.</div>
+        </div>
+
+        <div class="cmp-note warn">
+          <strong>Hypoglycemia Watch:</strong> IGF-1 LR3 can cause mild post-injection hypoglycemia &mdash; slight dizziness, shakiness, or sudden hunger &mdash; particularly if dosed on an empty stomach. This is why the post-workout + carb-meal timing is specified, not optional. If you ever feel dizzy, eat fast-acting carbs (juice, fruit) and sit down. Over 12 weeks, IGF-1 LR3 drives recovery speed, protein synthesis, and muscle fullness well beyond what HGH alone produces.
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Weekly Schedule</div>
+        <div class="sec-divider-title">12-Week Cycle + 4-Week Taper Tail</div>
+      </div>
+
+      <!-- Main Phase weeks 1-10 -->
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Main Phase &mdash; Weeks 1&ndash;10</div>
+            <div class="sched-card-sub">All 5 compounds active. Mon / Fri are the heaviest injection days (5 shots). Wed is 4 shots.</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 1&ndash;10</div>
+        </div>
+        <table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM (Fasted)</th>
+              <th>Pre-Workout</th>
+              <th>Post-Workout</th>
+              <th>Pre-Bed</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sched-day">Mon</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill im">L-Carn 120 mg IM</span></td>
+              <td><span class="sched-pill post">IGF-1 50 mcg</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">5</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Tue</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count light">2</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Wed</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill post">IGF-1 50 mcg</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">4</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Thu</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count light">2</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Fri</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill im">L-Carn 120 mg IM</span></td>
+              <td><span class="sched-pill post">IGF-1 50 mcg</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">5</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Sat</span></td>
+              <td><span class="sched-pill off">All off</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Sun</span></td>
+              <td><span class="sched-pill off">All off</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Ramp weeks 11-12 -->
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Frequency Ramp &mdash; Weeks 11&ndash;12</div>
+            <div class="sched-card-sub">5-Amino-1MQ moves to daily M&ndash;F. Tue / Thu go from 2 shots to 3.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:#8965cc;">Weeks 11&ndash;12</div>
+        </div>
+        <table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM (Fasted)</th>
+              <th>Pre-Workout</th>
+              <th>Post-Workout</th>
+              <th>Pre-Bed</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sched-day">Mon</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill im">L-Carn 120 mg IM</span></td>
+              <td><span class="sched-pill post">IGF-1 50 mcg</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">5</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Tue</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Wed</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill post">IGF-1 50 mcg</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">4</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Thu</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Fri</span></td>
+              <td><span class="sched-pill">HGH 2 IU · 20u · 24 IU bottle</span><span class="sched-pill">5-Amino 2 mg</span></td>
+              <td><span class="sched-pill im">L-Carn 120 mg IM</span></td>
+              <td><span class="sched-pill post">IGF-1 50 mcg</span></td>
+              <td><span class="sched-pill pm">CJC/Ipa 500 mcg</span></td>
+              <td class="right"><span class="sched-count">5</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Sat</span></td>
+              <td><span class="sched-pill off">All off</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Sun</span></td>
+              <td><span class="sched-pill off">All off</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Taper weeks 13-16 -->
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">HGH Taper Tail &mdash; Weeks 13&ndash;16</div>
+            <div class="sched-card-sub"><strong>Switch to the 36 IU bottle at start of Week 13.</strong> 5-Amino, CJC/Ipa, IGF-1 LR3, and L-Carnitine all end at Week 12.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:#8965cc;">36 IU Bottle</div>
+        </div>
+        <table class="sched-table">
+          <thead>
+            <tr>
+              <th>Phase</th>
+              <th>Bottle</th>
+              <th>Target Dose</th>
+              <th>Schedule</th>
+              <th>Draw (units)</th>
+              <th class="right">Shots / wk</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sched-day">Weeks 13&ndash;14</span></td>
+              <td><span class="sched-pill taper">36 IU bottle</span></td>
+              <td>1.5 IU <span style="color:var(--muted);font-size:11px;">(delivers 1.56 IU)</span></td>
+              <td>Mon &ndash; Fri</td>
+              <td><strong>13u</strong> = 0.13 mL</td>
+              <td class="right"><span class="sched-count light">5</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Week 15</span></td>
+              <td><span class="sched-pill taper">36 IU bottle</span></td>
+              <td>1.0 IU <span style="color:var(--muted);font-size:11px;">(delivers 0.96 IU)</span></td>
+              <td>Mon &ndash; Fri</td>
+              <td><strong>8u</strong> = 0.08 mL</td>
+              <td class="right"><span class="sched-count light">5</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Week 16</span></td>
+              <td><span class="sched-pill taper">36 IU bottle</span></td>
+              <td>1.0 IU <span style="color:var(--muted);font-size:11px;">(delivers 0.96 IU)</span></td>
+              <td>Mon / Wed / Fri</td>
+              <td><strong>8u</strong> = 0.08 mL</td>
+              <td class="right"><span class="sched-count light">3</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Week 17+</span></td>
+              <td><span class="sched-pill off">&mdash;</span></td>
+              <td>&mdash;</td>
+              <td>Off</td>
+              <td>&mdash;</td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================ SUPPLIES TAB ================ -->
+    <div class="tab-content" id="tab-supplies">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Supplies</div>
+        <div class="sec-divider-title">Order Before Day 1</div>
+      </div>
+
+      <div class="supplies-wrap">
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 200-pack</div>
+            <div class="supply-info-desc">For all SubQ injections (HGH, 5-Amino-1MQ, CJC/Ipa, IGF-1 LR3). One per shot, never reuse. ~4 shots/day peak = 200-pack gives full-cycle buffer.</div>
+          </div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">3 mL / cc Luer-Lock Syringe + 25G &times; 1.5&Prime; Needle &mdash; for L-Carnitine IM</div>
+            <div class="supply-info-desc">Purpose-built for the L-Carnitine 2 mL IM shots into glute or thigh. Individually wrapped. Get enough for 24+ shots across the 12-week run.</div>
+          </div>
+          <a href="https://www.amazon.com/Industrial-Scientific-Accessories-Refilling-Individually/dp/B0F4VDCJ89/" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water &mdash; ~31 mL Total</div>
+            <div class="supply-info-desc">For reconstitution: HGH 24 IU (2.4 mL &times; 6 = 14.4 mL) + HGH 36 IU (3 mL &times; 1 = 3 mL) + 5-Amino (2.5 mL &times; 2 = 5 mL) + CJC/Ipa (2 mL &times; 3 = 6 mL) + IGF-1 LR3 (1 mL &times; 2 = 2 mL) &asymp; 30.4 mL total. Order 3&ndash;4 bottles of 10 mL to cover the full cycle.</div>
+          </div>
+          <a href="https://www.farrislabs.com/products/bacteriostatic-water?srsltid=AfmBOopuDDGfQO0Tf8CWW_fkpEyumnmjugocILnLnwQyT9IGlIOO00fA" target="_blank" class="supply-link">Farris Labs &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 400-pack</div>
+            <div class="supply-info-desc">Wipe every vial stopper and every injection site. Heavy usage across 16 weeks &mdash; 400-pack is the right size.</div>
+          </div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+            <div class="supply-info-desc">All used needles go directly in here. Drop off free at any CVS or Walgreens when full.</div>
+          </div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+            <div class="supply-info-desc">Multiple active reconstituted vials at any given time. Keeps them organized, protected from light, and at stable temperature.</div>
+          </div>
+          <a href="https://a.co/d/07HthwLz" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Storage &amp; Handling</div>
+        <div class="sec-divider-title">Keep It Clean &middot; Rotate Sites</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="storage-title">❄ Refrigerated, Protected, Rotated</div>
+        <div class="storage-body">
+          <p><strong>&#9888; Mixed HGH supply &mdash; keep bottles separated.</strong> Store the <strong>24 IU bottles</strong> (Main Phase) in one clearly labeled ziplock and the <strong>36 IU bottle</strong> (Taper) in a <em>different</em> part of the fridge. At Week 13 you'll switch to the 36 IU bottle and the unit marks change &mdash; do not let them end up next to each other in the same tray.</p>
+          <p><strong>Dry (lyophilized) vials:</strong> store refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze. HGH, CJC/Ipa, IGF-1 LR3, and 5-Amino-1MQ are temperature-sensitive &mdash; the fridge is non-negotiable.</p>
+          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days of reconstitution. Reconstitute one vial of each compound at a time &mdash; don't start the 30-day clock on a second vial until the first is close to empty.</p>
+          <p><strong>L-Carnitine:</strong> pre-mixed in solution, store refrigerated once opened. Protect from light. Does not require reconstitution.</p>
+          <p><strong>Syringe discipline:</strong> fresh insulin syringe for every SubQ shot. Fresh 3 mL Luer-lock + 25G &times; 1.5&Prime; needle for every IM shot. Swap to a fresh needle between drawing and injecting when possible &mdash; piercing a rubber stopper dulls the needle tip and increases site reactions.</p>
+          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants (upper left/right, lower left/right), never inject the same 1&Prime; spot two days in a row. IM rotates between glute left, glute right, vastus lateralis left, vastus lateralis right on a 4-site rotation.</p>
+        </div>
+      </div>
+
+    </div><!-- /supplies tab -->
+
+    <!-- ================ TRACKER TAB ================ -->
+    <div class="tab-content" id="tab-tracker">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Daily Tracker</div>
+        <div class="sec-divider-title">16-Week Program · Auto-Saved</div>
+      </div>
+
+      <div class="trk-intro">
+        <strong>How it works:</strong> set your Cycle 1 start date below. The tracker automatically shifts through all 16 weeks and adjusts what's scheduled on each day (including the week 11&ndash;12 5-Amino ramp and the week 13&ndash;16 HGH taper). Tap any circle to mark a shot taken. All progress saves to your device.
+      </div>
+
+      <div class="trk-start">
+        <label for="cycleStart">Cycle Start Date</label>
+        <input type="date" id="cycleStart" onchange="setCycleStart(this.value)">
+        <span class="trk-saved" id="trkSaved">✓ Saved</span>
+      </div>
+
+      <div class="trk-dates" id="trkDates"><em>Set your start date above to see the full program timeline.</em></div>
+
+      <div class="trk-cal-banner">
+        <div>
+          <h4>📅 Download the Full 16-Week Calendar</h4>
+          <p>Generates every scheduled injection across all 16 weeks as calendar events. Imports into Google Calendar or Apple Calendar.</p>
+        </div>
+        <button class="trk-cal-dl" onclick="downloadICS()">⬇ Download .ics</button>
+      </div>
+
+      <div class="trk-stat-row">
+        <div class="trk-stat"><div class="trk-stat-v" id="stW">—</div><div class="trk-stat-l">Week</div></div>
+        <div class="trk-stat"><div class="trk-stat-v" id="stD">0/0</div><div class="trk-stat-l">Shots This Week</div></div>
+        <div class="trk-stat"><div class="trk-stat-v" id="stP">0%</div><div class="trk-stat-l">Cycle Complete</div></div>
+      </div>
+
+      <div class="trk-prog">
+        <div class="trk-prog-top"><span id="pTitle">Program Progress</span><span id="pLbl">0 / 238 shots</span></div>
+        <div class="trk-prog-bar"><div class="trk-prog-fill" id="pFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="trk-week-nav">
+        <button class="trk-wnav" id="wPrev" onclick="changeWeek(-1)">&#8249;</button>
+        <div class="trk-wlbl" id="wLabel">Week 1<small>Main Phase</small></div>
+        <button class="trk-wnav" id="wNext" onclick="changeWeek(1)">&#8250;</button>
+      </div>
+
+      <div class="trk-grid-wrap" id="trackerGrid"></div>
+
+      <div class="trk-notes">
+        <div class="trk-notes-lbl">Weekly Notes &mdash; Training · Sleep · Recovery · Side Effects</div>
+        <textarea class="trk-ta" id="wkNotes" placeholder="e.g. Week 3: sleep noticeably deeper. Slight water retention in hands weeks 1-2, resolved. PR on squat day..." oninput="saveNotes()"></textarea>
+      </div>
+
+      <div class="trk-actions">
+        <button class="trk-abtn" onclick="markAllToday()">✓ Mark All Today</button>
+        <button class="trk-abtn" onclick="clearWeek()">Clear This Week</button>
+        <button class="trk-abtn cal" onclick="downloadICS()">📅 Download Calendar</button>
+      </div>
+
+    </div><!-- /tracker tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+// ============ TABS ============
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(tab==='tracker'){renderTracker();updateStats();}
+}
+
+// ============ TRACKER CONFIG ============
+// Week 1: program start. Weeks 1-12 main phase. Week 13-16 taper.
+var DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var TOTAL_WEEKS=16;
+var PHASES={
+  main:{name:'Main Phase',color:'#7A6530',weeks:[1,2,3,4,5,6,7,8,9,10]},
+  ramp:{name:'Frequency Ramp',color:'#8965cc',weeks:[11,12]},
+  taper14:{name:'HGH Taper (1.5 IU)',color:'#4278a8',weeks:[13,14]},
+  taper15:{name:'HGH Taper (1.0 IU M–F)',color:'#4278a8',weeks:[15]},
+  taper16:{name:'HGH Taper (1.0 IU M/W/F)',color:'#4278a8',weeks:[16]}
+};
+function phaseForWeek(w){
+  for(var k in PHASES){if(PHASES[k].weeks.indexOf(w)>-1)return PHASES[k];}
+  return null;
+}
+function compoundsForWeek(w){
+  var r=[];
+  // HGH — mixed supply (Kyle Nelson)
+  if(w>=1&&w<=12)r.push({id:'hgh',name:'HGH',sub:'2 IU · 20u · 24 IU bottle',days:[1,2,3,4,5]});
+  else if(w>=13&&w<=14)r.push({id:'hgh',name:'HGH (taper)',sub:'1.5 IU · 13u · 36 IU bottle',days:[1,2,3,4,5]});
+  else if(w===15)r.push({id:'hgh',name:'HGH (taper)',sub:'1 IU · 8u · 36 IU bottle',days:[1,2,3,4,5]});
+  else if(w===16)r.push({id:'hgh',name:'HGH (taper)',sub:'1 IU · 8u · 36 IU bottle',days:[1,3,5]});
+  // 5-Amino
+  if(w>=1&&w<=10)r.push({id:'amino',name:'5-Amino',sub:'2mg · 10u · AM',days:[1,3,5]});
+  else if(w>=11&&w<=12)r.push({id:'amino',name:'5-Amino',sub:'2mg · 10u (ramp)',days:[1,2,3,4,5]});
+  // CJC/Ipa
+  if(w>=1&&w<=12)r.push({id:'cjcipa',name:'CJC/Ipa',sub:'500mcg · 10u · PM',days:[1,2,3,4,5]});
+  // L-Carnitine IM
+  if(w>=1&&w<=12)r.push({id:'lcarn',name:'L-Carn IM',sub:'120mg · 2mL · pre-w/o',days:[1,5]});
+  // IGF-1 LR3
+  if(w>=1&&w<=12)r.push({id:'igf',name:'IGF-1 LR3',sub:'50mcg · 5u · post-w/o',days:[1,3,5]});
+  return r;
+}
+// total scheduled shots across full program
+function totalScheduledShots(){
+  var t=0;
+  for(var w=1;w<=TOTAL_WEEKS;w++){
+    var cs=compoundsForWeek(w);
+    cs.forEach(function(c){t+=c.days.length;});
+  }
+  return t;
+}
+var TOTAL_SHOTS=totalScheduledShots(); // 238
+
+var currentWeek=1, state={}, cycleStartDate=null;
+
+// ============ STATE ============
+function loadState(){
+  try{var s=localStorage.getItem('kn_state');if(s)state=JSON.parse(s);}catch(e){}
+  try{var d=localStorage.getItem('kn_start');if(d){cycleStartDate=new Date(d+'T00:00:00');document.getElementById('cycleStart').value=d;}}catch(e){}
+  updateDateLabels();
+}
+function saveState(){
+  try{localStorage.setItem('kn_state',JSON.stringify(state));showSaved();}catch(e){}
+}
+function showSaved(){
+  var b=document.getElementById('trkSaved');b.classList.add('show');
+  clearTimeout(b._t);b._t=setTimeout(function(){b.classList.remove('show');},1200);
+}
+function setCycleStart(v){
+  cycleStartDate=v?new Date(v+'T00:00:00'):null;
+  try{localStorage.setItem('kn_start',v);}catch(e){}
+  showSaved();updateDateLabels();updateStats();renderTracker();
+}
+function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function fmtDate(d){if(!d)return '—';var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();}
+function weekStartDate(w){if(!cycleStartDate)return null;return addDays(cycleStartDate,(w-1)*7);}
+function updateDateLabels(){
+  var el=document.getElementById('trkDates');
+  if(!cycleStartDate){el.innerHTML='<em>Set your start date above to see the full program timeline.</em>';return;}
+  var s=weekStartDate(1), e=addDays(s,16*7-1);
+  var taperStart=weekStartDate(13), taperEnd=addDays(taperStart,4*7-1);
+  el.innerHTML='<strong>Main Cycle:</strong> '+fmtDate(s)+' → '+fmtDate(addDays(s,12*7-1))+' &nbsp;·&nbsp; <strong>HGH Taper:</strong> '+fmtDate(taperStart)+' → '+fmtDate(taperEnd);
+}
+
+// ============ DOSE TRACKING ============
+function doseKey(w,cid,di){return 'W'+w+'-'+cid+'-'+di;}
+function isDoseTaken(w,cid,di){return !!state[doseKey(w,cid,di)];}
+function toggleDose(w,cid,di){state[doseKey(w,cid,di)]=!state[doseKey(w,cid,di)];saveState();renderTracker();updateStats();}
+
+// ============ RENDER ============
+function renderTracker(){
+  var cs=compoundsForWeek(currentWeek);
+  var phase=phaseForWeek(currentWeek);
+  var html='';
+  // header row
+  html+='<div class="trk-dhr"><div></div><div class="trk-dhi">';
+  var dayOrder=[1,2,3,4,5,6,0];
+  var weekStart=weekStartDate(currentWeek);
+  dayOrder.forEach(function(dow,idx){
+    var dateNum='';
+    if(weekStart){
+      // week starts Monday if possible
+      var d=new Date(weekStart);
+      var wkDay=d.getDay();
+      var diff=(wkDay===0)?-6:(1-wkDay);
+      var monday=addDays(d,diff);
+      var cell=addDays(monday,idx);
+      dateNum=cell.getDate();
+    }
+    html+='<div class="trk-dh">'+DAY_NAMES[dow]+(dateNum?'<small>'+dateNum+'</small>':'')+'</div>';
+  });
+  html+='</div></div>';
+  // compound rows
+  cs.forEach(function(c){
+    html+='<div class="trk-cmp-row"><div class="trk-cmp-lbl"><div><div class="trk-cmp-lbl-name">'+c.name+'</div><div class="trk-cmp-lbl-sub">'+c.sub+'</div></div></div><div class="trk-drow">';
+    dayOrder.forEach(function(dow,idx){
+      if(c.days.indexOf(dow)<0){html+='<div class="trk-dc rest"></div>';}
+      else{
+        var taken=isDoseTaken(currentWeek,c.id,idx);
+        html+='<div class="trk-dc sched'+(taken?' taken':'')+'" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+idx+')"></div>';
+      }
+    });
+    html+='</div></div>';
+  });
+  if(cs.length===0){
+    html+='<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;"><em>No shots scheduled this week.</em></div>';
+  }
+  document.getElementById('trackerGrid').innerHTML=html;
+  // label
+  var wlbl=document.getElementById('wLabel');
+  wlbl.innerHTML='Week '+currentWeek+'<small>'+(phase?phase.name:'—')+'</small>';
+  document.getElementById('wPrev').disabled=currentWeek<=1;
+  document.getElementById('wNext').disabled=currentWeek>=TOTAL_WEEKS;
+  // notes
+  document.getElementById('wkNotes').value=state['W'+currentWeek+'-notes']||'';
+}
+
+function changeWeek(delta){
+  var n=currentWeek+delta;
+  if(n<1||n>TOTAL_WEEKS)return;
+  currentWeek=n;renderTracker();updateStats();
+}
+
+function saveNotes(){state['W'+currentWeek+'-notes']=document.getElementById('wkNotes').value;saveState();}
+
+function markAllToday(){
+  var dow=new Date().getDay();
+  var dayOrder=[1,2,3,4,5,6,0];
+  var idx=dayOrder.indexOf(dow);
+  if(idx<0)return;
+  var cs=compoundsForWeek(currentWeek);
+  cs.forEach(function(c){if(c.days.indexOf(dow)>-1)state[doseKey(currentWeek,c.id,idx)]=true;});
+  saveState();renderTracker();updateStats();
+}
+
+function clearWeek(){
+  if(!confirm('Clear all logs for Week '+currentWeek+'?'))return;
+  var notes=state['W'+currentWeek+'-notes']||'';
+  var keys=Object.keys(state).filter(function(k){return k.indexOf('W'+currentWeek+'-')===0;});
+  keys.forEach(function(k){delete state[k];});
+  if(notes)state['W'+currentWeek+'-notes']=notes;
+  saveState();renderTracker();updateStats();
+}
+
+function updateStats(){
+  // this week
+  var cs=compoundsForWeek(currentWeek);
+  var dayOrder=[1,2,3,4,5,6,0];
+  var weekTaken=0, weekScheduled=0;
+  cs.forEach(function(c){
+    dayOrder.forEach(function(dow,idx){
+      if(c.days.indexOf(dow)>-1){weekScheduled++;if(isDoseTaken(currentWeek,c.id,idx))weekTaken++;}
+    });
+  });
+  // cycle total
+  var totalTaken=0;
+  for(var w=1;w<=TOTAL_WEEKS;w++){
+    var wcs=compoundsForWeek(w);
+    wcs.forEach(function(c){
+      dayOrder.forEach(function(dow,idx){
+        if(c.days.indexOf(dow)>-1&&isDoseTaken(w,c.id,idx))totalTaken++;
+      });
+    });
+  }
+  var pct=TOTAL_SHOTS?Math.round((totalTaken/TOTAL_SHOTS)*100):0;
+  document.getElementById('stW').textContent='W'+currentWeek;
+  document.getElementById('stD').textContent=weekTaken+'/'+weekScheduled;
+  document.getElementById('stP').textContent=pct+'%';
+  document.getElementById('pFill').style.width=pct+'%';
+  document.getElementById('pLbl').textContent=totalTaken+' / '+TOTAL_SHOTS+' shots';
+}
+
+// ============ ICS ============
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please set your Cycle Start Date first, then download the calendar.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function uid(d,l){return icsD(d)+'-'+l.replace(/[^a-zA-Z0-9]/g,'')+'-BLS-KN-043@biolinkedsolutions.com';}
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    evts.push('BEGIN:VEVENT','UID:'+uid(d,lbl),'DTSTAMP:'+icsD(new Date())+'T080000Z',
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(d),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection — Kyle Nelson','END:VALARM','END:VEVENT');
+  }
+  var dayOrder=[1,2,3,4,5,6,0];
+  for(var w=1;w<=TOTAL_WEEKS;w++){
+    var cs=compoundsForWeek(w);
+    if(cs.length===0)continue;
+    for(var di=0;di<7;di++){
+      var dow=dayOrder[di];
+      var wkStart=weekStartDate(w);
+      // align to Monday
+      var s=new Date(wkStart);var wkD=s.getDay();var diff=(wkD===0)?-6:(1-wkD);
+      var monday=addDays(s,diff);
+      var cellDate=addDays(monday,di);
+      var lines=[];
+      cs.forEach(function(c){
+        if(c.days.indexOf(dow)>-1)lines.push(c.name+' '+c.sub);
+      });
+      if(lines.length===0)continue;
+      var title='BLS · Kyle · W'+w+' '+DAY_NAMES[dow]+' · '+lines.length+' shot'+(lines.length>1?'s':'');
+      var desc='Gorilla Stack — Kyle Nelson · Week '+w+'\\n\\n'+lines.join('\\n')+'\\n\\nBioLinked · BLS-KN-043';
+      addE(cellDate,title,desc,'W'+w+'D'+di);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked Solutions//Gorilla Stack — Kyle Nelson//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Gorilla Stack Kyle Nelson','X-WR-CALDESC:16-week peptide stack: HGH (mixed supply) + CJC/Ipa + IGF-1 LR3 + 5-Amino-1MQ + L-Carnitine','X-APPLE-CALENDAR-COLOR:#7A6530'].concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='BLS-Gorilla-Stack-Kyle-Nelson.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+
+loadState();
+</script>
+
+</body>
+</html>
