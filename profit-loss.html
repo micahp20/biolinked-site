@@ -182,6 +182,40 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
 .kit-hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
 .form-actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 22px; }
 .form-input.field-error, .form-select.field-error { border-color: #c0392b !important; box-shadow: 0 0 0 2px rgba(192,57,43,0.12) !important; background: #fdf4f3 !important; }
+.combobox { position: relative; }
+.combobox-list { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; max-height: 240px; overflow-y: auto; background: var(--surface); border: 1px solid var(--gold-border); border-radius: 6px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); z-index: 1000; }
+.combobox-item { padding: 10px 13px; font-size: 14px; color: var(--text); cursor: pointer; transition: background 0.12s; }
+.combobox-item:hover { background: var(--gold-glow); }
+.combobox-item.combobox-create { border-top: 1px solid var(--gold-border); }
+.combobox-empty { padding: 12px 13px; font-size: 12px; color: var(--muted); font-style: italic; }
+.engagement-badge { display: inline-block; font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 700; padding: 3px 9px; border-radius: 99px; border: 1px solid; }
+.engagement-badge.hot  { color: var(--gold);  background: var(--gold-glow); border-color: var(--gold-border-bright); }
+.engagement-badge.warm { color: var(--muted); background: var(--surface2);  border-color: var(--gold-border); }
+.engagement-badge.cold { color: var(--red);   background: var(--red-bg);    border-color: var(--red-border); }
+.link-pill { display: inline-block; font-size: 12px; color: var(--gold); background: var(--gold-glow); border: 1px solid var(--gold-border); padding: 2px 9px; border-radius: 99px; font-weight: 600; }
+.merge-preview { background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 6px; padding: 12px 14px; margin: 12px 0 6px; font-size: 12px; color: var(--text2); line-height: 1.55; }
+.merge-preview strong { color: var(--gold); font-weight: 700; }
+.link-all-rows { display: flex; flex-direction: column; gap: 12px; max-height: 50vh; overflow-y: auto; padding-right: 4px; }
+.link-all-row { display: grid; grid-template-columns: 1fr 1.2fr; gap: 12px; align-items: center; padding: 10px 12px; background: var(--surface2); border: 1px solid var(--gold-border); border-radius: 6px; }
+.link-all-row-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.link-all-row-sub  { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.detail-section { padding: 14px 0; border-bottom: 1px solid var(--gold-border); }
+.detail-section:last-child { border-bottom: none; }
+.detail-label { font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 6px; }
+.detail-value { font-size: 14px; color: var(--text); }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+.linked-list { display: flex; flex-direction: column; gap: 6px; max-height: 280px; overflow-y: auto; }
+.linked-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: 10px; align-items: center; padding: 8px 10px; background: var(--surface2); border-radius: 6px; font-size: 13px; }
+.linked-row-name { font-weight: 500; }
+.linked-row-meta { font-size: 11px; color: var(--muted); }
+.unlink-btn { background: transparent; border: 1px solid var(--red-border); color: var(--red); font-size: 11px; padding: 4px 10px; border-radius: 4px; cursor: pointer; }
+.unlink-btn:hover { background: var(--red-bg); }
+.pivot-cell { text-align: right; font-variant-numeric: tabular-nums; }
+.pivot-cell.hot { background: var(--gold-glow); font-weight: 700; color: var(--gold); }
+.pivot-cell.empty { color: var(--muted2); }
+.pivot-rowname { font-weight: 600; color: var(--text); position: sticky; left: 0; background: var(--surface); }
+#pivotTable th { white-space: nowrap; }
+#pivotTable td { padding: 8px 12px; }
 
 /* Activity log */
 .log-panel { margin-top: 28px; background: var(--surface); border: 1px solid var(--gold-border); border-radius: 10px; overflow: hidden; }
@@ -319,6 +353,8 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       <button class="tab-btn" data-tab="products" onclick="switchTab('products',this)">🧪 Products</button>
       <button class="tab-btn" data-tab="orders" onclick="switchTab('orders',this)">📥 Orders</button>
       <button class="tab-btn" data-tab="sales" onclick="switchTab('sales',this)">💰 Sales</button>
+      <button class="tab-btn" data-tab="clients" onclick="switchTab('clients',this)">👥 Clients</button>
+      <button class="tab-btn" data-tab="vendors" onclick="switchTab('vendors',this)">🏷 Vendors</button>
       <button class="tab-btn" data-tab="reports" onclick="switchTab('reports',this)">📊 Reports</button>
     </div>
 
@@ -343,7 +379,6 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
             <th class="sortable" data-table="inv" data-col="name" data-type="text">Peptide / Compound</th>
             <th class="sortable" data-table="inv" data-col="vials" data-type="num">Vials Remaining</th>
             <th class="sortable hide-mob" data-table="inv" data-col="vialSize" data-type="text">Vial Size</th>
-            <th class="sortable hide-mob" data-table="inv" data-col="kitQty" data-type="num">Kit Size</th>
             <th class="sortable" data-table="inv" data-col="status" data-type="text">Status</th>
             <th class="hide-mob">Note</th>
             <th>Actions</th>
@@ -410,6 +445,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
           <span class="search-icon">🔍</span>
           <input type="text" id="ordersSearch" placeholder="Search vendor, product, note…" oninput="renderOrders()">
         </div>
+        <button class="btn btn-ghost btn-sm" id="ordersLinkAllBtn" onclick="openLinkAll('order')" style="display:none;margin-left:auto;">↗ Link All</button>
       </div>
       <div class="table-wrap">
         <table class="data-table">
@@ -435,6 +471,7 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
           <span class="search-icon">🔍</span>
           <input type="text" id="salesSearch" placeholder="Search customer, product, note…" oninput="renderSales()">
         </div>
+        <button class="btn btn-ghost btn-sm" id="salesLinkAllBtn" onclick="openLinkAll('sale')" style="display:none;margin-left:auto;">↗ Link All</button>
       </div>
       <div class="table-wrap">
         <table class="data-table">
@@ -453,6 +490,67 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
       </div>
     </div>
 
+    <!-- CLIENTS TAB -->
+    <div class="tab-panel" id="tab-clients">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="clientSearch" placeholder="Search name, email, phone…" oninput="renderClients()">
+        </div>
+        <div class="filter-tabs">
+          <button class="filter-tab active" onclick="setClientFilter('all',this)">All</button>
+          <button class="filter-tab" onclick="setClientFilter('hot',this)">Hot</button>
+          <button class="filter-tab" onclick="setClientFilter('warm',this)">Warm</button>
+          <button class="filter-tab" onclick="setClientFilter('cold',this)">Cold</button>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="openMergeModal('client')">↔ Merge Clients</button>
+          <button class="btn btn-primary btn-sm" onclick="openClientModal()">＋ Add Client</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" data-table="clientList" data-col="name"   data-type="text">Client</th>
+            <th class="sortable" data-table="clientList" data-col="spend"  data-type="num">Total Spent</th>
+            <th class="sortable" data-table="clientList" data-col="orders" data-type="num">Orders</th>
+            <th class="sortable hide-mob" data-table="clientList" data-col="last" data-type="date">Last Order</th>
+            <th class="hide-mob">Contact</th>
+            <th>Status</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="clientsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- VENDORS TAB -->
+    <div class="tab-panel" id="tab-vendors">
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="vendorSearch" placeholder="Search name…" oninput="renderVendors()">
+        </div>
+        <div style="margin-left:auto;display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="openMergeModal('vendor')">↔ Merge Vendors</button>
+          <button class="btn btn-primary btn-sm" onclick="openVendorModal()">＋ Add Vendor</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" data-table="vendorList" data-col="name"   data-type="text">Vendor</th>
+            <th class="sortable" data-table="vendorList" data-col="spend"  data-type="num">Total Spent</th>
+            <th class="sortable" data-table="vendorList" data-col="orders" data-type="num">Orders</th>
+            <th class="sortable hide-mob" data-table="vendorList" data-col="last" data-type="date">Last Order</th>
+            <th class="hide-mob">Contact</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="vendorsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- REPORTS TAB -->
     <div class="tab-panel" id="tab-reports">
       <div class="filter-bar">
@@ -461,6 +559,49 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
         <span class="filter-label">To</span>
         <input type="date" class="date-input" id="reportTo" onchange="renderReports()">
         <button class="btn btn-ghost btn-sm" onclick="clearReportDates()">Clear</button>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">⭐ Top Clients by Spend (this year)</div>
+        <button class="btn btn-ghost btn-sm" id="topClientsToggle" onclick="toggleTopClientsAll()" style="display:none;">Show all</button>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" data-table="topClients" data-col="name"   data-type="text">Client</th>
+            <th class="sortable" data-table="topClients" data-col="spend"  data-type="num">Total Spent</th>
+            <th class="sortable" data-table="topClients" data-col="orders" data-type="num">Orders</th>
+            <th class="sortable hide-mob" data-table="topClients" data-col="last" data-type="date">Last Order</th>
+            <th>Status</th>
+          </tr></thead>
+          <tbody id="topClientsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-header"><div class="section-title">🔁 Re-engagement List — clients with no order in 60+ days</div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr>
+            <th class="sortable" data-table="reengage" data-col="name"   data-type="text">Client</th>
+            <th class="sortable" data-table="reengage" data-col="last"   data-type="date">Last Order</th>
+            <th class="sortable" data-table="reengage" data-col="days"   data-type="num">Days Since</th>
+            <th class="sortable" data-table="reengage" data-col="spend"  data-type="num">Historical Spend</th>
+            <th class="hide-mob">Contact</th>
+            <th>Action</th>
+          </tr></thead>
+          <tbody id="reengageBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-header">
+        <div class="section-title">🔥 Hot Products by Client (last 12 mo)</div>
+        <button class="btn btn-ghost btn-sm" id="pivotToggleBtn" onclick="togglePivotAll()" style="display:none;">Show all</button>
+      </div>
+      <div class="table-wrap" id="pivotWrap">
+        <table class="data-table" id="pivotTable">
+          <thead id="pivotHead"></thead>
+          <tbody id="pivotBody"></tbody>
+        </table>
       </div>
 
       <div class="section-header"><div class="section-title">💰 Top Customers — Who's Spending Most With You</div></div>
@@ -577,8 +718,28 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
   <div class="modal">
     <button class="modal-close" onclick="closeModal('orderModal')">✕</button>
     <div class="modal-title">Log <em>Order</em></div>
-    <div class="form-group"><label class="form-label">Product *</label><select class="form-select" id="oProduct" onchange="fillOrderCost()"></select></div>
-    <div class="form-group"><label class="form-label">Vendor</label><input class="form-input" id="oVendor" list="vendorList" placeholder="Supplier name"><datalist id="vendorList"></datalist></div>
+    <div class="form-group">
+      <label class="form-label">Product *</label>
+      <div class="combobox">
+        <input type="hidden" id="oProductId" value="">
+        <input type="text" class="form-input" id="oProductSearch" placeholder="Type to search or create…" autocomplete="off"
+          oninput="filterProductCombobox()"
+          onfocus="filterProductCombobox()"
+          onblur="setTimeout(closeProductCombobox, 200)">
+        <div class="combobox-list" id="oProductList"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Vendor</label>
+      <div class="combobox">
+        <input type="hidden" id="oVendorId" value="">
+        <input type="text" class="form-input" id="oVendorSearch" placeholder="Type to search or create (optional)…" autocomplete="off"
+          oninput="filterVendorCombobox('o')"
+          onfocus="filterVendorCombobox('o')"
+          onblur="setTimeout(()=>closeVendorCombobox('o'), 200)">
+        <div class="combobox-list" id="oVendorList"></div>
+      </div>
+    </div>
     <div class="form-grid2">
       <div class="form-group"><label class="form-label">Date *</label><input class="form-input" id="oDate" type="date"></div>
       <div class="form-group"><label class="form-label">Qty (Vials) *</label><input class="form-input" id="oQty" type="number" min="1" placeholder="10"></div>
@@ -586,6 +747,10 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     <div class="form-group"><label class="form-label">Unit Cost / Vial ($)</label><input class="form-input" id="oUnitCost" type="number" min="0" step="0.01" placeholder="Auto-fills from product"></div>
     <div class="form-group"><label class="form-label">Note (optional)</label><input class="form-input" id="oNote" placeholder="Lot #, PO #, etc."></div>
     <div class="form-group" id="oSyncHint" style="font-size:11px;color:var(--muted);margin-top:-6px;">—</div>
+    <div class="form-group" style="flex-direction:row;align-items:center;gap:10px;margin-bottom:6px;">
+      <input type="checkbox" id="oCreateOrdered" checked onchange="updateOrderSyncHint()" style="width:18px;height:18px;cursor:pointer;accent-color:var(--gold);flex-shrink:0;">
+      <label for="oCreateOrdered" style="font-size:13px;color:var(--text);cursor:pointer;font-weight:500;letter-spacing:0;text-transform:none;">Also add to Inventory as ORDERED</label>
+    </div>
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('orderModal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveOrder()">Log Order</button>
@@ -599,7 +764,17 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     <button class="modal-close" onclick="closeModal('saleModal')">✕</button>
     <div class="modal-title">Log <em>Sale</em></div>
     <div class="form-group"><label class="form-label">Product *</label><select class="form-select" id="sProduct" onchange="fillSalePrice()"></select></div>
-    <div class="form-group"><label class="form-label">Customer</label><input class="form-input" id="sCustomer" list="customerList" placeholder="Customer name"><datalist id="customerList"></datalist></div>
+    <div class="form-group">
+      <label class="form-label">Client</label>
+      <div class="combobox">
+        <input type="hidden" id="sClientId" value="">
+        <input type="text" class="form-input" id="sClientSearch" placeholder="Type to search or create…" autocomplete="off"
+          oninput="filterClientCombobox('s')"
+          onfocus="filterClientCombobox('s')"
+          onblur="setTimeout(()=>closeClientCombobox('s'), 200)">
+        <div class="combobox-list" id="sClientList"></div>
+      </div>
+    </div>
     <div class="form-grid2">
       <div class="form-group"><label class="form-label">Date *</label><input class="form-input" id="sDate" type="date"></div>
       <div class="form-group"><label class="form-label">Qty (Vials) *</label><input class="form-input" id="sQty" type="number" min="1" placeholder="1"></div>
@@ -610,6 +785,134 @@ body::before { content: ''; position: fixed; inset: 0; background-image: url("da
     <div class="form-actions">
       <button class="btn btn-ghost" onclick="closeModal('saleModal')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSale()">Log Sale</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── CLIENT MODAL (add/edit) ───── -->
+<div class="modal-overlay" id="clientModal" onclick="closeModalOutside(event,'clientModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('clientModal')">✕</button>
+    <div class="modal-title" id="clientModalTitle">Add <em>Client</em></div>
+    <div class="form-group"><label class="form-label">Name *</label><input class="form-input" id="cName" placeholder="Client name" /></div>
+    <div class="form-grid2">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="cEmail" type="email" placeholder="email@example.com" /></div>
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="cPhone" placeholder="(555) 555-5555" /></div>
+    </div>
+    <div class="form-group"><label class="form-label">Venmo Handle</label><input class="form-input" id="cVenmo" placeholder="@handle" /></div>
+    <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="cNotes" placeholder="Optional notes" /></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('clientModal')">Cancel</button>
+      <button class="btn btn-primary" id="cSaveBtn" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── VENDOR MODAL (add/edit) ───── -->
+<div class="modal-overlay" id="vendorModal" onclick="closeModalOutside(event,'vendorModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('vendorModal')">✕</button>
+    <div class="modal-title" id="vendorModalTitle">Add <em>Vendor</em></div>
+    <div class="form-group"><label class="form-label">Name *</label><input class="form-input" id="vName" placeholder="Vendor name" /></div>
+    <div class="form-group"><label class="form-label">Contact Name</label><input class="form-input" id="vContact" placeholder="Sales rep / point of contact" /></div>
+    <div class="form-grid2">
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="vEmail" type="email" /></div>
+      <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="vPhone" /></div>
+    </div>
+    <div class="form-group"><label class="form-label">Website</label><input class="form-input" id="vWebsite" placeholder="https://..." /></div>
+    <div class="form-group"><label class="form-label">Notes</label><input class="form-input" id="vNotes" placeholder="Optional notes" /></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('vendorModal')">Cancel</button>
+      <button class="btn btn-primary" id="vSaveBtn" onclick="saveVendor()">Save Vendor</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── CLIENT DETAIL MODAL ───── -->
+<div class="modal-overlay" id="clientDetailModal" onclick="closeModalOutside(event,'clientDetailModal')">
+  <div class="modal" style="max-width:640px;">
+    <button class="modal-close" onclick="closeModal('clientDetailModal')">✕</button>
+    <div id="clientDetailBody"></div>
+  </div>
+</div>
+
+<!-- ───── VENDOR DETAIL MODAL ───── -->
+<div class="modal-overlay" id="vendorDetailModal" onclick="closeModalOutside(event,'vendorDetailModal')">
+  <div class="modal" style="max-width:640px;">
+    <button class="modal-close" onclick="closeModal('vendorDetailModal')">✕</button>
+    <div id="vendorDetailBody"></div>
+  </div>
+</div>
+
+<!-- ───── MERGE MODAL (clients & vendors) ───── -->
+<div class="modal-overlay" id="mergeModal" onclick="closeModalOutside(event,'mergeModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('mergeModal')">✕</button>
+    <div class="modal-title" id="mergeModalTitle">Merge <em>Records</em></div>
+    <div class="form-group">
+      <label class="form-label">Merge this <span id="mergeKindFrom">record</span></label>
+      <div class="combobox">
+        <input type="hidden" id="mergeFromId" value="">
+        <input type="text" class="form-input" id="mergeFromSearch" placeholder="Type to search…" autocomplete="off"
+          oninput="filterMergeCombobox('from')"
+          onfocus="filterMergeCombobox('from')"
+          onblur="setTimeout(()=>closeMergeCombobox('from'), 200)">
+        <div class="combobox-list" id="mergeFromList"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Into this <span id="mergeKindInto">record</span></label>
+      <div class="combobox">
+        <input type="hidden" id="mergeIntoId" value="">
+        <input type="text" class="form-input" id="mergeIntoSearch" placeholder="Type to search…" autocomplete="off"
+          oninput="filterMergeCombobox('into')"
+          onfocus="filterMergeCombobox('into')"
+          onblur="setTimeout(()=>closeMergeCombobox('into'), 200)">
+        <div class="combobox-list" id="mergeIntoList"></div>
+      </div>
+    </div>
+    <div id="mergePreview" class="merge-preview">Pick both records to see what will move.</div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('mergeModal')">Cancel</button>
+      <button class="btn btn-danger" id="mergeConfirmBtn" onclick="confirmMerge()" disabled>Confirm Merge</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── LINK ROW MODAL (single sale or order) ───── -->
+<div class="modal-overlay" id="linkRowModal" onclick="closeModalOutside(event,'linkRowModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('linkRowModal')">✕</button>
+    <div class="modal-title" id="linkRowTitle">Link <em>Record</em></div>
+    <div id="linkRowSummary" class="merge-preview" style="margin-top:0;"></div>
+    <div class="form-group">
+      <label class="form-label" id="linkRowLabel">Link to</label>
+      <div class="combobox">
+        <input type="hidden" id="linkRowId" value="">
+        <input type="text" class="form-input" id="linkRowSearch" placeholder="Type to search or create…" autocomplete="off"
+          oninput="filterLinkRowCombobox()"
+          onfocus="filterLinkRowCombobox()"
+          onblur="setTimeout(closeLinkRowCombobox, 200)">
+        <div class="combobox-list" id="linkRowList"></div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('linkRowModal')">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmLinkRow()">Link</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── LINK ALL MATCHING MODAL ───── -->
+<div class="modal-overlay" id="linkAllModal" onclick="closeModalOutside(event,'linkAllModal')">
+  <div class="modal" style="max-width:720px;">
+    <button class="modal-close" onclick="closeModal('linkAllModal')">✕</button>
+    <div class="modal-title" id="linkAllTitle">Link All <em>Matching</em></div>
+    <div id="linkAllSummary" class="merge-preview" style="margin-top:0;"></div>
+    <div id="linkAllRows" class="link-all-rows"></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal('linkAllModal')">Cancel</button>
+      <button class="btn btn-primary" id="linkAllConfirmBtn" onclick="confirmLinkAll()">Confirm All</button>
     </div>
   </div>
 </div>
@@ -655,21 +958,37 @@ let items = [];       // inventory
 let products = [];    // pl_products
 let orders = [];      // pl_orders
 let sales = [];       // pl_sales
+let clients = [];     // pl_clients
+let vendors = [];     // pl_vendors
 let activeTab = 'inventory';
 let activeInvFilter = 'all';
+let activeClientFilter = 'all';
 let editInvId = null;
 let editProductId = null;
+let editClientId = null;
+let editVendorId = null;
+let detailClientId = null;
+let detailVendorId = null;
+let mergeMode = null;       // 'client' | 'vendor'
+let linkRowMode = null;     // 'sale' | 'order'
+let linkRowTargetId = null;
+let linkAllMode = null;     // 'sale' | 'order'
+let linkAllAssignments = []; // [{name, ids:[], clientId|vendorId}]
 let logEntries = [];
 
 const sortState = {
-  inv:       { col: null, dir: 'asc' },
-  overview:  { col: null, dir: 'asc' },
-  products:  { col: null, dir: 'asc' },
-  orders:    { col: 'date', dir: 'desc' },
-  sales:     { col: 'date', dir: 'desc' },
-  customers: { col: 'spend', dir: 'desc' },
-  vendors:   { col: 'spend', dir: 'desc' },
-  deadstock: { col: 'vials', dir: 'desc' }
+  inv:        { col: null, dir: 'asc' },
+  overview:   { col: null, dir: 'asc' },
+  products:   { col: null, dir: 'asc' },
+  orders:     { col: 'date', dir: 'desc' },
+  sales:      { col: 'date', dir: 'desc' },
+  customers:  { col: 'spend', dir: 'desc' },
+  vendors:    { col: 'spend', dir: 'desc' },
+  deadstock:  { col: 'vials', dir: 'desc' },
+  clientList: { col: 'spend', dir: 'desc' },
+  vendorList: { col: 'spend', dir: 'desc' },
+  topClients: { col: 'spend', dir: 'desc' },
+  reengage:   { col: 'spend', dir: 'desc' }
 };
 
 /* ═══════════════════════════════════════════════
@@ -689,11 +1008,13 @@ function updateLastUpdated() {
 async function loadAll() {
   setSyncStatus('syncing', 'Loading…');
   try {
-    const [inv, prods, ords, sls] = await Promise.all([
+    const [inv, prods, ords, sls, cls, vds] = await Promise.all([
       supa('inventory',   'GET', null, '?order=name.asc'),
       supa('pl_products', 'GET', null, '?order=name.asc'),
       supa('pl_orders',   'GET', null, '?order=date.desc'),
-      supa('pl_sales',    'GET', null, '?order=date.desc')
+      supa('pl_sales',    'GET', null, '?order=date.desc'),
+      supa('pl_clients',  'GET', null, '?order=name.asc'),
+      supa('pl_vendors',  'GET', null, '?order=name.asc')
     ]);
     items = inv.map(r => ({
       id: r.id,
@@ -708,12 +1029,14 @@ async function loadAll() {
     products = prods.map(r => ({ id: r.id, name: r.name, cost: parseFloat(r.cost) || 0, sale: parseFloat(r.sale) || 0, inventoryId: r.inventory_id || null }));
     orders = ords.map(r => {
       const parsed = splitNote(r.note);
-      return { id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, unitCost: parseFloat(r.unit_cost) || 0, note: parsed.note, vendor: r.vendor || parsed.name };
+      return { id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, unitCost: parseFloat(r.unit_cost) || 0, note: parsed.note, vendor: r.vendor || parsed.name, vendorId: r.vendor_id || null };
     });
     sales = sls.map(r => {
       const parsed = splitNote(r.note);
-      return { id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, price: parseFloat(r.price) || 0, note: parsed.note, customer: r.customer || parsed.name };
+      return { id: r.id, productId: r.product_id, date: r.date, qty: parseInt(r.qty) || 0, price: parseFloat(r.price) || 0, note: parsed.note, customer: r.customer || parsed.name, clientId: r.client_id || null };
     });
+    clients = cls.map(r => ({ id: r.id, name: r.name, email: r.email || '', phone: r.phone || '', venmo: r.venmo_handle || '', notes: r.notes || '', lastContactedAt: r.last_contacted_at || null, createdAt: r.created_at }));
+    vendors = vds.map(r => ({ id: r.id, name: r.name, contactName: r.contact_name || '', email: r.email || '', phone: r.phone || '', website: r.website || '', notes: r.notes || '', createdAt: r.created_at }));
     setSyncStatus('synced', 'Synced');
     updateLastUpdated();
   } catch(e) {
@@ -750,16 +1073,23 @@ function switchTab(name, btn) {
     products:  '＋ Add Product',
     orders:    '＋ Log Order',
     sales:     '＋ Log Sale',
+    clients:   '＋ Add Client',
+    vendors:   '＋ Add Vendor',
     reports:   '＋ Log Sale'
   };
   primary.textContent = labels[name] || '＋ Add';
   primary.style.display = name === 'reports' ? 'none' : 'inline-flex';
+
+  if (name === 'clients') renderClients();
+  else if (name === 'vendors') renderVendors();
 }
 
 function primaryActionClick() {
   if (activeTab === 'inventory') openInvModal();
   else if (activeTab === 'products') openProductModal();
   else if (activeTab === 'orders') openOrderModal();
+  else if (activeTab === 'clients') openClientModal();
+  else if (activeTab === 'vendors') openVendorModal();
   else openSaleModal(); // overview & sales
 }
 
@@ -794,14 +1124,16 @@ document.addEventListener('click', (e) => {
   if (s.col === c) s.dir = s.dir === 'asc' ? 'desc' : 'asc';
   else { s.col = c; s.dir = (th.dataset.type === 'num' || th.dataset.type === 'date') ? 'desc' : 'asc'; }
   if (t === 'inv') renderInventory();
-  else if (t === 'customers' || t === 'vendors' || t === 'deadstock') renderReports();
+  else if (t === 'clientList') renderClients();
+  else if (t === 'vendorList') renderVendors();
+  else if (t === 'customers' || t === 'vendors' || t === 'deadstock' || t === 'topClients' || t === 'reengage') renderReports();
   else renderPL();
 });
 
 /* ═══════════════════════════════════════════════
    MASTER RENDER
    ═══════════════════════════════════════════════ */
-function renderAll() { renderInventory(); renderPL(); }
+function renderAll() { renderInventory(); renderPL(); renderClients(); renderVendors(); }
 function renderPL()  { renderPLStats(); renderOverview(); renderProducts(); renderOrders(); renderSales(); renderReports(); updateSortIndicators(); }
 
 /* ═══════════════════════════════════════════════
@@ -845,7 +1177,7 @@ function renderInventory() {
   }
 
   if (!filtered.length) {
-    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-title">No items found</div><div class="empty-state-sub">Adjust filters or add a compound</div></div></td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><div class="empty-state-icon">🧪</div><div class="empty-state-title">No items found</div><div class="empty-state-sub">Adjust filters or add a compound</div></div></td></tr>`;
     updateSortIndicators();
     return;
   }
@@ -855,7 +1187,7 @@ function renderInventory() {
     const maxV = Math.max(item.kitQty * 10, item.vials, 10);
     const pct = Math.min((item.vials / maxV) * 100, 100);
     return `<tr id="row-${item.id}">
-      <td><div class="cell-name">${esc(item.name)}</div><div class="cell-meta">${item.kitQty} kit${item.kitQty !== 1 ? 's' : ''} ordered</div></td>
+      <td><div class="cell-name">${esc(item.name)}</div></td>
       <td>
         <div class="vial-bar-wrap"><div class="vial-bar-bg"><div class="vial-bar-fill ${barClass(st)}" style="width:${pct}%"></div></div><span class="vial-count-text">${item.vials}</span></div>
         <div class="qty-edit-wrap" id="edit-${item.id}">
@@ -866,10 +1198,10 @@ function renderInventory() {
         </div>
       </td>
       <td class="hide-mob vials-cell">${item.vialSize}</td>
-      <td class="hide-mob vials-cell">${item.kitQty}× kit</td>
       <td><span class="status-badge ${statusClass(st)}">${statusLabel(st)}</span></td>
       <td class="hide-mob">${item.note ? `<span class="note-tag" title="${esc(item.note)}">${esc(item.note)}</span>` : '<span style="color:var(--muted2);font-size:11px;">—</span>'}</td>
       <td><div class="row-actions" id="actions-${item.id}">
+        ${st === 'ordered' ? `<button class="btn btn-primary btn-sm" onclick="receiveOrder('${item.id}')">↓ Receive</button>` : ''}
         <button class="btn btn-ghost btn-sm" onclick="startEdit('${item.id}')">✏ Edit</button>
         <button class="btn btn-danger btn-sm" onclick="deleteItem('${item.id}')">✕</button>
       </div></td>
@@ -1190,6 +1522,13 @@ function renderProducts() {
 function renderOrders() {
   const tbody = document.getElementById('ordersBody');
   const search = (document.getElementById('ordersSearch')?.value || '').toLowerCase().trim();
+  // Update Link All button visibility
+  const linkAllBtn = document.getElementById('ordersLinkAllBtn');
+  if (linkAllBtn) {
+    const unlinkedCount = orders.filter(o => !o.vendorId && o.vendor).length;
+    linkAllBtn.style.display = unlinkedCount > 0 ? 'inline-flex' : 'none';
+    linkAllBtn.textContent = `↗ Link All (${unlinkedCount})`;
+  }
   if (!orders.length) { tbody.innerHTML = emptyRow(8, '📥', 'No orders logged', 'Log purchase orders to track your COGS'); return; }
   let rows = orders.map(o => ({ ...o, total: o.unitCost * o.qty, name: pName(o.productId).toLowerCase() }));
   if (search) rows = rows.filter(r => r.name.includes(search) || (r.vendor || '').toLowerCase().includes(search) || (r.note || '').toLowerCase().includes(search));
@@ -1202,21 +1541,37 @@ function renderOrders() {
     unitCost: r => r.unitCost,
     total:    r => r.total
   });
-  tbody.innerHTML = rows.map(o => `<tr>
-    <td><div class="cell-name">${esc(pName(o.productId))}</div></td>
-    <td style="font-weight:500;">${o.vendor ? esc(o.vendor) : '<span style="color:var(--muted2);">—</span>'}</td>
-    <td style="color:var(--text2);">${fmtDate(o.date)}</td>
-    <td style="font-weight:600;">${o.qty}</td>
-    <td class="cell-money hide-mob">${fmt(o.unitCost)}</td>
-    <td class="cell-money c-red">${fmt(o.unitCost * o.qty)}</td>
-    <td class="hide-mob" style="color:var(--muted);font-size:12px;">${esc(o.note || '—')}</td>
-    <td><div class="cell-actions"><button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">✕</button></div></td>
-  </tr>`).join('');
+  tbody.innerHTML = rows.map(o => {
+    const showLink = !o.vendorId && o.vendor;
+    const vendorCell = o.vendorId
+      ? `<span class="link-pill">${esc(o.vendor || '—')}</span>`
+      : (o.vendor ? esc(o.vendor) : '<span style="color:var(--muted2);">—</span>');
+    return `<tr>
+      <td><div class="cell-name">${esc(pName(o.productId))}</div></td>
+      <td style="font-weight:500;">${vendorCell}</td>
+      <td style="color:var(--text2);">${fmtDate(o.date)}</td>
+      <td style="font-weight:600;">${o.qty}</td>
+      <td class="cell-money hide-mob">${fmt(o.unitCost)}</td>
+      <td class="cell-money c-red">${fmt(o.unitCost * o.qty)}</td>
+      <td class="hide-mob" style="color:var(--muted);font-size:12px;">${esc(o.note || '—')}</td>
+      <td><div class="cell-actions">
+        ${showLink ? `<button class="btn btn-ghost btn-sm" onclick="openLinkRow('order','${o.id}')">↗ Link</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
 }
 
 function renderSales() {
   const tbody = document.getElementById('salesBody');
   const search = (document.getElementById('salesSearch')?.value || '').toLowerCase().trim();
+  // Update Link All button visibility
+  const linkAllBtn = document.getElementById('salesLinkAllBtn');
+  if (linkAllBtn) {
+    const unlinkedCount = sales.filter(s => !s.clientId && s.customer).length;
+    linkAllBtn.style.display = unlinkedCount > 0 ? 'inline-flex' : 'none';
+    linkAllBtn.textContent = `↗ Link All (${unlinkedCount})`;
+  }
   if (!sales.length) { tbody.innerHTML = emptyRow(8, '💰', 'No sales logged', 'Log a sale to start tracking revenue'); return; }
   let rows = sales.map(s => ({ ...s, total: s.price * s.qty, name: pName(s.productId).toLowerCase() }));
   if (search) rows = rows.filter(r => r.name.includes(search) || (r.customer || '').toLowerCase().includes(search) || (r.note || '').toLowerCase().includes(search));
@@ -1229,16 +1584,25 @@ function renderSales() {
     price:    r => r.price,
     total:    r => r.total
   });
-  tbody.innerHTML = rows.map(s => `<tr>
-    <td><div class="cell-name">${esc(pName(s.productId))}</div></td>
-    <td style="font-weight:500;">${s.customer ? esc(s.customer) : '<span style="color:var(--muted2);">—</span>'}</td>
-    <td style="color:var(--text2);">${fmtDate(s.date)}</td>
-    <td style="font-weight:600;">${s.qty}</td>
-    <td class="cell-money hide-mob">${fmt(s.price)}</td>
-    <td class="cell-money c-green">${fmt(s.price * s.qty)}</td>
-    <td class="hide-mob" style="color:var(--muted);font-size:12px;">${esc(s.note || '—')}</td>
-    <td><div class="cell-actions"><button class="btn btn-danger btn-sm" onclick="deleteSale('${s.id}')">✕</button></div></td>
-  </tr>`).join('');
+  tbody.innerHTML = rows.map(s => {
+    const showLink = !s.clientId && s.customer;
+    const customerCell = s.clientId
+      ? `<span class="link-pill">${esc(s.customer || '—')}</span>`
+      : (s.customer ? esc(s.customer) : '<span style="color:var(--muted2);">—</span>');
+    return `<tr>
+      <td><div class="cell-name">${esc(pName(s.productId))}</div></td>
+      <td style="font-weight:500;">${customerCell}</td>
+      <td style="color:var(--text2);">${fmtDate(s.date)}</td>
+      <td style="font-weight:600;">${s.qty}</td>
+      <td class="cell-money hide-mob">${fmt(s.price)}</td>
+      <td class="cell-money c-green">${fmt(s.price * s.qty)}</td>
+      <td class="hide-mob" style="color:var(--muted);font-size:12px;">${esc(s.note || '—')}</td>
+      <td><div class="cell-actions">
+        ${showLink ? `<button class="btn btn-ghost btn-sm" onclick="openLinkRow('sale','${s.id}')">↗ Link</button>` : ''}
+        <button class="btn btn-danger btn-sm" onclick="deleteSale('${s.id}')">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
 }
 
 /* ═══════════════════════════════════════════════
@@ -1260,6 +1624,9 @@ function clearReportDates() {
 }
 
 function renderReports() {
+  renderTopClients();
+  renderReengagement();
+  renderHotProductsPivot();
   renderTopCustomers();
   renderTopVendors();
   renderDeadStock();
@@ -1422,29 +1789,39 @@ async function deleteProduct(id) {
 }
 
 function openOrderModal() {
-  if (!products.length) { alert('Add a product first (go to the Products tab).'); return; }
-  const sel = document.getElementById('oProduct');
-  sel.innerHTML = products.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
-  fillOrderCost();
+  document.getElementById('oProductId').value = '';
+  document.getElementById('oProductSearch').value = '';
+  document.getElementById('oVendorId').value = '';
+  document.getElementById('oVendorSearch').value = '';
+  document.getElementById('oUnitCost').value = '';
   document.getElementById('oDate').value = today();
   document.getElementById('oQty').value = '1';
-  document.getElementById('oVendor').value = '';
   document.getElementById('oNote').value = '';
-  const vlist = [...new Set(orders.map(o => o.vendor).filter(Boolean))].sort();
-  document.getElementById('vendorList').innerHTML = vlist.map(v => `<option value="${esc(v)}">`).join('');
+  document.getElementById('oCreateOrdered').checked = true;
+  updateOrderSyncHint();
   openModal('orderModal');
 }
 function fillOrderCost() {
-  const id = document.getElementById('oProduct').value;
+  const id = document.getElementById('oProductId').value;
   const p = products.find(p => String(p.id) === String(id));
   if (p && p.cost) document.getElementById('oUnitCost').value = p.cost;
   updateOrderSyncHint();
 }
 function updateOrderSyncHint() {
-  const id = document.getElementById('oProduct').value;
+  const id = document.getElementById('oProductId').value;
   const p = products.find(p => String(p.id) === String(id));
   const hint = document.getElementById('oSyncHint');
-  if (!p || !p.inventoryId) { hint.textContent = 'Not linked to inventory — stock won\'t auto-update. Edit product to link.'; hint.style.color = 'var(--muted)'; return; }
+  const createOrdered = document.getElementById('oCreateOrdered')?.checked;
+  if (!p || !p.inventoryId) {
+    if (createOrdered) {
+      hint.textContent = '✓ Will create new inventory row tagged ORDERED.';
+      hint.style.color = 'var(--green)';
+      return;
+    }
+    hint.textContent = 'Not linked to inventory — stock won\'t auto-update. Edit product to link.';
+    hint.style.color = 'var(--muted)';
+    return;
+  }
   const item = items.find(i => String(i.id) === String(p.inventoryId));
   if (!item) { hint.textContent = 'Linked inventory item missing.'; hint.style.color = 'var(--red)'; return; }
   hint.textContent = `✓ Will add to inventory: ${item.name} (${item.vials} vials → +qty)`;
@@ -1452,22 +1829,40 @@ function updateOrderSyncHint() {
 }
 
 async function saveOrder() {
-  const productId = document.getElementById('oProduct').value;
-  const vendor = document.getElementById('oVendor').value.trim();
+  const productId = document.getElementById('oProductId').value;
+  const vendorId  = document.getElementById('oVendorId').value || null;
+  const vendorTyped = document.getElementById('oVendorSearch').value.trim();
+  const resolvedVendor = vendors.find(v => String(v.id) === String(vendorId));
+  const vendor = resolvedVendor ? resolvedVendor.name : vendorTyped;
   const date = document.getElementById('oDate').value;
   const qty = parseInt(document.getElementById('oQty').value) || 0;
   const unitCost = parseFloat(document.getElementById('oUnitCost').value) || 0;
   const note = document.getElementById('oNote').value.trim();
+  const createOrdered = document.getElementById('oCreateOrdered').checked;
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
   const body = { product_id: productId, date, qty, unit_cost: unitCost };
+  if (vendorId) body.vendor_id = vendorId;
+  if (vendor) body.vendor = vendor;
   const fullNote = vendor ? (note ? `${vendor} · ${note}` : vendor) : (note || null);
   if (fullNote) body.note = fullNote;
   try {
     const res = await supa('pl_orders', 'POST', body);
-    if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note: fullNote || '', vendor });
+    if (res && res[0]) orders.push({ id: res[0].id, productId, date, qty, unitCost, note: fullNote || '', vendor, vendorId });
     else { throw new Error('Supabase returned empty response — likely RLS blocked the insert.'); }
-    await adjustInventoryForProduct(productId, +qty, `order +${qty}${vendor ? ' · ' + vendor : ''}`);
+    const product = products.find(p => String(p.id) === String(productId));
+    if (createOrdered && product && !product.inventoryId) {
+      const invBody = { name: product.name, vials: qty, vial_size: '3mL', kit_qty: 1, note: vendor || null, status: 'ordered' };
+      const invRes = await supa('inventory', 'POST', invBody);
+      if (invRes && invRes[0]) {
+        items.push({ id: invRes[0].id, name: product.name, vials: qty, vialSize: '3mL', kitQty: 1, note: vendor || '', status: 'ordered', addedAt: Date.now() });
+        product.inventoryId = invRes[0].id;
+        await supa('pl_products', 'PATCH', { inventory_id: invRes[0].id }, `?id=eq.${product.id}`).catch(() => {});
+        addLog(`Ordered: ${product.name} — ${qty} vials${vendor ? ' · ' + vendor : ''}`, 'var(--gold)');
+      }
+    } else {
+      await adjustInventoryForProduct(productId, +qty, `order +${qty}${vendor ? ' · ' + vendor : ''}`);
+    }
     setSyncStatus('synced', 'Saved ✓');
     updateLastUpdated();
     closeModal('orderModal');
@@ -1491,6 +1886,81 @@ async function deleteOrder(id) {
   });
 }
 
+async function receiveOrder(id) {
+  const item = items.find(i => String(i.id) === String(id));
+  if (!item) return;
+  const oldStatus = item.status;
+  const newStatus = item.vials === 0 ? 'out' : item.vials <= 3 ? 'low' : 'in-stock';
+  setSyncStatus('syncing', 'Receiving…');
+  try {
+    await supa('inventory', 'PATCH', { status: newStatus }, `?id=eq.${id}`);
+    item.status = newStatus;
+    addLog(`Received: ${item.name} (${item.vials} vials in stock)`, 'var(--green)');
+    setSyncStatus('synced', 'Saved ✓');
+    updateLastUpdated();
+    renderInventory();
+  } catch(e) {
+    console.error('Receive failed:', e);
+    item.status = oldStatus;
+    setSyncStatus('error', 'Error');
+    alert('Receive failed: ' + (e.message || e));
+  }
+}
+
+function filterProductCombobox() {
+  const q = document.getElementById('oProductSearch').value.trim();
+  const qLower = q.toLowerCase();
+  const list = document.getElementById('oProductList');
+  const matches = qLower
+    ? products.filter(p => p.name.toLowerCase().includes(qLower))
+    : products.slice();
+  matches.sort((a, b) => a.name.localeCompare(b.name));
+  let html = matches.map(p => `<div class="combobox-item" onmousedown="event.preventDefault();selectProductFromCombobox('${p.id}')">${esc(p.name)}${p.cost ? ` <span style="color:var(--muted);font-size:11px;">$${p.cost.toFixed(2)}</span>` : ''}</div>`).join('');
+  const exact = matches.some(p => p.name.toLowerCase() === qLower);
+  if (q && !exact) {
+    html += `<div class="combobox-item combobox-create" onmousedown="event.preventDefault();createProductFromCombobox()"><span style="color:var(--gold);font-weight:600;">+ Create new product:</span> ${esc(q)}</div>`;
+  }
+  if (!html) html = `<div class="combobox-empty">No products yet — type a name to create one.</div>`;
+  list.innerHTML = html;
+  list.style.display = 'block';
+}
+
+function selectProductFromCombobox(id) {
+  const p = products.find(p => String(p.id) === String(id));
+  if (!p) return;
+  document.getElementById('oProductId').value = p.id;
+  document.getElementById('oProductSearch').value = p.name;
+  closeProductCombobox();
+  fillOrderCost();
+}
+
+async function createProductFromCombobox() {
+  const name = document.getElementById('oProductSearch').value.trim();
+  if (!name) return;
+  setSyncStatus('syncing', 'Creating…');
+  try {
+    const res = await supa('pl_products', 'POST', { name, cost: 0, sale: 0, inventory_id: null });
+    if (res && res[0]) {
+      const newP = { id: res[0].id, name, cost: 0, sale: 0, inventoryId: null };
+      products.push(newP);
+      selectProductFromCombobox(newP.id);
+      setSyncStatus('synced', 'Saved ✓');
+      updateLastUpdated();
+    } else {
+      throw new Error('Empty response from Supabase.');
+    }
+  } catch(e) {
+    console.error('Create product failed:', e);
+    setSyncStatus('error', 'Error');
+    alert('Could not create product: ' + (e.message || e));
+  }
+}
+
+function closeProductCombobox() {
+  const list = document.getElementById('oProductList');
+  if (list) list.style.display = 'none';
+}
+
 function openSaleModal() {
   if (!products.length) { alert('Add a product first (go to the Products tab).'); return; }
   const sel = document.getElementById('sProduct');
@@ -1498,10 +1968,9 @@ function openSaleModal() {
   fillSalePrice();
   document.getElementById('sDate').value = today();
   document.getElementById('sQty').value = '1';
-  document.getElementById('sCustomer').value = '';
+  document.getElementById('sClientId').value = '';
+  document.getElementById('sClientSearch').value = '';
   document.getElementById('sNote').value = '';
-  const clist = [...new Set(sales.map(s => s.customer).filter(Boolean))].sort();
-  document.getElementById('customerList').innerHTML = clist.map(c => `<option value="${esc(c)}">`).join('');
   openModal('saleModal');
 }
 function fillSalePrice() {
@@ -1523,7 +1992,10 @@ function updateSaleSyncHint() {
 
 async function saveSale() {
   const productId = document.getElementById('sProduct').value;
-  const customer = document.getElementById('sCustomer').value.trim();
+  const clientId  = document.getElementById('sClientId').value || null;
+  const clientTyped = document.getElementById('sClientSearch').value.trim();
+  const resolvedClient = clients.find(c => String(c.id) === String(clientId));
+  const customer = resolvedClient ? resolvedClient.name : clientTyped;
   const date = document.getElementById('sDate').value;
   const qty = parseInt(document.getElementById('sQty').value) || 0;
   const price = parseFloat(document.getElementById('sPrice').value) || 0;
@@ -1531,11 +2003,13 @@ async function saveSale() {
   if (!productId || !date || !qty) { alert('Product, date, and qty are required.'); return; }
   setSyncStatus('syncing', 'Saving…');
   const body = { product_id: productId, date, qty, price };
+  if (clientId) body.client_id = clientId;
+  if (customer) body.customer = customer;
   const fullNote = customer ? (note ? `${customer} · ${note}` : customer) : (note || null);
   if (fullNote) body.note = fullNote;
   try {
     const res = await supa('pl_sales', 'POST', body);
-    if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note: fullNote || '', customer });
+    if (res && res[0]) sales.push({ id: res[0].id, productId, date, qty, price, note: fullNote || '', customer, clientId });
     else { throw new Error('Supabase returned empty response — likely RLS blocked the insert.'); }
     await adjustInventoryForProduct(productId, -qty, `sale −${qty}${customer ? ' · ' + customer : ''}`);
     setSyncStatus('synced', 'Saved ✓');
@@ -1645,10 +2119,875 @@ function emptyRow(cols, icon, title, sub) { return `<tr><td colspan="${cols}"><d
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
-    ['invModal','productModal','orderModal','saleModal','confirmOverlay'].forEach(id => closeModal(id));
+    ['invModal','productModal','orderModal','saleModal','clientModal','vendorModal','clientDetailModal','vendorDetailModal','mergeModal','linkRowModal','linkAllModal','confirmOverlay'].forEach(id => closeModal(id));
     closeSheet();
   }
 });
+
+/* ═══════════════════════════════════════════════
+   CLIENTS / VENDORS — STATS + BADGES
+   ═══════════════════════════════════════════════ */
+function daysSince(dateStr) {
+  if (!dateStr) return Infinity;
+  const dt = new Date(dateStr + 'T12:00:00');
+  if (isNaN(dt)) return Infinity;
+  return Math.floor((Date.now() - dt.getTime()) / 86400000);
+}
+function engagementBadge(lastDateStr) {
+  const d = daysSince(lastDateStr);
+  if (d === Infinity) return 'cold';
+  if (d <= 30) return 'hot';
+  if (d <= 90) return 'warm';
+  return 'cold';
+}
+function clientStats(clientId) {
+  const linked = sales.filter(s => String(s.clientId) === String(clientId));
+  let spend = 0, vials = 0, last = '';
+  linked.forEach(s => {
+    spend += s.qty * s.price;
+    vials += s.qty;
+    if (!last || s.date > last) last = s.date;
+  });
+  return { spend, vials, orders: linked.length, last };
+}
+function vendorStats(vendorId) {
+  const linked = orders.filter(o => String(o.vendorId) === String(vendorId));
+  let spend = 0, vials = 0, last = '';
+  linked.forEach(o => {
+    spend += o.qty * o.unitCost;
+    vials += o.qty;
+    if (!last || o.date > last) last = o.date;
+  });
+  return { spend, vials, orders: linked.length, last };
+}
+function findClient(id) { return clients.find(c => String(c.id) === String(id)) || null; }
+function findVendor(id) { return vendors.find(v => String(v.id) === String(id)) || null; }
+function setClientFilter(f, btn) {
+  activeClientFilter = f;
+  document.querySelectorAll('#tab-clients .filter-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderClients();
+}
+
+/* ═══════════════════════════════════════════════
+   CLIENTS — RENDER
+   ═══════════════════════════════════════════════ */
+function renderClients() {
+  const tbody = document.getElementById('clientsBody');
+  if (!tbody) return;
+  const search = (document.getElementById('clientSearch')?.value || '').toLowerCase().trim();
+  if (!clients.length) {
+    tbody.innerHTML = emptyRow(6, '👥', 'No clients yet', 'Add a client or create one inline from the Sale modal');
+    return;
+  }
+  let rows = clients.map(c => {
+    const st = clientStats(c.id);
+    return { ...c, ...st, badge: engagementBadge(st.last) };
+  });
+  if (search) {
+    rows = rows.filter(r =>
+      (r.name || '').toLowerCase().includes(search) ||
+      (r.email || '').toLowerCase().includes(search) ||
+      (r.phone || '').toLowerCase().includes(search)
+    );
+  }
+  if (activeClientFilter !== 'all') rows = rows.filter(r => r.badge === activeClientFilter);
+  if (!rows.length) { tbody.innerHTML = emptyRow(6, '🔍', 'No matches', 'Try clearing filters'); return; }
+  rows = sortRows(rows, 'clientList', {
+    name:   r => (r.name || '').toLowerCase(),
+    spend:  r => r.spend,
+    orders: r => r.orders,
+    last:   r => r.last ? new Date(r.last).getTime() : 0
+  });
+  tbody.innerHTML = rows.map(r => {
+    const contactRaw = r.email || r.phone || '';
+    const contactCell = contactRaw ? esc(contactRaw) : '<span style="color:var(--muted2);">—</span>';
+    return `<tr style="cursor:pointer;" onclick="openClientDetail('${r.id}')">
+      <td><div class="cell-name">${esc(r.name)}</div></td>
+      <td class="cell-money c-green">${fmt(r.spend)}</td>
+      <td style="font-weight:600;">${r.orders}</td>
+      <td class="hide-mob" style="color:var(--muted);">${r.last ? fmtDate(r.last) : '—'}</td>
+      <td class="hide-mob" style="color:var(--text2);font-size:12px;">${contactCell}</td>
+      <td><span class="engagement-badge ${r.badge}">${r.badge}</span></td>
+      <td><div class="cell-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openClientModal('${r.id}')">✏ Edit</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   VENDORS — RENDER
+   ═══════════════════════════════════════════════ */
+function renderVendors() {
+  const tbody = document.getElementById('vendorsBody');
+  if (!tbody) return;
+  const search = (document.getElementById('vendorSearch')?.value || '').toLowerCase().trim();
+  if (!vendors.length) {
+    tbody.innerHTML = emptyRow(5, '🏷', 'No vendors yet', 'Add a vendor or create one inline from the Order modal');
+    return;
+  }
+  let rows = vendors.map(v => {
+    const st = vendorStats(v.id);
+    return { ...v, ...st };
+  });
+  if (search) rows = rows.filter(r => (r.name || '').toLowerCase().includes(search));
+  if (!rows.length) { tbody.innerHTML = emptyRow(5, '🔍', 'No matches', 'Try a different search term'); return; }
+  rows = sortRows(rows, 'vendorList', {
+    name:   r => (r.name || '').toLowerCase(),
+    spend:  r => r.spend,
+    orders: r => r.orders,
+    last:   r => r.last ? new Date(r.last).getTime() : 0
+  });
+  tbody.innerHTML = rows.map(r => {
+    const contactRaw = r.email || r.phone || r.contactName || '';
+    const contactCell = contactRaw ? esc(contactRaw) : '<span style="color:var(--muted2);">—</span>';
+    return `<tr style="cursor:pointer;" onclick="openVendorDetail('${r.id}')">
+      <td><div class="cell-name">${esc(r.name)}</div></td>
+      <td class="cell-money c-red">${fmt(r.spend)}</td>
+      <td style="font-weight:600;">${r.orders}</td>
+      <td class="hide-mob" style="color:var(--muted);">${r.last ? fmtDate(r.last) : '—'}</td>
+      <td class="hide-mob" style="color:var(--text2);font-size:12px;">${contactCell}</td>
+      <td><div class="cell-actions"><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openVendorModal('${r.id}')">✏ Edit</button></div></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   CLIENTS / VENDORS — CRUD
+   ═══════════════════════════════════════════════ */
+function openClientModal(id) {
+  editClientId = id || null;
+  if (id) {
+    const c = findClient(id); if (!c) return;
+    document.getElementById('clientModalTitle').innerHTML = 'Edit <em>Client</em>';
+    document.getElementById('cSaveBtn').textContent = 'Save Changes';
+    document.getElementById('cName').value  = c.name;
+    document.getElementById('cEmail').value = c.email;
+    document.getElementById('cPhone').value = c.phone;
+    document.getElementById('cVenmo').value = c.venmo;
+    document.getElementById('cNotes').value = c.notes;
+  } else {
+    document.getElementById('clientModalTitle').innerHTML = 'Add <em>Client</em>';
+    document.getElementById('cSaveBtn').textContent = 'Save Client';
+    ['cName','cEmail','cPhone','cVenmo','cNotes'].forEach(k => document.getElementById(k).value = '');
+  }
+  openModal('clientModal');
+  setTimeout(() => document.getElementById('cName').focus(), 100);
+}
+
+async function saveClient() {
+  const name = document.getElementById('cName').value.trim();
+  if (!name) { document.getElementById('cName').focus(); return; }
+  const body = {
+    name,
+    email: document.getElementById('cEmail').value.trim() || null,
+    phone: document.getElementById('cPhone').value.trim() || null,
+    venmo_handle: document.getElementById('cVenmo').value.trim() || null,
+    notes: document.getElementById('cNotes').value.trim() || null
+  };
+  setSyncStatus('syncing', 'Saving…');
+  try {
+    if (editClientId) {
+      await supa('pl_clients', 'PATCH', body, `?id=eq.${editClientId}`);
+      const c = findClient(editClientId);
+      if (c) Object.assign(c, { name: body.name, email: body.email || '', phone: body.phone || '', venmo: body.venmo_handle || '', notes: body.notes || '' });
+    } else {
+      const res = await supa('pl_clients', 'POST', body);
+      if (res && res[0]) clients.push({ id: res[0].id, name, email: body.email || '', phone: body.phone || '', venmo: body.venmo_handle || '', notes: body.notes || '', lastContactedAt: null, createdAt: res[0].created_at });
+    }
+    setSyncStatus('synced', 'Saved ✓'); updateLastUpdated();
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Save failed: ' + (e.message || e)); }
+  closeModal('clientModal');
+  renderClients(); renderReports();
+}
+
+async function deleteClient(id) {
+  const c = findClient(id); if (!c) return;
+  showConfirm(`Delete client "${c.name}"? Linked sales will be unlinked but kept.`, async () => {
+    try {
+      await supa('pl_clients', 'DELETE', null, `?id=eq.${id}`);
+      clients = clients.filter(x => String(x.id) !== String(id));
+      sales.forEach(s => { if (String(s.clientId) === String(id)) s.clientId = null; });
+      closeModal('clientDetailModal');
+      renderClients(); renderSales(); renderReports();
+    } catch(e) { console.error(e); alert('Delete failed: ' + (e.message || e)); }
+  });
+}
+
+function openVendorModal(id) {
+  editVendorId = id || null;
+  if (id) {
+    const v = findVendor(id); if (!v) return;
+    document.getElementById('vendorModalTitle').innerHTML = 'Edit <em>Vendor</em>';
+    document.getElementById('vSaveBtn').textContent = 'Save Changes';
+    document.getElementById('vName').value     = v.name;
+    document.getElementById('vContact').value  = v.contactName;
+    document.getElementById('vEmail').value    = v.email;
+    document.getElementById('vPhone').value    = v.phone;
+    document.getElementById('vWebsite').value  = v.website;
+    document.getElementById('vNotes').value    = v.notes;
+  } else {
+    document.getElementById('vendorModalTitle').innerHTML = 'Add <em>Vendor</em>';
+    document.getElementById('vSaveBtn').textContent = 'Save Vendor';
+    ['vName','vContact','vEmail','vPhone','vWebsite','vNotes'].forEach(k => document.getElementById(k).value = '');
+  }
+  openModal('vendorModal');
+  setTimeout(() => document.getElementById('vName').focus(), 100);
+}
+
+async function saveVendor() {
+  const name = document.getElementById('vName').value.trim();
+  if (!name) { document.getElementById('vName').focus(); return; }
+  const body = {
+    name,
+    contact_name: document.getElementById('vContact').value.trim() || null,
+    email: document.getElementById('vEmail').value.trim() || null,
+    phone: document.getElementById('vPhone').value.trim() || null,
+    website: document.getElementById('vWebsite').value.trim() || null,
+    notes: document.getElementById('vNotes').value.trim() || null
+  };
+  setSyncStatus('syncing', 'Saving…');
+  try {
+    if (editVendorId) {
+      await supa('pl_vendors', 'PATCH', body, `?id=eq.${editVendorId}`);
+      const v = findVendor(editVendorId);
+      if (v) Object.assign(v, { name: body.name, contactName: body.contact_name || '', email: body.email || '', phone: body.phone || '', website: body.website || '', notes: body.notes || '' });
+    } else {
+      const res = await supa('pl_vendors', 'POST', body);
+      if (res && res[0]) vendors.push({ id: res[0].id, name, contactName: body.contact_name || '', email: body.email || '', phone: body.phone || '', website: body.website || '', notes: body.notes || '', createdAt: res[0].created_at });
+    }
+    setSyncStatus('synced', 'Saved ✓'); updateLastUpdated();
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Save failed: ' + (e.message || e)); }
+  closeModal('vendorModal');
+  renderVendors(); renderReports();
+}
+
+async function deleteVendor(id) {
+  const v = findVendor(id); if (!v) return;
+  showConfirm(`Delete vendor "${v.name}"? Linked orders will be unlinked but kept.`, async () => {
+    try {
+      await supa('pl_vendors', 'DELETE', null, `?id=eq.${id}`);
+      vendors = vendors.filter(x => String(x.id) !== String(id));
+      orders.forEach(o => { if (String(o.vendorId) === String(id)) o.vendorId = null; });
+      closeModal('vendorDetailModal');
+      renderVendors(); renderOrders(); renderReports();
+    } catch(e) { console.error(e); alert('Delete failed: ' + (e.message || e)); }
+  });
+}
+
+/* ═══════════════════════════════════════════════
+   CLIENT / VENDOR — DETAIL MODALS
+   ═══════════════════════════════════════════════ */
+function openClientDetail(id) {
+  detailClientId = id;
+  const c = findClient(id); if (!c) return;
+  const linked = sales.filter(s => String(s.clientId) === String(id)).sort((a, b) => (a.date > b.date ? -1 : 1));
+  const st = clientStats(id);
+  const badge = engagementBadge(st.last);
+  const linkedHtml = linked.length
+    ? linked.map(s => `<div class="linked-row">
+        <div><div class="linked-row-name">${esc(pName(s.productId))}</div><div class="linked-row-meta">${fmtDate(s.date)} · qty ${s.qty}</div></div>
+        <div class="cell-money c-green">${fmt(s.qty * s.price)}</div>
+        <button class="unlink-btn" onclick="unlinkSale('${s.id}')">Unlink</button>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:12px;">No linked sales yet.</div>';
+  document.getElementById('clientDetailBody').innerHTML = `
+    <div class="modal-title">${esc(c.name)} <span class="engagement-badge ${badge}" style="vertical-align:middle;margin-left:8px;">${badge}</span></div>
+    <div class="detail-section">
+      <div class="detail-grid">
+        <div><div class="detail-label">Email</div><div class="detail-value">${esc(c.email || '—')}</div></div>
+        <div><div class="detail-label">Phone</div><div class="detail-value">${esc(c.phone || '—')}</div></div>
+        <div><div class="detail-label">Venmo</div><div class="detail-value">${esc(c.venmo || '—')}</div></div>
+        <div><div class="detail-label">Last Contacted</div><div class="detail-value">${c.lastContactedAt ? fmtDate(c.lastContactedAt.slice(0,10)) : '—'}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">Notes</div>
+      <textarea id="cDetailNotes" class="form-input" style="min-height:60px;font-size:13px;" onblur="saveClientNotes('${c.id}')">${esc(c.notes || '')}</textarea>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">${linked.length} linked sale${linked.length === 1 ? '' : 's'} · ${fmt(st.spend)} total</div>
+      <div class="linked-list">${linkedHtml}</div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger btn-sm" onclick="deleteClient('${c.id}')">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('clientDetailModal')">Close</button>
+      <button class="btn btn-primary" onclick="closeModal('clientDetailModal');openClientModal('${c.id}')">Edit</button>
+    </div>
+  `;
+  openModal('clientDetailModal');
+}
+
+async function saveClientNotes(id) {
+  const c = findClient(id); if (!c) return;
+  const v = document.getElementById('cDetailNotes').value;
+  if (v === c.notes) return;
+  c.notes = v;
+  try { await supa('pl_clients', 'PATCH', { notes: v || null }, `?id=eq.${id}`); } catch(e) { console.error(e); }
+}
+
+function openVendorDetail(id) {
+  detailVendorId = id;
+  const v = findVendor(id); if (!v) return;
+  const linked = orders.filter(o => String(o.vendorId) === String(id)).sort((a, b) => (a.date > b.date ? -1 : 1));
+  const st = vendorStats(id);
+  const linkedHtml = linked.length
+    ? linked.map(o => `<div class="linked-row">
+        <div><div class="linked-row-name">${esc(pName(o.productId))}</div><div class="linked-row-meta">${fmtDate(o.date)} · qty ${o.qty}</div></div>
+        <div class="cell-money c-red">${fmt(o.qty * o.unitCost)}</div>
+        <button class="unlink-btn" onclick="unlinkOrder('${o.id}')">Unlink</button>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:12px;">No linked orders yet.</div>';
+  document.getElementById('vendorDetailBody').innerHTML = `
+    <div class="modal-title">${esc(v.name)}</div>
+    <div class="detail-section">
+      <div class="detail-grid">
+        <div><div class="detail-label">Contact</div><div class="detail-value">${esc(v.contactName || '—')}</div></div>
+        <div><div class="detail-label">Email</div><div class="detail-value">${esc(v.email || '—')}</div></div>
+        <div><div class="detail-label">Phone</div><div class="detail-value">${esc(v.phone || '—')}</div></div>
+        <div><div class="detail-label">Website</div><div class="detail-value">${v.website ? `<a href="${esc(v.website)}" target="_blank" style="color:var(--gold);">${esc(v.website)}</a>` : '—'}</div></div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">Notes</div>
+      <textarea id="vDetailNotes" class="form-input" style="min-height:60px;font-size:13px;" onblur="saveVendorNotes('${v.id}')">${esc(v.notes || '')}</textarea>
+    </div>
+    <div class="detail-section">
+      <div class="detail-label">${linked.length} linked order${linked.length === 1 ? '' : 's'} · ${fmt(st.spend)} total</div>
+      <div class="linked-list">${linkedHtml}</div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-danger btn-sm" onclick="deleteVendor('${v.id}')">Delete</button>
+      <button class="btn btn-ghost" onclick="closeModal('vendorDetailModal')">Close</button>
+      <button class="btn btn-primary" onclick="closeModal('vendorDetailModal');openVendorModal('${v.id}')">Edit</button>
+    </div>
+  `;
+  openModal('vendorDetailModal');
+}
+
+async function saveVendorNotes(id) {
+  const v = findVendor(id); if (!v) return;
+  const val = document.getElementById('vDetailNotes').value;
+  if (val === v.notes) return;
+  v.notes = val;
+  try { await supa('pl_vendors', 'PATCH', { notes: val || null }, `?id=eq.${id}`); } catch(e) { console.error(e); }
+}
+
+async function unlinkSale(saleId) {
+  const s = sales.find(x => String(x.id) === String(saleId)); if (!s) return;
+  try {
+    await supa('pl_sales', 'PATCH', { client_id: null }, `?id=eq.${saleId}`);
+    s.clientId = null;
+    if (detailClientId) openClientDetail(detailClientId);
+    renderSales(); renderClients(); renderReports();
+  } catch(e) { console.error(e); alert('Unlink failed: ' + (e.message || e)); }
+}
+
+async function unlinkOrder(orderId) {
+  const o = orders.find(x => String(x.id) === String(orderId)); if (!o) return;
+  try {
+    await supa('pl_orders', 'PATCH', { vendor_id: null }, `?id=eq.${orderId}`);
+    o.vendorId = null;
+    if (detailVendorId) openVendorDetail(detailVendorId);
+    renderOrders(); renderVendors(); renderReports();
+  } catch(e) { console.error(e); alert('Unlink failed: ' + (e.message || e)); }
+}
+
+/* ═══════════════════════════════════════════════
+   CLIENT / VENDOR — COMBOBOXES
+   ═══════════════════════════════════════════════ */
+function _renderComboboxList(listEl, items, q, onSelectFn, onCreateFn) {
+  const qLower = q.toLowerCase();
+  let html = items.map(it => `<div class="combobox-item" onmousedown="event.preventDefault();${onSelectFn}('${it.id}')">${esc(it.name)}</div>`).join('');
+  const exact = items.some(it => it.name.toLowerCase() === qLower);
+  if (q && !exact && onCreateFn) {
+    html += `<div class="combobox-item combobox-create" onmousedown="event.preventDefault();${onCreateFn}()"><span style="color:var(--gold);font-weight:600;">+ Create new:</span> ${esc(q)}</div>`;
+  }
+  if (!html) html = `<div class="combobox-empty">No matches — type a name to create one.</div>`;
+  listEl.innerHTML = html;
+  listEl.style.display = 'block';
+}
+
+function filterClientCombobox(prefix) {
+  const q = document.getElementById(prefix + 'ClientSearch').value.trim();
+  const list = document.getElementById(prefix + 'ClientList');
+  const matched = (q ? clients.filter(c => c.name.toLowerCase().includes(q.toLowerCase())) : clients.slice())
+    .sort((a, b) => a.name.localeCompare(b.name));
+  _renderComboboxList(list, matched, q, prefix === 's' ? 'selectClientFromCombobox_s' : 'selectClientFromCombobox_' + prefix, prefix === 's' ? 'createClientFromCombobox_s' : 'createClientFromCombobox_' + prefix);
+}
+function selectClientFromCombobox_s(id) {
+  const c = findClient(id); if (!c) return;
+  document.getElementById('sClientId').value = c.id;
+  document.getElementById('sClientSearch').value = c.name;
+  closeClientCombobox('s');
+}
+async function createClientFromCombobox_s() {
+  const name = document.getElementById('sClientSearch').value.trim();
+  if (!name) return;
+  setSyncStatus('syncing', 'Creating…');
+  try {
+    const res = await supa('pl_clients', 'POST', { name });
+    if (res && res[0]) {
+      const newC = { id: res[0].id, name, email: '', phone: '', venmo: '', notes: '', lastContactedAt: null, createdAt: res[0].created_at };
+      clients.push(newC);
+      selectClientFromCombobox_s(newC.id);
+      setSyncStatus('synced', 'Saved ✓'); updateLastUpdated();
+    } else throw new Error('Empty response');
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Create failed: ' + (e.message || e)); }
+}
+function closeClientCombobox(prefix) {
+  const list = document.getElementById(prefix + 'ClientList');
+  if (list) list.style.display = 'none';
+}
+
+function filterVendorCombobox(prefix) {
+  const q = document.getElementById(prefix + 'VendorSearch').value.trim();
+  const list = document.getElementById(prefix + 'VendorList');
+  const matched = (q ? vendors.filter(v => v.name.toLowerCase().includes(q.toLowerCase())) : vendors.slice())
+    .sort((a, b) => a.name.localeCompare(b.name));
+  _renderComboboxList(list, matched, q, 'selectVendorFromCombobox_' + prefix, 'createVendorFromCombobox_' + prefix);
+}
+function selectVendorFromCombobox_o(id) {
+  const v = findVendor(id); if (!v) return;
+  document.getElementById('oVendorId').value = v.id;
+  document.getElementById('oVendorSearch').value = v.name;
+  closeVendorCombobox('o');
+}
+async function createVendorFromCombobox_o() {
+  const name = document.getElementById('oVendorSearch').value.trim();
+  if (!name) return;
+  setSyncStatus('syncing', 'Creating…');
+  try {
+    const res = await supa('pl_vendors', 'POST', { name });
+    if (res && res[0]) {
+      const newV = { id: res[0].id, name, contactName: '', email: '', phone: '', website: '', notes: '', createdAt: res[0].created_at };
+      vendors.push(newV);
+      selectVendorFromCombobox_o(newV.id);
+      setSyncStatus('synced', 'Saved ✓'); updateLastUpdated();
+    } else throw new Error('Empty response');
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Create failed: ' + (e.message || e)); }
+}
+function closeVendorCombobox(prefix) {
+  const list = document.getElementById(prefix + 'VendorList');
+  if (list) list.style.display = 'none';
+}
+
+/* ═══════════════════════════════════════════════
+   MERGE — clients & vendors
+   ═══════════════════════════════════════════════ */
+function openMergeModal(mode) {
+  mergeMode = mode;
+  const kind = mode === 'client' ? 'client' : 'vendor';
+  document.getElementById('mergeModalTitle').innerHTML = `Merge <em>${kind === 'client' ? 'Clients' : 'Vendors'}</em>`;
+  document.getElementById('mergeKindFrom').textContent = kind;
+  document.getElementById('mergeKindInto').textContent = kind;
+  document.getElementById('mergeFromId').value = '';
+  document.getElementById('mergeIntoId').value = '';
+  document.getElementById('mergeFromSearch').value = '';
+  document.getElementById('mergeIntoSearch').value = '';
+  document.getElementById('mergeConfirmBtn').disabled = true;
+  document.getElementById('mergePreview').textContent = `Pick both ${kind}s to see what will move.`;
+  openModal('mergeModal');
+}
+
+function filterMergeCombobox(side) {
+  const q = document.getElementById('merge' + (side === 'from' ? 'From' : 'Into') + 'Search').value.trim();
+  const list = document.getElementById('merge' + (side === 'from' ? 'From' : 'Into') + 'List');
+  const source = mergeMode === 'client' ? clients : vendors;
+  const otherId = document.getElementById('merge' + (side === 'from' ? 'Into' : 'From') + 'Id').value;
+  const matched = (q ? source.filter(x => x.name.toLowerCase().includes(q.toLowerCase())) : source.slice())
+    .filter(x => String(x.id) !== String(otherId))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  _renderComboboxList(list, matched, q, 'selectMergeCombobox_' + side, null);
+}
+function selectMergeCombobox_from(id) { _selectMerge('from', id); }
+function selectMergeCombobox_into(id) { _selectMerge('into', id); }
+function _selectMerge(side, id) {
+  const source = mergeMode === 'client' ? clients : vendors;
+  const obj = source.find(x => String(x.id) === String(id));
+  if (!obj) return;
+  document.getElementById('merge' + (side === 'from' ? 'From' : 'Into') + 'Id').value = obj.id;
+  document.getElementById('merge' + (side === 'from' ? 'From' : 'Into') + 'Search').value = obj.name;
+  closeMergeCombobox(side);
+  updateMergePreview();
+}
+function closeMergeCombobox(side) {
+  const list = document.getElementById('merge' + (side === 'from' ? 'From' : 'Into') + 'List');
+  if (list) list.style.display = 'none';
+}
+function updateMergePreview() {
+  const fromId = document.getElementById('mergeFromId').value;
+  const intoId = document.getElementById('mergeIntoId').value;
+  const previewEl = document.getElementById('mergePreview');
+  const btn = document.getElementById('mergeConfirmBtn');
+  if (!fromId || !intoId) { previewEl.textContent = 'Pick both records to see what will move.'; btn.disabled = true; return; }
+  if (fromId === intoId) { previewEl.textContent = 'Source and target must differ.'; btn.disabled = true; return; }
+  const fromName = (mergeMode === 'client' ? findClient(fromId) : findVendor(fromId))?.name || '';
+  const intoName = (mergeMode === 'client' ? findClient(intoId) : findVendor(intoId))?.name || '';
+  let count = 0, total = 0;
+  if (mergeMode === 'client') {
+    sales.forEach(s => { if (String(s.clientId) === String(fromId)) { count++; total += s.qty * s.price; } });
+    previewEl.innerHTML = `Will reassign <strong>${count}</strong> sale${count === 1 ? '' : 's'} totaling <strong>${fmt(total)}</strong> from <strong>${esc(fromName)}</strong> → <strong>${esc(intoName)}</strong>, then delete <strong>${esc(fromName)}</strong>. <span style="color:var(--red);">No undo.</span>`;
+  } else {
+    orders.forEach(o => { if (String(o.vendorId) === String(fromId)) { count++; total += o.qty * o.unitCost; } });
+    previewEl.innerHTML = `Will reassign <strong>${count}</strong> order${count === 1 ? '' : 's'} totaling <strong>${fmt(total)}</strong> from <strong>${esc(fromName)}</strong> → <strong>${esc(intoName)}</strong>, then delete <strong>${esc(fromName)}</strong>. <span style="color:var(--red);">No undo.</span>`;
+  }
+  btn.disabled = false;
+}
+
+async function confirmMerge() {
+  const fromId = document.getElementById('mergeFromId').value;
+  const intoId = document.getElementById('mergeIntoId').value;
+  if (!fromId || !intoId || fromId === intoId) return;
+  setSyncStatus('syncing', 'Merging…');
+  try {
+    if (mergeMode === 'client') {
+      await supa('pl_sales', 'PATCH', { client_id: intoId }, `?client_id=eq.${fromId}`);
+      sales.forEach(s => { if (String(s.clientId) === String(fromId)) s.clientId = intoId; });
+      await supa('pl_clients', 'DELETE', null, `?id=eq.${fromId}`);
+      clients = clients.filter(c => String(c.id) !== String(fromId));
+    } else {
+      await supa('pl_orders', 'PATCH', { vendor_id: intoId }, `?vendor_id=eq.${fromId}`);
+      orders.forEach(o => { if (String(o.vendorId) === String(fromId)) o.vendorId = intoId; });
+      await supa('pl_vendors', 'DELETE', null, `?id=eq.${fromId}`);
+      vendors = vendors.filter(v => String(v.id) !== String(fromId));
+    }
+    setSyncStatus('synced', 'Merged ✓'); updateLastUpdated();
+    closeModal('mergeModal');
+    renderAll();
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Merge failed: ' + (e.message || e)); }
+}
+
+/* ═══════════════════════════════════════════════
+   LINK ROW — single sale or order
+   ═══════════════════════════════════════════════ */
+function openLinkRow(mode, rowId) {
+  linkRowMode = mode;
+  linkRowTargetId = rowId;
+  const isSale = mode === 'sale';
+  const row = isSale ? sales.find(s => String(s.id) === String(rowId)) : orders.find(o => String(o.id) === String(rowId));
+  if (!row) return;
+  document.getElementById('linkRowTitle').innerHTML = `Link <em>${isSale ? 'Sale' : 'Order'}</em>`;
+  document.getElementById('linkRowLabel').textContent = isSale ? 'Link this sale to which client?' : 'Link this order to which vendor?';
+  const typedName = isSale ? (row.customer || '') : (row.vendor || '');
+  const total = isSale ? row.qty * row.price : row.qty * row.unitCost;
+  document.getElementById('linkRowSummary').innerHTML = `<strong>${esc(pName(row.productId))}</strong> · ${fmtDate(row.date)} · qty ${row.qty} · <strong>${fmt(total)}</strong><br>Typed name: <strong>${esc(typedName || '—')}</strong>`;
+  document.getElementById('linkRowId').value = '';
+  document.getElementById('linkRowSearch').value = typedName;
+  openModal('linkRowModal');
+  setTimeout(filterLinkRowCombobox, 50);
+}
+
+function filterLinkRowCombobox() {
+  const q = document.getElementById('linkRowSearch').value.trim();
+  const list = document.getElementById('linkRowList');
+  const source = linkRowMode === 'sale' ? clients : vendors;
+  const matched = (q ? source.filter(x => x.name.toLowerCase().includes(q.toLowerCase())) : source.slice())
+    .sort((a, b) => a.name.localeCompare(b.name));
+  _renderComboboxList(list, matched, q, 'selectLinkRowCombobox', 'createLinkRowFromCombobox');
+}
+function selectLinkRowCombobox(id) {
+  const source = linkRowMode === 'sale' ? clients : vendors;
+  const obj = source.find(x => String(x.id) === String(id));
+  if (!obj) return;
+  document.getElementById('linkRowId').value = obj.id;
+  document.getElementById('linkRowSearch').value = obj.name;
+  closeLinkRowCombobox();
+}
+async function createLinkRowFromCombobox() {
+  const name = document.getElementById('linkRowSearch').value.trim();
+  if (!name) return;
+  const table = linkRowMode === 'sale' ? 'pl_clients' : 'pl_vendors';
+  setSyncStatus('syncing', 'Creating…');
+  try {
+    const res = await supa(table, 'POST', { name });
+    if (res && res[0]) {
+      if (linkRowMode === 'sale') clients.push({ id: res[0].id, name, email: '', phone: '', venmo: '', notes: '', lastContactedAt: null, createdAt: res[0].created_at });
+      else vendors.push({ id: res[0].id, name, contactName: '', email: '', phone: '', website: '', notes: '', createdAt: res[0].created_at });
+      selectLinkRowCombobox(res[0].id);
+      setSyncStatus('synced', 'Saved ✓'); updateLastUpdated();
+    }
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Create failed: ' + (e.message || e)); }
+}
+function closeLinkRowCombobox() {
+  const list = document.getElementById('linkRowList');
+  if (list) list.style.display = 'none';
+}
+async function confirmLinkRow() {
+  const id = document.getElementById('linkRowId').value;
+  if (!id || !linkRowTargetId) { alert('Pick a record first.'); return; }
+  setSyncStatus('syncing', 'Linking…');
+  try {
+    if (linkRowMode === 'sale') {
+      await supa('pl_sales', 'PATCH', { client_id: id }, `?id=eq.${linkRowTargetId}`);
+      const s = sales.find(x => String(x.id) === String(linkRowTargetId));
+      if (s) s.clientId = id;
+    } else {
+      await supa('pl_orders', 'PATCH', { vendor_id: id }, `?id=eq.${linkRowTargetId}`);
+      const o = orders.find(x => String(x.id) === String(linkRowTargetId));
+      if (o) o.vendorId = id;
+    }
+    setSyncStatus('synced', 'Linked ✓'); updateLastUpdated();
+    closeModal('linkRowModal');
+    renderAll();
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Link failed: ' + (e.message || e)); }
+}
+
+/* ═══════════════════════════════════════════════
+   LINK ALL MATCHING — batch retroactive linking
+   ═══════════════════════════════════════════════ */
+function openLinkAll(mode) {
+  linkAllMode = mode;
+  const isSale = mode === 'sale';
+  document.getElementById('linkAllTitle').innerHTML = `Link All <em>${isSale ? 'Sales' : 'Orders'} by Name</em>`;
+  // Group unlinked rows by typed name
+  const rows = isSale ? sales.filter(s => !s.clientId && s.customer) : orders.filter(o => !o.vendorId && o.vendor);
+  const groups = {};
+  rows.forEach(r => {
+    const key = (isSale ? r.customer : r.vendor).trim();
+    if (!groups[key]) groups[key] = { name: key, rowIds: [], count: 0, total: 0 };
+    groups[key].rowIds.push(r.id);
+    groups[key].count++;
+    groups[key].total += isSale ? r.qty * r.price : r.qty * r.unitCost;
+  });
+  const source = isSale ? clients : vendors;
+  linkAllAssignments = Object.values(groups).map((g, idx) => {
+    const match = source.find(x => x.name.toLowerCase() === g.name.toLowerCase());
+    return { ...g, idx, targetId: match ? match.id : '', search: match ? match.name : g.name, autoResolved: !!match };
+  });
+  const autoCount = linkAllAssignments.filter(g => g.autoResolved).length;
+  document.getElementById('linkAllSummary').innerHTML = `Found <strong>${linkAllAssignments.length}</strong> unique name${linkAllAssignments.length === 1 ? '' : 's'} across <strong>${rows.length}</strong> ${isSale ? 'sale' : 'order'}${rows.length === 1 ? '' : 's'}. ${autoCount > 0 ? `<strong style="color:var(--green);">${autoCount} auto-matched.</strong> ` : ''}Click "+ Create new" in any unmatched dropdown to create on the fly.`;
+  const container = document.getElementById('linkAllRows');
+  container.innerHTML = linkAllAssignments.map(g => `
+    <div class="link-all-row">
+      <div>
+        <div class="link-all-row-name">${esc(g.name)} ${g.autoResolved ? '<span style="color:var(--green);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;margin-left:6px;">✓ matched</span>' : ''}</div>
+        <div class="link-all-row-sub">${g.count} ${isSale ? 'sale' : 'order'}${g.count === 1 ? '' : 's'} · ${fmt(g.total)}</div>
+      </div>
+      <div class="combobox">
+        <input type="hidden" id="linkAllId_${g.idx}" value="${esc(g.targetId)}">
+        <input type="text" class="form-input" id="linkAllSearch_${g.idx}" placeholder="Type to search or create…" autocomplete="off"
+          oninput="filterLinkAllCombobox(${g.idx})"
+          onfocus="filterLinkAllCombobox(${g.idx})"
+          onblur="setTimeout(()=>closeLinkAllCombobox(${g.idx}), 200)"
+          value="${esc(g.search)}">
+        <div class="combobox-list" id="linkAllList_${g.idx}"></div>
+      </div>
+    </div>
+  `).join('');
+  openModal('linkAllModal');
+}
+
+function filterLinkAllCombobox(idx) {
+  const q = document.getElementById('linkAllSearch_' + idx).value.trim();
+  const list = document.getElementById('linkAllList_' + idx);
+  const source = linkAllMode === 'sale' ? clients : vendors;
+  const matched = (q ? source.filter(x => x.name.toLowerCase().includes(q.toLowerCase())) : source.slice())
+    .sort((a, b) => a.name.localeCompare(b.name));
+  // Custom render so onmousedown captures idx
+  const qLower = q.toLowerCase();
+  let html = matched.map(it => `<div class="combobox-item" onmousedown="event.preventDefault();selectLinkAllCombobox(${idx}, '${it.id}')">${esc(it.name)}</div>`).join('');
+  const exact = matched.some(it => it.name.toLowerCase() === qLower);
+  if (q && !exact) {
+    html += `<div class="combobox-item combobox-create" onmousedown="event.preventDefault();createLinkAllFromCombobox(${idx})"><span style="color:var(--gold);font-weight:600;">+ Create new:</span> ${esc(q)}</div>`;
+  }
+  if (!html) html = `<div class="combobox-empty">No matches — type a name to create one.</div>`;
+  list.innerHTML = html;
+  list.style.display = 'block';
+}
+function selectLinkAllCombobox(idx, id) {
+  const source = linkAllMode === 'sale' ? clients : vendors;
+  const obj = source.find(x => String(x.id) === String(id));
+  if (!obj) return;
+  document.getElementById('linkAllId_' + idx).value = obj.id;
+  document.getElementById('linkAllSearch_' + idx).value = obj.name;
+  if (linkAllAssignments[idx]) linkAllAssignments[idx].targetId = obj.id;
+  closeLinkAllCombobox(idx);
+}
+async function createLinkAllFromCombobox(idx) {
+  const name = document.getElementById('linkAllSearch_' + idx).value.trim();
+  if (!name) return;
+  const table = linkAllMode === 'sale' ? 'pl_clients' : 'pl_vendors';
+  setSyncStatus('syncing', 'Creating…');
+  try {
+    const res = await supa(table, 'POST', { name });
+    if (res && res[0]) {
+      if (linkAllMode === 'sale') clients.push({ id: res[0].id, name, email: '', phone: '', venmo: '', notes: '', lastContactedAt: null, createdAt: res[0].created_at });
+      else vendors.push({ id: res[0].id, name, contactName: '', email: '', phone: '', website: '', notes: '', createdAt: res[0].created_at });
+      selectLinkAllCombobox(idx, res[0].id);
+      setSyncStatus('synced', 'Saved ✓'); updateLastUpdated();
+    }
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Create failed: ' + (e.message || e)); }
+}
+function closeLinkAllCombobox(idx) {
+  const list = document.getElementById('linkAllList_' + idx);
+  if (list) list.style.display = 'none';
+}
+
+async function confirmLinkAll() {
+  const isSale = linkAllMode === 'sale';
+  const source = isSale ? clients : vendors;
+  // Final pass: try to resolve targetId from hidden input, then from a case-insensitive name match on the typed text.
+  const assignments = linkAllAssignments
+    .map(g => {
+      let targetId = g.targetId || document.getElementById('linkAllId_' + g.idx)?.value || '';
+      if (!targetId) {
+        const typed = (document.getElementById('linkAllSearch_' + g.idx)?.value || '').trim().toLowerCase();
+        if (typed) {
+          const match = source.find(x => x.name.toLowerCase() === typed);
+          if (match) targetId = match.id;
+        }
+      }
+      return { ...g, targetId };
+    })
+    .filter(g => g.targetId);
+  if (!assignments.length) {
+    alert(`No rows resolved to an existing ${isSale ? 'client' : 'vendor'}. Use the dropdown to pick or "+ Create new" for each row.`);
+    return;
+  }
+  const skipped = linkAllAssignments.length - assignments.length;
+  if (skipped > 0) {
+    const ok = confirm(`Will link ${assignments.length} of ${linkAllAssignments.length} group${linkAllAssignments.length === 1 ? '' : 's'}. ${skipped} unmatched group${skipped === 1 ? '' : 's'} will be skipped. Continue?`);
+    if (!ok) return;
+  }
+  const totalRows = assignments.reduce((a, g) => a + g.rowIds.length, 0);
+  setSyncStatus('syncing', `Linking ${totalRows}…`);
+  try {
+    for (const g of assignments) {
+      const idsCSV = g.rowIds.map(id => `"${id}"`).join(',');
+      const query = `?id=in.(${idsCSV})`;
+      if (isSale) {
+        await supa('pl_sales', 'PATCH', { client_id: g.targetId }, query);
+        sales.forEach(s => { if (g.rowIds.includes(s.id)) s.clientId = g.targetId; });
+      } else {
+        await supa('pl_orders', 'PATCH', { vendor_id: g.targetId }, query);
+        orders.forEach(o => { if (g.rowIds.includes(o.id)) o.vendorId = g.targetId; });
+      }
+    }
+    setSyncStatus('synced', 'Linked ✓'); updateLastUpdated();
+    closeModal('linkAllModal');
+    renderAll();
+  } catch(e) { console.error(e); setSyncStatus('error', 'Error'); alert('Batch link failed: ' + (e.message || e)); }
+}
+
+/* ═══════════════════════════════════════════════
+   REPORTS — new sections
+   ═══════════════════════════════════════════════ */
+let topClientsExpanded = false;
+function toggleTopClientsAll() { topClientsExpanded = !topClientsExpanded; document.getElementById('topClientsToggle').textContent = topClientsExpanded ? 'Show top 10' : 'Show all'; renderTopClients(); }
+
+function renderTopClients() {
+  const tbody = document.getElementById('topClientsBody');
+  if (!tbody) return;
+  const yearStart = new Date().getFullYear() + '-01-01';
+  const ytd = sales.filter(s => s.clientId && s.date >= yearStart);
+  if (!ytd.length) { tbody.innerHTML = emptyRow(5, '⭐', 'No linked sales this year', 'Link sales to clients to populate this report'); return; }
+  const map = {};
+  ytd.forEach(s => {
+    const c = findClient(s.clientId); if (!c) return;
+    if (!map[c.id]) map[c.id] = { id: c.id, name: c.name, spend: 0, orders: 0, last: '' };
+    map[c.id].spend += s.qty * s.price;
+    map[c.id].orders++;
+    if (!map[c.id].last || s.date > map[c.id].last) map[c.id].last = s.date;
+  });
+  let rows = Object.values(map).map(r => ({ ...r, badge: engagementBadge(r.last) }));
+  rows = sortRows(rows, 'topClients', { name: r => r.name.toLowerCase(), spend: r => r.spend, orders: r => r.orders, last: r => new Date(r.last).getTime() });
+  const toggle = document.getElementById('topClientsToggle');
+  if (toggle) toggle.style.display = rows.length > 10 ? 'inline-flex' : 'none';
+  if (!topClientsExpanded) rows = rows.slice(0, 10);
+  tbody.innerHTML = rows.map(r => `<tr style="cursor:pointer;" onclick="openClientDetail('${r.id}')">
+    <td><div class="cell-name">${esc(r.name)}</div></td>
+    <td class="cell-money c-green">${fmt(r.spend)}</td>
+    <td style="font-weight:600;">${r.orders}</td>
+    <td class="hide-mob" style="color:var(--muted);">${fmtDate(r.last)}</td>
+    <td><span class="engagement-badge ${r.badge}">${r.badge}</span></td>
+  </tr>`).join('');
+}
+
+function renderReengagement() {
+  const tbody = document.getElementById('reengageBody');
+  if (!tbody) return;
+  if (!clients.length) { tbody.innerHTML = emptyRow(6, '🔁', 'No clients yet', 'Add clients to surface re-engagement targets'); return; }
+  const candidates = clients.map(c => {
+    const st = clientStats(c.id);
+    return { ...c, spend: st.spend, orders: st.orders, last: st.last, days: daysSince(st.last) };
+  }).filter(r => r.days > 60 && r.spend > 0);
+  if (!candidates.length) { tbody.innerHTML = emptyRow(6, '✓', 'Everyone\'s active', 'No clients are 60+ days quiet right now'); return; }
+  const rows = sortRows(candidates, 'reengage', { name: r => r.name.toLowerCase(), last: r => r.last ? new Date(r.last).getTime() : 0, days: r => r.days, spend: r => r.spend });
+  tbody.innerHTML = rows.map(r => {
+    const contact = r.email ? `<a href="mailto:${esc(r.email)}" style="color:var(--gold);">${esc(r.email)}</a>` : (r.phone || '<span style="color:var(--muted2);">—</span>');
+    const lastTouch = r.lastContactedAt ? `Last contacted ${fmtDate(r.lastContactedAt.slice(0, 10))}` : 'Mark contacted';
+    return `<tr>
+      <td><div class="cell-name" style="cursor:pointer;" onclick="openClientDetail('${r.id}')">${esc(r.name)}</div></td>
+      <td style="color:var(--muted);">${fmtDate(r.last)}</td>
+      <td style="font-weight:600;">${r.days === Infinity ? '—' : r.days}</td>
+      <td class="cell-money c-green">${fmt(r.spend)}</td>
+      <td class="hide-mob" style="font-size:12px;">${contact}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="markClientContacted('${r.id}')">${esc(lastTouch)}</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function markClientContacted(id) {
+  const c = findClient(id); if (!c) return;
+  const nowIso = new Date().toISOString();
+  try {
+    await supa('pl_clients', 'PATCH', { last_contacted_at: nowIso }, `?id=eq.${id}`);
+    c.lastContactedAt = nowIso;
+    renderReengagement();
+  } catch(e) { console.error(e); alert('Mark failed: ' + (e.message || e)); }
+}
+
+let pivotExpanded = false;
+function togglePivotAll() { pivotExpanded = !pivotExpanded; document.getElementById('pivotToggleBtn').textContent = pivotExpanded ? 'Show top 20' : 'Show all'; renderHotProductsPivot(); }
+
+function renderHotProductsPivot() {
+  const head = document.getElementById('pivotHead');
+  const body = document.getElementById('pivotBody');
+  if (!head || !body) return;
+  const cutoff = new Date(); cutoff.setMonth(cutoff.getMonth() - 12);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  const linked = sales.filter(s => s.clientId && s.date >= cutoffStr);
+  if (!linked.length) { head.innerHTML = ''; body.innerHTML = `<tr><td><div class="empty-state"><div class="empty-icon">🔥</div><div class="empty-title">No linked sales in last 12 months</div><div class="empty-sub">Link sales to clients to populate this pivot</div></div></td></tr>`; document.getElementById('pivotToggleBtn').style.display = 'none'; return; }
+
+  // Aggregate qty per client × product
+  const matrix = {}; // matrix[clientId][productId] = qty
+  const productTotals = {};
+  const clientTotals = {};
+  linked.forEach(s => {
+    if (!matrix[s.clientId]) matrix[s.clientId] = {};
+    matrix[s.clientId][s.productId] = (matrix[s.clientId][s.productId] || 0) + s.qty;
+    productTotals[s.productId] = (productTotals[s.productId] || 0) + s.qty;
+    clientTotals[s.clientId] = (clientTotals[s.clientId] || 0) + s.qty;
+  });
+
+  const allProductIds = Object.keys(productTotals).sort((a, b) => productTotals[b] - productTotals[a]);
+  const toggle = document.getElementById('pivotToggleBtn');
+  if (toggle) toggle.style.display = allProductIds.length > 20 ? 'inline-flex' : 'none';
+  const productIds = pivotExpanded ? allProductIds : allProductIds.slice(0, 20);
+  const clientIds = Object.keys(clientTotals).sort((a, b) => clientTotals[b] - clientTotals[a]);
+
+  // Compute hot threshold: 75th percentile of all non-zero cell values
+  const allCells = [];
+  clientIds.forEach(cid => productIds.forEach(pid => { const v = matrix[cid]?.[pid] || 0; if (v > 0) allCells.push(v); }));
+  allCells.sort((a, b) => a - b);
+  const hotThreshold = allCells.length ? allCells[Math.floor(allCells.length * 0.75)] : Infinity;
+
+  head.innerHTML = `<tr>
+    <th class="pivot-rowname">Client</th>
+    ${productIds.map(pid => `<th>${esc(pName(pid))}</th>`).join('')}
+  </tr>`;
+  body.innerHTML = clientIds.map(cid => {
+    const c = findClient(cid);
+    const name = c ? c.name : 'Unknown';
+    const cells = productIds.map(pid => {
+      const v = matrix[cid]?.[pid] || 0;
+      if (!v) return `<td class="pivot-cell empty">—</td>`;
+      const cls = v >= hotThreshold ? 'pivot-cell hot' : 'pivot-cell';
+      return `<td class="${cls}">${v}</td>`;
+    }).join('');
+    return `<tr><td class="pivot-rowname"><div style="cursor:pointer;" onclick="openClientDetail('${cid}')">${esc(name)}</div></td>${cells}</tr>`;
+  }).join('');
+}
 
 window.addEventListener('load', loadAll);
 </script>
