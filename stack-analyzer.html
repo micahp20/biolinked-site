@@ -592,6 +592,35 @@ const SCHED={
   'SNAP-8':{time:'PM',freq:'Daily topical',notes:'More potent than Argireline — 5–10% serum'},
 };
 
+// ─── GOAL / RISK LOOKUPS (used by score formula + improvement suggestions) ──
+const GOAL_GROUPS={
+  fat_loss:['glp1','fatloss','metabolic'],
+  recovery:['healing','anti-inflammatory','immune'],
+  gh:['gh'],
+  longevity:['longevity','bioregulator','mitochondria','immune'],
+  cognitive:['cognitive','sleep'],
+  hormonal:['hormonal'],
+  immune:['immune','anti-inflammatory'],
+  energy:['mitochondria','metabolic'],
+  sexual:['sexual'],
+  skin:['skin'],
+  muscle:['gh','hormonal'],
+};
+const RISK_CONTRA={
+  glucose:['Semaglutide','Tirzepatide','Retatrutide','Cagrilintide','Survodutide','Liraglutide','MK-677'],
+  bp:['Clenbuterol','MK-677','Melanotan 2'],
+  gi:['Semaglutide','Tirzepatide','Retatrutide','Cagrilintide','Survodutide','Liraglutide','MK-677'],
+  fertility:['Testosterone (TRT)','Triptorelin'],
+  transplant:['Thymosin Alpha-1','Thymalin','Thymagen','LL-37','KPV'],
+  ssri:['PT-141','Selank','Melanotan 2','Cabergoline'],
+};
+const GOAL_CANONICALS={
+  fat_loss:'Tirzepatide',recovery:'BPC-157',gh:'CJC-1295 + Ipamorelin',
+  longevity:'Epithalon',cognitive:'Semax',hormonal:'Testosterone (TRT)',
+  immune:'Thymosin Alpha-1',energy:'NAD+',sexual:'PT-141',
+  skin:'GHK-Cu (Topical)',muscle:'CJC-1295 + Ipamorelin',
+};
+
 // ─── STATE & HELPERS ──────────────────────────────────────────────────────────
 let stack=[],ddTimer=null,isAnalyzing=false,lastReport=null;
 const getPep=n=>PEPTIDES.find(x=>x.name===n);
@@ -687,6 +716,67 @@ function generateObs(names,goal,exp,risk,score,syn,caut,avd,redundancies){
   return obs;
 }
 
+function generateImprovements({stack,pairs,redundancies,goal,goalLabel,risk,riskLabel,synCount,score,neutralRatio}){
+  const out=[];
+  const has=n=>stack.some(s=>s.name===n);
+  const fs=t=>{const m=t.match(/^[^.!?]+[.!?]/);return m?m[0]:t;};
+  // TIER 1 — safety / hard flags
+  for(const p of pairs.filter(p=>p.rating==='avoid').slice(0,2)){
+    out.push({title:'Resolve conflict',body:`${p.a} + ${p.b} flagged as avoid. ${fs(p.note)}`});
+  }
+  if(risk&&RISK_CONTRA[risk]){
+    let hits=stack.filter(p=>RISK_CONTRA[risk].includes(p.name));
+    if(risk==='fertility'&&(has('HCG')||has('Gonadorelin'))) hits=hits.filter(p=>p.name!=='Testosterone (TRT)');
+    for(const p of hits.slice(0,2)){
+      out.push({title:'Reconsider compound for your flag',body:`${p.name} is contraindicated under '${riskLabel}'. Review need or remove.`});
+    }
+  }
+  // TIER 2 — redundancy
+  for(const r of redundancies){
+    out.push({title:'Reduce redundancy',body:`${r.title}. ${fs(r.body)}`});
+  }
+  // TIER 3 — design / alignment
+  for(const p of pairs.filter(p=>p.rating==='caution').slice(0,2)){
+    out.push({title:'Review caution',body:`${p.a} + ${p.b}: ${fs(p.note)}`});
+  }
+  if(goal&&GOAL_GROUPS[goal]){
+    const aligned=stack.filter(p=>GOAL_GROUPS[goal].includes(p.group)).length;
+    if(aligned/stack.length<0.5){
+      const pick=GOAL_CANONICALS[goal];
+      if(pick&&!has(pick)){
+        out.push({title:`Add a ${goalLabel}-aligned compound`,body:`Stack underweight on ${goalLabel} compounds. Consider adding ${pick}.`});
+      }
+    }
+  }
+  if(stack.length>=7){
+    out.push({title:'Trim the stack',body:`${stack.length} compounds creates attribution problems. Target 4–5 for cleanest signal.`});
+  }
+  if(stack.length===2&&synCount===0){
+    let partner=null;
+    outer: for(const c of stack){
+      for(const p of PEPTIDES){
+        if(p.name===c.name||has(p.name))continue;
+        const s=getSyn(c.name,p.name);
+        if(s&&s.rating==='synergy'){partner={for:c.name,name:p.name};break outer;}
+      }
+    }
+    if(partner){
+      out.push({title:'Add a documented synergy partner',body:`${partner.for} pairs well with ${partner.name}. Adding it would create a documented synergy.`});
+    }
+  }
+  // TIER 4 — generic fallbacks (only fire when nothing higher fired)
+  if(out.length===0&&neutralRatio>0.7){
+    out.push({title:'Most pairs are uncharacterized',body:'Consider rebuilding around documented synergy pairs (e.g., BPC-157 + TB-500, CJC-1295 + Ipamorelin).'});
+  }
+  if(out.length===0&&score<90){
+    out.push({title:'Track to validate',body:'No major flags detected. Track subjective response weekly to build attribution data.'});
+  }
+  if(out.length===0&&score>=90){
+    out.push({title:'Stack looks well-constructed',body:'Document week-by-week response to validate the design.'});
+  }
+  return out.slice(0,4);
+}
+
 function makeReportText(r){
   return['BIO LINKED PEPTIDE SOLUTIONS — STACK ANALYSIS','='.repeat(50),'',
     `Date: ${new Date().toLocaleDateString()}`,
@@ -711,6 +801,7 @@ async function analyzeStack(){
   btn.disabled=true;btn.textContent='⏳ Analyzing…';
   document.getElementById('empty-card').style.display='none';
   document.querySelectorAll('.result-block').forEach(e=>e.remove());
+  lastReport=null;
   const col=document.getElementById('results-col');
 
   const goal=document.getElementById('goal-select').value;
@@ -724,12 +815,47 @@ async function analyzeStack(){
   const avoidCount=pairs.filter(p=>p.rating==='avoid').length;
   const avgConf=Math.round(pairs.reduce((a,p)=>a+p.confidence,0)/pairs.length);
   const redundancies=detectRedundancies(names);
-  let score=72+synCount*7-cautCount*10-avoidCount*24-Math.max(0,redundancies.length-1)*5;
+  const unknownPairs=pairs.filter(p=>p.evidence==='unknown');
+  const neutralRatio=pairs.length?unknownPairs.length/pairs.length:0;
+  // ─── SCORE FORMULA ──────────────────────────────────────────────────────────
+  // Distribution target: 5..99. Replaces old base-72 formula which produced
+  // degenerate 72-clusters whenever SYNERGY_DB had no entries for the pairs.
+  // (1) base 50 — neutral floor (mediocre stacks should feel mediocre)
+  let score=50;
+  // (2) synergy strength: +6/syn, capped +20 — strongest positive signal
+  score+=Math.min(20,synCount*6);
+  // (3) avg pair confidence (incl. neutrals): -10..+10 — well-characterized stack reward
+  score+=Math.round((avgConf-50)/5);
+  // (4) stack-size sweet spot: 4-5 ideal, 2 thin, 7-8 overstacked
+  const SIZE_BONUS={2:-2,3:3,4:6,5:6,6:2,7:-3,8:-8};
+  score+=SIZE_BONUS[stack.length]??0;
+  // (5) goal alignment: -10..+12 smooth — stack should bias toward stated goal
+  if(goal&&GOAL_GROUPS[goal]){
+    const aligned=stack.filter(p=>GOAL_GROUPS[goal].includes(p.group)).length;
+    score+=Math.round((aligned/stack.length)*22-10);
+  }
+  // (6) risk-flag contraindications: -8 each, capped -25
+  //     fertility special case: TRT only counts when no HCG/Gonadorelin (mirrors obs logic)
+  if(risk&&RISK_CONTRA[risk]){
+    let hits=stack.filter(p=>RISK_CONTRA[risk].includes(p.name));
+    if(risk==='fertility'&&(names.includes('HCG')||names.includes('Gonadorelin'))) hits=hits.filter(p=>p.name!=='Testosterone (TRT)');
+    score-=Math.min(25,hits.length*8);
+  }
+  // (7) cautions: -7/pair (softened from -10 to leave room for other factors)
+  score-=cautCount*7;
+  // (8) avoids: -18/pair (softened from -24; combined with redund/risk still tanks fast)
+  score-=avoidCount*18;
+  // (9) redundancies: -5/each (FIXED off-by-one; old formula gave the first one free)
+  score-=redundancies.length*5;
+  // (10) neutral-pair ratio penalty: -6..0 when >60% of pairs are uncharacterized
+  if(neutralRatio>0.6) score-=Math.round(6*(neutralRatio-0.6)/0.4);
+  // clamp
   score=Math.max(5,Math.min(99,score));
   const scoreColor=score>=80?'var(--green)':score>=60?'var(--gold)':score>=40?'var(--amber)':'var(--red)';
   const scoreLabel=score>=80?'Strong Synergy':score>=60?'Good Stack':score>=40?'Proceed with Caution':'Conflicts Detected';
   const goalLabel=document.getElementById('goal-select').selectedOptions[0].textContent;
   const expLabel=document.getElementById('exp-select').selectedOptions[0].textContent;
+  const riskLabel=document.getElementById('risk-select').selectedOptions[0].textContent;
   const recs=generateSimplify(names);
   const obs=generateObs(names,goal,exp,risk,score,synCount,cautCount,avoidCount,redundancies);
   lastReport={names,goalLabel,expLabel,score,scoreLabel,synCount,cautCount:cautCount,avoidCount,recs,obs};
@@ -747,6 +873,15 @@ async function analyzeStack(){
     </div>
   </div>`;
   col.appendChild(scoreEl);
+
+  // HOW TO IMPROVE — deterministic suggestions, priority-ordered, cap 4
+  const improvements=generateImprovements({stack,pairs,redundancies,goal,goalLabel,risk,riskLabel,synCount,score,neutralRatio});
+  if(improvements.length){
+    const impEl=document.createElement('div');impEl.className='result-block panel fade-in';
+    impEl.innerHTML=`<div class="panel-head"><h2>How to Improve This Stack</h2><p>Specific actions ordered by impact on your score</p></div>
+    <div class="panel-body"><div class="rec-grid">${improvements.map((r,i)=>`<div class="rec-card"><div class="rc-num">Action ${i+1}</div><div class="rc-title">${r.title}</div><div class="rc-body">${r.body}</div></div>`).join('')}</div></div>`;
+    col.appendChild(impEl);
+  }
 
   // METRICS
   const meEl=document.createElement('div');meEl.className='result-block panel fade-in-1';
