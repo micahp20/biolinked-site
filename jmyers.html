@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jessie Myers — BioLinked Protocol</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);
+  --bg:#f5f5f5;--bg-card:#ffffff;--bg-card2:#f0f0f0;--white:#1a1a1a;
+  --text:#1a1a1a;--text-muted:#888880;--border:rgba(0,0,0,0.10);
+  --green:#2d6a4f;--green-dim:rgba(45,106,79,0.12);--green-light:#3a9a5a;
+  --rose:#c9607a;--rose-dim:rgba(176,48,96,0.06);--rose-border:rgba(176,48,96,0.20);
+  --blue:#1d5a9a;--blue-dim:rgba(29,90,154,0.08);--blue-light:#2d7dd2;--blue-border:rgba(29,90,154,0.22);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;font-size:15px;}
+
+.header{background:#ffffff;border-bottom:1px solid var(--gold-border);padding:4rem 2rem 3rem;text-align:center;position:relative;overflow:hidden;}
+.header::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.header-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(139,115,53,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(139,115,53,0.04) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+.header-logo{font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1.5rem;font-weight:500;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;}
+.header-logo::before,.header-logo::after{content:'';width:40px;height:1px;background:var(--gold-border);}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,6vw,58px);color:var(--white);font-weight:400;line-height:1.1;margin-bottom:0.5rem;letter-spacing:0.02em;position:relative;}
+.header h1 em{color:var(--gold);font-style:italic;}
+.header-focus{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--blue-light);font-style:italic;letter-spacing:0.04em;margin-bottom:0.5rem;position:relative;}
+.header-sub{color:var(--text-muted);font-size:12px;font-weight:400;letter-spacing:0.12em;text-transform:uppercase;position:relative;}
+.header-meta{display:flex;justify-content:center;gap:0;margin-top:2.5rem;flex-wrap:wrap;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;max-width:840px;margin-left:auto;margin-right:auto;position:relative;}
+.meta-item{flex:1;min-width:100px;text-align:center;padding:1rem 0.75rem;border-right:1px solid var(--gold-border);}
+.meta-item:last-child{border-right:none;}
+.meta-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);display:block;margin-bottom:4px;}
+.meta-value{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;}
+
+.nav-tabs{display:flex;justify-content:center;gap:0;border-bottom:1px solid var(--gold-border);background:#ffffff;position:sticky;top:56px;z-index:100;}
+.nav-tab{padding:1rem 1.75rem;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none;font-family:'Montserrat',sans-serif;}
+.nav-tab:hover{color:var(--gold-light);}
+.nav-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+.container{max-width:920px;margin:0 auto;padding:0 1.5rem 5rem;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.section{margin-top:3.5rem;}
+.section-header{display:flex;align-items:center;gap:14px;margin-bottom:1.75rem;padding-bottom:1rem;border-bottom:1px solid var(--gold-border);}
+.section-icon{width:34px;height:34px;border-radius:2px;border:1px solid var(--gold-border);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--gold-dim);}
+.section-icon svg{width:16px;height:16px;}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--white);}
+
+.intro-card{background:#ffffff;border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:1.75rem 2rem;margin-top:2.5rem;border-radius:2px;}
+.intro-card p{font-size:15px;color:#333330;line-height:1.9;font-weight:300;}
+.intro-card strong{font-weight:600;color:var(--gold);}
+
+.note-card{border-radius:2px;padding:1.25rem 1.75rem;margin-top:1.25rem;}
+.note-card h4{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:8px;}
+.note-card p{font-size:13px;line-height:1.7;font-weight:300;}
+.note-green{background:rgba(45,106,79,0.06);border:1px solid rgba(45,106,79,0.18);border-left:3px solid var(--green-light);}
+.note-green h4{color:var(--green-light);}
+.note-green p{color:rgba(45,106,79,0.80);}
+.note-gold{background:rgba(139,115,53,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);}
+.note-gold h4{color:var(--gold);}
+.note-gold p{color:var(--text-muted);}
+.note-blue{background:var(--blue-dim);border:1px solid var(--blue-border);border-left:3px solid var(--blue-light);}
+.note-blue h4{color:var(--blue-light);}
+.note-blue p{color:rgba(29,90,154,0.80);}
+.note-rose{background:var(--rose-dim);border:1px solid var(--rose-border);border-left:3px solid var(--rose);}
+.note-rose h4{color:var(--rose);}
+.note-rose p{color:rgba(176,48,96,0.75);}
+
+.goal-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:1.5rem;}
+.goal-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:99px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:1px solid;}
+.chip-rec{background:rgba(29,90,154,0.08);border-color:rgba(29,90,154,0.25);color:#2d7dd2;}
+.chip-long{background:rgba(45,106,79,0.08);border-color:rgba(45,106,79,0.22);color:#2d6a4f;}
+.chip-muscle{background:rgba(239,148,55,0.08);border-color:rgba(239,148,55,0.22);color:#d4832a;}
+.chip-fat{background:rgba(176,48,96,0.08);border-color:rgba(176,48,96,0.22);color:#c9607a;}
+
+.cat-badge{display:inline-block;padding:2px 9px;border-radius:2px;font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;border:1px solid;}
+.cat-rec{background:var(--blue-dim);border-color:var(--blue-border);color:var(--blue-light);}
+.cat-long{background:rgba(45,106,79,0.08);border-color:rgba(45,106,79,0.18);color:#2d6a4f;}
+.cat-horm{background:var(--rose-dim);border-color:var(--rose-border);color:var(--rose);}
+.cat-ener{background:rgba(139,115,53,0.10);border-color:rgba(139,115,53,0.25);color:var(--gold);}
+.cat-muscle{background:rgba(239,148,55,0.08);border-color:rgba(239,148,55,0.20);color:#d4832a;}
+.cat-epigen{background:rgba(176,48,96,0.06);border-color:rgba(176,48,96,0.18);color:var(--rose);}
+.cat-met{background:rgba(29,90,154,0.08);border-color:rgba(29,90,154,0.20);color:var(--blue-light);}
+.cat-fat{background:rgba(176,48,96,0.08);border-color:rgba(176,48,96,0.22);color:#c9607a;}
+
+.peptide-grid{display:grid;gap:1.5rem;}
+.peptide-card{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;transition:border-color 0.2s;}
+.peptide-card:hover{border-color:var(--gold-border);}
+.peptide-header{padding:1.5rem 1.75rem 1.25rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;background:#f8f8f8;}
+.peptide-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--white);margin-bottom:5px;}
+.peptide-tagline{font-size:10px;color:var(--gold);font-weight:500;letter-spacing:0.12em;text-transform:uppercase;}
+.peptide-price{background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;padding:6px 16px;border-radius:2px;white-space:nowrap;text-align:right;}
+.peptide-price span{display:block;font-size:9px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:2px;font-family:'Montserrat',sans-serif;}
+.peptide-body{padding:1.5rem 1.75rem;display:grid;gap:1.25rem;}
+.peptide-section-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px;}
+.peptide-text{font-size:14px;color:#555550;line-height:1.8;font-weight:300;}
+.peptide-details{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:0.75rem;}
+.detail-box{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.875rem 1rem;}
+.detail-box .label{font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;}
+.detail-box .value{font-size:14px;font-weight:500;color:var(--text);}
+.recon-steps{counter-reset:step;list-style:none;display:flex;flex-direction:column;gap:9px;}
+.recon-steps li{counter-increment:step;display:flex;align-items:flex-start;gap:12px;font-size:14px;color:#555550;line-height:1.65;font-weight:300;}
+.recon-steps li::before{content:counter(step);min-width:22px;height:22px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+.schedule-table{width:100%;border-collapse:collapse;font-size:13px;}
+.schedule-table th{background:#f0f0f0;color:var(--gold);padding:10px 14px;text-align:left;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:600;border-bottom:1px solid var(--gold-border);}
+.schedule-table td{padding:12px 14px;border-bottom:1px solid var(--border);color:#555550;vertical-align:top;font-weight:300;font-size:13px;}
+.schedule-table tr:last-child td{border-bottom:none;}
+.schedule-table tr td{background:#ffffff;}
+.schedule-table tr:nth-child(even) td{background:#f8f8f8;}
+.peptide-pill{display:inline-block;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;margin:2px 3px 2px 0;letter-spacing:0.03em;}
+.peptide-pill.pm{background:rgba(29,90,154,0.06);border-color:rgba(29,90,154,0.18);color:var(--blue-light);}
+.peptide-pill.epig{background:rgba(176,48,96,0.06);border-color:rgba(176,48,96,0.18);color:var(--rose);}
+.peptide-pill.wknd{background:rgba(45,106,79,0.06);border-color:rgba(45,106,79,0.15);color:var(--green);}
+.peptide-pill.horm{background:var(--rose-dim);border-color:var(--rose-border);color:var(--rose);}
+.peptide-pill.prn{background:rgba(45,106,79,0.06);border-color:rgba(45,106,79,0.18);color:var(--green);}
+
+.week-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.week-cell{background:#ffffff;padding:1rem 0.75rem;text-align:center;}
+.week-cell.header{background:#f0f0f0;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);font-weight:600;padding:0.875rem;}
+.week-cell .wk{font-size:11px;color:var(--text-muted);margin-bottom:4px;font-weight:500;}
+.week-cell .phase{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--gold);}
+.week-cell .note{font-size:11px;color:#888880;margin-top:4px;line-height:1.5;font-weight:300;}
+.phase-1{background:#f5f8fc;}
+.phase-2{background:#f5faf6;}
+.phase-3{background:#fafaf5;}
+.phase-4{background:#faf8f5;}
+
+.timeline{position:relative;padding-left:2rem;}
+.timeline::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:1px;background:var(--gold-border);}
+.timeline-item{position:relative;margin-bottom:2.25rem;}
+.timeline-item::before{content:'';position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg);}
+.timeline-week{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
+.timeline-text{font-size:14px;color:#555550;line-height:1.8;font-weight:300;}
+
+.monitor-list{display:grid;gap:8px;}
+.monitor-item{display:flex;gap:14px;align-items:flex-start;background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;font-size:14px;color:#555550;line-height:1.65;font-weight:300;}
+.monitor-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0;}
+.dot-ok{background:var(--green-light);}
+.dot-watch{background:var(--gold);}
+
+.price-table{background:#ffffff;border:1px solid var(--gold-border);border-radius:2px;overflow:hidden;}
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 1.75rem;border-bottom:1px solid var(--border);}
+.price-row:last-child{border-bottom:none;}
+.price-row.total{background:#f0f0f0;border-top:1px solid var(--gold-border);}
+.price-row .item{font-size:15px;color:var(--text);font-weight:400;}
+.price-row .qty{font-size:12px;color:var(--text-muted);margin-top:2px;font-weight:300;}
+.price-row .amt{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);}
+.price-row.total .item{color:var(--text);font-size:16px;font-weight:600;}
+.price-row.total .amt{font-size:26px;color:var(--gold);}
+.price-row.dimmed{opacity:0.3;}
+.price-row.dimmed .item{text-decoration:line-through;color:var(--text-muted);}
+
+.level-tabs{display:flex;border:1px solid var(--gold-border);border-radius:2px 2px 0 0;overflow:hidden;}
+.ltab{flex:1;padding:0.875rem 0.35rem;background:#f0f0f0;border:none;border-right:1px solid var(--gold-border);cursor:pointer;text-align:center;}
+.ltab:last-child{border-right:none;}
+.ltab.active{background:#ffffff;}
+.ltab-eyebrow{font-size:8px;letter-spacing:0.1em;text-transform:uppercase;display:block;color:var(--gold);margin-bottom:3px;font-family:'Montserrat',sans-serif;font-weight:600;}
+.ltab-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--white);display:block;}
+.ltab-sub{font-size:9px;display:block;color:var(--text-muted);margin-top:2px;font-family:'Montserrat',sans-serif;}
+
+.venmo-section{background:linear-gradient(135deg,#f8f8f8 0%,#f0f0f0 100%);border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:2rem;margin-top:3rem;text-align:center;}
+.venmo-section h3{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--text);font-weight:400;margin-bottom:0.5rem;}
+.venmo-section h3 em{color:var(--gold);font-style:italic;}
+.venmo-section p{font-size:13px;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6;}
+.venmo-btn{display:inline-block;background:var(--gold);color:#ffffff;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:16px 40px;border-radius:2px;text-decoration:none;transition:background 0.2s;}
+.venmo-btn:hover{background:var(--gold-light);}
+.venmo-handle{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;margin-top:12px;display:block;}
+
+.storage-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.storage-card{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1.25rem 1.5rem;}
+.storage-card h4{font-size:13px;font-weight:600;margin-bottom:0.5rem;color:var(--gold);}
+.storage-card p{font-size:13px;color:#555550;line-height:1.7;font-weight:300;}
+
+.disclaimer{background:#f8f5f0;border:1px solid rgba(139,115,53,0.18);border-radius:2px;padding:1.25rem 1.75rem;margin-top:3.5rem;font-size:13px;color:#6a5a30;line-height:1.75;font-weight:300;}
+.disclaimer strong{font-weight:600;color:var(--gold);}
+
+.footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--gold-border);font-size:11px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;}
+.footer strong{color:var(--gold);font-weight:600;}
+
+.tracker-top{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-top:2rem;}
+.tracker-stat{background:#ffffff;border:1px solid var(--gold-border);border-radius:2px;padding:1.25rem;text-align:center;}
+.tracker-stat .ts-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-muted);margin-bottom:6px;}
+.tracker-stat .ts-value{font-family:'Cormorant Garamond',serif;font-size:28px;color:var(--gold);font-weight:600;}
+.tracker-stat .ts-sub{font-size:11px;color:var(--text-muted);margin-top:2px;}
+.week-selector{display:flex;align-items:center;gap:1rem;margin:2rem 0 1.5rem;justify-content:center;}
+.week-nav-btn{width:36px;height:36px;background:#ffffff;border:1px solid var(--gold-border);color:var(--gold);border-radius:2px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.week-nav-btn:hover{background:var(--gold-dim);}
+.week-label{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--white);font-weight:600;min-width:120px;text-align:center;}
+.day-header-row{display:grid;grid-template-columns:130px 1fr;gap:6px;margin-bottom:2px;}
+.day-headers-inner{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.day-header{text-align:center;font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:8px 2px;background:#f0f0f0;border:1px solid var(--border);border-radius:2px 2px 0 0;}
+.day-header.rest-day{color:#aaaaaa;}
+.tracker-grid-wrap{display:grid;grid-template-columns:130px 1fr;gap:6px;margin-bottom:3px;}
+.tracker-compound-label{display:flex;align-items:center;justify-content:flex-end;padding-right:6px;}
+.compound-badge{font-size:10px;font-weight:600;letter-spacing:0.04em;color:var(--gold);text-align:right;line-height:1.3;}
+.compound-badge span{display:block;color:var(--text-muted);font-weight:400;font-size:9px;letter-spacing:0.06em;}
+.day-row{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.dose-cell{background:#ffffff;border:1px solid var(--border);border-top:none;padding:4px 2px;text-align:center;cursor:pointer;transition:all 0.15s;min-height:36px;display:flex;align-items:center;justify-content:center;}
+.dose-cell.scheduled:hover{background:var(--gold-dim);}
+.dose-cell.taken{background:rgba(45,106,79,0.12);border-color:rgba(45,106,79,0.35);}
+.dose-cell.taken::after{content:'✓';color:var(--green-light);font-size:15px;font-weight:700;}
+.dose-cell.scheduled:not(.taken)::after{content:'○';color:var(--gold-border);font-size:13px;}
+.dose-cell.rest{background:transparent;border-color:transparent;cursor:default;}
+.dose-cell.rest::after{content:'—';color:#cccccc;font-size:12px;}
+.dose-cell.prn{background:rgba(236,72,153,0.03);border-color:var(--border);cursor:pointer;}
+.dose-cell.prn:not(.taken)::after{content:'·';color:#bbb;font-size:20px;line-height:1;}
+.notes-area{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;margin-top:1.5rem;}
+.notes-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:8px;}
+.notes-input{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;font-weight:300;resize:vertical;min-height:70px;outline:none;transition:border-color 0.2s;}
+.notes-input:focus{border-color:var(--gold-border);}
+.notes-input::placeholder{color:var(--text-muted);}
+.tracker-actions{display:flex;gap:1rem;margin-top:1.5rem;flex-wrap:wrap;}
+.action-btn{flex:1;min-width:160px;padding:0.875rem 1.5rem;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;border-radius:2px;transition:all 0.2s;text-align:center;}
+.action-btn:hover{background:rgba(139,115,53,0.18);border-color:var(--gold);}
+.action-btn.primary{background:var(--gold);color:#ffffff;border-color:var(--gold);}
+.action-btn.primary:hover{background:var(--gold-light);}
+.progress-bar-wrap{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;margin-top:1rem;}
+.progress-label{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;display:flex;justify-content:space-between;}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;transition:width 0.4s ease;}
+.cycle-start-row{display:flex;align-items:center;gap:1rem;margin-top:1.5rem;background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:1rem 1.25rem;flex-wrap:wrap;}
+.cycle-start-row label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);white-space:nowrap;}
+.cycle-start-row input[type="date"]{background:#fafafa;border:1px solid var(--gold-border);border-radius:2px;padding:6px 12px;color:var(--text);font-family:'Montserrat',sans-serif;font-size:13px;outline:none;}
+.save-badge{display:inline-block;background:rgba(45,106,79,0.10);border:1px solid rgba(45,106,79,0.40);color:var(--green-light);font-size:10px;font-weight:600;letter-spacing:0.08em;padding:3px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
+.save-badge.show{opacity:1;}
+.ios-download-banner{background:#f0f0f0;border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:1.25rem 1.75rem;margin-top:2.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;}
+.ios-banner-text{font-size:13px;color:var(--text-muted);line-height:1.6;}
+.ios-banner-text strong{color:var(--gold);font-weight:600;}
+
+.checklist-wrap{background:#f8f8f8;border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.5rem 1.75rem;margin-top:2rem;}
+.checklist-title{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:1rem;}
+.checklist-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#555550;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;}
+.checklist-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.checklist-link{color:var(--gold);font-size:10px;font-weight:600;letter-spacing:0.08em;text-decoration:none;white-space:nowrap;}
+.order-btn{display:inline-block;background:var(--gold);color:#ffffff;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:10px 20px;border-radius:2px;text-decoration:none;}
+.order-btn:hover{background:var(--gold-light);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.container>*{animation:fadeUp 0.5s ease both;}
+
+@media(max-width:640px){
+  .week-grid{grid-template-columns:repeat(2,1fr);}
+  .storage-grid{grid-template-columns:1fr;}
+  .peptide-header{flex-direction:column;}
+  .header-meta{flex-direction:column;}
+  .meta-item{border-right:none;border-bottom:1px solid var(--gold-border);}
+  .meta-item:last-child{border-bottom:none;}
+  .tracker-top{grid-template-columns:1fr 1fr;}
+  .nav-tab{padding:0.875rem 0.75rem;font-size:10px;}
+  .tracker-grid-wrap{grid-template-columns:90px 1fr;}
+  .day-header-row{grid-template-columns:90px 1fr;}
+  .compound-badge{font-size:9px;}
+  .level-tabs{flex-wrap:wrap;}
+  .ltab{min-width:calc(33% - 1px);}
+}
+</style>
+  <link rel="icon" type="image/png" href="/favicon.png">
+</head>
+<body>
+
+<script>
+(function(){
+  const path = window.location.pathname;
+  const isActive = (href) => {
+    const clean = href.replace('.html','');
+    if(clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
+    return path.includes(clean.replace('/',''));
+  };
+
+  const links = [
+    {href:'/index.html', label:'Home'},
+    {href:'/peptide-index.html', label:'Index'},
+    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
+    {href:'/stacks-blends.html', label:'Stacks & Blends'},
+  ];
+
+  const tools = [
+    {href:'/peptide-tracker.html', label:'Peptide Tracker'},
+    {href:'/stack-analyzer.html', label:'Stack Analyzer'},
+    {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
+  ];
+
+  const navHTML = `
+<nav class="bl-nav" id="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="/index.html" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BIO LINKED</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      ${links.map(l=>`<a href="${l.href}" class="bl-nav-link${isActive(l.href)?' active':''}">${l.label}</a>`).join('')}
+      <div class="bl-nav-dropdown" id="bl-dropdown">
+        <button class="bl-nav-link bl-dropdown-btn">Tools ▾</button>
+        <div class="bl-nav-dropdown-menu" id="bl-dropdown-menu">
+          ${tools.map(t=>`<a href="${t.href}" class="bl-nav-dropdown-item${isActive(t.href)?' active':''}">${t.label}</a>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    ${links.map(l=>`<a href="${l.href}" class="bl-nav-mobile-link">${l.label}</a>`).join('')}
+    <div class="bl-nav-mobile-section">Tools</div>
+    ${tools.map(t=>`<a href="${t.href}" class="bl-nav-mobile-link bl-nav-mobile-sub">${t.label}</a>`).join('')}
+  </div>
+</nav>`;
+
+  const navCSS = `<style>
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Outfit',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.1em}
+.bl-nav-logo-sub{font-size:8px;color:#777;letter-spacing:0.18em;text-transform:uppercase;margin-top:2px}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:11.5px;color:#444;text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown{position:relative}
+.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:#fff;border:1px solid #eaeaea;border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
+.bl-nav-dropdown:hover .bl-nav-dropdown-menu,.bl-nav-dropdown-menu:hover{display:block}
+.bl-nav-dropdown-btn{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bl-nav-dropdown:hover .bl-dropdown-btn{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:#444;text-decoration:none;transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8;color:#9A7B2F;padding-left:20px}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:#1a1a1a;padding:8px}
+.bl-nav-mobile-menu{display:none;border-top:1px solid #eaeaea;background:#fff;padding:12px 20px 20px}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:10px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Outfit',sans-serif}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
+.bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#9A7B2F;font-family:'Outfit',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
+@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
+</style>`;
+
+  document.head.insertAdjacentHTML('beforeend', navCSS);
+  document.body.insertAdjacentHTML('afterbegin', navHTML);
+
+  document.getElementById('bl-mobile-btn').addEventListener('click', function(){
+    const menu = document.getElementById('bl-mobile-menu');
+    menu.classList.toggle('open');
+    this.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  const dropdown = document.getElementById('bl-dropdown');
+  const menu = document.getElementById('bl-dropdown-menu');
+  let closeTimer;
+  dropdown.addEventListener('mouseenter', () => { clearTimeout(closeTimer); menu.style.display='block'; });
+  dropdown.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+  menu.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  menu.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+
+})();
+
+</script>
+
+<div class="header">
+  <div class="header-grid"></div>
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Jessie <em>Myers</em></h1>
+  <div class="header-focus">Recomposition Reset · Break the Stall · Lean Forward</div>
+  <div class="header-sub">Fat Loss · Muscle Preservation · Metabolic Reset · 8-Week Cycle</div>
+  <div class="header-meta">
+    <div class="meta-item"><span class="meta-label">Age</span><span class="meta-value">43</span></div>
+    <div class="meta-item"><span class="meta-label">Sex</span><span class="meta-value">Female</span></div>
+    <div class="meta-item"><span class="meta-label">Weight</span><span class="meta-value">148 lbs</span></div>
+    <div class="meta-item"><span class="meta-label">Goal Weight</span><span class="meta-value">138 lbs</span></div>
+    <div class="meta-item"><span class="meta-label">Cycle Length</span><span class="meta-value">8 Weeks</span></div>
+    <div class="meta-item"><span class="meta-label">Compounds</span><span class="meta-value">5 Total</span></div>
+    <div class="meta-item"><span class="meta-label">Prepared by</span><span class="meta-value">BioLinked</span></div>
+  </div>
+</div>
+
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="switchTab('protocol',event)">Protocol</button>
+  <button class="nav-tab" onclick="switchTab('supplies',event)">Supplies</button>
+  <button class="nav-tab" onclick="switchTab('tracker',event)">Daily Tracker</button>
+</div>
+
+<div class="container">
+
+<!-- PROTOCOL TAB -->
+<div id="tab-protocol" class="tab-content active">
+
+  <div class="goal-chips">
+    <span class="goal-chip chip-fat">🔥 Fat Loss</span>
+    <span class="goal-chip chip-muscle">💪 Muscle Preservation</span>
+    <span class="goal-chip chip-rec">⚡ Metabolic Reset</span>
+  </div>
+
+  <div class="intro-card">
+    <p>Jessie, you've already done the hard part — you train 4–5 days a week, your sleep is dialed in, your stress is low, and you've got an HRT foundation already supporting your lean tissue. Semaglutide brought you here, but your body has clearly adapted to that single mechanism, and the last 10 pounds aren't moving anymore. <strong>This protocol switches the metabolic conversation entirely.</strong> Retatrutide is a triple-receptor agonist that goes where Sema cannot — it covers GLP-1 (the appetite axis you already know) plus GIP and glucagon, and the glucagon arm is what drives true thermogenesis, hepatic fat oxidation, and the metabolic rate increase that breaks plateau. <strong>But the real win for someone in your position — 43, on HRT, doing the work — is what we stack alongside it.</strong> CJC-1295/Ipamorelin and Tesamorelin generate a clean, sustained GH pulse that protects your muscle while you're in a fat-loss phase — this is the single most important thing for a woman your age trying to drop 10 lbs without losing the lean tissue you've earned. <strong>5-Amino-1MQ blocks NNMT</strong>, the enzyme that progressively locks fat into adipose storage as we age — it's a recomp lever specifically built for women in their 40s who can't get the last layer to release. <strong>SLU-PP-332 is your training amplifier</strong>, used pre-fasted-workout to dial up mitochondrial fat oxidation and endurance during the sessions you're already putting in. The whole stack is designed for one outcome: get to 138 with <em>more</em> muscle than you started with — not less.</p>
+  </div>
+
+  <div class="note-card note-blue" style="margin-top:1.25rem;">
+    <h4>🎯 Why This Stack vs. Another Round of Sema</h4>
+    <p>Sema is a single-receptor (GLP-1) agonist. Once your body acclimates and you hit a stall, increasing the dose generally produces more GI side effects without further weight loss. Retatrutide is a tri-agonist (GLP-1 + GIP + glucagon), and the glucagon component is exactly the lever Sema doesn't have — it directly raises basal metabolic rate, mobilizes hepatic fat, and improves glucose disposal. Combined with the GH pulse from CJC/Ipa + Tesamorelin and the NNMT inhibition from 5-Amino-1MQ, you're now hitting fat loss from four independent pathways instead of one. That's how a stall ends.</p>
+  </div>
+
+  <div class="note-card note-gold" style="margin-top:1rem;">
+    <h4>💡 Protocol Design Philosophy — Recomp, Not Just Loss</h4>
+    <p>You don't want to lose 10 lbs of muscle and water — you want to lose 10 lbs of fat while maintaining (or building) lean tissue. That's a different target, and it requires a different stack. Reta + 5-Amino drive the fat-loss vector. CJC/Ipa + Tesamorelin protect and grow lean tissue through the GH/IGF-1 axis. SLU-PP-332 amplifies the workouts you're already doing. Your existing HRT-T base and 5g creatine are perfectly aligned with this — they keep your muscle protein synthesis machinery primed throughout. The result: at week 8, the scale shows 138, but the mirror and the gym show more lean tissue than where you started.</p>
+  </div>
+
+  <div class="note-card note-rose" style="margin-top:1rem;">
+    <h4>⚠️ Allergy Note — Penicillin</h4>
+    <p>Your penicillin allergy is noted. None of the compounds in this protocol contain penicillin or any beta-lactam antibiotic, so there is no direct conflict. If you ever develop signs of an injection-site infection (heat, spreading redness, pus, fever), do <strong>not</strong> let a provider treat you with amoxicillin, ampicillin, or any "-cillin" antibiotic — alternatives like clindamycin or doxycycline are appropriate. Strict sterile technique prevents this almost entirely.</p>
+  </div>
+
+  <div class="note-card note-green" style="margin-top:1rem;">
+    <h4>🍷 Lifestyle Note — Alcohol &amp; This Stack</h4>
+    <p>You noted 3–7 drinks per week — that's a moderate, well-controlled level and not a meaningful issue for this protocol. Worth being aware that alcohol modestly blunts overnight GH pulse amplitude (works against CJC-1295/Ipamorelin and Tesamorelin), so when possible, time drinks to non-training days or earlier in the evening (not within 2–3 hours of your CJC PM injection). At your current intake you don't need to change anything — just be consistent and let the stack do its work.</p>
+  </div>
+
+  <!-- COMPOUND CARDS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#8B7335" stroke-width="1.2"/><path d="M5 8.5C5.5 8.5 6.5 10.5 8 10.5C9.5 10.5 10.5 8.5 10.5 8.5" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><circle cx="6" cy="6.5" r="0.75" fill="#8B7335"/><circle cx="10" cy="6.5" r="0.75" fill="#8B7335"/></svg>
+      </div>
+      <div class="section-title">Your Protocol — 5 Compounds</div>
+    </div>
+    <div class="peptide-grid">
+
+      <!-- 1. RETATRUTIDE -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">1 &nbsp;·&nbsp; Retatrutide</div>
+            <div class="peptide-tagline">Triple-Agonist (GLP-1 / GIP / Glucagon) · Fat Loss Driver &nbsp;<span class="cat-badge cat-fat">Fat Loss</span></div>
+          </div>
+          <div class="peptide-price"><span>4 vials × $50</span>$200</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Retatrutide is the next generation beyond Semaglutide and Tirzepatide — a triple-receptor agonist that activates GLP-1, GIP, <em>and</em> glucagon receptors simultaneously. The first two share mechanisms with Sema (appetite suppression, improved satiety, slower gastric emptying), but the third is what changes everything for you. <strong>Glucagon-receptor activation directly raises basal metabolic rate, drives hepatic fat oxidation, and improves glucose disposal.</strong> This is the missing lever that Sema doesn't have, and it's exactly what's needed to break a stall on your "last 10 pounds." Clinical data on Retatrutide is showing fat-loss outcomes well beyond what Sema or Tirzepatide produce, and a more favorable lean-mass-to-fat-loss ratio — meaning you keep more muscle while losing more fat. Starting at 1mg AM, 3× per week. We'll keep this conservative for the first cycle so your GI system adapts smoothly coming off Sema.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">15 mg × 4</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">1 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">1.5 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">3× per week</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 15 mg vial + 1.5 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 1.5 mL BAC water to the 15 mg vial → concentration = <strong>10 mg/mL</strong>. Run water slowly down the inner glass wall — never squirt directly onto powder.</li>
+              <li>Swirl gently until fully dissolved. Do not shake. Solution should be clear.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 1 mg dose</strong> using a 29–31 gauge insulin syringe.</li>
+              <li>Each 15 mg vial = 15 doses. Reconstitute one vial at a time and store the rest dry until needed (better for long-term peptide stability than reconstituting all 4 up front). Four vials = 60 doses total — well over the 24 needed for an 8-week cycle, giving you headroom to titrate up to 4× per week or 1.5–2 mg in weeks 5–8 if tolerated.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. CJC-1295 / IPAMORELIN -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">2 &nbsp;·&nbsp; CJC-1295 / Ipamorelin</div>
+            <div class="peptide-tagline">GHRH + GHRP Combo · GH Pulse · Muscle Preservation &nbsp;<span class="cat-badge cat-muscle">Muscle &amp; GH</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$90</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">CJC-1295 and Ipamorelin together are the gold-standard GH-stimulating peptide stack — they work synergistically through two different receptor pathways to produce a clean, sustained GH pulse. <strong>CJC-1295</strong> is a GHRH analog that lengthens the GH release window, while <strong>Ipamorelin</strong> is a selective GHRP that triggers the pulse without spiking cortisol or prolactin. Combined in one combo vial, they hit both signals at once. <strong>For a woman in her 40s actively losing fat, this is the single most important lean-mass-protection compound in the stack.</strong> When Reta puts you into a caloric deficit through appetite suppression, your body would otherwise pull some energy from muscle. The CJC/Ipa pulse flips that signal — IGF-1 elevates, lean tissue is protected, and fat becomes the preferred substrate. Dosed PM 30+ minutes pre-sleep on an empty stomach also synchronizes with your natural overnight GH window, amplifying a pulse you're already wired to produce. Pairs synergistically with Tesamorelin (different timing, same end goal).</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">5mg+5mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">250 mcg each</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">PM (pre-sleep)</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 5mg+5mg combo vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the combo vial → concentration = <strong>2.5 mg/mL of each component (CJC-1295 and Ipamorelin)</strong>.</li>
+              <li>Run water slowly down the glass wall. Swirl gently until dissolved. Do not shake.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 250 mcg of each component per injection</strong>.</li>
+              <li>Inject SubQ PM, ideally 30+ minutes before bed and at least 2 hours after your last meal (fasted state amplifies GH response). Each vial = 20 doses. Two vials = 40 doses. At 5 on / 2 off × 8 weeks = 40 doses — exact full cycle coverage.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 5-AMINO-1MQ -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">3 &nbsp;·&nbsp; 5-Amino-1MQ</div>
+            <div class="peptide-tagline">NNMT Inhibitor · Adipose Mobilization · Recomp Lever &nbsp;<span class="cat-badge cat-fat">Fat Loss</span></div>
+          </div>
+          <div class="peptide-price"><span>1 vial</span>$50</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">5-Amino-1MQ is one of the most underrated compounds for women in their 40s trying to drop the last layer of stubborn fat. Its mechanism is unique: it inhibits <strong>NNMT (nicotinamide N-methyltransferase)</strong>, an enzyme that becomes overexpressed in adipose tissue with age and that progressively "locks" fat into storage by depleting cellular NAD+ and methyl group availability. By blocking NNMT, 5-Amino-1MQ does two things simultaneously: (1) it makes adipose tissue actively release fatty acids into circulation for oxidation, and (2) it raises intracellular NAD+, which improves mitochondrial energy output in muscle tissue. <strong>The net effect is exactly what you want — fat comes off, muscle gets more energy.</strong> This is why 5-Amino-1MQ is showing up in protocols specifically built for women over 40 who hit fat-loss plateaus. Run it AM, fasted, alongside Tesamorelin.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">50 mg × 1</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">1 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">5 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">10 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM fasted</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 50 mg vial + 5 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 5 mL BAC water to the 50 mg vial → concentration = <strong>10 mg/mL</strong>. (Note: 5 mL of BAC is required to deliver a clean 1 mg dose at 10 units — a 2 mL recon would give a 5 mg dose, which is higher than this protocol calls for.)</li>
+              <li>Swirl gently until fully dissolved — clear solution expected. Do not shake.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 1 mg dose</strong>.</li>
+              <li>Inject SubQ AM, fasted (no food 30–60 min before or after). One vial = 50 doses. At 5 on / 2 off × 8 weeks = 40 doses — one vial covers the full cycle with margin.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. TESAMORELIN -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">4 &nbsp;·&nbsp; Tesamorelin</div>
+            <div class="peptide-tagline">GHRH Analog · Visceral Fat · Lean Mass Preservation &nbsp;<span class="cat-badge cat-muscle">Muscle &amp; GH</span></div>
+          </div>
+          <div class="peptide-price"><span>4 vials</span>$200</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">Tesamorelin is the GHRH analog with the strongest clinical data for <strong>visceral fat reduction specifically</strong> — and that's the deepest, most stubborn fat to release. It was originally developed and FDA-approved for HIV-associated lipodystrophy (excess visceral fat), and has since become a gold-standard peptide for body recomposition in adults 40+. While CJC-1295/Ipamorelin produces a clean PM pulse, Tesamorelin works on a slightly different timing curve and amplitude — running both gives you a more complete GH-pulse profile across the day. For your goals, Tesamorelin's targeted visceral-fat mechanism is why it earns a spot. Many women in their 40s notice that even when total weight stays stable, body composition continues to drift toward more visceral and less subcutaneous fat — Tesamorelin reverses that trend specifically. Pair with 5-Amino-1MQ in your AM cluster for maximal fat-mobilization synergy.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">10 mg × 4</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">1 mg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">5 on / 2 off</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">AM (fasted preferred)</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 10 mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 10 mg vial → concentration = <strong>5 mg/mL</strong>.</li>
+              <li>Swirl very gently until dissolved — Tesamorelin is sensitive to mechanical disruption. Do not shake.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 1 mg dose</strong>.</li>
+              <li>Inject SubQ AM fasted, alongside 5-Amino-1MQ. Each vial = 10 doses. Four vials = 40 doses. At 5 on / 2 off × 8 weeks = 40 doses — exact full cycle coverage.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. SLU-PP-332 -->
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div>
+            <div class="peptide-name">5 &nbsp;·&nbsp; SLU-PP-332</div>
+            <div class="peptide-tagline">ERR Agonist · Endurance &amp; Mitochondrial Activator &nbsp;<span class="cat-badge cat-met">Performance</span></div>
+          </div>
+          <div class="peptide-price"><span>2 vials</span>$80</div>
+        </div>
+        <div class="peptide-body">
+          <div><div class="peptide-section-label">Why it's in your protocol</div><div class="peptide-text">SLU-PP-332 is the newest and most exciting compound in this stack — it's an estrogen-related receptor (ERR) pan-agonist that effectively mimics the metabolic effects of exercise at the cellular level. <strong>It's marketed (informally) as "exercise in a vial," and for your protocol it's a true workout amplifier.</strong> Its primary research effects: <strong>(1) increases endurance capacity, (2) enhances fat metabolism, (3) improves mitochondrial function, and (4) activates energy-burning pathways</strong> — including fatty acid oxidation and mitochondrial biogenesis. For someone training 4–5× per week already, SLU-PP-332 means each session becomes more metabolically productive — you'll burn more fat per session, sustain higher intensity longer, and recover with better mitochondrial substrate availability. Use it as needed (PRN) before fasted training sessions — typically 2–4× per week timed to your hardest workouts. This is the compound that makes the gym work you're already doing pay off harder.</div></div>
+          <div><div class="peptide-section-label">Dosage &amp; schedule</div>
+            <div class="peptide-details">
+              <div class="detail-box"><div class="label">Vial Size</div><div class="value">5 mg × 2</div></div>
+              <div class="detail-box"><div class="label">Dose</div><div class="value">500 mcg</div></div>
+              <div class="detail-box"><div class="label">BAC Water</div><div class="value">2 mL</div></div>
+              <div class="detail-box"><div class="label">Draw</div><div class="value">20 units</div></div>
+              <div class="detail-box"><div class="label">Schedule</div><div class="value">As needed (PRN)</div></div>
+              <div class="detail-box"><div class="label">Timing</div><div class="value">Fasted, pre-workout</div></div>
+            </div>
+          </div>
+          <div><div class="peptide-section-label">Reconstitution — 5 mg vial + 2 mL BAC water</div>
+            <ol class="recon-steps">
+              <li>Add 2 mL BAC water to the 5 mg vial → concentration = <strong>2.5 mg/mL (2,500 mcg/mL)</strong>.</li>
+              <li>Swirl gently until dissolved. Clear solution expected.</li>
+              <li>Draw <strong>20 units (0.20 mL) = 500 mcg dose</strong>.</li>
+              <li>Inject SubQ 30–60 minutes before fasted training (your toughest 2–4 sessions per week). Each vial = 10 doses. Two vials = 20 doses — covers ~2.5 PRN doses per week across the cycle. Skip on rest days or low-intensity sessions to conserve.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /peptide-grid -->
+  </div>
+
+  <!-- WEEKLY SCHEDULE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1" stroke="#8B7335" stroke-width="1.2"/><path d="M5 1.5V4M11 1.5V4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><path d="M2 6.5H14" stroke="#8B7335" stroke-width="0.8"/></svg>
+      </div>
+      <div class="section-title">Weekly Injection Schedule</div>
+    </div>
+    <table class="schedule-table">
+      <thead><tr><th>Day</th><th>AM (fasted)</th><th>PM / Pre-Sleep</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Monday</strong></td>
+          <td><span class="peptide-pill">Reta 1mg</span><span class="peptide-pill">5-Amino 1mg</span><span class="peptide-pill">Tesa 1mg</span><span class="peptide-pill prn">SLU 500mcg pre-workout (PRN)</span></td>
+          <td><span class="peptide-pill pm">CJC-1295/Ipa 250mcg</span></td>
+          <td>Heaviest AM cluster. Reta day. SLU optional pre-workout if training is intense.</td>
+        </tr>
+        <tr>
+          <td><strong>Tuesday</strong></td>
+          <td><span class="peptide-pill">5-Amino 1mg</span><span class="peptide-pill">Tesa 1mg</span><span class="peptide-pill prn">SLU 500mcg pre-workout (PRN)</span></td>
+          <td><span class="peptide-pill pm">CJC-1295/Ipa 250mcg</span></td>
+          <td>No Reta today. Lighter AM. Use SLU if training fasted.</td>
+        </tr>
+        <tr>
+          <td><strong>Wednesday</strong></td>
+          <td><span class="peptide-pill">Reta 1mg</span><span class="peptide-pill">5-Amino 1mg</span><span class="peptide-pill">Tesa 1mg</span></td>
+          <td><span class="peptide-pill pm">CJC-1295/Ipa 250mcg</span></td>
+          <td>Mid-week Reta. Most clients save SLU for their hardest 2 sessions/week.</td>
+        </tr>
+        <tr>
+          <td><strong>Thursday</strong></td>
+          <td><span class="peptide-pill">5-Amino 1mg</span><span class="peptide-pill">Tesa 1mg</span><span class="peptide-pill prn">SLU 500mcg pre-workout (PRN)</span></td>
+          <td><span class="peptide-pill pm">CJC-1295/Ipa 250mcg</span></td>
+          <td>No Reta today.</td>
+        </tr>
+        <tr>
+          <td><strong>Friday</strong></td>
+          <td><span class="peptide-pill">Reta 1mg</span><span class="peptide-pill">5-Amino 1mg</span><span class="peptide-pill">Tesa 1mg</span></td>
+          <td><span class="peptide-pill pm">CJC-1295/Ipa 250mcg</span></td>
+          <td>Third Reta of the week. Finish strong.</td>
+        </tr>
+        <tr><td><strong>Saturday</strong></td><td>—</td><td>—</td><td>Full rest day from injections. SLU optional only if you're doing a hard fasted session.</td></tr>
+        <tr><td><strong>Sunday</strong></td><td>—</td><td>—</td><td>Second rest day. Prep syringes for Monday's AM cluster the night before.</td></tr>
+      </tbody>
+    </table>
+    <div class="note-card note-gold" style="margin-top:1.25rem;">
+      <h4>📈 Weeks 5–8 Titration Option</h4>
+      <p>If you tolerate Retatrutide cleanly through week 4 (no nausea, normal appetite recovery between doses, energy stable), you have two optional titration paths starting week 5: (1) increase Reta to 4× per week by adding Sunday or Saturday, or (2) increase the dose to 1.5 mg (15 units) on the same 3× per week schedule. Most clients who break a stubborn stall choose option 2 — same injection frequency, more glucagon receptor activation. Discuss with us before changing.</p>
+    </div>
+    <div class="note-card note-blue" style="margin-top:1rem;">
+      <h4>💉 Injection Refresher — You've Done This Before</h4>
+      <p>You've reported some prior injection experience, so you know the basics. Quick refresh: 29–31 gauge insulin syringes, abdomen at 2–3 inches from the navel, pinch an inch of skin, 45° angle, slow injection. Rotate sides each AM cluster. With 2–3 injections in a single AM session on Reta days, lay everything out the night before and label syringes — this turns the morning from rushed to routine.</p>
+    </div>
+  </div>
+
+  <!-- 8-WEEK TIMELINE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 12L6 8L9 10L13 4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="section-title">8-Week Cycle — What to Expect</div>
+    </div>
+    <div class="week-grid">
+      <div class="week-cell header">Weeks</div>
+      <div class="week-cell header">Phase</div>
+      <div class="week-cell header">Primary Focus</div>
+      <div class="week-cell header">Key Changes</div>
+      <div class="week-cell phase-1"><div class="wk">Wks 1–2</div></div>
+      <div class="week-cell phase-1"><div class="phase">Reset</div></div>
+      <div class="week-cell phase-1"><div class="note">Sema Washout · Reta Onboarding</div></div>
+      <div class="week-cell phase-1"><div class="note">Appetite shifts as Sema clears and Reta takes over. Possible mild GI adjustment days 3–7. Sleep deepens noticeably from CJC-1295/Ipa PM dose. Scale may stabilize before moving.</div></div>
+      <div class="week-cell phase-2"><div class="wk">Wks 3–4</div></div>
+      <div class="week-cell phase-2"><div class="phase">Activation</div></div>
+      <div class="week-cell phase-2"><div class="note">Stall Breaks · GH Axis Online</div></div>
+      <div class="week-cell phase-2"><div class="note">Scale starts moving — 2–4 lbs typically. Workout recovery noticeably faster. Visible body comp changes around the midsection (Tesamorelin doing its work).</div></div>
+      <div class="week-cell phase-3"><div class="wk">Wks 5–6</div></div>
+      <div class="week-cell phase-3"><div class="phase">Peak Window</div></div>
+      <div class="week-cell phase-3"><div class="note">Maximum Fat Loss · Recomp Visible</div></div>
+      <div class="week-cell phase-3"><div class="note">Most pronounced fat loss window. Optional Reta titration up. Strength holding or increasing despite weight dropping — that's the recomp signature.</div></div>
+      <div class="week-cell phase-4"><div class="wk">Wks 7–8</div></div>
+      <div class="week-cell phase-4"><div class="phase">Lock In</div></div>
+      <div class="week-cell phase-4"><div class="note">Consolidate · Assess · Plan Cycle 2</div></div>
+      <div class="week-cell phase-4"><div class="note">Approaching 138 target. Lean tissue preserved. Plan a 2–4 week off-cycle, then maintenance or cycle 2 to dial in further.</div></div>
+    </div>
+    <div class="timeline" style="margin-top:2rem;">
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 1–2 — The Reset</div>
+        <div class="timeline-text">Your body is transitioning off Sema and onto a fundamentally different mechanism. Expect appetite to feel slightly different — Reta's GLP-1 component will feel familiar, but the GIP and glucagon arms add a metabolic dimension Sema didn't have. The first week is about acclimation. The very first thing you'll likely notice is from the CJC-1295/Ipa PM dose: deeper, more restorative sleep within 3–5 days. Tesamorelin and 5-Amino-1MQ begin their work in the AM cluster. Don't expect dramatic scale movement in week 1 — your body needs to clear residual Sema and adjust. Stay consistent with training and protein intake (target ~110–120 g/day at your bodyweight).</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 3–4 — The Stall Breaks</div>
+        <div class="timeline-text">This is the phase where the math of this stack vs. Sema becomes obvious. The glucagon-receptor activation from Reta has now fully kicked in your basal metabolic rate. Combined with Tesamorelin's targeted visceral fat mobilization and 5-Amino-1MQ unlocking adipose stores, the scale starts moving in a way it hadn't on Sema alone. Most clients in your situation report 2–4 lbs of clean fat loss across these two weeks. Critically, your gym sessions feel <em>better</em>, not worse — that's the GH/IGF-1 axis from CJC/Ipa + Tesa protecting your muscle even as you're in a deficit.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 5–6 — Peak Protocol Window</div>
+        <div class="timeline-text">All five compounds in full synergy. This is the window where the most dramatic fat loss happens in this protocol — and it's also when you have the option to titrate Reta up to 1.5 mg if tolerated, which can accelerate the back half of the cycle. Body composition changes become clearly visible — particularly around the waist and lower body, where adipose tissue tends to accumulate after 40. SLU-PP-332 used pre-workout 2–4× per week amplifies each session. Your strength benchmarks should be holding firm or improving even as the scale drops — track them, because this is the proof of recomp.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-week">Weeks 7–8 — Consolidate &amp; Assess</div>
+        <div class="timeline-text">Final stretch. The fat loss accumulated through weeks 3–6 is now consolidating, and you're likely approaching or hitting the 138 target. Take stock at week 8: photos, measurements, strength numbers, energy levels. The goal isn't just the scale — it's the composition. After this cycle, plan a 2–4 week off-cycle to let your body normalize. Then either maintain at a lower Reta frequency or run a focused cycle 2 to dial in further. You did this without losing the muscle you trained for — that's the win.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STORAGE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1" stroke="#8B7335" stroke-width="1.2"/><path d="M6 6H10M6 9H8" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Storage &amp; Handling</div>
+    </div>
+    <div class="storage-grid">
+      <div class="storage-card"><h4>Dry powder vials (before reconstitution)</h4><p>Store all lyophilized vials refrigerated at 36–46°F (2–8°C). Keep away from light. Do not freeze. Shelf life is 12–24 months unopened. Only reconstitute what you plan to use within 30 days.</p></div>
+      <div class="storage-card"><h4>After reconstitution</h4><p>All reconstituted vials must be refrigerated immediately and used within 30 days. Never freeze a reconstituted peptide — this destroys the protein structure. Use a fresh syringe for every draw.</p></div>
+      <div class="storage-card"><h4>Bacteriostatic water (BAC water)</h4><p>Use sterile BAC water for all 5 compounds. The benzyl alcohol preservative allows safe multi-draw use over 30 days. Do not substitute plain sterile water. With 5 compounds (one of which uses 5 mL recon), order at least 6 BAC water vials — see your supplies checklist for the McGuff link.</p></div>
+      <div class="storage-card"><h4>Syringes &amp; injection technique</h4><p>29–31 gauge insulin syringes (0.5 mL or 1 mL barrel). Never reuse — one syringe per injection, always. Dispose in sharps container immediately. Rotate injection sites: abdomen is preferred for all SubQ injections. Pinch skin, 45° angle, slow injection. Wipe vial stopper and skin with alcohol prep pad before every use.</p></div>
+    </div>
+  </div>
+
+  <!-- WHAT TO MONITOR -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2L14 13H2L8 2Z" stroke="#8B7335" stroke-width="1.2" stroke-linejoin="round"/><path d="M8 7V9.5" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/><circle cx="8" cy="11.5" r="0.5" fill="#8B7335"/></svg></div>
+      <div class="section-title">What to Monitor</div>
+    </div>
+    <div class="monitor-list">
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Mild GI adjustment days 3–7 of week 1 — slight nausea or appetite shifts as Sema clears and Reta takes over. Hydrate, eat smaller meals, lean protein. Resolves by day 7–10.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Noticeably deeper sleep within days 3–5 — CJC-1295/Ipa PM dose synchronizing with your natural overnight GH window. Intended effect.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Mild flushing or warmth at injection site for 1–5 minutes after dosing. Common with Tesamorelin and Reta. Resolves quickly.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Scale stays flat in week 1 — your body is recalibrating. Real movement begins weeks 2–3. Don't weigh daily during the first 10 days; weekly is enough.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Slightly reduced workout endurance days 1–4 of Reta as your body shifts metabolic substrate utilization. Resolves quickly. SLU-PP-332 helps bridge this if used pre-workout.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-ok"></div><strong style="margin-right:6px;">Normal:</strong> Slightly increased thirst — Reta improves glucose disposal and fat oxidation, both of which require adequate hydration. Aim for 90–100 oz/day.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Persistent nausea past week 2 on Retatrutide — drop to 0.75 mg (7–8 units) for 2 weeks before re-titrating up, and notify BioLinked. Coming off Sema, some clients need a slower ramp.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Loss of strength in compound lifts (squat, deadlift, press) — this would suggest excessive caloric deficit or insufficient protein. Increase protein to 120–130 g/day and check that you're not overshooting calorie restriction.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Joint puffiness or fluid retention from CJC/Ipa or Tesamorelin — uncommon at these doses but possible. If noticed, drop CJC/Ipa to 3× per week instead of 5× and reassess.</div>
+      <div class="monitor-item"><div class="monitor-dot dot-watch"></div><strong style="margin-right:6px;color:var(--gold);">Monitor:</strong> Injection site infection (heat, spreading redness, pus, fever). Given your penicillin allergy, ensure any treating provider knows to avoid amoxicillin/ampicillin — clindamycin or doxycycline are appropriate alternatives.</div>
+    </div>
+  </div>
+
+  <!-- PRICING -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B7335" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Protocol Investment — Choose Your Level</div>
+    </div>
+
+    <div class="level-tabs">
+      <button class="ltab active" id="ltab1" onclick="showLevel(1,this)"><span class="ltab-eyebrow">Level 1</span><span class="ltab-name">Full Stack</span><span class="ltab-sub">All 5 · $620</span></button>
+      <button class="ltab" id="ltab2" onclick="showLevel(2,this)"><span class="ltab-eyebrow">Level 2</span><span class="ltab-name">Core Stack</span><span class="ltab-sub">4 compounds · $540</span></button>
+      <button class="ltab" id="ltab3" onclick="showLevel(3,this)"><span class="ltab-eyebrow">Level 3</span><span class="ltab-name">Starter</span><span class="ltab-sub">3 compounds · $340</span></button>
+      <button class="ltab" id="ltab4" onclick="showLevel(4,this)"><span class="ltab-eyebrow">Level 4</span><span class="ltab-name">Essential</span><span class="ltab-sub">2 compounds · $290</span></button>
+      <button class="ltab" id="ltab5" onclick="showLevel(5,this)"><span class="ltab-eyebrow">Level 5</span><span class="ltab-name">Basic</span><span class="ltab-sub">1 compound · $200</span></button>
+    </div>
+
+    <div id="level1" class="price-table" style="border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The complete protocol — all four fat-loss and muscle-preservation pathways firing simultaneously plus a workout amplifier. This is the stack built specifically for breaking a Sema stall while keeping every pound of muscle you've earned in the gym.</div>
+      <div class="price-row"><div><div class="item">Retatrutide</div><div class="qty">15mg × 4 vials · $50/vial · 3× per week · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row"><div><div class="item">CJC-1295 / Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · PM (pre-sleep)</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">5-Amino-1MQ</div><div class="qty">50mg × 1 vial · $50/vial · 5 on / 2 off · AM fasted</div></div><div class="amt">$50</div></div>
+      <div class="price-row"><div><div class="item">Tesamorelin</div><div class="qty">10mg × 4 vials · $50/vial · 5 on / 2 off · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row"><div><div class="item">SLU-PP-332</div><div class="qty">5mg × 2 vials · $40/vial · As needed · Fasted pre-workout</div></div><div class="amt">$80</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 1 Full Stack</div><div class="qty">All 5 compounds · 8-week cycle</div></div><div class="amt">$620</div></div>
+    </div>
+
+    <div id="level2" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Core Stack drops only the workout amplifier (SLU-PP-332) — your four cornerstone compounds remain intact. Best fit if your training is already at high intensity and you don't need an additional fasted-workout boost. You still get the full triple-agonist fat-loss engine, the GH-pulse muscle protection from CJC/Ipa + Tesamorelin, and the NNMT inhibition from 5-Amino-1MQ. This is the most efficient cost-to-result level for a recomp focused on lean tissue preservation.</div>
+      <div class="price-row"><div><div class="item">Retatrutide</div><div class="qty">15mg × 4 vials · $50/vial · 3× per week · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row"><div><div class="item">CJC-1295 / Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · PM (pre-sleep)</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">5-Amino-1MQ</div><div class="qty">50mg × 1 vial · $50/vial · 5 on / 2 off · AM fasted</div></div><div class="amt">$50</div></div>
+      <div class="price-row"><div><div class="item">Tesamorelin</div><div class="qty">10mg × 4 vials · $50/vial · 5 on / 2 off · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row dimmed"><div><div class="item">SLU-PP-332</div><div class="qty">Not included at this level — add in cycle 2 if training intensity calls for it</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 2 Core Stack</div><div class="qty">4 compounds · 8-week cycle</div></div><div class="amt">$540</div></div>
+    </div>
+
+    <div id="level3" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Starter level keeps the three highest-leverage compounds for your goal: Retatrutide as the primary fat-loss driver, CJC-1295/Ipamorelin to protect lean mass during the deficit, and 5-Amino-1MQ as the targeted recomp lever for stubborn over-40 adiposity. Tesamorelin and SLU-PP-332 drop out, saving cost while keeping the foundational mechanism intact. A reasonable first cycle if you want to see how Reta performs on its own with minimal muscle-protection support.</div>
+      <div class="price-row"><div><div class="item">Retatrutide</div><div class="qty">15mg × 4 vials · $50/vial · 3× per week · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row"><div><div class="item">CJC-1295 / Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · PM (pre-sleep)</div></div><div class="amt">$90</div></div>
+      <div class="price-row"><div><div class="item">5-Amino-1MQ</div><div class="qty">50mg × 1 vial · $50/vial · 5 on / 2 off · AM fasted</div></div><div class="amt">$50</div></div>
+      <div class="price-row dimmed"><div><div class="item">Tesamorelin · SLU-PP-332</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 3 Starter</div><div class="qty">3 compounds · 8-week cycle</div></div><div class="amt">$340</div></div>
+    </div>
+
+    <div id="level4" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Essential level pairs the fat-loss driver (Retatrutide) with the most important muscle-protection compound (CJC-1295/Ipamorelin). This is the minimum stack that delivers the core "lose fat without losing muscle" outcome — particularly valuable for a 43-year-old female on HRT, where preserving lean tissue is non-negotiable. If budget is the primary constraint and you can only run two compounds, these are the two that matter most.</div>
+      <div class="price-row"><div><div class="item">Retatrutide</div><div class="qty">15mg × 4 vials · $50/vial · 3× per week · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row"><div><div class="item">CJC-1295 / Ipamorelin</div><div class="qty">5mg+5mg × 2 vials · $45/vial · 5 on / 2 off · PM (pre-sleep)</div></div><div class="amt">$90</div></div>
+      <div class="price-row dimmed"><div><div class="item">5-Amino-1MQ · Tesamorelin · SLU-PP-332</div><div class="qty">Not included at this level</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 4 Essential</div><div class="qty">2 compounds · 8-week cycle</div></div><div class="amt">$290</div></div>
+    </div>
+
+    <div id="level5" class="price-table" style="display:none;border-top:none;border-radius:0 0 2px 2px;">
+      <div style="background:rgba(139,115,53,0.06);padding:0.875rem 1.75rem;border-bottom:1px solid var(--border);font-size:13px;color:#6a5a30;line-height:1.7;font-weight:300;">The Basic level is Retatrutide alone — the single highest-impact compound for breaking your Sema stall. At 1mg, 3× per week, two vials cover the full 8-week cycle with headroom. This is the lean entry point: same triple-agonist mechanism that breaks plateaus, no add-ons. Reasonable if you want to test Reta's effect on your specific physiology before committing to the supporting cast in cycle 2.</div>
+      <div class="price-row"><div><div class="item">Retatrutide</div><div class="qty">15mg × 4 vials · $50/vial · 3× per week · AM</div></div><div class="amt">$200</div></div>
+      <div class="price-row dimmed"><div><div class="item">CJC-1295/Ipa · 5-Amino-1MQ · Tesamorelin · SLU-PP-332</div><div class="qty">Not included at this level — add in cycle 2 to protect lean mass</div></div><div class="amt" style="color:var(--text-muted)">—</div></div>
+      <div class="price-row total"><div><div class="item">Total — Level 5 Basic</div><div class="qty">1 compound · 8-week cycle</div></div><div class="amt">$200</div></div>
+    </div>
+
+    <script>
+    function showLevel(n,btn){
+      [1,2,3,4,5].forEach(i=>{document.getElementById('level'+i).style.display='none';});
+      ['ltab1','ltab2','ltab3','ltab4','ltab5'].forEach(id=>{document.getElementById(id).classList.remove('active');});
+      document.getElementById('level'+n).style.display='block';
+      btn.classList.add('active');
+    }
+    </script>
+  </div>
+
+  <!-- VENMO -->
+  <div class="venmo-section">
+    <h3>Ready to <em>Order?</em></h3>
+    <p>Send payment via Venmo and your protocol ships within 24–48 hours.<br>Include your name and level in the note field.</p>
+    <a href="https://venmo.com/micahp20" class="venmo-btn">Pay on Venmo</a>
+    <span class="venmo-handle">@micahp20</span>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Important Notice:</strong> This protocol has been prepared by BioLinked Solutions for educational and informational purposes only. It does not constitute medical advice, diagnosis, or treatment. Peptides discussed in this document are research compounds not approved by the FDA for human use unless otherwise noted. Always consult with a licensed healthcare provider before beginning any new supplement or compound protocol. BioLinked Solutions is not responsible for adverse outcomes resulting from misuse or improper administration. If you experience any adverse reactions, discontinue use immediately and seek medical attention.
+  </div>
+
+</div><!-- /tab-protocol -->
+
+
+<!-- SUPPLIES TAB -->
+<div id="tab-supplies" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><path d="M2 3h12l-1 9H3L2 3Z" stroke="#8B7335" stroke-width="1.2" stroke-linejoin="round"/><path d="M5 3V2a1 1 0 011-1h4a1 1 0 011 1v1" stroke="#8B7335" stroke-width="1.2"/><path d="M6 7h4M8 5v4" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+      <div class="section-title">Supplies — Order Before Day 1</div>
+    </div>
+    <div class="intro-card" style="margin-top:1rem;">
+      <p>Five items, all available online. Order them together before your cycle begins. With 5 active compounds in the fridge and 2–3 injections on Reta-day mornings, having organized supplies before Day 1 makes the cycle smoother. <strong>Note:</strong> for BAC water, we now recommend McGuff Pharmacy — it's medical-grade, sterile, and arrives faster than Amazon equivalents for a similar price.</p>
+    </div>
+    <div class="peptide-grid" style="margin-top:1.5rem;">
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Insulin Syringes</div><div class="peptide-tagline">29–31 Gauge · 1 mL · 100-pack</div></div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">On Reta days you'll do 2–3 injections in a single AM cluster, so you'll go through syringes consistently. Never reuse — one per injection, always. A 100-pack covers the full cycle plus extras for SLU-PP-332 PRN doses.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Bacteriostatic Water (BAC Water)</div><div class="peptide-tagline">McGuff Pharmacy · 30 mL Sterile · Order 6+</div></div>
+          <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372&gad_source=4&gad_campaignid=22427589810&gbraid=0AAAAADQPwEuqb7fh5CMWknB_btquFfb2g&gclid=Cj0KCQjw2MbPBhCSARIsAP3jP9xJ7NOLRmLBJ1cnPkCeBZGMPuWL1NH72cuL6s4Xzz0Y-g1FXzN1tFkaAvP2EALw_wcB" target="_blank" class="order-btn">Order at McGuff →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">Five compounds to reconstitute, with one (5-Amino-1MQ) requiring 5 mL — total BAC water need is roughly 14 mL for initial reconstitution plus margin for re-recons. Order 6+ vials to be safe across the full 8-week cycle. <strong>McGuff is the recommended source</strong> — medical-grade, sterile, and reliable. Each vial gets dedicated BAC water; do not share BAC across compounds at reconstitution.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Alcohol Prep Pads</div><div class="peptide-tagline">70% Isopropyl · Sterile · 200-pack</div></div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">Wipe the vial stopper before every draw and the injection site before every injection. With your penicillin allergy, infection avoidance is especially important — strict sterile technique prevents the scenario where you'd need an antibiotic at all. Use them generously.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Sharps Container</div><div class="peptide-tagline">FDA-Cleared · Puncture-Proof · 1 Quart</div></div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">Used needles go directly into the sharps container — no exceptions. Over 8 weeks at the Full Stack level you'll accumulate 80–100+ syringes. When full, drop off free at any CVS or Walgreens pharmacy.</div></div>
+      </div>
+      <div class="peptide-card">
+        <div class="peptide-header">
+          <div><div class="peptide-name">Peptide Organizer / Cold Storage</div><div class="peptide-tagline">Insulated · Multi-vial · Keeps compounds organized</div></div>
+          <a href="https://a.co/d/07HthwLz" target="_blank" class="order-btn">Amazon →</a>
+        </div>
+        <div class="peptide-body"><div class="peptide-text">With 5 active vials in the fridge — each a different compound, dose, and timing — labeling and organization prevent mix-ups. A dedicated peptide container also protects from light and keeps everything in one designated place in the fridge.</div></div>
+      </div>
+    </div>
+    <div class="checklist-wrap">
+      <div class="checklist-title">Quick Order Checklist — All 5 Items</div>
+      <div class="checklist-row"><span>1 — Insulin Syringes (29–31G · 1 mL · 100-pack)</span><a href="https://a.co/d/04JCzBqF" target="_blank" class="checklist-link">a.co/d/04JCzBqF →</a></div>
+      <div class="checklist-row"><span>2 — BAC Water (McGuff Pharmacy · 30 mL · order 6+)</span><a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372&gad_source=4&gad_campaignid=22427589810&gbraid=0AAAAADQPwEuqb7fh5CMWknB_btquFfb2g&gclid=Cj0KCQjw2MbPBhCSARIsAP3jP9xJ7NOLRmLBJ1cnPkCeBZGMPuWL1NH72cuL6s4Xzz0Y-g1FXzN1tFkaAvP2EALw_wcB" target="_blank" class="checklist-link">McGuff →</a></div>
+      <div class="checklist-row"><span>3 — Alcohol Prep Pads (70% IPA · 200-pack)</span><a href="https://a.co/d/0fnbd8VV" target="_blank" class="checklist-link">a.co/d/0fnbd8VV →</a></div>
+      <div class="checklist-row"><span>4 — Sharps Container (1 quart · FDA-cleared)</span><a href="https://a.co/d/0jhnMLPg" target="_blank" class="checklist-link">a.co/d/0jhnMLPg →</a></div>
+      <div class="checklist-row"><span>5 — Peptide Organizer / Cold Storage</span><a href="https://a.co/d/07HthwLz" target="_blank" class="checklist-link">a.co/d/07HthwLz →</a></div>
+    </div>
+  </div>
+</div><!-- /tab-supplies -->
+
+
+<!-- TRACKER TAB -->
+<div id="tab-tracker" class="tab-content">
+  <div class="section" style="margin-top:2rem;">
+    <div class="section-header">
+      <div class="section-icon"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#8B7335" stroke-width="1.2"/><path d="M5 8L7 10L11 6" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="section-title">Daily Dose Tracker — 8-Week Cycle</div>
+    </div>
+
+    <div style="background:#f8f8f8;border:1px solid var(--gold-border);border-radius:2px;padding:1.25rem 1.75rem;margin-bottom:1rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.75rem;">
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Retatrutide</div><div style="font-size:11px;font-weight:500;color:var(--text);">1mg · 10u · AM · Mon/Wed/Fri</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">CJC-1295/Ipa</div><div style="font-size:11px;font-weight:500;color:var(--text);">250mcg each · 10u · PM · 5on/2off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">5-Amino-1MQ</div><div style="font-size:11px;font-weight:500;color:var(--text);">1mg · 10u · AM fasted · 5on/2off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">Tesamorelin</div><div style="font-size:11px;font-weight:500;color:var(--text);">1mg · 20u · AM · 5on/2off</div></div>
+      <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:0.75rem 1rem;"><div style="font-size:9px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-muted);font-weight:600;margin-bottom:4px;">SLU-PP-332 (PRN)</div><div style="font-size:11px;font-weight:500;color:var(--text);">500mcg · 20u · Pre-workout fasted</div></div>
+    </div>
+
+    <div class="note-card note-blue" style="margin-top:0;">
+      <h4>★ SLU-PP-332 — As Needed (PRN)</h4>
+      <p>SLU is logged on any day you use it pre-workout. There's no fixed weekday schedule — tap the cell on days you take it. Most clients use it 2–4 days per week timed to their hardest fasted training sessions.</p>
+    </div>
+
+    <div class="cycle-start-row">
+      <label>Cycle Start Date</label>
+      <input type="date" id="cycleStartDate" onchange="setCycleStart(this.value)">
+      <span class="save-badge" id="saveBadge">Saved ✓</span>
+    </div>
+
+    <div class="tracker-top">
+      <div class="tracker-stat"><div class="ts-label">Cycle Progress</div><div class="ts-value" id="statWeek">—</div><div class="ts-sub" id="statDay">Set start date above</div></div>
+      <div class="tracker-stat"><div class="ts-label">Doses This Week</div><div class="ts-value" id="statDoses">0</div><div class="ts-sub">logged</div></div>
+      <div class="tracker-stat"><div class="ts-label">Cycle Complete</div><div class="ts-value" id="statPct">0%</div><div class="ts-sub">overall</div></div>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label"><span>8-Week Cycle</span><span id="progressLabel">0 / 56 days</span></div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    </div>
+
+    <div class="week-selector">
+      <button class="week-nav-btn" onclick="changeWeek(-1)">&#8249;</button>
+      <div class="week-label" id="weekLabel">Week 1</div>
+      <button class="week-nav-btn" onclick="changeWeek(1)">&#8250;</button>
+    </div>
+
+    <div id="trackerGrid"></div>
+
+    <div class="notes-area">
+      <div class="notes-label">Weekly Notes — Strength, scale, energy, sleep, how training felt</div>
+      <textarea class="notes-input" id="weekNotes" placeholder="e.g. Sleep deeper since day 4. Scale finally moved Thursday. Squat numbers holding strong. Energy great by week 3..." oninput="saveNotes()"></textarea>
+    </div>
+
+    <div class="tracker-actions">
+      <button class="action-btn" onclick="markAllToday()">✓ Mark All Today</button>
+      <button class="action-btn" onclick="clearWeek()">Clear This Week</button>
+      <button class="action-btn primary" onclick="downloadTracker()">⬇ Download for iOS</button>
+    </div>
+
+    <div class="ios-download-banner">
+      <div class="ios-banner-text">
+        <strong>Save to iPhone / iPad</strong> — Tap Download for iOS, open in Safari on your device. Tap the Share button → Add to Home Screen to install as a standalone app. All dose logs save locally to your device.
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-tracker -->
+
+</div><!-- /container -->
+
+<div class="footer">
+  Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;·&nbsp; Jessie Myers &nbsp;·&nbsp; Recomposition Reset · Break the Stall · Lean Forward &nbsp;·&nbsp; 8-Week Cycle
+</div>
+
+<script>
+const COMPOUNDS = [
+  {id:'reta',     name:'Retatrutide',   sub:'1mg · AM · Mon/Wed/Fri',   days:[1,3,5],     prn:false},
+  {id:'cjc',      name:'CJC/Ipa',       sub:'250mcg each · PM · 5on/2off', days:[1,2,3,4,5], prn:false},
+  {id:'amino',    name:'5-Amino-1MQ',   sub:'1mg · AM fasted',          days:[1,2,3,4,5], prn:false},
+  {id:'tesa',     name:'Tesamorelin',   sub:'1mg · AM · 5on/2off',      days:[1,2,3,4,5], prn:false},
+  {id:'slu',      name:'SLU-PP-332 ★',  sub:'500mcg · pre-workout PRN', days:[1,2,3,4,5,6,0], prn:true},
+];
+const DAY_NAMES=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const TOTAL_WEEKS=8,TOTAL_DAYS=56;
+let currentWeek=1,state={},cycleStartDate=null;
+
+function loadState(){
+  try{const s=localStorage.getItem('jessieProtocolState');if(s)state=JSON.parse(s);}catch(e){}
+  try{const d=localStorage.getItem('jessieCycleStart');if(d){cycleStartDate=new Date(d);document.getElementById('cycleStartDate').value=d;}}catch(e){}
+  updateStats();
+}
+function saveState(){
+  try{localStorage.setItem('jessieProtocolState',JSON.stringify(state));const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}catch(e){}
+}
+function saveNotes(){if(!state[currentWeek])state[currentWeek]={};state[currentWeek].__notes=document.getElementById('weekNotes').value;saveState();}
+function setCycleStart(val){cycleStartDate=val?new Date(val):null;try{localStorage.setItem('jessieCycleStart',val);}catch(e){}updateStats();const b=document.getElementById('saveBadge');b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1500);}
+function isScheduled(c,dow){return c.days.includes(dow);}
+function isDoseTaken(w,cid,di){return!!(state[w]&&state[w][cid]&&state[w][cid][di]);}
+function toggleDose(w,cid,di){if(!state[w])state[w]={};if(!state[w][cid])state[w][cid]={};state[w][cid][di]=!state[w][cid][di];saveState();renderGrid();updateStats();}
+
+function renderGrid(){
+  const container=document.getElementById('trackerGrid');
+  const weekDates=getWeekDates(currentWeek);
+  let html='';
+  html+='<div class="day-header-row"><div></div><div class="day-headers-inner">';
+  for(let d=0;d<7;d++){
+    const dow=(d+1)%7;
+    const dayName=DAY_NAMES[dow];
+    const dateStr=weekDates?weekDates[d].getDate():'';
+    const allRest=COMPOUNDS.filter(c=>!c.prn).every(c=>!isScheduled(c,dow));
+    html+='<div class="day-header'+(allRest?' rest-day':'')+'">' +dayName+(dateStr?'<br><span style="font-size:9px;font-weight:300;color:#888">'+dateStr+'</span>':'')+'</div>';
+  }
+  html+='</div></div>';
+  COMPOUNDS.forEach(c=>{
+    html+='<div class="tracker-grid-wrap"><div class="tracker-compound-label"><div class="compound-badge">'+c.name+'<span>'+c.sub+'</span></div></div><div class="day-row">';
+    for(let d=0;d<7;d++){
+      const dow=(d+1)%7;
+      const taken=isDoseTaken(currentWeek,c.id,d);
+      if(c.prn){html+='<div class="dose-cell prn'+(taken?' taken':'')+'" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+d+')"></div>';}
+      else if(!isScheduled(c,dow)){html+='<div class="dose-cell rest"></div>';}
+      else if(taken){html+='<div class="dose-cell scheduled taken" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+d+')"></div>';}
+      else{html+='<div class="dose-cell scheduled" onclick="toggleDose('+currentWeek+',\''+c.id+'\','+d+')"></div>';}
+    }
+    html+='</div></div>';
+  });
+  container.innerHTML=html;
+  document.getElementById('weekNotes').value=state[currentWeek]&&state[currentWeek].__notes?state[currentWeek].__notes:'';
+  document.getElementById('weekLabel').textContent='Week '+currentWeek;
+}
+
+function getWeekDates(w){
+  if(!cycleStartDate)return null;
+  const start=new Date(cycleStartDate);
+  start.setDate(start.getDate()+(w-1)*7);
+  const dates=[];
+  for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);dates.push(d);}
+  return dates;
+}
+function changeWeek(delta){const n=currentWeek+delta;if(n<1||n>TOTAL_WEEKS)return;currentWeek=n;renderGrid();}
+function markAllToday(){
+  const dow=new Date().getDay();let di=-1;
+  for(let d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}
+  if(di<0)return;
+  if(!state[currentWeek])state[currentWeek]={};
+  COMPOUNDS.filter(c=>!c.prn).forEach(c=>{if(isScheduled(c,dow)){if(!state[currentWeek][c.id])state[currentWeek][c.id]={};state[currentWeek][c.id][di]=true;}});
+  saveState();renderGrid();updateStats();
+}
+function clearWeek(){
+  if(!confirm('Clear all dose logs for Week '+currentWeek+'?'))return;
+  const notes=state[currentWeek]&&state[currentWeek].__notes;
+  state[currentWeek]={};if(notes)state[currentWeek].__notes=notes;
+  saveState();renderGrid();updateStats();
+}
+function updateStats(){
+  let weekText='Week '+currentWeek,dayText='of 8-week cycle';
+  if(cycleStartDate){
+    const now=new Date(),diff=Math.floor((now-cycleStartDate)/86400000);
+    const cw=Math.min(TOTAL_WEEKS,Math.max(1,Math.floor(diff/7)+1));
+    weekText='Week '+cw;dayText='Day '+Math.min(diff+1,TOTAL_DAYS)+' of '+TOTAL_DAYS;
+    if(currentWeek===1&&cw>1){currentWeek=cw;}
+    const pct=Math.min(100,Math.round((diff/TOTAL_DAYS)*100));
+    document.getElementById('progressFill').style.width=pct+'%';
+    document.getElementById('progressLabel').textContent=Math.min(diff+1,TOTAL_DAYS)+' / '+TOTAL_DAYS+' days';
+    document.getElementById('statPct').textContent=pct+'%';
+  }
+  document.getElementById('statWeek').textContent=weekText;
+  document.getElementById('statDay').textContent=dayText;
+  let dc=0,sc=0;
+  for(let d=0;d<7;d++){const dow=(d+1)%7;COMPOUNDS.filter(c=>!c.prn).forEach(c=>{if(isScheduled(c,dow)){sc++;if(isDoseTaken(currentWeek,c.id,d))dc++;}});}
+  document.getElementById('statDoses').textContent=dc+'/'+sc;
+}
+function switchTab(tab,event){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  if(event)event.target.classList.add('active');
+  if(tab==='tracker'){renderGrid();updateStats();}
+}
+function downloadTracker(){
+  const startVal = document.getElementById('cycleStartDate').value || '';
+  const compounds = [
+    {id:'reta',n:'Retatrutide',s:'1mg · AM · M/W/F',d:[1,3,5]},
+    {id:'cjc',n:'CJC/Ipa',s:'250mcg each · PM',d:[1,2,3,4,5]},
+    {id:'amino',n:'5-Amino-1MQ',s:'1mg · AM fasted',d:[1,2,3,4,5]},
+    {id:'tesa',n:'Tesamorelin',s:'1mg · AM',d:[1,2,3,4,5]},
+    {id:'slu',n:'SLU-PP-332 ★',s:'500mcg · pre-WO PRN',d:[0,1,2,3,4,5,6],prn:true}
+  ];
+  const cData = JSON.stringify(compounds);
+  const parts = [
+    '<!DOCTYPE html><html lang="en"><head>',
+    '<meta charset="UTF-8">',
+    '<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">',
+    '<meta name="apple-mobile-web-app-capable" content="yes">',
+    '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">',
+    '<meta name="apple-mobile-web-app-title" content="Jessie Tracker">',
+    '<title>Jessie Myers — Peptide Tracker</title>',
+    '<style>',
+    '*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}',
+    ':root{--gold:#8B7335;--gold-light:#A08840;--gold-dim:rgba(139,115,53,0.10);--gold-border:rgba(139,115,53,0.30);--bg:#f5f5f5;--bg-card:#fff;--bg-card2:#f0f0f0;--text:#1a1a1a;--text-muted:#888880;--border:rgba(0,0,0,0.10);--green-dim:rgba(45,106,79,0.12);--green:#3a9a5a}',
+    'body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);font-size:13px;padding-bottom:env(safe-area-inset-bottom)}',
+    '.hdr{background:#fff;border-bottom:1px solid var(--gold-border);padding:max(1.5rem,env(safe-area-inset-top)) 1rem 1rem;text-align:center}',
+    '.hdr h1{font-size:20px;color:var(--text);font-weight:300;letter-spacing:0.04em}.hdr h1 em{color:var(--gold);font-style:normal}',
+    '.hdr p{font-size:10px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:4px}',
+    '.wrap{max-width:600px;margin:0 auto;padding:1rem}',
+    '.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}',
+    '.stat{background:#fff;border:1px solid var(--gold-border);border-radius:4px;padding:10px 6px;text-align:center}',
+    '.stat .val{font-size:20px;color:var(--gold);font-weight:600}.stat .lbl{font-size:8px;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-top:3px}',
+    '.prog-wrap{background:#fff;border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:1rem}',
+    '.prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}',
+    '.prog-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden}',
+    '.prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px}',
+    '.week-sel{display:flex;align-items:center;justify-content:center;gap:12px;margin:1rem 0}',
+    '.wnav{width:38px;height:38px;background:#fff;border:1px solid var(--gold-border);color:var(--gold);border-radius:4px;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer}',
+    '.wlbl{font-size:18px;color:var(--text);font-weight:300;min-width:80px;text-align:center}',
+    '.grid-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:1rem}',
+    '.tt{width:100%;border-collapse:collapse;min-width:380px}',
+    '.tt th{background:#f0f0f0;color:var(--gold);padding:6px 2px;font-size:8px;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;text-align:center;border-bottom:1px solid var(--gold-border)}',
+    '.tt th.cn{text-align:left;padding-left:6px;min-width:90px}',
+    '.tt td{padding:2px;text-align:center;border-bottom:1px solid var(--border)}',
+    '.tt td.cn{text-align:left;padding-left:6px;font-size:10px;font-weight:600;color:var(--gold);white-space:nowrap}',
+    '.tt td.cn span{display:block;font-size:8px;font-weight:400;color:var(--text-muted)}',
+    '.tt tr:nth-child(even) td{background:#f8f8f8}',
+    '.db{width:30px;height:30px;border-radius:3px;border:1px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto;cursor:pointer;font-size:13px}',
+    '.db.taken{background:var(--green-dim);border-color:rgba(45,106,79,0.35)}',
+    '.db.rest{background:transparent;border-color:transparent;cursor:default;color:#ccc;font-size:10px}',
+    '.db.prn{background:rgba(236,72,153,0.03)}',
+    '.db:active{transform:scale(0.88)}',
+    '.notes-wrap{background:#fff;border:1px solid var(--border);border-radius:4px;padding:10px;margin-bottom:1rem}',
+    '.notes-lbl{font-size:8px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}',
+    '.notes-ta{width:100%;background:#fafafa;border:1px solid var(--border);border-radius:4px;padding:8px;color:var(--text);font-family:-apple-system,sans-serif;font-size:12px;resize:vertical;min-height:56px;outline:none}',
+    '.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem}',
+    '.btn{padding:12px;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;border-radius:4px;cursor:pointer;text-align:center}',
+    '.venmo-row{background:#fff;border:1px solid var(--gold-border);border-radius:4px;padding:12px;text-align:center;margin-bottom:1rem}',
+    '.venmo-row a{color:var(--gold);font-size:12px;font-weight:600;text-decoration:none}',
+    '.foot{text-align:center;font-size:10px;color:var(--text-muted);padding:1rem;line-height:1.5}',
+    '</style></head><body>',
+    '<div class="hdr"><h1>Jessie <em>Myers</em> — Tracker</h1><p>BioLinked Solutions · Recomp Reset · 8 Weeks</p></div>',
+    '<div class="wrap">',
+    '<div class="stats"><div class="stat"><div class="val" id="sW">—</div><div class="lbl">Week</div></div>',
+    '<div class="stat"><div class="val" id="sD">0</div><div class="lbl">Doses</div></div>',
+    '<div class="stat"><div class="val" id="sP">0%</div><div class="lbl">Complete</div></div></div>',
+    '<div class="prog-wrap"><div class="prog-top"><span>8-Week Cycle</span><span id="pL">0/56 days</span></div>',
+    '<div class="prog-bar"><div class="prog-fill" id="pF" style="width:0%"></div></div></div>',
+    '<div class="week-sel"><div class="wnav" onclick="cW(-1)">&#8249;</div>',
+    '<div class="wlbl" id="wL">Week 1</div>',
+    '<div class="wnav" onclick="cW(1)">&#8250;</div></div>',
+    '<div class="grid-wrap"><table class="tt"><thead><tr>',
+    '<th class="cn">Compound</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>',
+    '</tr></thead><tbody id="tB"></tbody></table></div>',
+    '<div class="notes-wrap"><div class="notes-lbl">Weekly Notes — Scale · Strength · Sleep · Energy</div>',
+    '<textarea class="notes-ta" id="wN" placeholder="Scale, strength numbers, sleep, energy..." oninput="svN()"></textarea></div>',
+    '<div class="btns"><div class="btn" onclick="mT()">&#10003; Mark All Today</div>',
+    '<div class="btn" onclick="cWk()">Clear Week</div></div>',
+    '<div class="venmo-row"><a href="https://venmo.com/micahp20">Reorder &middot; Venmo @micahp20</a></div>',
+    '<div class="foot">Tap circle = dose taken. &mdash; = rest day. &#9733; SLU-PP-332 is PRN — log when used pre-workout.</div>',
+    '</div>',
+    '<scr' + 'ipt>',
+    'const C=' + cData + ';',
+    'const TD=56,TW=8;',
+    'const SD="' + startVal + '";',
+    'let cw=1,st={};',
+    'function ls(){try{var s=localStorage.getItem("jmSt");if(s)st=JSON.parse(s);}catch(e){}upd();}',
+    'function sv(){try{localStorage.setItem("jmSt",JSON.stringify(st));}catch(e){}}',
+    'function svN(){if(!st[cw])st[cw]={};st[cw].__n=document.getElementById("wN").value;sv();}',
+    'function isSch(c,dow){return c.d.includes(dow);}',
+    'function isTk(w,ci,di){return!!(st[w]&&st[w][ci]&&st[w][ci][di]);}',
+    'function tog(w,ci,di){if(!st[w])st[w]={};if(!st[w][ci])st[w][ci]={};st[w][ci][di]=!st[w][ci][di];sv();ren();upd();}',
+    'function ren(){',
+    '  var tb=document.getElementById("tB");var h="";',
+    '  C.forEach(function(c){',
+    '    h+="<tr><td class=\\"cn\\">"+c.n+"<span>"+c.s+"</span></td>";',
+    '    for(var d=0;d<7;d++){',
+    '      var dow=(d+1)%7;',
+    '      var tk=isTk(cw,c.id,d);',
+    '      if(c.prn){h+=\'<td><div class="db prn\'+(tk?\' taken\':\'\')+\'" onclick="tog(\'+cw+\',"\'+(c.id)+\'",\'+d+\')">\'+(tk?"&#10003;":"&middot;")+\'</div></td>\';}',
+    '      else if(!isSch(c,dow)){h+=\'<td><div class="db rest">&mdash;</div></td>\';}',
+    '      else{h+=\'<td><div class="db\'+(tk?\' taken\':\'\')+\'" onclick="tog(\'+cw+\',"\'+(c.id)+\'",\'+d+\')">\'+(tk?"&#10003;":"&#9675;")+\'</div></td>\';}',
+    '    }',
+    '    h+="</tr>";',
+    '  });',
+    '  tb.innerHTML=h;',
+    '  document.getElementById("wL").textContent="Week "+cw;',
+    '  var n=st[cw]&&st[cw].__n?st[cw].__n:"";',
+    '  document.getElementById("wN").value=n;',
+    '}',
+    'function cW(d){var n=cw+d;if(n<1||n>TW)return;cw=n;ren();upd();}',
+    'function mT(){',
+    '  var dow=new Date().getDay();var di=-1;',
+    '  for(var d=0;d<7;d++){if((d+1)%7===dow){di=d;break;}}',
+    '  if(di<0)return;',
+    '  if(!st[cw])st[cw]={};',
+    '  C.forEach(function(c){if(!c.prn&&isSch(c,dow)){if(!st[cw][c.id])st[cw][c.id]={};st[cw][c.id][di]=true;}});',
+    '  sv();ren();upd();',
+    '}',
+    'function cWk(){if(!confirm("Clear Week "+cw+"?"))return;var n=st[cw]&&st[cw].__n;st[cw]={};if(n)st[cw].__n=n;sv();ren();upd();}',
+    'function upd(){',
+    '  var wt="—",dt="",pct=0,pr="0/56 days";',
+    '  if(SD){var now=new Date(),start=new Date(SD),diff=Math.floor((now-start)/86400000);',
+    '    var cywk=Math.min(TW,Math.max(1,Math.floor(diff/7)+1));',
+    '    wt="Wk "+cywk;dt="Day "+Math.min(diff+1,TD)+"/"+TD;',
+    '    pct=Math.min(100,Math.round((diff/TD)*100));pr=Math.min(diff+1,TD)+"/"+TD+" days";}',
+    '  document.getElementById("sW").textContent=wt;',
+    '  document.getElementById("sP").textContent=pct+"%";',
+    '  document.getElementById("pF").style.width=pct+"%";',
+    '  document.getElementById("pL").textContent=pr;',
+    '  var dc=0,sc=0;',
+    '  for(var d=0;d<7;d++){var dow=(d+1)%7;C.forEach(function(c){if(!c.prn&&isSch(c,dow)){sc++;if(isTk(cw,c.id,d))dc++;}});}',
+    '  document.getElementById("sD").textContent=dc+"/"+sc;',
+    '}',
+    'ls();ren();',
+    '</' + 'script>',
+    '</body></html>'
+  ];
+  const blob = new Blob([parts.join('')], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Jessie_Myers_Peptide_Tracker.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+loadState();
+renderGrid();
+</script>
+</body>
+</html>
