@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Keith Drieshman — BioLinked Invoice</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -201,9 +202,144 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
   .bundle-banner,.cal-banner{flex-direction:column;}
   .supply-card{flex-direction:column;align-items:flex-start;}
 }
+
+/* ───── WRAPPER TABS (Previous Protocol / New Protocol) ───── */
+.wrap-tabs{background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:101;display:flex;justify-content:center;gap:0;}
+.wrap-tab{padding:1rem 2rem;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-muted);cursor:pointer;background:transparent;border:none;border-bottom:2px solid transparent;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.wrap-tab:hover{color:var(--gold-light);background:rgba(139,115,53,0.04);}
+.wrap-tab.active{color:var(--gold);border-bottom-color:var(--gold);background:var(--gold-dim);}
+.wrap-tab .tag{display:inline-block;padding:2px 7px;background:var(--gold);color:#fff;font-size:8px;letter-spacing:0.1em;border-radius:99px;font-weight:700;}
+.wrap-content{display:none;}
+.wrap-content.active{display:block;}
+/* When prev wrapper is shown, push the inner sticky nav-tabs below the wrapper bar */
+#wrap-prev.active .nav-tabs{top:104px;}
+
+/* ───── FREE BADGE (DSIP bonus bottle) ───── */
+.free-badge{display:inline-block;background:linear-gradient(135deg,#5ab87a,#3a9a5a);color:#fff;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-left:10px;vertical-align:2px;box-shadow:0 1px 3px rgba(58,154,90,0.35);}
+.cmp-card.free-card{border-color:rgba(90,184,122,0.35);}
+.cmp-card.free-card .cmp-head{background:linear-gradient(135deg,rgba(90,184,122,0.10),rgba(90,184,122,0.03));border-bottom-color:rgba(90,184,122,0.20);}
+.li-row.free-row{border-color:rgba(90,184,122,0.35);background:linear-gradient(135deg,rgba(90,184,122,0.05),transparent);}
+.li-row.free-row .li-name{color:var(--text);}
+.li-free-price{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--green);}
+.li-free-strike{font-size:11px;color:var(--strike);text-decoration:line-through;font-weight:300;}
+
+/* ───── DISCOUNT HERO BANNER ───── */
+.disc-hero{background:linear-gradient(135deg,rgba(139,115,53,0.10),rgba(139,115,53,0.03));border:1px solid var(--gold-border);border-top:2px solid var(--gold);border-radius:2px;padding:1.5rem 1.75rem;margin-top:2rem;text-align:center;}
+.disc-hero .disc-pct{font-family:'Cormorant Garamond',serif;font-size:54px;color:var(--gold);font-weight:600;line-height:1;}
+.disc-hero .disc-pct em{font-style:normal;font-size:32px;}
+.disc-hero h3{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--white);font-weight:400;margin:0.5rem 0 0.4rem;}
+.disc-hero h3 em{color:var(--gold);font-style:italic;}
+.disc-hero p{font-size:12px;color:var(--text-muted);font-weight:300;line-height:1.7;}
+
+/* ───── SYNERGY OVERVIEW BLOCK ───── */
+.overview-block{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;padding:1.75rem 2rem;margin-top:1.25rem;}
+.overview-block .ov-lead{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--white);font-weight:400;line-height:1.7;margin-bottom:1.25rem;font-style:italic;}
+.overview-block .ov-lead em{color:var(--gold);}
+.overview-block .ov-pillar{margin-top:1.1rem;padding-top:1.1rem;border-top:1px solid var(--border);}
+.overview-block .ov-pillar:first-of-type{border-top:none;padding-top:0;margin-top:0;}
+.overview-block .ov-pillar h4{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;margin-bottom:0.4rem;}
+.overview-block .ov-pillar p{font-size:13px;color:#555550;line-height:1.85;font-weight:300;}
+.overview-block .ov-pillar p strong{color:var(--text);font-weight:600;}
+.overview-block .ov-synergy{margin-top:1.25rem;padding:1rem 1.25rem;background:var(--gold-dim);border-left:3px solid var(--gold);border-radius:2px;}
+.overview-block .ov-synergy strong{color:var(--gold);font-weight:600;}
+.overview-block .ov-synergy p{font-size:12.5px;line-height:1.8;color:#555550;font-weight:300;}
 </style>
 </head>
 <body>
+
+<script>
+(function(){
+  const path = window.location.pathname;
+  const isActive = (href) => {
+    const clean = href.replace('.html','');
+    if(clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
+    return path.includes(clean.replace('/',''));
+  };
+  const links = [
+    {href:'/index.html', label:'Home'},
+    {href:'/peptide-index.html', label:'Index'},
+    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
+    {href:'/stacks-blends.html', label:'Stacks & Blends'},
+  ];
+  const tools = [
+    {href:'/peptide-tracker.html', label:'Peptide Tracker'},
+    {href:'/stack-analyzer.html', label:'Stack Analyzer'},
+    {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
+  ];
+  const navHTML = `
+<nav class="bl-nav" id="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="/index.html" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BIO LINKED</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      ${links.map(l=>`<a href="${l.href}" class="bl-nav-link${isActive(l.href)?' active':''}">${l.label}</a>`).join('')}
+      <div class="bl-nav-dropdown" id="bl-dropdown">
+        <button class="bl-nav-link bl-dropdown-btn">Tools ▾</button>
+        <div class="bl-nav-dropdown-menu" id="bl-dropdown-menu">
+          ${tools.map(t=>`<a href="${t.href}" class="bl-nav-dropdown-item${isActive(t.href)?' active':''}">${t.label}</a>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    ${links.map(l=>`<a href="${l.href}" class="bl-nav-mobile-link">${l.label}</a>`).join('')}
+    <div class="bl-nav-mobile-section">Tools</div>
+    ${tools.map(t=>`<a href="${t.href}" class="bl-nav-mobile-link bl-nav-mobile-sub">${t.label}</a>`).join('')}
+  </div>
+</nav>`;
+  const navCSS = `<style>
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Outfit',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.1em}
+.bl-nav-logo-sub{font-size:8px;color:#777;letter-spacing:0.18em;text-transform:uppercase;margin-top:2px}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:11.5px;color:#444;text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown{position:relative}
+.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:#fff;border:1px solid #eaeaea;border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
+.bl-nav-dropdown:hover .bl-nav-dropdown-menu,.bl-nav-dropdown-menu:hover{display:block}
+.bl-nav-dropdown-btn{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bl-nav-dropdown:hover .bl-dropdown-btn{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:#444;text-decoration:none;transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8;color:#9A7B2F;padding-left:20px}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:#1a1a1a;padding:8px}
+.bl-nav-mobile-menu{display:none;border-top:1px solid #eaeaea;background:#fff;padding:12px 20px 20px}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:10px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Outfit',sans-serif}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
+.bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#9A7B2F;font-family:'Outfit',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
+@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
+</style>`;
+  document.head.insertAdjacentHTML('beforeend', navCSS);
+  document.body.insertAdjacentHTML('afterbegin', navHTML);
+  document.getElementById('bl-mobile-btn').addEventListener('click', function(){
+    const menu = document.getElementById('bl-mobile-menu');
+    menu.classList.toggle('open');
+    this.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+  const dropdown = document.getElementById('bl-dropdown');
+  const menu = document.getElementById('bl-dropdown-menu');
+  let closeTimer;
+  dropdown.addEventListener('mouseenter', () => { clearTimeout(closeTimer); menu.style.display='block'; });
+  dropdown.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+  menu.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  menu.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+})();
+</script>
+
+<!-- ═════════ WRAPPER TABS — Previous Protocol vs New Protocol ═════════ -->
+<div class="wrap-tabs">
+  <button class="wrap-tab" id="wrapTabPrev" onclick="switchWrap('prev')">Previous Protocol</button>
+  <button class="wrap-tab active" id="wrapTabNew" onclick="switchWrap('new')">New Protocol <span class="tag">Active</span></button>
+</div>
+
+<!-- ═════════ PREVIOUS PROTOCOL (preserved as-is) ═════════ -->
+<div id="wrap-prev" class="wrap-content">
 
 <div class="header">
   <div class="header-grid"></div>
@@ -853,15 +989,357 @@ function updateStats(){
 loadState();
 if(document.getElementById('tab-tracker').classList.contains('active')){renderGrid();}
 </script>
-<style>
-.bl-nav{background:#fff!important;border-bottom:1px solid #eaeaea!important}
-.bl-nav-logo-main{color:#1a1a1a!important}.bl-nav-logo-sub{color:#777!important}
-.bl-nav-link{color:#444!important}.bl-nav-link:hover,.bl-nav-link.active{color:#8B7335!important;background:rgba(139,115,53,0.07)!important}
-.bl-nav-dropdown-menu{background:#fff!important;border-color:#eaeaea!important}
-.bl-nav-dropdown-item{color:#444!important}.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8!important;color:#8B7335!important}
-.bl-nav-mobile-menu{background:#fff!important}.bl-nav-mobile-link{color:#444!important;border-bottom-color:#eaeaea!important}
-.bl-nav-mobile-btn{color:#1a1a1a!important}.bl-nav-mobile-section{color:#8B7335!important}
-</style>
-<script src="/nav.js" defer></script>
+
+</div><!-- /wrap-prev -->
+
+
+<!-- ═════════ NEW PROTOCOL — Khavinson Pineal Reset ═════════ -->
+<div id="wrap-new" class="wrap-content active">
+
+<div class="header">
+  <div class="header-grid"></div>
+  <div class="header-logo">Bio Linked Peptide Solutions</div>
+  <h1>Keith <em>Drieshman</em></h1>
+  <div class="header-focus">Khavinson Pineal Reset · Longevity &amp; Sleep · UV Protection · 20-Day Cycle</div>
+  <div class="inv-badge-row">
+    <div class="inv-badge">Date: <span>April 2026</span></div>
+    <div class="inv-badge">Ref: <span>BLS-KD-0426</span></div>
+    <div class="inv-badge">Compounds: <span>4</span></div>
+    <div class="inv-badge">Cycle: <span>20 Days</span></div>
+    <div class="inv-badge">By: <span>BioLinked</span></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ━━━ DISCOUNT HERO ━━━ -->
+  <div class="disc-hero">
+    <div class="disc-pct">25<em>% OFF</em></div>
+    <h3>Your <em>Loyalty</em> Pricing</h3>
+    <p>$25/bottle (vs. standard $30) on all paid bottles &nbsp;·&nbsp; plus a complimentary DSIP bottle ($30 value)<br>
+    Total saved: <strong style="color:var(--gold);">$75</strong> off the full $300 standard value</p>
+  </div>
+
+  <!-- ━━━ PROTOCOL OVERVIEW ━━━ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#8B7335" stroke-width="1.2"/><path d="M8 4V8L10 10" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="section-title">Protocol Overview — The Khavinson Pineal Reset</div>
+    </div>
+    <div class="overview-block">
+      <p class="ov-lead">A focused longevity reset built around a single biological axis &mdash; <em>the pineal gland and the brain it talks to</em> &mdash; with a seasonal melanin builder and a sleep-architecture bonus alongside it.</p>
+
+      <div class="ov-pillar">
+        <h4>Epitalon + Pinealon — The Khavinson Pairing</h4>
+        <p>Epitalon is a pineal-targeting tetrapeptide that activates telomerase, restores circadian melatonin rhythm, and modulates the hypothalamic&ndash;pituitary axis at the level it was designed to be regulated from. Pinealon is its tripeptide complement &mdash; same family, different angle: neuroprotection, cognitive resilience, and direct support of the brain tissue downstream of the pineal signal. Run together for <strong>20 consecutive days</strong>, this is the canonical Khavinson protocol &mdash; Epitalon resets the upstream signal, Pinealon protects the structures receiving it. Twenty days isn't arbitrary. Bioregulator effects accumulate; the 20-day window is what the Russian clinical literature settled on as the dose-response sweet spot before diminishing returns.</p>
+      </div>
+
+      <div class="ov-pillar">
+        <h4>Melanotan 1 — UV Protection Ahead of Exposure</h4>
+        <p>Melanin is your cellular sunscreen, and the body builds it slowly. MT-1 is an alpha-MSH analog that signals melanocytes to lay down <strong>eumelanin</strong> (the protective pigment, not the red-orange pheomelanin) before UV starts hitting your skin in volume. The trick is timing: <strong>start now, before peak sun season</strong> &mdash; by the time exposure ramps up, your protection is already in place. Twice-weekly dosing (Mon/Thu) is the standard maintenance cadence once baseline pigmentation is established. It doesn't synergize with the bioregulators directly, but it belongs in a longevity stack &mdash; UV damage is one of the largest external accelerants of cellular aging.</p>
+      </div>
+
+      <div class="ov-pillar">
+        <h4>DSIP — Bonus Inclusion for Sleep Architecture</h4>
+        <p>Delta Sleep-Inducing Peptide deepens slow-wave sleep without the next-day grogginess of pharmaceutical sleep aids. It pairs naturally with Epitalon since both touch circadian rhythm, but DSIP works on a different mechanism &mdash; modulating the delta-wave generators directly. <strong>Use it as needed on disrupted nights, not nightly.</strong> Included as a complimentary bottle to round out the stack.</p>
+      </div>
+
+      <div class="ov-synergy">
+        <p><strong>How it fits together.</strong> Epitalon resets the pineal signal. Pinealon protects the brain receiving it. DSIP backs up the sleep architecture both compounds support. MT-1 sits parallel &mdash; protecting the body from the largest external aging input (UV) while the others work on the internal clock. Twenty-day intensives are exactly that: intensives. You don't need to redose them constantly to get the benefit.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ━━━ COMPOUND CARDS ━━━ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#8B7335" stroke-width="1.2"/><circle cx="6" cy="6.5" r="0.75" fill="#8B7335"/><circle cx="10" cy="6.5" r="0.75" fill="#8B7335"/><path d="M5 10C5.5 10.5 6.5 11 8 11C9.5 11 10.5 10.5 11 10" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="section-title">Your Compounds — 4 Bottles</div>
+    </div>
+    <div class="cmp-grid">
+
+      <!-- EPITALON -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">Epitalon</div>
+            <div class="cmp-tag">Pineal Bioregulator · Telomerase Activator · Circadian Reset</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$100</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">4 bottles &middot; $25 ea</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol — Pineal Reset (Upstream)</div>
+            <div class="ptext">Epitalon is a pineal-targeting tetrapeptide developed by Vladimir Khavinson over four decades of clinical research at the St. Petersburg Institute of Bioregulation. Its primary mechanism is <strong>telomerase activation</strong> &mdash; measurably extending telomere length in human leukocyte cells in published trials. Just as importantly for daily life, Epitalon <strong>restores age-degraded melatonin rhythm</strong>: the pineal gland is one of the first endocrine structures to lose function with age, and Epitalon directly resets that signal. Run for 20 consecutive days, you should notice deeper sleep onset, more consolidated REM, and a subjective shift in how rested you feel each morning. This is the upstream signal &mdash; Pinealon protects what receives it.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">10mg &times; 4</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">2mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">40 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Daily &times; 20 days</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">Evening</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to each 10mg vial &rarr; concentration = <strong>5 mg/mL</strong></li>
+              <li>Swirl gently until dissolved. Do not shake.</li>
+              <li>Draw <strong>40 units (0.40 mL) = 2mg per dose</strong> with a 29&ndash;31G insulin syringe</li>
+              <li>Each vial = 5 doses at 2mg. <strong>4 vials = 20 doses = exactly 20 consecutive days</strong> &mdash; zero waste, perfect coverage.</li>
+              <li>Reconstitute one vial at a time, store the rest dry until needed. Refrigerate post-reconstitution. Inject SubQ abdomen evening, ~1 hour before sleep.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- PINEALON -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">Pinealon</div>
+            <div class="cmp-tag">Brain Bioregulator · Neuroprotection · Cognitive Resilience</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$100</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">4 bottles &middot; $25 ea</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol — Brain Tissue (Downstream)</div>
+            <div class="ptext">Pinealon is the tripeptide complement to Epitalon &mdash; same Khavinson family, but targeted at neuronal tissue rather than the pineal gland itself. Its mechanism is <strong>direct neuroprotection</strong>: it crosses the blood-brain barrier, scavenges reactive oxygen species in brain mitochondria, and has been shown to preserve cognitive function in models of oxidative stress. In a longevity context, that translates to <strong>cognitive resilience as you age</strong> &mdash; mental sharpness, memory recall, processing speed all benefit from running Pinealon alongside Epitalon for the same 20-day window. The pairing is canonical for a reason: Epitalon resets the upstream signal, Pinealon protects the downstream tissue receiving it.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">10mg &times; 4</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">2mg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">40 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Daily &times; 20 days</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">AM</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to each 10mg vial &rarr; concentration = <strong>5 mg/mL</strong></li>
+              <li>Swirl gently until dissolved. Do not shake.</li>
+              <li>Draw <strong>40 units (0.40 mL) = 2mg per dose</strong></li>
+              <li>Each vial = 5 doses. <strong>4 vials = 20 doses = exactly 20 days</strong> &mdash; matches the Epitalon timeline so they finish together.</li>
+              <li>Inject SubQ abdomen AM, paired with Epitalon's PM dose. Run them on the same calendar window.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- MELANOTAN 1 -->
+      <div class="cmp-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">Melanotan 1 (MT-1)</div>
+            <div class="cmp-tag">&alpha;-MSH Analog · Eumelanin Builder · UV Photoprotection</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);font-weight:600;">$25</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">1 bottle &middot; $25</div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol — Build Melanin Before the Sun</div>
+            <div class="ptext">Melanotan 1 is an alpha-MSH analog that signals melanocytes to produce <strong>eumelanin</strong> &mdash; the dark, photoprotective pigment that absorbs UV before it damages cellular DNA. The biology requires lead time: melanin synthesis isn't a same-day response, it accumulates with consistent stimulation. <strong>The protocol works only if you start before sun exposure ramps up.</strong> By starting now, by the time peak season hits, your skin's natural protection is already in place &mdash; meaning fewer burns, less photoaging, and dramatically lower UV-driven oxidative damage. Twice-weekly maintenance dosing on Mondays and Thursdays keeps the signal active without overshooting.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">10mg &times; 1</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">250 mcg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">5 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Mon &amp; Thu</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">Evening</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to the 10mg vial &rarr; concentration = <strong>5 mg/mL (5,000 mcg/mL)</strong></li>
+              <li>Swirl gently until dissolved. Do not shake.</li>
+              <li>Draw <strong>5 units (0.05 mL) = 250 mcg per dose</strong></li>
+              <li>Each vial = 40 doses at 250 mcg. At 2&times; per week, that's <strong>~20 weeks of supply</strong> from a single bottle &mdash; carries you through full sun season.</li>
+              <li>Start now; do not wait until summer. Inject SubQ abdomen evening on Mon &amp; Thu. Expect mild flushing and reduced appetite for ~30 min after the first 2&ndash;3 doses &mdash; this is normal and fades.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <!-- DSIP — FREE BONUS -->
+      <div class="cmp-card free-card">
+        <div class="cmp-head">
+          <div>
+            <div class="cmp-name">DSIP <span class="free-badge">FREE Bonus</span></div>
+            <div class="cmp-tag">Delta Sleep-Inducing Peptide · Slow-Wave Sleep · As Needed</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--green);font-weight:600;">FREE</div>
+            <div style="font-size:8px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">1 bottle &middot; <span style="text-decoration:line-through;">$30 value</span></div>
+          </div>
+        </div>
+        <div class="cmp-body">
+          <div>
+            <div class="plabel">Why it's in your protocol — Sleep Architecture (Bonus)</div>
+            <div class="ptext">Delta Sleep-Inducing Peptide is a small neuropeptide that <strong>enhances slow-wave sleep specifically</strong> &mdash; the deepest, most restorative phase, which is also the first stage to fragment with age and stress. Unlike pharmaceutical sleep aids, DSIP doesn't sedate; it modulates the brain's own delta-wave generators. Practically, that means <strong>deeper sleep without next-day grogginess.</strong> Pairs naturally with Epitalon since both touch circadian rhythm, but works on a different axis. <strong>Use it as needed &mdash; not nightly.</strong> Reach for it on disrupted nights, after travel, or during stretches of high stress. The rest of the time, your body's own sleep machinery handles it. Included as a complimentary bottle to round out the longevity stack.</div>
+          </div>
+          <div>
+            <div class="plabel">Dosage &amp; Schedule</div>
+            <div class="deets">
+              <div class="dbox"><div class="dlbl">Vial Size</div><div class="dval">10mg &times; 1</div></div>
+              <div class="dbox"><div class="dlbl">Dose</div><div class="dval">500 mcg</div></div>
+              <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2 mL</div></div>
+              <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units</div></div>
+              <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">As needed (PRN)</div></div>
+              <div class="dbox"><div class="dlbl">Timing</div><div class="dval">~1 hr pre-sleep</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="plabel">Reconstitution</div>
+            <ol class="recon">
+              <li>Add <strong>2 mL BAC water</strong> to the 10mg vial &rarr; concentration = <strong>5 mg/mL</strong></li>
+              <li>Swirl gently until dissolved.</li>
+              <li>Draw <strong>10 units (0.10 mL) = 500 mcg per dose</strong></li>
+              <li>Each vial = 20 doses. Stretch this across as many disrupted nights as you need &mdash; with PRN dosing, a single bottle typically lasts months.</li>
+              <li>Inject SubQ abdomen ~1 hour before bed. Most users report falling asleep faster and waking up more rested the following morning.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ━━━ INVOICE ━━━ -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#8B7335" stroke-width="1.2"/><path d="M8 5V5.5M8 10.5V11M6.5 7C6.5 6.17 7.17 5.5 8 5.5H8.5C9.33 5.5 10 6.17 10 7C10 7.83 9.33 8.5 8.5 8.5H7.5C6.67 8.5 6 9.17 6 10C6 10.83 6.67 11.5 7.5 11.5H8C8.83 11.5 9.5 10.83 9.5 10" stroke="#8B7335" stroke-width="1.2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="section-title">Order Summary</div>
+    </div>
+
+    <div class="line-items">
+      <div class="li-row">
+        <div>
+          <div class="li-name">Epitalon</div>
+          <div class="li-sub">4 bottles &middot; 10mg each &middot; Pineal bioregulator &middot; Daily &times; 20 days</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$120 standard (4 &times; $30)</div>
+          <div class="li-your">$100</div>
+          <div class="li-save">Save $20</div>
+        </div>
+      </div>
+      <div class="li-row">
+        <div>
+          <div class="li-name">Pinealon</div>
+          <div class="li-sub">4 bottles &middot; 10mg each &middot; Brain bioregulator &middot; Daily &times; 20 days</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$120 standard (4 &times; $30)</div>
+          <div class="li-your">$100</div>
+          <div class="li-save">Save $20</div>
+        </div>
+      </div>
+      <div class="li-row">
+        <div>
+          <div class="li-name">Melanotan 1 (MT-1)</div>
+          <div class="li-sub">1 bottle &middot; 10mg &middot; UV photoprotection &middot; Mon/Thu</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-original">$30 standard (1 &times; $30)</div>
+          <div class="li-your">$25</div>
+          <div class="li-save">Save $5</div>
+        </div>
+      </div>
+      <div class="li-row free-row">
+        <div>
+          <div class="li-name">DSIP <span class="free-badge">FREE Bonus</span></div>
+          <div class="li-sub">1 bottle &middot; 10mg &middot; Sleep-architecture support &middot; As needed</div>
+        </div>
+        <div class="li-price-col">
+          <div class="li-free-strike">$30 standard value</div>
+          <div class="li-free-price">FREE</div>
+          <div class="li-save" style="background:rgba(58,154,90,0.15);color:var(--green);border-color:var(--green-border);">$30 Value · Free</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="totals-block" style="margin-top:3px;">
+      <div class="tot-row"><span class="tl">Epitalon &times; 4 bottles</span><span class="tv">$100</span></div>
+      <div class="tot-row"><span class="tl">Pinealon &times; 4 bottles</span><span class="tv">$100</span></div>
+      <div class="tot-row"><span class="tl">Melanotan 1 &times; 1 bottle</span><span class="tv">$25</span></div>
+      <div class="tot-row"><span class="tl">DSIP &times; 1 bottle (Bonus)</span><span class="tv" style="color:var(--green);">FREE</span></div>
+      <div class="tot-row"><span class="tl">Standard 10-Bottle Value</span><span class="tv" style="color:var(--strike);text-decoration:line-through;">$300</span></div>
+      <div class="tot-row" style="background:var(--green-dim);border-top:1px solid var(--green-border);">
+        <span class="tl" style="color:var(--green);font-weight:500;">Your Savings (25% Off)</span>
+        <span class="tv" style="color:var(--green);">&minus;$75</span>
+      </div>
+      <div class="tot-row grand">
+        <span class="tl">Total &mdash; 20-Day Cycle</span>
+        <span class="tv">$225</span>
+      </div>
+    </div>
+
+    <div class="note note-gold" style="margin-top:1.25rem;">
+      <h4>🎁 What's Included in the 25% Savings</h4>
+      <p><strong>$45 in per-bottle discounts</strong> ($25 vs $30 across all 9 paid bottles) <strong>+ $30 FREE DSIP bottle</strong> = $75 total off the $300 standard 10-bottle value. The bonus DSIP is yours to keep regardless &mdash; use it on disrupted nights through the year.</p>
+    </div>
+  </div>
+
+  <!-- ━━━ VENMO ━━━ -->
+  <div class="venmo">
+    <h3>Ready to <em>Order?</em></h3>
+    <p>Send $225 via Venmo &mdash; include your name in the note. Ships within 24&ndash;48 hours.</p>
+    <a href="https://venmo.com/micahp20" class="venmo-btn">Pay $225 on Venmo</a>
+    <span class="venmo-handle">@micahp20</span>
+  </div>
+
+  <div class="disc">
+    <strong>Important Notice:</strong> This invoice is for educational and research purposes only and does not constitute medical advice. All compounds are research peptides. Melanotan 1 may cause flushing, nausea, and reduced appetite during initial doses. Discontinue and seek medical attention if adverse reactions occur.
+  </div>
+
+</div><!-- /container -->
+
+<div class="footer">Prepared by <strong>Bio Linked Peptide Solutions</strong> &nbsp;&middot;&nbsp; Keith Drieshman &nbsp;&middot;&nbsp; Khavinson Pineal Reset · 20-Day Cycle · BLS-KD-0426</div>
+
+</div><!-- /wrap-new -->
+
+
+<script>
+function switchWrap(which){
+  document.getElementById('wrap-prev').classList.toggle('active', which==='prev');
+  document.getElementById('wrap-new').classList.toggle('active', which==='new');
+  document.getElementById('wrapTabPrev').classList.toggle('active', which==='prev');
+  document.getElementById('wrapTabNew').classList.toggle('active', which==='new');
+  // update the "Active" tag visibility
+  var prevTab = document.getElementById('wrapTabPrev');
+  var newTab = document.getElementById('wrapTabNew');
+  prevTab.innerHTML = which==='prev' ? 'Previous Protocol <span class="tag">Active</span>' : 'Previous Protocol';
+  newTab.innerHTML = which==='new' ? 'New Protocol <span class="tag">Active</span>' : 'New Protocol';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+
 </body>
 </html>
