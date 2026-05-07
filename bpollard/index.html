@@ -86,7 +86,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .tier-grid{display:grid;gap:1rem;margin-top:1.25rem;}
 .tier-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden;transition:border-color 0.2s;}
 .tier-card.featured{border:1px solid var(--gold-border);border-top:3px solid var(--gold);box-shadow:0 1px 3px rgba(139,115,53,0.06);}
-.tier-head{padding:1.25rem 1.5rem 0.875rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.75rem;}
+.tier-head{padding:1.25rem 1.5rem;border-bottom:1px solid transparent;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;padding-right:3.25rem;position:relative;}
+details[open] > .tier-head{border-bottom-color:var(--border);padding-bottom:0.875rem;}
 .tier-name-block .tier-eyebrow{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px;}
 .tier-name-block h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--white);font-weight:600;line-height:1.15;}
 .tier-name-block h3 em{color:var(--gold);font-style:italic;}
@@ -104,13 +105,32 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .tier-rationale p{font-size:13px;color:#555550;line-height:1.7;font-weight:300;}
 
 /* COMPOUND CARDS */
-.cmp-grid{display:grid;gap:1.1rem;margin-top:1.25rem;}
+.cmp-grid{display:grid;gap:0.75rem;margin-top:1.25rem;}
 .cmp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
-.cmp-head{background:var(--bg-card2);padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;}
-.cmp-name{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:600;color:var(--white);}
-.cmp-tag{font-size:10px;color:var(--gold);font-weight:500;letter-spacing:0.1em;text-transform:uppercase;margin-top:2px;}
+.cmp-head{background:var(--bg-card2);padding:1rem 1.5rem;border-bottom:1px solid transparent;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;padding-right:3.25rem;position:relative;}
+details[open] > .cmp-head{border-bottom-color:var(--border);}
+.cmp-name{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;color:var(--white);line-height:1.15;}
+.cmp-tag{font-size:11px;color:var(--text-muted);font-weight:400;letter-spacing:0.04em;margin-top:3px;}
+.cmp-tag strong{color:var(--gold);font-weight:700;}
 .cmp-price{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--gold);font-weight:600;}
 .cmp-body{padding:1.25rem 1.5rem;display:grid;gap:0.875rem;}
+
+/* COLLAPSIBLE DETAILS/SUMMARY (no JS) */
+details.tier-card,details.cmp-card{display:block;}
+details.tier-card > summary,details.cmp-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;}
+details.tier-card > summary::-webkit-details-marker,details.cmp-card > summary::-webkit-details-marker{display:none;}
+details.tier-card > summary::after,details.cmp-card > summary::after{content:'+';position:absolute;right:1.25rem;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:var(--bg-card);transition:all 0.18s;}
+details[open].tier-card > summary::after,details[open].cmp-card > summary::after{content:'\2212';background:var(--gold-dim);}
+details.tier-card > summary:hover::after,details.cmp-card > summary:hover::after{border-color:var(--gold);color:var(--gold-light);}
+
+/* COMPOUND QUICK FACTS (collapsed body) */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.55rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:#3a3a35;line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:74px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+.cmp-quick a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-border);font-weight:500;font-size:13px;}
+.cmp-quick a:hover{color:var(--gold-light);border-bottom-color:var(--gold);}
 .plabel{font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:5px;}
 .ptext{font-size:14.5px;color:#555550;line-height:1.8;font-weight:300;}
 .ptext + .ptext{margin-top:0.5rem;}
@@ -314,8 +334,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
     <div class="tier-grid">
 
       <!-- LEVEL 1 -->
-      <div class="tier-card featured">
-        <div class="tier-head">
+      <details class="tier-card featured">
+        <summary class="tier-head">
           <div class="tier-name-block">
             <div class="tier-eyebrow">Level 1 · Recommended</div>
             <h3>Full <em>Stack</em></h3>
@@ -324,7 +344,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <div class="pv">$850</div>
             <div class="pl">All 7 Compounds</div>
           </div>
-        </div>
+        </summary>
         <div class="tier-body">
           <ul class="tier-compounds">
             <li><strong>Retatrutide</strong> · 2× 30mg vials — fat loss engine ($160)</li>
@@ -340,11 +360,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <p>Your three goals — fat loss, cognitive enhancement, longevity — each get their own dedicated layer. Reta + Cagri + MOTS-c + SLU-PP-332 hit fat loss from four different angles at once (appetite, satiety, metabolic rate, fat oxidation). Selank covers the cognitive piece so the sales pressure doesn't burn you out mid-cycle. SS-31 + DSIP do the longevity work — protecting the mitochondria and rebuilding the sleep your alcohol load has been eroding. Nothing in this tier is redundant; each compound is the cleanest tool for the specific job. <strong>This is the version of the protocol that does what you actually came in asking for.</strong></p>
           </div>
         </div>
-      </div>
+      </details>
 
       <!-- LEVEL 2 -->
-      <div class="tier-card">
-        <div class="tier-head">
+      <details class="tier-card">
+        <summary class="tier-head">
           <div class="tier-name-block">
             <div class="tier-eyebrow">Level 2</div>
             <h3>Core <em>Stack</em></h3>
@@ -353,7 +373,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <div class="pv">$640</div>
             <div class="pl">5 Compounds</div>
           </div>
-        </div>
+        </summary>
         <div class="tier-body">
           <ul class="tier-compounds">
             <li><strong>Retatrutide</strong> · 2× 30mg vials ($160)</li>
@@ -369,11 +389,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <p>Drops the two compounds (DSIP, SLU-PP-332) that you can either add later or partially substitute with lifestyle. You still get the full fat-loss core (Reta + Cagri + MOTS-c), the cognitive layer (Selank), and the longevity/cardiovascular protection (SS-31). This is the version for someone who wants to cover all three goals but isn't ready to run seven compounds at once. <strong>Easy upgrade path:</strong> add DSIP and SLU-PP-332 mid-cycle once you're comfortable with the routine.</p>
           </div>
         </div>
-      </div>
+      </details>
 
       <!-- LEVEL 3 -->
-      <div class="tier-card">
-        <div class="tier-head">
+      <details class="tier-card">
+        <summary class="tier-head">
           <div class="tier-name-block">
             <div class="tier-eyebrow">Level 3</div>
             <h3>Starter <em>Stack</em></h3>
@@ -382,7 +402,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <div class="pv">$400</div>
             <div class="pl">3 Compounds · Onboarding</div>
           </div>
-        </div>
+        </summary>
         <div class="tier-body">
           <ul class="tier-compounds">
             <li><strong>Retatrutide</strong> · 2× 30mg vials ($160)</li>
@@ -395,11 +415,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <p>The Starter framing: <strong>your first peptide cycle, simplified.</strong> Three compounds, all SubQ, all AM-timed, no PRN logic and no PM dosing to remember. Reta drives appetite suppression and weight loss, Cagri amplifies satiety so the deficit doesn't break you in the second half of the day, and MOTS-c keeps cellular energy expenditure up while the deficit is happening. By the end of 8 weeks you'll know exactly how your body responds, and you can layer in the cognitive (Selank) and longevity (SS-31, DSIP) pieces on the next cycle.</p>
           </div>
         </div>
-      </div>
+      </details>
 
       <!-- LEVEL 4 -->
-      <div class="tier-card">
-        <div class="tier-head">
+      <details class="tier-card">
+        <summary class="tier-head">
           <div class="tier-name-block">
             <div class="tier-eyebrow">Level 4</div>
             <h3>Essential <em>Stack</em></h3>
@@ -408,7 +428,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <div class="pv">$400</div>
             <div class="pl">3 Compounds · Fat Loss Only</div>
           </div>
-        </div>
+        </summary>
         <div class="tier-body">
           <ul class="tier-compounds">
             <li><strong>Retatrutide</strong> · 2× 30mg vials ($160)</li>
@@ -421,7 +441,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
             <p>Same three compounds as the Starter — <strong>different framing, same price</strong>. The Essential tier is for the version of you that says: "Just get me the 30 pounds off. We'll talk about the rest of it later." It's the floor under the goal: Reta does the deficit, Cagri makes the deficit livable, MOTS-c preserves metabolic output through the cut. Pure fat-loss build. No cognitive, no longevity, no sleep work. Cheapest path to hitting 200 lbs.</p>
           </div>
         </div>
-      </div>
+      </details>
 
     </div>
 
@@ -480,314 +500,137 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
   <div class="cmp-grid">
 
     <!-- RETATRUTIDE -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">Retatrutide</div>
-          <div class="cmp-tag">Triple Agonist · GLP-1 / GIP / Glucagon · The Fat Loss Engine</div>
+          <div class="cmp-name">Retatrutide — 30mg</div>
+          <div class="cmp-tag"><strong>1mg</strong> per dose · 10u draw</div>
         </div>
         <div class="cmp-price">$160</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">Reta hits three receptors at once — GLP-1 (appetite + satiety), GIP (insulin sensitivity), and glucagon (energy expenditure). Tirzepatide hits the first two; Reta adds glucagon, which is why it's been showing the largest weight loss numbers in trials of any compound currently on the table. <strong>For your specific situation:</strong> a 30-lb cut with daily heavy alcohol use in the picture means you need the appetite-suppression piece to do real work — alcohol calories pile up fast, and Reta makes you not want them in the first place. The glucagon agonism also raises resting energy expenditure rather than blunting it the way pure GLP-1s can — important since you're <em>not</em> on a 5x/week training schedule and need the metabolism working for you on the days off.</div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">2× 30mg vials</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">3.0 mL each</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">10 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">1.0 mg</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units · 0.10 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">M / W / F · AM</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab the rubber stopper of the Reta vial and the BAC water vial with an alcohol pad.</li>
-            <li>Slowly draw <strong>3.0 mL of bacteriostatic water</strong> into a syringe and inject down the side of the Reta vial — <em>not</em> directly onto the powder.</li>
-            <li>Swirl gently to mix. <strong>Do not shake.</strong> Solution should be clear within a minute.</li>
-            <li>Concentration math: 30 mg ÷ 3 mL = <strong>10 mg/mL</strong> → every 10 units on a U-100 syringe = 1 mg.</li>
-            <li>Refrigerate immediately. Open the second vial only when the first runs low — keeps the 30-day post-reconstitution clock short.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Site</div>
-          <div class="ptext">Inject AM, fasted or with light food. Rotate between lower abdomen, outer thigh, and love handles. M/W/F dosing (3x/wk) is the prescribed cadence — if tolerance is excellent by Week 3 we can ramp to 4x/wk. <strong>Do not stack with alcohol on injection day</strong> — the GLP-1 + alcohol combination dramatically increases nausea risk for the first 24 hours after a shot. Plan injection days to be lighter drink days.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">3ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">1mg → pull syringe to <span class="units">10 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">M / W / F, AM</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
     <!-- CAGRILINTIDE -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">Cagrilintide</div>
-          <div class="cmp-tag">Amylin Analog · Satiety Amplifier · Reta Synergy</div>
+          <div class="cmp-name">Cagrilintide — 10mg</div>
+          <div class="cmp-tag"><strong>0.5mg</strong> per dose · 10u draw</div>
         </div>
         <div class="cmp-price">$120</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">Cagri is a long-acting amylin analog — it slows gastric emptying and amplifies satiety signaling at the brainstem. The pairing with Reta is the basis for <strong>CagriSema</strong>, the next-generation obesity drug that has been outperforming semaglutide head-to-head in trials. <strong>For your specific situation:</strong> the "always on the go, packed schedule" piece means you tend to graze, eat late, and finish the day with the biggest meal — exactly the eating pattern that derails a Reta-only cut. Cagri makes you full longer from earlier meals, which front-loads your day and protects the deficit when the schedule pulls you off normal eating windows.</div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">2× 10mg vials</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2.0 mL each</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">5 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">0.5 mg</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units · 0.10 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">Sunday · AM</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab vial stopper and BAC water vial with alcohol.</li>
-            <li>Add <strong>2.0 mL of bacteriostatic water</strong> down the side of the Cagri vial.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Concentration math: 10 mg ÷ 2 mL = <strong>5 mg/mL</strong> → 10 units = 0.5 mg.</li>
-            <li>Refrigerate. Use within 30 days of reconstitution. One vial covers ~20 doses; you only need 8 (one per week × 8 weeks), so a single vial easily covers the cycle with margin. Hold the second vial sealed in the fridge as backup.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Cadence</div>
-          <div class="ptext">Once weekly, Sunday AM. The half-life is long (~7 days) so the satiety effect carries through the entire week and sets the appetite tone for the work week ahead. Pair the Sunday Cagri shot with the Sunday Reta shot if it falls on the same day — same injection session, two compounds, less hassle.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">2ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">0.5mg → pull syringe to <span class="units">10 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">Sunday, AM (1×/week)</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
     <!-- SS-31 -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">SS-31 (Elamipretide)</div>
-          <div class="cmp-tag">Mitochondrial Membrane Protector · Cardiovascular Support</div>
+          <div class="cmp-name">SS-31 (Elamipretide) — 50mg</div>
+          <div class="cmp-tag"><strong>500mcg</strong> per dose · 2u draw</div>
         </div>
         <div class="cmp-price">$150</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">SS-31 binds to <strong>cardiolipin</strong> in the inner mitochondrial membrane and stabilizes the electron transport chain — it doesn't generate energy itself, it protects the structural machinery that does. The result is dramatically reduced reactive oxygen species (ROS) production, particularly in tissues with high mitochondrial density: <strong>heart, kidney, brain, skeletal muscle</strong>. <strong>For your specific situation:</strong> three things converge. (1) You're 47 with daily heavy alcohol use — the most underappreciated cellular cost of alcohol is mitochondrial damage in cardiac and hepatic tissue. (2) You're already on lisinopril for blood pressure, which means cardiovascular load is on the table. (3) You're going to lose 30 lbs in 8 weeks, which is metabolically intense and will pull liberated fatty acids through the mitochondria at a high rate. SS-31 protects the system that has to handle all three at once. This is the longevity layer of the stack.</div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">1× 50mg vial</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2.0 mL</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">25 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">500 mcg (0.5 mg)</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">2 units · 0.02 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">M–F · AM</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab the SS-31 vial stopper and BAC water vial with alcohol.</li>
-            <li>Slowly add <strong>2.0 mL bacteriostatic water</strong> down the side of the SS-31 vial.</li>
-            <li>Swirl gently. Do not shake. Solution should be clear and faintly amber.</li>
-            <li>Concentration math: 50 mg ÷ 2 mL = <strong>25 mg/mL</strong> → 2 units (0.02 mL) = 500 mcg per dose.</li>
-            <li><strong>Note:</strong> a 2-unit draw is small — go slow on the syringe and pull <em>just past</em> the 2u mark, then push back to exactly 2u to clear any air. Precision matters at small volumes.</li>
-            <li>Refrigerate immediately. Use within 30 days.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Cadence</div>
-          <div class="ptext">5 days on / 2 days off — Monday through Friday AM, weekend off to give the system a window. SubQ abdomen rotation. AM timing pairs cleanly with the rest of the AM stack (Reta on shot days, MOTS-c, SLU-PP-332). One vial @ 25 mg/mL × 2u doses = ~100 doses, easily covers the cycle. The "feel" of SS-31 is subtle — most people notice it as <strong>cleaner energy and faster recovery</strong> rather than any acute sensation. Its work is invisible and structural.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">2ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">500mcg → pull syringe to <span class="units">2 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">M–F, AM (5 on / 2 off)</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
     <!-- MOTS-C -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">MOTS-C</div>
-          <div class="cmp-tag">Mitochondrial-Derived Peptide · Metabolic Floor · Insulin Sensitizer</div>
+          <div class="cmp-name">MOTS-C — 40mg</div>
+          <div class="cmp-tag"><strong>2mg</strong> per dose · 15u draw</div>
         </div>
         <div class="cmp-price">$120</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">MOTS-C is a peptide encoded in mitochondrial DNA — your own cells make it, but production drops significantly with age and metabolic stress. It signals the body to <strong>build more mitochondria, run them more efficiently, and improve insulin sensitivity in skeletal muscle</strong>. The downstream effect is increased cellular energy expenditure — your cells burn more substrate to do the same work. <strong>For your specific situation:</strong> Reta cuts your intake; MOTS-c raises your output. The combination is the cleanest version of "eat less, burn more" available — both sides of the energy equation, working at the cellular level on opposite levers. The insulin sensitivity piece also routes nutrients toward muscle instead of fat storage, which matters specifically because you're 47 and on test — your body is already primed to use protein well, and MOTS-c keeps that pathway dialed in through the deficit.</div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">2× 40mg vials</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">3.0 mL each</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">~13.3 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">2.0 mg</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">15 units · 0.15 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">M–F · AM fasted</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab vial stopper and BAC vial with alcohol.</li>
-            <li>Add <strong>3.0 mL bacteriostatic water</strong> down the side of the MOTS-C vial.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Concentration math: 40 mg ÷ 3 mL = <strong>13.33 mg/mL</strong> → 15 units (0.15 mL) = 2 mg per dose.</li>
-            <li>Refrigerate. Each vial = 20 doses. Two vials cover 40 doses; you'll use 40 (5/wk × 8 wk) — exact match.</li>
-            <li>Open vial #2 only when vial #1 runs low.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Cadence</div>
-          <div class="ptext">5 on / 2 off — M–F mornings, weekend off. <strong>Fasted is the right call</strong> — MOTS-c works through AMPK activation, and AMPK signaling is sharper on an empty stomach. Pair with morning Reta on shot days. SubQ abdomen rotation.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">3ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">2mg → pull syringe to <span class="units">15 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">M–F, AM fasted (5 on / 2 off)</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
     <!-- SELANK -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">Selank</div>
-          <div class="cmp-tag">Nootropic Anxiolytic · Cognitive Edge · No Sedation</div>
+          <div class="cmp-name">Selank — 10mg</div>
+          <div class="cmp-tag"><strong>1mg</strong> per dose · 20u draw</div>
         </div>
         <div class="cmp-price">$90</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">Selank is a synthetic analog of tuftsin — a heptapeptide that increases BDNF (brain-derived neurotrophic factor), modulates serotonin, and produces a <strong>clean anxiolytic effect without sedation, dependence, or cognitive blunting</strong>. Where benzodiazepines slow you down, Selank takes the edge off without taking the sharpness off. <strong>For your specific situation:</strong> high-pressure sales is a job that lives or dies on cognitive bandwidth in the afternoon — when stress accumulates, focus narrows, and decisions get short and reactive. Selank PRN in the afternoon (especially before high-stakes calls or the 3pm energy crash window) gives you the calm <em>without</em> the brain fog. It also pairs well with the alcohol piece — many people find that having a clean cognitive tool available in the afternoon reduces the reach for the first drink of the day at 5pm because the underlying anxiety the alcohol was treating is already addressed.</div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">2× 10mg vials</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2.0 mL each</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">5 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">1 mg (1000 mcg)</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">20 units · 0.20 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">PRN · Afternoon</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab vial stopper and BAC vial with alcohol.</li>
-            <li>Add <strong>2.0 mL bacteriostatic water</strong> down the side of the Selank vial.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Concentration math: 10 mg ÷ 2 mL = <strong>5 mg/mL</strong> → 20 units (0.20 mL) = 1 mg per dose.</li>
-            <li>Refrigerate. Each vial = 10 doses; with PRN dosing one vial easily covers most of the cycle. Hold vial #2 in the fridge.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Cadence</div>
-          <div class="ptext">PRN — "as needed." Best used in the afternoon when the cortisol curve is dropping and pressure stacks up: before a tough call, mid-afternoon to clear a stressed headspace, or 30–60 min before a high-stakes work block. Onset is 15–30 min, duration 4–6 hours. SubQ abdomen. <strong>Don't dose late evening</strong> — it's not sedating, but you don't want it competing with the DSIP sleep window. Cap at 2 doses per day. 1–2x/wk PRN is a typical use rhythm; 3–4x/wk during heavy weeks is fine.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">2ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">1mg → pull syringe to <span class="units">20 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">PRN, afternoon (cap 2/day)</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
     <!-- DSIP -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">DSIP (Delta Sleep-Inducing Peptide)</div>
-          <div class="cmp-tag">Sleep Architecture Rebuilder · Slow-Wave Sleep Restoration</div>
+          <div class="cmp-name">DSIP — 5mg</div>
+          <div class="cmp-tag"><strong>250mcg</strong> per dose · 10u draw</div>
         </div>
         <div class="cmp-price">$90</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">DSIP is a 9-amino-acid peptide that promotes <strong>delta-wave (slow-wave) sleep</strong> — the deepest stage of sleep, where most physical recovery, hormonal release, and memory consolidation actually happen. It doesn't sedate you; it nudges your brain toward deeper sleep architecture once you're already asleep. <strong>For your specific situation:</strong> here's the hard truth on the alcohol — even at "moderate" daily use, alcohol systematically suppresses slow-wave sleep and REM sleep for the entire night. You may be in bed 7 hours but only spending 30 minutes in deep sleep when you should be spending 90+. That's the source of the brain fog, the slow recovery, and a huge piece of why your body composition has been drifting. Your sleep quality self-rated at 4/5 is probably overestimating because you don't remember not feeling this way. DSIP rebuilds the deep-sleep stages alcohol has been blocking. This is, honestly, the single highest-leverage compound in the entire stack for someone in your situation. <strong>If you fix nothing else, fix the sleep.</strong></div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">2× 5mg vials</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">2.0 mL each</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">2.5 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">250 mcg</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">10 units · 0.10 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">M–F · 1–3 hrs pre-bed</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab vial stopper and BAC vial with alcohol.</li>
-            <li>Add <strong>2.0 mL bacteriostatic water</strong> down the side of the DSIP vial.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Concentration math: 5 mg ÷ 2 mL = <strong>2.5 mg/mL</strong> → 10 units (0.10 mL) = 250 mcg per dose.</li>
-            <li>Refrigerate. Each vial = 20 doses. Two vials = 40 doses; you'll use 40 (5/wk × 8 wk) — exact match.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Cadence</div>
-          <div class="ptext">5 on / 2 off — M–F evenings. Inject <strong>1–3 hours before bed</strong>, ideally on a relatively empty stomach. The peptide doesn't make you drowsy — it sets the table for your brain to fall into deeper sleep stages once you're down. <strong>The biggest gain comes on nights you've had alcohol</strong> — DSIP partially counteracts the slow-wave-sleep suppression alcohol causes. SubQ abdomen.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">2ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">250mcg → pull syringe to <span class="units">10 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">M–F, 1–3 hrs pre-bed</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
     <!-- SLU-PP-332 -->
-    <div class="cmp-card">
-      <div class="cmp-head">
+    <details class="cmp-card">
+      <summary class="cmp-head">
         <div>
-          <div class="cmp-name">SLU-PP-332</div>
-          <div class="cmp-tag">ERR Agonist · Exercise Mimetic · Fat Oxidation Accelerator</div>
+          <div class="cmp-name">SLU-PP-332 — 5mg</div>
+          <div class="cmp-tag"><strong>1mg</strong> per dose · 20u draw</div>
         </div>
         <div class="cmp-price">$120</div>
-      </div>
+      </summary>
       <div class="cmp-body">
-
-        <div>
-          <div class="plabel">Why It's In Your Protocol</div>
-          <div class="ptext">SLU-PP-332 is an agonist of the <strong>estrogen-related receptor (ERR)</strong> family — the master regulators of oxidative metabolism in skeletal muscle. Activating ERR triggers many of the same downstream changes as endurance exercise: increased mitochondrial biogenesis, increased fat oxidation, improved muscle endurance. It is, functionally, an <strong>exercise mimetic</strong> — the cellular signaling of training, without the training. In animal models it produces meaningful fat loss even without exercise. <strong>For your specific situation:</strong> you train moderate 3–4x/week, but you're not training every day, and your work / family schedule isn't going to let you. SLU-PP-332 makes the training days you <em>do</em> get more productive, and partially extends the metabolic effects of training to the days you don't. Stacks particularly well with MOTS-c (both increase mitochondrial output, but through different pathways).</div>
-        </div>
-
-        <div class="deets">
-          <div class="dbox"><div class="dlbl">Supply</div><div class="dval">2× 5mg vials</div></div>
-          <div class="dbox"><div class="dlbl">BAC Water</div><div class="dval">1.0 mL each</div></div>
-          <div class="dbox"><div class="dlbl">Concentration</div><div class="dval">5 mg/mL</div></div>
-          <div class="dbox"><div class="dlbl">Per Dose</div><div class="dval">1 mg (1000 mcg)</div></div>
-          <div class="dbox"><div class="dlbl">Draw</div><div class="dval">20 units · 0.20 mL</div></div>
-          <div class="dbox"><div class="dlbl">Schedule</div><div class="dval">M–F · AM</div></div>
-        </div>
-
-        <div>
-          <div class="plabel">Reconstitution</div>
-          <ol class="recon">
-            <li>Swab vial stopper and BAC vial with alcohol.</li>
-            <li>Add <strong>1.0 mL bacteriostatic water</strong> down the side of the SLU-PP-332 vial.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Concentration math: 5 mg ÷ 1 mL = <strong>5 mg/mL</strong> → 20 units (0.20 mL) = 1 mg per dose.</li>
-            <li>Refrigerate. Each vial = 5 doses; two vials = 10 doses. The cycle calls for ~40 doses (5/wk × 8 wk), so you may run short late in the cycle — <strong>budget for a refill around Week 6</strong>, or plan to drop to 3x/wk M/W/F if extending the supply.</li>
-          </ol>
-        </div>
-
-        <div>
-          <div class="plabel">Timing &amp; Cadence</div>
-          <div class="ptext">5 on / 2 off — M–F mornings. SubQ abdomen. Pair with the rest of the AM stack on training days; on non-training days the dose still extends the metabolic signaling that training would have created. <strong>Do not dose evening</strong> — ERR activation is mildly stimulatory and can interfere with sleep onset.</div>
-        </div>
-
+        <ul class="cmp-quick">
+          <li><span class="ql">Recon</span><span class="qv">1ml BAC water · <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute →</a></span></li>
+          <li><span class="ql">Dose</span><span class="qv">1mg → pull syringe to <span class="units">20 units</span></span></li>
+          <li><span class="ql">Schedule</span><span class="qv">M–F, AM (5 on / 2 off)</span></li>
+          <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+        </ul>
       </div>
-    </div>
+    </details>
 
   </div>
 
