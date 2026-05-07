@@ -242,7 +242,43 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .trk-cal-dl{background:#4278a8;color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
 .trk-cal-dl:hover{background:#345d85;}
 
-@media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}}
+/* COLLAPSIBLE INVOICE LINE ITEMS */
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:15px;font-weight:700;color:var(--text);}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);}
+.li-body{padding:14px 18px;background:#fafafa;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;}
+.li-body .li-cell{font-size:12px;color:var(--muted);font-weight:500;}
+.li-body .li-cell strong{display:block;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
+.li-body .li-detail{grid-column:1/-1;font-size:13px;color:var(--text);line-height:1.6;font-weight:400;padding-top:4px;border-top:1px solid var(--border);margin-top:4px;}
+
+/* COLLAPSIBLE COMPOUND CARDS */
+details.cmp-card{display:block;padding:0;}
+details.cmp-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:18px 56px 18px 24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.cmp-card > summary::-webkit-details-marker{display:none;}
+details.cmp-card > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].cmp-card > summary::after{content:'\2212';background:var(--gold-dim);}
+details.cmp-card > summary:hover::after{border-color:var(--gold);}
+details[open].cmp-card > summary{border-bottom-color:var(--border);}
+details.cmp-card .cmp-name{margin-bottom:3px;}
+details.cmp-card .cmp-tag{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.04em;}
+details.cmp-card .cmp-tag strong{color:var(--gold);font-weight:700;}
+.cmp-body-quick{padding:18px 24px;}
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:74px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+.cmp-quick a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-border);font-weight:500;font-size:13px;}
+.cmp-quick a:hover{color:#5f4f26;border-bottom-color:var(--gold);}
+
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details{open:true;} details > summary{list-style:none;}}
 @media(max-width:1100px){
   .invoice-wrap,.print-btn{width:90%;}
 }
@@ -414,38 +450,68 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
       </div>
 
-      <table class="items-table">
-        <thead>
-          <tr>
-            <th>Item</th>
-            <th style="text-align:center">Qty</th>
-            <th style="text-align:right">Unit Price</th>
-            <th style="text-align:right">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><div class="item-name">HGH 36 IU</div><div class="item-detail">Somatropin &middot; SubQ &middot; M&ndash;F + 4-Week Taper</div></td>
-            <td class="item-qty">5</td><td class="item-unit">$190.00</td><td class="item-total">$950.00</td>
-          </tr>
-          <tr>
-            <td><div class="item-name">5-Amino-1MQ 50mg</div><div class="item-detail">NNMT Inhibitor &middot; NAD+ Restoration &middot; M/W/F &rarr; M&ndash;F</div></td>
-            <td class="item-qty">2</td><td class="item-unit">$100.00</td><td class="item-total">$200.00</td>
-          </tr>
-          <tr>
-            <td><div class="item-name">CJC-1295 / Ipamorelin 10mg</div><div class="item-detail">GH Secretagogue Blend &middot; Pre-Bed &middot; M&ndash;F</div></td>
-            <td class="item-qty">3</td><td class="item-unit">$45.00</td><td class="item-total">$135.00</td>
-          </tr>
-          <tr>
-            <td><div class="item-name">L-Carnitine 600mg / 10mL</div><div class="item-detail">Mitochondrial Transport &middot; IM &middot; Mon + Fri</div></td>
-            <td class="item-qty">5</td><td class="item-unit">$48.00</td><td class="item-total">$240.00</td>
-          </tr>
-          <tr>
-            <td><div class="item-name">IGF-1 LR3 1mg</div><div class="item-detail">Insulin-like Growth Factor &middot; Post-Workout &middot; M/W/F</div></td>
-            <td class="item-qty">2</td><td class="item-unit">$95.00</td><td class="item-total">$190.00</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">HGH 36 IU</span>
+            <span class="li-summary-price">$950.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>5 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$190.00</div>
+            <div class="li-cell"><strong>Total</strong>$950.00</div>
+            <div class="li-detail">Somatropin &middot; SubQ &middot; M&ndash;F + 4-Week Taper</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">5-Amino-1MQ 50mg</span>
+            <span class="li-summary-price">$200.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>2 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$100.00</div>
+            <div class="li-cell"><strong>Total</strong>$200.00</div>
+            <div class="li-detail">NNMT Inhibitor &middot; NAD+ Restoration &middot; M/W/F &rarr; M&ndash;F</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">CJC-1295 / Ipamorelin 10mg</span>
+            <span class="li-summary-price">$135.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>3 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$45.00</div>
+            <div class="li-cell"><strong>Total</strong>$135.00</div>
+            <div class="li-detail">GH Secretagogue Blend &middot; Pre-Bed &middot; M&ndash;F</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">L-Carnitine 600mg / 10mL</span>
+            <span class="li-summary-price">$240.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>5 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$48.00</div>
+            <div class="li-cell"><strong>Total</strong>$240.00</div>
+            <div class="li-detail">Mitochondrial Transport &middot; IM &middot; Mon + Fri (premixed)</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">IGF-1 LR3 1mg</span>
+            <span class="li-summary-price">$190.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>2 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$95.00</div>
+            <div class="li-cell"><strong>Total</strong>$190.00</div>
+            <div class="li-detail">Insulin-like Growth Factor &middot; Post-Workout &middot; M/W/F</div>
+          </div>
+        </details>
+      </div>
 
       <div class="totals-block">
         <div class="total-row"><span>HGH 36 IU &times; 5</span><span>$950.00</span></div>
@@ -533,288 +599,114 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <!-- HGH -->
-      <div class="cmp-card">
-        <div class="cmp-head">
+      <details class="cmp-card">
+        <summary>
           <div>
-            <div class="cmp-name">HGH (Somatropin)</div>
-            <div class="cmp-tag">Foundation &middot; SubQ &middot; 12 Weeks + 4-Week Taper</div>
+            <div class="cmp-name">HGH (Somatropin) &mdash; 36 IU</div>
+            <div class="cmp-tag"><strong>2 IU</strong> per dose &middot; 17u draw (main phase)</div>
           </div>
           <div class="cmp-meta">
             <div class="cmp-meta-price">$950.00</div>
             <div class="cmp-meta-sub">5 &times; 36 IU</div>
           </div>
+        </summary>
+        <div class="cmp-body-quick">
+          <ul class="cmp-quick">
+            <li><span class="ql">Recon</span><span class="qv">3.0 ml BAC water &middot; <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute &rarr;</a></span></li>
+            <li><span class="ql">Dose</span><span class="qv">2 IU &rarr; pull syringe to <span class="units">17 units</span></span></li>
+            <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, AM fasted or pre-bed (taper steps wks 13&ndash;16 &mdash; see Schedule below)</span></li>
+            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+          </ul>
         </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Why it's the foundation</div>
-          <div class="cmp-body-text">HGH sits at the top of the stack. At 2 IU on weekdays, the dose is deliberately in the <strong>anti-aging / recovery range</strong> &mdash; well below the supraphysiological doses used in bodybuilding protocols. What this produces over 8&ndash;12 weeks is deeper sleep, improved skin quality, faster recovery between training sessions, and a gradual body composition shift driven by GH's preferential use of stored fat as fuel. Everything else in the program either amplifies what HGH starts (CJC/Ipa, IGF-1 LR3) or makes sure its byproducts are fully used (5-Amino-1MQ, L-Carnitine).</div>
-          <div class="cmp-body-text"><strong>The 4-week taper is deliberate.</strong> After 12 weeks of daily HGH, your pituitary has been reading elevated IGF-1 and has dialed its own GH output down via negative feedback. Stopping cold leaves endogenous GH suppressed for weeks while exogenous HGH clears &mdash; that's the "rebound crash." The taper walks the dose down (2 IU &rarr; 1.5 &rarr; 1 M&ndash;F &rarr; 1 M/W/F) so the axis reactivates gradually.</div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Dosing &amp; Schedule</div>
-          <div class="cmp-details">
-            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">36 IU &times; 5</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">3.0 mL each</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">12 IU/mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ abdomen</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">AM fasted or pre-bed</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Use</div><div class="cmp-dval">One bottle at a time</div></div>
-          </div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Per-Phase Dose Reference</div>
-          <div class="cmp-body-text" style="margin-bottom:8px;">Concentration stays constant at <strong>12 IU/mL across all 5 bottles</strong> &mdash; but the unit draw steps down each taper phase. Keep this table handy; delivered IU per shot lands within &plusmn;4% of target, well inside clinical tolerance.</div>
-          <table class="bottle-dose-table">
-            <thead>
-              <tr>
-                <th>Phase</th>
-                <th>Target</th>
-                <th>Draw</th>
-                <th>Delivered</th>
-                <th>Schedule</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>Weeks 1&ndash;12</strong><br><span style="font-size:10px;color:var(--muted);font-weight:400;">Main phase</span></td><td>2.0 IU</td><td><strong>17 units</strong></td><td>2.04 IU</td><td>Mon &ndash; Fri</td></tr>
-              <tr><td><strong>Weeks 13&ndash;14</strong><br><span style="font-size:10px;color:var(--muted);font-weight:400;">Taper step 1</span></td><td>1.5 IU</td><td><strong>13 units</strong></td><td>1.56 IU</td><td>Mon &ndash; Fri</td></tr>
-              <tr><td><strong>Week 15</strong><br><span style="font-size:10px;color:var(--muted);font-weight:400;">Taper step 2</span></td><td>1.0 IU</td><td><strong>8 units</strong></td><td>0.96 IU</td><td>Mon &ndash; Fri</td></tr>
-              <tr><td><strong>Week 16</strong><br><span style="font-size:10px;color:var(--muted);font-weight:400;">Taper step 3</span></td><td>1.0 IU</td><td><strong>8 units</strong></td><td>0.96 IU</td><td>Mon / Wed / Fri</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Reconstitution &amp; Math</div>
-          <ol class="cmp-recon">
-            <li>Add <strong>3.0 mL BAC water</strong> to the first 36 IU vial. Angle the needle against the glass wall &mdash; do not inject water directly onto the lyophilized powder.</li>
-            <li>Concentration: 36 IU &divide; 3 mL = <strong>12 IU/mL</strong>. Units math: every 10 units on an insulin syringe = 1.2 IU.</li>
-            <li>Swirl gently, do not shake.</li>
-            <li>Use each reconstituted vial within 30 days. <strong>Finish one bottle before opening the next</strong> &mdash; don't reconstitute two vials at the same time.</li>
-            <li>Each vial = roughly 3 mL &divide; 0.17 mL per shot = <strong>17 shots at the 17u main-phase draw</strong>. 5 bottles &times; 17 shots = 85 main-phase shots of capacity (you'll use 60 across weeks 1&ndash;12, with the remaining volume carrying into the taper).</li>
-            <li>Refrigerate reconstituted vials immediately. Label each with the date you mixed it.</li>
-          </ol>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Timing &mdash; Why It Matters</div>
-          <div class="cmp-body-text">Shoot HGH either <strong>morning fasted</strong> or <strong>pre-bed, 2+ hours after last meal</strong>. Never with food. Insulin from a meal suppresses the GH pulse and accelerates GH clearance from circulation &mdash; you spend the cost of the injection without getting the full signal. Fasted timing lets the GH signal run clean.</div>
-        </div>
-
-        <div class="cmp-note">
-          <strong>What to Expect:</strong> <strong>Weeks 1&ndash;2:</strong> mild water retention in hands, feet, or face is normal and resolves by weeks 3&ndash;4. Sleep may deepen early. Occasional tingling or mild carpal tunnel symptoms occur in ~10&ndash;15% of users at 2 IU &mdash; usually resolves with reduced sodium or dose adjustment. <strong>Weeks 3&ndash;6:</strong> recovery noticeably faster, skin quality subtly improves. <strong>Weeks 7&ndash;12:</strong> body composition shift becomes visible &mdash; this is the slowest, steadiest effect in the stack. <strong>Weeks 13&ndash;16 (taper):</strong> gradual reactivation of your own GH axis. No acute crash.
-        </div>
-      </div>
+      </details>
 
       <!-- 5-AMINO-1MQ -->
-      <div class="cmp-card">
-        <div class="cmp-head">
+      <details class="cmp-card">
+        <summary>
           <div>
-            <div class="cmp-name">5-Amino-1MQ</div>
-            <div class="cmp-tag">NNMT Inhibitor &middot; SubQ &middot; M/W/F &rarr; M&ndash;F Ramp</div>
+            <div class="cmp-name">5-Amino-1MQ &mdash; 50 mg</div>
+            <div class="cmp-tag"><strong>2 mg</strong> per dose &middot; 10u draw</div>
           </div>
           <div class="cmp-meta">
             <div class="cmp-meta-price">$200.00</div>
             <div class="cmp-meta-sub">2 &times; 50 mg</div>
           </div>
+        </summary>
+        <div class="cmp-body-quick">
+          <ul class="cmp-quick">
+            <li><span class="ql">Recon</span><span class="qv">2.5 ml BAC water &middot; <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute &rarr;</a></span></li>
+            <li><span class="ql">Dose</span><span class="qv">2 mg &rarr; pull syringe to <span class="units">10 units</span></span></li>
+            <li><span class="ql">Schedule</span><span class="qv">M/W/F, AM (ramps to M&ndash;F wks 11&ndash;12)</span></li>
+            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+          </ul>
         </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Why it's in the stack</div>
-          <div class="cmp-body-text">5-Amino-1MQ (5-Amino-1-methylquinolinium) selectively inhibits <strong>NNMT</strong> &mdash; an enzyme that consumes NAD+ and methyl groups in adipose tissue and muscle. NNMT activity rises with age and metabolic stress, and when it's high, NAD+ gets siphoned off before the mitochondria can use it to oxidize fat.</div>
-          <div class="cmp-body-text">In the Gorilla Stack 2.0 context this matters because HGH is pulling fat out of storage at an elevated rate. If NAD+ is low, those liberated fatty acids don't get burned in the mitochondria &mdash; they simply recirculate and re-deposit. Blocking NNMT raises intracellular NAD+ without needing to supplement NAD+ directly, keeping adipose tissue receptive to burning what HGH mobilizes.</div>
-          <div class="cmp-body-text">Secondary mechanism: 5-Amino-1MQ activates dormant muscle <strong>satellite cells</strong> &mdash; the reserve pool of muscle-building cells that HGH and IGF-1 then recruit. Amplifies both sides of the stack (fat oxidation + anabolic reserve).</div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Dosing &amp; Schedule</div>
-          <div class="cmp-details">
-            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">50 mg &times; 2</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">2.5 mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">20 mg/mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">2 mg (10u)</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ abdomen</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">AM (flexible)</div></div>
-          </div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Reconstitution &amp; Math</div>
-          <ol class="cmp-recon">
-            <li>Add <strong>2.5 mL BAC water</strong> to each 50 mg vial.</li>
-            <li>Concentration: 50 mg &divide; 2.5 mL = <strong>20 mg/mL</strong>.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Draw <strong>10 units (0.10 mL) = 2 mg per shot</strong>.</li>
-            <li><strong>Weeks 1&ndash;10: M/W/F</strong> (3 shots/week &times; 10 weeks = 30 shots).</li>
-            <li><strong>Weeks 11&ndash;12: M&ndash;F</strong> frequency ramp (5 shots/week &times; 2 weeks = 10 shots). Pushes harder through the final main-phase weeks where HGH-driven fat mobilization is peaking.</li>
-            <li>Total need: 80 mg. Supply: 100 mg (2 vials). Comfortable margin.</li>
-            <li>Reconstitute one vial first; open the second only when the first runs low &mdash; keeps the 30-day post-reconstitution clock short.</li>
-          </ol>
-        </div>
-
-        <div class="cmp-note">
-          <strong>What to Expect:</strong> Most users don't <em>feel</em> 5-Amino-1MQ directly &mdash; its effect is permissive (lets other processes work better). What you notice is the <strong>sum effect:</strong> cleaner fat loss curve, more consistent training energy, easier leanness at the end of the stack than a comparable HGH-only cycle would produce. The week 11&ndash;12 ramp often coincides with the most visible composition shifts of the cycle.
-        </div>
-      </div>
+      </details>
 
       <!-- CJC-1295 / IPAMORELIN -->
-      <div class="cmp-card">
-        <div class="cmp-head">
+      <details class="cmp-card">
+        <summary>
           <div>
-            <div class="cmp-name">CJC-1295 / Ipamorelin</div>
-            <div class="cmp-tag">GH Secretagogue Blend &middot; SubQ &middot; Pre-Bed &middot; M&ndash;F</div>
+            <div class="cmp-name">CJC-1295 / Ipamorelin &mdash; 10 mg</div>
+            <div class="cmp-tag"><strong>500 mcg</strong> per dose &middot; 10u draw</div>
           </div>
           <div class="cmp-meta">
             <div class="cmp-meta-price">$135.00</div>
             <div class="cmp-meta-sub">3 &times; 10 mg</div>
           </div>
+        </summary>
+        <div class="cmp-body-quick">
+          <ul class="cmp-quick">
+            <li><span class="ql">Recon</span><span class="qv">2 ml BAC water &middot; <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute &rarr;</a></span></li>
+            <li><span class="ql">Dose</span><span class="qv">500 mcg &rarr; pull syringe to <span class="units">10 units</span></span></li>
+            <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, pre-bed (empty stomach, 2+ hrs after last meal)</span></li>
+            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+          </ul>
         </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Why it's in the stack</div>
-          <div class="cmp-body-text">CJC/Ipa is the gold-standard dual GH secretagogue blend. <strong>CJC-1295</strong> is a GHRH analog that tells your pituitary to produce GH. <strong>Ipamorelin</strong> is a selective ghrelin receptor agonist that triggers stored GH <em>release</em> in a clean pulsatile pattern &mdash; minimal cortisol or prolactin spillover. Combined, they stack two independent "push" signals on your own nocturnal GH pulse.</div>
-          <div class="cmp-body-text">In the Gorilla Stack 2.0, CJC/Ipa does two jobs. <strong>During the HGH cycle</strong> it adds an endogenous GH pulse on top of the exogenous HGH, producing layered GH signaling. <strong>Through the full 12 weeks</strong> it keeps your own GH axis actively stimulated even while exogenous HGH is suppressing it &mdash; bridging smoothly into the taper, so as HGH walks down, your pituitary is already primed to take over again.</div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Dosing &amp; Schedule</div>
-          <div class="cmp-details">
-            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">10 mg &times; 3</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">2 mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">5 mg/mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">500 mcg (10u)</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ abdomen</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">Pre-bed, empty</div></div>
-          </div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Reconstitution &amp; Math</div>
-          <ol class="cmp-recon">
-            <li>Add <strong>2 mL BAC water</strong> to each 10 mg vial.</li>
-            <li>Concentration: 10 mg &divide; 2 mL = <strong>5 mg/mL</strong> (2.5 mg CJC + 2.5 mg Ipa per mL).</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Draw <strong>10 units (0.10 mL) = 500 mcg total blend per shot</strong> (250 mcg CJC + 250 mcg Ipa).</li>
-            <li>Each vial = 20 doses. 3 vials = 60 doses. M&ndash;F &times; 12 weeks = <strong>60 shots &mdash; exact match, zero waste</strong>.</li>
-            <li>Refrigerate. Use within 30 days of reconstitution.</li>
-          </ol>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Timing &mdash; Why Pre-Bed &amp; Empty</div>
-          <div class="cmp-body-text">Shoot <strong>2+ hours after your last meal, right before bed</strong>. Carbs or fats within the hour blunt the GH pulse &mdash; insulin and circulating free fatty acids both dampen GH release at the pituitary. Empty-stomach pre-bed timing captures the deepest natural nocturnal GH pulse and amplifies it.</div>
-        </div>
-
-        <div class="cmp-note">
-          <strong>What to Expect:</strong> Mild flushing or head-tingling for 5&ndash;10 minutes post-injection is normal histamine response from Ipamorelin &mdash; harmless and typically fades within the first week or two. <strong>Deeper sleep within week 1.</strong> Some users report more vivid dreams &mdash; a marker of improved slow-wave / REM cycling. The body composition and recovery benefits compound with the HGH and IGF-1 action over the full 12 weeks.
-        </div>
-      </div>
+      </details>
 
       <!-- L-CARNITINE -->
-      <div class="cmp-card">
-        <div class="cmp-head">
+      <details class="cmp-card">
+        <summary>
           <div>
-            <div class="cmp-name">L-Carnitine</div>
-            <div class="cmp-tag">Mitochondrial Transport &middot; <strong>IM (not SubQ)</strong> &middot; Mon + Fri</div>
+            <div class="cmp-name">L-Carnitine &mdash; 600 mg / 10 mL</div>
+            <div class="cmp-tag"><strong>120 mg</strong> per dose &middot; 2 ml draw &middot; premixed</div>
           </div>
           <div class="cmp-meta">
             <div class="cmp-meta-price">$225.00</div>
             <div class="cmp-meta-sub">5 &times; 600 mg / 10 mL</div>
           </div>
+        </summary>
+        <div class="cmp-body-quick">
+          <ul class="cmp-quick">
+            <li><span class="ql">Dose</span><span class="qv">120 mg &rarr; draw <span class="units">2 ml (2 cc)</span> from premixed vial</span></li>
+            <li><span class="ql">Schedule</span><span class="qv">Mon + Fri, pre-workout / AM</span></li>
+            <li><span class="ql">Site</span><span class="qv"><strong>IM</strong>, glute or vastus lateralis (outer thigh) &mdash; not SubQ</span></li>
+            <li><span class="ql">Needle</span><span class="qv">3 ml Luer-lock syringe + 25G &times; 1.5&Prime; needle</span></li>
+          </ul>
         </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Why it's in the stack</div>
-          <div class="cmp-body-text">L-Carnitine isn't a peptide &mdash; it's the amino-acid derivative that <strong>physically shuttles fatty acids across the mitochondrial membrane</strong>. Without sufficient carnitine at the injection site, free fatty acids mobilized by HGH sit at the mitochondrial doorstep and get recirculated back into storage rather than burned.</div>
-          <div class="cmp-body-text">Oral L-Carnitine is limited by roughly 15% bioavailability and gut conversion to TMAO. Injectable L-Carnitine at 120 mg IM delivers near-complete bioavailability. Twice-weekly (Mon + Fri) is enough to maintain elevated muscle carnitine &mdash; saturation is slow-building and persistent. Timed pre-workout, you hit peak muscle carnitine concentration when mitochondrial fat oxidation demand is highest.</div>
-          <div class="cmp-body-text">Paired with HGH's upstream fat mobilization, the full chain &mdash; <em>liberation &rarr; transport &rarr; oxidation</em> &mdash; is covered.</div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Dosing &amp; Schedule</div>
-          <div class="cmp-details">
-            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">600 mg / 10 mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Pre-Mixed</div><div class="cmp-dval">60 mg/mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">120 mg = 2 mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">IM glute/thigh</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Needle</div><div class="cmp-dval">25G &times; 1.5&Prime;</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Syringe</div><div class="cmp-dval">3 mL Luer-lock</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Schedule</div><div class="cmp-dval">Mon + Fri</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">Pre-workout / AM</div></div>
-          </div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Draw &amp; Injection</div>
-          <ol class="cmp-recon">
-            <li>L-Carnitine is <strong>pre-mixed in solution</strong> &mdash; no reconstitution required. Draw directly from the vial.</li>
-            <li>Dose: <strong>120 mg = 2 mL (2 cc)</strong>. Some 3 mL syringes carry a secondary units scale where 2 mL = 200u; the primary marking is mL/cc.</li>
-            <li>Swap the draw needle for a fresh 25G &times; 1.5&Prime; before injecting.</li>
-            <li><strong>Route: IM</strong> &mdash; upper outer quadrant of the glute, or the vastus lateralis (outer thigh). Not SubQ.</li>
-            <li>Rotate sites every injection: glute left, glute right, thigh left, thigh right. Do not inject the same spot two shots in a row.</li>
-            <li>Inject slowly (30&ndash;60 seconds) to minimize burn and site reaction.</li>
-            <li>Total need: 24 shots (Mon + Fri &times; 12 weeks). Supply: 5 vials &times; 5 shots each = 25 shots. One extra shot of margin.</li>
-          </ol>
-        </div>
-
-        <div class="cmp-note warn">
-          <strong>Injection Reality Check:</strong> At 60 mg/mL the solution is concentrated. <strong>Occasional mild site reactions</strong> &mdash; small lump, transient bruise, brief burn during the injection &mdash; are normal and not a concern unless persistent beyond 24 hours. If a specific site feels sore at the next rotation, skip it and favor the other sites. Never inject IM into the same 1&Prime; spot twice in a row.
-        </div>
-      </div>
+      </details>
 
       <!-- IGF-1 LR3 -->
-      <div class="cmp-card">
-        <div class="cmp-head">
+      <details class="cmp-card">
+        <summary>
           <div>
-            <div class="cmp-name">IGF-1 LR3</div>
-            <div class="cmp-tag">Insulin-like Growth Factor &middot; SubQ &middot; Post-Workout M/W/F</div>
+            <div class="cmp-name">IGF-1 LR3 &mdash; 1 mg</div>
+            <div class="cmp-tag"><strong>50 mcg</strong> per dose &middot; 5u draw</div>
           </div>
           <div class="cmp-meta">
             <div class="cmp-meta-price">$160.00</div>
             <div class="cmp-meta-sub">2 &times; 1 mg</div>
           </div>
+        </summary>
+        <div class="cmp-body-quick">
+          <ul class="cmp-quick">
+            <li><span class="ql">Recon</span><span class="qv">1 ml BAC water &middot; <a href="https://youtu.be/APpVFoU3GlU" target="_blank" rel="noopener">How to reconstitute &rarr;</a></span></li>
+            <li><span class="ql">Dose</span><span class="qv">50 mcg &rarr; pull syringe to <span class="units">5 units</span></span></li>
+            <li><span class="ql">Schedule</span><span class="qv">M/W/F, post-workout +30 min (with carb meal)</span></li>
+            <li><span class="ql">Site</span><span class="qv">Subq, abdomen (or trained muscle group)</span></li>
+          </ul>
         </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Why it's in the stack</div>
-          <div class="cmp-body-text">IGF-1 is the <strong>primary downstream anabolic signal</strong> from growth hormone &mdash; it's literally how GH builds tissue at the cellular level. The <strong>LR3</strong> variant has a 20&ndash;30 hour half-life (versus ~20 minutes for native IGF-1), so a single post-workout shot keeps IGF-1 receptor activity elevated through the critical 24-hour protein synthesis window after training.</div>
-          <div class="cmp-body-text">In Gorilla Stack 2.0, IGF-1 LR3 is dosed post-workout to capitalize on the anabolic opening training creates. Paired with a <strong>carb-containing post-workout meal</strong>, insulin amplifies IGF-1 receptor sensitivity and nutrient shuttling into muscle. The combined signal &mdash; HGH + IGF-1 + training + insulin &mdash; drives satellite cell activation, protein synthesis, and glycogen replenishment at the moment of maximum opportunity.</div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Dosing &amp; Schedule</div>
-          <div class="cmp-details">
-            <div class="cmp-dbox"><div class="cmp-dlbl">Vial</div><div class="cmp-dval">1 mg &times; 2</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">BAC Water</div><div class="cmp-dval">1 mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Concentration</div><div class="cmp-dval">1000 mcg/mL</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Dose</div><div class="cmp-dval">50 mcg (5u)</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Route</div><div class="cmp-dval">SubQ</div></div>
-            <div class="cmp-dbox"><div class="cmp-dlbl">Timing</div><div class="cmp-dval">Post-workout +30m</div></div>
-          </div>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Reconstitution &amp; Math</div>
-          <ol class="cmp-recon">
-            <li>Add <strong>1 mL BAC water</strong> to each 1 mg vial.</li>
-            <li>Concentration: 1 mg &divide; 1 mL = <strong>1000 mcg/mL</strong>.</li>
-            <li>Swirl gently. Do not shake.</li>
-            <li>Draw <strong>5 units (0.05 mL) = 50 mcg per shot</strong>.</li>
-            <li>Each vial = 20 doses. 2 vials = 40 doses. M/W/F &times; 12 weeks = 36 shots. Comfortable margin (~4 extra shots).</li>
-            <li>Refrigerate. Use within 30 days of reconstitution. Reconstitute one vial at a time.</li>
-          </ol>
-        </div>
-
-        <div class="cmp-section">
-          <div class="cmp-label">Injection Window &amp; Pairing</div>
-          <div class="cmp-body-text">Inject <strong>within 30 minutes of finishing training</strong>. Follow the shot with a carb-containing meal (40&ndash;80 g carbs depending on training intensity). The insulin response amplifies IGF-1 receptor activation and drives nutrient uptake into the muscle at peak receptivity. SubQ anywhere is fine for systemic effect; injecting into the bi-lateral quads or delts of trained muscle groups concentrates the IGF-1 signal locally, which is a minor but real advantage.</div>
-        </div>
-
-        <div class="cmp-note warn">
-          <strong>Hypoglycemia Watch:</strong> IGF-1 LR3 can cause mild post-injection hypoglycemia &mdash; slight dizziness, shakiness, or sudden hunger &mdash; particularly if dosed on an empty stomach. This is why the post-workout + carb-meal timing is specified, not optional. If you ever feel dizzy, eat fast-acting carbs (juice, fruit) and sit down. Over 12 weeks, IGF-1 LR3 drives recovery speed, protein synthesis, and muscle fullness well beyond what HGH alone produces.
-        </div>
-      </div>
+      </details>
 
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Weekly Schedule</div>
