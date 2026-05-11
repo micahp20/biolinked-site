@@ -326,11 +326,35 @@ details.cmp-card .cmp-tag strong{color:var(--gold);font-weight:700;}
   .tab-bar{position:sticky;top:56px;}
   .tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}
   .sec-divider-title{font-size:19px;}
-  .sched-card{padding:16px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  .sched-card{padding:14px 14px;}
   .sched-card-title{font-size:17px;}
+  .sched-card-sub{font-size:11px;}
+  /* Non-weekly schedule tables (HGH Taper, etc.) keep horizontal scroll */
+  .sched-card{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   .sched-table{font-size:11px;}
   .sched-table th{font-size:8px;padding:6px 4px;letter-spacing:0.08em;}
   .sched-table td{padding:7px 4px;font-size:11px;}
+  /* Weekly schedule tables: stack as cards on mobile */
+  .sched-card:has(.sched-table.weekly){overflow:visible;}
+  .sched-table.weekly{display:block;font-size:12px;background:transparent;}
+  .sched-table.weekly thead{display:none;}
+  .sched-table.weekly tbody{display:block;}
+  .sched-table.weekly tr{display:block;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:6px;padding:12px 14px;margin-bottom:10px;position:relative;}
+  .sched-table.weekly tr:last-child td{border-bottom:none;}
+  .sched-table.weekly td{display:block;border:none !important;padding:5px 0;background:transparent !important;font-size:12px;line-height:1.55;}
+  .sched-table.weekly td:first-child{padding:0 70px 8px 0;margin-bottom:6px;border-bottom:1px solid var(--border) !important;}
+  .sched-table.weekly td:first-child .sched-day{font-size:14px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;}
+  .sched-table.weekly td.right{position:absolute;top:12px;right:14px;padding:0 !important;display:flex;align-items:center;gap:6px;}
+  .sched-table.weekly td.right::before{content:'shots';font-size:8px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+  .sched-table.weekly td:nth-child(n+2):not(.right){display:grid;grid-template-columns:96px 1fr;gap:8px;align-items:start;padding:6px 0;}
+  .sched-table.weekly td:nth-child(2)::before{content:'AM Fasted';}
+  .sched-table.weekly td:nth-child(3)::before{content:'Pre-Workout';}
+  .sched-table.weekly td:nth-child(4)::before{content:'Post-Workout';}
+  .sched-table.weekly td:nth-child(5)::before{content:'Pre-Bed';}
+  .sched-table.weekly td:nth-child(n+2):not(.right)::before{font-size:8.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding-top:3px;line-height:1.4;}
+  .sched-table.weekly .sched-pill{font-size:11px;padding:3px 9px;margin:1px 2px 1px 0;}
+  /* Hide empty timeslot rows on mobile (Sat/Sun with just "All off" or "—") to reduce noise */
+  .sched-table.weekly td:nth-child(n+2):not(.right):has(.sched-pill.off:only-child){display:none;}
   .sched-pill{font-size:9px;padding:1px 5px;margin:1px 1px 1px 0;}
   .supply-row{flex-direction:column;align-items:flex-start;padding:12px 14px;}
   .supply-link{width:100%;text-align:center;padding:10px 14px;}
@@ -801,7 +825,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           </div>
           <div class="sched-phase-pill">Weeks 1&ndash;10</div>
         </div>
-        <table class="sched-table">
+        <table class="sched-table weekly">
           <thead>
             <tr>
               <th style="width:52px">Day</th>
@@ -882,7 +906,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           </div>
           <div class="sched-phase-pill" style="background:#8965cc;">Weeks 11&ndash;12</div>
         </div>
-        <table class="sched-table">
+        <table class="sched-table weekly">
           <thead>
             <tr>
               <th style="width:52px">Day</th>
