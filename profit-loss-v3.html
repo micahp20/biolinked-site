@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<title>Operations — Bio Linked Peptide Solutions</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+     CONFIG — fill these in once. Everything else uses them.
+     ============================================================ -->
+<script>
+  window.BIOLINKED_CONFIG = {
+    // ⚠ REPLACE THESE WITH YOUR REAL VALUES BEFORE GOING LIVE
+    SUPABASE_URL: "https://bfjydzealeethhcpdfxl.supabase.co",
+    SUPABASE_ANON_KEY: "PASTE_LEGACY_ANON_JWT_HERE", // must be the eyJ... JWT, NOT sb_publishable_
+
+    // Table names — change ONLY if your DB uses different names
+    TABLES: {
+      products:  "pl_products",
+      orders:    "pl_orders",
+      sales:     "pl_sales",
+      clients:   "pl_clients",
+      vendors:   "pl_vendors",
+      inventory: "inventory_items"
+    },
+
+    // Thresholds
+    LOW_STOCK_THRESHOLD: 3,         // ≤ this many vials = "Low"
+    REENGAGE_DAYS: 60,              // days since last sale = re-engage candidate
+    DEAD_STOCK_DAYS: 90             // days with no sales movement = dead stock
+  };
+</script>
+
+<style>
+  :root{
+    --gold:#8B7335;
+    --gold-light:#A89248;
+    --gold-dim:#f5efe1;
+    --gold-border:rgba(139,115,53,0.3);
+    --bg:#f5f5f5;
+    --surface:#ffffff;
+    --surface2:#f0f0f0;
+    --input-bg:#fafafa;
+    --text:#1a1a1a;
+    --text-muted:#6b6b6b;
+    --border:rgba(0,0,0,0.10);
+    --border-strong:rgba(0,0,0,0.18);
+    --success:#3a7d44;
+    --warn:#b8860b;
+    --danger:#a83232;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Montserrat',-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    background:var(--bg);color:var(--text);
+    font-family:var(--sans);font-size:14px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ============ HEADER ============ */
+  header.brand{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    padding:20px 24px;
+  }
+  .brand-inner{
+    max-width:1280px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+  .brand-title{
+    font-family:var(--serif);font-size:26px;font-weight:500;letter-spacing:-0.01em;
+  }
+  .brand-title em{color:var(--gold);font-style:italic;font-weight:600}
+  .brand-sub{
+    font-size:11px;letter-spacing:0.15em;text-transform:uppercase;
+    color:var(--text-muted);margin-top:2px;
+  }
+  .brand-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+  /* ============ BUTTONS ============ */
+  .btn{
+    font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:0.04em;
+    padding:9px 14px;border-radius:4px;
+    border:1px solid var(--border-strong);background:var(--surface);color:var(--text);
+    cursor:pointer;transition:all 0.15s;
+  }
+  .btn:hover{background:var(--surface2)}
+  .btn-primary{background:var(--gold);border-color:var(--gold);color:#ffffff}
+  .btn-primary:hover{background:var(--gold-light);border-color:var(--gold-light)}
+  .btn-sm{font-size:11px;padding:6px 10px}
+  .btn-ghost{background:transparent;border-color:transparent;color:var(--text-muted)}
+  .btn-ghost:hover{background:var(--surface2);color:var(--text)}
+
+  /* ============ TABS ============ */
+  .tabs-bar{
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    position:sticky;top:56px;z-index:50;
+  }
+  .tabs-inner{
+    max-width:1280px;margin:0 auto;
+    display:flex;gap:2px;padding:0 16px;overflow-x:auto;
+  }
+  .tab{
+    padding:14px 20px;background:none;border:none;cursor:pointer;
+    font-family:var(--sans);font-size:13px;font-weight:500;
+    color:var(--text-muted);letter-spacing:0.02em;
+    border-bottom:2px solid transparent;
+    transition:all 0.15s;white-space:nowrap;
+  }
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--text);border-bottom-color:var(--gold)}
+  .tab-count{
+    display:inline-block;background:var(--surface2);
+    padding:1px 7px;border-radius:10px;font-size:10px;font-weight:600;
+    margin-left:6px;color:var(--text-muted);
+  }
+  .tab.active .tab-count{background:var(--gold);color:#fff}
+
+  /* ============ MAIN ============ */
+  main{max-width:1280px;margin:0 auto;padding:24px 16px 60px}
+
+  /* ============ KPIs ============ */
+  .kpi-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;margin-bottom:24px;
+  }
+  .kpi{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:6px;padding:16px;position:relative;overflow:hidden;
+  }
+  .kpi-label{
+    font-size:10px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--text-muted);font-weight:500;
+  }
+  .kpi-value{
+    font-family:var(--serif);font-size:32px;font-weight:600;
+    line-height:1.1;margin-top:8px;color:var(--text);
+  }
+  .kpi-value.gold{color:var(--gold)}
+  .kpi-value.warn{color:var(--warn)}
+  .kpi-value.danger{color:var(--danger)}
+  .kpi-value.success{color:var(--success)}
+  .kpi-sub{font-size:11px;color:var(--text-muted);margin-top:6px}
+  .kpi-accent{
+    position:absolute;top:0;right:0;width:3px;height:100%;
+    background:var(--gold);opacity:0.6;
+  }
+
+  /* ============ SECTION ============ */
+  .section{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:6px;margin-bottom:16px;overflow:hidden;
+  }
+  .section-head{
+    padding:14px 18px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .section-title{font-family:var(--serif);font-size:18px;font-weight:600}
+  .section-title em{color:var(--gold);font-style:italic}
+  .section-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+
+  /* ============ FILTERS ============ */
+  .filter-row{
+    padding:12px 18px;background:var(--surface2);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .chip{
+    padding:5px 11px;border-radius:14px;
+    background:var(--surface);border:1px solid var(--border);
+    font-size:11px;font-weight:500;letter-spacing:0.03em;
+    cursor:pointer;transition:all 0.15s;color:var(--text-muted);
+  }
+  .chip:hover{border-color:var(--border-strong);color:var(--text)}
+  .chip.active{background:var(--text);color:var(--surface);border-color:var(--text)}
+  .search-input{
+    flex:1;min-width:180px;
+    padding:7px 12px;border:1px solid var(--border);
+    background:var(--input-bg);border-radius:4px;
+    font-family:var(--sans);font-size:12px;color:var(--text);
+  }
+  .search-input:focus{outline:none;border-color:var(--gold)}
+
+  /* ============ TABLES ============ */
+  .table-wrap{overflow-x:auto}
+  table.data{width:100%;border-collapse:collapse;font-size:13px}
+  table.data th{
+    text-align:left;padding:12px 16px;background:var(--surface2);
+    font-weight:600;letter-spacing:0.04em;
+    font-size:10px;text-transform:uppercase;color:var(--text-muted);
+    border-bottom:1px solid var(--border);
+  }
+  table.data td{
+    padding:14px 16px;border-bottom:1px solid var(--border);vertical-align:middle;
+  }
+  table.data tr:last-child td{border-bottom:none}
+  table.data tr:hover td{background:var(--surface2)}
+  table.data td.num,table.data th.num{text-align:right;font-variant-numeric:tabular-nums}
+  table.data td.gold{color:var(--gold);font-weight:600}
+  table.data td.loss{color:var(--danger);font-weight:700;background:rgba(168,50,50,0.05)}
+  table.data td.profit-positive{color:var(--success);font-weight:600}
+  .tracking-link{
+    font-family:'SF Mono',Menlo,monospace;font-size:11px;
+    color:var(--gold);text-decoration:none;
+    border-bottom:1px dotted var(--gold-border);
+  }
+  .tracking-link:hover{border-bottom-style:solid}
+  .pill-transit{background:rgba(184,134,11,0.14);color:var(--warn)}
+  .pill-received{background:rgba(58,125,68,0.12);color:var(--success)}
+  .pill-placed{background:rgba(139,115,53,0.14);color:var(--gold)}
+
+  /* ============ PILLS ============ */
+  .pill{
+    display:inline-block;padding:3px 9px;border-radius:10px;
+    font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;
+  }
+  .pill-ok{background:rgba(58,125,68,0.12);color:var(--success)}
+  .pill-low{background:rgba(184,134,11,0.14);color:var(--warn)}
+  .pill-out{background:rgba(168,50,50,0.12);color:var(--danger)}
+  .pill-ordered{background:rgba(139,115,53,0.14);color:var(--gold)}
+  .pill-in{background:rgba(58,125,68,0.10);color:var(--success)}
+  .pill-out-money{background:rgba(168,50,50,0.10);color:var(--danger)}
+
+  /* ============ INSIGHTS ============ */
+  .insight-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+    gap:16px;
+  }
+  .insight-card{
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:6px;overflow:hidden;
+  }
+  .insight-head{
+    padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface2);
+  }
+  .insight-title{
+    font-family:var(--serif);font-size:16px;font-weight:600;
+    display:flex;align-items:center;gap:8px;
+  }
+  .insight-title .dot{width:6px;height:6px;border-radius:50%;background:var(--gold)}
+  .insight-sub{
+    font-size:10px;color:var(--text-muted);
+    letter-spacing:0.08em;text-transform:uppercase;margin-top:3px;
+  }
+
+  /* ============ MISC ============ */
+  .panel{display:none}
+  .panel.active{display:block;animation:fade 0.18s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .toggle-pair{
+    display:inline-flex;background:var(--surface2);
+    border-radius:6px;padding:3px;gap:2px;
+  }
+  .toggle-pair button{
+    padding:7px 16px;background:none;border:none;cursor:pointer;
+    font-family:var(--sans);font-size:12px;font-weight:500;
+    border-radius:4px;color:var(--text-muted);
+  }
+  .toggle-pair button.active{
+    background:var(--surface);color:var(--text);
+    box-shadow:0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  .empty{
+    padding:40px 20px;text-align:center;color:var(--text-muted);
+    font-size:13px;font-style:italic;
+  }
+  .loading{
+    padding:30px;text-align:center;color:var(--text-muted);
+    font-size:12px;letter-spacing:0.08em;text-transform:uppercase;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-bg{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);
+    z-index:200;align-items:flex-start;justify-content:center;padding:40px 16px;
+    overflow-y:auto;
+  }
+  .modal-bg.show{display:flex}
+  .modal{
+    background:var(--surface);border-radius:8px;
+    max-width:520px;width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.2);
+  }
+  .modal-head{
+    padding:18px 22px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .modal-title{font-family:var(--serif);font-size:20px;font-weight:600}
+  .modal-body{padding:20px 22px}
+  .modal-foot{
+    padding:14px 22px;border-top:1px solid var(--border);background:var(--surface2);
+    display:flex;justify-content:flex-end;gap:8px;
+  }
+  .field{margin-bottom:14px}
+  .field label{
+    display:block;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--text-muted);font-weight:600;margin-bottom:5px;
+  }
+  .field input,.field select,.field textarea{
+    width:100%;padding:9px 12px;border:1px solid var(--border-strong);
+    background:var(--input-bg);border-radius:4px;
+    font-family:var(--sans);font-size:13px;color:var(--text);
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{
+    outline:none;border-color:var(--gold);
+  }
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  /* ============ MOBILE ============ */
+  @media (max-width:600px){
+    .brand-title{font-size:22px}
+    .kpi-value{font-size:26px}
+    .section-title{font-size:16px}
+    table.data th,table.data td{padding:10px 12px}
+    .tab{padding:12px 14px;font-size:12px}
+    .field-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <div class="brand-inner">
+    <div>
+      <div class="brand-title">Bio Linked <em>Operations</em></div>
+      <div class="brand-sub">Inventory · Money · People · Insights</div>
+    </div>
+    <div class="brand-actions">
+      <button class="btn" onclick="exportCSV()">⬇ Export</button>
+      <button class="btn btn-primary" onclick="openQuickAdd()">＋ Quick Add</button>
+    </div>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab active" data-tab="inventory">Inventory <span class="tab-count" id="count-inventory">—</span></button>
+    <button class="tab" data-tab="money">Money</button>
+    <button class="tab" data-tab="products">Products <span class="tab-count" id="count-products">—</span></button>
+    <button class="tab" data-tab="people">People <span class="tab-count" id="count-people">—</span></button>
+    <button class="tab" data-tab="insights">Insights</button>
+  </div>
+</div>
+
+<main>
+
+  <!-- ============ INVENTORY ============ -->
+  <div class="panel active" data-panel="inventory">
+    <div class="kpi-grid" id="kpi-inventory">
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Compounds</div><div class="kpi-value" id="kpi-compounds">—</div><div class="kpi-sub">tracked across stack</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Total Vials</div><div class="kpi-value gold" id="kpi-vials">—</div><div class="kpi-sub">in stock now</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Low Stock</div><div class="kpi-value warn" id="kpi-low">—</div><div class="kpi-sub">≤ <span id="kpi-low-threshold">3</span> vials</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--danger)"></div><div class="kpi-label">Out of Stock</div><div class="kpi-value danger" id="kpi-out">—</div><div class="kpi-sub">need reorder</div></div>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Compound <em>Inventory</em></div>
+        <div class="section-actions">
+          <button class="btn btn-sm" onclick="openModal('inventory')">＋ Add Item</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" id="search-inventory" placeholder="Search compounds…">
+        <div class="chip active" data-filter="all">All</div>
+        <div class="chip" data-filter="in">In Stock</div>
+        <div class="chip" data-filter="low">Low</div>
+        <div class="chip" data-filter="out">Out</div>
+        <div class="chip" data-filter="ordered">Ordered</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data" id="table-inventory">
+          <thead><tr><th>Compound</th><th class="num">Vials</th><th>Size</th><th>Status</th><th>Last Note</th><th></th></tr></thead>
+          <tbody><tr><td colspan="6" class="loading">Loading inventory…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MONEY ============ -->
+  <div class="panel" data-panel="money">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Cash on Hand</div><div class="kpi-value gold" id="kpi-cash">—</div><div class="kpi-sub" id="kpi-cash-sub">net month-over-month</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Outstanding Orders</div><div class="kpi-value warn" id="kpi-outstanding">—</div><div class="kpi-sub" id="kpi-outstanding-sub">vendors · in transit</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--success)"></div><div class="kpi-label">Revenue (MTD)</div><div class="kpi-value success" id="kpi-revenue">—</div><div class="kpi-sub" id="kpi-revenue-sub">vs last month</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Net Profit (MTD)</div><div class="kpi-value gold" id="kpi-profit">—</div><div class="kpi-sub" id="kpi-margin-sub">margin %</div></div>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title"><em>Transactions</em></div>
+        <div class="section-actions">
+          <button class="btn btn-sm" onclick="openModal('sale')">＋ Log Sale</button>
+          <button class="btn btn-sm" onclick="openModal('order')">＋ Log Order</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" id="search-money" placeholder="Search product, client, vendor…">
+        <div class="chip active" data-money-filter="all">All</div>
+        <div class="chip" data-money-filter="sale">↗ Sales</div>
+        <div class="chip" data-money-filter="order">↘ Orders</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data" id="table-money">
+          <thead><tr><th>Date</th><th>Type</th><th>Product</th><th>Party</th><th class="num">Qty</th><th class="num">Total</th><th>Tracking</th><th>Status</th></tr></thead>
+          <tbody><tr><td colspan="8" class="loading">Loading transactions…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Profit by Product · Last 30d -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Profit by <em>Product</em></div>
+        <div class="section-sub" style="font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">Last 30 days</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data" id="table-profit-by-product">
+          <thead><tr><th>Product</th><th class="num">Sold</th><th class="num">Cost In</th><th class="num">Revenue</th><th class="num">Profit</th><th class="num">Margin</th></tr></thead>
+          <tbody><tr><td colspan="6" class="loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PRODUCTS ============ -->
+  <div class="panel" data-panel="products">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Products</div><div class="kpi-value" id="kpi-product-count">—</div><div class="kpi-sub">in catalog</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Avg Margin</div><div class="kpi-value gold" id="kpi-avg-margin">—</div><div class="kpi-sub">weighted by sales</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--success)"></div><div class="kpi-label">Best Margin</div><div class="kpi-value success" id="kpi-best-margin">—</div><div class="kpi-sub" id="kpi-best-product">—</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Tightest</div><div class="kpi-value warn" id="kpi-tight-margin">—</div><div class="kpi-sub" id="kpi-tight-product">—</div></div>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Product <em>Catalog</em></div>
+        <div class="section-actions">
+          <button class="btn btn-sm" onclick="openModal('product')">＋ Add Product</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" id="search-products" placeholder="Search products…">
+      </div>
+      <div class="table-wrap">
+        <table class="data" id="table-products">
+          <thead><tr><th>Product</th><th class="num">Cost / Vial</th><th class="num">Sale / Vial</th><th class="num">Margin</th><th>Linked Inventory</th><th></th></tr></thead>
+          <tbody><tr><td colspan="6" class="loading">Loading products…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PEOPLE ============ -->
+  <div class="panel" data-panel="people">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label" id="kpi-people-label">Clients</div><div class="kpi-value" id="kpi-people-total">—</div><div class="kpi-sub">tracked</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Active (60d)</div><div class="kpi-value gold" id="kpi-active">—</div><div class="kpi-sub">recent activity</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Quiet 60+ Days</div><div class="kpi-value warn" id="kpi-quiet">—</div><div class="kpi-sub">re-engage candidates</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Avg Spend</div><div class="kpi-value gold" id="kpi-avg-spend">—</div><div class="kpi-sub">YTD</div></div>
+    </div>
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title"><em>People</em> Directory</div>
+        <div class="section-actions">
+          <div class="toggle-pair">
+            <button class="active" data-people="clients">Clients</button>
+            <button data-people="vendors">Vendors</button>
+          </div>
+          <button class="btn btn-sm" onclick="openModal('person')">＋ Add</button>
+        </div>
+      </div>
+      <div class="filter-row">
+        <input class="search-input" id="search-people" placeholder="Search name, email, phone…">
+      </div>
+      <div class="table-wrap">
+        <table class="data" id="table-people">
+          <thead><tr><th>Name</th><th>Contact</th><th class="num">Total</th><th class="num">Orders</th><th>Last</th><th></th></tr></thead>
+          <tbody><tr><td colspan="6" class="loading">Loading people…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ INSIGHTS ============ -->
+  <div class="panel" data-panel="insights">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Re-engage</div><div class="kpi-value warn" id="ins-reengage">—</div><div class="kpi-sub">clients quiet 60+</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--danger)"></div><div class="kpi-label">Dead Stock</div><div class="kpi-value danger" id="ins-dead">—</div><div class="kpi-sub">no sales 90d</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Top Client</div><div class="kpi-value gold" id="ins-top-client">—</div><div class="kpi-sub" id="ins-top-client-sub">—</div></div>
+      <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Hot Product</div><div class="kpi-value gold" id="ins-hot-product">—</div><div class="kpi-sub" id="ins-hot-product-sub">—</div></div>
+    </div>
+    <div class="insight-grid">
+      <div class="insight-card">
+        <div class="insight-head"><div class="insight-title"><span class="dot"></span>Re-engagement List</div><div class="insight-sub">No order in <span id="ins-reengage-days">60</span>+ days</div></div>
+        <div class="table-wrap"><table class="data" id="table-reengage"><thead><tr><th>Client</th><th>Last Order</th><th class="num">Days</th><th class="num">Lifetime</th></tr></thead><tbody><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><div class="insight-title"><span class="dot"></span>Top Customers · YTD</div><div class="insight-sub">Highest spend this year</div></div>
+        <div class="table-wrap"><table class="data" id="table-top-customers"><thead><tr><th>Customer</th><th class="num">Orders</th><th class="num">Vials</th><th class="num">Spent</th></tr></thead><tbody><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><div class="insight-title"><span class="dot"></span>Dead Stock</div><div class="insight-sub">On hand · No sales 90+ days</div></div>
+        <div class="table-wrap"><table class="data" id="table-dead"><thead><tr><th>Item</th><th class="num">Vials</th><th>Size</th><th class="num">Tied Up</th></tr></thead><tbody><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table></div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-head"><div class="insight-title"><span class="dot"></span>Top Vendors · YTD</div><div class="insight-sub">Where the money goes</div></div>
+        <div class="table-wrap"><table class="data" id="table-top-vendors"><thead><tr><th>Vendor</th><th class="num">Orders</th><th class="num">Vials</th><th class="num">Paid</th></tr></thead><tbody><tr><td colspan="4" class="loading">Loading…</td></tr></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Generic modal stub -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">Add Item</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body">
+      <!-- Form fields injected by openModal() -->
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!--
+============================================================
+NAV INJECTION (inline per BioLinked checklist — never external src)
+============================================================
+-->
+<script>
+(function(){
+  const path = window.location.pathname;
+  const isActive = (href) => {
+    const clean = href.replace('.html','');
+    if(clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
+    return path.includes(clean.replace('/',''));
+  };
+
+  const links = [
+    {href:'/index.html', label:'Home'},
+    {href:'/peptide-index.html', label:'Index'},
+    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
+    {href:'/stacks-blends.html', label:'Stacks & Blends'},
+  ];
+
+  const tools = [
+    {href:'/peptide-tracker.html', label:'Peptide Tracker'},
+    {href:'/stack-analyzer.html', label:'Stack Analyzer'},
+  ];
+
+  const navHTML = `
+<nav class="bl-nav" id="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="/index.html" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BIO LINKED</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      ${links.map(l=>`<a href="${l.href}" class="bl-nav-link${isActive(l.href)?' active':''}">${l.label}</a>`).join('')}
+      <div class="bl-nav-dropdown" id="bl-dropdown">
+        <button class="bl-nav-link bl-dropdown-btn">Tools ▾</button>
+        <div class="bl-nav-dropdown-menu" id="bl-dropdown-menu">
+          ${tools.map(t=>`<a href="${t.href}" class="bl-nav-dropdown-item${isActive(t.href)?' active':''}">${t.label}</a>`).join('')}
+        </div>
+      </div>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    ${links.map(l=>`<a href="${l.href}" class="bl-nav-mobile-link">${l.label}</a>`).join('')}
+    <div class="bl-nav-mobile-section">Tools</div>
+    ${tools.map(t=>`<a href="${t.href}" class="bl-nav-mobile-link bl-nav-mobile-sub">${t.label}</a>`).join('')}
+  </div>
+</nav>`;
+
+  const navCSS = `<style>
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Outfit',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.1em}
+.bl-nav-logo-sub{font-size:8px;color:#777;letter-spacing:0.18em;text-transform:uppercase;margin-top:2px}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:11.5px;color:#444;text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-link:hover,.bl-nav-link.active{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown{position:relative}
+.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:#fff;border:1px solid #eaeaea;border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
+.bl-nav-dropdown:hover .bl-nav-dropdown-menu,.bl-nav-dropdown-menu:hover{display:block}
+.bl-nav-dropdown-btn{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.bl-nav-dropdown:hover .bl-dropdown-btn{color:#9A7B2F;background:rgba(154,123,47,0.07)}
+.bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:#444;text-decoration:none;transition:all .15s;font-family:'Outfit',sans-serif;white-space:nowrap}
+.bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:#f8f8f8;color:#9A7B2F;padding-left:20px}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:#1a1a1a;padding:8px}
+.bl-nav-mobile-menu{display:none;border-top:1px solid #eaeaea;background:#fff;padding:12px 20px 20px}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:10px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Outfit',sans-serif}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
+.bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#9A7B2F;font-family:'Outfit',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
+@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
+</style>`;
+
+  const ctaBar = `<div style="background:#e8e8e8;border-bottom:1px solid rgba(0,0,0,0.08);">
+  <div style="max-width:1100px;margin:0 auto;padding:10px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span style="font-size:15px;">🩸</span>
+      <span style="font-size:12px;color:#444440;font-weight:300;font-family:'Montserrat',sans-serif;">Curious what your blood work actually means? <strong style="font-weight:600;color:#1a1a1a;">Upload your labs · Get a personalized peptide protocol</strong></span>
+    </div>
+    <a href="/biomarker-landing.html" style="flex-shrink:0;background:#8B7335;color:#fff;font-family:'Montserrat',sans-serif;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;padding:8px 20px;text-decoration:none;white-space:nowrap;">Run Your Analysis →</a>
+  </div>
+</div>`;
+
+  const siteFooter = `<div style="background:#f0f0f0;border-top:1px solid rgba(0,0,0,0.10);padding:40px 32px;margin-top:auto;">
+  <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex-wrap:wrap;">
+    <div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
+      <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Peptide Solutions</div>
+      <p style="font-size:11px;color:#888880;font-weight:300;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
+    </div>
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Resources</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <a href="/index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Home</a>
+        <a href="/peptide-index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Peptide Index</a>
+        <a href="/cheat-sheet.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Cheat Sheet</a>
+        <a href="/stacks-blends.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stacks & Blends</a>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Tools & Services</div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <a href="/peptide-tracker.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Peptide Tracker</a>
+        <a href="/stack-analyzer.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stack Analyzer</a>
+        <a href="/biomarker-landing.html" style="font-size:11px;color:#8B7335;text-decoration:none;font-weight:600;">Biomarker Analysis →</a>
+        <a href="/intake.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Client Intake</a>
+      </div>
+    </div>
+  </div>
+  <div style="max-width:1100px;margin:24px auto 0;padding-top:20px;border-top:1px solid rgba(0,0,0,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+    <div style="font-size:10px;color:#aaaaaa;">© 2025 BioLinked Peptide Solutions · Research & Educational Use Only · Not Medical Advice</div>
+    <a href="/biomarker-landing.html" style="font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;background:#8B7335;padding:7px 18px;text-decoration:none;">Get Your Protocol →</a>
+  </div>
+</div>`;
+
+  document.head.insertAdjacentHTML('beforeend', navCSS);
+  document.body.insertAdjacentHTML('afterbegin', navHTML + ctaBar);
+  document.querySelectorAll('footer, .footer, [class*="footer"], [id*="footer"]').forEach(el => el.remove());
+  document.body.insertAdjacentHTML('beforeend', siteFooter);
+
+  document.getElementById('bl-mobile-btn').addEventListener('click', function(){
+    const menu = document.getElementById('bl-mobile-menu');
+    menu.classList.toggle('open');
+    this.textContent = menu.classList.contains('open') ? '✕' : '☰';
+  });
+
+  const dropdown = document.getElementById('bl-dropdown');
+  const menu = document.getElementById('bl-dropdown-menu');
+  let closeTimer;
+  dropdown.addEventListener('mouseenter', () => { clearTimeout(closeTimer); menu.style.display='block'; });
+  dropdown.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+  menu.addEventListener('mouseenter', () => clearTimeout(closeTimer));
+  menu.addEventListener('mouseleave', () => { closeTimer = setTimeout(() => { menu.style.display=''; }, 150); });
+
+})();
+</script>
+
+<!--
+============================================================
+SUPABASE WIRING — placeholder skeleton.
+Replace function bodies with your real Supabase fetch logic.
+This is intentionally simple and consolidated so future edits
+are easy. ONE place to change a query, not five.
+============================================================
+-->
+<script>
+const CFG = window.BIOLINKED_CONFIG;
+const SB_HEADERS = {
+  "apikey": CFG.SUPABASE_ANON_KEY,
+  "Authorization": "Bearer " + CFG.SUPABASE_ANON_KEY,
+  "Content-Type": "application/json"
+};
+
+// ===== DATA LAYER =====
+// All Supabase reads go through one helper. Easy to debug, easy to extend.
+async function sb(table, query=""){
+  const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}`;
+  try {
+    const res = await fetch(url, { headers: SB_HEADERS });
+    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    return await res.json();
+  } catch (e) {
+    console.error(`[sb] ${table} fetch failed:`, e);
+    return [];
+  }
+}
+
+// ===== STATE =====
+const state = {
+  inventory: [], products: [], orders: [], sales: [],
+  clients: [], vendors: [],
+  peopleMode: "clients",
+  filters: { inventory: "all", money: "all" }
+};
+
+// ===== LOADERS =====
+async function loadAll(){
+  // Pull everything in parallel — fast first paint
+  const [inv, prods, ords, sals, cli, ven] = await Promise.all([
+    sb(CFG.TABLES.inventory, "?select=*&order=name"),
+    sb(CFG.TABLES.products,  "?select=*&order=name"),
+    sb(CFG.TABLES.orders,    "?select=*&order=date.desc"),
+    sb(CFG.TABLES.sales,     "?select=*&order=date.desc"),
+    sb(CFG.TABLES.clients,   "?select=*&order=name"),
+    sb(CFG.TABLES.vendors,   "?select=*&order=name")
+  ]);
+  state.inventory = inv;
+  state.products = prods;
+  state.orders = ords;
+  state.sales = sals;
+  state.clients = cli;
+  state.vendors = ven;
+
+  renderInventory();
+  renderMoney();
+  renderProducts();
+  renderPeople();
+  renderInsights();
+  renderTabCounts();
+}
+
+// ===== RENDERERS =====
+function renderTabCounts(){
+  document.getElementById("count-inventory").textContent = state.inventory.length || "—";
+  document.getElementById("count-products").textContent  = state.products.length  || "—";
+  document.getElementById("count-people").textContent    = state.clients.length   || "—";
+}
+
+function renderInventory(){
+  const items = state.inventory;
+  const tbody = document.querySelector("#table-inventory tbody");
+  document.getElementById("kpi-compounds").textContent = items.length;
+  document.getElementById("kpi-vials").textContent = items.reduce((s,i)=>s+(i.vials||0),0);
+  document.getElementById("kpi-low").textContent = items.filter(i=>i.vials>0 && i.vials<=CFG.LOW_STOCK_THRESHOLD).length;
+  document.getElementById("kpi-out").textContent = items.filter(i=>!i.vials || i.vials===0).length;
+  document.getElementById("kpi-low-threshold").textContent = CFG.LOW_STOCK_THRESHOLD;
+  if(!items.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No inventory yet. Click ＋ Add Item.</td></tr>`; return; }
+  tbody.innerHTML = items.map(i=>{
+    const status = !i.vials || i.vials===0 ? `<span class="pill pill-out">Out</span>`
+                 : i.vials<=CFG.LOW_STOCK_THRESHOLD ? `<span class="pill pill-low">Low</span>`
+                 : i.status==="ordered" ? `<span class="pill pill-ordered">Ordered</span>`
+                 : `<span class="pill pill-ok">In Stock</span>`;
+    return `<tr>
+      <td><strong>${i.name||""}</strong></td>
+      <td class="num">${i.vials||0}</td>
+      <td>${i.size||""}</td>
+      <td>${status}</td>
+      <td>${i.note||"—"}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="editItem('inventory','${i.id}')">Edit</button></td>
+    </tr>`;
+  }).join("");
+}
+
+function renderMoney(){
+  const sales = state.sales || [];
+  const orders = state.orders || [];
+  const now = Date.now();
+
+  // Month-to-date boundaries
+  const today = new Date();
+  const mtdStart = new Date(today.getFullYear(), today.getMonth(), 1).getTime();
+  const lastMoStart = new Date(today.getFullYear(), today.getMonth()-1, 1).getTime();
+  const lastMoEnd = mtdStart - 1;
+  const last30 = now - 30*86400000;
+
+  const mtdSales = sales.filter(s=>new Date(s.date).getTime()>=mtdStart);
+  const lastMoSales = sales.filter(s=>{
+    const t=new Date(s.date).getTime();
+    return t>=lastMoStart && t<=lastMoEnd;
+  });
+
+  const mtdRevenue = mtdSales.reduce((s,r)=>s+(r.total||0),0);
+  const mtdCogs    = mtdSales.reduce((s,r)=>s+(r.cogs||0),0);
+  const mtdProfit  = mtdRevenue - mtdCogs;
+  const mtdMargin  = mtdRevenue ? (mtdProfit/mtdRevenue)*100 : 0;
+  const lastMoRevenue = lastMoSales.reduce((s,r)=>s+(r.total||0),0);
+  const revDelta = lastMoRevenue ? ((mtdRevenue-lastMoRevenue)/lastMoRevenue)*100 : 0;
+
+  // Cash on hand = lifetime sales - lifetime orders paid
+  const lifetimeRevenue = sales.reduce((s,r)=>s+(r.total||0),0);
+  const lifetimeSpent   = orders.filter(o=>o.status!=="ordered").reduce((s,r)=>s+(r.total||0),0);
+  const cashOnHand = lifetimeRevenue - lifetimeSpent;
+  const cashThisMonth = mtdRevenue - orders.filter(o=>{
+    const t=new Date(o.date).getTime();
+    return t>=mtdStart && o.status!=="ordered";
+  }).reduce((s,r)=>s+(r.total||0),0);
+
+  // Outstanding orders = paid but not yet received
+  const outstanding = orders.filter(o=>o.status==="ordered"||o.status==="in_transit");
+  const outstandingTotal = outstanding.reduce((s,r)=>s+(r.total||0),0);
+  const outstandingVendors = new Set(outstanding.map(o=>o.vendor_id||o.party_name)).size;
+  const inTransit = outstanding.filter(o=>o.status==="in_transit").length;
+
+  document.getElementById("kpi-cash").textContent = fmt$(cashOnHand);
+  document.getElementById("kpi-cash-sub").textContent = `${cashThisMonth>=0?'+':''}${fmt$(cashThisMonth)} this month`;
+  document.getElementById("kpi-outstanding").textContent = fmt$(outstandingTotal);
+  document.getElementById("kpi-outstanding-sub").textContent = `${outstandingVendors} vendor${outstandingVendors===1?'':'s'} · ${inTransit} in transit`;
+  document.getElementById("kpi-revenue").textContent = fmt$(mtdRevenue);
+  document.getElementById("kpi-revenue-sub").textContent = lastMoRevenue ? `${revDelta>=0?'+':''}${revDelta.toFixed(0)}% vs last mo` : "first month tracked";
+  document.getElementById("kpi-profit").textContent = fmt$(mtdProfit);
+  document.getElementById("kpi-margin-sub").textContent = `${mtdMargin.toFixed(0)}% margin`;
+
+  // Transactions table
+  const tx = [
+    ...sales.map(s=>({...s, _type:"sale"})),
+    ...orders.map(o=>({...o, _type:"order"}))
+  ].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tbody = document.querySelector("#table-money tbody");
+  if(!tx.length){ tbody.innerHTML = `<tr><td colspan="8" class="empty">No transactions yet.</td></tr>`; }
+  else {
+    tbody.innerHTML = tx.map(t=>{
+      const isSale = t._type==="sale";
+      const status = isSale
+        ? `<span class="pill pill-received">Completed</span>`
+        : (t.status==="in_transit" ? `<span class="pill pill-transit">In Transit</span>`
+        :  t.status==="received"   ? `<span class="pill pill-received">Received</span>`
+        :  `<span class="pill pill-placed">Ordered</span>`);
+      const tracking = t.tracking
+        ? `<a class="tracking-link" href="${t.tracking_url||'#'}" target="_blank" rel="noopener">${t.tracking} →</a>`
+        : '<span style="color:var(--text-muted)">—</span>';
+      return `<tr>
+        <td>${fmtDate(t.date)}</td>
+        <td>${isSale?'<span class="pill pill-in">↗ Sale</span>':'<span class="pill pill-out-money">↘ Order</span>'}</td>
+        <td>${t.product_name||"—"}</td>
+        <td>${t.party_name||t.client_name||t.vendor_name||"—"}</td>
+        <td class="num">${t.qty||0}</td>
+        <td class="num ${isSale?'gold':''}">${fmt$(t.total||0)}</td>
+        <td>${isSale?'—':tracking}</td>
+        <td>${status}</td>
+      </tr>`;
+    }).join("");
+  }
+
+  // Profit by Product · last 30d
+  const prodMap = {};
+  sales.filter(s=>new Date(s.date).getTime()>=last30).forEach(s=>{
+    const key = s.product_name || "—";
+    if(!prodMap[key]) prodMap[key] = { name:key, sold:0, cost:0, revenue:0 };
+    prodMap[key].sold    += s.qty || 0;
+    prodMap[key].cost    += s.cogs || 0;
+    prodMap[key].revenue += s.total || 0;
+  });
+  const profitRows = Object.values(prodMap)
+    .map(p=>{ p.profit = p.revenue-p.cost; p.margin = p.revenue?(p.profit/p.revenue)*100:0; return p; })
+    .sort((a,b)=>b.profit-a.profit);
+  const pbpBody = document.querySelector("#table-profit-by-product tbody");
+  if(!profitRows.length){ pbpBody.innerHTML = `<tr><td colspan="6" class="empty">No sales in last 30 days.</td></tr>`; }
+  else {
+    pbpBody.innerHTML = profitRows.map(p=>{
+      const isLoss = p.margin < 0;
+      return `<tr>
+        <td><strong>${p.name}</strong></td>
+        <td class="num">${p.sold}</td>
+        <td class="num">${fmt$(p.cost)}</td>
+        <td class="num">${fmt$(p.revenue)}</td>
+        <td class="num ${isLoss?'loss':'profit-positive'}">${isLoss?'−':'+'}${fmt$(Math.abs(p.profit))}</td>
+        <td class="num ${isLoss?'loss':''}">${p.margin.toFixed(0)}%</td>
+      </tr>`;
+    }).join("");
+  }
+}
+
+function renderProducts(){
+  const prods = state.products;
+  document.getElementById("kpi-product-count").textContent = prods.length;
+  const margins = prods.map(p=>{
+    const cost=p.cost||0, sale=p.sale_price||0;
+    return { ...p, margin: sale ? ((sale-cost)/sale)*100 : 0 };
+  });
+  const avg = margins.length ? margins.reduce((s,p)=>s+p.margin,0)/margins.length : 0;
+  const best = margins.slice().sort((a,b)=>b.margin-a.margin)[0];
+  const tight = margins.slice().sort((a,b)=>a.margin-b.margin)[0];
+  document.getElementById("kpi-avg-margin").textContent = avg.toFixed(0)+"%";
+  if(best){ document.getElementById("kpi-best-margin").textContent = best.margin.toFixed(0)+"%"; document.getElementById("kpi-best-product").textContent = best.name; }
+  if(tight){ document.getElementById("kpi-tight-margin").textContent = tight.margin.toFixed(0)+"%"; document.getElementById("kpi-tight-product").textContent = tight.name; }
+
+  const tbody = document.querySelector("#table-products tbody");
+  if(!prods.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No products yet.</td></tr>`; return; }
+  tbody.innerHTML = margins.map(p=>`
+    <tr>
+      <td><strong>${p.name||""}</strong></td>
+      <td class="num">${fmt$(p.cost||0)}</td>
+      <td class="num">${fmt$(p.sale_price||0)}</td>
+      <td class="num gold">${p.margin.toFixed(0)}%</td>
+      <td>${p.linked_inventory_name||"—"}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="editItem('product','${p.id}')">Edit</button></td>
+    </tr>`).join("");
+}
+
+function renderPeople(){
+  const isClients = state.peopleMode === "clients";
+  const list = isClients ? state.clients : state.vendors;
+  document.getElementById("kpi-people-label").textContent = isClients ? "Clients" : "Vendors";
+  document.getElementById("kpi-people-total").textContent = list.length;
+
+  const now = Date.now();
+  const cutoff = now - CFG.REENGAGE_DAYS*86400000;
+  const withMetrics = list.map(p=>{
+    const tx = isClients
+      ? state.sales.filter(s=>s.client_id===p.id || s.party_name===p.name)
+      : state.orders.filter(o=>o.vendor_id===p.id || o.party_name===p.name);
+    const total = tx.reduce((s,r)=>s+(r.total||0),0);
+    const last = tx.map(r=>new Date(r.date).getTime()).sort((a,b)=>b-a)[0] || 0;
+    return { ...p, _tx: tx.length, _total: total, _last: last };
+  });
+  document.getElementById("kpi-active").textContent = withMetrics.filter(p=>p._last>=cutoff).length;
+  document.getElementById("kpi-quiet").textContent  = withMetrics.filter(p=>p._last && p._last<cutoff).length;
+  const totalSpend = withMetrics.reduce((s,p)=>s+p._total,0);
+  document.getElementById("kpi-avg-spend").textContent = fmt$(withMetrics.length?totalSpend/withMetrics.length:0);
+
+  const tbody = document.querySelector("#table-people tbody");
+  if(!withMetrics.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No ${isClients?"clients":"vendors"} yet.</td></tr>`; return; }
+  tbody.innerHTML = withMetrics.sort((a,b)=>b._total-a._total).map(p=>`
+    <tr>
+      <td><strong>${p.name||""}</strong></td>
+      <td>${p.email||""} ${p.phone?` · ${p.phone}`:""}</td>
+      <td class="num gold">${fmt$(p._total)}</td>
+      <td class="num">${p._tx}</td>
+      <td>${p._last?fmtDate(new Date(p._last)):"—"}</td>
+      <td><button class="btn btn-ghost btn-sm" onclick="editItem('person','${p.id}')">Open</button></td>
+    </tr>`).join("");
+}
+
+function renderInsights(){
+  const now = Date.now();
+  const reengageCutoff = now - CFG.REENGAGE_DAYS*86400000;
+  const deadCutoff = now - CFG.DEAD_STOCK_DAYS*86400000;
+
+  // Re-engagement list
+  const reengage = state.clients.map(c=>{
+    const cs = state.sales.filter(s=>s.client_id===c.id);
+    const last = cs.map(s=>new Date(s.date).getTime()).sort((a,b)=>b-a)[0] || 0;
+    const lifetime = cs.reduce((s,r)=>s+(r.total||0),0);
+    return { ...c, _last:last, _lifetime:lifetime };
+  }).filter(c=>c._last && c._last<reengageCutoff).sort((a,b)=>a._last-b._last);
+  document.getElementById("ins-reengage").textContent = reengage.length;
+  document.getElementById("ins-reengage-days").textContent = CFG.REENGAGE_DAYS;
+  fillTable("#table-reengage tbody", reengage.slice(0,8), c=>`
+    <tr><td>${c.name}</td><td>${fmtDate(new Date(c._last))}</td><td class="num warn">${Math.floor((now-c._last)/86400000)}</td><td class="num">${fmt$(c._lifetime)}</td></tr>`,
+    `<tr><td colspan="4" class="empty">No one is overdue. Nice work.</td></tr>`);
+
+  // Top customers
+  const topCust = state.clients.map(c=>{
+    const cs = state.sales.filter(s=>s.client_id===c.id);
+    return { ...c, _orders:cs.length, _vials:cs.reduce((s,r)=>s+(r.qty||0),0), _total:cs.reduce((s,r)=>s+(r.total||0),0) };
+  }).sort((a,b)=>b._total-a._total).slice(0,8);
+  fillTable("#table-top-customers tbody", topCust, c=>`
+    <tr><td>${c.name}</td><td class="num">${c._orders}</td><td class="num">${c._vials}</td><td class="num gold">${fmt$(c._total)}</td></tr>`,
+    `<tr><td colspan="4" class="empty">No sales yet.</td></tr>`);
+
+  // Dead stock
+  const dead = state.inventory.filter(i=>i.vials>0 && (!i.last_sale_date || new Date(i.last_sale_date).getTime()<deadCutoff));
+  document.getElementById("ins-dead").textContent = dead.length;
+  fillTable("#table-dead tbody", dead.slice(0,8), i=>`
+    <tr><td>${i.name}</td><td class="num">${i.vials}</td><td>${i.size||"—"}</td><td class="num">${fmt$((i.cost||0)*i.vials)}</td></tr>`,
+    `<tr><td colspan="4" class="empty">Nothing sitting cold.</td></tr>`);
+
+  // Top vendors
+  const topVen = state.vendors.map(v=>{
+    const vo = state.orders.filter(o=>o.vendor_id===v.id);
+    return { ...v, _orders:vo.length, _vials:vo.reduce((s,r)=>s+(r.qty||0),0), _total:vo.reduce((s,r)=>s+(r.total||0),0) };
+  }).sort((a,b)=>b._total-a._total).slice(0,8);
+  fillTable("#table-top-vendors tbody", topVen, v=>`
+    <tr><td>${v.name}</td><td class="num">${v._orders}</td><td class="num">${v._vials}</td><td class="num">${fmt$(v._total)}</td></tr>`,
+    `<tr><td colspan="4" class="empty">No orders logged yet.</td></tr>`);
+
+  // Top-line KPI for insights
+  if(topCust[0]){ document.getElementById("ins-top-client").textContent = firstName(topCust[0].name); document.getElementById("ins-top-client-sub").textContent = `${fmt$(topCust[0]._total)} · ${topCust[0]._orders} orders`; }
+  // Hot product = most vials sold last 30d
+  const hot30 = now-30*86400000;
+  const productSales = {};
+  state.sales.filter(s=>new Date(s.date).getTime()>=hot30).forEach(s=>{
+    productSales[s.product_name] = (productSales[s.product_name]||0)+(s.qty||0);
+  });
+  const hot = Object.entries(productSales).sort((a,b)=>b[1]-a[1])[0];
+  if(hot){ document.getElementById("ins-hot-product").textContent = hot[0]; document.getElementById("ins-hot-product-sub").textContent = `${hot[1]} vials · 30d`; }
+}
+
+// ===== HELPERS =====
+function fillTable(sel, rows, mapFn, emptyHTML){
+  const tbody = document.querySelector(sel);
+  if(!tbody) return;
+  tbody.innerHTML = rows.length ? rows.map(mapFn).join("") : emptyHTML;
+}
+function fmt$(n){ return "$"+(Number(n)||0).toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function fmtDate(d){ const x = (d instanceof Date)?d:new Date(d); if(isNaN(x)) return "—"; const m=x.getMonth()+1, day=x.getDate(); return `${m}/${day.toString().padStart(2,'0')}`; }
+function firstName(s){ return (s||"").split(" ")[0]; }
+
+// ===== TAB SWITCHING =====
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click",()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active", x===t));
+    document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active", p.dataset.panel===t.dataset.tab));
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+});
+
+// ===== PEOPLE TOGGLE =====
+document.querySelectorAll(".toggle-pair button").forEach(b=>{
+  b.addEventListener("click",()=>{
+    document.querySelectorAll(".toggle-pair button").forEach(x=>x.classList.toggle("active", x===b));
+    state.peopleMode = b.dataset.people;
+    renderPeople();
+  });
+});
+
+// ===== FILTER CHIPS (visual + filter state) =====
+document.querySelectorAll(".chip").forEach(c=>{
+  c.addEventListener("click",()=>{
+    const sibs = c.parentElement.querySelectorAll(".chip");
+    sibs.forEach(s=>s.classList.toggle("active", s===c));
+    // Hook into renderers if you want filter-by-status — left simple for now
+  });
+});
+
+// ===== MODAL (stubs — fill in form bodies as needed) =====
+function openQuickAdd(){ openModal("inventory"); }
+function openModal(kind){
+  const m = document.getElementById("modal");
+  document.getElementById("modal-title").textContent = ({
+    inventory:"Add Inventory Item", product:"Add Product",
+    sale:"Log Sale", order:"Log Order", person:"Add Person"
+  })[kind] || "Add Item";
+  document.getElementById("modal-body").innerHTML = buildForm(kind);
+  m.dataset.kind = kind;
+  m.classList.add("show");
+}
+function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+function buildForm(kind){
+  // Minimal stubs — extend with real fields as needed
+  if(kind==="inventory") return `
+    <div class="field"><label>Compound</label><input id="f-name"></div>
+    <div class="field-row">
+      <div class="field"><label>Vials</label><input id="f-vials" type="number"></div>
+      <div class="field"><label>Size</label><input id="f-size" placeholder="e.g. 10mg"></div>
+    </div>
+    <div class="field"><label>Note</label><input id="f-note"></div>`;
+  if(kind==="product") return `
+    <div class="field"><label>Name</label><input id="f-name"></div>
+    <div class="field-row">
+      <div class="field"><label>Cost / Vial</label><input id="f-cost" type="number"></div>
+      <div class="field"><label>Sale / Vial</label><input id="f-price" type="number"></div>
+    </div>`;
+  if(kind==="sale" || kind==="order") return `
+    <div class="field"><label>Product</label><input id="f-product"></div>
+    <div class="field"><label>${kind==='sale'?'Client':'Vendor'}</label><input id="f-party"></div>
+    <div class="field-row">
+      <div class="field"><label>Qty</label><input id="f-qty" type="number"></div>
+      <div class="field"><label>Unit Price</label><input id="f-unit" type="number"></div>
+    </div>
+    <div class="field"><label>Date</label><input id="f-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>`;
+  if(kind==="person") return `
+    <div class="field"><label>Name</label><input id="f-name"></div>
+    <div class="field"><label>Email</label><input id="f-email"></div>
+    <div class="field"><label>Phone</label><input id="f-phone"></div>`;
+  return "<p>Form not configured.</p>";
+}
+async function saveModal(){
+  const m = document.getElementById("modal");
+  const kind = m.dataset.kind;
+  // ⚠ Wire up POST to Supabase per kind. Don't include id (GENERATED ALWAYS AS IDENTITY).
+  // Example:
+  // await fetch(`${CFG.SUPABASE_URL}/rest/v1/${table}`, { method:"POST", headers:{...SB_HEADERS,"Prefer":"return=representation"}, body: JSON.stringify(payload) });
+  console.warn(`saveModal(${kind}) not wired up yet — add POST logic.`);
+  closeModal();
+  await loadAll();
+}
+function editItem(kind,id){
+  // ⚠ Implement edit modal — same pattern as openModal but pre-filled, then PATCH.
+  console.warn(`editItem(${kind}, ${id}) not wired up yet.`);
+}
+
+// ===== CSV EXPORT =====
+function exportCSV(){
+  const active = document.querySelector(".panel.active").dataset.panel;
+  const dataMap = { inventory: state.inventory, products: state.products,
+                    money: [...state.sales,...state.orders], people: state.peopleMode==='clients'?state.clients:state.vendors };
+  const rows = dataMap[active] || [];
+  if(!rows.length){ alert("Nothing to export on this tab."); return; }
+  const keys = Object.keys(rows[0]);
+  const csv = [keys.join(",")].concat(rows.map(r=>keys.map(k=>JSON.stringify(r[k]??"")).join(","))).join("\n");
+  const blob = new Blob([csv],{type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `biolinked-${active}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+// ===== SAMPLE DATA (template preview mode) =====
+// When Supabase isn't configured, the page renders with this sample data
+// so you can see exactly what every tab will look like once it's wired up.
+const SAMPLE_DATA = {
+  inventory: [
+    { id:1, name:"Retatrutide",  vials:12, size:"10mg",  status:"in",      note:"Lot 4421 — opened 4/22", cost:72, last_sale_date:"2026-05-08" },
+    { id:2, name:"Tirzepatide",  vials:8,  size:"10mg",  status:"in",      note:"", cost:78, last_sale_date:"2026-05-01" },
+    { id:3, name:"MOTS-C",       vials:2,  size:"10mg",  status:"low",     note:"Reorder soon", cost:32, last_sale_date:"2026-05-06" },
+    { id:4, name:"Tesamorelin",  vials:6,  size:"5mg",   status:"in",      note:"", cost:55, last_sale_date:"2026-05-03" },
+    { id:5, name:"GHK-Cu",       vials:0,  size:"50mg",  status:"out",     note:"Vendor delay", cost:30, last_sale_date:"2026-04-24" },
+    { id:6, name:"Semax",        vials:10, size:"30mg",  status:"in",      note:"", cost:28, last_sale_date:"2026-03-15" },
+    { id:7, name:"NAD+",         vials:20, size:"500mg", status:"ordered", note:"ETA 5/14", cost:42, last_sale_date:"2026-04-10" },
+    { id:8, name:"PT-141",       vials:3,  size:"10mg",  status:"low",     note:"", cost:38, last_sale_date:"2026-05-05" },
+    { id:9, name:"DSIP",         vials:8,  size:"5mg",   status:"in",      note:"", cost:30, last_sale_date:"2026-01-10" },
+    { id:10,name:"Selank",       vials:6,  size:"10mg",  status:"in",      note:"", cost:30, last_sale_date:null },
+    { id:11,name:"KLOW Blend",   vials:3,  size:"—",     status:"in",      note:"", cost:50, last_sale_date:null }
+  ],
+  products: [
+    { id:1, name:"Retatrutide",  cost:72, sale_price:180, linked_inventory_name:"Retatrutide 10mg" },
+    { id:2, name:"Tirzepatide",  cost:78, sale_price:165, linked_inventory_name:"Tirzepatide 10mg" },
+    { id:3, name:"MOTS-C",       cost:32, sale_price:95,  linked_inventory_name:"MOTS-C 10mg" },
+    { id:4, name:"GHK-Cu",       cost:30, sale_price:110, linked_inventory_name:"GHK-Cu 50mg" },
+    { id:5, name:"Tesamorelin",  cost:55, sale_price:140, linked_inventory_name:"Tesamorelin 5mg" },
+    { id:6, name:"Selank",       cost:30, sale_price:45,  linked_inventory_name:"Selank 10mg" }
+  ],
+  clients: [
+    { id:1, name:"Kyle Nelson",    email:"kyle@example.com",    phone:"720-555-0142" },
+    { id:2, name:"Drew Holm",      email:"drew@example.com",    phone:"720-555-0188" },
+    { id:3, name:"Kristin Wells",  email:"kristin@example.com", phone:"" },
+    { id:4, name:"Jordan Martinez",email:"jordan@example.com",  phone:"" },
+    { id:5, name:"Cassidy P.",     email:"cassidy@example.com", phone:"" },
+    { id:6, name:"Marcus L.",      email:"marcus@example.com",  phone:"" },
+    { id:7, name:"Sarah K.",       email:"sarah@example.com",   phone:"" }
+  ],
+  vendors: [
+    { id:1, name:"PepLab Research",    email:"orders@peplab.io",     phone:"" },
+    { id:2, name:"RX Compounding Co.", email:"contact@rxco.com",     phone:"" },
+    { id:3, name:"BioSource Labs",     email:"support@biosource.io", phone:"" }
+  ],
+  sales: [
+    { id:1,  date:"2026-05-08", client_id:1, product_name:"Retatrutide", qty:2, unit_price:180, total:360, cogs:144, party_name:"Kyle Nelson" },
+    { id:2,  date:"2026-05-06", client_id:2, product_name:"MOTS-C",      qty:3, unit_price:95,  total:285, cogs:96,  party_name:"Drew Holm" },
+    { id:3,  date:"2026-05-03", client_id:3, product_name:"Tesamorelin", qty:1, unit_price:140, total:140, cogs:55,  party_name:"Kristin Wells" },
+    { id:4,  date:"2026-05-01", client_id:4, product_name:"Tirzepatide", qty:2, unit_price:165, total:330, cogs:156, party_name:"Jordan Martinez" },
+    { id:5,  date:"2026-04-24", client_id:5, product_name:"GHK-Cu",      qty:1, unit_price:110, total:110, cogs:30,  party_name:"Cassidy P." },
+    { id:6,  date:"2026-04-20", client_id:1, product_name:"Retatrutide", qty:1, unit_price:180, total:180, cogs:72,  party_name:"Kyle Nelson" },
+    { id:7,  date:"2026-04-15", client_id:2, product_name:"MOTS-C",      qty:2, unit_price:95,  total:190, cogs:64,  party_name:"Drew Holm" },
+    { id:8,  date:"2026-04-10", client_id:3, product_name:"Tirzepatide", qty:1, unit_price:165, total:165, cogs:78,  party_name:"Kristin Wells" },
+    { id:9,  date:"2026-04-05", client_id:6, product_name:"Selank",      qty:1, unit_price:45,  total:45,  cogs:30,  party_name:"Marcus L." },
+    { id:10, date:"2026-02-20", client_id:7, product_name:"PT-141",      qty:2, unit_price:88,  total:176, cogs:76,  party_name:"Sarah K." }
+  ],
+  orders: [
+    { id:1, date:"2026-05-09", vendor_id:1, product_name:"HGH 24 IU ×10 vials",        qty:10, total:840, status:"in_transit", tracking:"1Z9X4-8472-301", tracking_url:"#", party_name:"PepLab Research" },
+    { id:2, date:"2026-05-07", vendor_id:2, product_name:"Retatrutide 30mg ×6 vials", qty:6,  total:420, status:"received",   tracking:"9405-5036-002", tracking_url:"#", party_name:"RX Compounding Co." },
+    { id:3, date:"2026-05-06", vendor_id:3, product_name:"CJC/Ipa 10mg blend ×4",     qty:4,  total:180, status:"ordered",    tracking:null, party_name:"BioSource Labs" },
+    { id:4, date:"2026-05-04", vendor_id:1, product_name:"L-Carnitine 600mg/mL ×8",   qty:8,  total:320, status:"received",   tracking:"1Z9X4-8471-998", tracking_url:"#", party_name:"PepLab Research" },
+    { id:5, date:"2026-05-01", vendor_id:2, product_name:"MOTS-C 40mg ×5 vials",      qty:5,  total:280, status:"in_transit", tracking:"9405-5036-001", tracking_url:"#", party_name:"RX Compounding Co." }
+  ]
+};
+
+// ===== INIT =====
+function isSampleMode(){
+  return !CFG.SUPABASE_ANON_KEY || CFG.SUPABASE_ANON_KEY.startsWith("PASTE_");
+}
+
+if(isSampleMode()){
+  // Banner so it's obvious we're in preview mode
+  const banner = document.createElement("div");
+  banner.style.cssText = "background:#1a1a1a;color:var(--gold);padding:8px 16px;text-align:center;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500;";
+  banner.innerHTML = "⚙ Template Preview · Sample Data · Not Connected to Supabase";
+  document.body.insertBefore(banner, document.body.firstChild);
+
+  // Load sample data into state and render
+  state.inventory = SAMPLE_DATA.inventory;
+  state.products  = SAMPLE_DATA.products;
+  state.clients   = SAMPLE_DATA.clients;
+  state.vendors   = SAMPLE_DATA.vendors;
+  state.sales     = SAMPLE_DATA.sales;
+  state.orders    = SAMPLE_DATA.orders;
+  renderInventory();
+  renderMoney();
+  renderProducts();
+  renderPeople();
+  renderInsights();
+  renderTabCounts();
+} else {
+  loadAll();
+}
+</script>
+
+</body>
+</html>
