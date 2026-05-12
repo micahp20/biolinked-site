@@ -474,7 +474,7 @@
             <button class="active" data-people="clients">Clients</button>
             <button data-people="vendors">Vendors</button>
           </div>
-          <button class="btn btn-sm" onclick="openModal('person')">＋ Add</button>
+          <button class="btn btn-sm" onclick="openPersonModal()">＋ Add</button>
         </div>
       </div>
       <div class="filter-row">
@@ -728,10 +728,50 @@ async function loadAll(){
   ]);
   state.inventory = inv;
   state.products = prods;
-  state.orders = ords;
-  state.sales = sals;
   state.clients = cli;
   state.vendors = ven;
+
+  // Lookup tables for enrichment
+  const productById = Object.fromEntries(prods.map(p => [String(p.id), p]));
+  const clientById  = Object.fromEntries(cli.map(c => [String(c.id), c]));
+  const vendorById  = Object.fromEntries(ven.map(v => [String(v.id), v]));
+
+  // Enrich sales: add total, cogs, product_name, party_name, client_name
+  state.sales = sals.map(s => {
+    const p = productById[String(s.product_id)] || null;
+    const c = s.client_id ? clientById[String(s.client_id)] : null;
+    const qty = s.qty || 0;
+    const price = s.price || 0;
+    const cost = p ? (p.cost || 0) : 0;
+    return {
+      ...s,
+      total: qty * price,
+      cogs:  qty * cost,
+      product_name: p ? p.name : (s.customer || "—"),
+      client_name:  c ? c.name : (s.customer || ""),
+      party_name:   c ? c.name : (s.customer || "")
+    };
+  });
+
+  // Enrich orders: add total, product_name, vendor_name, party_name, status, tracking, decoded note
+  state.orders = ords.map(o => {
+    const p = productById[String(o.product_id)] || null;
+    const ven = o.vendor_id ? vendorById[String(o.vendor_id)] : null;
+    const qty = o.qty || 0;
+    const unit = o.unit_cost || 0;
+    const meta = unpackOrderNote(o.note);
+    return {
+      ...o,
+      total: qty * unit,
+      product_name: p ? p.name : "—",
+      vendor_name:  ven ? ven.name : (o.vendor || ""),
+      party_name:   ven ? ven.name : (o.vendor || ""),
+      status:       meta.status,
+      tracking:     meta.tracking,
+      tracking_url: meta.tracking ? `https://www.google.com/search?q=${encodeURIComponent(meta.tracking)}` : "",
+      _user_note:   meta.note
+    };
+  });
 
   renderInventory();
   renderMoney();
@@ -765,7 +805,7 @@ function renderInventory(){
     return `<tr>
       <td><strong>${i.name||""}</strong></td>
       <td class="num">${i.vials||0}</td>
-      <td>${i.size||""}</td>
+      <td>${i.vial_size||""}</td>
       <td>${status}</td>
       <td>${i.note||"—"}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="editItem('inventory','${i.id}')">Edit</button></td>
@@ -885,9 +925,11 @@ function renderMoney(){
 function renderProducts(){
   const prods = state.products;
   document.getElementById("kpi-product-count").textContent = prods.length;
+  const lookupInv = (id) => state.inventory.find(i => String(i.id) === String(id));
   const margins = prods.map(p=>{
-    const cost=p.cost||0, sale=p.sale_price||0;
-    return { ...p, margin: sale ? ((sale-cost)/sale)*100 : 0 };
+    const cost=p.cost||0, sale=p.sale||0;
+    const inv = lookupInv(p.inventory_id);
+    return { ...p, _sale: sale, _invName: inv ? inv.name : null, margin: sale ? ((sale-cost)/sale)*100 : 0 };
   });
   const avg = margins.length ? margins.reduce((s,p)=>s+p.margin,0)/margins.length : 0;
   const best = margins.slice().sort((a,b)=>b.margin-a.margin)[0];
@@ -902,9 +944,9 @@ function renderProducts(){
     <tr>
       <td><strong>${p.name||""}</strong></td>
       <td class="num">${fmt$(p.cost||0)}</td>
-      <td class="num">${fmt$(p.sale_price||0)}</td>
+      <td class="num">${fmt$(p._sale)}</td>
       <td class="num gold">${p.margin.toFixed(0)}%</td>
-      <td>${p.linked_inventory_name||"—"}</td>
+      <td>${p._invName||"—"}</td>
       <td><button class="btn btn-ghost btn-sm" onclick="editItem('product','${p.id}')">Edit</button></td>
     </tr>`).join("");
 }
@@ -1035,62 +1077,324 @@ document.querySelectorAll(".chip").forEach(c=>{
   });
 });
 
-// ===== MODAL (stubs — fill in form bodies as needed) =====
+// ===== MODAL (wired to live Supabase) =====
 function openQuickAdd(){ openModal("inventory"); }
+function openPersonModal(){
+  // People tab "+ Add" button — opens client or vendor based on current peopleMode
+  openModal(state.peopleMode === "vendors" ? "vendor" : "client");
+}
 function openModal(kind){
   const m = document.getElementById("modal");
   document.getElementById("modal-title").textContent = ({
     inventory:"Add Inventory Item", product:"Add Product",
-    sale:"Log Sale", order:"Log Order", person:"Add Person"
+    sale:"Log Sale", order:"Log Order",
+    client:"Add Client", vendor:"Add Vendor",
+    person:"Add Person"  // legacy alias — should route to client/vendor
   })[kind] || "Add Item";
+  if (kind === "person") kind = state.peopleMode === "vendors" ? "vendor" : "client";
   document.getElementById("modal-body").innerHTML = buildForm(kind);
   m.dataset.kind = kind;
   m.classList.add("show");
 }
 function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+
+function optList(list, valueKey, labelKey, placeholder){
+  const opts = list.map(x => `<option value="${x[valueKey]}">${esc(x[labelKey] || "")}</option>`).join("");
+  return `<option value="">${placeholder}</option>${opts}`;
+}
+
 function buildForm(kind){
-  // Minimal stubs — extend with real fields as needed
+  const today = new Date().toISOString().slice(0,10);
+
   if(kind==="inventory") return `
-    <div class="field"><label>Compound</label><input id="f-name"></div>
+    <div class="field"><label>Compound</label><input id="f-name" autofocus></div>
     <div class="field-row">
-      <div class="field"><label>Vials</label><input id="f-vials" type="number"></div>
-      <div class="field"><label>Size</label><input id="f-size" placeholder="e.g. 10mg"></div>
+      <div class="field"><label>Vials on Hand</label><input id="f-vials" type="number" value="0" min="0"></div>
+      <div class="field"><label>Size</label><input id="f-size" placeholder="e.g. 10mg or 3mL"></div>
     </div>
     <div class="field"><label>Note</label><input id="f-note"></div>`;
+
   if(kind==="product") return `
-    <div class="field"><label>Name</label><input id="f-name"></div>
+    <div class="field"><label>Product Name</label><input id="f-name" autofocus></div>
     <div class="field-row">
-      <div class="field"><label>Cost / Vial</label><input id="f-cost" type="number"></div>
-      <div class="field"><label>Sale / Vial</label><input id="f-price" type="number"></div>
-    </div>`;
-  if(kind==="sale" || kind==="order") return `
-    <div class="field"><label>Product</label><input id="f-product"></div>
-    <div class="field"><label>${kind==='sale'?'Client':'Vendor'}</label><input id="f-party"></div>
-    <div class="field-row">
-      <div class="field"><label>Qty</label><input id="f-qty" type="number"></div>
-      <div class="field"><label>Unit Price</label><input id="f-unit" type="number"></div>
+      <div class="field"><label>Cost / Vial ($)</label><input id="f-cost" type="number" step="0.01" min="0" value="0"></div>
+      <div class="field"><label>Sale / Vial ($)</label><input id="f-price" type="number" step="0.01" min="0" value="0"></div>
     </div>
-    <div class="field"><label>Date</label><input id="f-date" type="date" value="${new Date().toISOString().slice(0,10)}"></div>`;
-  if(kind==="person") return `
-    <div class="field"><label>Name</label><input id="f-name"></div>
-    <div class="field"><label>Email</label><input id="f-email"></div>
-    <div class="field"><label>Phone</label><input id="f-phone"></div>`;
+    <div class="field"><label>Linked Inventory Item</label>
+      <select id="f-inventory">${optList(state.inventory, "id", "name", "— None (link later) —")}</select>
+    </div>`;
+
+  if(kind==="sale") return `
+    <div class="field"><label>Product</label>
+      <select id="f-product" autofocus onchange="onSaleProductChange()">${optList(state.products, "id", "name", "— Select product —")}</select>
+    </div>
+    <div class="field"><label>Client</label>
+      <select id="f-client">${optList(state.clients, "id", "name", "— Select client —")}</select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Qty</label><input id="f-qty" type="number" min="1" value="1"></div>
+      <div class="field"><label>Unit Price ($)</label><input id="f-unit" type="number" step="0.01" min="0" value="0"></div>
+    </div>
+    <div class="field"><label>Date</label><input id="f-date" type="date" value="${today}"></div>
+    <div class="field"><label>Note</label><input id="f-note"></div>`;
+
+  if(kind==="order") return `
+    <div class="field"><label>Product</label>
+      <select id="f-product" autofocus onchange="onOrderProductChange()">${optList(state.products, "id", "name", "— Select product —")}</select>
+    </div>
+    <div class="field"><label>Vendor</label>
+      <select id="f-vendor">${optList(state.vendors, "id", "name", "— Select vendor —")}</select>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Qty</label><input id="f-qty" type="number" min="1" value="1"></div>
+      <div class="field"><label>Unit Cost ($)</label><input id="f-unit" type="number" step="0.01" min="0" value="0"></div>
+    </div>
+    <div class="field"><label>Date</label><input id="f-date" type="date" value="${today}"></div>
+    <div class="field-row">
+      <div class="field"><label>Tracking #</label><input id="f-tracking" placeholder="(optional)"></div>
+      <div class="field"><label>Status</label>
+        <select id="f-status">
+          <option value="ordered">Ordered</option>
+          <option value="in_transit">In Transit</option>
+          <option value="received" selected>Received (bump inventory)</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Note</label><input id="f-note"></div>`;
+
+  if(kind==="client") return `
+    <div class="field"><label>Client Name</label><input id="f-name" autofocus></div>
+    <div class="field-row">
+      <div class="field"><label>Email</label><input id="f-email" type="email"></div>
+      <div class="field"><label>Phone</label><input id="f-phone"></div>
+    </div>
+    <div class="field"><label>Venmo Handle</label><input id="f-venmo" placeholder="@handle"></div>
+    <div class="field"><label>Notes</label><input id="f-note"></div>`;
+
+  if(kind==="vendor") return `
+    <div class="field"><label>Vendor Name</label><input id="f-name" autofocus></div>
+    <div class="field"><label>Contact Name</label><input id="f-contact"></div>
+    <div class="field-row">
+      <div class="field"><label>Email</label><input id="f-email" type="email"></div>
+      <div class="field"><label>Phone</label><input id="f-phone"></div>
+    </div>
+    <div class="field"><label>Website</label><input id="f-website" placeholder="https://..."></div>
+    <div class="field"><label>Notes</label><input id="f-note"></div>`;
+
   return "<p>Form not configured.</p>";
 }
+
+// Auto-fill sale unit price from selected product's sale price
+function onSaleProductChange(){
+  const pid = document.getElementById("f-product").value;
+  const p = state.products.find(x => String(x.id) === String(pid));
+  if (p && p.sale) document.getElementById("f-unit").value = p.sale;
+}
+// Auto-fill order unit cost from selected product's cost
+function onOrderProductChange(){
+  const pid = document.getElementById("f-product").value;
+  const p = state.products.find(x => String(x.id) === String(pid));
+  if (p && p.cost) document.getElementById("f-unit").value = p.cost;
+}
+
+// ===== SUPABASE WRITE HELPERS =====
+async function sbWrite(table, method, body, query=""){
+  const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}`;
+  const res = await fetch(url, {
+    method,
+    headers: { ...SB_HEADERS, "Prefer": "return=representation" },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`${res.status}: ${txt || res.statusText}`);
+  }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : [];
+}
+
+// Encode/decode order status + tracking inside the note field (no DB change)
+function packOrderNote(status, tracking, note){
+  return JSON.stringify({ status: status || "ordered", tracking: tracking || "", note: note || "" });
+}
+function unpackOrderNote(raw){
+  if (!raw) return { status: "ordered", tracking: "", note: "" };
+  try {
+    const o = JSON.parse(raw);
+    if (typeof o === "object" && o && "status" in o) {
+      return { status: o.status || "ordered", tracking: o.tracking || "", note: o.note || "" };
+    }
+  } catch(e) {}
+  return { status: "ordered", tracking: "", note: String(raw) };
+}
+
+// Find inventory item linked to a product. Falls back to fuzzy name match if no link.
+function findInventoryForProduct(product){
+  if (!product) return null;
+  if (product.inventory_id) {
+    const direct = state.inventory.find(i => String(i.id) === String(product.inventory_id));
+    if (direct) return direct;
+  }
+  // Fuzzy name match
+  const norm = s => (s||"").toLowerCase().replace(/[\s\-–—_:]+/g,"").replace(/\d+(\.\d+)?(mg|mcg|iu|ml)s?\b/g,"").trim();
+  const pn = norm(product.name);
+  if (!pn) return null;
+  return state.inventory.find(i => {
+    const n = norm(i.name);
+    return n && (n === pn || n.startsWith(pn) || pn.startsWith(n));
+  }) || null;
+}
+
+// Adjust inventory vials for a product by delta. If no inventory item exists yet
+// and we're adding (delta > 0), create one.
+async function adjustInventoryForProduct(productId, delta){
+  const p = state.products.find(p => String(p.id) === String(productId));
+  if (!p) { console.warn("adjustInventory: product not found", productId); return; }
+  let item = findInventoryForProduct(p);
+  if (!item && delta > 0) {
+    // Auto-create inventory row when receiving an order for a product not yet in inventory
+    const newRow = { name: p.name, vials: delta, vial_size: "", kit_qty: 1, note: null, status: "in-stock" };
+    const res = await sbWrite(CFG.TABLES.inventory, "POST", newRow);
+    if (res && res[0]) {
+      state.inventory.push(res[0]);
+      // Link product to this new inventory item
+      await sbWrite(CFG.TABLES.products, "PATCH", { inventory_id: res[0].id }, `?id=eq.${p.id}`).catch(()=>{});
+      p.inventory_id = res[0].id;
+    }
+    return;
+  }
+  if (!item) {
+    alert(`⚠ Sale saved but inventory NOT adjusted.\n\nProduct "${p.name}" isn't linked to an inventory item. Edit the product to link it.`);
+    return;
+  }
+  const newVials = Math.max(0, (item.vials || 0) + delta);
+  const newStatus = newVials === 0 ? "out" : newVials <= CFG.LOW_STOCK_THRESHOLD ? "low" : "in-stock";
+  await sbWrite(CFG.TABLES.inventory, "PATCH", { vials: newVials, status: newStatus }, `?id=eq.${item.id}`);
+  item.vials = newVials;
+  item.status = newStatus;
+}
+
+// ===== MAIN SAVE =====
 async function saveModal(){
   const m = document.getElementById("modal");
   const kind = m.dataset.kind;
-  // ⚠ Wire up POST to Supabase per kind. Don't include id (GENERATED ALWAYS AS IDENTITY).
-  // Example:
-  // await fetch(`${CFG.SUPABASE_URL}/rest/v1/${table}`, { method:"POST", headers:{...SB_HEADERS,"Prefer":"return=representation"}, body: JSON.stringify(payload) });
-  console.warn(`saveModal(${kind}) not wired up yet — add POST logic.`);
-  closeModal();
-  await loadAll();
+  const v = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
+  const vTrim = (id) => v(id).trim();
+  const vNum  = (id) => parseFloat(v(id)) || 0;
+  const vInt  = (id) => parseInt(v(id)) || 0;
+
+  try {
+    if (kind === "inventory") {
+      const name = vTrim("f-name");
+      if (!name) { alert("Compound name required."); return; }
+      const body = {
+        name, vials: vInt("f-vials"), vial_size: vTrim("f-size") || null,
+        kit_qty: 1, note: vTrim("f-note") || null,
+        status: vInt("f-vials") === 0 ? "out" : vInt("f-vials") <= CFG.LOW_STOCK_THRESHOLD ? "low" : "in-stock"
+      };
+      await sbWrite(CFG.TABLES.inventory, "POST", body);
+    }
+
+    else if (kind === "product") {
+      const name = vTrim("f-name");
+      if (!name) { alert("Product name required."); return; }
+      const invVal = v("f-inventory");
+      const body = {
+        name, cost: vNum("f-cost"), sale: vNum("f-price"),
+        inventory_id: invVal ? (isNaN(parseInt(invVal)) ? invVal : parseInt(invVal)) : null
+      };
+      await sbWrite(CFG.TABLES.products, "POST", body);
+    }
+
+    else if (kind === "sale") {
+      const productId = v("f-product");
+      const clientId  = v("f-client") || null;
+      const date = v("f-date");
+      const qty  = vInt("f-qty");
+      const price = vNum("f-unit");
+      if (!productId) { alert("Pick a product."); return; }
+      if (!date || !qty) { alert("Date and qty are required."); return; }
+      const client = clientId ? state.clients.find(c => String(c.id) === String(clientId)) : null;
+      const body = { product_id: productId, date, qty, price };
+      if (clientId) body.client_id = clientId;
+      if (client)   body.customer = client.name;
+      const userNote = vTrim("f-note");
+      const fullNote = client ? (userNote ? `${client.name} · ${userNote}` : client.name) : (userNote || null);
+      if (fullNote) body.note = fullNote;
+      await sbWrite(CFG.TABLES.sales, "POST", body);
+      await adjustInventoryForProduct(productId, -qty);
+    }
+
+    else if (kind === "order") {
+      const productId = v("f-product");
+      const vendorId  = v("f-vendor") || null;
+      const date = v("f-date");
+      const qty  = vInt("f-qty");
+      const unitCost = vNum("f-unit");
+      const status = v("f-status") || "ordered";
+      const tracking = vTrim("f-tracking");
+      const userNote = vTrim("f-note");
+      if (!productId) { alert("Pick a product."); return; }
+      if (!date || !qty) { alert("Date and qty are required."); return; }
+      const vendor = vendorId ? state.vendors.find(x => String(x.id) === String(vendorId)) : null;
+      const body = {
+        product_id: productId, date, qty, unit_cost: unitCost,
+        note: packOrderNote(status, tracking, userNote)
+      };
+      if (vendorId) body.vendor_id = vendorId;
+      if (vendor)   body.vendor = vendor.name;
+      await sbWrite(CFG.TABLES.orders, "POST", body);
+      if (status === "received") {
+        await adjustInventoryForProduct(productId, +qty);
+      }
+    }
+
+    else if (kind === "client") {
+      const name = vTrim("f-name");
+      if (!name) { alert("Client name required."); return; }
+      const body = {
+        name,
+        email: vTrim("f-email") || null,
+        phone: vTrim("f-phone") || null,
+        venmo_handle: vTrim("f-venmo") || null,
+        notes: vTrim("f-note") || null
+      };
+      await sbWrite(CFG.TABLES.clients, "POST", body);
+    }
+
+    else if (kind === "vendor") {
+      const name = vTrim("f-name");
+      if (!name) { alert("Vendor name required."); return; }
+      const body = {
+        name,
+        contact_name: vTrim("f-contact") || null,
+        email: vTrim("f-email") || null,
+        phone: vTrim("f-phone") || null,
+        website: vTrim("f-website") || null,
+        notes: vTrim("f-note") || null
+      };
+      await sbWrite(CFG.TABLES.vendors, "POST", body);
+    }
+
+    else {
+      console.warn("Unknown modal kind:", kind);
+    }
+
+    closeModal();
+    await loadAll();
+  } catch (e) {
+    console.error("saveModal failed:", e);
+    alert("Save failed:\n\n" + (e.message || e));
+  }
 }
-function editItem(kind,id){
-  // ⚠ Implement edit modal — same pattern as openModal but pre-filled, then PATCH.
-  console.warn(`editItem(${kind}, ${id}) not wired up yet.`);
+
+function editItem(kind, id){
+  // Edit not wired in this pass — view-only edit comes next
+  console.warn(`editItem(${kind}, ${id}) — edit modal not wired yet.`);
+  alert("Edit isn't wired up yet — coming in the next pass. For now, add a new entry or use the legacy P&L page to edit.");
 }
+
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 
 // ===== CSV EXPORT =====
 function exportCSV(){
