@@ -372,16 +372,25 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
         </div>
       </div>
       <script>
-        function applyPromo(){
-          var code = (document.getElementById('promoInput').value || '').trim().toUpperCase();
-          var msg = document.getElementById('promoMsg');
-          if (code === '1211') {
+        // SHA-256 of the valid promo code. Plain text NOT stored in source.
+        const VALID_HASH = '2ecefe59ab6ae4e734bb1adec3bbb706be8c6fae0b39500d05f7a6665ffa7390';
+        async function sha256(s){
+          const buf = new TextEncoder().encode(s);
+          const hash = await crypto.subtle.digest('SHA-256', buf);
+          return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+        }
+        async function applyPromo(){
+          const code = (document.getElementById('promoInput').value || '').trim().toUpperCase();
+          const msg = document.getElementById('promoMsg');
+          if (!code) { msg.style.color = 'var(--text3)'; msg.textContent = 'Enter a code first.'; return; }
+          const h = await sha256(code);
+          if (h === VALID_HASH) {
+            // Issue a short-lived access token (24h). Stored client-side.
+            const token = btoa(JSON.stringify({ src: 'promo', exp: Date.now() + 30 * 86400000 }));
+            try { localStorage.setItem('bl_access_token', token); } catch(e) {}
             msg.style.color = '#3a7a5a';
             msg.textContent = '✓ Code accepted — redirecting to your free analysis…';
-            setTimeout(function(){ window.location.href = '/bl-tools-access.html'; }, 700);
-          } else if (!code) {
-            msg.style.color = 'var(--text3)';
-            msg.textContent = 'Enter a code first.';
+            setTimeout(function(){ window.location.href = '/bl-tools-access.html?t=' + encodeURIComponent(token); }, 700);
           } else {
             msg.style.color = '#b45a4a';
             msg.textContent = '✗ Invalid code.';
