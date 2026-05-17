@@ -155,6 +155,34 @@ details.cmp-card .cmp-tag strong{color:var(--gold);font-weight:700;}
 .cmp-quick a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-border);font-weight:500;font-size:13px;}
 .cmp-quick a:hover{color:#5f4f26;border-bottom-color:var(--gold);}
 
+/* COLLAPSIBLE INVOICE LINE ITEMS */
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:15px;font-weight:700;color:var(--text);}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);}
+.li-body{padding:14px 18px;background:#fafafa;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;}
+.li-body .li-cell{font-size:12px;color:var(--muted);font-weight:500;}
+.li-body .li-cell strong{display:block;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
+.li-body .li-detail{grid-column:1/-1;font-size:13px;color:var(--text);line-height:1.6;font-weight:400;padding-top:4px;border-top:1px solid var(--border);margin-top:4px;}
+
+/* STACK OVERVIEW CARD */
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-bottom:24px;}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-of-type{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.stack-desc{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;margin-top:16px;font-size:14px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+
 @media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details > summary{list-style:none;}}
 @media(max-width:1100px){
   .invoice-wrap,.print-btn{width:90%;}
@@ -271,8 +299,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
   </div>
 
   <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('pricing',this)">Pricing</button>
-    <button class="tab-btn" onclick="switchTab('compounds',this)">Compounds</button>
+    <button class="tab-btn active" onclick="switchTab('pricing',this)">Invoice &amp; Stack</button>
     <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
     <button class="tab-btn" onclick="switchTab('recon',this)">Reconstitution</button>
     <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
@@ -308,11 +335,62 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
       </div>
 
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide 30 mg</span>
+            <span class="li-summary-price">$80.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>1 vial</div>
+            <div class="li-cell"><strong>Unit Price</strong>$80.00</div>
+            <div class="li-cell"><strong>Total</strong>$80.00</div>
+            <div class="li-detail">Triple agonist (GLP-1 / GIP / glucagon) &middot; Titrate 0.5 mg &rarr; 1 mg &middot; M / W / F, AM</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">5-Amino-1MQ 50 mg</span>
+            <span class="li-summary-price">$60.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>1 vial</div>
+            <div class="li-cell"><strong>Unit Price</strong>$60.00</div>
+            <div class="li-cell"><strong>Total</strong>$60.00</div>
+            <div class="li-detail">NNMT Inhibitor &middot; NAD+ Restoration &middot; 1.67 mg pre-workout &middot; M&ndash;F</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">MOTS-C 40 mg</span>
+            <span class="li-summary-price">$120.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>2 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$60.00</div>
+            <div class="li-cell"><strong>Total</strong>$120.00</div>
+            <div class="li-detail">Mitochondrial Exercise-Mimetic &middot; AMPK / Glucose Disposal &middot; 2 mg AM &middot; M&ndash;F</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">CJC-1295 / Ipamorelin 10 mg</span>
+            <span class="li-summary-price">$90.00</span>
+          </summary>
+          <div class="li-body">
+            <div class="li-cell"><strong>Qty</strong>2 vials</div>
+            <div class="li-cell"><strong>Unit Price</strong>$45.00</div>
+            <div class="li-cell"><strong>Total</strong>$90.00</div>
+            <div class="li-detail">Dual GH Secretagogue Blend &middot; 0.5 mg pre-bed (empty stomach) &middot; M&ndash;F</div>
+          </div>
+        </details>
+      </div>
+
       <div class="totals-block">
         <div class="total-row"><span>Retatrutide 30 mg &times; 1</span><span>$80.00</span></div>
         <div class="total-row"><span>5-Amino-1MQ 50 mg &times; 1</span><span>$60.00</span></div>
         <div class="total-row"><span>MOTS-C 40 mg &times; 2</span><span>$120.00</span></div>
-        <div class="total-row"><span>CJC-1295 / Ipamorelin 10 mg &times; 2</span><span>$90.00</span></div>
+        <div class="total-row"><span>CJC-1295 / Ipamorelin &times; 2</span><span>$90.00</span></div>
         <div class="total-row sub"><span>Subtotal</span><span>$350.00</span></div>
         <div class="total-row discount">
           <div class="lbl">
@@ -323,6 +401,46 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
         <div class="total-row grand"><span>Total Due</span><span class="val">$299.00</span></div>
         <div class="you-save">You save $51</div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-title">Protocol Overview &mdash; How This Stack Works Together</div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Retatrutide</div>
+            <div class="stack-desc">The engine of fat loss. Triple agonist (GLP-1 / GIP / glucagon) suppresses appetite, accelerates fat oxidation, and improves insulin sensitivity. Titrates from 0.5 mg up to 1 mg on M / W / F &mdash; the slow ramp is what keeps GI side effects manageable.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">5-Amino-1MQ</div>
+            <div class="stack-desc">An NNMT inhibitor that restores intracellular NAD+ in fat and muscle. Reta aggressively mobilizes fat &mdash; if NAD+ is low, those liberated fatty acids recirculate instead of being oxidized. 5-Amino keeps the cellular fuel machinery primed so what Reta releases actually gets burned, and activates dormant muscle satellite cells as reserve for rebuilding.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">MOTS-C</div>
+            <div class="stack-desc">A mitochondrial-derived peptide that mimics exercise at the cellular level &mdash; activates AMPK, improves glucose disposal, and increases insulin sensitivity. Stacked alongside Reta, it amplifies metabolic efficiency and helps preserve lean tissue through an aggressive calorie deficit.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">CJC-1295 / Ipamorelin</div>
+            <div class="stack-desc">A dual GH secretagogue blend (GHRH analog + ghrelin receptor agonist) that amplifies endogenous growth hormone release. Drives recovery, deeper sleep, and lean tissue preservation &mdash; the counterweight to Reta's catabolic pressure. Pre-bed on an empty stomach is non-negotiable.</div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>Stack Synergy:</strong> Reta does the heavy lifting on fat loss, but used alone in an aggressive deficit it can erode lean tissue and leave mobilized fat un-oxidized. 5-Amino-1MQ restores the NAD+ fuel needed to actually burn what Reta releases. MOTS-C runs metabolic protection in parallel &mdash; better glucose disposal, preserved insulin sensitivity, exercise-mimetic AMPK activation. CJC/Ipa rebuilds at night through amplified GH pulses: deeper sleep, faster recovery, lean mass held intact. Each compound addresses a distinct part of the recomp cascade &mdash; none redundant, each one enabling the next.
+        </div>
       </div>
 
       <div class="payment-block">
@@ -342,111 +460,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
     </div><!-- /pricing tab -->
-
-    <!-- ================ COMPOUNDS TAB ================ -->
-    <div class="tab-content" id="tab-compounds">
-
-      <div class="sec-divider">
-        <div class="sec-divider-eyebrow">Compound Detail</div>
-        <div class="sec-divider-title">Mechanism &middot; Dosing &middot; Timing</div>
-      </div>
-
-      <!-- RETATRUTIDE -->
-      <details class="cmp-card" open>
-        <summary>
-          <div>
-            <div class="cmp-name">Retatrutide &mdash; 30 mg</div>
-            <div class="cmp-tag"><strong>0.5 &rarr; 1 mg</strong> per dose &middot; titration first 2 weeks</div>
-          </div>
-          <div class="cmp-meta">
-            <div class="cmp-meta-price">$80.00</div>
-            <div class="cmp-meta-sub">1 &times; 30 mg</div>
-          </div>
-        </summary>
-        <div class="cmp-body-quick">
-          <ul class="cmp-quick">
-            <li><span class="ql">Mechanism</span><span class="qv">Triple agonist (GLP-1 / GIP / glucagon) &mdash; suppresses appetite, accelerates fat oxidation, improves insulin sensitivity. The most powerful incretin currently available.</span></li>
-            <li><span class="ql">Titration</span><span class="qv">0.5 mg &rarr; pull syringe to <span class="units">5 units</span> (first ~2 weeks)</span></li>
-            <li><span class="ql">Maintenance</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (once tolerated, through end of supply)</span></li>
-            <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri, AM</span></li>
-            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
-          </ul>
-          <div class="cmp-note">
-            <strong>Why titration matters:</strong> Reta is potent. Starting at 0.5 mg for 2 weeks lets your GI tract adapt before stepping up to the working dose. Skipping titration is the #1 cause of nausea, vomiting, and protocol abandonment.
-          </div>
-        </div>
-      </details>
-
-      <!-- 5-AMINO-1MQ -->
-      <details class="cmp-card">
-        <summary>
-          <div>
-            <div class="cmp-name">5-Amino-1MQ &mdash; 50 mg</div>
-            <div class="cmp-tag"><strong>1.67 mg</strong> per dose &middot; 10u draw &middot; pre-workout</div>
-          </div>
-          <div class="cmp-meta">
-            <div class="cmp-meta-price">$60.00</div>
-            <div class="cmp-meta-sub">1 &times; 50 mg</div>
-          </div>
-        </summary>
-        <div class="cmp-body-quick">
-          <ul class="cmp-quick">
-            <li><span class="ql">Mechanism</span><span class="qv">NNMT inhibitor that restores intracellular NAD+ in fat and muscle. Pairs with Reta &mdash; Reta mobilizes fat, 5-Amino keeps the cellular machinery primed to actually oxidize it.</span></li>
-            <li><span class="ql">Dose</span><span class="qv">1.67 mg &rarr; pull syringe to <span class="units">10 units</span></span></li>
-            <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, <strong>right before workout</strong></span></li>
-            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
-          </ul>
-        </div>
-      </details>
-
-      <!-- MOTS-C -->
-      <details class="cmp-card">
-        <summary>
-          <div>
-            <div class="cmp-name">MOTS-C &mdash; 40 mg</div>
-            <div class="cmp-tag"><strong>2 mg</strong> per dose &middot; 15u draw &middot; AM</div>
-          </div>
-          <div class="cmp-meta">
-            <div class="cmp-meta-price">$120.00</div>
-            <div class="cmp-meta-sub">2 &times; 40 mg</div>
-          </div>
-        </summary>
-        <div class="cmp-body-quick">
-          <ul class="cmp-quick">
-            <li><span class="ql">Mechanism</span><span class="qv">Mitochondrial-derived peptide that mimics exercise at the cellular level &mdash; activates AMPK, improves glucose disposal, increases insulin sensitivity, and protects against metabolic dysfunction.</span></li>
-            <li><span class="ql">Dose</span><span class="qv">2 mg &rarr; pull syringe to <span class="units">15 units</span></span></li>
-            <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, AM</span></li>
-            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
-          </ul>
-        </div>
-      </details>
-
-      <!-- CJC-1295 / IPAMORELIN -->
-      <details class="cmp-card">
-        <summary>
-          <div>
-            <div class="cmp-name">CJC-1295 / Ipamorelin &mdash; 10 mg</div>
-            <div class="cmp-tag"><strong>0.5 mg</strong> per dose &middot; 10u draw &middot; pre-bed</div>
-          </div>
-          <div class="cmp-meta">
-            <div class="cmp-meta-price">$90.00</div>
-            <div class="cmp-meta-sub">2 &times; 10 mg</div>
-          </div>
-        </summary>
-        <div class="cmp-body-quick">
-          <ul class="cmp-quick">
-            <li><span class="ql">Mechanism</span><span class="qv">Dual GH secretagogue blend &mdash; amplifies endogenous growth hormone release via two complementary pathways (GHRH analog + ghrelin receptor agonist). Drives recovery, deeper sleep, and lean tissue preservation.</span></li>
-            <li><span class="ql">Dose</span><span class="qv">0.5 mg &rarr; pull syringe to <span class="units">10 units</span></span></li>
-            <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, <strong>pre-bed on an empty stomach</strong> (2+ hrs after last meal)</span></li>
-            <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
-          </ul>
-          <div class="cmp-note">
-            <strong>Fasting window is non-negotiable:</strong> Food &mdash; especially carbs and fats &mdash; spikes blood glucose and blunts the natural GH pulse this peptide is designed to amplify. Eating within 2 hours of injection wastes the dose.
-          </div>
-        </div>
-      </details>
-
-    </div><!-- /compounds tab -->
 
     <!-- ================ SCHEDULE TAB ================ -->
     <div class="tab-content" id="tab-schedule">
