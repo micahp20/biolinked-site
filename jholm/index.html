@@ -123,6 +123,16 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .sched-scroll .sched-table{min-width:480px;}
 
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-banner .cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-banner .cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-banner .cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-banner .cal-dl-btn:hover{background:#345d85;}
+@media(max-width:640px){.cal-banner{flex-direction:column;align-items:stretch;}.cal-banner .cal-controls{flex-direction:column;align-items:stretch;}.cal-banner .cal-dl-btn{width:100%;}.cal-banner input[type=date]{width:100%;}}
+
 .storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
 .storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
 .storage-body{font-size:13px;line-height:1.75;color:#3d2f10;font-weight:400;}
@@ -498,6 +508,17 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="sec-divider-title">Titrate Up &middot; Then Run Through Your Supply</div>
       </div>
 
+      <div class="cal-banner">
+        <div class="cal-left">
+          <h4>&#128197; Add to Your Calendar</h4>
+          <p>Pick your cycle start date and download the .ics file. Opens in Apple Calendar (iOS) and Google Calendar (Android) &mdash; every injection day across the cycle becomes a calendar event with that day's shot list.</p>
+        </div>
+        <div class="cal-controls">
+          <input type="date" id="cycleStart">
+          <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+        </div>
+      </div>
+
       <div class="cmp-note" style="margin-bottom:18px;">
         <strong>Timing note:</strong> "8 weeks" is approximate. The real cycle = titrate up over the first ~2 weeks, then run at maintenance dose until your bottles are used up. Some people move faster, some slower &mdash; let your body and your supply set the pace, not the calendar.
       </div>
@@ -729,6 +750,59 @@ function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
   document.getElementById('tab-'+tab).classList.add('active');
   btn.classList.add('active');
+}
+
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Cycle Start Date first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-jholm@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  for(var w=1;w<=8;w++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(w-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var isRetaDay=(dow===1||dow===3||dow===5);
+      var retaDose=w<=2?'5u (0.5 mg)':'10u (1 mg)';
+      var phase=w<=2?'Titration':'Maintenance';
+      var lines=[];
+      if(isRetaDay){
+        lines.push('AM: Reta '+retaDose+' + MOTS-C 15u (2 mg)');
+      } else {
+        lines.push('AM: MOTS-C 15u (2 mg)');
+      }
+      lines.push('Pre-workout: 5-Amino 10u (1.67 mg)');
+      lines.push('Pre-bed (empty stomach): CJC/Ipa 10u (0.5 mg)');
+      var shotCount=isRetaDay?4:3;
+      var title='BLS · Julie · W'+w+' '+dayNames[dow]+' · '+shotCount+' shots';
+      var desc='Julie\'s 8-Week Recomp Stack · Week '+w+' ('+phase+')\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'W'+w+'D'+d);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Julie Holm Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Julie Holm Protocol','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='Julie-Holm-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
 }
 </script>
 
