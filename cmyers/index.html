@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chris's Recomp &amp; Recovery Protocol — BioLinked</title>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+
+.tab-bar{display:flex;background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
+.tab-btn{flex:1;padding:14px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-top:none;border-left:none;border-right:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+.inv-body{padding:32px 36px;}
+.inv-parties{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid var(--border);}
+.party-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.party-name{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.party-detail{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:18px 22px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:15px;color:var(--text);font-weight:400;}
+.total-row.sub{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:600;}
+.total-row.discount{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-radius:2px;padding:10px 14px;margin-top:8px;}
+.total-row.discount .lbl{display:flex;flex-direction:column;}
+.total-row.discount .lbl-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;}
+.total-row.discount .lbl-text{font-size:14px;font-weight:600;color:var(--text);}
+.total-row.discount .val{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:10px;padding-top:14px;font-size:18px;font-weight:700;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);}
+.you-save{text-align:center;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-top:8px;}
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:20px 22px;margin-bottom:24px;}
+.payment-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:15px;color:var(--text);font-weight:500;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);}
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+.footer-disc{font-size:12px;color:var(--muted);line-height:1.65;font-weight:400;max-width:420px;}
+.footer-brand{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 0;padding:16px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+
+.program-intro{text-align:center;padding:20px 0 26px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.program-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--text);line-height:1.05;letter-spacing:0.01em;}
+.program-title em{font-style:italic;color:var(--gold);}
+.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
+.program-context{max-width:680px;margin:14px auto 0;font-size:13px;line-height:1.75;color:var(--muted);font-weight:400;text-align:left;background:rgba(122,101,48,0.04);border-left:2px solid var(--gold-border);padding:12px 16px;border-radius:2px;}
+.program-context strong{color:var(--text);font-weight:600;}
+.program-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:18px;}
+.program-badge{background:#f8f8f8;border:1px solid var(--border);padding:5px 11px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border-radius:2px;}
+.program-badge strong{color:var(--gold);font-weight:700;}
+
+.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.sec-divider.mt{margin-top:32px;}
+.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:84px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+
+.sched-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:16px;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-top:2px;}
+.sched-phase-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:5px 11px;border-radius:2px;white-space:nowrap;}
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);font-weight:400;vertical-align:top;font-size:12px;line-height:1.5;}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
+.sched-count{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.sched-count.light{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);}
+.sched-count.off{background:#eeeeee;color:#999;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11.5px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.reta{background:rgba(183,148,244,0.14);border-color:rgba(183,148,244,0.32);color:#7655b8;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-scroll .sched-table{min-width:480px;}
+
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-banner .cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-banner .cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-banner .cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-banner .cal-dl-btn:hover{background:#345d85;}
+
+.tip-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:14px;}
+.tip-card.featured{border-top-width:3px;border-left:3px solid var(--gold);background:rgba(122,101,48,0.04);}
+.tip-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.tip-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.2;}
+.tip-body{font-size:14px;line-height:1.75;color:var(--text);font-weight:400;}
+.tip-body p + p{margin-top:10px;}
+.tip-body strong{font-weight:700;color:var(--text);}
+.tip-body em{font-style:italic;color:var(--muted);}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:14px;}
+.tier-box{background:#ffffff;border:1px solid var(--gold-border);border-top:3px solid var(--gold);border-radius:2px;padding:14px 16px;}
+.tier-box .tier-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.tier-box .tier-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);margin-bottom:6px;line-height:1.2;}
+.tier-box .tier-dose{font-size:13px;color:var(--text);line-height:1.6;font-weight:500;}
+.tier-box .tier-dose strong{color:var(--gold);font-weight:700;}
+
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:15px;font-weight:700;color:var(--text);}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);}
+.li-summary-price .strike{font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;}
+.li-body{padding:18px 22px;background:#fafafa;}
+.li-body .li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.7;}
+.li-body .li-callout strong{color:var(--gold);font-weight:700;}
+
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-top:8px;margin-bottom:24px;}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-of-type{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.stack-desc{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;margin-top:16px;font-size:14px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+
+.recon-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:22px 24px;margin-bottom:18px;}
+.recon-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);}
+.recon-card-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.15;}
+.recon-card-tag{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.06em;margin-top:2px;}
+.recon-meta{text-align:right;}
+.recon-meta-price{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:600;}
+.recon-meta-sub{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-top:1px;}
+.recon-card-section{margin-top:14px;}
+.recon-card-label{font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.recon-steps{list-style:none;counter-reset:step;margin-top:2px;}
+.recon-steps li{counter-increment:step;display:flex;gap:10px;padding:5px 0;font-size:13px;color:var(--text);line-height:1.65;}
+.recon-steps li::before{content:counter(step);flex-shrink:0;width:21px;height:21px;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-top:2px;}
+.recon-steps li strong{font-weight:700;}
+
+.storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
+.storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.storage-body{font-size:13px;line-height:1.75;color:#3d2f10;font-weight:400;}
+.storage-body p + p{margin-top:10px;}
+.storage-body strong{color:var(--text);font-weight:700;}
+
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details > summary{list-style:none;}}
+@media(max-width:1100px){
+  .invoice-wrap,.print-btn{width:90%;}
+}
+@media(max-width:820px){
+  .invoice-wrap,.print-btn{width:94%;}
+  body{padding:24px 10px;}
+  .inv-header{padding:22px 22px;}
+  .inv-body{padding:24px 22px;}
+  .inv-footer{padding:14px 22px;}
+}
+@media(max-width:640px){
+  .invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}
+  body{padding:8px 0;font-size:15px;}
+  .inv-header{flex-direction:column;gap:14px;padding:20px 18px;}
+  .inv-meta{text-align:left;}
+  .inv-brand-name{font-size:26px;}
+  .inv-body{padding:20px 16px;}
+  .inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}
+  .inv-parties{grid-template-columns:1fr;gap:16px;}
+  .total-row{font-size:13px;}
+  .total-row.grand .val{font-size:24px;}
+  .total-row.discount .val{font-size:18px;}
+  .program-title{font-size:30px;}
+  .program-intro{padding:14px 0 18px;}
+  .program-badge{font-size:8px;padding:4px 8px;}
+  .tab-bar{position:sticky;top:56px;}
+  .tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}
+  .sec-divider-title{font-size:19px;}
+  .sched-card{padding:16px 16px;}
+  .sched-card-title{font-size:17px;}
+  .sched-table{font-size:11px;}
+  .sched-table th{font-size:8px;padding:6px 4px;letter-spacing:0.08em;}
+  .sched-table td{padding:7px 4px;font-size:11px;}
+  .sched-pill{font-size:9px;padding:1px 5px;margin:1px 1px 1px 0;}
+  .sched-pill strong{font-size:10.5px;}
+  .storage-card{padding:14px 16px;}
+  .storage-body{font-size:12px;}
+  .payment-block{padding:16px 18px;}
+  .tip-card{padding:16px 18px;}
+  .tip-title{font-size:17px;}
+  .tip-body{font-size:13px;}
+  .recon-card{padding:18px 18px;}
+  .recon-card-name{font-size:19px;}
+  .cal-banner{flex-direction:column;align-items:stretch;}
+  .cal-banner .cal-controls{flex-direction:column;align-items:stretch;}
+  .cal-banner .cal-dl-btn{width:100%;}
+  .cal-banner input[type=date]{width:100%;}
+}
+</style>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+      <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-link">Stack Analyzer</a>
+      <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-link">Biomarkers</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+    <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-mobile-link">Stack Analyzer</a>
+    <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-mobile-link">Biomarkers</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Protocol</div>
+      <div class="inv-number">Chris Myers</div>
+      <div class="inv-date">~6&ndash;7 Month Recomp Cycle</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('synergy',this)">Synergy</button>
+    <button class="tab-btn" onclick="switchTab('pricing',this)">Pricing</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  </div>
+
+  <div class="inv-body">
+
+    <!-- ================ PROTOCOL TAB ================ -->
+    <div class="tab-content active" id="tab-protocol">
+
+      <div class="program-intro">
+        <div class="program-eyebrow">Protocol</div>
+        <div class="program-title">Chris's <em>Recomp &amp; Recovery</em> Protocol</div>
+        <div class="program-tag">Strip the fat. Keep the muscle. Recover like the work matters.</div>
+        <div class="program-context">
+          <strong>41-year-old firefighter and two-tour combat veteran (Baghdad)</strong>, training 4&ndash;5 days a week. Target: <strong>215 &rarr; 205</strong>. This is a personal recomp protocol &mdash; fat loss with lean tissue preserved, recovery dialed in, sleep deepened. Built for someone who works physical shifts, trains hard, and intends to keep doing both for the long haul.
+        </div>
+        <div class="program-badges">
+          <span class="program-badge">~<strong>6&ndash;7 Month</strong> Cycle</span>
+          <span class="program-badge"><strong>Run Till Empty</strong> Structure</span>
+          <span class="program-badge"><strong>2</strong> Compounds</span>
+          <span class="program-badge">Recomp &middot; Recovery &middot; Longevity</span>
+        </div>
+      </div>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Compounds</div>
+        <div class="sec-divider-title">HGH + Retatrutide &middot; Tap to Expand</div>
+      </div>
+
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">HGH (Human Growth Hormone) &mdash; 36 IU</span>
+            <span class="li-summary-price">4 vials</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">36 IU / 3 mL (12 IU/mL after recon)</span></li>
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 IU = 0.08 mL &rarr; pull syringe to <span class="units">8 units</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F &middot; AM on empty stomach, or pre-bed on non-training days</span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+              <li><span class="ql">Supply</span><span class="qv">4 vials &times; 36 IU = 144 IU &middot; lasts ~28 weeks at 5 IU/wk</span></li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide &mdash; 60 mg</span>
+            <span class="li-summary-price">1 vial</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">60 mg / 3 mL (20 mg/mL after recon)</span></li>
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg = 0.05 mL &rarr; pull syringe to <span class="units">5 units</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M / W / F &middot; AM (no titration &mdash; starting dose for an athletic 215 lb male)</span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+              <li><span class="ql">Supply</span><span class="qv">60 mg / 3 mg per week = 20 weeks at Phase 1 frequency, longer as tier-down begins</span></li>
+            </ul>
+            <div class="li-callout"><strong>Important:</strong> Reta dosing tiers down as bodyweight stabilizes &mdash; see the <strong>Tier-Down Protocol</strong> in the Notes &amp; Tips tab.</div>
+          </div>
+        </details>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-title">Protocol Overview &mdash; How This Pairing Works</div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Retatrutide &mdash; Strips the Fat</div>
+            <div class="stack-desc">Triple agonist (GLP-1 / GIP / glucagon). Suppresses appetite, drives substantial fat loss (especially visceral), improves insulin sensitivity. Creates the calorie deficit almost effortlessly. Run alone in an athletic guy, though, Reta can pull muscle along with fat &mdash; that's why HGH is the other half of this stack.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">HGH &mdash; Protects the Muscle, Speeds Recovery</div>
+            <div class="stack-desc">At 1 IU M&ndash;F (wellness/recovery dose, not a bodybuilder dose), HGH stimulates IGF-1, preserves lean tissue during the cut, deepens sleep, accelerates tissue repair, and supports the connective-tissue and joint resilience that matters for a firefighter who still trains hard.</div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>The Pairing:</strong> Reta cuts. HGH preserves and rebuilds. Together they produce real body recomposition &mdash; leaner, denser, stronger, not just smaller. See the <strong>Synergy</strong> tab for the full explanation.
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Reconstitution</div>
+        <div class="sec-divider-title">Vial Specs &middot; BAC Water &middot; Draw Math</div>
+      </div>
+
+      <!-- HGH RECON -->
+      <div class="recon-card">
+        <div class="recon-card-head">
+          <div>
+            <div class="recon-card-name">HGH (Somatropin) &mdash; 36 IU / 3 mL</div>
+            <div class="recon-card-tag">Final concentration: 12 IU/mL &middot; 4 vials for the cycle</div>
+          </div>
+          <div class="recon-meta">
+            <div class="recon-meta-price">8 units</div>
+            <div class="recon-meta-sub">1 IU per dose</div>
+          </div>
+        </div>
+        <div class="recon-card-section">
+          <div class="recon-card-label">Reconstitute (per vial)</div>
+          <ol class="recon-steps">
+            <li>Wipe the vial stopper with an alcohol pad.</li>
+            <li>Draw <strong>3 mL of bacteriostatic water</strong> into a syringe.</li>
+            <li>Inject the BAC water <strong>slowly down the inner wall</strong> of the HGH vial &mdash; do not jet directly onto the lyophilized powder.</li>
+            <li>Gently swirl &mdash; <strong>do not shake</strong>. HGH is a fragile peptide; agitation degrades potency.</li>
+            <li>Wait 60&ndash;90 seconds until fully dissolved. Refrigerate immediately.</li>
+          </ol>
+        </div>
+        <div class="recon-card-section">
+          <div class="recon-card-label">Draw Math</div>
+          <ul class="cmp-quick">
+            <li><span class="ql">Per Dose</span><span class="qv">1 IU = 0.083 mL = <span class="units">8 units</span> on a U-100 insulin syringe</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RETA RECON -->
+      <div class="recon-card">
+        <div class="recon-card-head">
+          <div>
+            <div class="recon-card-name">Retatrutide &mdash; 60 mg / 3 mL</div>
+            <div class="recon-card-tag">Final concentration: 20 mg/mL &middot; 1 vial for the cycle</div>
+          </div>
+          <div class="recon-meta">
+            <div class="recon-meta-price">5 units</div>
+            <div class="recon-meta-sub">1 mg per dose</div>
+          </div>
+        </div>
+        <div class="recon-card-section">
+          <div class="recon-card-label">Reconstitute</div>
+          <ol class="recon-steps">
+            <li>Wipe the vial stopper with an alcohol pad.</li>
+            <li>Draw <strong>3 mL of bacteriostatic water</strong>.</li>
+            <li>Inject slowly down the side of the vial.</li>
+            <li>Swirl gently until fully dissolved.</li>
+            <li>Return to fridge.</li>
+          </ol>
+        </div>
+        <div class="recon-card-section">
+          <div class="recon-card-label">Draw Math</div>
+          <ul class="cmp-quick">
+            <li><span class="ql">Per Dose</span><span class="qv">1 mg = 0.05 mL = <span class="units">5 units</span> on a U-100 insulin syringe</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="storage-card">
+        <div class="storage-title">❄ Refrigerated, Protected, Rotated</div>
+        <div class="storage-body">
+          <p><strong>Dry (lyophilized) HGH:</strong> store refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze. Never shake.</p>
+          <p><strong>Reconstituted HGH:</strong> refrigerate immediately. Most stable for ~3&ndash;4 weeks; potency degrades after that. At ~7 weeks per bottle (the rate this protocol uses), you'll be pushing the back end &mdash; see the <strong>HGH Stability</strong> tip in the Notes tab.</p>
+          <p><strong>Reta:</strong> store dry-vial refrigerated. Once reconstituted, use within 30 days.</p>
+          <p><strong>Syringe discipline:</strong> fresh U-100 insulin syringe for every shot. Never reuse. Wipe stopper + injection site with alcohol pad every time.</p>
+          <p><strong>Site rotation:</strong> SubQ abdomen, 4 quadrants, no same-spot repeats two days in a row.</p>
+        </div>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================ SCHEDULE TAB ================ -->
+    <div class="tab-content" id="tab-schedule">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Weekly Schedule</div>
+        <div class="sec-divider-title">M&ndash;F Daily Cluster &middot; Sat / Sun Off</div>
+      </div>
+
+      <div class="cal-banner">
+        <div class="cal-left">
+          <h4>&#128197; Add to Your Calendar</h4>
+          <p>Pick your cycle start date and download the .ics file. Opens in Apple Calendar (iOS) and Google Calendar (Android) &mdash; every injection day for the ~28-week HGH supply becomes a calendar event with that day's shot list.</p>
+        </div>
+        <div class="cal-controls">
+          <input type="date" id="cycleStart">
+          <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+        </div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 1 &mdash; Active Fat Loss (215 &rarr; ~208)</div>
+            <div class="sched-card-sub">HGH every weekday morning. Reta on M / W / F. Sat / Sun fully off both compounds.</div>
+          </div>
+          <div class="sched-phase-pill">Active Cut</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM (Empty Stomach)</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="sched-day">Mon</span></td>
+              <td><span class="sched-pill"><strong>8u</strong> · HGH (1 IU)</span><span class="sched-pill reta"><strong>5u</strong> · Reta (1 mg)</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Tue</span></td>
+              <td><span class="sched-pill"><strong>8u</strong> · HGH (1 IU)</span></td>
+              <td class="right"><span class="sched-count light">1</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Wed</span></td>
+              <td><span class="sched-pill"><strong>8u</strong> · HGH (1 IU)</span><span class="sched-pill reta"><strong>5u</strong> · Reta (1 mg)</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Thu</span></td>
+              <td><span class="sched-pill"><strong>8u</strong> · HGH (1 IU)</span></td>
+              <td class="right"><span class="sched-count light">1</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Fri</span></td>
+              <td><span class="sched-pill"><strong>8u</strong> · HGH (1 IU)</span><span class="sched-pill reta"><strong>5u</strong> · Reta (1 mg)</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Sat</span></td>
+              <td><span class="sched-pill off">Rest &mdash; HGH may shift pre-bed</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+            <tr>
+              <td><span class="sched-day">Sun</span></td>
+              <td><span class="sched-pill off">Rest &mdash; HGH may shift pre-bed</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="cmp-note" style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
+        <strong style="color:var(--gold);">As you approach goal weight,</strong> Reta frequency tiers down. Phase 2: 1 mg twice/week. Phase 3 (at 205): 1 mg once/week or stop. HGH stays M&ndash;F throughout the supply. Full breakdown in the <strong>Notes &amp; Tips</strong> tab.
+      </div>
+
+    </div><!-- /schedule tab -->
+
+    <!-- ================ SYNERGY TAB ================ -->
+    <div class="tab-content" id="tab-synergy">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Stack Philosophy</div>
+        <div class="sec-divider-title">Why HGH + Reta &middot; The Recomp Logic</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Card 01 &mdash; The Fat Loss Engine</div>
+        <div class="tip-title">Retatrutide &mdash; Strips the Fat</div>
+        <div class="tip-body">
+          <p>Retatrutide is a <strong>triple agonist (GLP-1, GIP, and glucagon receptors)</strong> that drives substantial fat loss, particularly visceral fat. It suppresses appetite, improves insulin sensitivity, and creates a calorie deficit almost effortlessly.</p>
+          <p>The problem with running Reta alone in an athletic guy training 4&ndash;5x/week: <strong>when you cut hard on a GLP-1, you can lose muscle along with the fat.</strong> That's where HGH comes in.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Card 02 &mdash; The Muscle &amp; Recovery Layer</div>
+        <div class="tip-title">HGH &mdash; Protects the Muscle, Speeds Recovery</div>
+        <div class="tip-body">
+          <p>At <strong>1 IU M&ndash;F</strong> (a wellness/recovery dose, not a bodybuilder dose), HGH stimulates IGF-1, supports lean mass preservation during the cut, improves recovery from training, deepens sleep quality, and accelerates tissue repair &mdash; critical for a firefighter dealing with repetitive joint stress and inflammation.</p>
+          <p>HGH also has anti-aging effects on skin and connective tissue, and supports the kind of metabolic resilience needed for shift work.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Card 03 &mdash; Why They Work Together</div>
+        <div class="tip-title">The Pairing &mdash; Real Recomposition, Not Just a Smaller Body</div>
+        <div class="tip-body">
+          <p><strong>Reta cuts. HGH preserves and rebuilds.</strong> Run alone, Reta can leave you "skinny-fat" &mdash; lighter on the scale but softer in the mirror. HGH ensures the 10 pounds Chris drops come off as <em>fat</em>, not muscle.</p>
+          <p>The pairing produces real body recomposition: <strong>leaner, denser, stronger</strong> &mdash; not just smaller. For a 41-year-old who still trains hard and works a physically demanding job, this combo addresses fat loss, recovery, sleep, and longevity in one stack.</p>
+        </div>
+      </div>
+
+    </div><!-- /synergy tab -->
+
+    <!-- ================ PRICING TAB ================ -->
+    <div class="tab-content" id="tab-pricing">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Bundle Pricing</div>
+        <div class="sec-divider-title">HGH + Reta &middot; ~6&ndash;7 Month Supply</div>
+      </div>
+
+      <div class="cmp-note" style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.75;margin-bottom:20px;">
+        <strong style="color:var(--gold);text-transform:uppercase;letter-spacing:0.14em;font-size:11px;display:block;margin-bottom:6px;">How Long Does This Last?</strong>
+        <strong>HGH:</strong> 4 vials &times; 36 IU = 144 IU total. At 1 IU &times; 5 days/week (5 IU/wk), that's <strong>~28 weeks (~7 months)</strong> of HGH.<br>
+        <strong>Retatrutide:</strong> 60 mg vial. Phase 1 uses 3 mg/wk (20 weeks); Phase 2 uses 2 mg/wk (longer); Phase 3 uses 1 mg/wk or stops. <strong>Comfortably covers the full 6&ndash;7 month cycle</strong>, with extra room as the tier-down kicks in.
+      </div>
+
+      <div class="inv-parties">
+        <div>
+          <div class="party-label">From</div>
+          <div class="party-name">BioLinked Solutions</div>
+          <div class="party-detail">biolinkedsolutions.com<br>Venmo: @micahp20</div>
+        </div>
+        <div>
+          <div class="party-label">Billed To</div>
+          <div class="party-name">Chris Myers</div>
+          <div class="party-detail">Recomp &amp; Recovery Protocol<br>Due upon receipt</div>
+        </div>
+      </div>
+
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">HGH 36 IU &times; 4 vials</span>
+            <span class="li-summary-price"><span class="strike">$700</span>$600.00</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Qty</span><span class="qv">4 vials</span></li>
+              <li><span class="ql">List Price</span><span class="qv">$175 / vial &times; 4 = $700</span></li>
+              <li><span class="ql">Bundle Price</span><span class="qv"><strong>$150 / vial &times; 4 = $600</strong> (per-bottle discount of $25)</span></li>
+              <li><span class="ql">Supply</span><span class="qv">~28 weeks at 1 IU &times; 5 days/week</span></li>
+            </ul>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide 60 mg &times; 1 vial</span>
+            <span class="li-summary-price"><span class="strike">$200</span>$180.00</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Qty</span><span class="qv">1 vial</span></li>
+              <li><span class="ql">List Price</span><span class="qv">$200</span></li>
+              <li><span class="ql">Bundle Price</span><span class="qv"><strong>$180</strong> (first-responder discount of $20)</span></li>
+              <li><span class="ql">Supply</span><span class="qv">20 weeks at Phase 1 (3 mg/wk) &middot; longer as tier-down kicks in &mdash; lasts the full 6&ndash;7 month cycle</span></li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
+      <div class="totals-block">
+        <div class="total-row"><span>HGH 36 IU &times; 4 (list)</span><span>$700.00</span></div>
+        <div class="total-row"><span>Retatrutide 60 mg &times; 1 (list)</span><span>$200.00</span></div>
+        <div class="total-row sub"><span>Subtotal</span><span>$900.00</span></div>
+        <div class="total-row discount">
+          <div class="lbl">
+            <span class="lbl-eyebrow">Bundle + First Responder</span>
+            <span class="lbl-text">HGH bottle discount ($100) + Reta first-responder discount ($20)</span>
+          </div>
+          <span class="val">&minus;$120.00</span>
+        </div>
+        <div class="total-row grand"><span>Total Due</span><span class="val">$780.00</span></div>
+        <div class="you-save">You save $120 &middot; First Responder Recognition</div>
+      </div>
+
+      <div class="payment-block">
+        <div class="payment-title">Payment Instructions</div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128184;</div>
+          <div><div class="payment-text">Send via Venmo</div><div class="payment-handle">@micahp20</div></div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128221;</div>
+          <div class="payment-text">Include your name in the Venmo note</div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128230;</div>
+          <div class="payment-text">Ships within 24&ndash;48 hours of payment confirmation</div>
+        </div>
+      </div>
+
+    </div><!-- /pricing tab -->
+
+    <!-- ================ NOTES TAB ================ -->
+    <div class="tab-content" id="tab-notes">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Protocol Notes</div>
+        <div class="sec-divider-title">Execution &middot; Tier-Down &middot; What to Watch For</div>
+      </div>
+
+      <div class="tip-card featured">
+        <div class="tip-eyebrow">Tip 01 &mdash; The Reta Tier-Down Protocol (Critical)</div>
+        <div class="tip-title">Phase Down As Bodyweight Stabilizes</div>
+        <div class="tip-body">
+          <p>GLP-1s are <strong>easy to over-rely on</strong>. Once Chris hits or approaches 205, the body's metabolic adaptation is what needs to take over &mdash; not the drug. Tier the dose down as you close in on goal weight to <strong>preserve lean mass</strong> and let the metabolism re-adapt to maintenance.</p>
+        </div>
+        <div class="tier-grid">
+          <div class="tier-box">
+            <div class="tier-eyebrow">Phase 1</div>
+            <div class="tier-title">Active Cut</div>
+            <div class="tier-dose">Body: <strong>215 &rarr; ~208</strong><br>Reta: <strong>1 mg M / W / F</strong> = 3 mg/week</div>
+          </div>
+          <div class="tier-box">
+            <div class="tier-eyebrow">Phase 2</div>
+            <div class="tier-title">Closing on Goal</div>
+            <div class="tier-dose">Body: <strong>~208 &rarr; 205</strong><br>Reta: <strong>1 mg twice / week</strong> = 2 mg/week</div>
+          </div>
+          <div class="tier-box">
+            <div class="tier-eyebrow">Phase 3</div>
+            <div class="tier-title">Hold at Goal</div>
+            <div class="tier-dose">Body: <strong>at 205, holding</strong><br>Reta: <strong>1 mg once / week</strong>, or stop entirely</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 02 &mdash; HGH Timing</div>
+        <div class="tip-title">AM Fasted, or Pre-Bed on Off Days</div>
+        <div class="tip-body">
+          <p><strong>Default: AM on an empty stomach</strong>, ideally 30&ndash;45 min before food. HGH triggers the IGF-1 cascade; insulin blunts it, so any food (especially carbs) within an hour of the shot dampens the effect.</p>
+          <p><strong>On training rest days,</strong> a pre-bed shot is fine and may actually deepen sleep slightly &mdash; same fasted rule, 2+ hrs after the last meal. Pick one slot per day and stay consistent.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 03 &mdash; HGH Stability (Heads Up)</div>
+        <div class="tip-title">Pace the Bottles &mdash; You're Stretching the Window</div>
+        <div class="tip-body">
+          <p>Reconstituted HGH is most stable for the <strong>first 3&ndash;4 weeks</strong> in the fridge. After that, potency degrades. Each vial in this protocol covers ~7 weeks (36 IU &divide; 5 IU/wk), which means the <strong>back half of each bottle is past peak stability</strong>.</p>
+          <p><strong>What this means in practice:</strong></p>
+          <p>1. <strong>Use bacteriostatic water</strong> for reconstitution (not sterile water) &mdash; the benzyl alcohol preservative is what makes the longer storage window possible.<br>
+          2. <strong>Keep it cold.</strong> Back of the fridge, not the door. Never leave at room temp.<br>
+          3. <strong>Don't shake. Ever.</strong> Roll or swirl gently to mix. Shaking shears the protein.<br>
+          4. <strong>Expect a small dropoff in week 5&ndash;7 of each vial</strong> &mdash; subjective: slightly less of the deep-sleep effect, slightly less recovery boost. Not catastrophic, but real. You can shorten this by going to <strong>2 vials at a time</strong> with shorter recon-to-empty windows (reconstitute one, use it within 4 weeks, then the next) if you want maximum potency.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 04 &mdash; Reta Onboarding</div>
+        <div class="tip-title">No Titration Needed, But Expect Some GI</div>
+        <div class="tip-body">
+          <p>Starting at 1 mg M/W/F is fine for an athletic 215 lb male &mdash; no need for the slow titration that smaller users or first-time GLP-1 patients require. <strong>Body mass + metabolic robustness handle this dose cleanly.</strong></p>
+          <p><strong>Expect mild GI in weeks 1&ndash;2:</strong> some nausea, occasional reflux, early satiety, possibly constipation. These usually settle by week 3. Eat smaller, slower meals, lower fat content early on. <strong>If nausea is persistent or severe past week 2</strong>, drop to 1 mg twice/week briefly and ramp back up.</p>
+          <p>Red flags (call a clinician): persistent vomiting, severe abdominal pain (especially radiating to the back &mdash; pancreatitis risk), gallbladder symptoms.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 05 &mdash; Hydration</div>
+        <div class="tip-title">3&ndash;4 L Water/Day on Reta &mdash; Non-Negotiable</div>
+        <div class="tip-body">
+          <p>Reta suppresses thirst signaling alongside appetite. You will not feel thirsty even when you're dehydrated &mdash; that's how people end up with headaches, constipation, fatigue, and poor performance, then blame "the peptide" when it's just water deficit.</p>
+          <p><strong>Target: 3&ndash;4 L/day</strong> across shifts and training. Add electrolytes (sodium, potassium, magnesium) once a day, ideally pre-training or mid-shift. Coffee doesn't count.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 06 &mdash; Sleep Hygiene</div>
+        <div class="tip-title">HGH Pays Off Most During Deep Sleep</div>
+        <div class="tip-body">
+          <p>The biggest dividends from HGH show up during slow-wave sleep &mdash; that's when the GH/IGF-1 axis does most of its recovery work. <strong>Protect the first 3 hours of sleep aggressively.</strong></p>
+          <p>Tactics for shift workers: blackout curtains, cold room (~65&deg;F), no screens 30 min before bed, magnesium glycinate 400 mg before lights out, and protect a consistent 7&ndash;8 hr window whenever the schedule allows. Stacking HGH on top of bad sleep is a partial waste &mdash; the compound multiplies the recovery you give it room to do.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 07 &mdash; Signals</div>
+        <div class="tip-title">Signs the Protocol Is Working</div>
+        <div class="tip-body">
+          <p><strong>Weeks 1&ndash;2:</strong> appetite drops noticeably (Reta kicking in). Some GI noise. HGH effects subtle at first &mdash; maybe deeper sleep, maybe a hand-tingling/water retention sensation in the mornings (normal, resolves).</p>
+          <p><strong>Weeks 3&ndash;6:</strong> steady weight loss, <strong>~1&ndash;2 lbs/week</strong>. Recovery from training feels faster. Skin clearer. Sleep deeper. The mirror starts moving even when the scale plateaus a bit.</p>
+          <p><strong>Months 2&ndash;4:</strong> bodyweight approaching 205&ndash;208. Time to think about Phase 2 of the tier-down. Lean tissue holding (waist shrinking but shoulders/arms staying full). Joint feeling better than it has in years.</p>
+          <p><strong>Months 5&ndash;7:</strong> goal weight held with reduced Reta dose. HGH still doing recovery work. The recomp is real &mdash; not just lighter, but denser.</p>
+          <p><strong>Yellow flags &mdash; reassess:</strong> rapid weight loss above 3 lbs/week (means too aggressive a deficit; eat more), strength dropping noticeably in the gym (lean mass loss; consider tier-down + more protein), persistent fatigue, or sleep getting <em>worse</em> instead of better.</p>
+        </div>
+      </div>
+
+    </div><!-- /notes tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Cycle Start Date first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-cmyers@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  // 28 weeks = HGH supply at Phase 1 cadence
+  for(var w=1;w<=28;w++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(w-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var isRetaDay=(dow===1||dow===3||dow===5);
+      var lines=['AM (empty stomach): HGH 8u (1 IU)'];
+      if(isRetaDay){
+        lines.push('AM: Reta 5u (1 mg) - Phase 1 cadence; tier down as you approach 205');
+      }
+      var shotCount=isRetaDay?2:1;
+      var title='BLS · Chris · W'+w+' '+dayNames[dow]+' · '+shotCount+' shot'+(shotCount>1?'s':'');
+      var desc='Chris Myers Recomp Protocol · Week '+w+'\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'W'+w+'D'+d);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Chris Myers Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Chris Myers Recomp Protocol','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='Chris-Myers-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+</script>
+
+</body>
+</html>
