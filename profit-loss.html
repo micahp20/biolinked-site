@@ -1094,9 +1094,14 @@ function openModal(kind){
   if (kind === "person") kind = state.peopleMode === "vendors" ? "vendor" : "client";
   document.getElementById("modal-body").innerHTML = buildForm(kind);
   m.dataset.kind = kind;
+  m.dataset.editId = "";  // clear any prior edit context
   m.classList.add("show");
 }
-function closeModal(){ document.getElementById("modal").classList.remove("show"); }
+function closeModal(){
+  const m = document.getElementById("modal");
+  m.classList.remove("show");
+  m.dataset.editId = "";
+}
 
 function optList(list, valueKey, labelKey, placeholder){
   const opts = list.map(x => `<option value="${x[valueKey]}">${esc(x[labelKey] || "")}</option>`).join("");
@@ -1278,10 +1283,21 @@ async function adjustInventoryForProduct(productId, delta){
 async function saveModal(){
   const m = document.getElementById("modal");
   const kind = m.dataset.kind;
+  const editId = m.dataset.editId || "";
+  const isEdit = !!editId;
   const v = (id) => { const el = document.getElementById(id); return el ? el.value : ""; };
   const vTrim = (id) => v(id).trim();
   const vNum  = (id) => parseFloat(v(id)) || 0;
   const vInt  = (id) => parseInt(v(id)) || 0;
+
+  // Helper: POST a new row, or PATCH the existing one when isEdit
+  const upsert = async (table, body) => {
+    if (isEdit) {
+      await sbWrite(table, "PATCH", body, `?id=eq.${encodeURIComponent(editId)}`);
+    } else {
+      await sbWrite(table, "POST", body);
+    }
+  };
 
   try {
     if (kind === "inventory") {
@@ -1292,7 +1308,7 @@ async function saveModal(){
         kit_qty: 1, note: vTrim("f-note") || null,
         status: vInt("f-vials") === 0 ? "out" : vInt("f-vials") <= CFG.LOW_STOCK_THRESHOLD ? "low" : "in-stock"
       };
-      await sbWrite(CFG.TABLES.inventory, "POST", body);
+      await upsert(CFG.TABLES.inventory, body);
     }
 
     else if (kind === "product") {
@@ -1303,7 +1319,7 @@ async function saveModal(){
         name, cost: vNum("f-cost"), sale: vNum("f-price"),
         inventory_id: invVal ? (isNaN(parseInt(invVal)) ? invVal : parseInt(invVal)) : null
       };
-      await sbWrite(CFG.TABLES.products, "POST", body);
+      await upsert(CFG.TABLES.products, body);
     }
 
     else if (kind === "sale") {
@@ -1316,13 +1332,15 @@ async function saveModal(){
       if (!date || !qty) { alert("Date and qty are required."); return; }
       const client = clientId ? state.clients.find(c => String(c.id) === String(clientId)) : null;
       const body = { product_id: productId, date, qty, price };
-      if (clientId) body.client_id = clientId;
-      if (client)   body.customer = client.name;
+      body.client_id = clientId || null;
+      body.customer = client ? client.name : null;
       const userNote = vTrim("f-note");
       const fullNote = client ? (userNote ? `${client.name} · ${userNote}` : client.name) : (userNote || null);
-      if (fullNote) body.note = fullNote;
-      await sbWrite(CFG.TABLES.sales, "POST", body);
-      await adjustInventoryForProduct(productId, -qty);
+      body.note = fullNote;
+      await upsert(CFG.TABLES.sales, body);
+      // Only adjust inventory on NEW sales — editing a sale leaves stock alone
+      // (qty changes on edit would require knowing the prior qty to reconcile).
+      if (!isEdit) await adjustInventoryForProduct(productId, -qty);
     }
 
     else if (kind === "order") {
@@ -1341,10 +1359,12 @@ async function saveModal(){
         product_id: productId, date, qty, unit_cost: unitCost,
         note: packOrderNote(status, tracking, userNote)
       };
-      if (vendorId) body.vendor_id = vendorId;
-      if (vendor)   body.vendor = vendor.name;
-      await sbWrite(CFG.TABLES.orders, "POST", body);
-      if (status === "received") {
+      body.vendor_id = vendorId || null;
+      body.vendor = vendor ? vendor.name : null;
+      await upsert(CFG.TABLES.orders, body);
+      // Only bump inventory when a brand-new order is logged as received.
+      // Editing an existing order doesn't re-bump (edit inventory directly if needed).
+      if (!isEdit && status === "received") {
         await adjustInventoryForProduct(productId, +qty);
       }
     }
@@ -1359,7 +1379,7 @@ async function saveModal(){
         venmo_handle: vTrim("f-venmo") || null,
         notes: vTrim("f-note") || null
       };
-      await sbWrite(CFG.TABLES.clients, "POST", body);
+      await upsert(CFG.TABLES.clients, body);
     }
 
     else if (kind === "vendor") {
@@ -1373,7 +1393,7 @@ async function saveModal(){
         website: vTrim("f-website") || null,
         notes: vTrim("f-note") || null
       };
-      await sbWrite(CFG.TABLES.vendors, "POST", body);
+      await upsert(CFG.TABLES.vendors, body);
     }
 
     else {
@@ -1389,9 +1409,83 @@ async function saveModal(){
 }
 
 function editItem(kind, id){
-  // Edit not wired in this pass — view-only edit comes next
-  console.warn(`editItem(${kind}, ${id}) — edit modal not wired yet.`);
-  alert("Edit isn't wired up yet — coming in the next pass. For now, add a new entry or use the legacy P&L page to edit.");
+  const dataMap = {
+    inventory: state.inventory,
+    product: state.products,
+    sale: state.sales,
+    order: state.orders,
+    client: state.clients,
+    vendor: state.vendors
+  };
+  const list = dataMap[kind];
+  if (!list) { alert("Unknown item type: " + kind); return; }
+  const item = list.find(x => String(x.id) === String(id));
+  if (!item) { alert("Item not found."); return; }
+
+  openModal(kind);
+  const m = document.getElementById("modal");
+  m.dataset.editId = String(id);
+  document.getElementById("modal-title").textContent = ({
+    inventory: "Edit Inventory Item",
+    product:   "Edit Product",
+    sale:      "Edit Sale",
+    order:     "Edit Order",
+    client:    "Edit Client",
+    vendor:    "Edit Vendor"
+  })[kind] || "Edit Item";
+
+  const setVal = (elId, val) => {
+    const el = document.getElementById(elId);
+    if (el) el.value = (val === null || val === undefined) ? "" : val;
+  };
+
+  if (kind === "inventory") {
+    setVal("f-name", item.name);
+    setVal("f-vials", item.vials);
+    setVal("f-size", item.vial_size);
+    setVal("f-note", item.note);
+  } else if (kind === "product") {
+    setVal("f-name", item.name);
+    setVal("f-cost", item.cost);
+    setVal("f-price", item.sale);
+    setVal("f-inventory", item.inventory_id || "");
+  } else if (kind === "sale") {
+    setVal("f-product", item.product_id);
+    setVal("f-client", item.client_id || "");
+    setVal("f-qty", item.qty);
+    setVal("f-unit", item.price);
+    setVal("f-date", item.date ? String(item.date).slice(0,10) : "");
+    let note = item.note || "";
+    if (item.customer && note.startsWith(item.customer + " · ")) {
+      note = note.substring((item.customer + " · ").length);
+    } else if (item.customer && note === item.customer) {
+      note = "";
+    }
+    setVal("f-note", note);
+  } else if (kind === "order") {
+    setVal("f-product", item.product_id);
+    setVal("f-vendor", item.vendor_id || "");
+    setVal("f-qty", item.qty);
+    setVal("f-unit", item.unit_cost);
+    setVal("f-date", item.date ? String(item.date).slice(0,10) : "");
+    const unpacked = unpackOrderNote(item.note);
+    setVal("f-tracking", unpacked.tracking);
+    setVal("f-status", unpacked.status);
+    setVal("f-note", unpacked.note);
+  } else if (kind === "client") {
+    setVal("f-name", item.name);
+    setVal("f-email", item.email);
+    setVal("f-phone", item.phone);
+    setVal("f-venmo", item.venmo_handle);
+    setVal("f-note", item.notes);
+  } else if (kind === "vendor") {
+    setVal("f-name", item.name);
+    setVal("f-contact", item.contact_name);
+    setVal("f-email", item.email);
+    setVal("f-phone", item.phone);
+    setVal("f-website", item.website);
+    setVal("f-note", item.notes);
+  }
 }
 
 function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
