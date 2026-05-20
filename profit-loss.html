@@ -712,7 +712,14 @@ const state = {
   inventory: [], products: [], orders: [], sales: [],
   clients: [], vendors: [],
   peopleMode: "clients",
-  filters: { inventory: "all", money: "all" }
+  filters: { inventory: "all", money: "all" },
+  search:  { inventory: "", money: "", products: "", people: "" },
+  sort:    {
+    inventory: { col: "name",  dir: "asc" },
+    money:     { col: "date",  dir: "desc" },
+    products:  { col: "name",  dir: "asc" },
+    people:    { col: "_total", dir: "desc" }
+  }
 };
 
 // ===== LOADERS =====
@@ -789,14 +796,49 @@ function renderTabCounts(){
 }
 
 function renderInventory(){
-  const items = state.inventory;
+  const all = state.inventory;
   const tbody = document.querySelector("#table-inventory tbody");
-  document.getElementById("kpi-compounds").textContent = items.length;
-  document.getElementById("kpi-vials").textContent = items.reduce((s,i)=>s+(i.vials||0),0);
-  document.getElementById("kpi-low").textContent = items.filter(i=>i.vials>0 && i.vials<=CFG.LOW_STOCK_THRESHOLD).length;
-  document.getElementById("kpi-out").textContent = items.filter(i=>!i.vials || i.vials===0).length;
+  const thead = document.querySelector("#table-inventory thead tr");
+  // KPIs always reflect the full dataset, not the filtered view
+  document.getElementById("kpi-compounds").textContent = all.length;
+  document.getElementById("kpi-vials").textContent = all.reduce((s,i)=>s+(i.vials||0),0);
+  document.getElementById("kpi-low").textContent = all.filter(i=>i.vials>0 && i.vials<=CFG.LOW_STOCK_THRESHOLD).length;
+  document.getElementById("kpi-out").textContent = all.filter(i=>!i.vials || i.vials===0).length;
   document.getElementById("kpi-low-threshold").textContent = CFG.LOW_STOCK_THRESHOLD;
-  if(!items.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No inventory yet. Click ＋ Add Item.</td></tr>`; return; }
+
+  // Re-render sortable header (arrow indicators update with state.sort)
+  if (thead) thead.innerHTML =
+    sortHeader("inventory", "name",      "Compound") +
+    sortHeader("inventory", "vials",     "Vials", "num") +
+    sortHeader("inventory", "vial_size", "Size") +
+    sortHeader("inventory", "status",    "Status") +
+    sortHeader("inventory", "note",      "Last Note") +
+    `<th></th>`;
+
+  // Apply chip filter
+  let items = all;
+  const f = state.filters.inventory;
+  if (f === "in")       items = items.filter(i => i.vials > CFG.LOW_STOCK_THRESHOLD);
+  else if (f === "low") items = items.filter(i => i.vials > 0 && i.vials <= CFG.LOW_STOCK_THRESHOLD);
+  else if (f === "out") items = items.filter(i => !i.vials || i.vials === 0);
+  else if (f === "ordered") items = items.filter(i => i.status === "ordered");
+
+  // Apply search
+  const q = state.search.inventory;
+  if (q) items = items.filter(i =>
+    (i.name||"").toLowerCase().includes(q) ||
+    (i.note||"").toLowerCase().includes(q) ||
+    (i.vial_size||"").toLowerCase().includes(q)
+  );
+
+  // Apply sort
+  items = applySort(items, state.sort.inventory, {});
+
+  if(!items.length){
+    const msg = (q || f !== "all") ? "No inventory matches your search/filter." : "No inventory yet. Click ＋ Add Item.";
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">${msg}</td></tr>`;
+    return;
+  }
   tbody.innerHTML = items.map(i=>{
     const status = !i.vials || i.vials===0 ? `<span class="pill pill-out">Out</span>`
                  : i.vials<=CFG.LOW_STOCK_THRESHOLD ? `<span class="pill pill-low">Low</span>`
@@ -865,13 +907,42 @@ function renderMoney(){
   document.getElementById("kpi-profit").textContent = fmt$(mtdProfit);
   document.getElementById("kpi-margin-sub").textContent = `${mtdMargin.toFixed(0)}% margin`;
 
-  // Transactions table
-  const tx = [
+  // Sortable header
+  const moneyThead = document.querySelector("#table-money thead tr");
+  if (moneyThead) moneyThead.innerHTML =
+    sortHeader("money", "date",         "Date") +
+    sortHeader("money", "_type",        "Type") +
+    sortHeader("money", "product_name", "Product") +
+    sortHeader("money", "party_name",   "Party") +
+    sortHeader("money", "qty",          "Qty", "num") +
+    sortHeader("money", "total",        "Total", "num") +
+    `<th>Tracking</th>` +
+    sortHeader("money", "status",       "Status");
+
+  // Build transactions, filter by chip + search, then sort
+  let tx = [
     ...sales.map(s=>({...s, _type:"sale"})),
     ...orders.map(o=>({...o, _type:"order"}))
-  ].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  ];
+  const mf = state.filters.money;
+  if (mf === "sale")  tx = tx.filter(t => t._type === "sale");
+  else if (mf === "order") tx = tx.filter(t => t._type === "order");
+  const mq = state.search.money;
+  if (mq) tx = tx.filter(t =>
+    (t.product_name||"").toLowerCase().includes(mq) ||
+    (t.party_name||t.client_name||t.vendor_name||t.customer||t.vendor||"").toLowerCase().includes(mq) ||
+    (t.note||"").toLowerCase().includes(mq) ||
+    (t.tracking||"").toLowerCase().includes(mq)
+  );
+  tx = applySort(tx, state.sort.money, {
+    date: r => new Date(r.date).getTime(),
+    party_name: r => r.party_name || r.client_name || r.vendor_name || r.customer || r.vendor || ""
+  });
   const tbody = document.querySelector("#table-money tbody");
-  if(!tx.length){ tbody.innerHTML = `<tr><td colspan="8" class="empty">No transactions yet.</td></tr>`; }
+  if(!tx.length){
+    const msg = (mq || mf !== "all") ? "No transactions match your search/filter." : "No transactions yet.";
+    tbody.innerHTML = `<tr><td colspan="8" class="empty">${msg}</td></tr>`;
+  }
   else {
     tbody.innerHTML = tx.map(t=>{
       const isSale = t._type==="sale";
@@ -941,9 +1012,31 @@ function renderProducts(){
   if(best){ document.getElementById("kpi-best-margin").textContent = best.margin.toFixed(0)+"%"; document.getElementById("kpi-best-product").textContent = best.name; }
   if(tight){ document.getElementById("kpi-tight-margin").textContent = tight.margin.toFixed(0)+"%"; document.getElementById("kpi-tight-product").textContent = tight.name; }
 
+  // Sortable header
+  const pThead = document.querySelector("#table-products thead tr");
+  if (pThead) pThead.innerHTML =
+    sortHeader("products", "name",     "Product") +
+    sortHeader("products", "cost",     "Cost / Vial", "num") +
+    sortHeader("products", "_sale",    "Sale / Vial", "num") +
+    sortHeader("products", "margin",   "Margin", "num") +
+    sortHeader("products", "_invName", "Linked Inventory") +
+    `<th></th>`;
+
+  // Search filter
+  const pq = state.search.products;
+  let rows = margins;
+  if (pq) rows = rows.filter(p =>
+    (p.name||"").toLowerCase().includes(pq) ||
+    (p._invName||"").toLowerCase().includes(pq)
+  );
+  rows = applySort(rows, state.sort.products, {});
+
   const tbody = document.querySelector("#table-products tbody");
-  if(!prods.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No products yet.</td></tr>`; return; }
-  tbody.innerHTML = margins.map(p=>`
+  if(!rows.length){
+    const msg = pq ? "No products match your search." : "No products yet.";
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">${msg}</td></tr>`; return;
+  }
+  tbody.innerHTML = rows.map(p=>`
     <tr>
       <td><strong>${p.name||""}</strong></td>
       <td class="num">${fmt$(p.cost||0)}</td>
@@ -978,9 +1071,32 @@ function renderPeople(){
   const totalSpend = withMetrics.reduce((s,p)=>s+p._total,0);
   document.getElementById("kpi-avg-spend").textContent = fmt$(withMetrics.length?totalSpend/withMetrics.length:0);
 
+  // Sortable header
+  const peopleThead = document.querySelector("#table-people thead tr");
+  if (peopleThead) peopleThead.innerHTML =
+    sortHeader("people", "name",   "Name") +
+    `<th>Contact</th>` +
+    sortHeader("people", "_total", "Lifetime", "num") +
+    sortHeader("people", "_tx",    "Tx", "num") +
+    sortHeader("people", "_last",  "Last") +
+    `<th></th>`;
+
+  // Search filter
+  const peq = state.search.people;
+  let rows = withMetrics;
+  if (peq) rows = rows.filter(p =>
+    (p.name||"").toLowerCase().includes(peq) ||
+    (p.email||"").toLowerCase().includes(peq) ||
+    (p.phone||"").toLowerCase().includes(peq)
+  );
+  rows = applySort(rows, state.sort.people, {});
+
   const tbody = document.querySelector("#table-people tbody");
-  if(!withMetrics.length){ tbody.innerHTML = `<tr><td colspan="6" class="empty">No ${isClients?"clients":"vendors"} yet.</td></tr>`; return; }
-  tbody.innerHTML = withMetrics.sort((a,b)=>b._total-a._total).map(p=>`
+  if(!rows.length){
+    const msg = peq ? `No ${isClients?"clients":"vendors"} match your search.` : `No ${isClients?"clients":"vendors"} yet.`;
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">${msg}</td></tr>`; return;
+  }
+  tbody.innerHTML = rows.map(p=>`
     <tr>
       <td><strong>${p.name||""}</strong></td>
       <td>${p.email||""} ${p.phone?` · ${p.phone}`:""}</td>
@@ -1638,6 +1754,79 @@ if(isSampleMode()){
 } else {
   loadAll();
 }
+
+// ===== SEARCH / FILTER / SORT WIRING =====
+function setupSearchAndFilters(){
+  // Search inputs — debounce by re-rendering on every input
+  const wireSearch = (inputId, panel, renderFn) => {
+    const el = document.getElementById(inputId);
+    if (!el) return;
+    el.addEventListener("input", () => {
+      state.search[panel] = el.value.trim().toLowerCase();
+      renderFn();
+    });
+  };
+  wireSearch("search-inventory", "inventory", renderInventory);
+  wireSearch("search-money",     "money",     renderMoney);
+  wireSearch("search-products",  "products",  renderProducts);
+  wireSearch("search-people",    "people",    renderPeople);
+
+  // Inventory status chips
+  document.querySelectorAll('[data-filter]').forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll('[data-filter]').forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.filters.inventory = chip.dataset.filter;
+      renderInventory();
+    });
+  });
+
+  // Money type chips
+  document.querySelectorAll('[data-money-filter]').forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll('[data-money-filter]').forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      state.filters.money = chip.dataset.money_filter || chip.dataset.moneyFilter;
+      renderMoney();
+    });
+  });
+
+  // Sortable column headers — set up after a render so dynamic content has them
+  document.addEventListener("click", (e) => {
+    const th = e.target.closest("th[data-sort]");
+    if (!th) return;
+    const panel = th.dataset.panel;
+    const col = th.dataset.sort;
+    if (!panel || !col) return;
+    const cur = state.sort[panel];
+    if (cur.col === col) cur.dir = cur.dir === "asc" ? "desc" : "asc";
+    else { cur.col = col; cur.dir = "asc"; }
+    ({ inventory: renderInventory, money: renderMoney, products: renderProducts, people: renderPeople }[panel] || (()=>{}))();
+  });
+}
+
+// Generic sort helper
+function applySort(rows, sortState, valueGetters){
+  const getter = valueGetters[sortState.col] || ((r) => r[sortState.col]);
+  const dir = sortState.dir === "desc" ? -1 : 1;
+  return rows.slice().sort((a, b) => {
+    const av = getter(a), bv = getter(b);
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    if (typeof av === "number" && typeof bv === "number") return (av - bv) * dir;
+    return String(av).localeCompare(String(bv), undefined, { sensitivity: "base" }) * dir;
+  });
+}
+
+// Renders a sort indicator (▲/▼) next to the active column
+function sortHeader(panel, col, label, extraClass){
+  const cur = state.sort[panel];
+  const arrow = cur.col === col ? (cur.dir === "asc" ? " ▲" : " ▼") : "";
+  return `<th data-panel="${panel}" data-sort="${col}" style="cursor:pointer;user-select:none;"${extraClass?` class="${extraClass}"`:""}>${label}<span style="color:var(--gold);font-size:10px;">${arrow}</span></th>`;
+}
+
+setupSearchAndFilters();
 </script>
 
 </body>
