@@ -808,7 +808,10 @@ function renderInventory(){
       <td>${i.vial_size||""}</td>
       <td>${status}</td>
       <td>${i.note||"—"}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="editItem('inventory','${i.id}')">Edit</button></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="editItem('inventory','${i.id}')">Edit</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteItem('inventory','${i.id}')">Delete</button>
+      </td>
     </tr>`;
   }).join("");
 }
@@ -947,7 +950,10 @@ function renderProducts(){
       <td class="num">${fmt$(p._sale)}</td>
       <td class="num gold">${p.margin.toFixed(0)}%</td>
       <td>${p._invName||"—"}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="editItem('product','${p.id}')">Edit</button></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="editItem('product','${p.id}')">Edit</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteItem('product','${p.id}')">Delete</button>
+      </td>
     </tr>`).join("");
 }
 
@@ -981,7 +987,10 @@ function renderPeople(){
       <td class="num gold">${fmt$(p._total)}</td>
       <td class="num">${p._tx}</td>
       <td>${p._last?fmtDate(new Date(p._last)):"—"}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="editItem('person','${p.id}')">Open</button></td>
+      <td style="white-space:nowrap;">
+        <button class="btn btn-ghost btn-sm" onclick="editItem('person','${p.id}')">Open</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteItem('person','${p.id}')">Delete</button>
+      </td>
     </tr>`).join("");
 }
 
@@ -1409,6 +1418,8 @@ async function saveModal(){
 }
 
 function editItem(kind, id){
+  // 'person' is a legacy alias — route to client or vendor based on People mode
+  if (kind === "person") kind = state.peopleMode === "vendors" ? "vendor" : "client";
   const dataMap = {
     inventory: state.inventory,
     product: state.products,
@@ -1485,6 +1496,39 @@ function editItem(kind, id){
     setVal("f-phone", item.phone);
     setVal("f-website", item.website);
     setVal("f-note", item.notes);
+  }
+}
+
+async function deleteItem(kind, id){
+  // 'person' alias → resolve based on current people mode
+  if (kind === "person") kind = state.peopleMode === "vendors" ? "vendor" : "client";
+  const tableMap = {
+    inventory: CFG.TABLES.inventory,
+    product:   CFG.TABLES.products,
+    sale:      CFG.TABLES.sales,
+    order:     CFG.TABLES.orders,
+    client:    CFG.TABLES.clients,
+    vendor:    CFG.TABLES.vendors
+  };
+  const listMap = {
+    inventory: state.inventory,
+    product:   state.products,
+    sale:      state.sales,
+    order:     state.orders,
+    client:    state.clients,
+    vendor:    state.vendors
+  };
+  const table = tableMap[kind];
+  if (!table) { alert("Unknown item type: " + kind); return; }
+  const item = (listMap[kind] || []).find(x => String(x.id) === String(id));
+  const label = item ? (item.name || `#${id}`) : `#${id}`;
+  if (!confirm(`Delete this ${kind}?\n\n${label}\n\nThis can't be undone.`)) return;
+  try {
+    await sbWrite(table, "DELETE", null, `?id=eq.${encodeURIComponent(id)}`);
+    await loadAll();
+  } catch (e) {
+    console.error("deleteItem failed:", e);
+    alert("Delete failed:\n\n" + (e.message || e));
   }
 }
 
