@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kyle's Recomp + Test Protocol — BioLinked</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+.tab-bar{display:flex;background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
+.tab-btn{flex:1;padding:14px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.inv-body{padding:32px 36px;}
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:18px 22px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:15px;color:var(--text);font-weight:400;}
+.total-row.sub{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:600;}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:10px;padding-top:14px;font-size:18px;font-weight:700;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);}
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:20px 22px;margin-bottom:24px;}
+.payment-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:15px;color:var(--text);font-weight:500;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);}
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+.footer-disc{font-size:12px;color:var(--muted);line-height:1.65;font-weight:400;max-width:420px;}
+.footer-brand{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 0;padding:16px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+.program-intro{text-align:center;padding:20px 0 26px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.program-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--text);line-height:1.05;letter-spacing:0.01em;}
+.program-title em{font-style:italic;color:var(--gold);}
+.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
+.program-context{margin:14px 0 0;font-size:13px;line-height:1.75;color:var(--muted);font-weight:400;text-align:left;background:rgba(122,101,48,0.04);border-left:2px solid var(--gold-border);padding:14px 18px;border-radius:2px;}
+.program-context strong{color:var(--text);font-weight:600;}
+.program-context p+p{margin-top:10px;}
+.program-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:18px;}
+.program-badge{background:#f8f8f8;border:1px solid var(--border);padding:5px 11px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border-radius:2px;}
+.program-badge strong{color:var(--gold);font-weight:700;}
+.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.sec-divider.mt{margin-top:32px;}
+.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:84px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+.sched-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:16px;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-top:2px;}
+.sched-phase-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:5px 11px;border-radius:2px;white-space:nowrap;}
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);font-weight:400;vertical-align:top;font-size:12px;line-height:1.5;}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
+.sched-count{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.sched-count.light{background:var(--gold-dim);color:var(--gold);border:1px solid var(--gold-border);}
+.sched-count.off{background:#eeeeee;color:#999;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11.5px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.pm{background:rgba(183,148,244,0.14);border-color:rgba(183,148,244,0.32);color:#7655b8;}
+.sched-pill.prn{background:rgba(99,179,237,0.12);border-color:rgba(99,179,237,0.32);color:#4278a8;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-scroll .sched-table{min-width:540px;}
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-banner .cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-banner .cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-banner .cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-banner .cal-dl-btn:hover{background:#345d85;}
+.tip-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:14px;}
+.tip-card.featured{border-top-width:3px;border-left:3px solid var(--gold);background:rgba(122,101,48,0.04);}
+.tip-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.tip-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.2;}
+.tip-body{font-size:14px;line-height:1.75;color:var(--text);font-weight:400;}
+.tip-body p + p{margin-top:10px;}
+.tip-body strong{font-weight:700;color:var(--text);}
+.tip-body em{font-style:italic;color:var(--muted);}
+.tip-body table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px;}
+.tip-body table th{background:#f0f0f0;color:var(--gold);padding:8px 10px;text-align:left;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.tip-body table td{padding:8px 10px;border-bottom:1px solid var(--border);}
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:15px;font-weight:700;color:var(--text);}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);}
+.li-body{padding:18px 22px;background:#fafafa;}
+.li-body .li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.7;}
+.li-body .li-callout strong{color:var(--gold);font-weight:700;}
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-top:8px;margin-bottom:24px;}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-of-type{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.stack-desc{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;margin-top:16px;font-size:14px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+.supplies-wrap{margin-bottom:20px;}
+.supply-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:13px 16px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.supply-row:hover{border-color:var(--gold-border);}
+.supply-info{flex:1;min-width:220px;}
+.supply-info-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.supply-info-desc{font-size:12px;color:var(--muted);font-weight:400;line-height:1.6;}
+.supply-link{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.supply-link:hover{background:#5f4f26;}
+.storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
+.storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.storage-body{font-size:13px;line-height:1.75;color:#3d2f10;font-weight:400;}
+.storage-body p + p{margin-top:10px;}
+.storage-body strong{color:var(--text);font-weight:700;}
+.inv-switcher{width:75%;max-width:1200px;margin:0 auto 14px;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:3px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.inv-switcher-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+.inv-switcher-select{background:#fff;border:1px solid rgba(122,101,48,0.45);border-radius:2px;padding:8px 14px;font-size:13px;font-weight:600;font-family:'Montserrat',sans-serif;color:#1a1a1a;cursor:pointer;outline:none;min-width:280px;}
+.inv-switcher-select:hover{border-color:var(--gold);}
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar,.inv-switcher{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details > summary{list-style:none;}}
+@media(max-width:1100px){.invoice-wrap,.print-btn,.inv-switcher{width:90%;}}
+@media(max-width:820px){.invoice-wrap,.print-btn,.inv-switcher{width:94%;}body{padding:24px 10px;}.inv-header{padding:22px 22px;}.inv-body{padding:24px 22px;}.inv-footer{padding:14px 22px;}}
+@media(max-width:640px){.invoice-wrap,.print-btn,.inv-switcher{width:100%;border-left:none;border-right:none;border-radius:0;}body{padding:8px 0;font-size:15px;}.inv-switcher{flex-direction:column;align-items:stretch;text-align:center;}.inv-switcher-select{width:100%;min-width:0;}.inv-header{flex-direction:column;gap:14px;padding:20px 18px;}.inv-meta{text-align:left;}.inv-brand-name{font-size:26px;}.inv-body{padding:20px 16px;}.inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}.total-row{font-size:13px;}.total-row.grand .val{font-size:24px;}.program-title{font-size:30px;}.program-intro{padding:14px 0 18px;}.program-badge{font-size:8px;padding:4px 8px;}.tab-bar{position:sticky;top:56px;}.tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}.sec-divider-title{font-size:19px;}.sched-card{padding:16px 16px;}.sched-card-title{font-size:17px;}.sched-table{font-size:11px;}.sched-table th{font-size:8px;padding:6px 4px;letter-spacing:0.08em;}.sched-table td{padding:7px 4px;font-size:11px;}.sched-pill{font-size:9px;padding:1px 5px;margin:1px 1px 1px 0;}.sched-pill strong{font-size:10.5px;}.storage-card{padding:14px 16px;}.storage-body{font-size:12px;}.payment-block{padding:16px 18px;}.tip-card{padding:16px 18px;}.tip-title{font-size:17px;}.tip-body{font-size:13px;}.cal-banner{flex-direction:column;align-items:stretch;}.cal-banner .cal-controls{flex-direction:column;align-items:stretch;}.cal-banner .cal-dl-btn{width:100%;}.cal-banner input[type=date]{width:100%;}}
+</style>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+      <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-link">Stack Analyzer</a>
+      <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-link">Biomarkers</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+    <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-mobile-link">Stack Analyzer</a>
+    <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-mobile-link">Biomarkers</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+<div class="inv-switcher">
+  <span class="inv-switcher-label">&#128196; Kyle Nelson &middot; Select Invoice</span>
+  <select class="inv-switcher-select" onchange="if(this.value)window.location.href=this.value;">
+    <option value="">— Choose invoice —</option>
+    <option value="/knelson/" selected>Invoice #2 &mdash; Test + Recomp Stack (Tesa + Reta)</option>
+    <option value="/knelson/gorilla-stack.html">Invoice #1 &mdash; Gorilla Stack (HGH-based)</option>
+  </select>
+</div>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Protocol &middot; Invoice #2</div>
+      <div class="inv-number">Kyle Nelson</div>
+      <div class="inv-date">Test + Recomp Stack &middot; Tesa + Reta</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  </div>
+
+  <div class="inv-body">
+
+    <!-- ================ PROTOCOL TAB ================ -->
+    <div class="tab-content active" id="tab-protocol">
+
+      <div class="program-intro">
+        <div class="program-eyebrow">Personalized Protocol</div>
+        <div class="program-title">Kyle's <em>Test + Recomp</em> Stack</div>
+        <div class="program-tag">Test for the base. Tesa + Reta for the recomp on top.</div>
+        <div class="program-context">
+          <p><strong>Three-item order &mdash; two layers of work.</strong> Testosterone provides the anabolic base; you're managing that side independently with your own protocol. The peptide stack (Tesamorelin + Retatrutide) layers cleanly on top: Tesa amplifies the GH/IGF-1 axis for body comp, Reta drives fat loss and appetite control.</p>
+          <p><strong>Reta is the long runner.</strong> One vial active, one frozen as backup. Starting low at 1 mg M/W/F and titrating based on how your body responds &mdash; we let the data drive the dose, not the calendar. See the Notes &amp; Tips tab for the full titration logic.</p>
+        </div>
+        <div class="program-badges">
+          <span class="program-badge"><strong>3</strong> Items</span>
+          <span class="program-badge">Test Base &middot; Recomp Peptides</span>
+          <span class="program-badge">Reta Titration</span>
+          <span class="program-badge">Friends &amp; Family Pricing</span>
+        </div>
+        <div style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(122,101,48,0.08);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 16px;border-radius:2px;">
+          <span style="font-size:18px;line-height:1;">&#128150;</span>
+          <span style="text-align:left;">
+            <span style="display:block;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">Friends &amp; Family Pricing</span>
+            <span style="display:block;font-size:13px;color:var(--text);font-weight:500;margin-top:2px;">Bundle Total <strong style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700;">$440</strong> &middot; You save <strong style="color:var(--gold);">$60</strong></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Items &amp; Pricing</div>
+        <div class="sec-divider-title">3 Items &middot; Tap to Expand</div>
+      </div>
+
+      <div class="line-items">
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Testosterone Cypionate &middot; 250 mg/mL &middot; 10 mL &middot; 2 vials <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#4a4a44;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">Self-Managed</span></span>
+            <span class="li-summary-price">$100 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">250 mg/mL &middot; 10 mL multi-dose vial &middot; 2 vials &middot; 2,500 mg of test per vial = 5,000 mg total</span></li>
+              <li><span class="ql">Recon</span><span class="qv">Pre-mixed in oil carrier &mdash; <strong>no reconstitution needed</strong></span></li>
+              <li><span class="ql">Dose</span><span class="qv">Client-managed &mdash; per Kyle's own protocol</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Client-managed &mdash; not part of the BioLinked protocol page</span></li>
+              <li><span class="ql">Site</span><span class="qv">IM (intramuscular) &mdash; quad / glute / delt rotation per Kyle's own plan</span></li>
+            </ul>
+            <div class="li-callout"><strong>Test is the anabolic base.</strong> Kyle is running his own dosing protocol on this &mdash; nothing on the BioLinked schedule or calendar pertains to test. The peptide stack (Tesa + Reta) sits on top of whatever test base he's already running, with no conflicts or interactions to manage.</div>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Tesamorelin &middot; 10 mg &middot; 2 vials <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#3a7a5a;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">~4 Weeks</span></span>
+            <span class="li-summary-price"><span style="font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;">$50</span>$40 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">10 mg / 2 mL (5 mg/mL after recon) &middot; 2 vials cover the ~4-week cycle</span></li>
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">20 units</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, pre-bed (fasted 2+ hrs after last meal) &middot; <strong>run until bottles are empty</strong></span></li>
+              <li><span class="ql">Supply</span><span class="qv">10 mg / 1 mg per dose = 10 doses per vial &middot; 2 vials = 20 doses &middot; M&ndash;F = ~4 weeks</span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+            </ul>
+            <div class="li-callout"><strong>The most clinically researched GHRH analog.</strong> Amplifies your body's natural GH pulse from the pituitary &mdash; works <em>with</em> your physiology rather than suppressing it. Strongest data for visceral fat reduction and lean tissue preservation. At 4 weeks this serves as a focused GH-axis primer to kick the cycle into gear &mdash; sleep depth + recovery shift within 2&ndash;3 weeks.</div>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide &middot; 60 mg &middot; 2 vials <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#7A6530;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">1 Active &middot; 1 Frozen</span></span>
+            <span class="li-summary-price"><span style="font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;">$100</span>$80 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">60 mg / 3 mL (20 mg/mL after recon) &middot; <strong>1 vial active</strong> + 1 vial frozen as backup/extension</span></li>
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial (active vial only &mdash; reconstitute frozen vial only when needed)</span></li>
+              <li><span class="ql">Dose (start)</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">5 units</span> &middot; titrate based on response</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M / W / F &middot; <strong>run until vial is empty</strong></span></li>
+              <li><span class="ql">Supply</span><span class="qv">60 mg per vial &middot; 1 active vial = ~13&ndash;20 weeks depending on titration &middot; frozen vial doubles the runway</span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen (rotate quadrants)</span></li>
+            </ul>
+            <div class="li-callout"><strong>The fat-loss anchor of the stack.</strong> Triple-agonist (GLP-1 + GIP + glucagon) &mdash; the third receptor (glucagon) is what differentiates Reta from Tirz and drives the additional fat-burning + energy-expenditure response. Dosing is <strong>data-driven, not calendar-driven</strong>: start at 1 mg, hold through Week 4, then titrate up to 1.5 mg if tolerated. See the Notes &amp; Tips tab for the full titration logic and frozen-vial strategy.</div>
+          </div>
+        </details>
+
+      </div>
+
+      <div style="background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">&#128150; Friends &amp; Family Pricing &middot; Bundle Total</div>
+          <div style="font-size:13px;color:#3d2f10;line-height:1.6;">Tesamorelin discount ($10 off &times; 2 = $20) + Retatrutide discount ($20 off &times; 2 = $40). Total savings vs. list: <strong>$60</strong>. Test priced flat.</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1;">$440</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:0.08em;">was <span style="text-decoration:line-through;">$500</span></div>
+        </div>
+      </div>
+
+      <div class="totals-block">
+        <div class="total-row"><span>Testosterone Cypionate 250 mg/mL &times; 2</span><span>$200.00</span></div>
+        <div class="total-row"><span>Tesamorelin 10 mg &times; 2 (list)</span><span>$100.00</span></div>
+        <div class="total-row"><span>Retatrutide 60 mg &times; 2 (list)</span><span>$200.00</span></div>
+        <div class="total-row sub"><span>Subtotal (MSRP)</span><span>$500.00</span></div>
+        <div class="total-row" style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-radius:2px;padding:10px 14px;margin-top:8px;">
+          <span style="display:flex;flex-direction:column;">
+            <span style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;">Friends &amp; Family Discount</span>
+            <span style="font-size:14px;font-weight:600;color:var(--text);">Tesamorelin $20 off (2 &times; $10) + Retatrutide $40 off (2 &times; $20)</span>
+          </span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);">&minus;$60.00</span>
+        </div>
+        <div class="total-row grand"><span>Total Due</span><span class="val">$440.00</span></div>
+        <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-top:8px;">You save $60 &middot; Friends &amp; Family Pricing</div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-title">Protocol Overview &mdash; How the Stack Works Together</div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Testosterone &mdash; The Anabolic Base (Self-Managed)</div>
+            <div class="stack-desc">Kyle's own protocol &mdash; not on the BioLinked calendar. Test provides the muscle-protein-synthesis floor that everything else builds on. The peptide stack layers on top without interference: Tesa works on a different axis (GHRH/pituitary), Reta on a different one again (gut hormones/CNS appetite). Three independent levers, none of them stepping on each other.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Tesamorelin &mdash; The 4-Week GH Primer</div>
+            <div class="stack-desc">Short focused run to wake up the GH/IGF-1 axis at the start of the cycle. Pre-bed timing rides the body's natural nocturnal GH pulse &mdash; deeper sleep, better recovery, lean-tissue preservation while Reta drives fat loss. Finishes around Week 4 by design; the work it does (sleep depth, recovery baseline) carries through the rest of the Reta run.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Retatrutide &mdash; The Fat-Loss Engine (Long Runner)</div>
+            <div class="stack-desc">The compound that defines the cycle length. Starting low at 1 mg M/W/F to establish tolerance, then titrating up based on response, not calendar. With one vial active and one frozen, runway is yours to dictate: extend continuously, or run vial #1 + take a break + restart with vial #2 for a second push.</div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>Stack Synergy:</strong> Test base + Tesa GH primer + Reta fat-loss engine = three different mechanisms working in parallel. Tesa front-loads the cycle (Wks 1&ndash;4) to lock in sleep / recovery / lean-tissue preservation while Reta is still ramping. By the time Tesa runs out, Reta has built up therapeutic concentration and takes over as the lead compound for the rest of the cycle. Test sits underneath the whole thing as the anabolic anchor.
+        </div>
+      </div>
+
+      <div class="payment-block">
+        <div class="payment-title">Payment Instructions</div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128184;</div>
+          <div><div class="payment-text">Send via Venmo</div><div class="payment-handle">@micahp20</div></div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128221;</div>
+          <div class="payment-text">Include your name in the Venmo note</div>
+        </div>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================ SCHEDULE TAB ================ -->
+    <div class="tab-content" id="tab-schedule">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Weekly Schedule</div>
+        <div class="sec-divider-title">Tesa Wks 1&ndash;4 &middot; Reta Long Run (Titrated)</div>
+      </div>
+
+      <div class="cal-banner">
+        <div class="cal-left">
+          <h4>&#128197; Add to Your Calendar</h4>
+          <p>Pick your Week 1 Monday and download the .ics file. Opens in Apple Calendar (iOS) and Google Calendar (Android) &mdash; Tesa events Mon&ndash;Fri Wks 1&ndash;4, Reta events M/W/F across the full cycle with titration markers at Wk 5 and Wk 9.</p>
+        </div>
+        <div class="cal-controls">
+          <input type="date" id="cycleStart">
+          <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+        </div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 1 &mdash; Tesa + Reta Starter</div>
+            <div class="sched-card-sub">Tesa pre-bed M&ndash;F + Reta M/W/F at 1 mg starter dose. Test on Kyle's own schedule.</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 1&ndash;4</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM / PM</th>
+              <th>Pre-Bed</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>5u</strong> · Reta (1 mg)</span></td><td><span class="sched-pill pm"><strong>20u</strong> · Tesa (1 mg)</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill off">No Reta</span></td><td><span class="sched-pill pm"><strong>20u</strong> · Tesa</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>5u</strong> · Reta</span></td><td><span class="sched-pill pm"><strong>20u</strong> · Tesa</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill off">No Reta</span></td><td><span class="sched-pill pm"><strong>20u</strong> · Tesa</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>5u</strong> · Reta</span></td><td><span class="sched-pill pm"><strong>20u</strong> · Tesa</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 2 &mdash; Reta Only (Titrate to 1.5 mg if Tolerated)</div>
+            <div class="sched-card-sub">Tesa is done. Reta continues at bumped dose (or hold at 1 mg if GI issues, drop to 0.5 mg if needed).</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 5&ndash;8</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM / PM</th>
+              <th>Pre-Bed</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>7.5u</strong> · Reta (1.5 mg)</span></td><td><span class="sched-pill off">Tesa done</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>7.5u</strong> · Reta</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>7.5u</strong> · Reta</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 3 &mdash; Reta Cap (Optional Bump to 2 mg)</div>
+            <div class="sched-card-sub">Final phase. Bump to 2 mg M/W/F only if 1.5 mg has plateaued and tolerance is solid. Otherwise hold at 1.5.</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 9+ &middot; Until Empty</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM / PM</th>
+              <th>Pre-Bed</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>10u</strong> · Reta (2 mg)</span></td><td><span class="sched-pill off">—</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>10u</strong> · Reta</span></td><td><span class="sched-pill off">—</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>10u</strong> · Reta</span></td><td><span class="sched-pill off">—</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
+        <strong style="color:var(--gold);">Tesa pre-bed timing:</strong> empty stomach, 2+ hours after your last meal &mdash; food blunts the GH pulse. Inject at the same time each night to keep the rhythm consistent (e.g. 10 PM if you eat at 8).<br><br>
+        <strong style="color:var(--gold);">Reta dose-bump decisions:</strong> only advance if tolerance is solid + you want more effect. The dose ladder is 0.5 / 1.0 / 1.5 / 2.0 mg &mdash; you can move in either direction. See the Notes &amp; Tips tab for the full titration logic.<br><br>
+        <strong style="color:var(--gold);">Test schedule:</strong> Kyle's own protocol &mdash; not represented in the table above. No interaction with the peptide schedule.
+      </div>
+
+    </div><!-- /schedule tab -->
+
+    <!-- ================ SUPPLIES TAB ================ -->
+    <div class="tab-content" id="tab-supplies">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Supplies</div>
+        <div class="sec-divider-title">Order Before Day 1</div>
+      </div>
+
+      <div class="supplies-wrap">
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 100-pack</div>
+            <div class="supply-info-desc">For every SubQ shot (Tesa + Reta only). Peak Phase 1 week = 8 shots (5 Tesa + 3 Reta). After Wk 4, drop to 3/week (Reta only). Across a ~20-week cycle, ~80&ndash;100 shots total &mdash; a 100-pack is the right size. Buy a second pack if extending with frozen vial.</div>
+          </div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">IM Needles for Test &mdash; Client's Own Setup</div>
+            <div class="supply-info-desc">Kyle is self-managing the Test injections &mdash; pull/inject needle setup is on his side. Typical IM is a 22&ndash;25G &times; 1&Prime; or 1.5&Prime; needle. Not listed here because it's outside the BioLinked protocol scope.</div>
+          </div>
+          <span class="supply-link" style="background:#4a4a44;cursor:default;">Self-Managed</span>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water &mdash; ~7 mL Total (for Peptides)</div>
+            <div class="supply-info-desc">For reconstitution: Tesamorelin (2 mL &times; 2 = 4 mL) + Retatrutide active vial (3 mL &times; 1 = 3 mL) = 7 mL. Only reconstitute the frozen Reta vial when ready to use it &mdash; that's another 3 mL when the time comes. One 30 mL McGuff bottle covers everything with room to spare.</div>
+          </div>
+          <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">McGuff &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 100-pack</div>
+            <div class="supply-info-desc">Wipe every vial stopper and every injection site (peptides + Test). A 100-pack covers the cycle comfortably.</div>
+          </div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+            <div class="supply-info-desc">All used needles go directly in here. Drop off free at any CVS or Walgreens when full.</div>
+          </div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+            <div class="supply-info-desc">For the active reconstituted vials (Tesa Wks 1&ndash;4 + Reta active vial). Keeps them organized, protected from light, and at stable temperature.</div>
+          </div>
+          <a href="https://a.co/d/07HthwLz" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Storage &amp; Handling</div>
+        <div class="sec-divider-title">Keep It Cold &middot; Freeze the Backup Reta</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="storage-title">❄ Refrigerated, Protected, Rotated</div>
+        <div class="storage-body">
+          <p><strong>Dry (lyophilized) vials &mdash; fridge:</strong> store at 36&ndash;46&deg;F before reconstitution. Protect from light. This applies to Tesa and the <em>active</em> Reta vial before recon.</p>
+          <p><strong>Reta vial #2 &mdash; freezer:</strong> store the second Reta vial in the freezer (0&deg;F or colder) in its dry/lyophilized state. Lyophilized peptides are stable in the freezer essentially indefinitely on the cycle timescale &mdash; protects potency for when you need it later. Do <em>not</em> freeze after reconstitution.</p>
+          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days. Reta active vial will be in the fridge for ~13&ndash;20 weeks &mdash; that's longer than the 30-day window. The convention with longer-cycle Reta is that potency holds well past 30 days at 4&deg;C when kept clean and dark; rotate to a fresh draw site on the stopper each time and avoid contamination.</p>
+          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row.</p>
+        </div>
+      </div>
+
+    </div><!-- /supplies tab -->
+
+    <!-- ================ NOTES TAB ================ -->
+    <div class="tab-content" id="tab-notes">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Reta Titration</div>
+        <div class="sec-divider-title">How to Move the Dose Up, Down, or Hold</div>
+      </div>
+
+      <div class="tip-card featured">
+        <div class="tip-eyebrow">Tip 01 &mdash; Reta Dose Ladder</div>
+        <div class="tip-title">Data-Driven, Not Calendar-Driven</div>
+        <div class="tip-body">
+          <p>Reta is the long runner here &mdash; the active vial alone is 13&ndash;20 weeks depending on how you titrate. The dose ladder gives you four steps to move between:</p>
+          <table>
+            <thead><tr><th>Window</th><th>Dose</th><th>Units (5u = 1 mg)</th><th>Weekly</th><th>Trigger</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Wks 1&ndash;4</strong></td><td>1.0 mg</td><td>5u</td><td>3 mg/wk</td><td>Starter &mdash; establish tolerance + baseline response</td></tr>
+              <tr><td><strong>Wks 5&ndash;8</strong></td><td>1.5 mg</td><td>7.5u</td><td>4.5 mg/wk</td><td>Advance if tolerance is solid + want more effect</td></tr>
+              <tr><td><strong>Wks 9+</strong></td><td>2.0 mg (cap)</td><td>10u</td><td>6 mg/wk</td><td>Only if 1.5 has plateaued &mdash; final ceiling</td></tr>
+              <tr><td><strong>Drop step</strong></td><td>0.5 mg</td><td>2.5u</td><td>1.5 mg/wk</td><td>Back-off dose if GI issues / fat loss too fast</td></tr>
+            </tbody>
+          </table>
+          <p><strong>Move UP signals:</strong> GI tolerance is solid (no nausea / vomiting / persistent constipation), appetite control is effective but not extreme, fat loss has slowed or plateaued. <strong>Move DOWN signals:</strong> persistent nausea past Week 2, vomiting at all, fat loss faster than ~2 lbs/wk sustained, energy dropping or workouts feeling flat (likely under-eating).</p>
+          <p><strong>The rule:</strong> never advance because of the calendar. Advance because the body is asking for it. Hold a dose for an extra 2&ndash;4 weeks if you're getting what you want at the current step.</p>
+        </div>
+      </div>
+
+      <div class="tip-card featured">
+        <div class="tip-eyebrow">Tip 02 &mdash; The Frozen Vial Strategy</div>
+        <div class="tip-title">Two Ways to Use Vial #2</div>
+        <div class="tip-body">
+          <p><strong>Lyophilized Reta in the freezer (0&deg;F or colder)</strong> stays viable on any cycle timescale you'd realistically use it on. Keep it sealed in its original packaging, in the original vial, dry &mdash; do not reconstitute until ready.</p>
+          <p><strong>Strategy A &mdash; Continuous extension:</strong> when the active vial is empty, pull the frozen vial, let it come to fridge temp (don't shock it &mdash; transfer to fridge for 24 hrs before reconstitution), then reconstitute and continue. This gives you a single ~26&ndash;40 week continuous run.</p>
+          <p><strong>Strategy B &mdash; Maintenance restart:</strong> finish vial #1, take 4&ndash;8 weeks off Reta (keep training and Tesa cycle behind you), then restart with vial #2 for a second push. Lets the body's metabolic adaptation reset before the second wave hits.</p>
+          <p><strong>Which to pick:</strong> depends on what's happening at the end of vial #1. Still losing? Continue (Strategy A). Stalled or feel run-down? Take the break (Strategy B). The frozen vial gives you that choice &mdash; it's not committed.</p>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Week-by-Week</div>
+        <div class="sec-divider-title">What to Expect</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 1&ndash;2</div>
+        <div class="tip-title">Foundation &middot; First Reta GI Window</div>
+        <div class="tip-body">
+          <p>Tesa starts kicking sleep depth + recovery within the first week. Reta at 1 mg M/W/F is the conservative entry &mdash; the first 1&ndash;2 weeks are the GI tolerance window. <strong>Mild nausea or appetite suppression is expected;</strong> usually clears by Week 2. If nausea is severe or persistent, drop to 0.5 mg (2.5 units) for a few doses before resuming the climb.</p>
+          <p>Log appetite, energy, and any GI signals. This baseline matters for whether to advance at Week 5.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 3&ndash;4</div>
+        <div class="tip-title">Tesa Closing Out &middot; Reta Building</div>
+        <div class="tip-body">
+          <p>Tesa runs out around Week 4 &mdash; the GH-axis work it did is locked in. You should be sleeping better, recovering faster, lean tissue protected. Reta concentration is now therapeutic &mdash; appetite control firm, fat loss starting to show.</p>
+          <p><strong>End of Week 4 decision point:</strong> bump Reta to 1.5 mg (7.5 units) starting Week 5, or hold at 1 mg if you're getting what you need.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 5&ndash;8</div>
+        <div class="tip-title">Reta Mid-Cycle &middot; Body Comp Curve</div>
+        <div class="tip-body">
+          <p>Tesa is done; Reta carries the cycle. Fat loss curve at its steepest here if dosing is right &mdash; expect 1&ndash;1.5 lbs/wk sustained at 1.5 mg dose. If faster than that, drop back to 1 mg (you're risking lean tissue).</p>
+          <p>Energy and workout quality matter here &mdash; if they drop, you're under-eating. Add 200&ndash;300 cal of protein/carbs around training rather than holding the deficit hard.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 9+</div>
+        <div class="tip-title">Cap Decision &middot; Vial Runway</div>
+        <div class="tip-body">
+          <p><strong>Bump to 2 mg only if:</strong> 1.5 mg has plateaued, appetite control has weakened, GI tolerance has been clean for 4+ weeks. Otherwise hold at 1.5 mg through to vial empty. 2 mg is the cap &mdash; no benefit going above that on a recomp cycle.</p>
+          <p>Track vial fill level weekly. When the active vial gets to ~10 doses remaining, decide on Strategy A (extend with frozen vial) or Strategy B (finish, break, restart later).</p>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Execution Tips</div>
+        <div class="sec-divider-title">Timing &middot; Site Rotation &middot; Monitoring</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 03 &mdash; Tesa Pre-Bed Window</div>
+        <div class="tip-title">Empty Stomach, 2+ Hrs After Last Meal</div>
+        <div class="tip-body">
+          <p>Tesa rides the body's natural nocturnal GH pulse &mdash; food blunts the pulse, so fasted is non-negotiable. If you ate at 8 PM, inject at 10 PM or later. Water, black coffee, and tea are fine in the fasted window. Skip the dose if you snacked late.</p>
+          <p>Same time each night &mdash; the body locks onto the rhythm.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 04 &mdash; Reta Timing</div>
+        <div class="tip-title">Morning Is Easiest &middot; Same Time Each Dose Day</div>
+        <div class="tip-body">
+          <p>Reta has a long half-life (~6 days), so the exact time of day doesn't matter much from a pharmacology standpoint. But for habit + GI predictability, <strong>morning dosing is the cleanest</strong> &mdash; any nausea spike happens during waking hours rather than ruining sleep.</p>
+          <p>Same time each M/W/F holds the rhythm. If you miss a dose by &lt;24 hrs, take it when you remember and continue the schedule. Miss by &gt;24 hrs &mdash; skip and resume next scheduled day.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 05 &mdash; Site Rotation</div>
+        <div class="tip-title">Four Abdomen Quadrants, Cycle Through</div>
+        <div class="tip-body">
+          <p>SubQ shots go in the abdomen, 2+ inches from the navel. Four quadrants: upper-left, upper-right, lower-left, lower-right. Rotate every shot &mdash; never inject the same 1&Prime; spot two days in a row. Same-quadrant repeat is fine if the spot is &gt;1&Prime; from the last shot.</p>
+          <p>Test IM goes in a different zone entirely (quad / glute / delt &mdash; Kyle's own rotation). No overlap with the peptide sites.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 06 &mdash; What to Monitor</div>
+        <div class="tip-title">Normal vs. Watch For</div>
+        <div class="tip-body">
+          <p><strong>Normal (no action):</strong></p>
+          <p>&middot; Mild nausea / appetite drop with first 1&ndash;2 Reta shots &mdash; subsides<br>
+          &middot; Mild injection-site redness or small bruising &mdash; rotate sites and use proper SubQ technique<br>
+          &middot; Slight warmth or "fullness" feeling 30 min after Tesa &mdash; normal GH response<br>
+          &middot; Mild water retention in first 2 weeks of Tesa &mdash; normal, resolves as the body adapts<br>
+          &middot; Constipation on Reta &mdash; common; hydration + fiber addresses it</p>
+          <p><strong>Monitor (contact BioLinked):</strong></p>
+          <p>&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique issue or contamination<br>
+          &middot; Severe nausea or vomiting past Week 2 of Reta &mdash; drop to 0.5 mg or pause<br>
+          &middot; Fat loss faster than ~2 lbs/wk sustained &mdash; drop Reta dose, lean tissue is at risk<br>
+          &middot; Persistent fatigue or workouts feeling flat &mdash; usually under-eating; add cals around training<br>
+          &middot; Numbness/tingling in hands beyond Week 4 of Tesa &mdash; flag to reassess dosing</p>
+        </div>
+      </div>
+
+    </div><!-- /notes tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Week 1 Monday first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-knelson@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  // Generate 20 weeks of Reta + 4 weeks of Tesa
+  for(var w=1;w<=20;w++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(w-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var isMWF=(d===0||d===2||d===4);
+      var isTesaWk=(w<=4);
+      var lines=[];
+      var phase='';
+      var shots=0;
+      var retaDose='';
+      var retaUnits='';
+      if(w<=4){retaDose='1 mg';retaUnits='5u';phase='Phase 1 — Tesa + Reta starter';}
+      else if(w<=8){retaDose='1.5 mg';retaUnits='7.5u';phase='Phase 2 — Reta titrate (1.5 mg if tolerated)';}
+      else {retaDose='2 mg cap';retaUnits='10u';phase='Phase 3 — Reta cap (or hold at 1.5)';}
+      if(isMWF){
+        lines.push('Reta '+retaUnits+' ('+retaDose+') — SubQ abdomen, morning');
+        shots++;
+      }
+      if(isTesaWk){
+        lines.push('Tesa 20u (1 mg) — SubQ abdomen, pre-bed (empty stomach, 2+ hrs after last meal)');
+        shots++;
+      }
+      if(shots===0)continue;
+      // Add titration markers
+      var marker='';
+      if(w===5&&d===0)marker=' · TITRATE: Reta → 1.5 mg if tolerated';
+      if(w===9&&d===0)marker=' · TITRATE: Reta → 2 mg only if 1.5 plateaued';
+      var title='BLS · Kyle · W'+w+' '+dayNames[dow]+' · '+shots+' shot'+(shots===1?'':'s')+marker;
+      var desc='Kyle Nelson Test + Recomp · Week '+w+' · '+phase+'\\n\\n'+lines.join('\\n')+'\\n\\nTest on your own schedule — not in this calendar.';
+      addE(date,title,desc,'W'+w+'D'+d);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Kyle Nelson Recomp Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Kyle Recomp + Test','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='Kyle-Nelson-Recomp-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+</script>
+
+</body>
+</html>
