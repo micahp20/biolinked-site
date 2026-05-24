@@ -438,6 +438,7 @@
       <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Avg Margin</div><div class="kpi-value gold" id="kpi-avg-margin">—</div><div class="kpi-sub">weighted by sales</div></div>
       <div class="kpi"><div class="kpi-accent" style="background:var(--success)"></div><div class="kpi-label">Best Margin</div><div class="kpi-value success" id="kpi-best-margin">—</div><div class="kpi-sub" id="kpi-best-product">—</div></div>
       <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Tightest</div><div class="kpi-value warn" id="kpi-tight-margin">—</div><div class="kpi-sub" id="kpi-tight-product">—</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Not Linked</div><div class="kpi-value warn" id="kpi-unlinked-count">—</div><div class="kpi-sub">need inventory link</div></div>
     </div>
     <div class="section">
       <div class="section-head">
@@ -1018,6 +1019,9 @@ function renderProducts(){
   document.getElementById("kpi-avg-margin").textContent = avg.toFixed(0)+"%";
   if(best){ document.getElementById("kpi-best-margin").textContent = best.margin.toFixed(0)+"%"; document.getElementById("kpi-best-product").textContent = best.name; }
   if(tight){ document.getElementById("kpi-tight-margin").textContent = tight.margin.toFixed(0)+"%"; document.getElementById("kpi-tight-product").textContent = tight.name; }
+  const unlinkedCount = margins.filter(p => !p._invName).length;
+  const unlinkedEl = document.getElementById("kpi-unlinked-count");
+  if (unlinkedEl) unlinkedEl.textContent = unlinkedCount === 0 ? "0" : String(unlinkedCount);
 
   // Sortable header
   const pThead = document.querySelector("#table-products thead tr");
@@ -1043,18 +1047,26 @@ function renderProducts(){
     const msg = pq ? "No products match your search." : "No products yet.";
     tbody.innerHTML = `<tr><td colspan="6" class="empty">${msg}</td></tr>`; return;
   }
-  tbody.innerHTML = rows.map(p=>`
+  tbody.innerHTML = rows.map(p=>{
+    const linked = p._invName
+      ? `<span style="color:var(--text);">${p._invName}</span>`
+      : `<span class="pill" style="background:rgba(212,148,40,0.14);color:#9a6a18;border:1px solid rgba(212,148,40,0.45);font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;" title="Receive button won't bump inventory until this is linked">⚠ Not linked</span>`;
+    const nameCell = p._invName
+      ? `<strong>${p.name||""}</strong>`
+      : `<strong>${p.name||""}</strong> <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;color:#9a6a18;margin-left:6px;">⚠</span>`;
+    return `
     <tr>
-      <td><strong>${p.name||""}</strong></td>
+      <td>${nameCell}</td>
       <td class="num">${fmt$(p.cost||0)}</td>
       <td class="num">${fmt$(p._sale)}</td>
       <td class="num gold">${p.margin.toFixed(0)}%</td>
-      <td>${p._invName||"—"}</td>
+      <td>${linked}</td>
       <td style="white-space:nowrap;">
         <button class="btn btn-ghost btn-sm" onclick="editItem('product','${p.id}')">Edit</button>
         <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteItem('product','${p.id}')">Delete</button>
       </td>
-    </tr>`).join("");
+    </tr>`;
+  }).join("");
 }
 
 function renderPeople(){
