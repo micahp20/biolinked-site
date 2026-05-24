@@ -444,6 +444,7 @@
       <div class="section-head">
         <div class="section-title">Product <em>Catalog</em></div>
         <div class="section-actions">
+          <button class="btn btn-sm" onclick="autoLinkAllProducts()" title="Find Inventory items with matching names and link them to unlinked Products">&#128279; Auto-Link by Name</button>
           <button class="btn btn-sm" onclick="openModal('product')">＋ Add Product</button>
         </div>
       </div>
@@ -1437,14 +1438,17 @@ async function saveModal(){
   const vNum  = (id) => parseFloat(v(id)) || 0;
   const vInt  = (id) => parseInt(v(id)) || 0;
 
-  // Helper: POST a new row, or PATCH the existing one when isEdit
+  // Helper: POST a new row, or PATCH the existing one when isEdit. Returns Supabase response.
   const upsert = async (table, body) => {
     if (isEdit) {
-      await sbWrite(table, "PATCH", body, `?id=eq.${encodeURIComponent(editId)}`);
+      return await sbWrite(table, "PATCH", body, `?id=eq.${encodeURIComponent(editId)}`);
     } else {
-      await sbWrite(table, "POST", body);
+      return await sbWrite(table, "POST", body);
     }
   };
+
+  // Case/whitespace-insensitive name match used for auto-linking products ↔ inventory
+  const normName = s => (s || "").trim().toLowerCase();
 
   try {
     if (kind === "inventory") {
@@ -1455,13 +1459,29 @@ async function saveModal(){
         kit_qty: 1, note: vTrim("f-note") || null,
         status: vInt("f-vials") === 0 ? "out" : vInt("f-vials") <= CFG.LOW_STOCK_THRESHOLD ? "low" : "in-stock"
       };
-      await upsert(CFG.TABLES.inventory, body);
+      const res = await upsert(CFG.TABLES.inventory, body);
+      // Auto-link: if this inventory item matches any unlinked product by name, set product.inventory_id
+      const invRow = Array.isArray(res) && res[0] ? res[0] : null;
+      if (invRow && invRow.id) {
+        const target = normName(name);
+        const matches = state.products.filter(p => !p.inventory_id && normName(p.name) === target);
+        for (const p of matches) {
+          await sbWrite(CFG.TABLES.products, "PATCH", { inventory_id: invRow.id }, `?id=eq.${p.id}`).catch(()=>{});
+          p.inventory_id = invRow.id;
+        }
+      }
     }
 
     else if (kind === "product") {
       const name = vTrim("f-name");
       if (!name) { alert("Product name required."); return; }
-      const invVal = v("f-inventory");
+      let invVal = v("f-inventory");
+      // Auto-link: if user didn't pick an inventory item but one exists with the same name, link it
+      if (!invVal) {
+        const target = normName(name);
+        const match = state.inventory.find(i => normName(i.name) === target);
+        if (match) invVal = match.id;
+      }
       const body = {
         name, cost: vNum("f-cost"), sale: vNum("f-price"),
         inventory_id: invVal ? (isNaN(parseInt(invVal)) ? invVal : parseInt(invVal)) : null
@@ -1658,6 +1678,32 @@ function editItem(kind, id){
     setVal("f-website", item.website);
     setVal("f-note", item.notes);
   }
+}
+
+// Bulk auto-link: find Products with no inventory_id whose name matches an Inventory item, link them.
+async function autoLinkAllProducts(){
+  const normName = s => (s || "").trim().toLowerCase();
+  const invByName = new Map();
+  state.inventory.forEach(i => invByName.set(normName(i.name), i));
+  const candidates = state.products.filter(p => !p.inventory_id && invByName.has(normName(p.name)));
+  if (!candidates.length) {
+    alert("Nothing to link.\n\nEither all Products are already linked, or no Inventory item names match an unlinked Product.");
+    return;
+  }
+  const preview = candidates.slice(0, 10).map(p => `• ${p.name} → ${invByName.get(normName(p.name)).name}`).join("\n");
+  const more = candidates.length > 10 ? `\n…and ${candidates.length - 10} more` : "";
+  if (!confirm(`Link ${candidates.length} product${candidates.length===1?"":"s"} to matching Inventory items?\n\n${preview}${more}`)) return;
+  let linked = 0, failed = 0;
+  for (const p of candidates) {
+    const match = invByName.get(normName(p.name));
+    try {
+      await sbWrite(CFG.TABLES.products, "PATCH", { inventory_id: match.id }, `?id=eq.${p.id}`);
+      p.inventory_id = match.id;
+      linked++;
+    } catch (err) { failed++; }
+  }
+  renderProducts();
+  alert(`Linked ${linked} product${linked===1?"":"s"}.${failed ? `\n${failed} failed.` : ""}`);
 }
 
 // Open a confirmation modal showing current vs. projected inventory so the
