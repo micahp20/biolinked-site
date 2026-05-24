@@ -1239,6 +1239,9 @@ function openModal(kind){
   document.getElementById("modal-body").innerHTML = buildForm(kind);
   m.dataset.kind = kind;
   m.dataset.editId = "";  // clear any prior edit context
+  // markOrderReceived hides the footer for its custom 3-button layout; restore it
+  const foot = m.querySelector(".modal-foot");
+  if (foot) foot.style.display = "";
   m.classList.add("show");
 }
 function closeModal(){
@@ -1657,26 +1660,76 @@ function editItem(kind, id){
   }
 }
 
-// One-click: flip an Ordered/In-Transit order to Received AND bump linked inventory
-async function markOrderReceived(id){
+// Open a confirmation modal showing current vs. projected inventory so the
+// user can choose: bump (default for orders not yet counted), or status-only
+// (when they've already added vials manually). Avoids accidental double-count.
+function markOrderReceived(id){
   const order = state.orders.find(o => String(o.id) === String(id));
   if (!order) { alert("Order not found."); return; }
   if (order.status === "received") { alert("Already marked received."); return; }
   const product = state.products.find(p => String(p.id) === String(order.product_id));
   const productName = product ? product.name : "this order";
   const qty = order.qty || 0;
-  const willBump = product && product.inventory_id;
-  const msg = willBump
-    ? `Mark "${productName}" order received and bump inventory by ${qty} vial${qty===1?"":"s"}?`
-    : `Mark "${productName}" order received?\n\n(No linked inventory item — vial count won't change.)`;
-  if (!confirm(msg)) return;
+  const item = (product && product.inventory_id)
+    ? state.inventory.find(i => String(i.id) === String(product.inventory_id))
+    : null;
+
+  const m = document.getElementById("modal");
+  document.getElementById("modal-title").textContent = "Mark Order Received";
+
+  let bodyHTML = `
+    <div style="font-size:14px;line-height:1.7;color:var(--text);">
+      <div style="margin-bottom:14px;"><strong>${esc(productName)}</strong> &middot; ${qty} vial${qty===1?"":"s"} from ${esc(order.party_name || "vendor")}</div>`;
+
+  if (item) {
+    const cur = item.vials || 0;
+    const after = cur + qty;
+    bodyHTML += `
+      <div style="background:#f8f8f8;border:1px solid var(--border);border-radius:6px;padding:14px 16px;margin-bottom:16px;font-size:13px;line-height:1.7;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Linked Inventory &middot; ${esc(item.name)}</div>
+        <div>Current vials on hand: <strong>${cur}</strong></div>
+        <div>If you bump: <strong style="color:var(--success);">${after}</strong> &nbsp;(= ${cur} + ${qty})</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:18px;">
+        &#9888; <strong>Already counted these vials manually?</strong> Choose "Status Only" to flip the status without changing the vial count.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-ghost" onclick="doMarkReceived('${id}', false)">Status Only &mdash; Already Counted</button>
+        <button class="btn btn-primary" style="background:var(--success);border-color:var(--success);" onclick="doMarkReceived('${id}', true)">Receive &amp; Bump (+${qty})</button>
+      </div>`;
+  } else {
+    bodyHTML += `
+      <div style="background:rgba(212,148,40,0.10);border:1px solid rgba(212,148,40,0.45);border-radius:6px;padding:14px 16px;margin-bottom:18px;font-size:13px;color:#7a5410;line-height:1.6;">
+        &#9888; This product isn't linked to an inventory item. Status will flip to Received but no vial count will change.<br><br>
+        To enable auto-bump on future orders, edit this product and set "Linked Inventory Item".
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="doMarkReceived('${id}', false)">Flip Status to Received</button>
+      </div>`;
+  }
+  bodyHTML += `</div>`;
+
+  document.getElementById("modal-body").innerHTML = bodyHTML;
+  const foot = m.querySelector(".modal-foot");
+  if (foot) foot.style.display = "none";
+  m.classList.add("show");
+}
+
+async function doMarkReceived(id, bump){
+  const order = state.orders.find(o => String(o.id) === String(id));
+  if (!order) return;
   try {
     const newNote = packOrderNote("received", order.tracking || "", order._user_note || "");
     await sbWrite(CFG.TABLES.orders, "PATCH", { note: newNote }, `?id=eq.${encodeURIComponent(id)}`);
-    if (willBump) await adjustInventoryForProduct(order.product_id, +qty);
-    // Update local state without full refetch
+    if (bump) await adjustInventoryForProduct(order.product_id, +(order.qty || 0));
     order.status = "received";
     order.note = newNote;
+    // Restore modal footer for future opens then close
+    const foot = document.querySelector("#modal .modal-foot");
+    if (foot) foot.style.display = "";
+    closeModal();
     renderMoney();
     renderInventory();
   } catch (err) {
