@@ -917,7 +917,8 @@ function renderMoney(){
     sortHeader("money", "qty",          "Qty", "num") +
     sortHeader("money", "total",        "Total", "num") +
     `<th>Tracking</th>` +
-    sortHeader("money", "status",       "Status");
+    sortHeader("money", "status",       "Status") +
+    `<th></th>`;
 
   // Build transactions, filter by chip + search, then sort
   let tx = [
@@ -941,11 +942,12 @@ function renderMoney(){
   const tbody = document.querySelector("#table-money tbody");
   if(!tx.length){
     const msg = (mq || mf !== "all") ? "No transactions match your search/filter." : "No transactions yet.";
-    tbody.innerHTML = `<tr><td colspan="8" class="empty">${msg}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">${msg}</td></tr>`;
   }
   else {
     tbody.innerHTML = tx.map(t=>{
       const isSale = t._type==="sale";
+      const kind = isSale ? "sale" : "order";
       const status = isSale
         ? `<span class="pill pill-received">Completed</span>`
         : (t.status==="in_transit" ? `<span class="pill pill-transit">In Transit</span>`
@@ -963,6 +965,10 @@ function renderMoney(){
         <td class="num ${isSale?'gold':''}">${fmt$(t.total||0)}</td>
         <td>${isSale?'—':tracking}</td>
         <td>${status}</td>
+        <td class="row-actions" style="white-space:nowrap;">
+          <button class="btn btn-ghost btn-sm" onclick="editItem('${kind}','${t.id}')">Edit</button>
+          <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteItem('${kind}','${t.id}')">Delete</button>
+        </td>
       </tr>`;
     }).join("");
   }
