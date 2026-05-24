@@ -966,6 +966,7 @@ function renderMoney(){
         <td>${isSale?'—':tracking}</td>
         <td>${status}</td>
         <td class="row-actions" style="white-space:nowrap;">
+          ${(!isSale && t.status !== "received") ? `<button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success);" onclick="markOrderReceived('${t.id}')" title="Mark received + bump linked inventory">✓ Receive</button>` : ""}
           <button class="btn btn-ghost btn-sm" onclick="editItem('${kind}','${t.id}')">Edit</button>
           <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="deleteItem('${kind}','${t.id}')">Delete</button>
         </td>
@@ -1486,6 +1487,11 @@ async function saveModal(){
       if (!productId) { alert("Pick a product."); return; }
       if (!date || !qty) { alert("Date and qty are required."); return; }
       const vendor = vendorId ? state.vendors.find(x => String(x.id) === String(vendorId)) : null;
+
+      // Capture prior state BEFORE upsert so we can reconcile inventory on edit
+      let prior = null;
+      if (isEdit) prior = state.orders.find(o => String(o.id) === String(editId)) || null;
+
       const body = {
         product_id: productId, date, qty, unit_cost: unitCost,
         note: packOrderNote(status, tracking, userNote)
@@ -1493,10 +1499,28 @@ async function saveModal(){
       body.vendor_id = vendorId || null;
       body.vendor = vendor ? vendor.name : null;
       await upsert(CFG.TABLES.orders, body);
-      // Only bump inventory when a brand-new order is logged as received.
-      // Editing an existing order doesn't re-bump (edit inventory directly if needed).
-      if (!isEdit && status === "received") {
+
+      // Inventory reconciliation:
+      //  - NEW order with status=received  → bump qty
+      //  - EDIT with prior=non-received → new=received → bump qty on (possibly new) product
+      //  - EDIT with prior=received → new=non-received → decrement prior product by prior qty
+      //  - EDIT with prior=received → new=received → reconcile any product/qty deltas
+      const wasReceived = prior && prior.status === "received";
+      const isReceived  = status === "received";
+      if (!isEdit && isReceived) {
         await adjustInventoryForProduct(productId, +qty);
+      } else if (isEdit && !wasReceived && isReceived) {
+        await adjustInventoryForProduct(productId, +qty);
+      } else if (isEdit && wasReceived && !isReceived) {
+        await adjustInventoryForProduct(prior.product_id, -(prior.qty || 0));
+      } else if (isEdit && wasReceived && isReceived) {
+        // Product changed → undo old, apply new. Qty changed → apply delta on same product.
+        if (String(prior.product_id) !== String(productId)) {
+          await adjustInventoryForProduct(prior.product_id, -(prior.qty || 0));
+          await adjustInventoryForProduct(productId, +qty);
+        } else if ((prior.qty || 0) !== qty) {
+          await adjustInventoryForProduct(productId, qty - (prior.qty || 0));
+        }
       }
     }
 
@@ -1618,6 +1642,33 @@ function editItem(kind, id){
     setVal("f-phone", item.phone);
     setVal("f-website", item.website);
     setVal("f-note", item.notes);
+  }
+}
+
+// One-click: flip an Ordered/In-Transit order to Received AND bump linked inventory
+async function markOrderReceived(id){
+  const order = state.orders.find(o => String(o.id) === String(id));
+  if (!order) { alert("Order not found."); return; }
+  if (order.status === "received") { alert("Already marked received."); return; }
+  const product = state.products.find(p => String(p.id) === String(order.product_id));
+  const productName = product ? product.name : "this order";
+  const qty = order.qty || 0;
+  const willBump = product && product.inventory_id;
+  const msg = willBump
+    ? `Mark "${productName}" order received and bump inventory by ${qty} vial${qty===1?"":"s"}?`
+    : `Mark "${productName}" order received?\n\n(No linked inventory item — vial count won't change.)`;
+  if (!confirm(msg)) return;
+  try {
+    const newNote = packOrderNote("received", order.tracking || "", order._user_note || "");
+    await sbWrite(CFG.TABLES.orders, "PATCH", { note: newNote }, `?id=eq.${encodeURIComponent(id)}`);
+    if (willBump) await adjustInventoryForProduct(order.product_id, +qty);
+    // Update local state without full refetch
+    order.status = "received";
+    order.note = newNote;
+    renderMoney();
+    renderInventory();
+  } catch (err) {
+    alert("Could not mark received: " + err.message);
   }
 }
 
