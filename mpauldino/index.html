@@ -2,9 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>mpauldino · Lab & Stack Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Protocol by BioLinked</title>
 <link rel="icon" type="image/png" href="/favicon.png">
+<!-- PWA -->
+<link rel="manifest" href="/mpauldino/manifest.json">
+<link rel="apple-touch-icon" href="/mpauldino/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Protocol">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7A6530">
+<meta name="description" content="Personal peptide and biomarker tracker — Protocol by BioLinked">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -209,6 +218,96 @@ table.bio tr.clickable:hover td{background:var(--gold-soft);}
 .phase-dates{font-size:12px;color:var(--muted);}
 .phase-num{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--ink);font-weight:600;}
 .phase-num .lab{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.12em;font-family:'Inter',sans-serif;font-weight:600;display:block;margin-bottom:1px;}
+
+/* ========= PEPTIDE TRACKER (Meds tab) ========= */
+.pt-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 40px;}
+.pt-welcome h1{font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:600;color:var(--ink);margin-bottom:14px;line-height:1;}
+.pt-welcome p{font-size:15px;color:var(--muted);max-width:420px;margin-bottom:28px;line-height:1.6;}
+.pt-meds-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:10px;}
+.pt-meds-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;line-height:1.1;}
+.pt-meds-tools{display:flex;gap:6px;align-items:center;}
+.pt-iconbtn{width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink);transition:all .15s;}
+.pt-iconbtn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-soft);}
+.pt-iconbtn.primary{background:var(--ink);color:#fff;border-color:var(--ink);}
+.pt-iconbtn.primary:hover{background:#000;}
+.pt-menu-wrap{position:relative;}
+.pt-menu{position:absolute;top:46px;left:0;background:#fff;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);min-width:180px;padding:6px 0;z-index:20;}
+.pt-menu button{display:block;width:100%;text-align:left;padding:10px 14px;font-size:13px;color:var(--ink);transition:background .12s;}
+.pt-menu button:hover{background:var(--gold-soft);color:var(--gold);}
+.pt-menu button.danger{color:var(--red);}
+.pt-menu button.danger:hover{background:var(--red-soft);}
+.pt-search{position:relative;margin-bottom:16px;}
+.pt-search input{width:100%;padding:13px 44px 13px 44px;border:1px solid var(--border);border-radius:10px;background:#fff;font-size:14px;color:var(--ink);font-family:inherit;outline:none;transition:all .15s;}
+.pt-search input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft);}
+.pt-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none;}
+.pt-search-clear{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,0.05);color:var(--muted);font-size:13px;display:inline-flex;align-items:center;justify-content:center;}
+.pt-search-clear:hover{background:rgba(0,0,0,0.10);color:var(--ink);}
+.pt-list{display:flex;flex-direction:column;gap:12px;}
+.pt-med{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 18px 14px;transition:all .15s;}
+.pt-med:hover{border-color:var(--gold-border);box-shadow:var(--shadow);}
+.pt-med-name{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--ink);line-height:1.15;margin-bottom:8px;}
+.pt-med-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:13px;color:var(--ink-2);margin-bottom:3px;}
+.pt-med-row span:last-child{color:var(--muted);}
+.pt-med-doses{font-size:12px;color:var(--muted);margin-top:6px;letter-spacing:0.04em;}
+.pt-med-actions{display:flex;gap:8px;margin-top:14px;}
+.pt-med-actions .btn{flex:1;min-height:42px;font-size:11px;letter-spacing:0.06em;}
+.pt-med-actions .btn.edit{flex:0 0 42px;padding:0;}
+.pt-syringe{margin:14px 0 6px;}
+.pt-syringe-scale{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);font-weight:600;letter-spacing:0.06em;margin-bottom:4px;padding:0 2px;}
+.pt-syringe-bar{display:flex;align-items:stretch;background:#1a1a1a;border-radius:6px;overflow:hidden;height:34px;position:relative;user-select:none;touch-action:none;}
+.pt-syringe-bar .seg{flex:1;border-right:1px solid rgba(255,255,255,0.08);position:relative;}
+.pt-syringe-bar .seg:last-child{border-right:none;}
+.pt-syringe-bar .seg.on{background:linear-gradient(180deg,#fff,#e6e0c7);}
+.pt-syringe-bar .seg.partial{background:linear-gradient(90deg,#fff 0%,#fff var(--frac),#1a1a1a var(--frac),#1a1a1a 100%);}
+.pt-syringe-readout{flex:0 0 56px;background:#0a0a0a;color:#f0d97a;font-family:'Cormorant Garamond',serif;font-weight:700;font-size:18px;display:inline-flex;align-items:center;justify-content:center;border-left:1px solid rgba(255,255,255,0.12);}
+.pt-syringe-bar.interactive{cursor:ew-resize;}
+.pt-result{background:linear-gradient(135deg,var(--gold-soft),rgba(122,101,48,0.04));border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:8px;padding:14px 16px;margin:14px 0;}
+.pt-result-main{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);line-height:1.2;}
+.pt-result-sub{font-size:11.5px;color:var(--ink-2);margin-top:4px;letter-spacing:0.04em;}
+.pt-form-hint{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:16px;padding:10px 14px;background:rgba(122,101,48,0.04);border-left:2px solid var(--gold-border);border-radius:4px;}
+.pt-form-section{margin-bottom:24px;}
+.pt-form-section-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--gold-border);color:var(--gold);}
+.pt-typeahead{position:relative;}
+.pt-typeahead-list{position:absolute;top:calc(100% + 2px);left:0;right:0;background:#fff;border:1px solid var(--gold-border);border-radius:8px;max-height:260px;overflow-y:auto;z-index:10;box-shadow:var(--shadow);}
+.pt-typeahead-item{padding:10px 14px;cursor:pointer;font-size:13px;color:var(--ink);border-bottom:1px solid var(--border-2);transition:background .12s;}
+.pt-typeahead-item:last-child{border-bottom:none;}
+.pt-typeahead-item:hover{background:var(--gold-soft);color:var(--gold);}
+.pt-typeahead-item.add-new{color:var(--gold);font-weight:600;font-style:italic;}
+.pt-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:480px){.pt-row3{grid-template-columns:1fr;}}
+.pt-row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pt-sched-preview{background:#f8f6ef;border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--ink-2);line-height:1.5;margin-top:10px;}
+.pt-sched-preview strong{color:var(--gold);font-weight:600;}
+.pt-form-actions{display:flex;flex-direction:column;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);}
+.pt-form-actions .btn{min-height:48px;font-size:13px;}
+
+/* Log Dose bottom sheet */
+.pt-sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:flex-end;justify-content:center;z-index:200;padding:0;}
+.pt-sheet-bg.show{display:flex;animation:fadeIn 0.18s ease;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.pt-sheet{background:#fff;width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:22px 22px 26px;max-height:90vh;overflow-y:auto;animation:slideUp 0.22s ease;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.pt-sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.pt-sheet-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;}
+.pt-sheet-close{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.06);color:var(--ink-2);font-size:16px;display:inline-flex;align-items:center;justify-content:center;}
+
+/* Install banner */
+.pt-install-banner{background:linear-gradient(135deg,var(--gold-soft),rgba(122,101,48,0.04));border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:8px;padding:12px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12.5px;color:var(--ink);line-height:1.5;}
+.pt-install-banner strong{color:var(--gold);}
+.pt-install-banner-actions{display:flex;gap:6px;align-items:center;flex-shrink:0;}
+.pt-install-banner button{padding:7px 12px;font-size:11px;font-weight:600;letter-spacing:0.06em;border-radius:6px;text-transform:uppercase;}
+.pt-install-banner button.install{background:var(--gold);color:#fff;}
+.pt-install-banner button.dismiss{background:transparent;color:var(--muted);}
+.pt-install-banner button.dismiss:hover{color:var(--ink);}
+
+@media(max-width:600px){
+  .pt-welcome{padding:60px 18px 30px;}
+  .pt-welcome h1{font-size:42px;}
+  .pt-meds-title{font-size:26px;}
+  .pt-med{padding:14px 14px 12px;}
+  .pt-med-name{font-size:20px;}
+  .pt-med-actions .btn{min-height:46px;}
+}
 </style>
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -366,7 +465,23 @@ const DEFAULT_STATE = {
   daily: [],
   body: [],
   phases: [],
+  medications: [],
+  customPeptides: [],
+  doseLog: [],
+  prefs: { installBannerDismissed: false }
 };
+
+// ============================================================
+// PEPTIDE LIBRARY (37 default + user-added custom)
+// ============================================================
+const DEFAULT_PEPTIDES = [
+  'Retatrutide','Tirzepatide','Semaglutide','Tesamorelin','CJC-1295','CJC-1295 DAC',
+  'Ipamorelin','BPC-157','TB-500','MOTS-c','GHK-Cu','Epitalon','Pinealon','Semax',
+  'Selank','5-Amino-1MQ','Adamax','NAD+','HCG','AOD-9604','IGF-1 LR3','Hexarelin',
+  'GHRP-2','GHRP-6','PT-141','Kisspeptin','Thymosin Alpha-1','KPV','LL-37',
+  'Cerebrolysin','Cortagen','Cortexin','P21','Humanin','VIP','FOXO4-DRI',
+  'Testosterone Cypionate'
+];
 const Storage = {
   load(){
     try {
@@ -1525,10 +1640,573 @@ function AddPhaseForm({ existing, onSave, onCancel }){
 }
 
 // ============================================================
+// ============================================================
+// PEPTIDE TRACKER HELPERS
+// ============================================================
+function reconMath({ vialMg, bacMl, doseMg, syringeMax }){
+  const v = Number(vialMg)||0, b = Number(bacMl)||0, d = Number(doseMg)||0, s = Number(syringeMax)||100;
+  if (!v || !b || !d) return { units: 0, mgPerUnit: 0, conc: 0, valid: false };
+  const conc = v / b;                 // mg/mL after recon
+  const mgPerUnit = conc / s;         // mg per insulin unit (each unit = 1/s of 1 mL on the syringe)
+  const units = d / mgPerUnit;
+  return { units, mgPerUnit, conc, valid: true };
+}
+const FREQUENCIES = [
+  { id:'daily',         label:'Daily',                rrule:'FREQ=DAILY' },
+  { id:'eod',           label:'Every other day',      rrule:'FREQ=DAILY;INTERVAL=2' },
+  { id:'mwf',           label:'Mon / Wed / Fri',      rrule:'FREQ=WEEKLY;BYDAY=MO,WE,FR' },
+  { id:'tts',           label:'Tue / Thu / Sat',      rrule:'FREQ=WEEKLY;BYDAY=TU,TH,SA' },
+  { id:'2xweek',        label:'2× per week (Mon/Thu)',rrule:'FREQ=WEEKLY;BYDAY=MO,TH' },
+  { id:'weekly',        label:'Once weekly',          rrule:'FREQ=WEEKLY' }
+];
+const DURATIONS = [
+  { id:'ongoing', label:'Ongoing', weeks:null },
+  { id:'4w', label:'4 weeks', weeks:4 },
+  { id:'8w', label:'8 weeks', weeks:8 },
+  { id:'12w', label:'12 weeks', weeks:12 },
+  { id:'16w', label:'16 weeks', weeks:16 }
+];
+const SITE_ROTATION = [
+  { id:'auto', label:'Auto-rotate' },
+  { id:'abdomen', label:'Abdomen only' },
+  { id:'thigh', label:'Thigh only' },
+  { id:'pick', label:"I'll pick each time" }
+];
+const INJECTION_SITES = [
+  'Left Abdomen','Right Abdomen','Left Thigh','Right Thigh',
+  'Left Glute','Right Glute','Left Delt','Right Delt'
+];
+function freqLabel(id){ return (FREQUENCIES.find(f=>f.id===id)||{}).label || id; }
+function durationLabel(id){ return (DURATIONS.find(d=>d.id===id)||{}).label || id; }
+function rotationLabel(id){ return (SITE_ROTATION.find(s=>s.id===id)||{}).label || id; }
+
+// Build an .ics reminder file for a medication
+function buildMedICS(med){
+  const freq = FREQUENCIES.find(f=>f.id===med.frequency);
+  const duration = DURATIONS.find(d=>d.id===med.duration);
+  if (!freq || !med.startDate || !med.time) return null;
+  const [hh, mm] = (med.time || '08:00').split(':').map(Number);
+  const start = new Date(med.startDate + 'T' + (med.time || '08:00') + ':00');
+  const end = new Date(start.getTime() + 30 * 60000);
+  function fmt(d){
+    const p = n => String(n).padStart(2,'0');
+    return d.getFullYear() + p(d.getMonth()+1) + p(d.getDate()) + 'T' + p(d.getHours()) + p(d.getMinutes()) + '00';
+  }
+  let rrule = freq.rrule;
+  // Add COUNT if duration is set
+  if (duration && duration.weeks){
+    // approx count: weeks * doses-per-week
+    const perWeek = {daily:7, eod:3, mwf:3, tts:3, '2xweek':2, weekly:1}[med.frequency] || 7;
+    const count = perWeek * duration.weeks;
+    rrule += ';COUNT=' + count;
+  }
+  const uid = 'med-' + med.id + '-mpauldino@biolinkedsolutions.com';
+  const stamp = fmt(new Date()) + 'Z';
+  const title = med.name + ' — ' + med.units + ' units (' + med.dose + ' mg)';
+  const desc = [
+    'Protocol: ' + med.name + ' ' + med.vialSize + 'mg vial',
+    'Dose: ' + med.dose + ' mg → ' + med.units + ' units on ' + (med.syringeMax) + 'u syringe',
+    'Recon: ' + med.bac + ' mL BAC water',
+    'Frequency: ' + freqLabel(med.frequency),
+    'Site rotation: ' + rotationLabel(med.siteRotation),
+    med.duration && med.duration !== 'ongoing' ? 'Duration: ' + durationLabel(med.duration) : null
+  ].filter(Boolean).join('\\n');
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//BioLinked//Protocol//EN',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    'UID:' + uid,
+    'DTSTAMP:' + stamp,
+    'DTSTART:' + fmt(start),
+    'DTEND:' + fmt(end),
+    'SUMMARY:' + title,
+    'DESCRIPTION:' + desc,
+    'RRULE:' + rrule,
+    'BEGIN:VALARM',
+    'TRIGGER:-PT10M',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:' + title,
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = med.name.replace(/[^a-z0-9]+/gi,'-') + '-reminder.ics';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ document.body.removeChild(a); URL.revokeObjectURL(url); }, 800);
+}
+
+// ============================================================
+// PEPTIDE TRACKER UI COMPONENTS
+// ============================================================
+function SyringeBar({ units, max, interactive, onChange }){
+  const segs = 10;
+  const ref = useRef(null);
+  const total = Math.max(0, Math.min(max, units));
+  const fillFrac = total / max; // 0..1
+  const fillSegs = fillFrac * segs;
+  const handle = (clientX) => {
+    if (!interactive || !ref.current) return;
+    const rect = ref.current.getBoundingClientRect();
+    // Bar (without readout) takes left ~85% by flex. We treat full bar as the draggable.
+    const x = Math.max(0, Math.min(rect.width - 56, clientX - rect.left));
+    const frac = x / (rect.width - 56);
+    const u = Math.round(frac * max);
+    onChange && onChange(Math.max(0, Math.min(max, u)));
+  };
+  const onMouseDown = e => {
+    handle(e.clientX);
+    const move = ev => handle(ev.clientX);
+    const up = () => { window.removeEventListener('mousemove', move); window.removeEventListener('mouseup', up); };
+    window.addEventListener('mousemove', move); window.addEventListener('mouseup', up);
+  };
+  const onTouchStart = e => {
+    const t = e.touches[0]; handle(t.clientX);
+    const move = ev => { const tt = ev.touches[0]; handle(tt.clientX); ev.preventDefault(); };
+    const end = () => { window.removeEventListener('touchmove', move); window.removeEventListener('touchend', end); };
+    window.addEventListener('touchmove', move, { passive:false });
+    window.addEventListener('touchend', end);
+  };
+  const labels = Array.from({length: segs+1}, (_,i)=> Math.round((i/segs)*max));
+  return (
+    <div className="pt-syringe">
+      <div className="pt-syringe-scale">
+        {labels.slice(0,-1).map((l,i)=> <span key={i}>{l}</span>)}
+      </div>
+      <div ref={ref} className={`pt-syringe-bar${interactive?' interactive':''}`}
+           onMouseDown={interactive?onMouseDown:undefined}
+           onTouchStart={interactive?onTouchStart:undefined}>
+        {Array.from({length:segs}, (_,i)=> {
+          const filled = i < Math.floor(fillSegs);
+          const partial = !filled && i === Math.floor(fillSegs);
+          const frac = partial ? (fillSegs - i) : 0;
+          return <div key={i} className={`seg${filled?' on':''}${partial?' partial':''}`}
+                      style={partial ? { background: `linear-gradient(90deg, #fff 0%, #fff ${frac*100}%, #1a1a1a ${frac*100}%, #1a1a1a 100%)` } : {}}></div>;
+        })}
+        <div className="pt-syringe-readout">{Math.round(units)}</div>
+      </div>
+    </div>
+  );
+}
+
+function PeptideTypeahead({ value, onChange, customPeptides, onAddCustom }){
+  const [open, setOpen] = useState(false);
+  const all = useMemo(()=> [...DEFAULT_PEPTIDES, ...(customPeptides||[])].sort((a,b)=>a.localeCompare(b)), [customPeptides]);
+  const q = (value || '').trim().toLowerCase();
+  const matches = q ? all.filter(p => p.toLowerCase().includes(q)) : all;
+  const exact = q && all.some(p => p.toLowerCase() === q);
+  return (
+    <div className="field pt-typeahead">
+      <label>Peptide</label>
+      <input
+        type="text"
+        value={value || ''}
+        onChange={e => { onChange(e.target.value); setOpen(true); }}
+        onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(()=> setOpen(false), 180)}
+        placeholder="Type to search or add a peptide..."
+        autoComplete="off"
+      />
+      {open && (matches.length > 0 || (q && !exact)) && (
+        <div className="pt-typeahead-list">
+          {matches.slice(0, 30).map(p => (
+            <div key={p} className="pt-typeahead-item" onMouseDown={() => { onChange(p); setOpen(false); }}>{p}</div>
+          ))}
+          {q && !exact && (
+            <div className="pt-typeahead-item add-new" onMouseDown={() => { onAddCustom(value.trim()); onChange(value.trim()); setOpen(false); }}>
+              + Create "{value.trim()}"
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MedicationsTab({ state, update }){
+  const [view, setView] = useState(()=> (state.medications && state.medications.length) ? 'list' : 'welcome');
+  const [editing, setEditing] = useState(null);
+  const [search, setSearch] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [logFor, setLogFor] = useState(null);
+
+  useEffect(()=>{
+    if (view === 'list' && (!state.medications || !state.medications.length)) setView('welcome');
+  }, [state.medications, view]);
+
+  const meds = state.medications || [];
+  const filtered = !search.trim() ? meds : meds.filter(m =>
+    (m.name||'').toLowerCase().includes(search.toLowerCase()) ||
+    (m.note||'').toLowerCase().includes(search.toLowerCase())
+  );
+
+  const openNew = () => { setEditing(null); setView('form'); };
+  const openEdit = (med) => { setEditing(med); setView('form'); };
+  const saveMed = (m) => {
+    const list = [...(state.medications||[])];
+    const idx = list.findIndex(x => x.id === m.id);
+    if (idx >= 0) list[idx] = m; else list.push(m);
+    update({ ...state, medications: list });
+    setView('list'); setEditing(null);
+  };
+  const deleteMed = (id) => {
+    if (!confirm('Delete this protocol?')) return;
+    update({ ...state, medications: (state.medications||[]).filter(m => m.id !== id) });
+    setEditing(null); setView('list');
+  };
+  const logDose = (entry) => {
+    const next = [...(state.doseLog||[]), entry];
+    update({ ...state, doseLog: next });
+    setLogFor(null);
+  };
+  const addCustomPeptide = (name) => {
+    if (!name) return;
+    const list = state.customPeptides || [];
+    if (list.includes(name) || DEFAULT_PEPTIDES.includes(name)) return;
+    update({ ...state, customPeptides: [...list, name] });
+  };
+  const clearAll = () => {
+    if (!confirm('Clear ALL medications, dose log, and custom peptides? This cannot be undone.')) return;
+    update({ ...state, medications: [], doseLog: [], customPeptides: [] });
+    setMenuOpen(false); setView('welcome');
+  };
+
+  if (view === 'welcome') {
+    return (
+      <div>
+        <InstallBanner state={state} update={update} />
+        <div className="pt-welcome">
+          <h1>Welcome!</h1>
+          <p>Get started by adding your first medication, calculate your dose and set a reminder.</p>
+          <button className="btn gold" style={{minHeight:'52px',padding:'14px 26px',fontSize:'13px'}} onClick={openNew}>+ Add a first medication</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'form') {
+    return <MedForm
+      existing={editing}
+      customPeptides={state.customPeptides || []}
+      onAddCustom={addCustomPeptide}
+      onSave={saveMed}
+      onCancel={()=> setView('list')}
+      onDelete={deleteMed}
+    />;
+  }
+
+  // list view
+  return (
+    <div>
+      <InstallBanner state={state} update={update} />
+      <div className="pt-meds-head">
+        <div className="pt-meds-tools pt-menu-wrap">
+          <button className="pt-iconbtn" onClick={()=>setMenuOpen(!menuOpen)} title="Menu">≡</button>
+          {menuOpen && (
+            <div className="pt-menu" onMouseLeave={()=>setMenuOpen(false)}>
+              <button onClick={()=>{ downloadJSON(state); setMenuOpen(false); }}>↓ Export Data</button>
+              <button onClick={()=>{ document.getElementById('pt-import-file').click(); setMenuOpen(false); }}>↑ Import Data</button>
+              <button className="danger" onClick={clearAll}>× Clear All</button>
+            </div>
+          )}
+          <input id="pt-import-file" type="file" accept=".json" style={{display:'none'}} onChange={(e)=>{
+            const f = e.target.files?.[0]; if (!f) return;
+            const r = new FileReader();
+            r.onload = () => {
+              try {
+                const parsed = JSON.parse(r.result);
+                if (!confirm('Replace all current data with imported file?')) return;
+                update({ ...DEFAULT_STATE, ...parsed });
+              } catch (err) { alert('Invalid JSON: ' + err.message); }
+            };
+            r.readAsText(f); e.target.value = '';
+          }} />
+        </div>
+        <div className="pt-meds-title">Saved Medications</div>
+        <div className="pt-meds-tools">
+          <button className="pt-iconbtn primary" onClick={openNew} title="Add medication">+</button>
+        </div>
+      </div>
+      <div className="pt-search">
+        <span className="pt-search-icon">⌕</span>
+        <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search peptides..." />
+        {search && <button className="pt-search-clear" onClick={()=>setSearch('')}>✕</button>}
+      </div>
+      <div className="pt-list">
+        {filtered.length === 0 && (
+          <div className="empty">{search ? 'No medications match your search.' : 'No medications yet.'}</div>
+        )}
+        {filtered.map(m => (
+          <MedCard key={m.id} med={m} onEdit={()=>openEdit(m)} onLog={()=>setLogFor(m)} onReminder={()=>buildMedICS(m)} />
+        ))}
+      </div>
+      {logFor && (
+        <LogDoseSheet med={logFor} onClose={()=>setLogFor(null)} onSave={logDose} />
+      )}
+    </div>
+  );
+}
+
+function MedCard({ med, onEdit, onLog, onReminder }){
+  const dosesPerVial = med.dose ? Math.floor(med.vialSize / med.dose) : 0;
+  return (
+    <div className="pt-med">
+      <div className="pt-med-name">{med.name}: {med.vialSize}mg</div>
+      <div className="pt-med-row"><span>Dose: {med.units} units ({med.dose} mg)</span></div>
+      <div className="pt-med-row"><span>Syringe: {med.syringeMax === 100 ? '1ml' : (med.syringeMax === 50 ? '0.5ml' : '0.3ml')} / {med.syringeMax} units</span></div>
+      <SyringeBar units={med.units} max={med.syringeMax} interactive={false} />
+      <div className="pt-med-doses">{dosesPerVial} doses per vial · {freqLabel(med.frequency)}{med.time ? ' · ' + med.time : ''}</div>
+      <div className="pt-med-actions">
+        <button className="btn" onClick={onLog}>Log Dose</button>
+        <button className="btn ghost" onClick={onReminder}>Set Reminder</button>
+        <button className="btn ghost edit" onClick={onEdit} title="Edit">✎</button>
+      </div>
+    </div>
+  );
+}
+
+function MedForm({ existing, customPeptides, onAddCustom, onSave, onCancel, onDelete }){
+  const [name, setName] = useState(existing?.name || '');
+  const [syringeMax, setSyringeMax] = useState(existing?.syringeMax || 100);
+  const [vialSize, setVialSize] = useState(existing?.vialSize ?? '');
+  const [bac, setBac] = useState(existing?.bac ?? '');
+  const [dose, setDose] = useState(existing?.dose ?? '');
+  const [frequency, setFrequency] = useState(existing?.frequency || 'daily');
+  const [time, setTime] = useState(existing?.time || '08:00');
+  const [startDate, setStartDate] = useState(existing?.startDate || todayISO());
+  const [duration, setDuration] = useState(existing?.duration || 'ongoing');
+  const [siteRotation, setSiteRotation] = useState(existing?.siteRotation || 'auto');
+  const [previewUnits, setPreviewUnits] = useState(null);
+
+  const recon = reconMath({ vialMg: vialSize, bacMl: bac, doseMg: dose, syringeMax });
+  const drawUnits = recon.valid ? Math.round(recon.units) : 0;
+  const showUnits = previewUnits != null ? previewUnits : drawUnits;
+  const showMg = recon.valid ? (showUnits * recon.mgPerUnit) : 0;
+
+  const save = () => {
+    if (!name.trim()) { alert('Please pick or enter a peptide name'); return; }
+    if (!vialSize || !bac || !dose) { alert('Vial size, BAC water, and dose are required'); return; }
+    const med = {
+      id: existing?.id || genId('med'),
+      name: name.trim(),
+      syringeMax: Number(syringeMax),
+      vialSize: Number(vialSize),
+      bac: Number(bac),
+      dose: Number(dose),
+      units: drawUnits,
+      conc: recon.conc,
+      mgPerUnit: recon.mgPerUnit,
+      frequency, time, startDate, duration, siteRotation
+    };
+    onSave(med);
+  };
+
+  const schedSummary = `${freqLabel(frequency)} at ${time}, starting ${fmtShortDate(startDate)}${duration !== 'ongoing' ? ` for ${durationLabel(duration)}` : ' — ongoing'}. Site: ${rotationLabel(siteRotation)}.`;
+
+  return (
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'14px',flexWrap:'wrap',gap:'10px'}}>
+        <button className="btn ghost sm" onClick={onCancel}>← Back</button>
+        <div className="pt-meds-title" style={{fontSize:'22px'}}>{existing ? 'Edit Protocol' : 'Add Medication'}</div>
+        <div style={{width:'68px'}}></div>
+      </div>
+
+      <div className="pt-form-section">
+        <div className="pt-form-section-title">Medication</div>
+        <div className="pt-form-hint">Suggested common defaults. Adjust as needed.</div>
+
+        <PeptideTypeahead value={name} onChange={setName} customPeptides={customPeptides} onAddCustom={onAddCustom} />
+
+        <div className="field">
+          <label>Syringe</label>
+          <select value={syringeMax} onChange={e=>setSyringeMax(Number(e.target.value))}>
+            <option value={100}>1ml / 100 units</option>
+            <option value={50}>0.5ml / 50 units</option>
+            <option value={30}>0.3ml / 30 units</option>
+          </select>
+        </div>
+
+        <div className="pt-row3">
+          <div className="field"><label>Vial Size (mg)</label><input type="number" step="any" value={vialSize} onChange={e=>setVialSize(e.target.value)} placeholder="e.g. 10" /></div>
+          <div className="field"><label>BAC Water (ml)</label><input type="number" step="any" value={bac} onChange={e=>setBac(e.target.value)} placeholder="e.g. 2" /></div>
+          <div className="field"><label>Desired Dose (mg)</label><input type="number" step="any" value={dose} onChange={e=>setDose(e.target.value)} placeholder="e.g. 1" /></div>
+        </div>
+
+        {recon.valid && (
+          <div className="pt-result">
+            <div className="pt-result-main">Draw {drawUnits} units for {Number(dose)} mg</div>
+            <div className="pt-result-sub">{recon.conc.toFixed(2)} mg/mL · {recon.mgPerUnit.toFixed(3)} mg per unit</div>
+          </div>
+        )}
+
+        <SyringeBar
+          units={showUnits}
+          max={syringeMax}
+          interactive={true}
+          onChange={u => setPreviewUnits(u)}
+        />
+        {previewUnits != null && (
+          <div style={{textAlign:'center',fontSize:'12px',color:'var(--muted)',marginTop:'6px'}}>
+            Preview: <strong style={{color:'var(--gold)'}}>{previewUnits} units</strong> = {(previewUnits * recon.mgPerUnit).toFixed(3)} mg
+            <button className="btn ghost sm" style={{marginLeft:'10px'}} onClick={()=>setPreviewUnits(null)}>Reset</button>
+          </div>
+        )}
+      </div>
+
+      <div className="pt-form-section">
+        <div className="pt-form-section-title">Schedule &amp; Reminder</div>
+
+        <div className="field">
+          <label>Frequency</label>
+          <select value={frequency} onChange={e=>setFrequency(e.target.value)}>
+            {FREQUENCIES.map(f => <option key={f.id} value={f.id}>{f.label}</option>)}
+          </select>
+        </div>
+
+        <div className="pt-row2">
+          <div className="field"><label>Time of day</label><input type="time" value={time} onChange={e=>setTime(e.target.value)} /></div>
+          <div className="field"><label>Start date</label><input type="date" value={startDate} onChange={e=>setStartDate(e.target.value)} /></div>
+        </div>
+
+        <div className="pt-row2">
+          <div className="field">
+            <label>Duration</label>
+            <select value={duration} onChange={e=>setDuration(e.target.value)}>
+              {DURATIONS.map(d => <option key={d.id} value={d.id}>{d.label}</option>)}
+            </select>
+          </div>
+          <div className="field">
+            <label>Site rotation</label>
+            <select value={siteRotation} onChange={e=>setSiteRotation(e.target.value)}>
+              {SITE_ROTATION.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div className="pt-sched-preview"><strong>Schedule:</strong> {schedSummary}</div>
+      </div>
+
+      <div className="pt-form-actions">
+        <button className="btn gold" onClick={save}>{existing ? 'Save Changes' : 'Save Medication'}</button>
+        {existing && (
+          <button className="btn danger" onClick={()=>onDelete(existing.id)}>Delete Protocol</button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function LogDoseSheet({ med, onClose, onSave }){
+  const now = new Date();
+  const isoNow = now.toISOString().slice(0,10);
+  const timeNow = now.toTimeString().slice(0,5);
+  const [date, setDate] = useState(isoNow);
+  const [time, setTime] = useState(timeNow);
+  const [site, setSite] = useState(INJECTION_SITES[0]);
+  const [notes, setNotes] = useState('');
+
+  const save = () => {
+    onSave({
+      id: genId('dose'),
+      medId: med.id,
+      medName: med.name,
+      date, time, site, notes,
+      units: med.units, dose: med.dose,
+      loggedAt: new Date().toISOString()
+    });
+  };
+
+  return (
+    <div className="pt-sheet-bg show" onClick={(e)=>{ if (e.target.classList.contains('pt-sheet-bg')) onClose(); }}>
+      <div className="pt-sheet">
+        <div className="pt-sheet-head">
+          <div>
+            <div className="pt-sheet-title">Log Dose</div>
+            <div style={{fontSize:'12px',color:'var(--muted)',marginTop:'2px'}}>{med.name} · {med.units} units ({med.dose} mg)</div>
+          </div>
+          <button className="pt-sheet-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="pt-row2">
+          <div className="field"><label>Date</label><input type="date" value={date} onChange={e=>setDate(e.target.value)} /></div>
+          <div className="field"><label>Time</label><input type="time" value={time} onChange={e=>setTime(e.target.value)} /></div>
+        </div>
+        <div className="field">
+          <label>Injection Site</label>
+          <select value={site} onChange={e=>setSite(e.target.value)}>
+            {INJECTION_SITES.map(s => <option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div className="field"><label>Notes (optional)</label><textarea rows={2} value={notes} onChange={e=>setNotes(e.target.value)} placeholder="Anything notable about this dose..."></textarea></div>
+        <div style={{display:'flex',justifyContent:'flex-end',gap:'8px',marginTop:'14px'}}>
+          <button className="btn ghost" onClick={onClose}>Cancel</button>
+          <button className="btn gold" onClick={save}>Save Dose</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// PWA Install Banner — guides users to add the tracker to their home screen.
+let _deferredInstallPrompt = null;
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+  });
+}
+function InstallBanner({ state, update }){
+  const [show, setShow] = useState(false);
+  const [platform, setPlatform] = useState('other'); // 'ios' | 'android' | 'other'
+  useEffect(()=>{
+    if (state.prefs?.installBannerDismissed) return;
+    const ua = navigator.userAgent || '';
+    const standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (standalone) return; // already installed
+    if (/iPhone|iPad|iPod/i.test(ua)) { setPlatform('ios'); setShow(true); return; }
+    if (/Android/i.test(ua)) { setPlatform('android'); setShow(true); return; }
+  }, [state.prefs?.installBannerDismissed]);
+  if (!show) return null;
+  const dismiss = () => {
+    setShow(false);
+    update({ ...state, prefs: { ...(state.prefs||{}), installBannerDismissed: true } });
+  };
+  const install = async () => {
+    if (_deferredInstallPrompt) {
+      _deferredInstallPrompt.prompt();
+      const choice = await _deferredInstallPrompt.userChoice;
+      _deferredInstallPrompt = null;
+      if (choice.outcome === 'accepted') dismiss();
+    } else {
+      alert("To install: tap your browser's menu → Add to Home Screen.");
+    }
+  };
+  return (
+    <div className="pt-install-banner">
+      <div>
+        {platform === 'ios'
+          ? <span><strong>Install Protocol on your iPhone:</strong> tap the Share button, then "Add to Home Screen".</span>
+          : <span><strong>Install Protocol</strong> on your phone for a full-screen app experience.</span>
+        }
+      </div>
+      <div className="pt-install-banner-actions">
+        {platform === 'android' && <button className="install" onClick={install}>Install</button>}
+        <button className="dismiss" onClick={dismiss}>Dismiss</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // APP
 // ============================================================
 const TABS = [
   { id: 'overview', label: 'Overview' },
+  { id: 'meds',     label: 'Meds' },
   { id: 'labs',     label: 'Labs' },
   { id: 'stack',    label: 'Stack' },
   { id: 'daily',    label: 'Daily' },
@@ -1550,7 +2228,7 @@ function App(){
       <div className="brand">
         <div className="brand-left">
           <div>
-            <div className="brand-sub">Lab &amp; Stack Tracker</div>
+            <div className="brand-sub">Protocol by BioLinked</div>
             <div className="brand-title">mpauldino</div>
           </div>
         </div>
@@ -1592,6 +2270,7 @@ function App(){
       </div>
 
       {tab === 'overview' && <OverviewTab state={state} />}
+      {tab === 'meds'     && <MedicationsTab state={state} update={update} />}
       {tab === 'labs'     && <LabsTab state={state} update={update} />}
       {tab === 'stack'    && <StackTab state={state} update={update} />}
       {tab === 'daily'    && <DailyTab state={state} update={update} />}
@@ -1607,6 +2286,15 @@ function App(){
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+// Register service worker for PWA offline support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/mpauldino/sw.js').catch(err => {
+      console.warn('SW registration failed:', err);
+    });
+  });
+}
 </script>
 </body>
 </html>
