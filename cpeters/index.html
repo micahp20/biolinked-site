@@ -5,6 +5,14 @@
 <link rel="icon" type="image/png" href="/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Corrina's Recomp + Reset + Hormonal Balance — BioLinked</title>
+<!-- PWA — installable home-screen app -->
+<link rel="manifest" href="/cpeters/manifest.json">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Corrina">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7A6530">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -1100,5 +1108,82 @@ function downloadICS(){
 
 </script>
 
+<!-- PWA install banner + service worker -->
+<style>
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner.show{display:flex;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
+.bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.bl-pwa-install{background:#7A6530;color:#fff;}
+.bl-pwa-install:hover{background:#5f4f26;}
+.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
+.bl-pwa-dismiss:hover{color:#1a1a1a;}
+@media print{.bl-pwa-banner{display:none !important;}}
+</style>
+<div class="bl-pwa-banner" id="bl-pwa-banner">
+  <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
+  <div class="bl-pwa-banner-actions">
+    <button class="bl-pwa-banner-btn bl-pwa-install" id="bl-pwa-install-btn" style="display:none">Install</button>
+    <button class="bl-pwa-banner-btn bl-pwa-dismiss" id="bl-pwa-dismiss-btn">Not now</button>
+  </div>
+</div>
+<script>
+(function(){
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/cpeters/sw.js').catch(()=>{});
+    });
+  }
+  // Install banner
+  var DISMISS_KEY = 'bl-pwa-dismiss-cpeters';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  function show(){
+    if (isIOS) {
+      textEl.innerHTML = '<strong>Corrina, save this protocol as an app:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    } else if (isAndroid) {
+      textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access on your home screen.';
+    } else {
+      textEl.innerHTML = '<strong>Tip:</strong> install this protocol as an app on your phone for quick access. Open this page in mobile Safari or Chrome.';
+    }
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){
+    banner.classList.remove('show');
+    localStorage.setItem(DISMISS_KEY, '1');
+  });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') {
+      banner.classList.remove('show');
+      localStorage.setItem(DISMISS_KEY, '1');
+    }
+  });
+  // Only show on mobile devices
+  if (isIOS || isAndroid) {
+    setTimeout(show, 1500); // small delay so it doesn't pop immediately
+  }
+})();
+</script>
 </body>
 </html>
