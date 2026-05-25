@@ -113,8 +113,11 @@
 
   document.head.insertAdjacentHTML('beforeend', navCSS);
   document.body.insertAdjacentHTML('afterbegin', navHTML + ctaBar);
-  // Remove any existing hardcoded footer before injecting ours
-  document.querySelectorAll('footer, .footer, [class*="footer"], [id*="footer"]').forEach(el => el.remove());
+  // Remove any existing page-level footer before injecting ours.
+  // IMPORTANT: this selector must NOT match in-card elements like
+  // `.card-footer` (used on peptide-index for the View Details click target).
+  // Only match <footer> elements and classes that begin with "site-footer".
+  document.querySelectorAll('footer, .site-footer, [class^="site-footer"], [class*=" site-footer"], #site-footer').forEach(el => el.remove());
   document.body.insertAdjacentHTML('beforeend', siteFooter);
 
   // Mobile toggle
