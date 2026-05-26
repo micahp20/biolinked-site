@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>David's Mito Reset + Cut — BioLinked</title>
+<!-- PWA — installable home-screen app -->
+<link rel="manifest" href="/dcoone/manifest.json">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="David">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7A6530">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+.tab-bar{display:flex;background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
+.tab-btn{flex:1;padding:14px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.inv-body{padding:32px 36px;}
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:18px 22px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:15px;color:var(--text);font-weight:400;}
+.total-row.sub{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:600;}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:10px;padding-top:14px;font-size:18px;font-weight:700;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);}
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:20px 22px;margin-bottom:24px;}
+.payment-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:15px;color:var(--text);font-weight:500;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);}
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+.footer-disc{font-size:12px;color:var(--muted);line-height:1.65;font-weight:400;max-width:420px;}
+.footer-brand{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 0;padding:16px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+.program-intro{text-align:center;padding:20px 0 26px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.program-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--text);line-height:1.05;letter-spacing:0.01em;}
+.program-title em{font-style:italic;color:var(--gold);}
+.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
+.program-context{margin:14px 0 0;font-size:13px;line-height:1.75;color:var(--muted);font-weight:400;text-align:left;background:rgba(122,101,48,0.04);border-left:2px solid var(--gold-border);padding:14px 18px;border-radius:2px;}
+.program-context strong{color:var(--text);font-weight:600;}
+.program-context p+p{margin-top:10px;}
+.program-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:18px;}
+.program-badge{background:#f8f8f8;border:1px solid var(--border);padding:5px 11px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border-radius:2px;}
+.program-badge strong{color:var(--gold);font-weight:700;}
+.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.sec-divider.mt{margin-top:32px;}
+.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:84px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+.sched-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:16px;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-top:2px;}
+.sched-phase-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:5px 11px;border-radius:2px;white-space:nowrap;}
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);font-weight:400;vertical-align:top;font-size:12px;line-height:1.5;}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
+.sched-count{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.sched-count.off{background:#eeeeee;color:#999;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11.5px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.reta{background:rgba(58,107,142,0.14);border-color:rgba(58,107,142,0.32);color:#3a6b8e;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-scroll .sched-table{min-width:580px;}
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-banner .cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-banner .cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-banner .cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.tip-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:14px;}
+.tip-card.featured{border-top-width:3px;border-left:3px solid var(--gold);background:rgba(122,101,48,0.04);}
+.tip-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.tip-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.2;}
+.tip-body{font-size:14px;line-height:1.75;color:var(--text);font-weight:400;}
+.tip-body p + p{margin-top:10px;}
+.tip-body strong{font-weight:700;color:var(--text);}
+.tip-body em{font-style:italic;color:var(--muted);}
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:15px;font-weight:700;color:var(--text);}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);}
+.li-body{padding:18px 22px;background:#fafafa;}
+.li-body .li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.7;}
+.li-body .li-callout strong{color:var(--gold);font-weight:700;}
+.li-body .li-callout.why{background:rgba(58,107,142,0.07);border-color:rgba(58,107,142,0.35);border-left-color:#3a6b8e;color:#1f3f5a;}
+.li-body .li-callout.why strong{color:#3a6b8e;}
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-top:8px;margin-bottom:24px;}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-of-type{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.stack-desc{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;margin-top:16px;font-size:14px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+.supplies-wrap{margin-bottom:20px;}
+.supply-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:13px 16px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.supply-row:hover{border-color:var(--gold-border);}
+.supply-info{flex:1;min-width:220px;}
+.supply-info-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.supply-info-desc{font-size:12px;color:var(--muted);font-weight:400;line-height:1.6;}
+.supply-link{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.supply-link:hover{background:#5f4f26;}
+.storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
+.storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.storage-body{font-size:13px;line-height:1.75;color:#3d2f10;font-weight:400;}
+.storage-body p + p{margin-top:10px;}
+.storage-body strong{color:var(--text);font-weight:700;}
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details > summary{list-style:none;}}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:90%;}}
+@media(max-width:820px){.invoice-wrap,.print-btn{width:94%;}body{padding:24px 10px;}.inv-header{padding:22px 22px;}.inv-body{padding:24px 22px;}.inv-footer{padding:14px 22px;}}
+@media(max-width:640px){.invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}body{padding:8px 0;font-size:15px;}.inv-header{flex-direction:column;gap:14px;padding:20px 18px;}.inv-meta{text-align:left;}.inv-brand-name{font-size:26px;}.inv-body{padding:20px 16px;}.inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}.total-row{font-size:13px;}.total-row.grand .val{font-size:24px;}.program-title{font-size:30px;}.program-intro{padding:14px 0 18px;}.program-badge{font-size:8px;padding:4px 8px;}.tab-bar{position:sticky;top:56px;}.tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}.sec-divider-title{font-size:19px;}.sched-card{padding:16px 16px;}.sched-card-title{font-size:17px;}.sched-table{font-size:11px;}.sched-table th{font-size:8px;padding:6px 4px;letter-spacing:0.08em;}.sched-table td{padding:7px 4px;font-size:11px;}.sched-pill{font-size:9px;padding:1px 5px;margin:1px 1px 1px 0;}.sched-pill strong{font-size:10.5px;}.storage-card{padding:14px 16px;}.storage-body{font-size:12px;}.payment-block{padding:16px 18px;}.tip-card{padding:16px 18px;}.tip-title{font-size:17px;}.tip-body{font-size:13px;}.cal-banner{flex-direction:column;align-items:stretch;}.cal-banner .cal-controls{flex-direction:column;align-items:stretch;}.cal-banner .cal-dl-btn{width:100%;}.cal-banner input[type=date]{width:100%;}}
+</style>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+      <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-link">Stack Analyzer</a>
+      <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-link">Biomarkers</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+    <a href="https://biolinkedsolutions.com/tools/stack-analyzer" class="bl-nav-mobile-link">Stack Analyzer</a>
+    <a href="https://biolinkedsolutions.com/tools/biomarker-analysis" class="bl-nav-mobile-link">Biomarkers</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Protocol</div>
+      <div class="inv-number">David Coone</div>
+      <div class="inv-date">Mito Reset + 10&ndash;15 lb Cut</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  </div>
+
+  <div class="inv-body">
+
+    <!-- ================ PROTOCOL TAB ================ -->
+    <div class="tab-content active" id="tab-protocol">
+
+      <div class="program-intro">
+        <div class="program-eyebrow">Personalized Protocol</div>
+        <div class="program-title">David's <em>Mito Reset + Cut</em></div>
+        <div class="program-tag">Repair the engine first. Then the 10&ndash;15 lbs come off without the energy crash.</div>
+        <div class="program-context">
+          <p><strong>You're 45, recently off TRT, and want to drop 10&ndash;15 lbs.</strong> On paper that's a simple problem. In reality, coming off TRT exposes something most people don't think about &mdash; testosterone was quietly supporting your mitochondrial function. <strong>Without TRT in the picture, the metabolic floor drops.</strong> That's why guys coming off T often describe weight loss feeling "harder than it used to be" and energy that crashes in the afternoon.</p>
+          <p><strong>The piece nobody talks about &mdash; mitochondria and weight loss.</strong> Fat is stored chemical energy. To burn it, your cells need functioning mitochondria (the energy-producing machinery inside every cell). When the mitochondria are damaged, slow, or inefficient &mdash; which happens with aging, post-TRT, chronic stress, poor sleep &mdash; <strong>weight loss becomes harder and energy depletes faster.</strong> Diet alone hits a wall. Cardio alone hits a wall. You can be in a deficit and still not see the scale move. That's mitochondrial dysfunction blocking the fat-burning pathway.</p>
+          <p><strong>The fix is sequential, not parallel.</strong> You don't want to push a damaged engine harder &mdash; you want to repair it first, then run it. <strong>Phase 1 (SS-31 + Humanin)</strong> repairs and protects the mitochondria at the membrane and cell level. <strong>Phase 2 (MOTS-C + Retatrutide)</strong> then activates the now-healthy engine: MOTS-C drives metabolic activity (AMPK signaling), Reta drives the calorie deficit (appetite + fat oxidation). <strong>Repair, then activate, then cut.</strong> That's the whole logic.</p>
+        </div>
+        <div class="program-badges">
+          <span class="program-badge"><strong>~19-Week</strong> Cycle</span>
+          <span class="program-badge"><strong>4</strong> Compounds</span>
+          <span class="program-badge">Mito Repair &middot; Fat Loss</span>
+          <span class="program-badge">Post-TRT Friendly</span>
+          <span class="program-badge">Friends &amp; Family Pricing</span>
+        </div>
+        <div style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(122,101,48,0.08);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 16px;border-radius:2px;">
+          <span style="font-size:18px;line-height:1;">&#128150;</span>
+          <span style="text-align:left;">
+            <span style="display:block;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">Friends &amp; Family Pricing</span>
+            <span style="display:block;font-size:13px;color:var(--text);font-weight:500;margin-top:2px;">Bundle Total <strong style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700;">$430</strong> &middot; You save <strong style="color:var(--gold);">$115</strong></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Compounds &amp; Pricing</div>
+        <div class="sec-divider-title">4 Compounds &middot; Tap to Expand</div>
+      </div>
+
+      <div class="line-items">
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">SS-31 (Elamipretide) &middot; 50 mg &middot; 1 vial <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#3a7a5a;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">Phase 1 &middot; Wks 1&ndash;8</span></span>
+            <span class="li-summary-price"><span style="font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;">$125</span>$100 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">50 mg / 3 mL (16.67 mg/mL after recon)</span></li>
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">6 units</span> (0.06 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, AM &middot; <strong>Phase 1 (Weeks 1&ndash;8)</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why it's first in your protocol:</strong> SS-31 binds cardiolipin on the inner mitochondrial membrane and stabilizes the electron transport chain &mdash; the part of your cells that actually generates energy. Post-TRT, your mitochondria are running on reduced testosterone-driven support; SS-31 takes that load off by stabilizing the machinery directly. Less oxidative damage, more efficient ATP production, more fat-burning capacity. <strong>This is the foundation that lets the rest of the protocol work.</strong>
+            </div>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Humanin &middot; 10 mg &middot; 2 vials <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#3a7a5a;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">Phase 1 &middot; Wks 1&ndash;8</span></span>
+            <span class="li-summary-price"><span style="font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;">$60</span>$45 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">10 mg / 2 mL (5 mg/mL after recon) &middot; 2 vials cover the 8-week Phase 1</span></li>
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">500 mcg &rarr; pull syringe to <span class="units">10 units</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, AM &middot; <strong>Phase 1 (Weeks 1&ndash;8)</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen (rotate from SS-31 site)</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why it's paired with SS-31:</strong> Humanin is one of the only known mitochondrial-derived peptides &mdash; literally encoded inside mitochondrial DNA. It protects cells from oxidative stress, insulin resistance, and metabolic dysfunction at the cellular level. Where SS-31 protects the <em>membrane</em>, Humanin protects the <em>cell itself</em>. The pair gives the mitochondria two protective layers at once &mdash; the membrane stays clean AND the cell holds up against the metabolic load of a cut.
+            </div>
+            <div class="li-callout">
+              <strong>Bonus benefit for post-TRT:</strong> Humanin has documented effects on insulin sensitivity and glucose regulation &mdash; both of which can shift unfavorably when coming off testosterone. Running Humanin through Phase 1 helps stabilize that side of the equation before Phase 2 fat loss begins.
+            </div>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">MOTS-C &middot; 40 mg &middot; 2 vials <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#b97a1f;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">Phase 2 &middot; Wks 9+</span></span>
+            <span class="li-summary-price"><span style="font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;">$100</span>$80 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">40 mg / 3 mL (13.33 mg/mL after recon) &middot; 2 vials cover Phase 2</span></li>
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">~8 units</span> (0.075 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, AM <strong>fasted</strong> &middot; <strong>Phase 2 (starts Week 9)</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why it's in Phase 2, not Phase 1:</strong> MOTS-C is also a mitochondrial-derived peptide, but it works <em>opposite</em> to Humanin. Instead of protecting, it <strong>activates</strong>. It triggers AMPK signaling &mdash; the same pathway exercise and fasting activate &mdash; pushing your mitochondria to burn more fat, improve insulin sensitivity, and ramp up energy expenditure. By Week 9 the Phase 1 repair work has set the foundation. <strong>Now the activator works on a healthy engine.</strong>
+            </div>
+            <div class="li-callout">
+              <strong>Why fasted:</strong> AMPK activation is strongest in a fasted state &mdash; food (especially carbs) blunts the signal. Take MOTS-C first thing AM, water/black coffee only, eat 30&ndash;45 min after.
+            </div>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide &middot; 30 mg &middot; 1 vial <span style="font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;background:#3a6b8e;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;">Phase 2 &middot; Titrated</span></span>
+            <span class="li-summary-price"><span style="font-size:13px;color:var(--muted);text-decoration:line-through;font-weight:500;margin-right:6px;font-family:'Cormorant Garamond',serif;">$100</span>$80 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Vial</span><span class="qv">30 mg / 3 mL (10 mg/mL after recon)</span></li>
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (0.1 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>Phase 2a (Wks 9&ndash;11):</strong> Mon + Thu (2 doses/wk = 2 mg/wk total) &middot; <strong>Phase 2b (Wks 12+):</strong> M / W / F (3 doses/wk = 3 mg/wk total)</span></li>
+              <li><span class="ql">Supply</span><span class="qv">30 mg / 1 mg per dose = 30 doses &middot; Phase 2a uses 6 doses, Phase 2b uses ~24 doses over 8 weeks &middot; total Phase 2 = ~11 weeks of Reta coverage</span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen (rotate from MOTS-C site)</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why it's the fat-loss anchor:</strong> Triple-agonist (GLP-1 + GIP + glucagon). Suppresses appetite, drives fat oxidation, AND increases energy expenditure via the glucagon arm &mdash; the differentiator that makes Reta stronger for body comp than Ozempic or Mounjaro. <strong>For a 10&ndash;15 lb cut from your current weight, Reta is the cleanest fat-loss compound in research.</strong>
+            </div>
+            <div class="li-callout">
+              <strong>Why the titration:</strong> Reta GI tolerance is built, not given. Wks 9&ndash;11 at Mon + Thu lets your gut acclimate at lower weekly exposure. Wks 12+ bumps to M/W/F (50% more weekly mg) once tolerance is established. This is the standard slow-ramp that minimizes nausea + GI side effects.
+            </div>
+            <div class="li-callout">
+              <strong>Level down at goal:</strong> If you hit your 10&ndash;15 lb goal before the vial empties, drop Reta dose &mdash; either reduce to 0.5 mg (5 units) per dose OR drop frequency back to Mon + Thu only. The point is to maintain, not keep losing past your target. Notes &amp; Tips tab has the full "level down" logic.
+            </div>
+          </div>
+        </details>
+
+      </div>
+
+      <div style="background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">&#128150; Friends &amp; Family Pricing &middot; Bundle Total</div>
+          <div style="font-size:13px;color:#3d2f10;line-height:1.6;">SS-31 ($25 off) + Humanin ($15 off &times; 2 = $30) + MOTS-C ($20 off &times; 2 = $40) + Reta ($20 off). Total savings vs. list: <strong>$115</strong>.</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1;">$430</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:0.08em;">was <span style="text-decoration:line-through;">$545</span></div>
+        </div>
+      </div>
+
+      <div class="totals-block">
+        <div class="total-row sub"><span>Subtotal (MSRP)</span><span>$545.00</span></div>
+        <div class="total-row" style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-radius:2px;padding:10px 14px;margin-top:8px;">
+          <span style="display:flex;flex-direction:column;">
+            <span style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;">Friends &amp; Family Discount</span>
+            <span style="font-size:14px;font-weight:600;color:var(--text);">SS-31 $25 + Humanin $30 + MOTS-C $40 + Reta $20</span>
+          </span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);">&minus;$115.00</span>
+        </div>
+        <div class="total-row grand"><span>Total Due</span><span class="val">$430.00</span></div>
+        <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-top:8px;">You save $115 &middot; Friends &amp; Family Pricing</div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-title">Protocol Overview &mdash; How the Four Compounds Work Together</div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">SS-31 + Humanin &mdash; Phase 1 Repair (Wks 1&ndash;8)</div>
+            <div class="stack-desc">Two mitochondrial protection peptides. SS-31 stabilizes the inner membrane (cardiolipin); Humanin protects the cell itself from oxidative stress and insulin resistance. M&ndash;F AM for 8 weeks. Coming off TRT means your mitochondria are operating without the testosterone-driven support they were used to &mdash; this phase replaces that scaffolding with direct mitochondrial repair. <strong>Foundation built here is what makes Phase 2 fat loss possible without energy collapse.</strong></div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">MOTS-C &mdash; Phase 2 Activator (Wks 9+)</div>
+            <div class="stack-desc">After repair, MOTS-C activates the now-healthy mitochondria via AMPK signaling &mdash; the same pathway exercise activates. Drives fat oxidation, insulin sensitivity, energy expenditure. M&ndash;F AM fasted. <strong>This is the metabolic upgrade that hits AFTER repair, never before.</strong> Without Phase 1 first, MOTS-C would push damaged mitochondria harder and energy would crash. With Phase 1 done, it just upgrades a healthy engine.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Retatrutide &mdash; Phase 2 Fat-Loss Anchor (Wks 9+, Titrated)</div>
+            <div class="stack-desc">Triple-agonist (GLP-1 + GIP + glucagon). The compound that produces the 10&ndash;15 lb cut. Slow titration: Mon + Thu Wks 9&ndash;11 (gut acclimation), then M/W/F from Wk 12 (steady state). The glucagon arm differentiates it from Ozempic/Tirz on body comp outcomes. <strong>Drop dose or frequency at goal weight to maintain instead of overshooting.</strong></div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>Why these four together &mdash; the mitochondrial weight-loss equation:</strong> Fat is stored chemical energy. To burn it, you need mitochondria that can <em>actually</em> oxidize fat. Most weight-loss protocols ignore this and just push the deficit harder &mdash; which works until the mitochondria can't keep up, the metabolism slows, energy crashes, and the cut stalls. <strong>This protocol fixes that root cause first.</strong> Phase 1 (SS-31 + Humanin) repairs and protects the mitochondrial machinery for 8 weeks. Phase 2 (MOTS-C + Reta) then activates and uses the repaired machinery: MOTS-C drives metabolic activity at the cellular level, Reta drives the deficit at the appetite + signaling level. Together they create the conditions where 10&ndash;15 lbs comes off cleanly, energy stays stable, and you don't end the cut feeling worse than when you started.<br><br>
+          <strong>End-state by goal weight:</strong> 10&ndash;15 lbs down, energy stable (not depleted like most cuts), mitochondrial function restored (the post-TRT slump addressed at the source), and metabolic flexibility back to where it was pre-TRT or better. Sustainable because the cellular foundation was rebuilt.
+        </div>
+      </div>
+
+      <div class="payment-block">
+        <div class="payment-title">Payment Instructions</div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128184;</div>
+          <div><div class="payment-text">Send via Venmo</div><div class="payment-handle">@micahp20</div></div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128274;</div>
+          <div class="payment-text"><strong>Set payment privacy to <span style="color:var(--gold);">Private</span></strong> (not Public or Friends)</div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128221;</div>
+          <div class="payment-text">Include your name in the Venmo note (e.g. "David Coone &middot; Mito + Cut")</div>
+        </div>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================ SCHEDULE TAB ================ -->
+    <div class="tab-content" id="tab-schedule">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Weekly Schedule</div>
+        <div class="sec-divider-title">Phase 1: Repair (Wks 1&ndash;8) &middot; Phase 2: Activate + Cut (Wks 9+)</div>
+      </div>
+
+      <div class="cal-banner">
+        <div class="cal-left">
+          <h4>&#128197; Add to Your Calendar</h4>
+          <p>Pick your Week 1 Monday and download the .ics file. Phase 1 (SS-31 + Humanin M&ndash;F AM, Wks 1&ndash;8), Phase 2a (MOTS-C M&ndash;F + Reta Mon/Thu, Wks 9&ndash;11), Phase 2b (MOTS-C M&ndash;F + Reta M/W/F, Wks 12+).</p>
+        </div>
+        <div class="cal-controls">
+          <input type="date" id="cycleStart">
+          <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+        </div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 1 &mdash; Repair the Engine</div>
+            <div class="sched-card-sub">SS-31 + Humanin M&ndash;F AM. 2 shots per active day. Sat/Sun rest.</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 1&ndash;8</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>6u</strong> · SS-31 (1 mg)</span><span class="sched-pill"><strong>10u</strong> · Humanin (500 mcg)</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill"><strong>6u</strong> · SS-31</span><span class="sched-pill"><strong>10u</strong> · Humanin</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>6u</strong> · SS-31</span><span class="sched-pill"><strong>10u</strong> · Humanin</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill"><strong>6u</strong> · SS-31</span><span class="sched-pill"><strong>10u</strong> · Humanin</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>6u</strong> · SS-31</span><span class="sched-pill"><strong>10u</strong> · Humanin</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">All off &mdash; recover</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">All off &mdash; recover</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 2a &mdash; Activate + Reta Ramp-Up</div>
+            <div class="sched-card-sub">SS-31 + Humanin done. MOTS-C M&ndash;F fasted. Reta Mon + Thu only (gut acclimation).</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 9&ndash;11</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM Fasted</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C (1 mg, fasted)</span><span class="sched-pill reta"><strong>10u</strong> · Reta (1 mg)</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span><span class="sched-pill reta"><strong>10u</strong> · Reta</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 2b &mdash; Reta Steady State + Fat Loss</div>
+            <div class="sched-card-sub">MOTS-C M&ndash;F fasted continues. Reta bumps to M/W/F (3 mg/wk total). Cut accelerates here.</div>
+          </div>
+          <div class="sched-phase-pill">Weeks 12+</div>
+        </div>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr>
+              <th style="width:52px">Day</th>
+              <th>AM Fasted</th>
+              <th class="right">Shots</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C (1 mg, fasted)</span><span class="sched-pill reta"><strong>10u</strong> · Reta (1 mg)</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span><span class="sched-pill reta"><strong>10u</strong> · Reta</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>8u</strong> · MOTS-C</span><span class="sched-pill reta"><strong>10u</strong> · Reta</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
+        <strong style="color:var(--gold);">MOTS-C AM fasted requirement:</strong> First thing in the morning, water/black coffee only. Wait 30&ndash;45 min after dosing before eating. Food blunts the AMPK signal.<br><br>
+        <strong style="color:var(--gold);">Reta timing flexibility:</strong> Reta has a long half-life (~6 days) so exact time of day matters less than consistency. Just take it the same time on each scheduled day. Most people prefer morning so any GI side effects happen during waking hours rather than disrupting sleep.<br><br>
+        <strong style="color:var(--gold);">Level-down protocol at goal weight:</strong> When you hit your 10&ndash;15 lb goal, drop Reta to maintenance &mdash; either 0.5 mg per dose (5 units) OR drop frequency to Mon + Thu only. Don't overshoot the target. Full level-down logic in the Notes &amp; Tips tab.
+      </div>
+
+    </div><!-- /schedule tab -->
+
+    <!-- ================ SUPPLIES TAB ================ -->
+    <div class="tab-content" id="tab-supplies">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Supplies</div>
+        <div class="sec-divider-title">Order Before Day 1</div>
+      </div>
+
+      <div class="supplies-wrap">
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 200-pack</div>
+            <div class="supply-info-desc">Short, thin needle for SubQ shots. One per injection &mdash; never reuse.</div>
+          </div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL bottle</div>
+            <div class="supply-info-desc">Sterile water with a preservative. Used to mix your dry peptide powder into a liquid you can draw.</div>
+          </div>
+          <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">McGuff &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 200-pack</div>
+            <div class="supply-info-desc">70% isopropyl wipes. Clean the vial top and your skin before every shot.</div>
+          </div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+            <div class="supply-info-desc">FDA-cleared disposal box for used needles. Drop off free at any CVS or Walgreens when full.</div>
+          </div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+            <div class="supply-info-desc">Small fridge organizer for your reconstituted vials. Keeps them sorted, labeled, and protected from light.</div>
+          </div>
+          <a href="https://a.co/d/07HthwLz" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Storage &amp; Handling</div>
+        <div class="sec-divider-title">Keep It Cold &middot; Keep It Clean</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
+        <div class="storage-body">
+          <p><strong>Dry (lyophilized) vials:</strong> refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</p>
+          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days. Fresh insulin syringe for each draw &mdash; never reuse.</p>
+          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row.</p>
+        </div>
+      </div>
+
+    </div><!-- /supplies tab -->
+
+    <!-- ================ NOTES TAB ================ -->
+    <div class="tab-content" id="tab-notes">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Read Before Day 1</div>
+        <div class="sec-divider-title">Featured Tips for Your Situation</div>
+      </div>
+
+      <div class="tip-card featured">
+        <div class="tip-eyebrow">Tip 01 &mdash; Mitochondria + Weight Loss + Coming Off TRT</div>
+        <div class="tip-title">Why Weight Loss Got Harder Once You Stopped TRT</div>
+        <div class="tip-body">
+          <p>Most guys coming off TRT notice something within a few months &mdash; the body composition that was easy to maintain on testosterone suddenly feels harder. Weight loss attempts hit a wall. Energy crashes in the afternoon. Workouts feel flat. <strong>The reason isn't willpower or "metabolism slowing with age."</strong> It's mitochondrial.</p>
+          <p>Testosterone has a direct supportive effect on mitochondrial function &mdash; it upregulates the genes that produce mitochondrial proteins, improves the efficiency of the electron transport chain, and supports the cellular processes that convert stored fat into usable energy. <strong>When you come off T, that scaffolding goes away.</strong> The mitochondria are still there, but they're operating without the support they were used to.</p>
+          <p><strong>How this affects weight loss specifically:</strong></p>
+          <ul style="margin-left:18px;margin-top:8px;">
+            <li><strong>Fat = stored chemical energy.</strong> To burn it, you need functioning mitochondria. Slow mitochondria = slow fat burning, regardless of how good your diet is.</li>
+            <li><strong>Energy depletes faster.</strong> Less efficient ATP production = afternoon crashes, gym sessions that feel harder than they should, and the "tired but wired" feeling of being in a deficit.</li>
+            <li><strong>Plateaus hit early.</strong> Your body senses the metabolic stress and downregulates further to conserve energy. Cuts that should produce 1&ndash;2 lbs/week start producing nothing.</li>
+          </ul>
+          <p><strong>The protocol fix:</strong> repair the mitochondria <em>before</em> driving the deficit. SS-31 + Humanin in Phase 1 directly address the cellular machinery. By Week 8, you're heading into Phase 2 with mitochondria that are functioning closer to where they were on T. Then MOTS-C activates them and Reta does the fat-loss work &mdash; without the energy crash that most cuts produce.</p>
+        </div>
+      </div>
+
+      <div class="tip-card featured">
+        <div class="tip-eyebrow">Tip 02 &mdash; Phase Sequencing</div>
+        <div class="tip-title">Why Reta Doesn't Start in Week 1</div>
+        <div class="tip-body">
+          <p>Most people would buy Reta and start it Day 1. We're not doing that for you. The reason: <strong>Reta drives a calorie deficit, and calorie deficits stress mitochondria.</strong> Stressing already-stressed mitochondria (post-TRT) makes everything worse &mdash; more energy crashes, more plateaus, worse adherence.</p>
+          <p>The sequence: <strong>repair (Wks 1&ndash;8) &rarr; activate (Wks 9+) &rarr; cut (Wks 9+).</strong> By the time Reta kicks in, you've spent 8 weeks repairing the engine. MOTS-C activates that repaired engine in Phase 2. Reta then drives the deficit on top of a metabolic system that can <em>handle</em> the deficit without falling apart.</p>
+          <p>You'll still lose the 10&ndash;15 lbs &mdash; possibly faster than a Reta-only approach &mdash; just with stable energy the whole way instead of the gas-out crash most cuts produce.</p>
+        </div>
+      </div>
+
+      <div class="tip-card featured">
+        <div class="tip-eyebrow">Tip 03 &mdash; Level-Down Protocol at Goal</div>
+        <div class="tip-title">Don't Overshoot. Drop the Dose When You're There.</div>
+        <div class="tip-body">
+          <p>10&ndash;15 lbs is your target. Reta will keep producing fat loss past that target if you let it. Most people don't level down in time and end up underweight or losing muscle they didn't want to lose.</p>
+          <p><strong>The protocol:</strong></p>
+          <ul style="margin-left:18px;margin-top:8px;">
+            <li><strong>~3 lbs from goal:</strong> drop Reta from M/W/F back to Mon + Thu only (cuts weekly dose 33%)</li>
+            <li><strong>At goal:</strong> drop Reta dose from 1 mg to 0.5 mg (5 units instead of 10) OR drop frequency to once weekly (Mon only)</li>
+            <li><strong>1&ndash;2 lbs past goal:</strong> stop Reta entirely. MOTS-C can continue if you want metabolic support.</li>
+          </ul>
+          <p>The point isn't to keep losing weight forever. The point is to land at your target, lock it in, and maintain. Reta is a tool, not a lifestyle &mdash; use it for the cut, then back off cleanly.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 04 &mdash; Reta GI Side Effects</div>
+        <div class="tip-title">What to Expect During the Ramp-Up</div>
+        <div class="tip-body">
+          <p>Reta in the first 1&ndash;2 weeks (Wks 9&ndash;10) is when GI side effects are most likely &mdash; nausea, slow gastric emptying, occasional constipation. The Mon + Thu titration is specifically designed to minimize this.</p>
+          <p><strong>If nausea hits hard:</strong></p>
+          <ul style="margin-left:18px;margin-top:8px;">
+            <li>Drop to once weekly (Mon only) for an additional 2 weeks before resuming Mon + Thu</li>
+            <li>OR drop dose to 0.5 mg (5 units) instead of 1 mg until tolerance builds</li>
+            <li>Eat smaller meals more frequently &mdash; large meals on Reta = guaranteed nausea</li>
+            <li>Hydrate aggressively (3+ L/day) and add electrolytes</li>
+          </ul>
+          <p>By Week 11&ndash;12 most GI effects fade as tolerance builds. The bump to M/W/F should feel manageable.</p>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Week-by-Week</div>
+        <div class="sec-divider-title">What to Expect Across the Cycle</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 1&ndash;2</div>
+        <div class="tip-title">Foundation &middot; Subtle but Real</div>
+        <div class="tip-body">
+          <p>Phase 1 starts. SS-31 + Humanin daily M&ndash;F AM. No scale movement yet &mdash; this isn't a weight loss phase. What you might notice: slightly more stable energy through the day, mild improvement in sleep depth, less "afternoon crash" feeling. Mild injection-site redness is normal.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 3&ndash;5</div>
+        <div class="tip-title">Mito Repair Compounds</div>
+        <div class="tip-body">
+          <p>By Week 3&ndash;4 the mitochondrial benefits start being noticeable. Energy is more consistent. Workouts feel like they did pre-TRT-cessation. Recovery between sessions improves. <strong>You'll start to feel "more like yourself"</strong> in terms of baseline energy.</p>
+          <p>Weight may shift slightly (a couple lbs either way) from water/glycogen changes &mdash; that's expected, not the goal.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 6&ndash;8</div>
+        <div class="tip-title">Phase 1 Wraps &middot; Foundation Locked In</div>
+        <div class="tip-body">
+          <p>Last 2&ndash;3 weeks of Phase 1. The mitochondrial repair compounds over time &mdash; by Week 8 you've built a foundation that will hold through the Phase 2 cut.</p>
+          <p>End of Week 8: SS-31 + Humanin vials wrapping up. Phase 2 (MOTS-C + Reta) starts Monday of Week 9.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 9&ndash;11</div>
+        <div class="tip-title">Phase 2a &middot; MOTS-C Activates, Reta Ramps</div>
+        <div class="tip-body">
+          <p>MOTS-C starts AM fasted M&ndash;F. Reta begins Mon + Thu only (gut acclimation). Expect: noticeable energy bump from MOTS-C (AMPK activation), appetite suppression from Reta within the first week, mild GI adjustment.</p>
+          <p>Weight should start dropping by end of Week 9 &mdash; expect 1&ndash;1.5 lbs/wk over Wks 9&ndash;11.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 12&ndash;15</div>
+        <div class="tip-title">Phase 2b &middot; Reta at Steady State, Cut Accelerates</div>
+        <div class="tip-body">
+          <p>Reta bumps to M/W/F at Week 12. Weekly dose now 3 mg vs 2 mg previously. Fat loss accelerates &mdash; expect 1.5&ndash;2 lbs/wk through this stretch. Energy stays solid thanks to the Phase 1 foundation + MOTS-C support.</p>
+          <p>Most clients hit their 10&ndash;15 lb goal somewhere in Weeks 14&ndash;17.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Weeks 16&ndash;19</div>
+        <div class="tip-title">Approaching Goal &middot; Level Down</div>
+        <div class="tip-body">
+          <p>Once you're within 3 lbs of goal, start the level-down (see Tip 03). At goal, drop Reta to maintenance. MOTS-C can continue to the end of Phase 2 (Wks 18&ndash;19 depending on Reta vial empty).</p>
+          <p><strong>End-of-cycle questions:</strong> 10&ndash;15 lbs down vs Week 1? Energy compared to start? How does maintenance feel? These answers determine whether to take a 4&ndash;8 week break, restart at a maintenance dose, or run a different protocol next.</p>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Execution Tips</div>
+        <div class="sec-divider-title">Daily Rhythm &middot; What to Monitor</div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 05 &mdash; AM Cluster Logistics</div>
+        <div class="tip-title">Phase 1 vs. Phase 2 Morning Routine</div>
+        <div class="tip-body">
+          <p><strong>Phase 1 mornings (Wks 1&ndash;8):</strong> SS-31 + Humanin together, 5 min. Same window, rotate to different abdomen quadrants. Doesn't have to be fasted &mdash; can be before or after breakfast. Easiest right after you wake up.</p>
+          <p><strong>Phase 2 mornings (Wks 9+):</strong> MOTS-C fasted only &mdash; first thing AM, water/black coffee only, wait 30&ndash;45 min before eating. On Reta days (Mon + Thu in Phase 2a, M/W/F in Phase 2b), Reta can go in the same window &mdash; doesn't need to be fasted, just convenient to cluster the shots.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 06 &mdash; Diet During the Cut</div>
+        <div class="tip-title">Reta Does the Hard Part &mdash; You Just Have to Eat Smart</div>
+        <div class="tip-body">
+          <p>Reta will kill your appetite. The trap most guys fall into: they eat too little and end up under-fueling, which crashes energy AND costs muscle. Hit these baselines:</p>
+          <ul style="margin-left:18px;margin-top:8px;">
+            <li><strong>Protein:</strong> 0.8&ndash;1 g per lb of bodyweight, daily. Non-negotiable for preserving muscle on a GLP-1.</li>
+            <li><strong>Total calories:</strong> aim for a ~500 kcal/day deficit, not more. Reta will make it feel easy &mdash; resist the urge to push the deficit harder.</li>
+            <li><strong>Hydration:</strong> 3+ L/day. Reta + dehydration = GI misery.</li>
+            <li><strong>Training:</strong> 3&ndash;4 lift sessions/week to retain muscle. Cardio optional.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div>
+        <div class="tip-title">Normal vs. Watch For</div>
+        <div class="tip-body">
+          <p><strong>Normal (no action):</strong></p>
+          <p>&middot; Mild injection-site redness or small bruising &mdash; rotate sites and use clean technique<br>
+          &middot; Improved sleep depth + slightly more vivid dreams Wks 1&ndash;2<br>
+          &middot; Mild flushing 5&ndash;10 min after MOTS-C &mdash; normal AMPK-related vascular response<br>
+          &middot; Reta GI effects in the first 1&ndash;2 weeks of Phase 2a &mdash; subsides as tolerance builds<br>
+          &middot; Appetite gone within 3&ndash;5 days of starting Reta &mdash; that's the compound working</p>
+          <p><strong>Monitor (contact BioLinked):</strong></p>
+          <p>&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique or contamination<br>
+          &middot; Severe nausea or vomiting past Week 2 of Reta &mdash; drop to 0.5 mg or pause and contact us<br>
+          &middot; Weight loss faster than 2 lbs/wk sustained &mdash; level down to protect lean tissue<br>
+          &middot; Persistent fatigue past Week 3 of Phase 1 &mdash; rare but worth flagging; may need to adjust dose timing</p>
+        </div>
+      </div>
+
+    </div><!-- /notes tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Week 1 Monday first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-dcoone@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  // 19-week schedule: Phase 1 (Wks 1-8), Phase 2a (Wks 9-11), Phase 2b (Wks 12-19)
+  for(var w=1;w<=19;w++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(w-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var lines=[];
+      var phase;
+      if (w<=8) {
+        phase='Phase 1 — Repair (SS-31 + Humanin)';
+        lines.push('AM: SS-31 6u (1 mg) + Humanin 10u (500 mcg)');
+      } else if (w<=11) {
+        phase='Phase 2a — Activate + Reta ramp';
+        lines.push('AM FASTED: MOTS-C 8u (1 mg) — water/black coffee only');
+        // Reta on Mon (d=0) and Thu (d=3)
+        if (d===0 || d===3) lines.push('AM (after MOTS-C): Reta 10u (1 mg) — Mon + Thu titration');
+      } else {
+        phase='Phase 2b — Reta steady state';
+        lines.push('AM FASTED: MOTS-C 8u (1 mg) — water/black coffee only');
+        // Reta on Mon (d=0), Wed (d=2), Fri (d=4)
+        if (d===0 || d===2 || d===4) lines.push('AM (after MOTS-C): Reta 10u (1 mg) — M/W/F steady state');
+      }
+      var shots = lines.length;
+      var title='BLS · David · W'+w+' '+dayNames[dow]+' · '+phase;
+      var desc='David Coone — Mito Reset + Cut · Week '+w+'\\n'+phase+'\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'W'+w+'D'+d);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//David Coone//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — David Mito + Cut','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='David-Coone-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+</script>
+<!-- PWA install banner + service worker -->
+<style>
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner.show{display:flex;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
+.bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.bl-pwa-install{background:#7A6530;color:#fff;}
+.bl-pwa-install:hover{background:#5f4f26;}
+.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
+.bl-pwa-dismiss:hover{color:#1a1a1a;}
+@media print{.bl-pwa-banner{display:none !important;}}
+</style>
+<div class="bl-pwa-banner" id="bl-pwa-banner">
+  <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
+  <div class="bl-pwa-banner-actions">
+    <button class="bl-pwa-banner-btn bl-pwa-install" id="bl-pwa-install-btn" style="display:none">Install</button>
+    <button class="bl-pwa-banner-btn bl-pwa-dismiss" id="bl-pwa-dismiss-btn">Not now</button>
+  </div>
+</div>
+<script>
+(function(){
+  if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('/dcoone/sw.js').catch(()=>{}); }); }
+  var DISMISS_KEY = 'bl-pwa-dismiss-dcoone';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-block'; });
+  function show(){
+    if (isIOS) textEl.innerHTML = '<strong>David, save this protocol as an app:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    else if (isAndroid) textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access on your home screen.';
+    else textEl.innerHTML = '<strong>Tip:</strong> install this protocol as an app on your phone. Open in mobile Safari or Chrome.';
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){ banner.classList.remove('show'); localStorage.setItem(DISMISS_KEY, '1'); });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') { banner.classList.remove('show'); localStorage.setItem(DISMISS_KEY, '1'); }
+  });
+  if (isIOS || isAndroid) setTimeout(show, 1500);
+})();
+</script>
+
+</body>
+</html>
