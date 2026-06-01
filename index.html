@@ -494,7 +494,9 @@ reveals.forEach(el => observer.observe(el));
 <script>
 (function(){
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+    let hadController_ = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController_) window.location.reload(); });
+    window.addEventListener("load", () => { navigator.serviceWorker.register("/sw.js").catch(()=>{}); });
   }
   var DISMISS_KEY = 'bl-pwa-dismiss-root';
   if (localStorage.getItem(DISMISS_KEY)) return;

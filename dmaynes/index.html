@@ -1343,7 +1343,9 @@ function downloadICS(prefix){
 (function(){
   // Register service worker
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
+    let hadController_ = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController_) window.location.reload(); });
+    window.addEventListener("load", () => {
       navigator.serviceWorker.register('/dmaynes/sw.js').catch(()=>{});
     });
   }
