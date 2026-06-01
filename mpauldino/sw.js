@@ -1,42 +1,41 @@
-// Protocol by BioLinked — Service Worker
-// Cache-first strategy for the app shell so the tracker works offline once installed.
-const CACHE = 'mpauldino-v3';
+// BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
+// Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
+const CACHE = 'mpauldino-v2';
 const ASSETS = [
   '/mpauldino/',
   '/mpauldino/index.html',
   '/mpauldino/manifest.json',
-  '/mpauldino/icon-180.png',
-  '/mpauldino/icon-192.png',
-  '/mpauldino/icon-512.png'
+  '/icon-180.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/favicon.png'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{}))
-  );
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
   self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
-  );
+  e.waitUntil(caches.keys().then(keys => Promise.all(
+    keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+  )));
   self.clients.claim();
 });
 
+// Network-first: always try fresh content first so clients see the latest protocol updates.
+// Falls back to cache only if the network is unavailable (offline support preserved).
 self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  // Only handle GETs from our origin within /mpauldino/
   if (e.request.method !== 'GET') return;
-  if (!url.pathname.startsWith('/mpauldino/')) return;
+  const url = new URL(e.request.url);
+  if (url.origin !== location.origin) return;
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).then(res => {
-      // Cache new same-origin responses
+    fetch(e.request).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match('/mpauldino/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/mpauldino/index.html')))
   );
 });
