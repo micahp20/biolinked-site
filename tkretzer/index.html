@@ -176,19 +176,6 @@ details[open].li-row > summary{border-bottom-color:var(--border);}
 .lab-range{font-size:10px;color:var(--muted);margin-top:3px;}
 .lab-section-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);margin-top:18px;margin-bottom:4px;}
 .lab-section-sub{font-size:11px;color:var(--muted);font-style:italic;margin-bottom:8px;}
-/* Daily tracker */
-.trk-table{width:100%;border-collapse:collapse;font-size:11px;min-width:600px;}
-.trk-table th{background:#f0f0f0;color:var(--gold);padding:6px 6px;text-align:center;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);border-right:1px solid var(--border);}
-.trk-table th.wk{background:#fafafa;text-align:left;padding-left:10px;}
-.trk-table td{padding:4px 5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;vertical-align:middle;}
-.trk-table tr.wkrow td.wkcell{background:#fcfcfa;font-weight:700;color:var(--gold);text-align:left;padding-left:10px;font-size:10px;letter-spacing:0.08em;text-transform:uppercase;}
-.trk-cell{display:flex;flex-direction:column;gap:2px;align-items:stretch;}
-.trk-chip{display:block;padding:3px 4px;font-size:9px;font-weight:600;border-radius:2px;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--muted);user-select:none;transition:all 0.12s;line-height:1.2;text-align:center;}
-.trk-chip:hover{border-color:var(--gold);color:var(--gold);}
-.trk-chip.ss31-done{background:#2f7a4a;border-color:#2f7a4a;color:#fff;}
-.trk-chip.mots-done{background:#7A6530;border-color:#7A6530;color:#fff;}
-.trk-rest{background:#f5f5f5;color:#bbb;font-style:italic;font-size:10px;padding:6px 4px;}
-@media(max-width:640px){.trk-table{font-size:10px;}.trk-chip{font-size:8px;padding:2px 3px;}}
 @media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details > summary{list-style:none;}}
 @media(max-width:1100px){.invoice-wrap,.print-btn{width:90%;}}
 @media(max-width:820px){.invoice-wrap,.print-btn{width:94%;}body{padding:24px 10px;}.inv-header{padding:22px 22px;}.inv-body{padding:24px 22px;}.inv-footer{padding:14px 22px;}}
@@ -514,68 +501,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <strong style="color:var(--gold);">Reconstituted vials:</strong> refrigerate immediately after recon. Each vial covers ~4 weeks of M&ndash;F dosing &mdash; well within the ~30-day stability window. Reconstitute one vial at a time as needed (SS-31 first; then each MOTS-C as the prior empties).<br><br>
         <strong style="color:var(--gold);">iPhone / iOS install:</strong> tap the Share button in Safari then "Add to Home Screen" &mdash; this protocol becomes a one-tap app. Tap "Download .ics" above to load all dose events into Apple Calendar with reminders.
       </div>
-
-      <!-- ============= DAILY TRACKER ============= -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Daily Tracker</div>
-        <div class="sec-divider-title">12-Week Check-Off Grid &middot; Auto-Saves to Your Device</div>
-      </div>
-
-      <div style="background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:18px 20px;margin-bottom:18px;">
-        <div style="margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.5;">Tap any compound chip on a given day to mark it done. State saves locally on this device.</div>
-        <div id="tracker-grid" style="overflow-x:auto;-webkit-overflow-scrolling:touch;"></div>
-      </div>
-
-      <script>
-        var TOTAL_WEEKS = 12;
-        var TRACKER_KEY = 'bl-tkretzer-tracker-v1';
-        function loadTracker(){
-          try { return JSON.parse(localStorage.getItem(TRACKER_KEY) || '{}'); } catch(e){ return {}; }
-        }
-        function saveTracker(state){
-          try { localStorage.setItem(TRACKER_KEY, JSON.stringify(state)); } catch(e){}
-        }
-        function toggleChip(cellId, key){
-          var state = loadTracker();
-          state[cellId] = !state[cellId];
-          saveTracker(state);
-          var el = document.getElementById(cellId);
-          if(el){ if(state[cellId]) el.classList.add(key+'-done'); else el.classList.remove(key+'-done'); }
-        }
-        function renderTracker(){
-          var state = loadTracker();
-          var html = '<table class="trk-table"><thead><tr>';
-          html += '<th class="wk" style="width:56px;">Wk</th>';
-          html += '<th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th><th>Sun</th>';
-          html += '</tr></thead><tbody>';
-          for(var w=1;w<=TOTAL_WEEKS;w++){
-            html += '<tr class="wkrow">';
-            html += '<td class="wkcell">Wk '+w+'</td>';
-            for(var d=0;d<7;d++){
-              html += '<td><div class="trk-cell">';
-              if(d>=5){
-                html += '<div class="trk-rest">off</div>';
-              } else {
-                // Sequential: Phase 1 (Wks 1-4) SS-31 alone; Phase 2 (Wks 5-12) MOTS-C alone.
-                if(w<=4){
-                  var ss = 'wk'+w+'-d'+d+'-ss31';
-                  html += '<div id="'+ss+'" class="trk-chip'+(state[ss]?' ss31-done':'')+'" onclick="toggleChip(\''+ss+'\',\'ss31\')" title="SS-31 2.5mg 10u">SS-31</div>';
-                } else {
-                  var mt = 'wk'+w+'-d'+d+'-mots';
-                  html += '<div id="'+mt+'" class="trk-chip'+(state[mt]?' mots-done':'')+'" onclick="toggleChip(\''+mt+'\',\'mots\')" title="MOTS-C 1mg 10u fasted">MOTS</div>';
-                }
-              }
-              html += '</div></td>';
-            }
-            html += '</tr>';
-          }
-          html += '</tbody></table>';
-          document.getElementById('tracker-grid').innerHTML = html;
-        }
-        if(document.readyState === 'loading'){
-          document.addEventListener('DOMContentLoaded', renderTracker);
-        } else { renderTracker(); }
-      </script>
 
     </div><!-- /schedule tab -->
 
