@@ -587,61 +587,16 @@ hr { border: none; border-top: 1px solid var(--border); }
 
 </div>
 
+<!-- Peptide product line + dosing data (single source of truth) — edit /peptide-data.js to change. -->
+<script src="/peptide-data.js"></script>
+
 <script>
-const PRESETS = {
-  'Tirzepatide (10mg)':      { vial:'10mg',     dose:'0.5mg',      bac:'2mL',  units:'10', schedule:'3x per week',              timing:'AM',                 price:60   },
-  'Tirzepatide (20mg)':      { vial:'20mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'2x per week',              timing:'AM',                 price:90   },
-  'Tirzepatide (30mg)':      { vial:'30mg',     dose:'1mg',        bac:'3mL',  units:'10', schedule:'2x per week',              timing:'AM',                 price:130  },
-  'Retatrutide (10mg)':      { vial:'10mg',     dose:'0.5mg',      bac:'2mL',  units:'10', schedule:'3-4x per week',            timing:'AM',                 price:45   },
-  'Retatrutide (20mg)':      { vial:'20mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'3-4x per week',            timing:'AM',                 price:90   },
-  'Retatrutide (30mg)':      { vial:'30mg',     dose:'1mg',        bac:'3mL',  units:'10', schedule:'3-4x per week',            timing:'AM',                 price:150  },
-  'Semaglutide':             { vial:'3mg',      dose:'250mcg',     bac:'2mL',  units:'17', schedule:'Once per week',            timing:'AM',                 price:65   },
-  'Cagrilintide':            { vial:'10mg',     dose:'0.5mg',      bac:'2mL',  units:'10', schedule:'Once per week',            timing:'AM',                 price:115  },
-  'AOD-9604':                { vial:'5mg',      dose:'300mcg',     bac:'2mL',  units:'11', schedule:'5 days on / 2 off',        timing:'AM fasted',          price:45   },
-  'Tesamorelin':             { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM/PM',              price:55   },
-  'BPC-157 (5mg)':           { vial:'5mg',      dose:'250mcg',     bac:'2mL',  units:'10', schedule:'Every day',                timing:'AM/PM',              price:20   },
-  'BPC-157 (10mg)':          { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'Every day',                timing:'AM/PM',              price:40   },
-  'TB-500':                  { vial:'5mg',      dose:'500mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:23   },
-  'Wolverine (BPC+TB)':      { vial:'5mg+5mg',  dose:'500mcg ea',  bac:'2mL',  units:'10', schedule:'Every day',                timing:'AM/PM',              price:50   },
-  'GLOW Blend':              { vial:'70mg',     dose:'1.75mg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:70   },
-  'KLOW Blend':              { vial:'80 units', dose:'4 units',    bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:80   },
-  'SS-31':                   { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:45   },
-  'Thymosin Alpha-1':        { vial:'10mg',     dose:'1.5mg',      bac:'2mL',  units:'30', schedule:'5 days on / 2 off',        timing:'AM',                 price:65   },
-  'HGH 10 IU':               { vial:'10 IU',    dose:'2 IU',       bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM fasted/pre-sleep',price:150  },
-  'HGH 15 IU':               { vial:'15 IU',    dose:'2 IU',       bac:'3mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM fasted/pre-sleep',price:200  },
-  'Ipamorelin':              { vial:'10mg',     dose:'300mcg',     bac:'3mL',  units:'9',  schedule:'5 days on / 2 off',        timing:'AM/PM',              price:40   },
-  'CJC-1295 No DAC (5mg)':   { vial:'5mg',      dose:'100mcg',     bac:'2mL',  units:'4',  schedule:'5 days on / 2 off',        timing:'AM/PM',              price:45   },
-  'CJC-1295 No DAC (10mg)':  { vial:'10mg',     dose:'100mcg',     bac:'3mL',  units:'3',  schedule:'5 days on / 2 off',        timing:'AM/PM',              price:90   },
-  'CJC-1295 with DAC':       { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'40', schedule:'2x per week',              timing:'AM',                 price:50   },
-  'CJC + Ipamorelin':        { vial:'5mg+5mg',  dose:'250mcg ea',  bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM/PM fasted',       price:45   },
-  'Sermorelin':              { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'Pre-sleep',          price:80   },
-  'IGF-1 LR3':               { vial:'1mg',      dose:'50mcg',      bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'Post-workout',       price:50   },
-  'HCG (5000 IU)':           { vial:'5000 IU',  dose:'500 IU',     bac:'2mL',  units:'20', schedule:'2-3x per week',            timing:'AM',                 price:154  },
-  'HCG (10000 IU)':          { vial:'10000 IU', dose:'500 IU',     bac:'3mL',  units:'15', schedule:'2-3x per week',            timing:'AM',                 price:220  },
-  'Hexarelin Acetate':       { vial:'5mg',      dose:'200mcg',     bac:'2mL',  units:'8',  schedule:'5 days on / 2 off',        timing:'AM fasted/pre-sleep',price:40   },
-  'Testosterone Cypionate':  { vial:'200mg/mL 10mL', dose:'100mg',bac:'—',    units:'50', schedule:'2x per week',              timing:'AM',                 price:85   },
-  'Testosterone Enanthate':  { vial:'200mg/mL 10mL', dose:'100mg',bac:'—',    units:'50', schedule:'2x per week',              timing:'AM',                 price:85   },
-  'Testosterone Propionate': { vial:'100mg/mL 10mL', dose:'50mg', bac:'—',    units:'50', schedule:'3x per week',              timing:'AM',                 price:75   },
-  'Tadalafil (Cialis)':      { vial:'30 × 20mg tabs', dose:'10-20mg',bac:'—', units:'—',  schedule:'As needed / daily 5mg',    timing:'30-60 min before',   price:35   },
-  'Kisspeptin-10':           { vial:'5mg',      dose:'125mcg',     bac:'2mL',  units:'5',  schedule:'Every day',                timing:'1hr before bed',     price:55   },
-  'Epitalon':                { vial:'20mg',     dose:'2mg',        bac:'2mL',  units:'20', schedule:'Every day × 20 days',      timing:'PM',                 price:65   },
-  'Semax':                   { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'Mon / Wed / Fri',          timing:'Morning',            price:45   },
-  'Selank':                  { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'As needed',                timing:'Afternoon',          price:45   },
-  'DSIP':                    { vial:'5mg',      dose:'250mcg',     bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'1-3 hrs before bed', price:45   },
-  'Dihexa':                  { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'40', schedule:'3x per week',              timing:'Morning',            price:75   },
-  'NAD+':                    { vial:'500mg',    dose:'100mg',      bac:'3mL',  units:'60', schedule:'2x per week',              timing:'AM fasted',          price:65   },
-  'Glutathione (600mg)':     { vial:'600mg',    dose:'600mg',      bac:'3mL',  units:'—',  schedule:'Weekly',                   timing:'AM',                 price:28   },
-  'Glutathione (1500mg)':    { vial:'1500mg',   dose:'600mg',      bac:'5mL',  units:'—',  schedule:'Weekly',                   timing:'AM',                 price:40   },
-  'MOTS-C (10mg)':           { vial:'10mg',     dose:'1mg',        bac:'2mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM fasted',          price:35   },
-  'MOTS-C (40mg)':           { vial:'40mg',     dose:'2mg',        bac:'3mL',  units:'15', schedule:'5 days on / 2 off',        timing:'AM fasted',          price:140  },
-  '5-Amino-1MQ':             { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM',                 price:25   },
-  'SLU-PP-332':              { vial:'5mg',      dose:'1mg',        bac:'2mL',  units:'20', schedule:'5 days on / 2 off',        timing:'AM',                 price:60   },
-  'PT-141':                  { vial:'10mg',     dose:'500mcg',     bac:'2mL',  units:'10', schedule:'As needed',                timing:'30 min before',      price:55   },
-  'Melanotan II':            { vial:'10mg',     dose:'250mcg',     bac:'2mL',  units:'5',  schedule:'Daily loading then maint', timing:'PM',                 price:45   },
-  'GHK-Cu (50mg)':           { vial:'50mg',     dose:'1.7mg',      bac:'3mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:55   },
-  'GHK-Cu (100mg)':          { vial:'100mg',    dose:'2mg',        bac:'5mL',  units:'10', schedule:'5 days on / 2 off',        timing:'AM',                 price:90   },
-  'Custom':                  { vial:'',         dose:'',           bac:'',     units:'',   schedule:'',                         timing:'',                   price:0    },
-};
+// PRESETS is built from /peptide-data.js — every entry where in_stock:true appears
+// in the compound dropdown, and selecting one auto-fills vial/dose/BAC/units/schedule/timing
+// per the cheat-sheet values stored there. Edit prices/values in peptide-data.js, not here.
+const PRESETS = (typeof window.buildPresetsFromPeptideData === 'function')
+  ? window.buildPresetsFromPeptideData()
+  : { 'Custom': { vial:'', dose:'', bac:'', units:'', schedule:'', timing:'', price:0 } };
 
 let compoundCount = 0;
 let levelCount = 0;
