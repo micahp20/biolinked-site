@@ -310,6 +310,16 @@ table.bio tr.clickable:hover td{background:var(--gold-soft);}
   .pt-med-name{font-size:20px;}
   .pt-med-actions .btn{min-height:46px;}
 }
+
+/* Biomarker definition popover */
+.bio-help{position:relative;display:inline-block;margin-left:6px;vertical-align:baseline;}
+.bio-help-btn{width:16px;height:16px;border-radius:50%;border:1px solid var(--gold-border,rgba(122,101,48,0.4));background:var(--gold-dim,rgba(122,101,48,0.1));color:var(--gold,#7A6530);font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;cursor:pointer;padding:0;line-height:1;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;}
+.bio-help-btn:hover{background:var(--gold,#7A6530);color:#fff;}
+.bio-help-btn.open{background:var(--gold,#7A6530);color:#fff;}
+.bio-help-pop{position:absolute;z-index:1000;top:calc(100% + 6px);left:50%;transform:translateX(-50%);width:280px;max-width:80vw;background:#ffffff;border:1px solid var(--gold-border,rgba(122,101,48,0.4));border-left:3px solid var(--gold,#7A6530);border-radius:2px;padding:10px 12px;font-size:12px;font-weight:400;color:var(--text,#1a1a1a);line-height:1.6;box-shadow:0 6px 20px rgba(0,0,0,0.18);text-transform:none;letter-spacing:normal;font-style:normal;text-align:left;white-space:normal;}
+.bio-help-pop::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%) rotate(45deg);width:10px;height:10px;background:#ffffff;border-left:1px solid var(--gold-border,rgba(122,101,48,0.4));border-top:1px solid var(--gold-border,rgba(122,101,48,0.4));}
+@media(max-width:480px){.bio-help-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:88vw;max-width:340px;}.bio-help-pop::before{display:none;}}
+
 </style>
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -335,55 +345,55 @@ const {
 // dir: 'higher' (higher value preferred), 'lower' (lower preferred), 'mid' (within range preferred)
 const INF = Number.POSITIVE_INFINITY;
 const BIOMARKERS = {
-  total_testosterone: { name: 'Total Testosterone', unit: 'ng/dL', category: 'Hormones', optimal: [800, 1200], ref: [250, 1100], dir: 'higher' },
-  free_testosterone: { name: 'Free Testosterone', unit: 'pg/mL', category: 'Hormones', optimal: [150, 224], ref: [46, 224], dir: 'higher' },
-  bioavailable_testosterone: { name: 'Bioavailable Testosterone', unit: 'ng/dL', category: 'Hormones', optimal: [300, 575], ref: [110, 575], dir: 'higher' },
-  shbg: { name: 'SHBG', unit: 'nmol/L', category: 'Hormones', optimal: [20, 40], ref: [10, 50], dir: 'mid' },
-  estradiol: { name: 'Estradiol', unit: 'pg/mL', category: 'Hormones', optimal: [20, 35], ref: [0, 39], dir: 'mid' },
-  dhea_s: { name: 'DHEA-S', unit: 'mcg/dL', category: 'Hormones', optimal: [300, 500], ref: [61, 442], dir: 'higher' },
-  cortisol_am: { name: 'Cortisol AM', unit: 'mcg/dL', category: 'Hormones', optimal: [10, 18], ref: [4, 22], dir: 'mid' },
-  acth: { name: 'ACTH', unit: 'pg/mL', category: 'Hormones', optimal: [10, 40], ref: [6, 50], dir: 'mid' },
-  tsh: { name: 'TSH', unit: 'mIU/L', category: 'Thyroid', optimal: [0.5, 2.5], ref: [0.4, 4.5], dir: 'lower' },
-  free_t4: { name: 'Free T4', unit: 'ng/dL', category: 'Thyroid', optimal: [1.2, 1.6], ref: [0.8, 1.8], dir: 'mid' },
-  free_t3: { name: 'Free T3', unit: 'pg/mL', category: 'Thyroid', optimal: [3.2, 4.2], ref: [2.3, 4.2], dir: 'higher' },
-  igf_1: { name: 'IGF-1', unit: 'ng/mL', category: 'Growth', optimal: [200, 300], ref: [52, 328], dir: 'higher' },
-  gh: { name: 'Growth Hormone', unit: 'ng/mL', category: 'Growth', optimal: null, ref: [0, 7.1], dir: 'higher' },
-  glucose: { name: 'Glucose', unit: 'mg/dL', category: 'Metabolic', optimal: [75, 90], ref: [65, 99], dir: 'lower' },
-  hba1c: { name: 'HbA1c', unit: '%', category: 'Metabolic', optimal: [4.3, 5.3], ref: [0, 5.7], dir: 'lower' },
-  total_cholesterol: { name: 'Total Cholesterol', unit: 'mg/dL', category: 'Lipids', optimal: [150, 200], ref: [0, 200], dir: 'lower' },
-  hdl: { name: 'HDL', unit: 'mg/dL', category: 'Lipids', optimal: [50, INF], ref: [40, INF], dir: 'higher' },
-  ldl: { name: 'LDL', unit: 'mg/dL', category: 'Lipids', optimal: [50, 80], ref: [0, 100], dir: 'lower' },
-  triglycerides: { name: 'Triglycerides', unit: 'mg/dL', category: 'Lipids', optimal: [40, 80], ref: [0, 150], dir: 'lower' },
-  apob: { name: 'ApoB', unit: 'mg/dL', category: 'Lipids', optimal: [40, 70], ref: [0, 90], dir: 'lower' },
-  non_hdl: { name: 'Non-HDL Cholesterol', unit: 'mg/dL', category: 'Lipids', optimal: [50, 100], ref: [0, 130], dir: 'lower' },
-  hscrp: { name: 'hsCRP', unit: 'mg/L', category: 'Inflammation', optimal: [0, 0.5], ref: [0, 1.0], dir: 'lower' },
-  wbc: { name: 'WBC', unit: 'K/uL', category: 'CBC', optimal: [4.5, 8.0], ref: [3.8, 10.8], dir: 'mid' },
-  rbc: { name: 'RBC', unit: 'M/uL', category: 'CBC', optimal: [4.5, 5.5], ref: [4.33, 5.82], dir: 'mid' },
-  hemoglobin: { name: 'Hemoglobin', unit: 'g/dL', category: 'CBC', optimal: [14, 17], ref: [13.7, 17.7], dir: 'mid' },
-  hematocrit: { name: 'Hematocrit', unit: '%', category: 'CBC', optimal: [45, 52], ref: [42.5, 55], dir: 'mid', warnAbove: 52, warnNote: 'Watch >52 on TRT — consider blood donation.' },
-  mcv: { name: 'MCV', unit: 'fL', category: 'CBC', optimal: [85, 98], ref: [81.4, 101.7], dir: 'mid' },
-  mch: { name: 'MCH', unit: 'pg', category: 'CBC', optimal: [27, 32], ref: [27, 33], dir: 'mid' },
-  mchc: { name: 'MCHC', unit: 'g/dL', category: 'CBC', optimal: [32, 35], ref: [31.6, 35.4], dir: 'mid' },
-  rdw: { name: 'RDW', unit: '%', category: 'CBC', optimal: [11, 13.5], ref: [11, 15], dir: 'lower' },
-  platelets: { name: 'Platelets', unit: 'K/uL', category: 'CBC', optimal: [175, 350], ref: [140, 400], dir: 'mid' },
-  neutrophils_abs: { name: 'Neutrophils (abs)', unit: 'cells/uL', category: 'CBC', optimal: [1800, 5500], ref: [1500, 7800], dir: 'mid' },
-  lymphocytes_abs: { name: 'Lymphocytes (abs)', unit: 'cells/uL', category: 'CBC', optimal: [1200, 3000], ref: [850, 3900], dir: 'mid' },
-  monocytes_abs: { name: 'Monocytes (abs)', unit: 'cells/uL', category: 'CBC', optimal: [250, 600], ref: [200, 950], dir: 'mid' },
-  eosinophils_abs: { name: 'Eosinophils (abs)', unit: 'cells/uL', category: 'CBC', optimal: [0, 400], ref: [15, 500], dir: 'lower' },
-  sodium: { name: 'Sodium', unit: 'mmol/L', category: 'CMP', optimal: [137, 142], ref: [135, 146], dir: 'mid' },
-  potassium: { name: 'Potassium', unit: 'mmol/L', category: 'CMP', optimal: [4.0, 4.7], ref: [3.5, 5.3], dir: 'mid' },
-  creatinine: { name: 'Creatinine', unit: 'mg/dL', category: 'CMP', optimal: [0.8, 1.2], ref: [0.6, 1.29], dir: 'mid' },
-  egfr: { name: 'eGFR', unit: 'mL/min', category: 'CMP', optimal: [75, INF], ref: [60, INF], dir: 'higher' },
-  bun: { name: 'BUN', unit: 'mg/dL', category: 'CMP', optimal: [8, 18], ref: [7, 25], dir: 'mid' },
-  alt: { name: 'ALT', unit: 'U/L', category: 'CMP', optimal: [10, 30], ref: [9, 46], dir: 'lower' },
-  ast: { name: 'AST', unit: 'U/L', category: 'CMP', optimal: [10, 30], ref: [10, 40], dir: 'lower' },
-  alp: { name: 'ALP', unit: 'U/L', category: 'CMP', optimal: [50, 100], ref: [36, 130], dir: 'mid' },
-  albumin: { name: 'Albumin', unit: 'g/dL', category: 'CMP', optimal: [4.2, 5.0], ref: [3.6, 5.1], dir: 'mid' },
-  total_bilirubin: { name: 'Total Bilirubin', unit: 'mg/dL', category: 'CMP', optimal: [0.2, 1.0], ref: [0.2, 1.2], dir: 'lower' },
-  calcium: { name: 'Calcium', unit: 'mg/dL', category: 'CMP', optimal: [8.8, 10.0], ref: [8.6, 10.3], dir: 'mid' },
-  total_protein: { name: 'Total Protein', unit: 'g/dL', category: 'CMP', optimal: [6.5, 7.8], ref: [6.1, 8.1], dir: 'mid' },
-  vitamin_d: { name: 'Vitamin D', unit: 'ng/mL', category: 'Vitamins', optimal: [50, 80], ref: [30, 100], dir: 'mid' },
-  psa: { name: 'PSA', unit: 'ng/mL', category: 'Prostate', optimal: [0, 2.5], ref: [0, 4.0], dir: 'lower' },
+  total_testosterone: { name: 'Total Testosterone', unit: 'ng/dL', category: 'Hormones', optimal: [800, 1200], ref: [250, 1100], dir: 'higher', def: 'Total amount of testosterone in your blood — both protein-bound and free. The baseline for energy, libido, muscle, and recovery.' },
+  free_testosterone: { name: 'Free Testosterone', unit: 'pg/mL', category: 'Hormones', optimal: [150, 224], ref: [46, 224], dir: 'higher', def: 'The portion of testosterone NOT bound to proteins — actually available to your tissues. Often the meaningful number when Total looks normal but symptoms persist.' },
+  bioavailable_testosterone: { name: 'Bioavailable Testosterone', unit: 'ng/dL', category: 'Hormones', optimal: [300, 575], ref: [110, 575], dir: 'higher', def: 'Free testosterone + albumin-bound testosterone — what your tissues can actually access. A real-world availability number between Total and Free.' },
+  shbg: { name: 'SHBG', unit: 'nmol/L', category: 'Hormones', optimal: [20, 40], ref: [10, 50], dir: 'mid', def: 'Sex Hormone-Binding Globulin — the protein that grabs testosterone and makes it inactive. High SHBG = less free testosterone even when Total looks fine.' },
+  estradiol: { name: 'Estradiol', unit: 'pg/mL', category: 'Hormones', optimal: [20, 35], ref: [0, 39], dir: 'mid', def: 'Primary estrogen. In men, made by converting testosterone via aromatase. Too low = joint pain, low libido, brain fog. Too high = water retention, mood, gyno risk.' },
+  dhea_s: { name: 'DHEA-S', unit: 'mcg/dL', category: 'Hormones', optimal: [300, 500], ref: [61, 442], dir: 'higher', def: 'Adrenal hormone, precursor to testosterone and estrogen. Declines with age; supports energy, libido, and immune function.' },
+  cortisol_am: { name: 'Cortisol AM', unit: 'mcg/dL', category: 'Hormones', optimal: [10, 18], ref: [4, 22], dir: 'mid', def: 'Stress hormone, drawn fasted in the morning when it should peak. High = chronic stress; low = adrenal exhaustion.' },
+  acth: { name: 'ACTH', unit: 'pg/mL', category: 'Hormones', optimal: [10, 40], ref: [6, 50], dir: 'mid', def: 'Adrenocorticotropic Hormone — signals adrenals to release cortisol. Helps distinguish pituitary vs adrenal causes of cortisol imbalance.' },
+  tsh: { name: 'TSH', unit: 'mIU/L', category: 'Thyroid', optimal: [0.5, 2.5], ref: [0.4, 4.5], dir: 'lower', def: 'Thyroid-Stimulating Hormone — pituitary signal to your thyroid. High TSH = thyroid underperforming; low TSH = thyroid running hot or being suppressed.' },
+  free_t4: { name: 'Free T4', unit: 'ng/dL', category: 'Thyroid', optimal: [1.2, 1.6], ref: [0.8, 1.8], dir: 'mid', def: 'The inactive thyroid hormone (storage form) converted to T3 in tissues. Tracks baseline thyroid output.' },
+  free_t3: { name: 'Free T3', unit: 'pg/mL', category: 'Thyroid', optimal: [3.2, 4.2], ref: [2.3, 4.2], dir: 'higher', def: 'The active thyroid hormone that actually drives metabolism. The real-world energy number.' },
+  igf_1: { name: 'IGF-1', unit: 'ng/mL', category: 'Growth', optimal: [200, 300], ref: [52, 328], dir: 'higher', def: 'Insulin-like Growth Factor 1 — your liver produces this in response to growth hormone. The reliable proxy for GH activity. Drives muscle building, recovery, lean tissue.' },
+  gh: { name: 'Growth Hormone', unit: 'ng/mL', category: 'Growth', optimal: null, ref: [0, 7.1], dir: 'higher', def: 'Pulses throughout the day; single draws often catch a valley. IGF-1 is the better single-point GH proxy. Direct GH is mainly useful with stimulation/suppression testing.' },
+  glucose: { name: 'Glucose', unit: 'mg/dL', category: 'Metabolic', optimal: [75, 90], ref: [65, 99], dir: 'lower', def: 'Fasting blood sugar. Over 100 = pre-diabetic range. Tracked alongside HbA1c for insulin resistance signal.' },
+  hba1c: { name: 'HbA1c', unit: '%', category: 'Metabolic', optimal: [4.3, 5.3], ref: [0, 5.7], dir: 'lower', def: 'Average blood sugar over the last 2–3 months. Far more meaningful than a one-time glucose reading. >5.7 = pre-diabetic, >6.5 = diabetic.' },
+  total_cholesterol: { name: 'Total Cholesterol', unit: 'mg/dL', category: 'Lipids', optimal: [150, 200], ref: [0, 200], dir: 'lower', def: 'Sum of HDL + LDL + a fraction of triglycerides. Limited on its own — the ApoB / LDL breakdown matters more.' },
+  hdl: { name: 'HDL', unit: 'mg/dL', category: 'Lipids', optimal: [50, INF], ref: [40, INF], dir: 'higher', def: '"Good" cholesterol — transports cholesterol back to the liver for clearance. Higher is generally better; <40 is a risk marker.' },
+  ldl: { name: 'LDL', unit: 'mg/dL', category: 'Lipids', optimal: [50, 80], ref: [0, 100], dir: 'lower', def: '"Bad" cholesterol — carries cholesterol into artery walls. High LDL is a major cardiovascular risk factor.' },
+  triglycerides: { name: 'Triglycerides', unit: 'mg/dL', category: 'Lipids', optimal: [40, 80], ref: [0, 150], dir: 'lower', def: 'Blood fats. High = insulin resistance and elevated cardiovascular risk. Must be drawn fasted to be meaningful.' },
+  apob: { name: 'ApoB', unit: 'mg/dL', category: 'Lipids', optimal: [40, 70], ref: [0, 90], dir: 'lower', def: 'The protein on every atherogenic lipoprotein (LDL, VLDL, etc.). The single most predictive cardiovascular risk marker — better than LDL alone.' },
+  non_hdl: { name: 'Non-HDL Cholesterol', unit: 'mg/dL', category: 'Lipids', optimal: [50, 100], ref: [0, 130], dir: 'lower', def: 'Total Cholesterol minus HDL. A simple proxy for all your atherogenic lipoproteins. Tracks closely with ApoB.' },
+  hscrp: { name: 'hsCRP', unit: 'mg/L', category: 'Inflammation', optimal: [0, 0.5], ref: [0, 1.0], dir: 'lower', def: 'High-sensitivity C-Reactive Protein — marker of systemic inflammation. Strong cardiovascular risk predictor independent of cholesterol. Sensitive to recent illness, so retest in 2–3 weeks if elevated.' },
+  wbc: { name: 'WBC', unit: 'K/uL', category: 'CBC', optimal: [4.5, 8.0], ref: [3.8, 10.8], dir: 'mid', def: 'White blood cells — your immune cells. High = infection or inflammation. Low = bone marrow or immune issue.' },
+  rbc: { name: 'RBC', unit: 'M/uL', category: 'CBC', optimal: [4.5, 5.5], ref: [4.33, 5.82], dir: 'mid', def: 'Red blood cell count. Carries oxygen. Elevated on TRT (testosterone boosts red cell production).' },
+  hemoglobin: { name: 'Hemoglobin', unit: 'g/dL', category: 'CBC', optimal: [14, 17], ref: [13.7, 17.7], dir: 'mid', def: 'Oxygen-carrying protein inside red blood cells. Rises on TRT alongside RBC and Hematocrit.' },
+  hematocrit: { name: 'Hematocrit', unit: '%', category: 'CBC', optimal: [45, 52], ref: [42.5, 55], dir: 'mid', warnAbove: 52, warnNote: 'Watch >52 on TRT — consider blood donation.', def: 'Percentage of blood volume that is red cells. Critical to watch on TRT — over 52% increases blood clot risk. Donating blood drops it back down.' },
+  mcv: { name: 'MCV', unit: 'fL', category: 'CBC', optimal: [85, 98], ref: [81.4, 101.7], dir: 'mid', def: 'Mean Corpuscular Volume — average red blood cell size. High = B12/folate deficiency; low = iron deficiency.' },
+  mch: { name: 'MCH', unit: 'pg', category: 'CBC', optimal: [27, 32], ref: [27, 33], dir: 'mid', def: 'Mean Corpuscular Hemoglobin — average hemoglobin per red cell. Tracks with MCV for anemia type.' },
+  mchc: { name: 'MCHC', unit: 'g/dL', category: 'CBC', optimal: [32, 35], ref: [31.6, 35.4], dir: 'mid', def: 'Mean Corpuscular Hemoglobin Concentration — hemoglobin density per red cell.' },
+  rdw: { name: 'RDW', unit: '%', category: 'CBC', optimal: [11, 13.5], ref: [11, 15], dir: 'lower', def: 'Red Cell Distribution Width — variability in red cell sizes. Elevated = mixed anemia or B12 / iron issues.' },
+  platelets: { name: 'Platelets', unit: 'K/uL', category: 'CBC', optimal: [175, 350], ref: [140, 400], dir: 'mid', def: 'Blood clotting cells. High = inflammation, infection, or stress; low = bleeding risk.' },
+  neutrophils_abs: { name: 'Neutrophils (abs)', unit: 'cells/uL', category: 'CBC', optimal: [1800, 5500], ref: [1500, 7800], dir: 'mid', def: 'Most abundant white cells — first responders to bacterial infection. Elevated in acute infection or chronic inflammation.' },
+  lymphocytes_abs: { name: 'Lymphocytes (abs)', unit: 'cells/uL', category: 'CBC', optimal: [1200, 3000], ref: [850, 3900], dir: 'mid', def: 'B cells and T cells — viral immunity and adaptive immune function.' },
+  monocytes_abs: { name: 'Monocytes (abs)', unit: 'cells/uL', category: 'CBC', optimal: [250, 600], ref: [200, 950], dir: 'mid', def: 'Macrophage precursors. Elevated in chronic inflammation or recovery from infection.' },
+  eosinophils_abs: { name: 'Eosinophils (abs)', unit: 'cells/uL', category: 'CBC', optimal: [0, 400], ref: [15, 500], dir: 'lower', def: 'Involved in allergic responses and parasitic infections.' },
+  sodium: { name: 'Sodium', unit: 'mmol/L', category: 'CMP', optimal: [137, 142], ref: [135, 146], dir: 'mid', def: 'Major blood electrolyte. Reflects hydration and kidney / adrenal status.' },
+  potassium: { name: 'Potassium', unit: 'mmol/L', category: 'CMP', optimal: [4.0, 4.7], ref: [3.5, 5.3], dir: 'mid', def: 'Critical for heart and muscle function. Outside normal range = arrhythmia risk.' },
+  creatinine: { name: 'Creatinine', unit: 'mg/dL', category: 'CMP', optimal: [0.8, 1.2], ref: [0.6, 1.29], dir: 'mid', def: 'Muscle metabolism byproduct cleared by kidneys. The primary kidney function marker.' },
+  egfr: { name: 'eGFR', unit: 'mL/min', category: 'CMP', optimal: [75, INF], ref: [60, INF], dir: 'higher', def: 'Estimated Glomerular Filtration Rate — calculated from creatinine, age, and sex. Direct kidney function measure. Sustained <60 = kidney disease.' },
+  bun: { name: 'BUN', unit: 'mg/dL', category: 'CMP', optimal: [8, 18], ref: [7, 25], dir: 'mid', def: 'Blood Urea Nitrogen — protein breakdown product cleared by kidneys. Elevated in dehydration or kidney issues.' },
+  alt: { name: 'ALT', unit: 'U/L', category: 'CMP', optimal: [10, 30], ref: [9, 46], dir: 'lower', def: 'Liver enzyme released when liver cells are stressed. Elevated = fatty liver, alcohol, hepatitis, medication, or intense training.' },
+  ast: { name: 'AST', unit: 'U/L', category: 'CMP', optimal: [10, 30], ref: [10, 40], dir: 'lower', def: 'Liver enzyme also present in muscle. Interpreted alongside ALT.' },
+  alp: { name: 'ALP', unit: 'U/L', category: 'CMP', optimal: [50, 100], ref: [36, 130], dir: 'mid', def: 'Alkaline Phosphatase — found in liver, bone, and gut. Elevated = bone activity (growth, healing) or biliary issues.' },
+  albumin: { name: 'Albumin', unit: 'g/dL', category: 'CMP', optimal: [4.2, 5.0], ref: [3.6, 5.1], dir: 'mid', def: 'Main blood protein. Marker of liver synthesis function and nutrition status.' },
+  total_bilirubin: { name: 'Total Bilirubin', unit: 'mg/dL', category: 'CMP', optimal: [0.2, 1.0], ref: [0.2, 1.2], dir: 'lower', def: 'Bilirubin from red cell breakdown. High = liver issue or hemolysis (cell breakdown).' },
+  calcium: { name: 'Calcium', unit: 'mg/dL', category: 'CMP', optimal: [8.8, 10.0], ref: [8.6, 10.3], dir: 'mid', def: 'Critical for bone, muscle, and nerve function. Tightly regulated; abnormal often points to parathyroid issues.' },
+  total_protein: { name: 'Total Protein', unit: 'g/dL', category: 'CMP', optimal: [6.5, 7.8], ref: [6.1, 8.1], dir: 'mid', def: 'Sum of albumin + globulins. Reflects nutrition and inflammatory state.' },
+  vitamin_d: { name: 'Vitamin D', unit: 'ng/mL', category: 'Vitamins', optimal: [50, 80], ref: [30, 100], dir: 'mid', def: '25-hydroxyvitamin D — the storage form. Critical for bone, immune function, and mood. Most adults are deficient. Target 50–80 ng/mL.' },
+  psa: { name: 'PSA', unit: 'ng/mL', category: 'Prostate', optimal: [0, 2.5], ref: [0, 4.0], dir: 'lower', def: 'Prostate-Specific Antigen — produced by prostate cells. Screens for prostate cancer; elevated in BPH (enlarged prostate), prostatitis, or cancer. Critical to track on TRT.' },
 };
 
 const CATEGORY_ORDER = ['Hormones','Thyroid','Growth','Metabolic','Lipids','Inflammation','CBC','CMP','Vitamins','Prostate'];
@@ -588,6 +598,33 @@ function downloadJSON(state){
 // ============================================================
 // SHARED COMPONENTS
 // ============================================================
+function BioHelp({ def: definition }){
+  const [open, setOpen] = React.useState(false);
+  const wrapRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!open) return;
+    function handleDocClick(e){
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleDocClick);
+    return () => document.removeEventListener('mousedown', handleDocClick);
+  }, [open]);
+  if (!definition) return null;
+  function onBtnClick(e){
+    e.stopPropagation();
+    e.preventDefault();
+    setOpen(prev => !prev);
+  }
+  return (
+    <span className="bio-help" ref={wrapRef} onClick={e => e.stopPropagation()}>
+      <button type="button" className={'bio-help-btn' + (open ? ' open' : '')} onClick={onBtnClick} aria-label="What is this?" aria-expanded={open}>?</button>
+      {open && (
+        <span className="bio-help-pop" role="tooltip">{definition}</span>
+      )}
+    </span>
+  );
+}
+
 function StatusDot({ status }){
   return <span className={`dot ${status||'gray'}`} title={status}></span>;
 }
@@ -721,7 +758,7 @@ function OverviewTab({ state }){
                 return (
                   <tr key={k}>
                     <td className="dot-cell"><StatusDot status={status} /></td>
-                    <td className="label">{bm.name}</td>
+                    <td className="label">{bm.name}<BioHelp def={bm.def} /></td>
                     <td className="val">{v != null ? v : '—'}<span className="unit">{bm.unit}</span></td>
                     <td className="trend-cell"><TrendArrow trend={trend} /></td>
                   </tr>
@@ -747,7 +784,7 @@ function OverviewTab({ state }){
                     <div className="flag-left">
                       <StatusDot status={f.status} />
                       <div>
-                        <div className="flag-name">{f.bm.name}</div>
+                        <div className="flag-name">{f.bm.name}<BioHelp def={f.bm.def} /></div>
                         <div className="flag-msg">{f.msg}{f.bm.warnNote && f.status === 'red' && f.bm.warnAbove != null && f.value > f.bm.warnAbove ? '' : ''}</div>
                       </div>
                     </div>
@@ -933,7 +970,7 @@ function LabDetail({ lab, prev, onEdit, onDelete, onChartKey }){
                   <tr key={key} className="clickable" onClick={()=> onChartKey(key)}>
                     <td className="dot-cell"><StatusDot status={status} /></td>
                     <td className="label">
-                      {bm.name}
+                      {bm.name}<BioHelp def={bm.def} />
                       <div style={{fontSize:'10px',color:'var(--muted)',marginTop:'1px'}}>optimal {optStr} · ref {refStr}</div>
                     </td>
                     <td className="val">{value != null ? value : '—'}<span className="unit">{bm.unit}</span></td>
@@ -1072,7 +1109,7 @@ function AddLabForm({ existing, onSave, onCancel }){
       <div className="input-grid">
         {(keysByCategory[activeCat] || []).map(({ key, bm }) => (
           <div className="field" key={key}>
-            <label>{bm.name} <span className="dim">({bm.unit})</span></label>
+            <label>{bm.name}<BioHelp def={bm.def} /> <span className="dim">({bm.unit})</span></label>
             <input
               type="number" step="any" value={values[key] ?? ''}
               onChange={e=> setVal(key, e.target.value)}
