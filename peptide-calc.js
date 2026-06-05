@@ -98,9 +98,23 @@
     if (!host) return;
     opts = opts || {};
 
-    var presets = (window.PEPTIDE_DATA || [])
-      .filter(function (p) { return p.in_stock && p.name !== 'Custom'; })
-      .sort(function (a, b) { return a.name.localeCompare(b.name); });
+    // Source of truth: prefer the full cheat-sheet master list (130+ peptides)
+    // when /cheat-sheet-data.js is loaded; fall back to the in-stock product
+    // line from /peptide-data.js if only that is available.
+    var presets;
+    if (window.CHEAT_SHEET_DATA && window.CHEAT_SHEET_DATA.length) {
+      presets = window.CHEAT_SHEET_DATA
+        .slice()
+        .filter(function (p) { return p && p.name; })
+        .sort(function (a, b) {
+          var ca = (a.cat || '').localeCompare(b.cat || '');
+          return ca !== 0 ? ca : a.name.localeCompare(b.name);
+        });
+    } else {
+      presets = (window.PEPTIDE_DATA || [])
+        .filter(function (p) { return p.in_stock && p.name !== 'Custom'; })
+        .sort(function (a, b) { return a.name.localeCompare(b.name); });
+    }
 
     var presetOptions = ['<option value="">— Manual entry —</option>']
       .concat(presets.map(function (p, i) {
