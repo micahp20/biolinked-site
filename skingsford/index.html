@@ -291,13 +291,13 @@ details[open].li-row > summary{border-bottom-color:var(--border);}
           <span class="program-badge"><strong>12-Week</strong> Cycle</span>
           <span class="program-badge"><strong>3-Phase</strong> Stack</span>
           <span class="program-badge">Fat Loss &middot; Muscle Retention &middot; Recovery</span>
-          <span class="program-badge">Built for Active Lifestyle</span>
+          <span class="program-badge"><strong>Friends and Family</strong> Pricing</span>
         </div>
         <div id="hero-pricing-pill" style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(122,101,48,0.08);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 16px;border-radius:2px;">
           <span style="font-size:18px;line-height:1;">&#128150;</span>
           <span style="text-align:left;">
-            <span style="display:block;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);" id="hero-pricing-label">Full Stack &middot; Level 1 Selected</span>
-            <span style="display:block;font-size:13px;color:var(--text);font-weight:500;margin-top:2px;" id="hero-pricing-value">Bundle Total <strong style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700;">$920</strong> &middot; tap a tier below to swap</span>
+            <span style="display:block;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);" id="hero-pricing-label">Full Stack &middot; Level 1 Selected &middot; Friends and Family</span>
+            <span style="display:block;font-size:13px;color:var(--text);font-weight:500;margin-top:2px;" id="hero-pricing-value">Bundle Total <strong style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700;">$820</strong> &middot; was <span style="text-decoration:line-through;color:var(--muted);">$920</span> &middot; <strong style="color:var(--gold);">$100 F&amp;F savings</strong></span>
           </span>
         </div>
       </div>
@@ -839,20 +839,31 @@ var TIERS = {
   }
 };
 
+var FF_DISCOUNT = 100; // Friends and Family — $100 off any tier
 function selectTier(n){
   var tier = TIERS[n];
   if(!tier) return;
   document.querySelectorAll('.tier').forEach(function(el){ el.classList.toggle('selected', String(el.dataset.tier) === String(n)); });
-  var total = tier.items.reduce(function(s,i){ return s + i.price; }, 0);
+  var subtotal = tier.items.reduce(function(s,i){ return s + i.price; }, 0);
+  var total = subtotal - FF_DISCOUNT;
   var html = '';
   tier.items.forEach(function(i){
     html += '<div class="total-row"><span>' + i.label + '</span><span>$' + i.price.toFixed(2) + '</span></div>';
   });
+  html += '<div class="total-row sub"><span>Subtotal</span><span>$' + subtotal.toFixed(2) + '</span></div>';
+  html += '<div class="total-row" style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-radius:2px;padding:10px 14px;margin-top:8px;">' +
+          '<span style="display:flex;flex-direction:column;">' +
+          '<span style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;">Friends and Family Discount</span>' +
+          '<span style="font-size:14px;font-weight:600;color:var(--text);">$100 off &middot; applies to any tier</span>' +
+          '</span>' +
+          '<span style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:700;color:var(--gold);">&minus;$' + FF_DISCOUNT.toFixed(2) + '</span>' +
+          '</div>';
   html += '<div class="total-row grand"><span>Total Due — ' + tier.name + '</span><span class="val">$' + total.toFixed(2) + '</span></div>';
+  html += '<div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-top:8px;">You save $' + FF_DISCOUNT + ' &middot; Friends and Family Pricing</div>';
   document.getElementById('totals-block').innerHTML = html;
   // Update hero pricing pill
-  document.getElementById('hero-pricing-label').textContent = tier.label;
-  document.getElementById('hero-pricing-value').innerHTML = 'Bundle Total <strong style="font-family:\'Cormorant Garamond\',serif;font-size:18px;color:var(--gold);font-weight:700;">$' + total + '</strong> · tap a tier below to swap';
+  document.getElementById('hero-pricing-label').textContent = tier.label + ' · Friends and Family';
+  document.getElementById('hero-pricing-value').innerHTML = 'Bundle Total <strong style="font-family:\'Cormorant Garamond\',serif;font-size:18px;color:var(--gold);font-weight:700;">$' + total + '</strong> · was <span style="text-decoration:line-through;color:var(--muted);">$' + subtotal + '</span> · <strong style="color:var(--gold);">$' + FF_DISCOUNT + ' F&amp;F savings</strong>';
 }
 
 // =================== TABS ===================
