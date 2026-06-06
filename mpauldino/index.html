@@ -2374,7 +2374,13 @@ const TABS = [
   { id: 'ask',      label: 'Ask' },
 ];
 
-// === ASK TAB — Phase A: mock answers, no backend ===
+// === ASK TAB ===
+// Phase B: paste the deployed Cloudflare Worker URL between the quotes below.
+// While empty, the chat falls back to the Phase A mock responses so the UI still works.
+const ASK_WORKER_URL = '';
+const ASK_CLIENT_SLUG = 'mpauldino';
+const ASK_CLIENT_NAME = 'Micah';
+
 const ASK_SUGGESTED = [
   "What does Reta do?",
   "How many units for my AM shot?",
@@ -2401,6 +2407,26 @@ function askMockAnswer(question){
   return "Good question — once the live brain is wired in (Phase B), I'll answer this from your protocol. For now, you can text Micah directly or check the Protocol tab for the full breakdown.";
 }
 
+async function askRemote(history){
+  const resp = await fetch(ASK_WORKER_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      clientSlug: ASK_CLIENT_SLUG,
+      clientName: ASK_CLIENT_NAME,
+      messages: history.map(m => ({ role: m.role, text: m.text })),
+    }),
+  });
+  if (!resp.ok) {
+    let detail = '';
+    try { detail = (await resp.text()).slice(0, 200); } catch (e) {}
+    throw new Error('HTTP ' + resp.status + (detail ? ' — ' + detail : ''));
+  }
+  const data = await resp.json();
+  if (!data || !data.reply) throw new Error('empty reply');
+  return data.reply;
+}
+
 function AskTab(){
   const [messages, setMessages] = React.useState([]);
   const [draft, setDraft] = React.useState('');
@@ -2411,16 +2437,32 @@ function AskTab(){
     if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight;
   }, [messages, thinking]);
 
-  const send = (text) => {
+  const send = async (text) => {
     const q = (text == null ? draft : text).trim();
     if (!q || thinking) return;
-    setMessages(m => [...m, { role: 'user', text: q }]);
+    const userMsg = { role: 'user', text: q };
+    const nextHistory = [...messages, userMsg];
+    setMessages(nextHistory);
     setDraft('');
     setThinking(true);
-    setTimeout(() => {
-      setMessages(m => [...m, { role: 'bot', text: askMockAnswer(q) }]);
+    try {
+      let reply;
+      if (ASK_WORKER_URL) {
+        reply = await askRemote(nextHistory);
+      } else {
+        await new Promise(r => setTimeout(r, 550));
+        reply = askMockAnswer(q);
+      }
+      setMessages(m => [...m, { role: 'bot', text: reply }]);
+    } catch (err) {
+      const msg = (err && err.message) || String(err);
+      setMessages(m => [...m, {
+        role: 'bot',
+        text: "Sorry — I couldn't reach the assistant. (" + msg + ") Try again in a moment, or text Micah directly.",
+      }]);
+    } finally {
       setThinking(false);
-    }, 550);
+    }
   };
 
   return (
@@ -2432,9 +2474,15 @@ function AskTab(){
         </div>
       </div>
 
-      <div className="ask-banner">
-        <strong>Preview Mode:</strong> answers below are placeholder rules so we can dial in the look and feel. Once the live Claude brain is wired in (Phase B), this chat will read your full protocol and answer specifically.
-      </div>
+      {ASK_WORKER_URL ? (
+        <div className="ask-banner">
+          <strong>Live mode:</strong> answers come from your actual protocol via Claude. Clinical questions still go to Micah directly.
+        </div>
+      ) : (
+        <div className="ask-banner">
+          <strong>Preview Mode:</strong> answers below are placeholder rules so we can dial in the look and feel. Once the live Claude brain is wired in (Phase B), this chat will read your full protocol and answer specifically.
+        </div>
+      )}
 
       <div className="ask-thread" ref={threadRef}>
         {messages.length === 0 && (
