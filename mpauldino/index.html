@@ -419,6 +419,29 @@ table.bio tr.clickable:hover td{background:var(--gold-soft);}
 .mp-proto .storage-body p:last-child{margin-bottom:0;}
 @media(max-width:640px){.mp-proto .program-title{font-size:30px;}.mp-proto .sec-divider-title{font-size:19px;}.mp-proto .sched-card{padding:16px 16px;}.mp-proto .sched-card-title{font-size:17px;}.mp-proto .sched-table th{font-size:8px;padding:6px 4px;}.mp-proto .sched-table td{padding:7px 4px;font-size:11px;}.mp-proto .sched-pill{font-size:9px;}}
 
+/* ASK TAB — protocol Q&A chat */
+.ask-wrap{max-width:760px;margin:0 auto;}
+.ask-banner{background:var(--gold-soft);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:8px;padding:12px 16px;font-size:12px;color:#3d2f10;line-height:1.6;margin-bottom:16px;}
+.ask-banner strong{color:var(--gold);font-weight:700;}
+.ask-thread{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;min-height:380px;max-height:540px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:12px;scroll-behavior:smooth;}
+.ask-msg{max-width:80%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;}
+.ask-msg.user{align-self:flex-end;background:var(--ink);color:#fff;border-bottom-right-radius:4px;}
+.ask-msg.bot{align-self:flex-start;background:var(--surface-2);border:1px solid var(--border-2);color:var(--ink);border-bottom-left-radius:4px;}
+.ask-msg.bot.typing{color:var(--muted);font-style:italic;}
+.ask-suggest{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px;}
+.ask-chip{background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:7px 13px;font-size:12px;color:var(--ink);cursor:pointer;transition:all .15s;font-weight:500;}
+.ask-chip:hover{background:var(--ink);color:#fff;border-color:var(--ink);}
+.ask-input-row{display:flex;gap:8px;align-items:stretch;}
+.ask-input-row input{flex:1;}
+.ask-send{background:var(--gold);border:1px solid var(--gold);color:#fff;padding:9px 20px;border-radius:6px;font-size:13px;font-weight:600;letter-spacing:0.03em;flex-shrink:0;}
+.ask-send:hover{background:var(--gold-2);border-color:var(--gold-2);}
+.ask-send:disabled{opacity:0.4;cursor:not-allowed;}
+.ask-welcome{text-align:center;padding:32px 16px;color:var(--muted);margin:auto 0;}
+.ask-welcome h3{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--ink);margin-bottom:8px;font-weight:600;}
+.ask-welcome p{font-size:13px;line-height:1.6;max-width:460px;margin:0 auto;}
+.ask-foot{font-size:11px;color:var(--muted);margin-top:10px;text-align:center;line-height:1.5;}
+.ask-foot a{color:var(--gold);font-weight:600;}
+
 </style>
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
@@ -2348,7 +2371,110 @@ const TABS = [
   { id: 'labs',     label: 'Labs' },
   { id: 'stack',    label: 'Stack' },
   { id: 'protocol', label: 'Protocol' },
+  { id: 'ask',      label: 'Ask' },
 ];
+
+// === ASK TAB — Phase A: mock answers, no backend ===
+const ASK_SUGGESTED = [
+  "What does Reta do?",
+  "How many units for my AM shot?",
+  "What if I miss a dose?",
+  "Should I take it fasted?",
+];
+
+const ASK_MOCK_RULES = [
+  { match: /reta|retatrut|glp.?1|triple agonist/i, reply: "Retatrutide is a GLP-1 / GIP / glucagon triple agonist. In your protocol it drives steady appetite suppression and a clean metabolic burn — the M/W/F micro-dose schedule keeps the curve smooth so side effects stay mild. (Preview answer — real protocol-specific replies coming in Phase B.)" },
+  { match: /dose|how much|how many units|draw/i, reply: "Most peptides in this kind of stack draw to 10 units on a U-100 insulin syringe — same draw, different compound. Open the Protocol tab for the exact mapping for each vial. (Preview answer.)" },
+  { match: /side effect|nausea|tired|fatigue|hungry/i, reply: "The common Reta-related effects are mild nausea early on, low-grade fatigue on shot days, and occasional GI slowdown. Hydration (3 L+/day) and a protein floor (~0.8–1 g per lb of goal weight) minimize all three. (Preview answer.)" },
+  { match: /recon|reconstitut|mix|bac|bacteriostatic/i, reply: "Use bacteriostatic water (not sterile water — the benzyl alcohol preservative is what gives you the multi-week storage window). Inject the BAC down the inside wall of the vial, swirl gently, don't shake. Refrigerate after mixing. (Preview answer.)" },
+  { match: /schedule|when|what day|timing|am|pm/i, reply: "Most AM peptides cluster Monday–Friday with weekends off. Reta is M/W/F AM. CJC/Ipa (if you're on it) is pre-bed M–F on an empty stomach. The Schedule view in the Protocol tab shows the full weekly grid. (Preview answer.)" },
+  { match: /skip|miss|forget/i, reply: "If you miss a dose, don't double up the next one — just resume the next scheduled day. Missing one dose in a M/W/F or M–F pattern barely moves the needle. (Preview answer.)" },
+  { match: /food|eat|meal|fasted|empty stomach/i, reply: "AM shots prefer fasted but tolerate light food. CJC/Ipa pre-bed needs a strict 2+ hour empty-stomach window — food blunts the GH pulse the peptide is built to amplify. (Preview answer.)" },
+  { match: /storage|fridge|cold|refrigerate/i, reply: "Dry vials live in the fridge (36–46°F), protected from light, never frozen. Once reconstituted, keep them in the back of the fridge (not the door) and finish within ~30 days. (Preview answer.)" },
+  { match: /site|inject|rotate|stomach|abdomen/i, reply: "SubQ abdomen is the default — rotate between 4 quadrants and never hit the same 1\" spot two days in a row. Outer thigh and love handles are fine alternatives. (Preview answer.)" },
+];
+
+function askMockAnswer(question){
+  for (const rule of ASK_MOCK_RULES) {
+    if (rule.match.test(question)) return rule.reply;
+  }
+  return "Good question — once the live brain is wired in (Phase B), I'll answer this from your protocol. For now, you can text Micah directly or check the Protocol tab for the full breakdown.";
+}
+
+function AskTab(){
+  const [messages, setMessages] = React.useState([]);
+  const [draft, setDraft] = React.useState('');
+  const [thinking, setThinking] = React.useState(false);
+  const threadRef = React.useRef(null);
+
+  React.useEffect(() => {
+    if (threadRef.current) threadRef.current.scrollTop = threadRef.current.scrollHeight;
+  }, [messages, thinking]);
+
+  const send = (text) => {
+    const q = (text == null ? draft : text).trim();
+    if (!q || thinking) return;
+    setMessages(m => [...m, { role: 'user', text: q }]);
+    setDraft('');
+    setThinking(true);
+    setTimeout(() => {
+      setMessages(m => [...m, { role: 'bot', text: askMockAnswer(q) }]);
+      setThinking(false);
+    }, 550);
+  };
+
+  return (
+    <div className="ask-wrap">
+      <div className="section-head">
+        <div>
+          <div className="section-title">Ask About Your Protocol</div>
+          <div className="section-sub">Quick answers about doses, schedule, side effects, anything you're not sure of.</div>
+        </div>
+      </div>
+
+      <div className="ask-banner">
+        <strong>Preview Mode:</strong> answers below are placeholder rules so we can dial in the look and feel. Once the live Claude brain is wired in (Phase B), this chat will read your full protocol and answer specifically.
+      </div>
+
+      <div className="ask-thread" ref={threadRef}>
+        {messages.length === 0 && (
+          <div className="ask-welcome">
+            <h3>Hi — what would you like to know?</h3>
+            <p>Ask about your doses, the weekly schedule, side effects, what to do if you miss a shot, or anything else about your protocol.</p>
+          </div>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} className={`ask-msg ${m.role}`}>{m.text}</div>
+        ))}
+        {thinking && <div className="ask-msg bot typing">thinking…</div>}
+      </div>
+
+      {messages.length === 0 && (
+        <div className="ask-suggest">
+          {ASK_SUGGESTED.map(s => (
+            <button key={s} className="ask-chip" onClick={() => send(s)}>{s}</button>
+          ))}
+        </div>
+      )}
+
+      <div className="ask-input-row">
+        <input
+          placeholder="Type a question…"
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+        />
+        <button className="ask-send" onClick={() => send()} disabled={!draft.trim() || thinking}>
+          Send
+        </button>
+      </div>
+
+      <div className="ask-foot">
+        Educational only — not medical advice. For anything clinical, contact Micah directly.
+      </div>
+    </div>
+  );
+}
 
 function ProtocolTab(){
   const calcRef = React.useRef(null);
@@ -2649,6 +2775,7 @@ function App(){
       {tab === 'labs'     && <LabsTab state={state} update={update} />}
       {tab === 'stack'    && <StackTab state={state} update={update} />}
       {tab === 'protocol' && <ProtocolTab />}
+      {tab === 'ask'      && <AskTab />}
 
       <div style={{marginTop:'40px',paddingTop:'20px',borderTop:'1px solid var(--border-2)',display:'flex',justifyContent:'space-between',fontSize:'11px',color:'var(--muted)'}}>
         <div>For personal &amp; educational use. Not medical advice.</div>
