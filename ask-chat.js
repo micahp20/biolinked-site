@@ -23,7 +23,7 @@
 
     var bannerCopy = isOperator
       ? '<strong>Open mode:</strong> brainstorming and speculative questions are fair game. Treat this as a sparring partner, not a guardrail.'
-      : '<strong>How this works:</strong> answers come from your protocol via Claude. For anything clinical, text ' + operatorName + ' directly.';
+      : '<strong>How this works:</strong> answers come from your protocol via Claude.';
 
     var welcomeCopy = isOperator
       ? 'Ask about anything — your current stack, peptides you might add, mechanisms, timing, dose math.'
@@ -66,7 +66,7 @@
           '<input type="text" id="ask-input" placeholder="Type a question…" autocomplete="off" maxlength="3000">' +
           '<button class="ask-send" id="ask-send">Send</button>' +
         '</div>' +
-        '<div class="ask-foot">Educational only — not medical advice. For anything clinical, contact ' + escapeHtml(operatorName) + ' directly.</div>' +
+        '<div class="ask-foot">Educational only — not medical advice.</div>' +
       '</div>';
 
     var input = document.getElementById('ask-input');
@@ -101,7 +101,7 @@
         var msg = (err && err.message) || String(err);
         messages.push({
           role: 'bot',
-          text: "Sorry — I couldn't reach the assistant. (" + msg + ") Try again in a moment, or text " + operatorName + " directly."
+          text: "Sorry — I couldn't reach the assistant. (" + msg + ") Try again in a moment."
         });
       }).then(function () {
         setThinking(false);
