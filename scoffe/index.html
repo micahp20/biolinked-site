@@ -380,7 +380,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Compound &amp; Pricing</div>
-        <div class="sec-divider-title">6 Compounds &middot; Tap to Expand</div>
+        <div class="sec-divider-title" id="compound-count-title">6 Compounds &middot; Tap to Expand</div>
       </div>
 
       <div class="line-items">
@@ -860,6 +860,7 @@ function switchTab(tab, btn){
 var TIERS = {
   1: {
     name: 'Level 1 · Full Stack',
+    compounds: ['reta','cjc','mots','semax','amino','igf'],
     items: [
       {label: 'Retatrutide 30 mg × 2 vials @ $100', price: 200.00},
       {label: 'CJC/Ipamorelin 5+5 mg × 2 vials @ $45', price: 90.00},
@@ -875,6 +876,7 @@ var TIERS = {
   },
   2: {
     name: 'Level 2 · Core Stack',
+    compounds: ['reta','cjc','mots','igf'],
     items: [
       {label: 'Retatrutide 30 mg × 2 vials @ $100', price: 200.00},
       {label: 'CJC/Ipamorelin 5+5 mg × 2 vials @ $45', price: 90.00},
@@ -888,6 +890,7 @@ var TIERS = {
   },
   3: {
     name: 'Level 3 · Starter',
+    compounds: ['reta','cjc','mots'],
     items: [
       {label: 'Retatrutide 30 mg × 2 vials @ $100', price: 200.00},
       {label: 'CJC/Ipamorelin 5+5 mg × 2 vials @ $45', price: 90.00},
@@ -907,6 +910,20 @@ function selectTier(n){
   });
 
   var tier = TIERS[n];
+
+  // Show/hide compound rows based on which ones are in the selected tier
+  document.querySelectorAll('details.li-row[data-compound]').forEach(function(row){
+    var compound = row.getAttribute('data-compound');
+    var included = tier.compounds.indexOf(compound) !== -1;
+    row.style.display = included ? '' : 'none';
+    if (!included) row.open = false;
+  });
+
+  // Update the compound-count title to match
+  var count = tier.compounds.length;
+  var title = document.getElementById('compound-count-title');
+  if (title) title.innerHTML = count + ' Compound' + (count > 1 ? 's' : '') + ' &middot; Tap to Expand';
+
   var rows = '';
   for (var i = 0; i < tier.items.length; i++){
     rows += '<div class="total-row"><span>' + tier.items[i].label + '</span><span>$' + tier.items[i].price.toFixed(2) + '</span></div>';
