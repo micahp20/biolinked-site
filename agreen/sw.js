@@ -2,9 +2,9 @@
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
 const CACHE = 'agreen-v1';
 const ASSETS = [
-  '/annie-green/',
-  '/annie-green/index.html',
-  '/annie-green/manifest.json',
+  '/agreen/',
+  '/agreen/index.html',
+  '/agreen/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -36,6 +36,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/annie-green/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/agreen/index.html')))
   );
 });
