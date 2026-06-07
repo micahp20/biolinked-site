@@ -1,10 +1,10 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'drew-holm-v5';
+const CACHE = 'dholm-v5';
 const ASSETS = [
-  '/drew-holm/',
-  '/drew-holm/index.html',
-  '/drew-holm/manifest.json',
+  '/dholm/',
+  '/dholm/index.html',
+  '/dholm/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -36,6 +36,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/drew-holm/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/dholm/index.html')))
   );
 });
