@@ -73,7 +73,7 @@ const ALLOWED_ORIGINS = new Set([
 
 const SLUG_RE = /^[a-z0-9-]+$/i;
 const MAX_MESSAGES = 30;
-const MAX_USER_CHARS = 2000;
+const MAX_USER_CHARS = 12000;
 
 export default {
   async fetch(request, env, ctx) {
