@@ -1,9 +1,9 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'gaclient-v1';
+const CACHE = 'ameris-daughter-v1';
 const ASSETS = [
-  '/gaclient/',
-  '/gaclient/index.html',
-  '/gaclient/manifest.json',
+  '/ameris-daughter/',
+  '/ameris-daughter/index.html',
+  '/ameris-daughter/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -33,6 +33,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/gaclient/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/ameris-daughter/index.html')))
   );
 });
