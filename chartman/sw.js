@@ -1,9 +1,9 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'ameris-daughter-v4';
+const CACHE = 'chartman-v1';
 const ASSETS = [
-  '/ameris-daughter/',
-  '/ameris-daughter/index.html',
-  '/ameris-daughter/manifest.json',
+  '/chartman/',
+  '/chartman/index.html',
+  '/chartman/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -33,6 +33,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/ameris-daughter/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/chartman/index.html')))
   );
 });
