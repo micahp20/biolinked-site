@@ -1484,6 +1484,15 @@ async function saveModal(){
         const match = state.inventory.find(i => normName(i.name) === target);
         if (match) invVal = match.id;
       }
+      // Auto-create: if still unlinked (new product, no matching inventory), create a stub
+      // inventory row with this name (0 vials, status "out") and link to it. Saves adding
+      // the compound twice. Skip on edits — clearing the link on an edit means "unlink".
+      if (!invVal && !isEdit) {
+        const newInvBody = { name, vials: 0, vial_size: null, kit_qty: 1, note: null, status: "out" };
+        const newInvRes = await sbWrite(CFG.TABLES.inventory, "POST", newInvBody);
+        const newInvRow = Array.isArray(newInvRes) && newInvRes[0] ? newInvRes[0] : null;
+        if (newInvRow && newInvRow.id) invVal = newInvRow.id;
+      }
       const body = {
         name, cost: vNum("f-cost"), sale: vNum("f-price"),
         inventory_id: invVal ? (isNaN(parseInt(invVal)) ? invVal : parseInt(invVal)) : null
