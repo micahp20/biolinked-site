@@ -1,9 +1,9 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'shines-v1';
+const CACHE = 'shinds-v2';
 const ASSETS = [
-  '/shines/',
-  '/shines/index.html',
-  '/shines/manifest.json',
+  '/shinds/',
+  '/shinds/index.html',
+  '/shinds/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -33,6 +33,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/shines/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/shinds/index.html')))
   );
 });
