@@ -1509,6 +1509,11 @@ async function saveModal(){
       if (!productId) { alert("Pick a product."); return; }
       if (!date || !qty) { alert("Date and qty are required."); return; }
       const client = clientId ? state.clients.find(c => String(c.id) === String(clientId)) : null;
+
+      // Capture prior state BEFORE upsert so we can reconcile inventory on edit
+      let prior = null;
+      if (isEdit) prior = state.sales.find(s => String(s.id) === String(editId)) || null;
+
       const body = { product_id: productId, date, qty, price };
       body.client_id = clientId || null;
       body.customer = client ? client.name : null;
@@ -1516,9 +1521,23 @@ async function saveModal(){
       const fullNote = client ? (userNote ? `${client.name} · ${userNote}` : client.name) : (userNote || null);
       body.note = fullNote;
       await upsert(CFG.TABLES.sales, body);
-      // Only adjust inventory on NEW sales — editing a sale leaves stock alone
-      // (qty changes on edit would require knowing the prior qty to reconcile).
-      if (!isEdit) await adjustInventoryForProduct(productId, -qty);
+
+      // Inventory reconciliation (sales subtract from stock):
+      //  - NEW sale → subtract qty
+      //  - EDIT, same product, qty changed → apply delta: prior.qty - newQty
+      //    (e.g. prior=10, new=5 → +5 returned to stock)
+      //  - EDIT, product changed → restore prior product's stock, subtract from new product
+      if (!isEdit) {
+        await adjustInventoryForProduct(productId, -qty);
+      } else if (prior) {
+        const priorQty = prior.qty || 0;
+        if (String(prior.product_id) !== String(productId)) {
+          await adjustInventoryForProduct(prior.product_id, +priorQty);
+          await adjustInventoryForProduct(productId, -qty);
+        } else if (priorQty !== qty) {
+          await adjustInventoryForProduct(productId, priorQty - qty);
+        }
+      }
     }
 
     else if (kind === "order") {
