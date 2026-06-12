@@ -1836,9 +1836,47 @@ async function deleteItem(kind, id){
   if (!table) { alert("Unknown item type: " + kind); return; }
   const item = (listMap[kind] || []).find(x => String(x.id) === String(id));
   const label = item ? (item.name || `#${id}`) : `#${id}`;
-  if (!confirm(`Delete this ${kind}?\n\n${label}\n\nThis can't be undone.`)) return;
+
+  // Symmetric delete: Products and Inventory are linked via product.inventory_id.
+  // When the user deletes one side, take the matching counterpart with it so
+  // they don't have to do it twice.
+  //   - delete Product → if it owned the only link to its Inventory row, drop it too
+  //   - delete Inventory → drop every Product still linked to it
+  // Sales / Orders / Clients / Vendors stay independent (no cascade).
+  const linkedDeletes = [];
+  if (kind === "product" && item && item.inventory_id) {
+    const invId = item.inventory_id;
+    const otherLinks = (state.products || []).filter(p =>
+      String(p.id) !== String(id) && String(p.inventory_id) === String(invId)
+    );
+    if (otherLinks.length === 0) {
+      const inv = state.inventory.find(i => String(i.id) === String(invId));
+      if (inv) linkedDeletes.push({ table: CFG.TABLES.inventory, id: inv.id, label: `Inventory: ${inv.name || `#${inv.id}`}` });
+    }
+  } else if (kind === "inventory" && item) {
+    const linkedProducts = (state.products || []).filter(p => String(p.inventory_id) === String(id));
+    for (const p of linkedProducts) {
+      linkedDeletes.push({ table: CFG.TABLES.products, id: p.id, label: `Product: ${p.name || `#${p.id}`}` });
+    }
+  }
+
+  let msg = `Delete this ${kind}?\n\n${label}\n\nThis can't be undone.`;
+  if (linkedDeletes.length > 0) {
+    const extras = linkedDeletes.map(d => `  · ${d.label}`).join("\n");
+    msg = `Delete this ${kind}?\n\n${label}\n\nLinked row${linkedDeletes.length > 1 ? 's' : ''} will also be deleted:\n${extras}\n\nThis can't be undone.`;
+  }
+  if (!confirm(msg)) return;
+
   try {
     await sbWrite(table, "DELETE", null, `?id=eq.${encodeURIComponent(id)}`);
+    for (const d of linkedDeletes) {
+      try {
+        await sbWrite(d.table, "DELETE", null, `?id=eq.${encodeURIComponent(d.id)}`);
+      } catch (innerErr) {
+        // Main row is already gone — log and keep going so we don't double-alert.
+        console.warn("Linked delete failed:", d, innerErr);
+      }
+    }
     await loadAll();
   } catch (e) {
     console.error("deleteItem failed:", e);
