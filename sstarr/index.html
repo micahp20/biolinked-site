@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Sonya's 4-Cycle Protocol — BioLinked</title>
+<link rel="manifest" href="/sstarr/manifest.json">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sonya">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7A6530">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);--green:#3a7a5a;--amber:#b97a1f;--red:#b85555;--info:#3a6b8e;--violet:#6f4fb8;--pink:#b8556f;}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+.tab-bar{display:flex;background:#fff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
+.tab-btn{flex:1;padding:14px 10px;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.inv-body{padding:32px 36px;}
+.program-intro{text-align:center;padding:20px 0 26px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.program-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--text);line-height:1.05;letter-spacing:0.01em;}
+.program-title em{font-style:italic;color:var(--gold);}
+.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
+.program-context{margin:14px 0 0;font-size:13px;line-height:1.75;color:var(--muted);font-weight:400;text-align:left;background:rgba(122,101,48,0.04);border-left:2px solid var(--gold-border);padding:14px 18px;border-radius:2px;}
+.program-context strong{color:var(--text);font-weight:600;}
+.program-context p+p{margin-top:10px;}
+.program-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:18px;}
+.program-badge{background:#f8f8f8;border:1px solid var(--border);padding:5px 11px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border-radius:2px;}
+.program-badge strong{color:var(--gold);font-weight:700;}
+.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.sec-divider.mt{margin-top:32px;}
+.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+
+/* ALLERGY BANNER */
+.allergy-banner{background:linear-gradient(135deg,rgba(184,85,85,0.10),rgba(184,85,85,0.03));border:2px solid var(--red);border-left:5px solid #8a3a3a;border-radius:3px;padding:14px 18px;margin-bottom:20px;}
+.allergy-banner-title{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8a3a3a;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.allergy-banner-body{font-size:13px;color:#5e2424;line-height:1.7;}
+.allergy-banner-body strong{color:#8a3a3a;font-weight:700;}
+.allergy-banner-body ul{margin-left:18px;margin-top:6px;}
+
+/* CYCLE SELECTOR */
+.cycle-prompt{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 18px;margin-bottom:14px;font-size:13px;color:#3d2f10;line-height:1.6;}
+.cycle-prompt strong{color:var(--gold);font-weight:700;}
+.cycle-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:22px;}
+.cycle{background:#fff;border:1px solid var(--border);border-radius:3px;padding:14px 14px 16px;cursor:pointer;position:relative;transition:all 0.18s;}
+.cycle:hover{border-color:var(--gold);background:#fefdf9;}
+.cycle.selected{border-color:var(--gold);background:#fefdf9;box-shadow:0 0 0 2px var(--gold-dim);}
+.cycle-select-mark{position:absolute;top:8px;right:8px;width:22px;height:22px;background:var(--gold);color:#fff;border-radius:50%;display:none;align-items:center;justify-content:center;font-size:13px;font-weight:700;}
+.cycle.selected .cycle-select-mark{display:flex;}
+.cycle-num{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
+.cycle-name{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;margin-bottom:6px;padding-right:24px;}
+.cycle-price{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold);line-height:1;}
+.cycle-incl{font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:0.02em;line-height:1.55;}
+.cycle-incl strong{color:var(--gold);font-weight:700;display:block;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:3px;}
+
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row>summary{cursor:pointer;list-style:none;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:nowrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row>summary::-webkit-details-marker{display:none;}
+details.li-row>summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row>summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row>summary:hover::after{border-color:var(--gold);}
+details[open].li-row>summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:14.5px;font-weight:700;color:var(--text);flex:1 1 0;min-width:0;}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);white-space:nowrap;text-align:right;}
+.li-body{padding:18px 22px;background:#fafafa;}
+.li-body>*+*{margin-top:14px;}
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:13.5px;color:var(--text);line-height:1.6;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:74px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;}
+.li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;font-size:13px;color:#3d2f10;line-height:1.7;}
+.li-callout strong{color:var(--gold);font-weight:700;}
+.li-callout.why{background:rgba(58,107,142,0.07);border-color:rgba(58,107,142,0.35);border-left-color:#3a6b8e;color:#1f3f5a;}
+.li-callout.why strong{color:#3a6b8e;}
+.li-callout.warn{background:rgba(184,85,85,0.07);border-color:rgba(184,85,85,0.40);border-left-color:var(--red);color:#5e2424;}
+.li-callout.warn strong{color:var(--red);}
+
+.cycle-pill{font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;}
+.cycle-pill.c1{background:var(--violet);}
+.cycle-pill.c2{background:var(--amber);}
+.cycle-pill.c3{background:var(--pink);}
+.cycle-pill.c4{background:var(--info);}
+.cycle-pill.c5{background:var(--green);}
+
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:18px 22px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:15px;color:var(--text);font-weight:400;gap:10px;}
+.total-row.sub{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:600;}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:10px;padding-top:14px;font-size:18px;font-weight:700;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);}
+
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:20px 22px;margin-bottom:24px;}
+.payment-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:15px;color:var(--text);font-weight:500;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);}
+
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-bottom:24px;}
+details.stack-card{display:block;}
+details.stack-card>summary{cursor:pointer;list-style:none;position:relative;padding-right:42px;}
+details.stack-card>summary::-webkit-details-marker{display:none;}
+details.stack-card>summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;background:#fff;}
+details[open].stack-card>summary::after{content:'\2212';background:var(--gold-dim);}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+details[open].stack-card>summary>.stack-card-title{margin-bottom:16px;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;font-size:14px;color:#3d2f10;line-height:1.75;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+
+/* SCHEDULE */
+.sched-card{background:#fff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:16px;}
+details.sched-card{display:block;}
+details.sched-card>summary{cursor:pointer;list-style:none;position:relative;padding-right:42px;}
+details.sched-card>summary::-webkit-details-marker{display:none;}
+details.sched-card>summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;background:#fff;}
+details[open].sched-card>summary::after{content:'\2212';background:var(--gold-dim);}
+.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:0;padding-bottom:0;border-bottom:none;}
+details[open].sched-card>summary.sched-card-head{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-top:2px;}
+.sched-phase-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:5px 11px;border-radius:2px;white-space:nowrap;}
+.sched-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;line-height:1.55;}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
+.sched-count{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.sched-count.off{background:#eeeeee;color:#999;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11.5px;}
+.sched-pill.c1{background:rgba(111,79,184,0.10);border-color:rgba(111,79,184,0.40);color:var(--violet);}
+.sched-pill.c2{background:rgba(185,122,31,0.10);border-color:rgba(185,122,31,0.40);color:var(--amber);}
+.sched-pill.c3{background:rgba(184,85,111,0.10);border-color:rgba(184,85,111,0.40);color:var(--pink);}
+.sched-pill.c4{background:rgba(58,107,142,0.10);border-color:rgba(58,107,142,0.40);color:var(--info);}
+.sched-pill.c5{background:rgba(58,122,90,0.10);border-color:rgba(58,122,90,0.40);color:var(--green);}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-scroll .sched-table{min-width:580px;}
+
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-banner .cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;}
+.cal-banner .cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-banner .cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+
+/* SUPPLIES */
+.supplies-wrap{margin-bottom:20px;}
+.supply-row{background:#fff;border:1px solid var(--border);border-radius:2px;padding:13px 16px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.supply-info{flex:1;min-width:220px;}
+.supply-info-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.supply-info-desc{font-size:12px;color:var(--muted);line-height:1.6;}
+.supply-link{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;text-decoration:none;white-space:nowrap;}
+.storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
+.storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.storage-body{font-size:13px;line-height:1.75;color:#3d2f10;}
+.storage-body p+p{margin-top:10px;}
+.storage-body strong{color:var(--text);font-weight:700;}
+
+/* TIPS */
+.tip-card{background:#fff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:14px;}
+.tip-card.featured{border-top-width:3px;border-left:3px solid var(--gold);background:rgba(122,101,48,0.04);}
+.tip-card.warn{border-top:3px solid var(--red);border-left:3px solid var(--red);background:rgba(184,85,85,0.04);}
+details.tip-card{display:block;}
+details.tip-card>summary{cursor:pointer;list-style:none;position:relative;padding-right:42px;}
+details.tip-card>summary::-webkit-details-marker{display:none;}
+details.tip-card>summary::after{content:'+';position:absolute;right:0;top:14px;width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;background:#fff;}
+details[open].tip-card>summary::after{content:'\2212';background:var(--gold-dim);}
+.tip-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+.tip-card.warn .tip-eyebrow{color:var(--red);}
+.tip-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.2;}
+details.tip-card>summary>.tip-title{margin-bottom:0;}
+details[open].tip-card>summary>.tip-title{margin-bottom:8px;}
+.tip-body{font-size:13.5px;line-height:1.75;color:var(--text);}
+.tip-body p+p{margin-top:9px;}
+.tip-body strong{font-weight:700;}
+.tip-body em{font-style:italic;color:var(--muted);}
+.tip-body ul{margin-left:18px;margin-top:8px;}
+
+/* TRACKER */
+.tracker-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;margin-bottom:18px;}
+.tracker-head-l{flex:1;min-width:200px;}
+.tracker-head-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+.tracker-head-day{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:2px;line-height:1.15;}
+.tracker-head-r{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.tracker-count{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1;text-align:right;}
+.tracker-count small{display:block;font-family:'Montserrat',sans-serif;font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;margin-top:2px;}
+.tracker-reset{background:#fff;border:1px solid var(--gold-border);color:var(--gold);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:8px 14px;border-radius:2px;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.tracker-reset:hover{background:var(--gold-dim);}
+.ios-install-card{background:#fff;border:2px solid var(--info);border-radius:6px;padding:16px 18px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.ios-install-l{flex:1;min-width:200px;}
+.ios-install-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--info);margin-bottom:4px;}
+.ios-install-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);line-height:1.2;}
+.ios-install-sub{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.5;}
+.ios-install-btn{background:var(--info);color:#fff;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:11px 18px;border-radius:6px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;display:inline-flex;align-items:center;gap:6px;}
+.ios-install-btn:hover{background:#2f5c7a;}
+
+.med-group{margin-bottom:18px;background:#fff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.med-group-head{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.med-group-head.c1{background:rgba(111,79,184,0.06);}
+.med-group-head.c2{background:rgba(185,122,31,0.06);}
+.med-group-head.c3{background:rgba(184,85,111,0.06);}
+.med-group-head.c4{background:rgba(58,107,142,0.06);}
+.med-group-head.c5{background:rgba(58,122,90,0.06);}
+.med-group-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);line-height:1.15;}
+.med-group-sub{font-size:10px;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;font-weight:700;margin-top:2px;}
+.med-group-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#fff;padding:4px 10px;border-radius:2px;}
+.med-group-pill.c1{background:var(--violet);}
+.med-group-pill.c2{background:var(--amber);}
+.med-group-pill.c3{background:var(--pink);}
+.med-group-pill.c4{background:var(--info);}
+.med-group-pill.c5{background:var(--green);}
+.med-list{display:flex;flex-direction:column;}
+.med-item{display:flex;align-items:center;gap:14px;padding:11px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;}
+.med-item:last-child{border-bottom:none;}
+.med-item:hover{background:rgba(122,101,48,0.04);}
+.med-check{flex-shrink:0;width:22px;height:22px;border:2px solid var(--gold-border);border-radius:4px;display:flex;align-items:center;justify-content:center;background:#fff;transition:all 0.15s;}
+.med-item.checked .med-check{background:var(--green);border-color:var(--green);}
+.med-item.checked .med-check::after{content:'✓';color:#fff;font-size:14px;font-weight:800;line-height:1;}
+.med-name{flex:1;font-size:14px;color:var(--text);font-weight:500;}
+.med-item.checked .med-name{color:var(--muted);text-decoration:line-through;}
+.med-dose{font-size:11px;color:var(--gold);font-weight:700;background:var(--gold-dim);border:1px solid var(--gold-border);padding:2px 9px;border-radius:99px;white-space:nowrap;}
+.med-tag{font-size:9px;color:var(--muted);font-weight:700;letter-spacing:0.10em;text-transform:uppercase;}
+
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+.footer-disc{font-size:12px;color:var(--muted);line-height:1.65;max-width:420px;}
+.footer-brand{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 0;padding:16px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar,.cycle-grid,.cycle-prompt,.tracker-reset,.ios-install-card{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details>summary{list-style:none;}details.li-row[style*="display: none"]{display:block !important;}}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:90%;}}
+@media(max-width:820px){.invoice-wrap,.print-btn{width:94%;}body{padding:24px 10px;}.inv-header{padding:22px 22px;}.inv-body{padding:24px 22px;}.inv-footer{padding:14px 22px;}}
+@media(max-width:640px){.invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}body{padding:8px 0;font-size:15px;}.inv-header{flex-direction:column;gap:14px;padding:20px 18px;}.inv-meta{text-align:left;}.inv-brand-name{font-size:26px;}.inv-body{padding:20px 16px;}.inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}.program-title{font-size:30px;}.program-intro{padding:14px 0 18px;}.tab-bar{position:sticky;top:56px;}.tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}.sec-divider-title{font-size:19px;}.cycle-grid{grid-template-columns:1fr;}.li-summary-name{font-size:13px;}.li-summary-price{font-size:17px;}.cal-banner{flex-direction:column;align-items:stretch;}.cal-banner .cal-controls{flex-direction:column;align-items:stretch;}.cal-banner .cal-dl-btn{width:100%;}.cal-banner input[type=date]{width:100%;}.med-item{padding:10px 14px;gap:10px;}.med-name{font-size:13px;}}
+</style>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">4-Cycle Protocol</div>
+      <div class="inv-number">Sonya Starr</div>
+      <div class="inv-date">Heal · Fat Loss · Libido · Muscle</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+    <button class="tab-btn" onclick="switchTab('tracker',this)">Tracker</button>
+  </div>
+
+  <div class="inv-body">
+
+    <!-- ================ PROTOCOL TAB ================ -->
+    <div class="tab-content active" id="tab-protocol">
+
+      <div class="program-intro">
+        <div class="program-eyebrow">Personalized Protocol</div>
+        <div class="program-title">Sonya's <em>4-Cycle Reset</em></div>
+        <div class="program-tag">Heal first &middot; then burn &middot; then desire &middot; then build &middot; 157 &rarr; 120</div>
+        <div class="program-context">
+          <p><strong>You're not doing one stack &mdash; you're doing four cycles in sequence.</strong> That's the right call. Trying to throw 13 compounds at the problem at once would feel overwhelming and wouldn't deliver what you actually want. The order is deliberate: <strong>fix sleep and gut first</strong>, then layer fat loss on a body that's already recovering, then bring libido back, then build the muscle that makes the new 120 lb body actually feel strong.</p>
+          <p><strong>Why heal first &mdash; before fat loss.</strong> You said it plainly: bloated, heavy, snug clothes, daily alcohol, sleep at 2/5, stress at 5/5. Throwing Retatrutide on top of that does <em>some</em> of the work, but the appetite suppression piece carries you. The fat actually melts off when sleep is fixed, cortisol drops, and the gut isn't inflamed. Epitalon + Pinealon hit the sleep/circadian axis; Wolverine Blend (BPC + TB) calms the gut lining. Three weeks of Cycle 1 and the rest of the work gets easier, not harder.</p>
+          <p><strong>Then Cycle 2 (fat loss) is when the scale moves.</strong> Reta drives the deficit, Cagrilintide layers in extra appetite control without piling on the GLP-1 side effects, MOTS-c keeps daytime energy up so you're not gassed at 3 PM. Cycle 3 brings sexual health back online once weight is moving and you feel like yourself again. Cycle 4 builds the muscle on the lighter frame &mdash; this is where 120 lb becomes <em>tight</em>, not skinny-fat.</p>
+          <p><strong>Selank and DSIP are as-needed across all four cycles.</strong> Selank is your "stress dial" for the high-cortisol days. DSIP is for the nights when sleep won't come on its own &mdash; not nightly, just when you need it. Both safe, neither habit-forming.</p>
+        </div>
+        <div class="program-badges">
+          <span class="program-badge"><strong>4</strong> Cycles + PRN</span>
+          <span class="program-badge"><strong>13</strong> Compounds</span>
+          <span class="program-badge">Goal: <strong>157 &rarr; 120</strong></span>
+          <span class="program-badge">Friends &amp; Family</span>
+        </div>
+      </div>
+
+      <!-- ALLERGY SAFETY BANNER -->
+      <div class="allergy-banner">
+        <div class="allergy-banner-title">⚠ Critical Allergy Notes &middot; Read Before Day 1</div>
+        <div class="allergy-banner-body">
+          <ul>
+            <li><strong>ChloraPrep allergy</strong> &rarr; <strong>NEVER use chlorhexidine-based skin prep.</strong> The supplies list calls for <em>alcohol prep pads (70% IPA) only</em>. Confirm any wipe says "isopropyl alcohol" or "IPA" &mdash; never "chlorhexidine gluconate" or "CHG."</li>
+            <li><strong>Bactrim + most antibiotic allergies</strong> &rarr; if an injection site goes hot, red, or swollen for &gt;24 hrs, <strong>do not reach for antibiotic ointment</strong>. Call your doctor or message us first &mdash; the right answer is usually rest, cool compress, and rotation, not a topical you might react to.</li>
+            <li><strong>Magnesium sensitivity</strong> &rarr; the sleep tip in this protocol suggests magnesium glycinate <em>only</em> &mdash; not citrate, oxide, or sulfate. Glycinate is the gentlest form on the gut.</li>
+            <li><strong>No artificial sweeteners, no carbonation</strong> &rarr; the electrolyte recommendation in Supplies is <em>plain salt + lemon</em>, not powder packets with stevia/sucralose/erythritol.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- CYCLE SELECTOR -->
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Choose Cycle</div>
+        <div class="sec-divider-title" id="cycle-title-h">Cycle 1 &middot; Heal First (Anti-Aging + Gut)</div>
+      </div>
+
+      <div class="cycle-prompt">
+        Tap a cycle below to view its compounds, pricing, and rationale. <strong>Run them in order</strong> &mdash; each cycle sets up the next. Selank + DSIP are as-needed across all cycles.
+      </div>
+
+      <div class="cycle-grid">
+        <div class="cycle selected" data-cycle="1" onclick="selectCycle(1)">
+          <div class="cycle-select-mark">&#10003;</div>
+          <div class="cycle-num">Cycle 1 &middot; Start Here</div>
+          <div class="cycle-name">Heal First &middot; Anti-Aging</div>
+          <div class="cycle-price">$235</div>
+          <div class="cycle-incl"><strong>Includes</strong>Epitalon &middot; Pinealon &middot; Wolverine (BPC+TB)</div>
+        </div>
+        <div class="cycle" data-cycle="2" onclick="selectCycle(2)">
+          <div class="cycle-select-mark">&#10003;</div>
+          <div class="cycle-num">Cycle 2</div>
+          <div class="cycle-name">Fat Loss &middot; Energy</div>
+          <div class="cycle-price">$280</div>
+          <div class="cycle-incl"><strong>Includes</strong>Retatrutide &middot; Cagrilintide &middot; MOTS-c</div>
+        </div>
+        <div class="cycle" data-cycle="3" onclick="selectCycle(3)">
+          <div class="cycle-select-mark">&#10003;</div>
+          <div class="cycle-num">Cycle 3</div>
+          <div class="cycle-name">Sexual Health &middot; Libido</div>
+          <div class="cycle-price">$265</div>
+          <div class="cycle-incl"><strong>Includes</strong>Kisspeptin &middot; PT-141 &middot; Oxytocin</div>
+        </div>
+        <div class="cycle" data-cycle="4" onclick="selectCycle(4)">
+          <div class="cycle-select-mark">&#10003;</div>
+          <div class="cycle-num">Cycle 4</div>
+          <div class="cycle-name">Muscle Building</div>
+          <div class="cycle-price">$180</div>
+          <div class="cycle-incl"><strong>Includes</strong>CJC-1295 No DAC &middot; AOD-9604</div>
+        </div>
+        <div class="cycle" data-cycle="5" onclick="selectCycle(5)">
+          <div class="cycle-select-mark">&#10003;</div>
+          <div class="cycle-num">Always-On</div>
+          <div class="cycle-name">As-Needed PRN</div>
+          <div class="cycle-price">$75</div>
+          <div class="cycle-incl"><strong>Includes</strong>Selank (stress) &middot; DSIP (sleep)</div>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Compounds &amp; Pricing</div>
+        <div class="sec-divider-title" id="compound-count-title">3 Compounds &middot; Tap to Expand</div>
+      </div>
+
+      <div class="line-items">
+
+        <!-- ============ CYCLE 1 ============ -->
+        <details class="li-row" data-compound="epitalon" data-cycle="1">
+          <summary>
+            <span class="li-summary-name">Epitalon &middot; 50 mg &middot; 1 vial <span class="cycle-pill c1">Cycle 1 &middot; PM Daily &times; 20</span></span>
+            <span class="li-summary-price">$75</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water &middot; 16.67 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">2.5 mg &rarr; pull syringe to <span class="units">15 units (0.15 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>Daily &times; 20 days</strong> &middot; PM (within 1 hr of bedtime)</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen, rotate quadrants</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the telomere + pineal reset.</strong> Epitalon upregulates telomerase &mdash; the enzyme that protects the ends of your chromosomes from age-related shortening. The downstream effect at 51 is meaningful: improved circadian melatonin signaling, deeper sleep onset, and a reset of the master clock that's been blunted by daily alcohol and chronic stress. <strong>The 20-day intensive isn't optional</strong> &mdash; that's the duration the clinical research is built on, and stopping early dilutes the effect.</div>
+            <div class="li-callout"><strong>What to expect:</strong> sleep depth improves around night 5&ndash;7 (vivid dreams are a common early sign &mdash; that's healthy). By night 10&ndash;14, mornings start feeling less heavy. By the end of the 20-day run, the circadian rhythm should hold on its own for 4&ndash;6 months. Most people repeat it once or twice a year.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="pinealon" data-cycle="1">
+          <summary>
+            <span class="li-summary-name">Pinealon &middot; 10 mg &middot; 2 vials <span class="cycle-pill c1">Cycle 1 &middot; AM Daily &times; 20</span></span>
+            <span class="li-summary-price">$30 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial &middot; 5 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">2 mg &rarr; pull syringe to <span class="units">40 units (0.40 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>Daily &times; 20 days</strong> &middot; AM (with or without food &mdash; not strict)</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the daytime brain layer.</strong> Pinealon is a tri-peptide bioregulator that pairs with Epitalon: while Epitalon resets the night-side clock, Pinealon supports daytime cognitive clarity, mood stability, and stress resilience. It works on the gene-expression level to reduce neuroinflammation &mdash; the kind that builds up from chronic cortisol, poor sleep, and daily drinks. <strong>Specifically chosen for you</strong> because the stress 5/5 score isn't going to drop just from sleep alone &mdash; you need the daytime resilience piece too.</div>
+            <div class="li-callout"><strong>The duo is the point.</strong> AM Pinealon + PM Epitalon for 20 days runs simultaneously. They aren't redundant &mdash; Epitalon is telomere/circadian, Pinealon is cognitive/anti-inflammatory. Each opens the door for the next cycle (fat loss works better when sleep and stress are managed).</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="wolverine" data-cycle="1">
+          <summary>
+            <span class="li-summary-name">Wolverine Blend &middot; BPC-157 + TB-500 (5/5 mg) &middot; 2 vials <span class="cycle-pill c1">Cycle 1 &middot; AM/PM Daily</span></span>
+            <span class="li-summary-price">$50 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial &middot; 5 mg/mL combined after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">500 mcg total (250 mcg BPC + 250 mcg TB) &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Daily, alternating AM/PM &middot; runs through all of Cycle 1 (~40 days per vial)</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen for systemic gut healing</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the gut-and-tissue repair layer.</strong> "Tired of feeling bloated and heavy" almost always traces back to low-grade gut inflammation, especially with daily alcohol on board. BPC-157 was originally isolated from gastric juice for exactly this reason &mdash; it repairs the gut lining, reduces systemic inflammation, and accelerates angiogenesis (new blood supply) at any tissue that needs healing. TB-500 layers on broader soft-tissue and immune support. <strong>Run through all of Cycle 1</strong> so by the time you start Cycle 2 (Retatrutide), the gut is in a place to actually handle the GI side effects of GLP-1 agonists smoothly.</div>
+            <div class="li-callout"><strong>Bloat resolution timeline:</strong> visible decrease in mid-morning bloating around day 7&ndash;10. By day 21, the "heavy / full" feeling after meals should be substantially gone. This is the layer that quietly fixes the daily comfort piece you mentioned.</div>
+          </div>
+        </details>
+
+        <!-- ============ CYCLE 2 ============ -->
+        <details class="li-row" data-compound="reta" data-cycle="2">
+          <summary>
+            <span class="li-summary-name">Retatrutide &middot; 30 mg &middot; 1 vial <span class="cycle-pill c2">Cycle 2 &middot; 3&ndash;4&times;/wk AM</span></span>
+            <span class="li-summary-price">$100</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water &middot; 10 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">3&ndash;4&times; per week &middot; AM &middot; M / W / F default; add Sat as the 4th if appetite gets too easy at 3&times;</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen, rotate quadrants &middot; never the same spot twice in 48 hrs</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the fat-loss anchor for 157 &rarr; 120.</strong> Retatrutide is a triple agonist: GLP-1 (appetite control) + GIP (insulin sensitivity) + glucagon (raises energy expenditure). That third lever is what separates Reta from Ozempic/Tirzepatide on body composition &mdash; <em>more fat burn per unit of appetite suppression</em>. At 1 mg M/W/F you're in the conservative recomp range: appetite suppression is real but not crushing, GI side effects stay manageable, and there's headroom for Cagrilintide + MOTS-c to do their work alongside.</div>
+            <div class="li-callout"><strong>Specifically tailored for you:</strong> starting Reta <em>after</em> Cycle 1 isn't slowing the process &mdash; it's accelerating it. The gut healing from Wolverine means the early-cycle nausea most clients deal with on Reta is dramatically reduced. The Epitalon/Pinealon work means cortisol and sleep are no longer fighting against the fat-loss curve. Reta starts working with the body, not against it.</div>
+            <div class="li-callout warn"><strong>Watch with your levothyroxine:</strong> Reta + your existing thyroid medication can work synergistically on metabolism, but if you notice palpitations, heat intolerance, or jitteriness around week 3&ndash;4, your TSH may have shifted &mdash; ask your doctor for a thyroid panel re-check.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="cagri" data-cycle="2">
+          <summary>
+            <span class="li-summary-name">Cagrilintide &middot; 10 mg &middot; 1 vial <span class="cycle-pill c2">Cycle 2 &middot; 2&times;/wk AM</span></span>
+            <span class="li-summary-price">$60</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water &middot; 5 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">250 mcg &rarr; pull syringe to <span class="units">5 units (0.05 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Twice per week &middot; AM &middot; Tue + Sat (spacing it away from Reta days)</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen, opposite side from Reta shot the day before</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the satiety amplifier without GI cost.</strong> Cagrilintide is an amylin analog. It works on a totally different receptor than Reta (which is GLP-1/GIP/glucagon), so stacking them gives you appetite control through two independent mechanisms &mdash; <em>more effect, less side-effect burden than just bumping Reta higher</em>. Specifically helps with the food-noise piece in the evening, which is where most women on Reta alone still struggle.</div>
+            <div class="li-callout"><strong>Why only 2&times;/week:</strong> Cagri has a long half-life &mdash; 2&times;/week gives steady coverage without piling on. Tue + Sat keeps it spaced from the Reta M/W/F so any GI sensitivity from either compound is easy to attribute.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="mots" data-cycle="2">
+          <summary>
+            <span class="li-summary-name">MOTS-c &middot; 20 mg &middot; 2 vials <span class="cycle-pill c2">Cycle 2 &middot; 5 on / 2 off AM Fasted</span></span>
+            <span class="li-summary-price">$60 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial &middot; 10 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F (5 on / 2 off) &middot; <strong>AM fasted</strong> &middot; before coffee or breakfast</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; daytime energy through the deficit.</strong> Mitochondrial-derived peptide. It signals your body to build more mitochondria and run them more efficiently &mdash; the downstream effect is steadier daytime energy, less mid-afternoon crash, and the ability to keep moving (light exercise 1&ndash;2&times;/wk &rarr; 3&ndash;4&times;/wk feels possible). Also improves insulin sensitivity in skeletal muscle, so calories route toward muscle preservation instead of fat storage. <strong>Crucial alongside Reta</strong> &mdash; the typical Reta complaint is "low energy in the deficit." MOTS-c eliminates it.</div>
+            <div class="li-callout"><strong>Fasted timing matters:</strong> MOTS-c works through AMPK signaling, which is most active in the fasted state. Take it before coffee/breakfast for maximum effect. Pairs cleanly with your morning levothyroxine routine (you should already be doing levo on empty stomach with 30-min wait).</div>
+          </div>
+        </details>
+
+        <!-- ============ CYCLE 3 ============ -->
+        <details class="li-row" data-compound="kiss" data-cycle="3">
+          <summary>
+            <span class="li-summary-name">Kisspeptin-10 &middot; 10 mg &middot; 2 vials <span class="cycle-pill c3">Cycle 3 &middot; Daily Pre-Bed</span></span>
+            <span class="li-summary-price">$55 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv"><strong>4 mL bacteriostatic water</strong> per vial &middot; 2.5 mg/mL after recon (recon optimized for clean 5u draw)</span></li>
+              <li><span class="ql">Dose</span><span class="qv">125 mcg &rarr; pull syringe to <span class="units">5 units (0.05 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Every day &middot; <strong>1 hr before bed</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the upstream libido regulator.</strong> Kisspeptin is the hypothalamic master switch for the entire reproductive hormonal axis. It signals the brain to release GnRH, which drives the natural production of the downstream sex hormones (LH, FSH, estradiol). <strong>At 51 with estrogen "sometimes,"</strong> this matters: Kisspeptin doesn't bypass your body's system, it wakes it back up. The effect on libido is gradual but real &mdash; building over 3&ndash;4 weeks of nightly dosing &mdash; and it pairs cleanly with HRT if you choose to add it back consistently.</div>
+            <div class="li-callout"><strong>1 hour pre-bed is the right window:</strong> Kisspeptin pulses naturally peak overnight. Dosing into that window amplifies the body's existing pattern instead of fighting it. Also has a mild calming effect that supports sleep onset &mdash; helpful at sleep 2/5.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="pt141" data-cycle="3">
+          <summary>
+            <span class="li-summary-name">PT-141 &middot; 10 mg &middot; 1 vial <span class="cycle-pill c3">Cycle 3 &middot; PRN Date Night</span></span>
+            <span class="li-summary-price">$55</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water &middot; 5 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">500 mcg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>As needed</strong> &middot; 30&ndash;45 min before intimacy &middot; cap at 2&times;/week</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the on-demand desire compound.</strong> PT-141 (bremelanotide) is a melanocortin agonist that drives sexual desire centrally, in the brain &mdash; it doesn't work on blood flow (like Viagra/Cialis), it works on the part of the brain that decides whether you want to. <strong>The right pairing with Kisspeptin:</strong> Kisspeptin builds the baseline desire over weeks; PT-141 is the on-demand booster for specific nights. Use them together and the overall arc on libido is meaningfully better than either alone.</div>
+            <div class="li-callout warn"><strong>Watch for:</strong> mild facial flushing and slight nausea in the first 60 min are common &mdash; both fade by hour 2. PT-141 also temporarily raises blood pressure for a few hours &mdash; <strong>not for use with uncontrolled high blood pressure</strong>. If you ever feel chest tightness or a strong headache, skip future doses and message us. Given the atorvastatin and intermittent estrogen, worth confirming blood pressure is stable before first use.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="oxy" data-cycle="3">
+          <summary>
+            <span class="li-summary-name">Oxytocin &middot; 10 mg &middot; 2 vials <span class="cycle-pill c3">Cycle 3 &middot; PRN AM Connection</span></span>
+            <span class="li-summary-price">$50 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">10 mL bacteriostatic water per vial &middot; 1 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">50 mcg &rarr; pull syringe to <span class="units">5 units (0.05 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">As needed &middot; AM or 30 min before connection time &middot; great alongside date nights</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the bonding/closeness layer.</strong> Oxytocin amplifies emotional connection, trust, and physical closeness. It's the third leg of the libido stack: <strong>Kisspeptin gives baseline desire, PT-141 gives on-demand arousal, oxytocin gives the emotional connection</strong> that makes intimacy feel different from mechanical. Many women at 51 find this is the actual missing piece &mdash; not desire itself but the sense of close-and-safe that makes desire welcome.</div>
+            <div class="li-callout"><strong>Use it for non-sexual closeness too:</strong> oxytocin shots before family dinners, long conversations, or any setting where you want to be present and connected. Effect window is 2&ndash;4 hours. No tolerance buildup; no habit formation.</div>
+          </div>
+        </details>
+
+        <!-- ============ CYCLE 4 ============ -->
+        <details class="li-row" data-compound="cjc" data-cycle="4">
+          <summary>
+            <span class="li-summary-name">CJC-1295 No DAC &middot; 10 mg &middot; 2 vials <span class="cycle-pill c4">Cycle 4 &middot; 5 on / 2 off AM/PM</span></span>
+            <span class="li-summary-price">$45 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv"><strong>2 mL bacteriostatic water</strong> per vial &middot; 5 mg/mL after recon (recon optimized for clean 10u draw)</span></li>
+              <li><span class="ql">Dose</span><span class="qv">500 mcg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F (5 on / 2 off) &middot; AM fasted OR pre-bed (2+ hrs after last meal). One shot per day is plenty for your goals.</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the lean muscle layer for the lighter body.</strong> CJC-1295 No DAC is a short-acting GHRH analog that delivers a sharp, pulsatile GH release &mdash; mimicking your body's natural overnight pulse. Pre-bed dosing rides that wave: deeper sleep, better recovery, modest lean tissue building, and slow steady improvement in skin quality and recovery from exercise. At 51 post-fat-loss, this is the layer that turns "lighter" into "tight" &mdash; muscle tone returns to the face, arms, and core.</div>
+            <div class="li-callout"><strong>Fasted is non-negotiable:</strong> food &mdash; especially carbs &mdash; spikes insulin and blunts the GH pulse this peptide exists to amplify. 2+ hours after last meal, then inject, then sleep within 30&ndash;60 min. If you ate too close to bed, skip that night and resume the next.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="aod" data-cycle="4">
+          <summary>
+            <span class="li-summary-name">AOD-9604 &middot; 5 mg &middot; 2 vials <span class="cycle-pill c4">Cycle 4 &middot; 5 on / 2 off AM Fasted</span></span>
+            <span class="li-summary-price">$45 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial &middot; 2.5 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">300 mcg &rarr; pull syringe to <span class="units">12 units (0.12 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M&ndash;F (5 on / 2 off) &middot; <strong>AM fasted</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen (or directly over stubborn fat areas if you have them)</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; targeted lipolysis without the GH side-effect profile.</strong> AOD-9604 is a fragment of growth hormone that retains only the fat-burning portion of the GH molecule, without the blood sugar effects or insulin resistance issues full GH can carry. <strong>Specifically chosen for Cycle 4</strong> because by this point you're at or near your goal weight (120 lb), but final stubborn fat &mdash; lower abdomen, hips, back-of-arms &mdash; tends to hold on. AOD attacks exactly those depots while CJC No DAC builds the muscle underneath.</div>
+            <div class="li-callout"><strong>The combo is the point:</strong> AOD-9604 + CJC No DAC together in Cycle 4 = lean tissue building plus stubborn fat targeting. This is the "finish strong" cycle &mdash; what makes 120 look and feel like 120, not "lighter but still soft."</div>
+          </div>
+        </details>
+
+        <!-- ============ CYCLE 5: AS-NEEDED ============ -->
+        <details class="li-row" data-compound="selank" data-cycle="5">
+          <summary>
+            <span class="li-summary-name">Selank &middot; 30 mg &middot; 1 vial <span class="cycle-pill c5">Always-On &middot; PRN Stress</span></span>
+            <span class="li-summary-price">$45</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water &middot; 10 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">As needed &middot; <strong>afternoon</strong> on high-stress days &middot; cap at 4&times;/week</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; your stress dial.</strong> Selank is a synthetic analog of tuftsin that drives BDNF expression and tunes GABA/serotonin tone &mdash; you get a clean anti-anxiety effect (sharper, calmer, more present) <strong>without sedation, dependency, or cognitive blunting</strong> that benzos and similar prescriptions carry. With your stress score at 5/5 and daily alcohol use, this is the tool that helps break the "stress drink to relax" loop &mdash; the calm Selank delivers is the calm you've been chasing with the drink.</div>
+            <div class="li-callout"><strong>Use it for the days that need it, not every day.</strong> The afternoon timing is intentional &mdash; that's the typical cortisol-spike + decision-fatigue window where most people reach for either a drink or doom-scroll. Selank dropped in here resets the rest of the evening cleanly.</div>
+          </div>
+        </details>
+
+        <details class="li-row" data-compound="dsip" data-cycle="5">
+          <summary>
+            <span class="li-summary-name">DSIP &middot; 10 mg &middot; 1 vial <span class="cycle-pill c5">Always-On &middot; PRN Sleep</span></span>
+            <span class="li-summary-price">$30</span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water &middot; 5 mg/mL after recon</span></li>
+              <li><span class="ql">Dose</span><span class="qv">250 mcg &rarr; pull syringe to <span class="units">5 units (0.05 mL)</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv">As needed &middot; <strong>1&ndash;3 hrs before bed</strong> on nights when sleep won't come on its own &middot; cap at 3&times;/week</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol &mdash; the rescue sleep tool.</strong> Delta Sleep-Inducing Peptide deepens slow-wave (delta) sleep specifically &mdash; not just total sleep time, but the <em>quality</em> of deep sleep that does the restoration. At sleep 2/5, this is the most direct intervention available. <strong>Why PRN, not nightly:</strong> Epitalon and Pinealon in Cycle 1 should bring baseline sleep up to 3.5&ndash;4/5; DSIP is for the nights when that's not enough &mdash; stress days, travel, hormonal disruption. Using it 2&ndash;3&times;/week preserves the effect; using it every night dulls it within 3 weeks.</div>
+            <div class="li-callout"><strong>1&ndash;3 hr window matters:</strong> DSIP has a short half-life. Dose too early and you wake up before the deep-sleep boost lands; too late and you fall asleep before the effect kicks in. Most users find ~2 hrs pre-bed is the sweet spot.</div>
+          </div>
+        </details>
+
+      </div>
+
+      <!-- DYNAMIC TOTALS BLOCK -->
+      <div class="totals-block" id="totals-block"></div>
+
+      <details class="stack-card">
+        <summary><div class="stack-card-title">The 4-Cycle Logic &mdash; Why This Order</div></summary>
+        <div class="stack-synergy">
+          <strong>The damage profile:</strong> 51, female, 157 &rarr; 120 goal, sleep 2/5, stress 5/5, daily alcohol, light exercise, never injected before, on levothyroxine. That's not a "one protocol fits all" client &mdash; it's a sequencing problem.<br><br>
+
+          <strong>Why Heal First:</strong> Trying to fat-loss your way out of poor sleep + high cortisol is the standard error and it doesn't work. The fat comes off slower, the body holds onto belly fat (cortisol drives that), and the weight comes right back. Cycle 1 fixes the substrate &mdash; sleep, circadian rhythm, gut inflammation &mdash; so Cycle 2's fat loss work actually compounds. The 3-week investment in Cycle 1 returns 2&times; the speed in Cycle 2.<br><br>
+
+          <strong>Why Fat Loss next:</strong> With sleep + gut handled, Reta works the way it's supposed to &mdash; cleanly, without the cortisol-driven plateaus most women hit. Cagri stacks for evening appetite (the hardest window for sustained fat loss in women your age). MOTS-c keeps daytime energy stable so the workouts can grow. <strong>157 &rarr; 120 in roughly 5&ndash;7 months at 1&ndash;1.5 lb/week is the realistic curve.</strong><br><br>
+
+          <strong>Why Sexual Health third:</strong> Libido follows body composition + sleep + stress. Drop weight + fix sleep first, and Cycle 3 has a foundation to amplify. Kisspeptin restarts the upstream signal, PT-141 gives the on-demand booster, oxytocin restores the emotional layer. At 51 with intermittent estrogen, this is a meaningful shift &mdash; not "trying to feel 25" but actually feeling present and wanted again in your body.<br><br>
+
+          <strong>Why Muscle last:</strong> Building muscle on the lighter frame is what turns 120 from "skinny" into "tight." CJC No DAC + AOD-9604 = the final polish. Your body composition at 120 with this added muscle layer is materially different from 120 without it &mdash; better metabolic floor, better posture, better next-decade trajectory.<br><br>
+
+          <strong>The Selank + DSIP layer:</strong> these aren't part of the sequencing &mdash; they're tools you use as needed across all 4 cycles. Bad sleep night? DSIP. Stress day? Selank. They make the rest of the protocol resilient to the bad days everyone has.
+        </div>
+      </details>
+
+      <div class="payment-block">
+        <div class="payment-title">Payment Instructions</div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128184;</div>
+          <div><div class="payment-text">Send via Venmo</div><div class="payment-handle">@micahp20</div></div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128274;</div>
+          <div class="payment-text"><strong>Set payment privacy to <span style="color:var(--gold);">Private</span></strong> (not Public or Friends)</div>
+        </div>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================ SCHEDULE TAB ================ -->
+    <div class="tab-content" id="tab-schedule">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Cycle Timing</div>
+        <div class="sec-divider-title">Run In Sequence &middot; Each Cycle ~3&ndash;6 Weeks</div>
+      </div>
+
+      <div class="cal-banner">
+        <div class="cal-left">
+          <h4>&#128197; Add Cycle 1 to Your Calendar</h4>
+          <p>Pick your Cycle 1 Day 1 (any day &mdash; Monday recommended). The .ics file generates: Pinealon AM &times; 20 days, Epitalon PM &times; 20 days, Wolverine alternating AM/PM through the whole window. You'll re-run this when you start Cycle 2.</p>
+        </div>
+        <div class="cal-controls">
+          <input type="date" id="cycleStart">
+          <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+        </div>
+      </div>
+
+      <details class="sched-card" open>
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Cycle 1 &middot; Heal First (Anti-Aging)</div>
+            <div class="sched-card-sub">20-day intensive. AM Pinealon + Wolverine, PM Epitalon + Wolverine alternation.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:var(--violet);">~3 Weeks</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>AM</th><th>PM (pre-bed)</th><th class="right">Shots</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon (2 mg)</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine (500 mcg)</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon (2.5 mg)</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Tue</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Wed</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Thu</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Fri</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Sat</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Sun</span></td>
+              <td><span class="sched-pill c1"><strong>40u</strong> &middot; Pinealon</span><span class="sched-pill c1"><strong>10u</strong> &middot; Wolverine</span></td>
+              <td><span class="sched-pill c1"><strong>15u</strong> &middot; Epitalon</span></td>
+              <td class="right"><span class="sched-count">3</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div style="background:rgba(111,79,184,0.06);border:1px solid rgba(111,79,184,0.35);border-left:3px solid var(--violet);border-radius:2px;padding:12px 16px;margin-top:10px;font-size:12px;color:#3d2b6f;line-height:1.65;"><strong>20-day window:</strong> Pinealon + Epitalon stop on day 20. Wolverine keeps running through the leftover ~20 days from the second vial &mdash; carries the gut healing into Cycle 2 startup as a soft handoff.</div>
+      </details>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Cycle 2 &middot; Fat Loss + Energy</div>
+            <div class="sched-card-sub">Reta 3&times;/wk, Cagri 2&times;/wk, MOTS-c M&ndash;F fasted. Runs until vials finished (~5&ndash;6 wks).</div>
+          </div>
+          <div class="sched-phase-pill" style="background:var(--amber);">~5&ndash;6 Wks</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>AM Fasted</th><th>AM (post-coffee OK)</th><th class="right">Shots</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; MOTS-c (1 mg)</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; Reta (1 mg)</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Tue</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; MOTS-c</span></td>
+              <td><span class="sched-pill c2"><strong>5u</strong> &middot; Cagri (250 mcg)</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Wed</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; MOTS-c</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; Reta</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Thu</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; MOTS-c</span></td>
+              <td><span class="sched-pill off">Rest</span></td>
+              <td class="right"><span class="sched-count">1</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Fri</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; MOTS-c</span></td>
+              <td><span class="sched-pill c2"><strong>10u</strong> &middot; Reta</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Sat</span></td>
+              <td><span class="sched-pill off">MOTS-c rest</span></td>
+              <td><span class="sched-pill c2"><strong>5u</strong> &middot; Cagri</span></td>
+              <td class="right"><span class="sched-count">1</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Sun</span></td>
+              <td colspan="2"><span class="sched-pill off">All off &mdash; recover</span></td>
+              <td class="right"><span class="sched-count off">0</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+      </details>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Cycle 3 &middot; Sexual Health</div>
+            <div class="sched-card-sub">Kisspeptin every night. PT-141 + Oxytocin PRN.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:var(--pink);">Daily + PRN</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>AM (PRN)</th><th>Pre-Date (PRN)</th><th>1 hr Pre-Bed (daily)</th><th class="right">Shots</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Daily</span></td>
+              <td><span class="sched-pill c3"><strong>5u</strong> &middot; Oxytocin (50 mcg) &mdash; PRN connection</span></td>
+              <td><span class="sched-pill c3"><strong>10u</strong> &middot; PT-141 (500 mcg) &mdash; 30&ndash;45 min pre</span></td>
+              <td><span class="sched-pill c3"><strong>5u</strong> &middot; Kisspeptin (125 mcg)</span></td>
+              <td class="right"><span class="sched-count">1&ndash;3</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <div style="background:rgba(184,85,111,0.06);border:1px solid rgba(184,85,111,0.35);border-left:3px solid var(--pink);border-radius:2px;padding:12px 16px;margin-top:10px;font-size:12px;color:#6f2c44;line-height:1.65;"><strong>Daily anchor:</strong> Kisspeptin pre-bed is the only non-negotiable in this cycle. PT-141 and Oxytocin float as you choose &mdash; cap PT-141 at 2&times;/week.</div>
+      </details>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Cycle 4 &middot; Muscle Building</div>
+            <div class="sched-card-sub">CJC No DAC pre-bed M&ndash;F. AOD-9604 AM fasted M&ndash;F. Weekends off.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:var(--info);">~6&ndash;8 Wks</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>AM Fasted</th><th>PM Pre-Bed</th><th class="right">Shots</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td>
+              <td><span class="sched-pill c4"><strong>12u</strong> &middot; AOD (300 mcg)</span></td>
+              <td><span class="sched-pill c4"><strong>10u</strong> &middot; CJC No DAC (500 mcg)</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Tue</span></td>
+              <td><span class="sched-pill c4"><strong>12u</strong> &middot; AOD</span></td>
+              <td><span class="sched-pill c4"><strong>10u</strong> &middot; CJC No DAC</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Wed</span></td>
+              <td><span class="sched-pill c4"><strong>12u</strong> &middot; AOD</span></td>
+              <td><span class="sched-pill c4"><strong>10u</strong> &middot; CJC No DAC</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Thu</span></td>
+              <td><span class="sched-pill c4"><strong>12u</strong> &middot; AOD</span></td>
+              <td><span class="sched-pill c4"><strong>10u</strong> &middot; CJC No DAC</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Fri</span></td>
+              <td><span class="sched-pill c4"><strong>12u</strong> &middot; AOD</span></td>
+              <td><span class="sched-pill c4"><strong>10u</strong> &middot; CJC No DAC</span></td>
+              <td class="right"><span class="sched-count">2</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Sat</span></td><td colspan="2"><span class="sched-pill off">All off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td colspan="2"><span class="sched-pill off">All off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </details>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">As-Needed &middot; Selank + DSIP</div>
+            <div class="sched-card-sub">Across all 4 cycles. No fixed schedule &mdash; use the tracker to log days used.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:var(--green);">PRN All Cycles</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">When</th><th>Afternoon</th><th>1&ndash;3 hr Pre-Bed</th><th class="right">Cap</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Stress day</span></td>
+              <td><span class="sched-pill c5"><strong>10u</strong> &middot; Selank (1 mg)</span></td>
+              <td>&mdash;</td>
+              <td class="right"><span class="sched-count">4&times;/wk max</span></td>
+            </tr>
+            <tr><td><span class="sched-day">Sleep won't come</span></td>
+              <td>&mdash;</td>
+              <td><span class="sched-pill c5"><strong>5u</strong> &middot; DSIP (250 mcg)</span></td>
+              <td class="right"><span class="sched-count">3&times;/wk max</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+      </details>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Sequence</div>
+        <div class="sec-divider-title">The Cycle-to-Cycle Roadmap</div>
+      </div>
+
+      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:6px;">
+        <strong style="color:var(--violet);">Cycle 1 (~Wk 1&ndash;3):</strong> Pinealon + Epitalon &times; 20 days. Wolverine bridges through.<br>
+        <strong style="color:var(--amber);">Cycle 2 (~Wk 4&ndash;9):</strong> Start Reta + Cagri + MOTS-c. Wolverine vial #2 finishes early Cycle 2.<br>
+        <strong style="color:var(--pink);">Cycle 3 (~Wk 10&ndash;14):</strong> Kisspeptin daily &times; ~35 days. PT-141 + Oxytocin PRN. Optionally overlap with tail of Cycle 2 if fat loss is going well.<br>
+        <strong style="color:var(--info);">Cycle 4 (~Wk 15&ndash;22):</strong> CJC No DAC + AOD-9604. The "finish" cycle &mdash; lean tissue + stubborn fat polish.<br>
+        <strong style="color:var(--green);">Throughout:</strong> Selank for stress days, DSIP for sleep rescue. Use as needed across all cycles.<br><br>
+        <strong style="color:var(--gold);">Total runway:</strong> roughly 5&ndash;6 months from Cycle 1 Day 1 to end of Cycle 4 &mdash; right around the timeline that takes 157 to 120 cleanly.
+      </div>
+
+    </div><!-- /schedule tab -->
+
+    <!-- ================ SUPPLIES TAB ================ -->
+    <div class="tab-content" id="tab-supplies">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Supplies</div>
+        <div class="sec-divider-title">Order Before Cycle 1 Day 1</div>
+      </div>
+
+      <div class="supplies-wrap">
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 200-pack</div>
+            <div class="supply-info-desc">For ALL injections in this protocol. Short, thin needle, painless once you have the technique. Get the 1 mL (100u) version &mdash; the 0.5 mL won't fit Pinealon's 40u draws. ~3&ndash;4 shots/day peak; one pack covers most of the cycle program.</div>
+          </div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% Isopropyl Alcohol, 400-pack</div>
+            <div class="supply-info-desc"><strong style="color:#8a3a3a;">CRITICAL FOR YOU:</strong> only use isopropyl alcohol wipes &mdash; <strong style="color:#8a3a3a;">never chlorhexidine (ChloraPrep / CHG)</strong>. Read the label. 70% IPA is the standard, safe option. Use one wipe on the vial top, one on your skin, every single shot.</div>
+          </div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL bottles, &times;2</div>
+            <div class="supply-info-desc">Recon math: Cycle 1 needs ~7 mL (Epitalon 3 + Pinealon 4 + Wolverine 4). Cycle 2 needs ~7 mL (Reta 3 + Cagri 2 + MOTS-c 4). Cycle 3 needs ~22 mL (Kiss 8 + PT-141 2 + Oxytocin 20). Cycle 4 needs ~8 mL (CJC 4 + AOD 4). Selank + DSIP ~5 mL. <strong>Total ~50 mL.</strong> Order two 30 mL bottles for safety.</div>
+          </div>
+          <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">McGuff &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+            <div class="supply-info-desc">All used needles go directly in here. Drop off free at any CVS or Walgreens when full. Never trash needles loose.</div>
+          </div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Peptide Organizer / Fridge Storage</div>
+            <div class="supply-info-desc">You'll have 3&ndash;5 active reconstituted vials at any given time. Keeps them organized, protected from light, and at stable temperature. Worth getting one before Day 1.</div>
+          </div>
+          <a href="https://a.co/d/07HthwLz" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Magnesium Glycinate (for the Pre-Bed routine &mdash; gentle on your gut)</div>
+            <div class="supply-info-desc"><strong>Glycinate form only.</strong> Avoid citrate (cramping), oxide (poorly absorbed), and sulfate (laxative). Glycinate is the most tolerable form for sensitive guts. 400 mg pre-bed pairs with the Epitalon/DSIP work in Cycle 1.</div>
+          </div>
+          <a href="https://a.co/d/0d7yZ1xN" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">What to Skip</div>
+        <div class="sec-divider-title">Items to Avoid &middot; Tailored for You</div>
+      </div>
+
+      <div class="storage-card" style="background:rgba(184,85,85,0.06);border-color:rgba(184,85,85,0.35);border-left-color:var(--red);">
+        <div class="storage-title" style="color:#8a3a3a;">&#10060; Specifically NOT On This List</div>
+        <div class="storage-body" style="color:#5e2424;">
+          <p><strong>ChloraPrep / chlorhexidine wipes:</strong> you're severely allergic. Most clinics use these by default &mdash; for at-home injections, alcohol pads ONLY.</p>
+          <p><strong>Electrolyte powders with artificial sweeteners (LMNT, Liquid IV, etc.):</strong> stevia, erythritol, sucralose, monk fruit &mdash; all upset a sensitive gut. Use a homemade option: water + pinch of sea salt + lemon + a few drops of magnesium glycinate liquid if you want.</p>
+          <p><strong>Carbonated water / kombucha:</strong> bloats a gut that's already healing. Stick with still water, herbal tea, or warm bone broth through Cycle 1.</p>
+          <p><strong>Magnesium citrate / oxide / sulfate:</strong> stomach-irritating forms. <strong>Glycinate only.</strong></p>
+          <p><strong>Any "antibiotic ointment" for injection sites:</strong> given your antibiotic allergy profile, the right answer for any site irritation is cool compress + rotation + rest, not topical antibiotics.</p>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Storage &amp; Handling</div>
+        <div class="sec-divider-title">Keep It Clean &middot; Rotate Sites</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
+        <div class="storage-body">
+          <p><strong>Dry (lyophilized) vials:</strong> refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</p>
+          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days of reconstitution. Only reconstitute one vial of each compound at a time &mdash; don't start the 30-day clock on a second vial until the first is nearly empty.</p>
+          <p><strong>Site rotation (SubQ abdomen):</strong> divide your abdomen into 8 quadrants &mdash; upper/lower &times; left/right &times; near/far from belly button. Never inject the same 1&Prime; spot two days in a row. With 2&ndash;3 shots a day, that's easy: just step to the next quadrant.</p>
+          <p><strong>Technique notes (you've never injected):</strong> 90&deg; angle to skin, pinch 1&Prime; of skin, slow steady push, hold for 5 seconds before withdrawing. Whole thing takes 10 seconds once you have the rhythm.</p>
+        </div>
+      </div>
+
+    </div><!-- /supplies tab -->
+
+    <!-- ================ NOTES & TIPS TAB ================ -->
+    <div class="tab-content" id="tab-notes">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Read Before Day 1</div>
+        <div class="sec-divider-title">Featured Tips for Sonya</div>
+      </div>
+
+      <details class="tip-card warn" open>
+        <summary>
+          <div class="tip-eyebrow">⚠ Tip 01 &middot; Your Allergy Profile</div>
+          <div class="tip-title">Three Things to Never Forget</div>
+        </summary>
+        <div class="tip-body">
+          <p><strong>1. ChloraPrep &mdash; never.</strong> Confirm every wipe is "70% isopropyl alcohol" or "IPA." Refuse any clinic prep without checking the label.</p>
+          <p><strong>2. Bactrim + most antibiotics &mdash; tell every prescriber.</strong> If a doctor wants to prescribe something for an unrelated reason, flag it first. For this protocol specifically: if any injection site goes hot/red/swollen &gt;24 hrs, message us before reaching for any topical antibiotic.</p>
+          <p><strong>3. Magnesium form &mdash; glycinate only.</strong> Other forms will cause GI distress. The sleep tips here are built around glycinate.</p>
+        </div>
+      </details>
+
+      <details class="tip-card featured" open>
+        <summary>
+          <div class="tip-eyebrow">Tip 02 &middot; First Injection Day</div>
+          <div class="tip-title">You've Never Done This Before &mdash; Here's the 5-Minute Walkthrough</div>
+        </summary>
+        <div class="tip-body">
+          <p><strong>The fear is bigger than the reality.</strong> Insulin syringes are tiny &mdash; thinner than a hair. Most clients report shot #1 stung less than expected, and by shot #5 it's a non-event.</p>
+          <p><strong>Your first shot setup:</strong></p>
+          <ul>
+            <li>Pick the time you'll do it daily and stick with it (consistency &gt; perfection)</li>
+            <li>Wash hands. Alcohol-wipe the vial top, let it dry 5 seconds</li>
+            <li>Draw your BAC water (only for the first recon) or pull your dose</li>
+            <li>Alcohol-wipe a fresh abdomen spot (1&Prime; from belly button or further), let it dry</li>
+            <li>Pinch 1&Prime; of skin between thumb and finger</li>
+            <li>Insert at 90&deg; (straight in), push slow, hold 5 sec, withdraw</li>
+            <li>Used needle into sharps container. Done.</li>
+          </ul>
+          <p><strong>Start with Cycle 1.</strong> Pinealon (40u, AM) is your first injection &mdash; it's a daytime peptide, no precise timing pressure, lets you build confidence before adding pre-bed shots.</p>
+        </div>
+      </details>
+
+      <details class="tip-card featured" open>
+        <summary>
+          <div class="tip-eyebrow">Tip 03 &middot; The Daily Alcohol Conversation</div>
+          <div class="tip-title">Direct Question, Direct Answer</div>
+        </summary>
+        <div class="tip-body">
+          <p>Daily alcohol is the single biggest variable working against this protocol. Not because of any direct interaction with the peptides (there isn't a dangerous one), but because every drink:</p>
+          <ul>
+            <li>Disrupts REM and deep sleep &mdash; <em>actively fights Epitalon and DSIP</em></li>
+            <li>Spikes cortisol the next morning &mdash; <em>fights Pinealon, MOTS-c, Reta's fat-loss work</em></li>
+            <li>Inflames the gut lining &mdash; <em>fights Wolverine Blend's whole job</em></li>
+            <li>Suppresses GH overnight &mdash; <em>fights CJC No DAC in Cycle 4</em></li>
+          </ul>
+          <p><strong>The protocol will still work with daily drinks &mdash; just slower and shallower.</strong> Realistic ask, not "stop drinking": <strong>during Cycle 1's 20-day Epitalon window, see if you can cap at 1 drink/day with 2 dry days/week.</strong> If you can hold that, you'll notice the Cycle 1 effect 2&ndash;3&times; harder, which earns the momentum for Cycle 2. If you can't hit that bar, run the protocol anyway &mdash; just know the curve is shallower.</p>
+          <p><strong>The other angle:</strong> the calm/relief drinks deliver is the same calm Selank delivers &mdash; without the next-day cost. Many clients in your situation find Selank takes over the role drinks were playing within a week or two, and the daily drink slides naturally down.</p>
+        </div>
+      </details>
+
+      <details class="tip-card">
+        <summary>
+          <div class="tip-eyebrow">Tip 04 &middot; Levothyroxine Timing</div>
+          <div class="tip-title">Don't Let Peptides Disrupt Your Thyroid Rhythm</div>
+        </summary>
+        <div class="tip-body">
+          <p>You're on levothyroxine &mdash; that means your AM is already structured: take levo first thing, fasted, wait 30&ndash;60 min before food, coffee, or anything else.</p>
+          <p><strong>MOTS-c (Cycle 2) and AOD-9604 (Cycle 4)</strong> are "AM fasted" peptides &mdash; they fit cleanly inside the same fasted window. The simple stack: take levo &rarr; wait 5 min &rarr; do your fasted SubQ shot(s) &rarr; continue your normal fasting wait &rarr; eat. No interference, same window.</p>
+          <p><strong>What to watch for:</strong> if your TSH drifts up (re-test at end of Cycle 2), Reta's metabolic effect can sometimes shift thyroid demand. Your prescriber may want to adjust the levo dose. Ask for a TSH + Free T4 + Free T3 check around weeks 8&ndash;10 of the program.</p>
+        </div>
+      </details>
+
+      <details class="tip-card">
+        <summary>
+          <div class="tip-eyebrow">Tip 05 &middot; What to Expect by Cycle</div>
+          <div class="tip-title">Realistic Timeline of Wins</div>
+        </summary>
+        <div class="tip-body">
+          <p><strong>Cycle 1 (Wk 1&ndash;3):</strong> sleep deepens around night 5&ndash;7 (vivid dreams normal &mdash; that's REM rebuilding). Bloating drops noticeably day 7&ndash;10. By end of Cycle 1, mornings feel measurably lighter &mdash; not weight loss yet, just <em>feel</em>.</p>
+          <p><strong>Cycle 2 (Wk 4&ndash;9):</strong> scale starts moving by day 10 of Reta. Appetite suppression hits hard the first 2 weeks &mdash; smaller meals, lower fat content. Expect 5&ndash;7 lb in the first 3 weeks, then a steadier 1&ndash;1.5 lb/wk. By end of Cycle 2 you should be in the 140s.</p>
+          <p><strong>Cycle 3 (Wk 10&ndash;14):</strong> libido shifts are gradual &mdash; first 2 weeks of Kisspeptin you might notice nothing, then suddenly it's clearly different. PT-141 + oxytocin amplify acutely. By end of Cycle 3, the emotional + physical pieces of intimacy feel reconnected.</p>
+          <p><strong>Cycle 4 (Wk 15&ndash;22):</strong> at this point you're approaching 120. Cycle 4 is what makes that 120 look tight rather than skinny &mdash; arm definition returns, posture improves, skin quality on the face shifts. The final 8 weeks polish the result.</p>
+        </div>
+      </details>
+
+      <details class="tip-card">
+        <summary>
+          <div class="tip-eyebrow">Tip 06 &middot; The Reta Side-Effect Playbook</div>
+          <div class="tip-title">Manage Nausea Without Quitting</div>
+        </summary>
+        <div class="tip-body">
+          <p>Most clients get mild&ndash;moderate nausea on Reta shot days for the first 2&ndash;3 weeks. Tactics that actually work:</p>
+          <ul>
+            <li><strong>Smaller meals on shot day.</strong> The "I'm full" signal hits halfway through a normal portion &mdash; respect it.</li>
+            <li><strong>Lower fat content on shot day.</strong> Fat slows gastric emptying, which is already slowed by Reta. Don't compound.</li>
+            <li><strong>Hydrate aggressively.</strong> 80&ndash;100 oz water on shot day. Counterintuitively prevents nausea more than it provokes it.</li>
+            <li><strong>Ginger tea or chewed fresh ginger.</strong> Cheap, no-side-effect, works for ~70% of clients.</li>
+          </ul>
+          <p>If nausea is &gt;mild after week 2, message us &mdash; the answer may be holding at 1 mg longer, or splitting the dose into 0.5 mg twice a week.</p>
+        </div>
+      </details>
+
+      <details class="tip-card">
+        <summary>
+          <div class="tip-eyebrow">Tip 07 &middot; When to Skip a Shot</div>
+          <div class="tip-title">Three Scenarios Where the Right Move is "Skip"</div>
+        </summary>
+        <div class="tip-body">
+          <ul>
+            <li><strong>Active illness with fever:</strong> skip all peptides until 24 hrs fever-free. Don't add immune work on top of the immune work already happening.</li>
+            <li><strong>Ate too close to a pre-bed shot:</strong> if it's been less than 2 hrs, skip the CJC No DAC or Kisspeptin and resume next night.</li>
+            <li><strong>Site is irritated:</strong> skip rather than inject into an angry site &mdash; rotate, rest the area 48 hrs, resume.</li>
+          </ul>
+          <p>Missing one shot in any cycle is not a setback. Missing 3+ in a row in Cycle 1 (Epitalon/Pinealon) breaks the compounding signal &mdash; consider restarting the 20-day window.</p>
+        </div>
+      </details>
+
+      <details class="tip-card">
+        <summary>
+          <div class="tip-eyebrow">Tip 08 &middot; PT-141 Pre-Use Check</div>
+          <div class="tip-title">Two Questions to Answer Before First Dose</div>
+        </summary>
+        <div class="tip-body">
+          <p>PT-141 temporarily raises blood pressure for a few hours. Before your first dose in Cycle 3:</p>
+          <ul>
+            <li><strong>Is your blood pressure controlled?</strong> If you don't know your baseline, take it (any drugstore has a free machine). If it's consistently &gt;140/90, message us before using.</li>
+            <li><strong>Atorvastatin + intermittent estrogen interaction:</strong> no direct contraindication, but if you experience strong headache, chest tightness, or visual changes within 60 min of dose, skip future use and tell us.</li>
+          </ul>
+          <p>For 95% of clients PT-141 is well-tolerated &mdash; mild facial flushing + slight nausea first 60 min that fade by hour 2. The above just rules out the edge case.</p>
+        </div>
+      </details>
+
+      <details class="tip-card">
+        <summary>
+          <div class="tip-eyebrow">Tip 09 &middot; Math Corrections from Spec</div>
+          <div class="tip-title">Small Recon/Draw Adjustments Made for Accuracy</div>
+        </summary>
+        <div class="tip-body">
+          <p>Four small math corrections from the original spec to ensure clean, safe draws:</p>
+          <ul>
+            <li><strong>Pinealon:</strong> 2 mg at 2 mL recon = <strong>40 units</strong>, not 20. Same dose, accurate draw.</li>
+            <li><strong>Kisspeptin-10:</strong> recon changed to <strong>4 mL</strong> (not 2 mL) so the 125 mcg dose lands at a clean 5 units instead of 2.5 units.</li>
+            <li><strong>DSIP:</strong> 250 mcg at 2 mL recon = <strong>5 units</strong>, not 10. (10 units would be 500 mcg.)</li>
+            <li><strong>CJC-1295 No DAC:</strong> recon changed to <strong>2 mL</strong> (not 3 mL) so 500 mcg lands at clean 10 units. Easier to dose precisely.</li>
+          </ul>
+          <p>All other compounds use the original spec recon and draw.</p>
+        </div>
+      </details>
+
+    </div><!-- /notes tab -->
+
+    <!-- ================ TRACKER TAB ================ -->
+    <div class="tab-content" id="tab-tracker">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Daily Tracker</div>
+        <div class="sec-divider-title">Tick Each Compound as You Take It</div>
+      </div>
+
+      <div class="ios-install-card">
+        <div class="ios-install-l">
+          <div class="ios-install-eyebrow">&#128241; Install as iOS App</div>
+          <div class="ios-install-title">Save your tracker to your home screen</div>
+          <div class="ios-install-sub">One tap to log shots. Works offline. iPhone: Share &rarr; "Add to Home Screen." Android: Install button below.</div>
+        </div>
+        <button class="ios-install-btn" id="ios-install-btn">&#11015; Install as App</button>
+      </div>
+
+      <div class="tracker-head">
+        <div class="tracker-head-l">
+          <div class="tracker-head-eyebrow">Today</div>
+          <div class="tracker-head-day" id="tracker-today">—</div>
+        </div>
+        <div class="tracker-head-r">
+          <div class="tracker-count"><span id="tracker-done">0</span>/<span id="tracker-total">0</span><small>Logged</small></div>
+          <button class="tracker-reset" onclick="resetTracker()">Reset Day</button>
+        </div>
+      </div>
+
+      <div class="cycle-prompt">
+        Pre-loaded with all 13 compounds, grouped by cycle and time. <strong>Items dim automatically when you're not in their cycle window.</strong> Selank + DSIP stay tickable any day (they're PRN). Saves locally to this device, auto-resets at midnight.
+      </div>
+
+      <!-- CYCLE 1 -->
+      <div class="med-group">
+        <div class="med-group-head c1">
+          <div>
+            <div class="med-group-title">Cycle 1 &middot; Heal First</div>
+            <div class="med-group-sub">Pinealon AM &middot; Wolverine AM/PM alt &middot; Epitalon PM &middot; 20-day intensive</div>
+          </div>
+          <span class="med-group-pill c1">Cycle 1</span>
+        </div>
+        <div class="med-list" data-cycle="1">
+          <div class="med-item" data-id="pinealon"><div class="med-check"></div><div class="med-name">Pinealon &middot; AM</div><span class="med-dose">40u (2 mg)</span></div>
+          <div class="med-item" data-id="wolverine-am"><div class="med-check"></div><div class="med-name">Wolverine Blend &middot; AM (odd days)</div><span class="med-dose">10u (500 mcg)</span></div>
+          <div class="med-item" data-id="epitalon"><div class="med-check"></div><div class="med-name">Epitalon &middot; Pre-bed</div><span class="med-dose">15u (2.5 mg)</span></div>
+          <div class="med-item" data-id="wolverine-pm"><div class="med-check"></div><div class="med-name">Wolverine Blend &middot; PM (even days)</div><span class="med-dose">10u (500 mcg)</span></div>
+        </div>
+      </div>
+
+      <!-- CYCLE 2 -->
+      <div class="med-group">
+        <div class="med-group-head c2">
+          <div>
+            <div class="med-group-title">Cycle 2 &middot; Fat Loss + Energy</div>
+            <div class="med-group-sub">MOTS-c M&ndash;F fasted &middot; Reta M/W/F &middot; Cagri Tue/Sat</div>
+          </div>
+          <span class="med-group-pill c2">Cycle 2</span>
+        </div>
+        <div class="med-list" data-cycle="2">
+          <div class="med-item" data-id="mots"><div class="med-check"></div><div class="med-name">MOTS-c &middot; AM Fasted (M&ndash;F)</div><span class="med-dose">10u (1 mg)</span></div>
+          <div class="med-item" data-id="reta"><div class="med-check"></div><div class="med-name">Retatrutide &middot; AM (M/W/F)</div><span class="med-dose">10u (1 mg)</span></div>
+          <div class="med-item" data-id="cagri"><div class="med-check"></div><div class="med-name">Cagrilintide &middot; AM (Tue/Sat)</div><span class="med-dose">5u (250 mcg)</span></div>
+        </div>
+      </div>
+
+      <!-- CYCLE 3 -->
+      <div class="med-group">
+        <div class="med-group-head c3">
+          <div>
+            <div class="med-group-title">Cycle 3 &middot; Sexual Health</div>
+            <div class="med-group-sub">Kisspeptin nightly &middot; PT-141 + Oxytocin PRN</div>
+          </div>
+          <span class="med-group-pill c3">Cycle 3</span>
+        </div>
+        <div class="med-list" data-cycle="3">
+          <div class="med-item" data-id="kiss"><div class="med-check"></div><div class="med-name">Kisspeptin-10 &middot; 1 hr Pre-bed</div><span class="med-dose">5u (125 mcg)</span></div>
+          <div class="med-item" data-id="pt141"><div class="med-check"></div><div class="med-name">PT-141 &middot; 30&ndash;45 min pre-intimacy (PRN)</div><span class="med-dose">10u (500 mcg)</span></div>
+          <div class="med-item" data-id="oxytocin"><div class="med-check"></div><div class="med-name">Oxytocin &middot; AM connection (PRN)</div><span class="med-dose">5u (50 mcg)</span></div>
+        </div>
+      </div>
+
+      <!-- CYCLE 4 -->
+      <div class="med-group">
+        <div class="med-group-head c4">
+          <div>
+            <div class="med-group-title">Cycle 4 &middot; Muscle Building</div>
+            <div class="med-group-sub">AOD AM fasted M&ndash;F &middot; CJC No DAC pre-bed M&ndash;F</div>
+          </div>
+          <span class="med-group-pill c4">Cycle 4</span>
+        </div>
+        <div class="med-list" data-cycle="4">
+          <div class="med-item" data-id="aod"><div class="med-check"></div><div class="med-name">AOD-9604 &middot; AM Fasted (M&ndash;F)</div><span class="med-dose">12u (300 mcg)</span></div>
+          <div class="med-item" data-id="cjc"><div class="med-check"></div><div class="med-name">CJC-1295 No DAC &middot; Pre-bed (M&ndash;F)</div><span class="med-dose">10u (500 mcg)</span></div>
+        </div>
+      </div>
+
+      <!-- CYCLE 5 PRN -->
+      <div class="med-group">
+        <div class="med-group-head c5">
+          <div>
+            <div class="med-group-title">Always-On PRN</div>
+            <div class="med-group-sub">Selank for stress days &middot; DSIP for sleep rescue</div>
+          </div>
+          <span class="med-group-pill c5">PRN</span>
+        </div>
+        <div class="med-list" data-cycle="5">
+          <div class="med-item" data-id="selank"><div class="med-check"></div><div class="med-name">Selank &middot; Afternoon (high-stress days)</div><span class="med-dose">10u (1 mg)</span></div>
+          <div class="med-item" data-id="dsip"><div class="med-check"></div><div class="med-name">DSIP &middot; 1&ndash;3 hr pre-bed (PRN)</div><span class="med-dose">5u (250 mcg)</span></div>
+        </div>
+      </div>
+
+      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
+        <strong style="color:var(--gold);">Tracker state is saved locally to this device.</strong> Tap any item to check or uncheck. Count updates and persists across the day. At midnight (next page load on a new date), the tracker auto-resets so you start fresh.<br><br>
+        <strong style="color:var(--gold);">Want to skip directly to a specific cycle's tracker?</strong> The Protocol tab's Cycle selector also re-arranges the compound list there &mdash; tap a different cycle to focus.
+      </div>
+
+    </div><!-- /tracker tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  var target = document.getElementById('tab-'+tab);
+  if (target) target.classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============ CYCLE SELECTOR ============ */
+var CYCLES = {
+  1: {
+    name: 'Cycle 1 · Heal First (Anti-Aging + Gut)',
+    short: 'Cycle 1 · Heal First',
+    compounds: ['epitalon','pinealon','wolverine'],
+    items: [
+      {label:'Epitalon 50 mg × 1 vial @ $75', price:75.00},
+      {label:'Pinealon 10 mg × 2 vials @ $30', price:60.00},
+      {label:'Wolverine Blend (BPC+TB) × 2 vials @ $50', price:100.00}
+    ],
+    subtotal: 235.00,
+    bundle: 235.00,
+    rationale: "Heal first. Epitalon + Pinealon reset the sleep/circadian/cognitive axis that daily alcohol + chronic stress have downregulated. Wolverine (BPC+TB) calms the gut lining and bridges the bloating piece. This is the 3-week investment that makes everything downstream work faster."
+  },
+  2: {
+    name: 'Cycle 2 · Fat Loss + Energy',
+    short: 'Cycle 2 · Fat Loss',
+    compounds: ['reta','cagri','mots'],
+    items: [
+      {label:'Retatrutide 30 mg × 1 vial @ $100', price:100.00},
+      {label:'Cagrilintide 10 mg × 1 vial @ $60', price:60.00},
+      {label:'MOTS-c 20 mg × 2 vials @ $60', price:120.00}
+    ],
+    subtotal: 280.00,
+    bundle: 280.00,
+    rationale: "157 → 120 fat-loss engine. Reta drives the deficit through triple-agonist appetite + energy expenditure; Cagri layers in evening satiety without piling on GI side effects; MOTS-c keeps daytime energy steady through the cut. ~5-6 weeks at 1-1.5 lb/wk pace."
+  },
+  3: {
+    name: 'Cycle 3 · Sexual Health + Libido',
+    short: 'Cycle 3 · Libido',
+    compounds: ['kiss','pt141','oxy'],
+    items: [
+      {label:'Kisspeptin-10 10 mg × 2 vials @ $55', price:110.00},
+      {label:'PT-141 10 mg × 1 vial @ $55', price:55.00},
+      {label:'Oxytocin 10 mg × 2 vials @ $50', price:100.00}
+    ],
+    subtotal: 265.00,
+    bundle: 265.00,
+    rationale: "The 3-layer libido stack: Kisspeptin restores the upstream signal (nightly), PT-141 delivers on-demand desire (PRN before intimacy), Oxytocin restores the emotional connection layer. Together they hit the full picture, not just one piece."
+  },
+  4: {
+    name: 'Cycle 4 · Muscle Building',
+    short: 'Cycle 4 · Muscle',
+    compounds: ['cjc','aod'],
+    items: [
+      {label:'CJC-1295 No DAC 10 mg × 2 vials @ $45', price:90.00},
+      {label:'AOD-9604 5 mg × 2 vials @ $45', price:90.00}
+    ],
+    subtotal: 180.00,
+    bundle: 180.00,
+    rationale: "The 'finish strong' cycle. CJC No DAC builds lean tissue on the lighter frame; AOD-9604 targets the stubborn fat depots (lower abdomen, hips, back-of-arms) that hold on after the main fat-loss phase. This is what makes 120 lb look tight, not skinny-fat."
+  },
+  5: {
+    name: 'Always-On · As-Needed PRN',
+    short: 'PRN · Stress + Sleep',
+    compounds: ['selank','dsip'],
+    items: [
+      {label:'Selank 30 mg × 1 vial @ $45', price:45.00},
+      {label:'DSIP 10 mg × 1 vial @ $30', price:30.00}
+    ],
+    subtotal: 75.00,
+    bundle: 75.00,
+    rationale: "Your two PRN tools that run across all 4 cycles. Selank is the daytime stress dial — anti-anxiety without sedation or dependency. DSIP is the sleep rescue for nights when sleep won't come. Used wisely (not nightly), they make the whole protocol resilient to bad days."
+  }
+};
+
+function selectCycle(n){
+  document.querySelectorAll('.cycle').forEach(function(c){
+    c.classList.toggle('selected', parseInt(c.getAttribute('data-cycle'),10) === n);
+  });
+  var cyc = CYCLES[n];
+  document.querySelectorAll('details.li-row[data-cycle]').forEach(function(row){
+    var included = parseInt(row.getAttribute('data-cycle'),10) === n;
+    row.style.display = included ? '' : 'none';
+    if (!included) row.open = false;
+  });
+  var count = cyc.compounds.length;
+  var title = document.getElementById('compound-count-title');
+  if (title) title.innerHTML = count + ' Compound' + (count > 1 ? 's' : '') + ' &middot; Tap to Expand';
+  var th = document.getElementById('cycle-title-h');
+  if (th) th.textContent = cyc.name;
+
+  var rows = '';
+  for (var i = 0; i < cyc.items.length; i++){
+    rows += '<div class="total-row"><span>' + cyc.items[i].label + '</span><span>$' + cyc.items[i].price.toFixed(2) + '</span></div>';
+  }
+  rows += '<div class="total-row sub"><span>Subtotal &middot; This Cycle</span><span>$' + cyc.subtotal.toFixed(2) + '</span></div>';
+  rows += '<div style="background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:14px 18px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">'
+    + '<div style="flex:1;min-width:240px;">'
+    + '<div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">&#128150; ' + cyc.short + ' &middot; Friends &amp; Family</div>'
+    + '<div style="font-size:13px;color:#3d2f10;line-height:1.6;">' + cyc.rationale + '</div>'
+    + '</div>'
+    + '<div style="text-align:right;">'
+    + '<div style="font-family:\'Cormorant Garamond\',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1;">$' + cyc.bundle.toFixed(0) + '</div>'
+    + '</div>'
+    + '</div>';
+  rows += '<div class="total-row grand"><span>Total &mdash; ' + cyc.short + '</span><span class="val">$' + cyc.bundle.toFixed(2) + '</span></div>';
+  rows += '<div class="total-row" style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--border);"><span style="font-size:11px;color:var(--muted);letter-spacing:0.10em;text-transform:uppercase;font-weight:700;">All 4 Cycles + PRN Combined</span><span style="font-family:\'Cormorant Garamond\',serif;font-size:22px;font-weight:700;color:var(--text);">$1,035.00</span></div>';
+
+  document.getElementById('totals-block').innerHTML = rows;
+}
+
+document.addEventListener('DOMContentLoaded', function(){ selectCycle(1); });
+
+/* ============ ICS CALENDAR EXPORT ============ */
+function downloadICS(){
+  var v = document.getElementById('cycleStart').value;
+  if (!v) { alert('Please pick your Cycle 1 Day 1 first.'); return; }
+  var p = v.split('-');
+  var start = new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
+  function pad(n){ return n < 10 ? '0' + n : String(n); }
+  function icsD(d){ return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+  function addDays(d, n){ var x = new Date(d); x.setDate(x.getDate() + n); return x; }
+  var stamp = icsD(new Date()) + 'T080000Z';
+  var dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts = [];
+  function addE(d, title, desc, lbl){
+    var uid = icsD(d) + '-' + lbl + '-sstarr@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:' + uid,'DTSTAMP:' + stamp,
+      'DTSTART;VALUE=DATE:' + icsD(d),'DTEND;VALUE=DATE:' + icsD(addDays(d,1)),
+      'SUMMARY:' + title,'DESCRIPTION:' + desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked Sonya','END:VALARM','END:VEVENT');
+  }
+  // Cycle 1: 20 days of Pinealon AM + Epitalon PM. Wolverine alternates AM/PM through day 40.
+  for (var i = 0; i < 40; i++){
+    var date = addDays(start, i);
+    var dow = date.getDay();
+    var lines = [];
+    if (i < 20){
+      lines.push('AM (fasted OK): Pinealon 40u / 0.40 mL (2 mg) — SubQ abdomen');
+      lines.push('Pre-bed: Epitalon 15u / 0.15 mL (2.5 mg) — SubQ abdomen');
+    }
+    if (i % 2 === 0){
+      lines.push('AM: Wolverine 10u / 0.10 mL (500 mcg total) — SubQ abdomen');
+    } else {
+      lines.push('PM: Wolverine 10u / 0.10 mL (500 mcg total) — SubQ abdomen');
+    }
+    if (lines.length === 0) continue;
+    var phase = i < 20 ? 'Cycle 1 Day ' + (i+1) + '/20' : 'Wolverine Bridge';
+    var title = 'BLS · Sonya · ' + phase + ' · ' + dayNames[dow];
+    var desc = 'Sonya · 4-Cycle Protocol · ' + phase + '\\n\\n' + lines.join('\\n');
+    addE(date, title, desc, 'C1D' + (i+1));
+  }
+  var ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Sonya Starr 4-Cycle//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Sonya Starr Cycle 1','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a'); a.href = url; a.download = 'Sonya-Starr-Cycle1.ics';
+  document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
+}
+
+/* ============ DAILY TRACKER ============ */
+(function(){
+  var KEY = 'sstarr-tracker-v1';
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function todayLabel(){
+    var d = new Date();
+    return d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  }
+  function load(){
+    try { var raw = JSON.parse(localStorage.getItem(KEY)||'{}'); if (raw.date === todayKey()) return raw.checked || {}; } catch(e){}
+    return {};
+  }
+  function save(state){
+    localStorage.setItem(KEY, JSON.stringify({date: todayKey(), checked: state}));
+  }
+  var state = load();
+  function refreshCounts(){
+    var items = document.querySelectorAll('.med-item');
+    var total = items.length;
+    var done = 0;
+    items.forEach(function(i){ if (i.classList.contains('checked')) done++; });
+    var d = document.getElementById('tracker-done');
+    var t = document.getElementById('tracker-total');
+    if (d) d.textContent = done;
+    if (t) t.textContent = total;
+  }
+  function init(){
+    var today = document.getElementById('tracker-today');
+    if (today) today.textContent = todayLabel();
+    document.querySelectorAll('.med-item').forEach(function(item){
+      var id = item.dataset.id;
+      if (state[id]) item.classList.add('checked');
+      item.addEventListener('click', function(){
+        item.classList.toggle('checked');
+        state[id] = item.classList.contains('checked');
+        save(state);
+        refreshCounts();
+      });
+    });
+    refreshCounts();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+  window.resetTracker = function(){
+    if (!confirm('Reset today\'s tracker? All checks will be cleared.')) return;
+    state = {};
+    save(state);
+    document.querySelectorAll('.med-item').forEach(function(i){ i.classList.remove('checked'); });
+    refreshCounts();
+  };
+})();
+</script>
+
+<!-- iOS install button handler + PWA -->
+<script>
+(function(){
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; });
+  var btn = document.getElementById('ios-install-btn');
+  if (btn) btn.addEventListener('click', async function(){
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    if (isIOS) {
+      alert('To install on iPhone:\n\n1. Tap the Share button (square with up arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right\n\nThen open from your home screen — full-screen tracker, works offline.');
+      return;
+    }
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      return;
+    }
+    alert('Open this page in mobile Safari (iPhone) or Chrome (Android) on your phone to install it as an app.');
+  });
+})();
+</script>
+
+<!-- PWA banner + SW -->
+<style>
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner.show{display:flex;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
+.bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.bl-pwa-install{background:#7A6530;color:#fff;}
+.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
+@media print{.bl-pwa-banner{display:none !important;}}
+</style>
+<div class="bl-pwa-banner" id="bl-pwa-banner">
+  <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
+  <div class="bl-pwa-banner-actions">
+    <button class="bl-pwa-banner-btn bl-pwa-install" id="bl-pwa-install-btn" style="display:none">Install</button>
+    <button class="bl-pwa-banner-btn bl-pwa-dismiss" id="bl-pwa-dismiss-btn">Not now</button>
+  </div>
+</div>
+<script>
+(function(){
+  if ('serviceWorker' in navigator) {
+    let hadController_ = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController_) window.location.reload(); });
+    window.addEventListener("load", () => { navigator.serviceWorker.register('/sstarr/sw.js').catch(()=>{}); });
+  }
+  var DISMISS_KEY = 'bl-pwa-dismiss-sstarr';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-block'; });
+  function show(){
+    if (isIOS) textEl.innerHTML = '<strong>Sonya, install your tracker:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    else if (isAndroid) textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access to your daily tracker.';
+    else textEl.innerHTML = '<strong>Tip:</strong> install this on your phone. Open in mobile Safari or Chrome.';
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){ banner.classList.remove('show'); localStorage.setItem(DISMISS_KEY, '1'); });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') { banner.classList.remove('show'); localStorage.setItem(DISMISS_KEY, '1'); }
+  });
+  if (isIOS || isAndroid) setTimeout(show, 1500);
+})();
+</script>
+
+</body>
+</html>
