@@ -370,6 +370,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
     <div class="fg" style="margin-bottom:0"><div class="flabel">Today's Date <span class="req">*</span></div><input type="text" id="sigDate" placeholder="MM/DD/YYYY" readonly style="background:#ebebeb;color:var(--muted);"></div>
   </div>
   <div class="sig-note">By typing your name and submitting, you confirm your agreement to all statements above. This electronic signature is legally binding in most jurisdictions.</div>
+  <div aria-hidden="true" style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;"><label>Leave this field empty<input type="text" id="hpField" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
   <div class="fnav"><button class="nbtn" onclick="goTo(6)">&larr; Back</button><span class="step-info">Step 7 of 7</span><button class="nbtn primary" onclick="submitForm()">Submit Intake ✓</button></div>
 </div>
 
@@ -458,6 +459,7 @@ async function submitForm(){
   data.append('Signature Date',document.getElementById('sigDate')?.value||'');
   data.append('Consent Confirmed','Yes — all 6 consent statements acknowledged');
   data.append('Submission Timestamp',new Date().toISOString());
+  data.append('_gotcha',document.getElementById('hpField')?.value||'');
   try{
     const res=await fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:data,headers:{'Accept':'application/json'}});
     if(res.ok){document.getElementById('sec7').classList.remove('active');document.getElementById('successScreen').classList.add('active');document.getElementById('barFill').style.width='100%';document.getElementById('stepText').textContent='Complete ✓';cur=TOTAL;buildDots();window.scrollTo({top:0,behavior:'smooth'});}
