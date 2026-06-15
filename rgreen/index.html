@@ -338,7 +338,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
         <div class="program-badges">
           <span class="program-badge"><strong>~8&ndash;10 Wk</strong> Active Cycle</span>
-          <span class="program-badge"><strong>7</strong> Compounds &middot; 9 Vials</span>
+          <span class="program-badge"><strong>7</strong> Compounds &middot; 10 Vials</span>
           <span class="program-badge">Recomp &middot; Energy &middot; Recovery</span>
           <span class="program-badge">Cognitive &middot; Libido</span>
           <span class="program-badge">First-Time Injector Ramp</span>
@@ -702,14 +702,14 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="supply-row">
           <div class="supply-info">
             <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 200-pack</div>
-            <div class="supply-info-desc">Short, thin needle for SubQ shots. One per injection &mdash; never reuse. With ~25 shots/week across the full stack, the 200-pack lasts ~8 weeks.</div>
+            <div class="supply-info-desc">Short, thin needle for SubQ shots. One per injection &mdash; never reuse. With ~21 shots/week peak (Wks 1&ndash;4) tapering as compounds finish, the 200-pack covers the full active cycle with margin.</div>
           </div>
           <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
         </div>
         <div class="supply-row">
           <div class="supply-info">
             <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL bottle</div>
-            <div class="supply-info-desc">Sterile water with a preservative. Used to mix your dry peptide powder into a liquid you can draw. You'll use ~25 mL across all 9 vials &mdash; one 30 mL bottle covers the stack with buffer.</div>
+            <div class="supply-info-desc">Sterile water with a preservative. Used to mix your dry peptide powder into a liquid you can draw. You'll use ~29 mL across all 10 vials (Oxytocin alone is 10 mL of the total) &mdash; one 30 mL bottle covers the stack exactly. Grab a second bottle if you want buffer.</div>
           </div>
           <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">McGuff &rarr;</a>
         </div>
@@ -923,10 +923,11 @@ function downloadICS(){
   // 10-week active cycle:
   //   Reta M/W/F AM all 10 wks (30 doses, 1 vial)
   //   MOTS M-F AM fasted, Wks 1-8 (40 doses, 2 vials)
-  //   Semax M/W/F AM, Wks 1-6/7 (20 doses, 1 vial -> ~6.7 wks; truncate at Wk 7)
+  //   Semax M/W/F AM, capped at 20 doses (1 vial; finishes Wed of Wk 7)
   //   Wolverine M-F PM, Wks 1-4 (20 doses, 2 vials)
   //   CJC/Ipa M-F PM fasted, Wks 1-8 (40 doses, 2 vials)
   // PT-141 + Oxytocin are PRN, not on calendar.
+  var semaxRemaining = 20;
   for (var w = 0; w < 10; w++){
     for (var d = 0; d < 7; d++){
       var date = addDays(start, w * 7 + d);
@@ -938,7 +939,7 @@ function downloadICS(){
       var pmLines = [];
       if (isMWF) amLines.push('  - Retatrutide 1 mg → 10u (0.10 mL) · SubQ abdomen');
       if (w < 8) amLines.push('  - MOTS-c 1 mg → 10u (0.10 mL) · SubQ different site, fasted');
-      if (isMWF && w < 7) amLines.push('  - Semax 500 mcg → 10u (0.10 mL) · SubQ different site');
+      if (isMWF && semaxRemaining > 0){ amLines.push('  - Semax 500 mcg → 10u (0.10 mL) · SubQ different site'); semaxRemaining--; }
       if (w < 4) pmLines.push('  - Wolverine Stack 1 mg → 20u (0.20 mL) · SubQ abdomen, pre-bed');
       if (w < 8) pmLines.push('  - CJC/Ipa 250 mcg ea → 10u (0.10 mL) · SubQ different site, fasted pre-bed');
       var shots = amLines.length + pmLines.length;
