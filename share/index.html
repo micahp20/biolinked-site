@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>BLS Share Helper</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;background:#f5f5f5;color:#000;padding:18px 14px 80px;min-height:100vh;-webkit-tap-highlight-color:transparent;}
+.wrap{max-width:560px;margin:0 auto;}
+.hd{text-align:center;padding:24px 0 18px;border-bottom:1px solid rgba(122,101,48,0.2);margin-bottom:18px;}
+.hd-brand{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:#1a1a1a;letter-spacing:0.04em;line-height:1;}
+.hd-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:#7A6530;margin-top:6px;}
+.hd-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-top:14px;}
+.hd-help{font-size:12.5px;color:#4a4a44;margin-top:8px;line-height:1.65;padding:0 6px;}
+.search{width:100%;padding:14px 16px;border:1px solid rgba(122,101,48,0.35);border-radius:4px;font-size:16px;background:#fff;outline:none;margin-bottom:14px;font-family:'Montserrat',sans-serif;}
+.search:focus{border-color:#7A6530;box-shadow:0 0 0 2px rgba(122,101,48,0.10);}
+.list{display:flex;flex-direction:column;gap:6px;}
+.row{background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:3px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;transition:all 0.18s;}
+.row:hover,.row:active{background:#fafafa;border-color:#7A6530;}
+.row-slug{font-size:14.5px;font-weight:600;color:#000;}
+.row-type{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#7A6530;background:rgba(122,101,48,0.10);padding:3px 9px;border-radius:99px;flex-shrink:0;}
+.row.copied{background:rgba(58,122,90,0.10);border-color:#3a7a5a;}
+.row.copied .row-slug{color:#1f4f3a;}
+.row.copied .row-type{background:#3a7a5a;color:#fff;}
+.empty{text-align:center;padding:30px;font-size:13px;color:#4a4a44;}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(120px);background:#1a1a1a;color:#fff;padding:14px 22px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;transition:all 0.22s;pointer-events:none;z-index:100;box-shadow:0 6px 20px rgba(0,0,0,0.25);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.footer{margin-top:24px;padding:14px 16px;font-size:11px;color:#6b6b65;line-height:1.65;text-align:center;background:rgba(122,101,48,0.04);border:1px dashed rgba(122,101,48,0.25);border-radius:3px;}
+.footer code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10.5px;background:rgba(0,0,0,0.05);padding:1px 6px;border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div class="hd-brand">BioLinked</div>
+    <div class="hd-sub">Share Helper</div>
+    <div class="hd-title">Cache-Busted Client Links</div>
+    <div class="hd-help">Tap a client. The fresh URL is copied to your clipboard &mdash; paste it into iMessage. Every send gets a unique URL so the preview always renders the compact BioLinked card.</div>
+  </div>
+  <input type="search" class="search" id="search" placeholder="Search client name&hellip;" autocomplete="off" autocapitalize="off" spellcheck="false">
+  <div class="list" id="list"></div>
+  <div class="footer">Bookmark this page (<code>/share</code>) on your phone home screen for one-tap access. The <code>?v=&lt;random&gt;</code> on each URL is what bypasses iMessage's preview cache.</div>
+</div>
+<div class="toast" id="toast">URL copied &middot; paste into iMessage</div>
+<script>
+// type: 'f' = folder URL (trailing slash), 'h' = .html file at root
+var CLIENTS = [
+  ['aburr','f'],['agreen','f'],['ahartman','f'],['awilson','f'],
+  ['bdelorenzo','f'],['benhartman','f'],['bhartman','f'],['bpollard','f'],['bspeidell','f'],
+  ['cesparza','f'],['chartman','f'],['cmaclean','f'],['cmakowiecki','f'],['cmaynes','f'],['cmyers','f'],['cpeters','f'],
+  ['dcoone','f'],['dholm','f'],['dmaynes','f'],
+  ['ejirikils','h'],
+  ['gpadilla','f'],
+  ['hgarza','f'],
+  ['jdelorenzo','f'],['jemery','f'],['jholm','f'],['jiis','f'],
+  ['jmaclean','h'],['jmaynes','f'],['jmyers','h'],['jsanders','h'],
+  ['kdrieshman','f'],['kmatthiessen','f'],['knelson','f'],['kwells','h'],
+  ['lesparza','f'],
+  ['mamaholm','f'],['mberto','f'],['mhartman','f'],['mjirikils','f'],['mpauldino','f'],
+  ['ngillan','f'],
+  ['pauldinos','f'],
+  ['rgreen','f'],
+  ['scastellanos','f'],['scoffe','f'],['shinds','f'],['skingsford','f'],['sstarr','f'],
+  ['tkretzer','f'],['tlefree','f']
+];
+
+var list = document.getElementById('list');
+var search = document.getElementById('search');
+var toast = document.getElementById('toast');
+var toastTimer;
+
+function buildURL(slug, type){
+  var v = Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+  var path = type === 'h' ? slug + '.html' : slug + '/';
+  return 'https://biolinkedsolutions.com/' + path + '?v=' + v;
+}
+
+function showToast(text){
+  toast.textContent = text || 'URL copied · paste into iMessage';
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 1800);
+}
+
+function copyURL(slug, type, rowEl){
+  var url = buildURL(slug, type);
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(function(){
+      rowEl.classList.add('copied');
+      setTimeout(function(){ rowEl.classList.remove('copied'); }, 1400);
+      showToast();
+    }).catch(function(){
+      fallbackCopy(url, rowEl);
+    });
+  } else {
+    fallbackCopy(url, rowEl);
+  }
+}
+
+function fallbackCopy(url, rowEl){
+  var t = document.createElement('textarea');
+  t.value = url;
+  t.style.position = 'fixed';
+  t.style.top = '-1000px';
+  document.body.appendChild(t);
+  t.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(t);
+  rowEl.classList.add('copied');
+  setTimeout(function(){ rowEl.classList.remove('copied'); }, 1400);
+  showToast();
+}
+
+function render(filter){
+  list.innerHTML = '';
+  var f = (filter || '').toLowerCase().trim();
+  var filtered = f ? CLIENTS.filter(function(c){ return c[0].indexOf(f) !== -1; }) : CLIENTS;
+  if (filtered.length === 0){
+    list.innerHTML = '<div class="empty">No matches.</div>';
+    return;
+  }
+  filtered.forEach(function(c){
+    var slug = c[0], type = c[1];
+    var row = document.createElement('div');
+    row.className = 'row';
+    row.innerHTML = '<span class="row-slug">' + slug + '</span><span class="row-type">' + (type === 'h' ? '.html' : 'folder') + '</span>';
+    row.addEventListener('click', function(){ copyURL(slug, type, row); });
+    list.appendChild(row);
+  });
+}
+
+search.addEventListener('input', function(e){ render(e.target.value); });
+render();
+</script>
+</body>
+</html>
