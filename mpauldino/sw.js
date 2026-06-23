@@ -1,10 +1,11 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'mpauldino-v13';
+const CACHE = 'mpauldino-v14';
 const ASSETS = [
   '/mpauldino/',
   '/mpauldino/index.html',
   '/mpauldino/manifest.json',
+  '/mpauldino/photo.jpg',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
