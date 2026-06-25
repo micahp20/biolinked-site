@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'jmaynes-v3';
+const CACHE = 'jmaynes-v4';
 const ASSETS = [
   '/jmaynes/',
   '/jmaynes/index.html',
