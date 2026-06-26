@@ -1869,6 +1869,20 @@ async function deleteItem(kind, id){
 
   try {
     await sbWrite(table, "DELETE", null, `?id=eq.${encodeURIComponent(id)}`);
+
+    // Inventory reconciliation on delete (mirror of the save-time logic):
+    //  - Sale deleted     → vials return to stock (+qty)
+    //  - Order deleted AND it was received → vials removed from stock (-qty)
+    //  - Non-received orders never bumped stock, so no decrement needed
+    //  - Inventory / product / client / vendor deletes don't touch stock here
+    if (kind === "sale" && item && item.product_id && (item.qty || 0) > 0) {
+      try { await adjustInventoryForProduct(item.product_id, +(item.qty || 0)); }
+      catch (invErr) { console.warn("Inventory restore on sale delete failed:", invErr); }
+    } else if (kind === "order" && item && item.status === "received" && item.product_id && (item.qty || 0) > 0) {
+      try { await adjustInventoryForProduct(item.product_id, -(item.qty || 0)); }
+      catch (invErr) { console.warn("Inventory decrement on received-order delete failed:", invErr); }
+    }
+
     for (const d of linkedDeletes) {
       try {
         await sbWrite(d.table, "DELETE", null, `?id=eq.${encodeURIComponent(d.id)}`);
