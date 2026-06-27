@@ -65,11 +65,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 
 /* Info tooltip — ? icon on peptide / med names */
 .info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
-.info-tip:hover,.info-tip:focus{background:var(--gold);color:#fff;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--gold);color:#fff;}
 .info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
 .info-tip-text strong{color:#e9c66c;font-weight:600;}
 .info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a1a;}
-.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text{opacity:1;}
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
 @media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
 
 /* Compound + med flat rows (non-expandable) */
@@ -290,7 +290,7 @@ details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gol
 .lab-section-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--gold);letter-spacing:0.04em;text-transform:uppercase;}
 .lab-section-sub{font-size:10px;font-weight:500;color:var(--muted);margin-top:1px;letter-spacing:0.04em;}
 
-.lab-row{display:grid;grid-template-columns:1.7fr 1fr auto auto;gap:10px 14px;align-items:baseline;padding:7px 4px;border-bottom:1px dotted #ebe5cf;font-size:13px;}
+.lab-row{position:relative;display:grid;grid-template-columns:1.7fr 1fr auto auto;gap:10px 14px;align-items:baseline;padding:7px 4px;border-bottom:1px dotted #ebe5cf;font-size:13px;}
 .lab-row:last-child{border-bottom:none;}
 .lab-name{font-weight:500;color:var(--text);min-width:0;}
 .lab-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--text);white-space:nowrap;text-align:right;}
@@ -318,6 +318,28 @@ details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gol
   .lab-status{grid-area:status;font-size:8px;padding:1px 6px;min-width:auto;}
   .lab-header-title{font-size:20px;}
   .lab-section-title{font-size:14px;}
+
+  /* On mobile, anchor lab-row tooltips to the ROW container (not the icon) so they span the row width and never clip off-screen */
+  .lab-row .info-tip{position:static;}
+  .lab-row .info-tip-text{
+    position:absolute;
+    bottom:auto;
+    top:calc(100% + 2px);
+    left:4px;
+    right:4px;
+    width:auto;
+    max-width:none;
+    transform:none;
+    margin:0;
+  }
+  .lab-row .info-tip-text::after{
+    top:-9px;
+    bottom:auto;
+    left:14px;
+    transform:none;
+    border-bottom-color:#1a1a1a;
+    border-top-color:transparent;
+  }
 }
 
 /* ===== Legacy Bloodwork tab styles (unused after the flat rebuild — kept for safety) ===== */
@@ -1251,6 +1273,22 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 });
+
+// ===== INFO-TIP TAP/CLICK TOGGLE — fixes iOS Safari tap not showing tooltips =====
+// Tap the ? once to open; tap again (or anywhere else) to close. Stops propagation so the
+// click doesn't toggle the parent <details> or trigger anything underneath.
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  // Close every open tooltip that's not the one being clicked
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if (t !== tip) t.classList.remove('is-open');
+  });
+  if (tip){
+    e.preventDefault();
+    e.stopPropagation();
+    tip.classList.toggle('is-open');
+  }
+}, true);  // useCapture: true so we run BEFORE the summary's default toggle handler
 </script>
 </body>
 </html>
