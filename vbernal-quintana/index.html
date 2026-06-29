@@ -89,24 +89,41 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
 .sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
 
-/* Phase / cycle overview cards (cpeters-style) — each cycle is independently buyable */
-.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;}
-.tier{background:#fff;border:1px solid var(--border);border-radius:6px;padding:22px 20px;display:flex;flex-direction:column;position:relative;transition:all 0.2s;}
-.tier:hover{border-color:var(--gold-border);transform:translateY(-2px);}
+/* Cycle cards — full-width expandable details, stack vertically (one per row) so compound rows fit inside */
+.tier-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+details.tier{background:#fff;border:1px solid var(--border);border-radius:6px;display:block;padding:0;transition:all 0.2s;}
+details.tier:hover{border-color:var(--gold-border);}
+details[open].tier{box-shadow:0 4px 18px rgba(0,0,0,0.06);}
+details.tier > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:18px 56px 18px 22px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;position:relative;}
+details.tier > summary::-webkit-details-marker{display:none;}
+details.tier > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].tier > summary::after{content:'\2212';background:var(--gold-dim);}
+details.tier > summary:hover::after{border-color:var(--gold);}
+.tier-summary-main{flex:1;min-width:220px;}
+.tier-summary-price{flex:0 0 auto;text-align:right;min-width:90px;}
 .tier-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px;}
 .tier-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.1;margin-bottom:4px;}
-.tier-tagline{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;line-height:1.2;margin:10px 0 4px;}
-.tier-cadence{font-size:11px;color:var(--muted);margin-bottom:14px;}
-.tier-includes{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;margin-top:6px;}
+.tier-tagline{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;line-height:1.2;margin:6px 0 4px;}
+.tier-cadence{font-size:11px;color:var(--muted);margin-top:2px;}
+.tier-body{padding:4px 22px 22px;border-top:1px solid var(--border);background:#fafafa;}
+.tier-body > *:first-child{margin-top:14px;}
+.tier-includes{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
 .tier-compounds{list-style:none;padding:0;margin-bottom:14px;}
 .tier-compounds li{font-size:12.5px;color:var(--text);padding:3px 0;display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
 .tier-compounds li::before{content:'•';color:var(--gold);font-weight:700;flex-shrink:0;}
 .tier-desc{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:14px;}
 .tier-desc strong{color:var(--gold);font-weight:700;}
-.tier-pricetag{margin-top:auto;padding-top:14px;border-top:1px dashed var(--border);text-align:center;}
 .tier-pricetag-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
-.tier-pricetag-amount{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;line-height:1;}
+.tier-pricetag-amount{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;line-height:1;}
 .tier-pricetag-sub{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;letter-spacing:0.04em;}
+@media(max-width:640px){
+  details.tier > summary{padding:14px 46px 14px 16px;}
+  details.tier > summary::after{right:12px;width:24px;height:24px;font-size:16px;}
+  .tier-name{font-size:19px;}
+  .tier-tagline{font-size:15px;}
+  .tier-pricetag-amount{font-size:26px;}
+  .tier-body{padding:4px 16px 18px;}
+}
 
 .cycle-card{background:linear-gradient(135deg,rgba(122,101,48,0.06),rgba(122,101,48,0.02));border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:14px 18px;margin-bottom:14px;}
 .cycle-card-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;}
@@ -390,126 +407,46 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="program-tag">Feel comfortable in your own skin &middot; cycle through 12 compounds across 4 phases.</div>
         <div class="program-context">
           <p><strong>The frame.</strong> You're 59, postmenopausal, on HRT, training 5+ days a week, eating clean &mdash; doing everything right and still fighting stubborn belly fat that won't move. That last layer of abdominal fat in postmenopausal women on HRT is its own physiology problem: <strong>not a calories problem, not a training problem.</strong> It's a hormone-driven fat-distribution problem (more on that in the Bloodwork tab). The compounds in this protocol target the actual mechanisms holding that fat in place &mdash; not the layers you've already optimized.</p>
-          <p><strong>The structure: 4 cycles, not 4 tiers.</strong> Instead of picking one package, you run all four sequentially (or stack them in parallel where they don't conflict). Each cycle targets a different goal lane:</p>
-          <p><strong>Cycle 1 &mdash; Stubborn Fat + Muscle ($450).</strong> Reta (the belly-fat anchor) + CJC/Ipa (lean tissue protection + sleep depth) + 5-Amino-1MQ (NNMT blocker, the over-50 fat-accelerator) + KLOW Blend (gut healing + inflammation + skin). The core 8-week run.</p>
-          <p><strong>Cycle 2 &mdash; Longevity + Anti-Aging ($280).</strong> Pinealon + Epitalon (Khavinson short bioregulator courses) + FOXO4-DRI (senolytic burst). Two 10-day courses + a 2&ndash;3 day senolytic burst. Run after Cycle 1 or in parallel with the AM block since timing is independent.</p>
-          <p><strong>Cycle 3 &mdash; Hormonal Balance + Libido ($265).</strong> PT-141 (melanocortin agonist for arousal) + Kisspeptin-10 (hypothalamic LH/FSH signal) + Oxytocin (intimacy + bonding). Used PRN or twice-weekly &mdash; not a daily routine, more of a tool kit.</p>
-          <p><strong>Cycle 4 &mdash; As Needed ($120).</strong> DSIP (deep sleep when you need it) + Selank (stress edge-off when you need it). PRN, no schedule pressure.</p>
-          <p><strong>Run-till-empty structure.</strong> No fixed week-count. The schedule below shows a typical week pulling from Cycle 1 + Cycle 4 PRN. Cycles 2 and 3 layer in when you're ready for them.</p>
+          <p><strong>The structure: 4 cycles, not 4 tiers.</strong> Instead of picking one package, run them sequentially (or stack in parallel where timing doesn't conflict). Each cycle below is independently buyable &mdash; tap any card to see the compound details, recon math, and "why it's in your protocol" notes for that cycle.</p>
         </div>
       </div>
 
-      <!-- ================ PHASE OVERVIEW — 4 BUY-INDEPENDENTLY CYCLES ================ -->
+      <!-- ================ CYCLE CARDS — 4 EXPANDABLE, ONE PER ROW ================ -->
       <div class="sec-divider">
         <div class="sec-divider-eyebrow">How the Stack Runs</div>
-        <div class="sec-divider-title">4 Cycles &middot; Buy One At a Time</div>
+        <div class="sec-divider-title">4 Cycles &middot; Buy One At a Time &middot; Tap to Expand</div>
       </div>
 
       <div style="background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:12px 16px;border-radius:2px;margin-bottom:16px;font-size:13px;color:#3d2f10;line-height:1.65;">
-        <strong style="color:var(--gold);">No need to grab the full stack up front.</strong> Each cycle is independently buyable &mdash; pick the one that matches what you want to work on first (Cycle 1 is the recommended starting point for the stubborn belly fat goal), then layer in the others as you're ready. <strong>Tap any cycle card below to see the compound details, recon math, and schedule</strong> further down on this page.
+        <strong style="color:var(--gold);">No need to grab the full stack up front.</strong> Each cycle is independently buyable. Cycle 1 is the recommended starting point for the stubborn-belly-fat goal. <strong>Tap any cycle card below to expand</strong> &mdash; you'll see the compound details, recon math, dose + schedule, and "why it's in your protocol" notes for that cycle inside.
       </div>
 
       <div class="tier-grid">
-        <div class="tier" style="border-left:3px solid #bc3a3a;">
-          <div class="tier-eyebrow" style="color:#bc3a3a;">Cycle 1 &middot; Start Here</div>
-          <div class="tier-name">&#9878;&#65039; Fat Loss + Muscle</div>
-          <div class="tier-tagline" style="color:#bc3a3a;">Reta + CJC/Ipa + 5-Amino + KLOW</div>
-          <div class="tier-cadence">M&ndash;F daily + Reta once-weekly Monday &middot; 8-week core</div>
-          <div class="tier-includes">Targets</div>
-          <ul class="tier-compounds">
-            <li>Stubborn belly fat (visceral / android pattern)</li>
-            <li>Lean tissue protection through the deficit</li>
-            <li>Over-50 NNMT fat-storage block</li>
-            <li>Gut healing + inflammation + skin tone</li>
-          </ul>
-          <div class="tier-desc"><strong>The recommended starting point.</strong> Targets the actual mechanism keeping postmenopausal belly fat in place &mdash; not a calories-only approach.</div>
-          <div class="tier-pricetag">
-            <div class="tier-pricetag-label">Cycle 1 Price</div>
-            <div class="tier-pricetag-amount" style="color:#bc3a3a;">$450</div>
-            <div class="tier-pricetag-sub">4 compounds &middot; 6 vials</div>
-          </div>
-        </div>
 
-        <div class="tier" style="border-left:3px solid #5e3e85;">
-          <div class="tier-eyebrow" style="color:#5e3e85;">Cycle 2 &middot; When Ready</div>
-          <div class="tier-name">&#9203; Longevity + Anti-Aging</div>
-          <div class="tier-tagline" style="color:#5e3e85;">Pinealon + Epitalon + FOXO4-DRI</div>
-          <div class="tier-cadence">10-day courses + 2&ndash;3 day senolytic burst &middot; 2&ndash;3x/year</div>
-          <div class="tier-includes">Targets</div>
-          <ul class="tier-compounds">
-            <li>Pineal / neural cell repair (Pinealon)</li>
-            <li>Telomere maintenance + cellular reset (Epitalon)</li>
-            <li>Senescent-cell clearance (FOXO4-DRI)</li>
-            <li>Short cycles &mdash; minimal injection burden</li>
-          </ul>
-          <div class="tier-desc"><strong>Layer on after Cycle 1 is routine</strong> or run in parallel since timing doesn't conflict. Short-course pattern means low daily commitment.</div>
-          <div class="tier-pricetag">
-            <div class="tier-pricetag-label">Cycle 2 Price</div>
-            <div class="tier-pricetag-amount" style="color:#5e3e85;">$280</div>
-            <div class="tier-pricetag-sub">3 compounds &middot; 5 vials</div>
-          </div>
-        </div>
-
-        <div class="tier" style="border-left:3px solid #c44d7e;">
-          <div class="tier-eyebrow" style="color:#c44d7e;">Cycle 3 &middot; When Ready</div>
-          <div class="tier-name">&#128150; Hormonal Balance + Libido</div>
-          <div class="tier-tagline" style="color:#c44d7e;">PT-141 + Kisspeptin + Oxytocin</div>
-          <div class="tier-cadence">Kisspeptin Mon/Thu &middot; PT-141 + Oxy PRN</div>
-          <div class="tier-includes">Targets</div>
-          <ul class="tier-compounds">
-            <li>Central arousal pathway (PT-141 / melanocortin)</li>
-            <li>Underlying hormone-axis signal (Kisspeptin)</li>
-            <li>Connection + bonding layer (Oxytocin)</li>
-            <li>Tools, not a daily routine</li>
-          </ul>
-          <div class="tier-desc"><strong>The intimacy toolkit.</strong> Most postmenopausal HRT-only protocols miss the brain-side arousal + emotional-connection layer &mdash; this fills that gap.</div>
-          <div class="tier-pricetag">
-            <div class="tier-pricetag-label">Cycle 3 Price</div>
-            <div class="tier-pricetag-amount" style="color:#c44d7e;">$265</div>
-            <div class="tier-pricetag-sub">3 compounds &middot; 5 vials</div>
-          </div>
-        </div>
-
-        <div class="tier" style="border-left:3px solid #b97a1f;">
-          <div class="tier-eyebrow" style="color:#b97a1f;">Cycle 4 &middot; As Needed</div>
-          <div class="tier-name">&#127769; Sleep + Stress</div>
-          <div class="tier-tagline" style="color:#b97a1f;">DSIP + Selank</div>
-          <div class="tier-cadence">DSIP PRN pre-bed &middot; Selank M/W/F + PRN</div>
-          <div class="tier-includes">Targets</div>
-          <ul class="tier-compounds">
-            <li>Deeper sleep on rough nights (DSIP)</li>
-            <li>Stress edge / baseline anxiety (Selank tuftsin)</li>
-            <li>Non-addictive, fast-acting tools</li>
-            <li>PRN &mdash; no schedule pressure</li>
-          </ul>
-          <div class="tier-desc"><strong>The safety net.</strong> Reach for these on the days that need them. Pairs with the CJC/Ipa sleep stack from Cycle 1 without conflict.</div>
-          <div class="tier-pricetag">
-            <div class="tier-pricetag-label">Cycle 4 Price</div>
-            <div class="tier-pricetag-amount" style="color:#b97a1f;">$120</div>
-            <div class="tier-pricetag-sub">2 compounds &middot; 3 vials</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="text-align:center;font-size:11.5px;color:var(--muted);margin-bottom:30px;font-style:italic;">
-        Or grab everything together &mdash; <strong style="color:var(--gold);font-style:normal;">Full Stack = $1,115</strong> (saves you the back-and-forth on payments and supplies).
-      </div>
-
-      <!-- ================ CYCLE 1 — FAT LOSS + MUSCLE ================ -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Cycle 1 Detail &middot; Fat Loss + Muscle</div>
-        <div class="sec-divider-title">Reta + CJC/Ipa + 5-Amino + KLOW &middot; $450</div>
-      </div>
-
-      <div class="cycle-card" style="border-left-color:#bc3a3a;background:linear-gradient(135deg,rgba(188,58,58,0.06),rgba(188,58,58,0.02));">
-        <div class="cycle-card-eyebrow" style="color:#bc3a3a;">Why this cycle</div>
-        <div class="cycle-card-title">The Stubborn-Fat Anchor &middot; 8-Week Core</div>
-        <div class="cycle-card-desc"><strong style="color:#bc3a3a;">Reta</strong> for stubborn belly fat (triple-agonist GLP-1 + GIP + glucagon &mdash; the glucagon arm targets visceral fat directly). <strong style="color:#bc3a3a;">CJC/Ipa</strong> for muscle building + sleep depth (overnight GH pulse). <strong style="color:#bc3a3a;">5-Amino-1MQ</strong> as the fat accelerator (NNMT inhibitor, unlocks the over-50 adipose storage pattern). <strong style="color:#bc3a3a;">KLOW</strong> for gut healing, inflammation, and skin tone &mdash; the visible-results layer.</div>
-      </div>
-
-      <div class="line-items">
-
-        <!-- RETA -->
+        <details class="tier" style="border-left:4px solid #bc3a3a;">
+          <summary>
+            <div class="tier-summary-main">
+              <div class="tier-eyebrow" style="color:#bc3a3a;">Cycle 1 &middot; Start Here</div>
+              <div class="tier-name">&#9878;&#65039; Fat Loss + Muscle</div>
+              <div class="tier-tagline" style="color:#bc3a3a;">Reta + CJC/Ipa + 5-Amino + KLOW</div>
+              <div class="tier-cadence">M&ndash;F daily + Reta once-weekly Monday &middot; 8-week core</div>
+            </div>
+            <div class="tier-summary-price">
+              <div class="tier-pricetag-label">Price</div>
+              <div class="tier-pricetag-amount" style="color:#bc3a3a;">$450</div>
+              <div class="tier-pricetag-sub">4 compounds &middot; 6 vials</div>
+            </div>
+          </summary>
+          <div class="tier-body">
+            <div class="tier-includes">Targets</div>
+            <ul class="tier-compounds">
+              <li>Stubborn belly fat (visceral / android pattern)</li>
+              <li>Lean tissue protection through the deficit</li>
+              <li>Over-50 NNMT fat-storage block</li>
+              <li>Gut healing + inflammation + skin tone</li>
+            </ul>
+            <div class="tier-desc"><strong>The recommended starting point.</strong> Reta drives visceral-fat burn via the glucagon arm. CJC/Ipa protects lean tissue + deepens sleep overnight. 5-Amino blocks the over-50 fat-storage enzyme. KLOW handles inflammation + gut + skin tone.</div>
+            <div class="line-items">
         <details class="li-row">
           <summary>
             <span class="li-summary-name">Retatrutide &middot; 40 mg &middot; 1 vial</span>
@@ -527,8 +464,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 40 mg vial &divide; 2 mg/shot = 20 shots per vial. At 1&times;/wk = 20 weeks of supply &mdash; comfortably outlasts the formal 8-week Cycle 1.</div>
           </div>
         </details>
-
-        <!-- CJC / IPA -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">CJC-1295 / Ipamorelin &middot; 5 mg + 5 mg blend &middot; 2 vials</span>
@@ -546,8 +481,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 2 vials &times; 20 doses = 40 doses. At 5&times;/wk = 8 weeks exactly &mdash; matches Cycle 1 length.</div>
           </div>
         </details>
-
-        <!-- 5-AMINO -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">5-Amino-1MQ &middot; 50 mg &middot; 1 vial</span>
@@ -564,8 +497,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 50 mg vial &divide; 1.67 mg/shot = ~30 shots. At 5&times;/wk = 6 weeks. Finishes 2 weeks before Cycle 1 ends &mdash; we reassess at the empty mark whether to reorder for continuation.</div>
           </div>
         </details>
-
-        <!-- KLOW -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">KLOW Blend &middot; 80 mg &middot; 2 vials</span>
@@ -582,24 +513,34 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 2 vials &times; 20 doses = 40 doses. At 5&times;/wk = 8 weeks exactly &mdash; matches Cycle 1 length.</div>
           </div>
         </details>
+            </div>
+          </div>
+        </details>
 
-      </div>
-
-      <!-- ================ CYCLE 2 — LONGEVITY ================ -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Cycle 2 Detail &middot; Longevity + Anti-Aging</div>
-        <div class="sec-divider-title">Pinealon + Epitalon + FOXO4-DRI &middot; $280</div>
-      </div>
-
-      <div class="cycle-card" style="border-left-color:#5e3e85;background:linear-gradient(135deg,rgba(94,62,133,0.06),rgba(94,62,133,0.02));">
-        <div class="cycle-card-eyebrow" style="color:#5e3e85;">Why this cycle</div>
-        <div class="cycle-card-title">The Bioregulator + Senolytic Layer &middot; Short Targeted Courses</div>
-        <div class="cycle-card-desc"><strong style="color:#5e3e85;">Pinealon + Epitalon</strong> are Khavinson short bioregulators &mdash; tiny peptides that signal pineal/brain repair + telomere-length support. Run as <strong>10-day courses, 2&ndash;3 times per year</strong>. <strong style="color:#5e3e85;">FOXO4-DRI</strong> is a senolytic (clears senescent "zombie" cells that accumulate with age) &mdash; given as a short 2&ndash;3 day burst. These don't replace the daily stack; they're targeted longevity layers you cycle in.</div>
-      </div>
-
-      <div class="line-items">
-
-        <!-- PINEALON -->
+        <details class="tier" style="border-left:4px solid #5e3e85;">
+          <summary>
+            <div class="tier-summary-main">
+              <div class="tier-eyebrow" style="color:#5e3e85;">Cycle 2 &middot; When Ready</div>
+              <div class="tier-name">&#9203; Longevity + Anti-Aging</div>
+              <div class="tier-tagline" style="color:#5e3e85;">Pinealon + Epitalon + FOXO4-DRI</div>
+              <div class="tier-cadence">10-day courses + 2&ndash;3 day senolytic burst &middot; 2&ndash;3x/year</div>
+            </div>
+            <div class="tier-summary-price">
+              <div class="tier-pricetag-label">Price</div>
+              <div class="tier-pricetag-amount" style="color:#5e3e85;">$280</div>
+              <div class="tier-pricetag-sub">3 compounds &middot; 5 vials</div>
+            </div>
+          </summary>
+          <div class="tier-body">
+            <div class="tier-includes">Targets</div>
+            <ul class="tier-compounds">
+              <li>Pineal / neural cell repair (Pinealon)</li>
+              <li>Telomere maintenance + cellular reset (Epitalon)</li>
+              <li>Senescent-cell clearance (FOXO4-DRI)</li>
+              <li>Short cycles &mdash; minimal injection burden</li>
+            </ul>
+            <div class="tier-desc"><strong>Layer on after Cycle 1 is routine</strong> or run in parallel since timing doesn't conflict. Short-course pattern (10-day Pinealon + Epitalon + 2&ndash;3 day FOXO4-DRI burst) means low daily commitment. Run 2&ndash;3 times per year.</div>
+            <div class="line-items">
         <details class="li-row">
           <summary>
             <span class="li-summary-name">Pinealon &middot; 20 mg &middot; 2 vials</span>
@@ -616,8 +557,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 20 mg vial &divide; 2 mg/shot = 10 shots per vial. <strong>2 vials = 20 shots = two complete 10-day courses</strong> (run one course now, save the second for ~6 months later).</div>
           </div>
         </details>
-
-        <!-- EPITALON -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">Epitalon &middot; 50 mg &middot; 2 vials</span>
@@ -634,8 +573,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 50 mg vial &divide; 10 mg/shot = 5 shots per vial. <strong>2 vials = 10 shots = exactly one 10-day course</strong>. We typically repeat 2&ndash;3 times per year, so plan another order in ~4&ndash;6 months.</div>
           </div>
         </details>
-
-        <!-- FOXO4-DRI -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">FOXO4-DRI &middot; 10 mg &middot; 1 vial</span>
@@ -652,24 +589,34 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 10 mg vial &divide; 4 mg/shot = ~2.5 shots per vial. <strong>Run every day until empty = a 2&ndash;3 day burst</strong>, then pause. We reassess in 4&ndash;6 months whether to repeat.</div>
           </div>
         </details>
+            </div>
+          </div>
+        </details>
 
-      </div>
-
-      <!-- ================ CYCLE 3 — HORMONAL BALANCE ================ -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Cycle 3 Detail &middot; Hormonal Balance + Libido</div>
-        <div class="sec-divider-title">PT-141 + Kisspeptin-10 + Oxytocin &middot; $265</div>
-      </div>
-
-      <div class="cycle-card" style="border-left-color:#c44d7e;background:linear-gradient(135deg,rgba(196,77,126,0.06),rgba(196,77,126,0.02));">
-        <div class="cycle-card-eyebrow" style="color:#c44d7e;">Why this cycle</div>
-        <div class="cycle-card-title">The Intimacy + Hormonal-Axis Toolkit &middot; PRN / Twice-Weekly</div>
-        <div class="cycle-card-desc"><strong>Not a daily routine</strong> &mdash; these are tools you reach for when you want them. <strong style="color:#c44d7e;">PT-141</strong> is the melanocortin agonist that drives central arousal (works on the brain, not the vasculature). <strong style="color:#c44d7e;">Kisspeptin-10</strong> signals the hypothalamus to release LH/FSH &mdash; supports the natural hormone axis in postmenopausal women on HRT, helps with mood, libido, and energy. <strong style="color:#c44d7e;">Oxytocin</strong> is the bonding + intimacy hormone &mdash; used PRN before connecting moments.</div>
-      </div>
-
-      <div class="line-items">
-
-        <!-- PT-141 -->
+        <details class="tier" style="border-left:4px solid #c44d7e;">
+          <summary>
+            <div class="tier-summary-main">
+              <div class="tier-eyebrow" style="color:#c44d7e;">Cycle 3 &middot; When Ready</div>
+              <div class="tier-name">&#128150; Hormonal Balance + Libido</div>
+              <div class="tier-tagline" style="color:#c44d7e;">PT-141 + Kisspeptin + Oxytocin</div>
+              <div class="tier-cadence">Kisspeptin Mon/Thu &middot; PT-141 + Oxy PRN</div>
+            </div>
+            <div class="tier-summary-price">
+              <div class="tier-pricetag-label">Price</div>
+              <div class="tier-pricetag-amount" style="color:#c44d7e;">$265</div>
+              <div class="tier-pricetag-sub">3 compounds &middot; 5 vials</div>
+            </div>
+          </summary>
+          <div class="tier-body">
+            <div class="tier-includes">Targets</div>
+            <ul class="tier-compounds">
+              <li>Central arousal pathway (PT-141 / melanocortin)</li>
+              <li>Underlying hormone-axis signal (Kisspeptin)</li>
+              <li>Connection + bonding layer (Oxytocin)</li>
+              <li>Tools, not a daily routine</li>
+            </ul>
+            <div class="tier-desc"><strong>The intimacy toolkit.</strong> Most postmenopausal HRT-only protocols miss the brain-side arousal + emotional-connection layer &mdash; this fills that gap. PT-141 handles central arousal, Kisspeptin supports the underlying hormone axis, Oxytocin handles bonding + connection.</div>
+            <div class="line-items">
         <details class="li-row">
           <summary>
             <span class="li-summary-name">PT-141 (Bremelanotide) &middot; 10 mg &middot; 1 vial</span>
@@ -687,8 +634,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 10 mg vial &divide; 500 mcg/shot = 20 doses. At Mon/Thu cadence = 10 weeks of supply. Or use less frequently and stretch the vial further.</div>
           </div>
         </details>
-
-        <!-- KISSPEPTIN -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">Kisspeptin-10 &middot; 10 mg &middot; 2 vials</span>
@@ -705,8 +650,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 2 vials &times; 20 doses = 40 doses. At Mon/Thu cadence = 20 weeks of supply &mdash; long-running.</div>
           </div>
         </details>
-
-        <!-- OXYTOCIN -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">Oxytocin &middot; 10 mg &middot; 2 vials</span>
@@ -723,24 +666,34 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 2 vials &times; 100 doses (10 mg &divide; 100 mcg = 100 shots per vial) = 200 doses. <strong>You'll never run out</strong> at PRN cadence.</div>
           </div>
         </details>
+            </div>
+          </div>
+        </details>
 
-      </div>
-
-      <!-- ================ CYCLE 4 — AS NEEDED ================ -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Cycle 4 Detail &middot; As Needed</div>
-        <div class="sec-divider-title">DSIP + Selank &middot; $120</div>
-      </div>
-
-      <div class="cycle-card" style="border-left-color:#b97a1f;background:linear-gradient(135deg,rgba(185,122,31,0.06),rgba(185,122,31,0.02));">
-        <div class="cycle-card-eyebrow" style="color:#b97a1f;">Why this cycle</div>
-        <div class="cycle-card-title">Sleep + Stress Tools On Demand</div>
-        <div class="cycle-card-desc"><strong style="color:#b97a1f;">DSIP</strong> for the nights you need deeper sleep (rough day, travel, late training session, hormonal surge keeping you up). <strong style="color:#b97a1f;">Selank</strong> for the days that get away from you &mdash; stress edge, baseline anxiety, that "tight chest" feeling. Tuftsin-derivative anxiolytic, non-sedating, fast-acting. Both pair cleanly with your existing CJC/Ipa sleep stack.</div>
-      </div>
-
-      <div class="line-items">
-
-        <!-- DSIP -->
+        <details class="tier" style="border-left:4px solid #b97a1f;">
+          <summary>
+            <div class="tier-summary-main">
+              <div class="tier-eyebrow" style="color:#b97a1f;">Cycle 4 &middot; As Needed</div>
+              <div class="tier-name">&#127769; Sleep + Stress</div>
+              <div class="tier-tagline" style="color:#b97a1f;">DSIP + Selank</div>
+              <div class="tier-cadence">DSIP PRN pre-bed &middot; Selank M/W/F + PRN</div>
+            </div>
+            <div class="tier-summary-price">
+              <div class="tier-pricetag-label">Price</div>
+              <div class="tier-pricetag-amount" style="color:#b97a1f;">$120</div>
+              <div class="tier-pricetag-sub">2 compounds &middot; 3 vials</div>
+            </div>
+          </summary>
+          <div class="tier-body">
+            <div class="tier-includes">Targets</div>
+            <ul class="tier-compounds">
+              <li>Deeper sleep on rough nights (DSIP)</li>
+              <li>Stress edge / baseline anxiety (Selank tuftsin)</li>
+              <li>Non-addictive, fast-acting tools</li>
+              <li>PRN &mdash; no schedule pressure</li>
+            </ul>
+            <div class="tier-desc"><strong>The safety net.</strong> DSIP for deeper sleep when life is keeping you up; Selank for the stress edge / baseline anxiety estrogen fluctuations can drive. Both pair cleanly with the Cycle 1 CJC/Ipa sleep stack without conflict.</div>
+            <div class="line-items">
         <details class="li-row">
           <summary>
             <span class="li-summary-name">DSIP &middot; 10 mg &middot; 1 vial</span>
@@ -757,8 +710,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 10 mg vial &divide; 500 mcg = 20 doses. PRN use stretches this for months.</div>
           </div>
         </details>
-
-        <!-- SEMAX -->
         <details class="li-row">
           <summary>
             <span class="li-summary-name">Selank &middot; 10 mg &middot; 2 vials</span>
@@ -775,57 +726,11 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <div class="li-callout"><strong>Supply:</strong> 2 vials &times; 10 doses = 20 doses. At M/W/F = ~6&ndash;7 weeks. Pause / reorder as needed.</div>
           </div>
         </details>
-
-      </div>
-
-      <!-- ================ TOTALS — PER-CYCLE BREAKDOWN ================ -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Pricing &middot; Buy Cycles Individually</div>
-        <div class="sec-divider-title">Each Cycle Stands Alone &middot; Pay As You Go</div>
-      </div>
-
-      <div class="totals-block">
-        <div style="font-size:13px;color:#3d2f10;line-height:1.65;margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed var(--gold-border);"><strong style="color:var(--gold);">Pricing summary.</strong> Buy any cycle on its own &mdash; no commitment to the full stack. Cycle 1 is the recommended starting point ($450 for the 8-week core that addresses the stubborn belly fat goal). Add Cycles 2&ndash;4 individually as you're ready. Each cycle's full compound breakdown is itemized below.</div>
-
-        <!-- CYCLE 1 -->
-        <div class="total-row" style="font-weight:700;color:#bc3a3a;text-transform:uppercase;letter-spacing:0.08em;font-size:12px;border-left:3px solid #bc3a3a;padding-left:10px;">&#9878;&#65039; Cycle 1 &middot; Fat Loss + Muscle</div>
-        <div class="total-row"><span>Retatrutide 40 mg &times; 1 vial</span><span>$100.00</span></div>
-        <div class="total-row"><span>CJC-1295 / Ipamorelin &times; 2 vials @ $45</span><span>$90.00</span></div>
-        <div class="total-row"><span>5-Amino-1MQ 50 mg &times; 1 vial</span><span>$100.00</span></div>
-        <div class="total-row"><span>KLOW Blend 80 mg &times; 2 vials @ $80</span><span>$160.00</span></div>
-        <div class="total-row" style="background:rgba(188,58,58,0.08);border:1px solid rgba(188,58,58,0.30);border-radius:2px;padding:10px 14px;margin-top:6px;font-weight:700;color:#bc3a3a;"><span>Cycle 1 Total &mdash; ready to buy</span><span style="font-family:'Cormorant Garamond',serif;font-size:22px;">$450.00</span></div>
-
-        <!-- CYCLE 2 -->
-        <div class="total-row" style="font-weight:700;color:#5e3e85;text-transform:uppercase;letter-spacing:0.08em;font-size:12px;border-left:3px solid #5e3e85;padding-left:10px;margin-top:16px;">&#9203; Cycle 2 &middot; Longevity + Anti-Aging</div>
-        <div class="total-row"><span>Pinealon 20 mg &times; 2 vials @ $50</span><span>$100.00</span></div>
-        <div class="total-row"><span>Epitalon 50 mg &times; 2 vials @ $50</span><span>$100.00</span></div>
-        <div class="total-row"><span>FOXO4-DRI 10 mg &times; 1 vial</span><span>$80.00</span></div>
-        <div class="total-row" style="background:rgba(94,62,133,0.08);border:1px solid rgba(94,62,133,0.30);border-radius:2px;padding:10px 14px;margin-top:6px;font-weight:700;color:#5e3e85;"><span>Cycle 2 Total &mdash; ready to buy</span><span style="font-family:'Cormorant Garamond',serif;font-size:22px;">$280.00</span></div>
-
-        <!-- CYCLE 3 -->
-        <div class="total-row" style="font-weight:700;color:#c44d7e;text-transform:uppercase;letter-spacing:0.08em;font-size:12px;border-left:3px solid #c44d7e;padding-left:10px;margin-top:16px;">&#128150; Cycle 3 &middot; Hormonal Balance + Libido</div>
-        <div class="total-row"><span>PT-141 10 mg &times; 1 vial</span><span>$55.00</span></div>
-        <div class="total-row"><span>Kisspeptin-10 10 mg &times; 2 vials @ $55</span><span>$110.00</span></div>
-        <div class="total-row"><span>Oxytocin 10 mg &times; 2 vials @ $50</span><span>$100.00</span></div>
-        <div class="total-row" style="background:rgba(196,77,126,0.08);border:1px solid rgba(196,77,126,0.30);border-radius:2px;padding:10px 14px;margin-top:6px;font-weight:700;color:#c44d7e;"><span>Cycle 3 Total &mdash; ready to buy</span><span style="font-family:'Cormorant Garamond',serif;font-size:22px;">$265.00</span></div>
-
-        <!-- CYCLE 4 -->
-        <div class="total-row" style="font-weight:700;color:#b97a1f;text-transform:uppercase;letter-spacing:0.08em;font-size:12px;border-left:3px solid #b97a1f;padding-left:10px;margin-top:16px;">&#127769; Cycle 4 &middot; Sleep + Stress (As Needed)</div>
-        <div class="total-row"><span>DSIP 10 mg &times; 1 vial</span><span>$30.00</span></div>
-        <div class="total-row"><span>Selank 10 mg &times; 2 vials @ $45</span><span>$90.00</span></div>
-        <div class="total-row" style="background:rgba(185,122,31,0.08);border:1px solid rgba(185,122,31,0.30);border-radius:2px;padding:10px 14px;margin-top:6px;font-weight:700;color:#b97a1f;"><span>Cycle 4 Total &mdash; ready to buy</span><span style="font-family:'Cormorant Garamond',serif;font-size:22px;">$120.00</span></div>
-
-        <!-- BUNDLE OPTION (subtle, optional) -->
-        <div style="background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:12px 16px;margin-top:18px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:200px;font-size:12px;color:var(--muted);line-height:1.55;">
-            <strong style="color:var(--text);">Optional &mdash; Full Stack:</strong> grab all 4 cycles together if you want everything on hand. Saves the back-and-forth on payments + supplies, but most clients in your position start with just Cycle 1.
+            </div>
           </div>
-          <div style="text-align:right;">
-            <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--gold);line-height:1;">$1,115</div>
-            <div style="font-size:9px;color:var(--muted);margin-top:2px;letter-spacing:0.06em;">12 compounds &middot; 4 cycles</div>
-          </div>
-        </div>
-      </div>
+        </details>
+
+      </div><!-- /tier-grid -->
 
       <details class="stack-card">
         <summary><div class="stack-card-title">Why This Multi-Cycle Stack for Vanessa Specifically</div></summary>
@@ -912,14 +817,14 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
       </div>
 
-      <details class="sched-card">
-        <summary class="sched-card-head">
+      <div class="sched-card">
+        <div class="sched-card-head">
           <div>
             <div class="sched-card-title">Typical Week &mdash; Cycle 1 Core + Selank + Kisspeptin</div>
             <div class="sched-card-sub">AM = 5-Amino + KLOW M&ndash;F + Reta on Mon + Selank M/W/F. PM = CJC/Ipa M&ndash;F pre-bed + Kisspeptin Mon/Thu pre-bed. Sat/Sun off.</div>
           </div>
           <div class="sched-phase-pill">Run-Till-Empty</div>
-        </summary>
+        </div>
         <div class="sched-scroll"><table class="sched-table">
           <thead>
             <tr>
@@ -964,7 +869,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
           </tbody>
         </table></div>
-      </details>
+      </div>
 
       <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;margin-bottom:14px;">
         <strong style="color:var(--gold);">Weekly totals at Cycle 1 + Selank + Kisspeptin:</strong> ~21 shots/wk. AM block is 2&ndash;4 shots depending on the day; PM is 1&ndash;2 shots. The block takes 3&ndash;5 min once routine.<br><br>
