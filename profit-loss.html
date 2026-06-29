@@ -701,13 +701,11 @@ const SB_HEADERS = {
 // ===== DATA LAYER =====
 // All Supabase reads go through one helper. Easy to debug, easy to extend.
 async function sb(table, query=""){
-  // Cache-bust the URL itself so intermediate caches / Service Workers / CDNs
-  // can't serve a stale snapshot. Combined with cache:'no-store' on the fetch,
-  // this guarantees every loadAll() pulls the latest from Supabase — critical
-  // when multiple devices (e.g. partner editing on a separate phone) are
-  // writing to the same tables.
-  const sep = query.includes("?") ? "&" : "?";
-  const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}${sep}_t=${Date.now()}`;
+  // cache:'no-store' on the fetch tells the browser + any intermediate cache
+  // to never serve a stale snapshot. Combined with the focus/visibility
+  // re-load on returning to the tab, this catches partner-edits-from-another-
+  // device without the user having to hard-reload.
+  const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}`;
   try {
     const res = await fetch(url, { headers: SB_HEADERS, cache: "no-store" });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
