@@ -338,6 +338,7 @@
       <div class="brand-sub">Inventory · Money · People · Insights</div>
     </div>
     <div class="brand-actions">
+      <button class="btn" id="manualRefreshBtn" onclick="manualRefresh()" title="Re-fetch latest data from the server (use when a partner edits from another device)">↻ Refresh</button>
       <button class="btn" onclick="exportCSV()">⬇ Export</button>
       <button class="btn btn-primary" onclick="openQuickAdd()">＋ Quick Add</button>
     </div>
@@ -700,9 +701,15 @@ const SB_HEADERS = {
 // ===== DATA LAYER =====
 // All Supabase reads go through one helper. Easy to debug, easy to extend.
 async function sb(table, query=""){
-  const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}`;
+  // Cache-bust the URL itself so intermediate caches / Service Workers / CDNs
+  // can't serve a stale snapshot. Combined with cache:'no-store' on the fetch,
+  // this guarantees every loadAll() pulls the latest from Supabase — critical
+  // when multiple devices (e.g. partner editing on a separate phone) are
+  // writing to the same tables.
+  const sep = query.includes("?") ? "&" : "?";
+  const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}${sep}_t=${Date.now()}`;
   try {
-    const res = await fetch(url, { headers: SB_HEADERS });
+    const res = await fetch(url, { headers: SB_HEADERS, cache: "no-store" });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     return await res.json();
   } catch (e) {
@@ -2003,7 +2010,35 @@ if(isSampleMode()){
   renderTabCounts();
 } else {
   loadAll();
+
+  // ===== Multi-device sync: re-fetch when the user returns to the page/tab =====
+  // Without this, if a partner edits inventory on another device, this device
+  // still shows the stale state until a hard reload. Listening to visibility +
+  // focus catches both "switch back to this tab" and "wake up from screen lock".
+  let _lastLoadAt = Date.now();
+  const _maybeReload = () => {
+    if (document.visibilityState !== "visible") return;
+    // Skip if loaded within the last 2s (avoids burst on rapid focus events)
+    if (Date.now() - _lastLoadAt < 2000) return;
+    _lastLoadAt = Date.now();
+    loadAll();
+  };
+  document.addEventListener("visibilitychange", _maybeReload);
+  window.addEventListener("focus", _maybeReload);
 }
+
+// ===== Manual refresh button — exposed globally so the header button can call it =====
+window.manualRefresh = async function(){
+  const btn = document.getElementById("manualRefreshBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "↻ Refreshing…"; }
+  try { await loadAll(); }
+  finally {
+    if (btn) {
+      btn.textContent = "↻ Refresh";
+      setTimeout(() => { btn.disabled = false; }, 400);
+    }
+  }
+};
 
 // ===== SEARCH / FILTER / SORT WIRING =====
 function setupSearchAndFilters(){
