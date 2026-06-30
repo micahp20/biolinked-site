@@ -591,12 +591,91 @@ hr { border: none; border-top: 1px solid var(--border); }
 <script src="/peptide-data.js"></script>
 
 <script>
-// PRESETS is built from /peptide-data.js — every entry where in_stock:true appears
-// in the compound dropdown, and selecting one auto-fills vial/dose/BAC/units/schedule/timing
-// per the cheat-sheet values stored there. Edit prices/values in peptide-data.js, not here.
-const PRESETS = (typeof window.buildPresetsFromPeptideData === 'function')
+// PRESETS drives the compound dropdown. Source order:
+//   1) On page load we fetch the live /profit-loss Supabase inventory and rebuild PRESETS
+//      from only items currently in-stock (status != "out" and vials > 0), alphabetized.
+//   2) Until that fetch returns, we render the fallback list from /peptide-data.js (in_stock=true).
+//   3) If Supabase is unreachable we stay on the static fallback so the page never breaks.
+// Each preset value matches a peptide-data.js entry (dose/BAC/units/schedule/timing/price) so
+// selecting one still auto-fills the row. Custom is always available.
+let PRESETS = (typeof window.buildPresetsFromPeptideData === 'function')
   ? window.buildPresetsFromPeptideData()
   : { 'Custom': { vial:'', dose:'', bac:'', units:'', schedule:'', timing:'', price:0 } };
+PRESETS['Custom'] = PRESETS['Custom'] || { vial:'', dose:'', bac:'', units:'', schedule:'', timing:'', price:0 };
+
+// ── Live inventory pull from /profit-loss Supabase backend ─────────────────────
+// Filters peptide-data.js presets down to the set of compounds that are currently
+// physically in stock per the inventory table. Then re-renders any open compound
+// dropdowns so the user sees the live list. Falls back silently to the static
+// in_stock=true list if the fetch fails (offline, CORS, etc.) so the page works
+// without network too.
+const PROTOCOL_INV_CFG = {
+  url: 'https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/inventory?select=name,vial_size,vials,status&order=name',
+  key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ'
+};
+
+async function loadLiveInventoryPresets() {
+  try {
+    const res = await fetch(PROTOCOL_INV_CFG.url, {
+      headers: { apikey: PROTOCOL_INV_CFG.key, Authorization: 'Bearer ' + PROTOCOL_INV_CFG.key },
+      cache: 'no-store'
+    });
+    if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+    const inv = await res.json();
+    const inStock = (inv || []).filter(i => i.status !== 'out' && (i.vials || 0) > 0);
+    if (!inStock.length) return false;
+
+    // Build a name->peptide-data lookup so we can grab dosing for matched items.
+    const norm = window.normPeptideName || (s => String(s||'').toLowerCase().trim());
+    const byName = {};
+    (window.PEPTIDE_DATA || []).forEach(p => { byName[norm(p.name)] = p; });
+
+    const next = { 'Custom': PRESETS['Custom'] };
+    inStock.forEach(item => {
+      // Try several name variants to match the peptide-data entry. Inventory rows
+      // often store size separately ("Tirzepatide" + vial_size "10mg") while
+      // peptide-data folds it into the name ("Tirzepatide (10mg)").
+      const candidates = [
+        item.name,
+        item.vial_size ? (item.name + ' (' + item.vial_size + ')') : null,
+        item.vial_size ? (item.name + ' ' + item.vial_size) : null
+      ].filter(Boolean);
+      let match = null;
+      for (let i = 0; i < candidates.length; i++) {
+        const hit = byName[norm(candidates[i])];
+        if (hit) { match = hit; break; }
+      }
+      const label = match ? match.name : (item.vial_size ? (item.name + ' (' + item.vial_size + ')') : item.name);
+      next[label] = match
+        ? { vial: match.vial, dose: match.dose, bac: match.bac, units: match.units, schedule: match.schedule, timing: match.timing, price: match.price }
+        : { vial: item.vial_size || '', dose: '', bac: '', units: '', schedule: '', timing: '', price: 0 };
+    });
+
+    // Alphabetize keys (Custom always first).
+    const alpha = { 'Custom': next['Custom'] };
+    Object.keys(next)
+      .filter(k => k !== 'Custom')
+      .sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }))
+      .forEach(k => { alpha[k] = next[k]; });
+    PRESETS = alpha;
+    return true;
+  } catch (e) {
+    console.warn('[protocol] Live inventory unavailable, using peptide-data.js fallback:', e);
+    return false;
+  }
+}
+
+function refreshAllCompoundDropdowns() {
+  const opts = Object.keys(PRESETS).map(k => '<option value="' + k + '">' + k + '</option>').join('');
+  document.querySelectorAll('#compoundRows tr td:nth-child(2) select').forEach(sel => {
+    const current = sel.value;
+    sel.innerHTML = '<option value="">— Select preset —</option>' + opts;
+    if (current && PRESETS[current]) sel.value = current;
+  });
+}
+
+// Kick off the live fetch as soon as the script loads; refresh dropdowns once it lands.
+loadLiveInventoryPresets().then(ok => { if (ok) refreshAllCompoundDropdowns(); });
 
 let compoundCount = 0;
 let levelCount = 0;

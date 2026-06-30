@@ -150,20 +150,35 @@ window.PEPTIDE_DATA = [
 ];
 
 // Convenience helper for the protocol page: returns a name -> {vial, dose, bac, units, schedule, timing, price} map
-// built from PEPTIDE_DATA, filtered to in_stock items only. Mimics the legacy PRESETS shape so existing code keeps working.
+// built from PEPTIDE_DATA, filtered to in_stock items only, sorted alphabetically by name.
+// Mimics the legacy PRESETS shape so existing code keeps working.
 window.buildPresetsFromPeptideData = function() {
   var out = {};
-  window.PEPTIDE_DATA.forEach(function(p) {
-    if (!p.in_stock) return;
-    out[p.name] = {
-      vial:     p.vial,
-      dose:     p.dose,
-      bac:      p.bac,
-      units:    p.units,
-      schedule: p.schedule,
-      timing:   p.timing,
-      price:    p.price
-    };
-  });
+  window.PEPTIDE_DATA
+    .filter(function(p) { return p.in_stock; })
+    .slice()
+    .sort(function(a, b) { return a.name.localeCompare(b.name, 'en', { sensitivity: 'base' }); })
+    .forEach(function(p) {
+      out[p.name] = {
+        vial:     p.vial,
+        dose:     p.dose,
+        bac:      p.bac,
+        units:    p.units,
+        schedule: p.schedule,
+        timing:   p.timing,
+        price:    p.price
+      };
+    });
   return out;
+};
+
+// Normalize a peptide/inventory name for case/space/punct-insensitive matching.
+// Strips parens, dashes, dots, slashes, plus spaces; lowercases everything.
+// Lets "Retatrutide (10mg)" (peptide-data) match "Retatrutide 10mg" (Supabase inventory).
+window.normPeptideName = function(s) {
+  return String(s || '')
+    .toLowerCase()
+    .replace(/[\(\)\[\]\.\-_\/\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 };
