@@ -212,6 +212,28 @@
     margin-top: 3px;
   }
 
+  /* Tablets & Oils view */
+  .orals-note {
+    background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold);
+    padding: 14px 18px; margin-bottom: 20px; font-size: 13px; line-height: 1.65; color: var(--text-muted);
+  }
+  .orals-note strong { color: var(--gold-dark); }
+  table.compare.orals-table { min-width: 720px; }
+  table.compare.orals-table td { font-size: 13px; }
+  table.compare .orals-code { font-family: 'Cormorant Garamond', serif; font-size: 15px; font-weight: 600; color: var(--gold); white-space: nowrap; }
+  table.compare .orals-name { font-weight: 600; color: var(--grey-dark); }
+  table.compare .orals-spec { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  table.compare .orals-price { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  table.compare .orals-price .amt { font-weight: 700; color: var(--gold-dark); font-size: 14px; }
+  table.compare .orals-price .unit { display: block; font-size: 10px; color: var(--text-soft); margin-top: 2px; }
+  .form-badge {
+    display: inline-block; font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    font-weight: 700; padding: 3px 8px; border-radius: 3px; white-space: nowrap;
+  }
+  .form-badge.tablet { background: rgba(139,115,53,0.12); color: var(--gold-dark); border: 1px solid rgba(139,115,53,0.3); }
+  .form-badge.oil { background: rgba(58,107,142,0.12); color: #2f5d80; border: 1px solid rgba(58,107,142,0.3); }
+  .orals-empty { text-align: center; color: var(--text-soft); font-style: italic; padding: 30px 10px; }
+
   /* Tier detail row */
   .tier-details {
     background: var(--surface-alt);
@@ -343,6 +365,7 @@
   <button class="tab active" data-view="compare">Compare Prices</button>
   <button class="tab" data-view="winners">Best Deals</button>
   <button class="tab" data-view="suppliers">Supplier Overview</button>
+  <button class="tab" data-view="orals">Tablets &amp; Oils</button>
 </nav>
 
 <main>
@@ -408,6 +431,45 @@
   <!-- SUPPLIERS VIEW -->
   <div class="view" id="view-suppliers">
     <div class="supplier-cards" id="supplier-cards"></div>
+  </div>
+
+  <!-- TABLETS & OILS VIEW -->
+  <div class="view" id="view-orals">
+    <div class="orals-note">
+      <strong>Guangzhou Laixian only.</strong> Finished-product tablets and injectable oils (steroids, SARMs, PDE-5, lipotropics, GLP-1 orals, etc.). These are a different form factor from the mg/vial peptides, so they're listed here rather than in the price-comparison table. Tablet prices are per bottle; oil prices are per box of 10 &times; 10&nbsp;ml vials.
+    </div>
+    <div class="stats" id="orals-stats"></div>
+    <div class="controls">
+      <div class="controls-row">
+        <div class="field search">
+          <label>Search Product or Code</label>
+          <input type="text" id="orals-search" placeholder="e.g. Anavar, Test, Sildenafil, Semaglutide, D10...">
+        </div>
+        <div class="field">
+          <label>Sort By</label>
+          <select id="orals-sort">
+            <option value="name">Name (A–Z)</option>
+            <option value="price-low">Price (Low to High)</option>
+            <option value="price-high">Price (High to Low)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="supplier-filters" id="orals-cat-filters"></div>
+    <div class="table-wrap">
+      <table class="compare orals-table">
+        <thead>
+          <tr>
+            <th style="width:78px">Form</th>
+            <th style="width:70px">Code</th>
+            <th>Product</th>
+            <th>Spec</th>
+            <th style="width:130px; text-align:right;">Price</th>
+          </tr>
+        </thead>
+        <tbody id="orals-body"></tbody>
+      </table>
+    </div>
   </div>
 </main>
 
@@ -482,8 +544,89 @@
         document.getElementById("view-" + t.dataset.view).classList.add("active");
         if (t.dataset.view === "winners") renderWinners();
         if (t.dataset.view === "suppliers") renderSupplierCards();
+        if (t.dataset.view === "orals") loadOrals();
       });
     });
+  }
+
+  // --- Tablets & Oils (Laixian finished products) ---
+  let ORALS = null;               // combined array once loaded
+  let oralsLoaded = false;
+  let oralsState = { search: "", sort: "name", cats: new Set(["Tablet", "Oil"]) };
+
+  function fmtOralPrice(p) { return p == null ? "—" : "$" + Number(p).toFixed(p % 1 === 0 ? 0 : 2); }
+
+  async function loadOrals() {
+    if (oralsLoaded) return;
+    oralsLoaded = true;
+    const body = document.getElementById("orals-body");
+    body.innerHTML = `<tr><td colspan="5" class="orals-empty">Loading catalog…</td></tr>`;
+    try {
+      const [tab, oil] = await Promise.all([
+        fetch("/suppliers-laixian-tablets.json").then(r => r.json()),
+        fetch("/suppliers-laixian-oils.json").then(r => r.json())
+      ]);
+      const tablets = tab.products.map(p => ({ form: "Tablet", code: String(p.code), name: p.name, spec: p.spec, price: p.price_usd_per_bottle, unit: "per bottle" }));
+      const oils = oil.products.map(p => ({ form: "Oil", code: String(p.code), name: p.name, spec: p.spec, price: p.price_usd_per_box, unit: "per box (10 vials)" }));
+      ORALS = tablets.concat(oils);
+      renderOralsStats();
+      renderOralsCatFilters();
+      renderOralsTable();
+    } catch (e) {
+      oralsLoaded = false; // allow retry on next tab click
+      body.innerHTML = `<tr><td colspan="5" class="orals-empty">Couldn't load the catalog. Check your connection and reopen this tab.</td></tr>`;
+    }
+  }
+
+  function renderOralsStats() {
+    if (!ORALS) return;
+    const nTab = ORALS.filter(p => p.form === "Tablet").length;
+    const nOil = ORALS.filter(p => p.form === "Oil").length;
+    document.getElementById("orals-stats").innerHTML = `
+      <div class="stat-card"><div class="label">Tablets</div><div class="value">${nTab}</div><div class="sub">Per-bottle pricing</div></div>
+      <div class="stat-card"><div class="label">Injectable Oils</div><div class="value">${nOil}</div><div class="sub">Per box of 10 &times; 10 ml</div></div>
+      <div class="stat-card"><div class="label">Total SKUs</div><div class="value">${ORALS.length}</div><div class="sub">Guangzhou Laixian</div></div>
+      <div class="stat-card"><div class="label">Form Factor</div><div class="value">2</div><div class="sub">Not in mg/vial comparison</div></div>
+    `;
+  }
+
+  function renderOralsCatFilters() {
+    const container = document.getElementById("orals-cat-filters");
+    const cats = [["Tablet", "Tablets"], ["Oil", "Injectable Oils"]];
+    container.innerHTML = cats.map(([key, label]) => {
+      const n = ORALS.filter(p => p.form === key).length;
+      return `<button class="supplier-chip ${oralsState.cats.has(key) ? 'active' : ''}" data-cat="${key}">${label} (${n})</button>`;
+    }).join("");
+    container.querySelectorAll(".supplier-chip").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = btn.dataset.cat;
+        if (oralsState.cats.has(k)) { if (oralsState.cats.size > 1) oralsState.cats.delete(k); }
+        else oralsState.cats.add(k);
+        renderOralsCatFilters();
+        renderOralsTable();
+      });
+    });
+  }
+
+  function renderOralsTable() {
+    const body = document.getElementById("orals-body");
+    const q = oralsState.search.trim().toLowerCase();
+    let rows = ORALS.filter(p => oralsState.cats.has(p.form));
+    if (q) rows = rows.filter(p => (p.name + " " + p.code + " " + p.spec).toLowerCase().includes(q));
+    if (oralsState.sort === "name") rows.sort((a, b) => a.name.localeCompare(b.name));
+    else if (oralsState.sort === "price-low") rows.sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+    else if (oralsState.sort === "price-high") rows.sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
+
+    if (!rows.length) { body.innerHTML = `<tr><td colspan="5" class="orals-empty">No products match your search.</td></tr>`; return; }
+    body.innerHTML = rows.map(p => `
+      <tr>
+        <td><span class="form-badge ${p.form === 'Tablet' ? 'tablet' : 'oil'}">${p.form}</span></td>
+        <td><span class="orals-code">${p.code}</span></td>
+        <td><span class="orals-name">${p.name}</span></td>
+        <td><span class="orals-spec">${p.spec || '—'}</span></td>
+        <td class="orals-price"><span class="amt">${fmtOralPrice(p.price)}</span><span class="unit">${p.unit}</span></td>
+      </tr>
+    `).join("");
   }
 
   function renderStats() {
@@ -767,6 +910,16 @@
     document.getElementById("price-tier").value = "1";
     renderSupplierFilters();
     renderTable();
+  });
+
+  // --- Tablets & Oils controls ---
+  document.getElementById("orals-search").addEventListener("input", (e) => {
+    oralsState.search = e.target.value;
+    if (ORALS) renderOralsTable();
+  });
+  document.getElementById("orals-sort").addEventListener("change", (e) => {
+    oralsState.sort = e.target.value;
+    if (ORALS) renderOralsTable();
   });
 
   // --- Initial render ---
