@@ -1,9 +1,9 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'aluna-v2';
+const CACHE = 'jjohnston-v1';
 const ASSETS = [
-  '/aluna/',
-  '/aluna/index.html',
-  '/aluna/manifest.json',
+  '/jjohnston/',
+  '/jjohnston/index.html',
+  '/jjohnston/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -33,6 +33,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/aluna/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/jjohnston/index.html')))
   );
 });
