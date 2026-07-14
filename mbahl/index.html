@@ -687,35 +687,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <!-- ============= DAILY TRACKER ============= -->
-      <div class="sec-divider mt">
-        <div class="sec-divider-eyebrow">Daily Tracker</div>
-        <div class="sec-divider-title">Check Off Every Shot &middot; Saves to Your Phone</div>
-      </div>
-
-      <div class="trk-intro">
-        <strong>How it works:</strong> tap any circle to mark that shot done &mdash; it turns into a green check and <strong>saves right on this device</strong> (no login). Each row is a compound; each column is a day. Use the arrows to move between weeks. The dash cells are rest days for that compound. This is pre-loaded with your exact schedule &mdash; nothing to set up.
-      </div>
-
-      <div class="trk-stat-row">
-        <div class="trk-stat"><div class="trk-stat-v" id="trk-done">0</div><div class="trk-stat-l">Shots Logged</div></div>
-        <div class="trk-stat"><div class="trk-stat-v" id="trk-adh">0%</div><div class="trk-stat-l">Adherence</div></div>
-        <div class="trk-stat"><div class="trk-stat-v" id="trk-streak">0</div><div class="trk-stat-l">Weeks Tracked</div></div>
-      </div>
-
-      <div class="trk-prog">
-        <div class="trk-prog-top"><span>Cycle Progress</span><span id="trk-prog-lbl">0 / 0 shots</span></div>
-        <div class="trk-prog-bar"><div class="trk-prog-fill" id="trk-prog-fill"></div></div>
-      </div>
-
-      <div class="trk-week-nav">
-        <button class="trk-wnav" id="trk-prev" onclick="trkWeek(-1)">&#8249;</button>
-        <div class="trk-wlbl" id="trk-wlbl">Week 1<small>of 16</small></div>
-        <button class="trk-wnav" id="trk-next" onclick="trkWeek(1)">&#8250;</button>
-      </div>
-
-      <div class="trk-grid-wrap"><div class="trk-grid-inner" id="trk-grid"></div></div>
-
-      <div style="text-align:center;"><button class="trk-reset" onclick="trkReset()">Reset this week&rsquo;s checkmarks</button></div>
 
     </div><!-- /schedule tab -->
 
@@ -1064,91 +1035,7 @@ function switchTab(tab, btn){
   btn.classList.add('active');
 }
 
-// ===== COMPOUND SCHEDULE MODEL (day: 0=Mon ... 6=Sun) =====
-var TRK_WEEKS = 16;
-var COMPOUNDS = [
-  {key:'test',  name:'Test Cyp',  sub:'35u',    days:[0,3]},
-  {key:'reta',  name:'Reta',      sub:'10u',    days:[0]},
-  {key:'mots',  name:'MOTS-c',    sub:'15u',    days:[0,1,2,3,4]},
-  {key:'klow',  name:'KLOW',      sub:'15u',    days:[0,1,2,3,4]},
-  {key:'amino', name:'5-Amino',   sub:'20u',    days:[0,2,4]},
-  {key:'cjc',   name:'CJC/Ipa',   sub:'10u PM', days:[0,1,2,3,4]}
-];
 var DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-
-// ===== DAILY TRACKER (localStorage) =====
-var TRK_KEY = 'bl-mbahl-tracker-v1';
-var trkCurWeek = 1;
-function trkLoad(){ try { return JSON.parse(localStorage.getItem(TRK_KEY) || '{}'); } catch(e){ return {}; } }
-function trkSave(s){ try { localStorage.setItem(TRK_KEY, JSON.stringify(s)); } catch(e){} }
-function trkTotalScheduled(){
-  var per = COMPOUNDS.reduce(function(a,c){ return a + c.days.length; }, 0);
-  return per * TRK_WEEKS;
-}
-function trkCountDone(){
-  var s = trkLoad(); var n = 0;
-  for (var k in s){ if (s[k]) n++; }
-  return n;
-}
-function trkToggle(id){
-  var s = trkLoad();
-  s[id] = !s[id];
-  if (!s[id]) delete s[id];
-  trkSave(s);
-  var el = document.getElementById(id);
-  if (el){ el.classList.toggle('taken', !!s[id]); }
-  trkRenderStats();
-}
-function trkRenderStats(){
-  var done = trkCountDone();
-  var total = trkTotalScheduled();
-  var pct = total ? Math.round(done/total*100) : 0;
-  // weeks tracked = weeks with at least one check
-  var s = trkLoad(); var wk = {};
-  for (var k in s){ if (s[k]){ var m = k.match(/^w(\d+)-/); if (m) wk[m[1]] = 1; } }
-  document.getElementById('trk-done').textContent = done;
-  document.getElementById('trk-adh').textContent = pct + '%';
-  document.getElementById('trk-streak').textContent = Object.keys(wk).length;
-  document.getElementById('trk-prog-lbl').textContent = done + ' / ' + total + ' shots';
-  document.getElementById('trk-prog-fill').style.width = pct + '%';
-}
-function trkRenderGrid(){
-  var s = trkLoad();
-  var w = trkCurWeek;
-  var html = '<div class="trk-dhr"><div></div><div class="trk-dhi">';
-  for (var d=0; d<7; d++){ html += '<div class="trk-dh">' + DAY_LABELS[d] + '</div>'; }
-  html += '</div></div>';
-  COMPOUNDS.forEach(function(c){
-    html += '<div class="trk-cmp-row"><div class="trk-cmp-lbl"><span class="trk-cmp-lbl-name">' + c.name + '</span><span class="trk-cmp-lbl-sub">' + c.sub + '</span></div><div class="trk-drow">';
-    for (var d=0; d<7; d++){
-      if (c.days.indexOf(d) !== -1){
-        var id = 'w' + w + '-' + c.key + '-d' + d;
-        var taken = s[id] ? ' taken' : '';
-        html += '<div id="' + id + '" class="trk-dc sched' + taken + '" onclick="trkToggle(\'' + id + '\')" title="' + c.name + ' ' + DAY_LABELS[d] + ' ' + c.sub + '"></div>';
-      } else {
-        html += '<div class="trk-dc rest"></div>';
-      }
-    }
-    html += '</div></div>';
-  });
-  document.getElementById('trk-grid').innerHTML = html;
-  document.getElementById('trk-wlbl').innerHTML = 'Week ' + w + '<small>of ' + TRK_WEEKS + '</small>';
-  document.getElementById('trk-prev').disabled = (w <= 1);
-  document.getElementById('trk-next').disabled = (w >= TRK_WEEKS);
-}
-function trkWeek(delta){
-  trkCurWeek = Math.min(TRK_WEEKS, Math.max(1, trkCurWeek + delta));
-  trkRenderGrid();
-}
-function trkReset(){
-  if (!confirm('Clear all checkmarks for Week ' + trkCurWeek + '?')) return;
-  var s = trkLoad();
-  for (var k in s){ if (k.indexOf('w' + trkCurWeek + '-') === 0) delete s[k]; }
-  trkSave(s);
-  trkRenderGrid();
-  trkRenderStats();
-}
-document.addEventListener('DOMContentLoaded', function(){ trkRenderGrid(); trkRenderStats(); });
 
 // ===== ICS CALENDAR EXPORT =====
 function downloadICS(){
