@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'dmiller-v1';
+const CACHE = 'dmiller-v2';
 const ASSETS = [
   '/dmiller/',
   '/dmiller/index.html',
