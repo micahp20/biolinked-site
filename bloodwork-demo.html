@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>BioLinked — Data-Driven Bloodwork (Demo)</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);padding:34px 16px 90px;-webkit-font-smoothing:antialiased;}
+  .invoice-wrap{width:82%;max-width:1000px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+  .inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:26px 32px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;border-top-left-radius:3px;border-top-right-radius:3px;}
+  .inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;letter-spacing:0.04em;line-height:1;}
+  .inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+  .inv-meta{text-align:right;}
+  .inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+  .inv-number{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;margin-top:2px;}
+  .inv-body{padding:28px 32px;background:var(--bg);}
+  .demo-note{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 16px;margin-bottom:22px;font-size:12.5px;color:#3d2f10;line-height:1.6;}
+  .demo-note strong{color:var(--gold);}
+  .demo-note code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--gold-dim);color:var(--gold);padding:1px 6px;border-radius:3px;}
+  .inv-footer{background:#fafafa;border-top:1px solid var(--border);padding:16px 32px;font-size:10px;color:var(--muted);line-height:1.5;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+  @media(max-width:640px){.invoice-wrap{width:100%;}.inv-header{padding:20px 18px;}.inv-body{padding:20px 16px;}}
+</style>
+</head>
+<body>
+<div class="invoice-wrap">
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Bloodwork Tab &middot; Demo</div>
+      <div class="inv-number">Data-Driven</div>
+    </div>
+  </div>
+  <div class="inv-body">
+    <div class="demo-note">
+      <strong>This entire report is rendered from the JSON block below</strong> &mdash; no hand-coded HTML. To update a client, replace the <code>#bw-data</code> JSON (the analyzer can export it) and the tab re-renders: overall score, biological age, and every reading with its flag + tap-to-explain tooltip. Sample data uses real numbers from the mpauldino profile.
+    </div>
+
+    <!-- ====== the mount point ====== -->
+    <div id="bw-mount"></div>
+  </div>
+  <div class="inv-footer">
+    For educational and research purposes only. Not medical advice. Biological age is a wellness estimate (PhenoAge-style), not a diagnosis. &middot; BioLinked Solutions
+  </div>
+</div>
+
+<!-- ====== per-client data (this is what the analyzer exports / you paste) ====== -->
+<script type="application/json" id="bw-data">
+{
+  "reportTitle": "Bloodwork Report",
+  "meta": "Latest draw 05/06/2026 · 7 panels across Jan 2025 → May 2026 · Hormones optimized, lipids elite, metabolic markers in target",
+  "bioAge": {
+    "value": 41,
+    "chronological": 47,
+    "note": "Driven by elite inflammation (hs-CRP 0.4), top-decile metabolic markers (A1c 4.6), and an optimized lipid panel. The hematocrit at the TRT upper edge is the one lever keeping it from going lower."
+  },
+  "score": {
+    "overall": 92,
+    "grade": "A · Elite",
+    "context": "Top 5–8% of men your age · Top 10–15% of TRT-optimized men",
+    "foot": "Composite score — weighted by long-term-outcome impact (cardiovascular + metabolic + inflammation weighted highest). Tap any domain for the per-marker breakdown.",
+    "categories": [
+      { "score": 98, "name": "Inflammation", "note": "hs-CRP 0.4 is essentially as good as it gets. The marker that quietly compounds longevity risk over decades — you are in the low-risk zone." },
+      { "score": 95, "name": "Cardiovascular", "note": "ApoB 67, Trig/HDL 1.0, LDL 83, HDL 78. Elite lipid profile. −5 only because HDL could theoretically go higher (not worth chasing)." },
+      { "score": 95, "name": "Metabolic", "note": "A1c 4.6, fasting glucose 86, triglycerides 79. Top decile. The pre-diabetic edge from baseline (glucose 100) is fully resolved." },
+      { "score": 92, "name": "Kidney + Liver", "note": "eGFR 88 (excellent — would need 90+ for top tier), creatinine 1.07, ALT/AST mid-range, bilirubin normalized from baseline 1.4 H to 0.7." },
+      { "score": 88, "name": "Hormones", "note": "Total T 1073, Free T 186.9, Bioavailable T 392.5 — all top quartile. −12 for the E2 51 H flag + IGF-1 sitting mid-range." },
+      { "score": 85, "name": "Thyroid", "note": "TSH 3.78 in range, T4 + T3 free both normal. −15 for the March 2026 TSH 5.48 H spike that resolved by May + missing Free T3 / reverse T3 data." },
+      { "score": 82, "name": "Hematology", "note": "Biggest drag on the overall score. Hgb 17.3 / Hct 50.2 sit at the TRT-driven upper edge. Polycythemia management via blood-donation cadence is the routine watch." }
+    ]
+  },
+  "sections": [
+    {
+      "title": "Hormone Panel",
+      "sub": "Testosterone · Estradiol · SHBG · Cortisol · DHEA-S · IGF-1 · PSA · GH",
+      "rows": [
+        { "name": "Total Testosterone", "value": "1073", "unit": "ng/dL", "ref": "250–1100", "status": "Optimal", "flag": "ok", "info": "Sum of bound + free + bioavailable T. The headline T number — drives energy, libido, muscle, mood.", "trend": "01/25 328 → 11/25 613 → 03/26 517 → 05/26 1073" },
+        { "name": "Free Testosterone", "value": "186.9", "unit": "pg/mL", "ref": "46–224", "status": "Optimal", "flag": "ok", "info": "T not bound to SHBG/albumin — directly active at tissue receptors. The bioactive T number.", "trend": "01/25 46.9 → 11/25 120 → 05/26 186.9" },
+        { "name": "Bioavailable Testosterone", "value": "392.5", "unit": "ng/dL", "ref": "110–575", "status": "Optimal", "flag": "ok", "info": "Free T + albumin-bound T = the T pool actually available to tissues.", "trend": "01/25 108.6 → 11/25 257.1 → 05/26 392.5" },
+        { "name": "SHBG", "value": "30", "unit": "nmol/L", "ref": "10–50", "status": "Normal", "flag": "normal", "info": "Sex Hormone Binding Globulin. Binds T in blood. High SHBG = less bioavailable T.", "trend": "01/25 27.2 → 05/26 30" },
+        { "name": "Estradiol", "value": "51", "unit": "pg/mL", "ref": "≤39", "status": "High", "flag": "hi", "info": "Primary estrogen in men. TRT increases T → E2 aromatization. Symptomatic high E2 (water retention, low libido despite high T) is the action point.", "trend": "01/25 23 → 01/26 <30 → 05/26 51" },
+        { "name": "Cortisol AM", "value": "11.8", "unit": "mcg/dL", "ref": "4–22", "status": "Optimal", "flag": "ok", "info": "Primary stress hormone. Morning peak is normal. Came down from 23.2 H (chronic stress signal) at baseline.", "trend": "01/25 23.2 → 05/26 11.8" },
+        { "name": "DHEA-S", "value": "253", "unit": "mcg/dL", "ref": "61–442", "status": "Normal", "flag": "normal", "info": "Adrenal androgen precursor. The longevity hormone. Pairs with TRT for energy + libido + cognition.", "trend": "01/25 253" },
+        { "name": "IGF-1 (LC/MS)", "value": "141", "unit": "ng/mL", "ref": "52–328", "status": "Z-score 0.0", "flag": "normal", "info": "Downstream effect of GH on the liver — the diagnostic readout of the GH axis. Mid-range for males; exogenous HGH typically drives this higher — recheck next panel.", "trend": "03/26 141" },
+        { "name": "PSA Total", "value": "1.69", "unit": "ng/mL", "ref": "≤4.00", "status": "Normal", "flag": "ok", "info": "Prostate Specific Antigen. Watch closely on TRT — should stay <4.0.", "trend": "01/26 1.69" }
+      ]
+    },
+    {
+      "title": "Metabolic + Lipids",
+      "sub": "Glucose · A1c · Lipid Panel · ApoB · hs-CRP",
+      "rows": [
+        { "name": "Glucose (fasting)", "value": "86", "unit": "mg/dL", "ref": "70–99", "status": "Optimal", "flag": "ok", "info": "Blood sugar after fasting. Pre-diabetic edge starts at 100. Was 100 H pre-TRT.", "trend": "01/25 100 → 03/26 86" },
+        { "name": "Hemoglobin A1c", "value": "4.6", "unit": "%", "ref": "<5.7", "status": "Optimal", "flag": "ok", "info": "3-month average blood sugar. Below 5.7 is non-diabetic; 4.6 is top-decile.", "trend": "03/26 4.6" },
+        { "name": "Triglycerides", "value": "79", "unit": "mg/dL", "ref": "<150", "status": "Optimal", "flag": "ok", "info": "Blood fat. Trig/HDL ratio (1.0 here) is a strong insulin-sensitivity proxy." },
+        { "name": "HDL Cholesterol", "value": "78", "unit": "mg/dL", "ref": ">40", "status": "Optimal", "flag": "ok", "info": "Protective cholesterol. Higher is generally better." },
+        { "name": "LDL Cholesterol", "value": "83", "unit": "mg/dL", "ref": "<100", "status": "Optimal", "flag": "ok", "info": "Primary atherogenic particle carrier. ApoB is the more precise readout." },
+        { "name": "ApoB", "value": "67", "unit": "mg/dL", "ref": "<90", "status": "Optimal", "flag": "ok", "info": "Counts every atherogenic particle — the single best lipid predictor of cardiovascular risk." },
+        { "name": "hs-CRP", "value": "0.4", "unit": "mg/L", "ref": "<1.0", "status": "Optimal", "flag": "ok", "info": "High-sensitivity inflammation marker. Below 1.0 is low cardiovascular risk." }
+      ]
+    },
+    {
+      "title": "Hematology (CBC)",
+      "sub": "Hemoglobin · Hematocrit · MCH · Eosinophils",
+      "rows": [
+        { "name": "Hemoglobin", "value": "17.3", "unit": "g/dL", "ref": "13.0–17.7", "status": "Upper edge", "flag": "normal", "info": "Oxygen-carrying protein. TRT drives it up; watch the upper edge for polycythemia.", "trend": "11/25 18.1 → 05/26 17.3" },
+        { "name": "Hematocrit", "value": "50.2", "unit": "%", "ref": "37.5–51.0", "status": "Upper edge", "flag": "normal", "info": "% of blood that is red cells. Peaked at 53.3 H in Nov 2025, then came back with a blood donation.", "trend": "11/25 53.3 H → 05/26 50.2" },
+        { "name": "MCH", "value": "34.1", "unit": "pg", "ref": "27–33", "status": "High", "flag": "hi", "info": "Average hemoglobin per red cell. Mildly high — minor, tracks with the TRT-driven RBC picture." },
+        { "name": "Eosinophils (abs)", "value": "673", "unit": "/µL", "ref": "30–350", "status": "High", "flag": "hi", "info": "White cell tied to allergy/parasites. Trending up — worth a recheck and an allergy/GI review if it persists." }
+      ]
+    }
+  ]
+}
+</script>
+
+<script src="/tools/bloodwork.js"></script>
+<script>BLBloodwork.render('#bw-data', '#bw-mount');</script>
+</body>
+</html>
