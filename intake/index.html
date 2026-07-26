@@ -362,6 +362,8 @@ async function submitForm(){
   data.append('Consent Confirmed','Yes — all 6 consent statements acknowledged');
   data.append('Submission Timestamp',new Date().toISOString());
   data.append('_gotcha',document.getElementById('hpField')?.value||'');
+  // Independent phone push (fires regardless of Formspree spam bucketing) — first name only, no client data leaves.
+  try{fetch('https://ntfy.sh/biolinked-intake-b88buaa4puz2lftt',{method:'POST',body:(document.getElementById('firstName')?.value?.trim()||'Someone')+' just submitted a BioLinked intake — check Formspree (Inbox AND Spam).',headers:{'Title':'New BioLinked Intake','Priority':'high','Tags':'inbox_tray','Click':'https://formspree.io/forms/meerdpwk/submissions'}}).catch(()=>{});}catch(e){}
   try{
     const res=await fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:data,headers:{'Accept':'application/json'}});
     if(res.ok){document.getElementById('sec7').classList.remove('active');document.getElementById('successScreen').classList.add('active');document.getElementById('barFill').style.width='100%';document.getElementById('stepText').textContent='Complete ✓';cur=TOTAL;buildDots();window.scrollTo({top:0,behavior:'smooth'});}
