@@ -1,6 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-// Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'scastellanos-v8';
+const CACHE = 'scastellanos-v2';
 const ASSETS = [
   '/scastellanos/',
   '/scastellanos/index.html',
@@ -23,8 +22,6 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Network-first: always try fresh content first so clients see the latest protocol updates.
-// Falls back to cache only if the network is unavailable (offline support preserved).
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
