@@ -26,335 +26,312 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Micah">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="theme-color" content="#7A6530">
+<meta name="theme-color" content="#3d6098">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);--green:#3a7a5a;--green-soft:rgba(58,122,90,0.12);--green-border:rgba(58,122,90,0.35);--amber:#b97a1f;--amber-soft:rgba(185,122,31,0.12);--amber-border:rgba(185,122,31,0.40);--red:#b85555;--red-soft:rgba(184,85,85,0.10);--red-border:rgba(184,85,85,0.40);--info:#3a6b8e;--info-soft:rgba(58,107,142,0.10);--info-border:rgba(58,107,142,0.35);}
-body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+/* ===== Clinical chart palette — light blue-silver / white / steel-blue accent ===== */
+:root{
+  --bg:#eef2f7;
+  --bg-alt:#f4f7fa;
+  --head:#f7fafd;
+  --surface:#ffffff;
+  --line:#d4dde8;
+  --line-soft:#e7edf4;
+  --text:#1a2230;
+  --muted:#5a6675;
+  --accent:#3d6098;
+  --accent-2:#4a6fa5;
+  --accent-dim:rgba(61,96,152,0.07);
+  --accent-line:rgba(61,96,152,0.28);
+  --green:#2f7a5b;--green-soft:rgba(47,122,91,0.11);--green-border:rgba(47,122,91,0.30);
+  --amber:#a97614;--amber-soft:rgba(169,118,20,0.12);--amber-border:rgba(169,118,20,0.32);
+  --red:#b1453d;--red-soft:rgba(177,69,61,0.10);--red-border:rgba(177,69,61,0.32);
+  --info:#3d6098;--info-soft:rgba(61,96,152,0.09);--info-border:rgba(61,96,152,0.30);
+  --shadow:0 1px 2px rgba(26,34,48,0.04),0 2px 10px rgba(26,34,48,0.05);
+  /* legacy aliases — any rule still asking for "gold" resolves to the steel-blue accent */
+  --gold:var(--accent);--gold-light:var(--accent-2);--gold-dim:var(--accent-dim);--gold-border:var(--line);--border:var(--line);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:34px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;-webkit-text-size-adjust:100%;}
 
-.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
-.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
-.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
-.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+/* ===== Chart shell ===== */
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 4px rgba(26,34,48,0.04),0 10px 34px rgba(26,34,48,0.07);overflow:hidden;}
+.inv-header{background:linear-gradient(180deg,#ffffff,#f4f7fa);border-bottom:2px solid var(--accent);padding:26px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}
+.inv-brand-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:9.5px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:var(--accent);margin-top:5px;}
 .inv-meta{text-align:right;}
-.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
-.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
-.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+.inv-label{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-size:21px;font-weight:700;color:var(--text);margin-top:3px;letter-spacing:0.01em;}
+.inv-date{font-size:12px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.5;}
 
-.tab-bar{display:flex;background:#fafafa;border-bottom:1px solid var(--border);padding:0;position:sticky;top:0;z-index:50;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-bar{display:flex;background:var(--bg-alt);border-bottom:1px solid var(--line);padding:0;position:sticky;top:0;z-index:50;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
 .tab-bar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:1 0 auto;white-space:nowrap;background:transparent;border:none;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;}
-.tab-btn:hover{color:var(--text);background:rgba(0,0,0,0.02);}
-.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fff;}
-.tab-content{display:none;padding:34px 36px 40px;}
+.tab-btn{flex:1 0 auto;white-space:nowrap;background:transparent;border:none;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;}
+.tab-btn:hover{color:var(--text);background:rgba(61,96,152,0.04);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:#fff;}
+.tab-content{display:none;padding:30px 34px 38px;background:var(--bg-alt);}
 #tab-command{padding:0 !important;}
 #cc-frame{width:100%;border:0;display:block;min-height:600px;background:var(--bg);}
 .tab-content.active{display:block;}
 
-.program-intro{padding:6px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px;}
-.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);}
-.program-title{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:var(--text);line-height:1.1;margin-top:6px;}
-.program-title em{font-style:italic;color:var(--gold);font-weight:400;}
-.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
-.program-context{margin-top:14px;font-size:14px;line-height:1.75;color:var(--text);font-weight:400;}
-.program-context p + p{margin-top:10px;}
-.program-context strong{font-weight:700;}
+/* ===== Intro block ===== */
+.program-intro{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
+.program-title{font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--accent);font-weight:700;}
+.program-tag{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
 
-.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
-.sec-divider.mt{margin-top:32px;}
-.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
-.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+/* ===== Section rules ===== */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--accent-line);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);}
+.sec-divider-title{font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
 
-/* Info tooltip — ? icon on peptide / med names */
-.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
-.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--gold);color:#fff;}
-.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
-.info-tip-text strong{color:#e9c66c;font-weight:600;}
-.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1a1a;}
+/* ===== Label → value rows (replaces flowing prose) ===== */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:126px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--line-soft);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.65;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);line-height:1.7;}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* ===== Info tooltip — ? icon ===== */
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--accent);color:#fff;border-color:var(--accent);}
+.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1d2733;color:#eef2f7;padding:10px 13px;border-radius:5px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 6px 22px rgba(26,34,48,0.28);}
+.info-tip-text strong{color:#9dc0f0;font-weight:600;}
+.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1d2733;}
 .info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
 @media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
 
-/* Compound + med flat rows (non-expandable) */
-.cmp-list{display:flex;flex-direction:column;gap:0;margin-bottom:24px;}
-.cmp-row{background:#fff;border:1px solid var(--border);border-radius:2px;padding:13px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:5px;}
-.cmp-row:last-child{margin-bottom:0;}
-.cmp-row-name{font-size:15px;font-weight:700;color:var(--text);flex:1 1 0;min-width:0;display:flex;align-items:center;flex-wrap:wrap;}
-.cmp-row-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
-.cmp-row-tag{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
-.cmp-row-tag em{font-style:normal;color:var(--muted);font-weight:500;letter-spacing:0.08em;}
-.cmp-row-dose{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);white-space:nowrap;line-height:1.2;}
+/* ===== Command Center banner ===== */
+.cc-banner{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin:0 0 22px;text-decoration:none;color:inherit;}
+.cc-banner:hover{background:#fbfdff;}
+.cc-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;}
+.cc-title{font-size:18px;font-weight:700;line-height:1.2;color:var(--text);letter-spacing:-0.01em;}
+.cc-sub{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.55;}
+.cc-arrow{font-size:24px;color:var(--accent);flex-shrink:0;}
 
-/* Body composition collapsible */
-details.bodycomp-card{background:#fff;border:1px solid var(--border);border-radius:2px;border-top:2px solid var(--gold);overflow:hidden;margin-bottom:24px;}
-details.bodycomp-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:16px 22px;display:flex;justify-content:space-between;align-items:center;gap:14px;transition:background 0.18s;}
+/* ===== Compound cards ===== */
+.cmp-group{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:12px;}
+.cmp-group::after{content:'';flex:1;height:1px;background:var(--line);}
+.cmp-group.mt{margin-top:18px;}
+.cmp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:6px;}
+.cmp-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;padding:0;overflow:visible;}
+.cmp-row-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 16px;border-bottom:1px solid var(--line);background:var(--head);border-radius:8px 8px 0 0;line-height:1.3;letter-spacing:0.005em;}
+.cmp-badge{display:inline-block;background:var(--accent);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;vertical-align:middle;white-space:nowrap;}
+.cmp-badge.grey{background:var(--muted);}
+.cmp-fields{display:flex;flex-direction:column;padding:2px 16px 10px;}
+.fld{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.fld:last-child{border-bottom:none;}
+.fld-l{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.fld-v{font-size:13px;font-weight:600;color:var(--text);text-align:right;font-variant-numeric:tabular-nums;}
+.fld.dose{border-top:1px solid var(--line-soft);}
+.fld.dose .fld-v{font-size:17px;font-weight:700;color:var(--accent);white-space:nowrap;}
+
+/* ===== Data tables (vial math, schedule) ===== */
+.data-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;}
+.data-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px;}
+.data-table thead th{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);padding:12px 14px 9px;text-align:left;background:var(--head);border-bottom:1px solid var(--line);white-space:nowrap;}
+.data-table thead th.right{text-align:right;}
+.data-table tbody td{padding:11px 14px;border-bottom:1px solid var(--line-soft);vertical-align:middle;color:var(--text);}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.data-table tbody tr:nth-child(even) td{background:#fbfcfe;}
+.data-table td.cmp{font-weight:700;white-space:nowrap;}
+.data-table td.cmp .sub{color:var(--muted);font-weight:400;font-size:11px;}
+.data-table td.num{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px;}
+
+/* ===== Chart note (footnotes / callouts) ===== */
+.chart-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:22px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Body composition card ===== */
+details.bodycomp-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:22px;}
+details.bodycomp-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;transition:background 0.18s;background:var(--head);}
 details.bodycomp-card > summary::-webkit-details-marker{display:none;}
-details.bodycomp-card > summary:hover{background:rgba(122,101,48,0.04);}
-details[open].bodycomp-card > summary{border-bottom:1px solid var(--border);}
+details.bodycomp-card > summary:hover{background:#eff5fc;}
+details[open].bodycomp-card > summary{border-bottom:1px solid var(--line);}
 .bc-card-left{flex:1;min-width:0;}
-.bc-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.bc-card-title{font-size:15px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:0.005em;}
 .bc-card-meta{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:0.02em;}
-.bc-card-tag{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);margin-right:12px;}
-.bc-card-chev{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.22s,background 0.22s;line-height:1;background:#fff;}
-details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var(--gold-dim);}
-.bc-card-body{padding:8px 22px 22px;}
-.bc-grid{display:grid;grid-template-columns:1fr 260px;gap:24px;align-items:start;}
+.bc-card-tag{font-size:18px;font-weight:700;color:var(--accent);margin-right:12px;font-variant-numeric:tabular-nums;}
+.bc-card-chev{font-size:17px;color:var(--accent);width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.22s,background 0.22s;line-height:1;background:#fff;font-weight:400;}
+details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var(--accent-dim);}
+.bc-card-body{padding:10px 20px 20px;}
+.bc-grid{display:grid;grid-template-columns:1fr 250px;gap:24px;align-items:start;}
 .bc-metrics{min-width:0;}
 .bc-photo{display:flex;flex-direction:column;}
-.bc-photo-frame{position:relative;border:1px solid var(--gold-border);border-radius:3px;overflow:hidden;background:#f5f1e6;aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;}
+.bc-photo-frame{position:relative;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;}
 .bc-photo-frame img{width:100%;height:100%;object-fit:cover;display:block;}
 .bc-photo-placeholder{display:none;font-size:11px;color:var(--muted);line-height:1.55;padding:18px;text-align:center;font-style:italic;}
-.bc-photo-placeholder code{font-family:'Montserrat',monospace,sans-serif;background:var(--gold-dim);padding:1px 5px;border-radius:2px;font-size:10px;color:var(--gold);font-style:normal;}
+.bc-photo-placeholder code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--accent-dim);padding:1px 5px;border-radius:3px;font-size:10px;color:var(--accent);font-style:normal;}
 .bc-photo-frame.bc-photo-empty .bc-photo-placeholder{display:block;}
-.bc-photo-caption{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;font-style:italic;letter-spacing:0.02em;}
-@media(max-width:820px){.bc-grid{grid-template-columns:1fr;}.bc-photo-frame{aspect-ratio:3/4;max-width:320px;margin:0 auto;}}
+.bc-photo-caption{font-size:11px;color:var(--muted);text-align:center;margin-top:8px;letter-spacing:0.02em;}
+@media(max-width:820px){.bc-grid{grid-template-columns:1fr;}.bc-photo-frame{aspect-ratio:3/4;max-width:300px;margin:0 auto;}}
 
-/* By-date bloodwork cards */
-.bw-dates{display:flex;flex-direction:column;gap:8px;margin-bottom:24px;}
-details.bw-date{background:#fff;border:1px solid var(--border);border-radius:2px;border-left:3px solid var(--gold);overflow:hidden;}
-details.bw-date > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px;transition:background 0.18s;}
-details.bw-date > summary::-webkit-details-marker{display:none;}
-details.bw-date > summary:hover{background:rgba(122,101,48,0.04);}
-details[open].bw-date > summary{border-bottom:1px solid var(--border);}
-.bwd-left{flex:1;min-width:0;}
-.bwd-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
-.bwd-date{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--text);margin-top:3px;}
-.bwd-meta{font-size:11px;color:var(--muted);margin-top:3px;letter-spacing:0.02em;}
-.bwd-chev{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.22s,background 0.22s;line-height:1;background:#fff;}
-details[open].bw-date .bwd-chev{transform:rotate(45deg);background:var(--gold-dim);}
-.bwd-body{padding:6px 20px 20px;}
-.bwd-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:9px 0;border-bottom:1px solid #f0f0f0;font-size:13.5px;}
-.bwd-row:last-of-type{border-bottom:none;}
-.bwd-row .bwd-name{color:var(--text);font-weight:500;flex:1;min-width:0;}
-.bwd-row .bwd-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);white-space:nowrap;}
-.bwd-row .bwd-unit{color:var(--muted);font-size:11px;margin-left:4px;font-weight:400;font-family:'Montserrat',sans-serif;}
-.bwd-row .bwd-flag{font-size:9px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:2px 8px;border-radius:10px;margin-left:6px;}
-.bwd-flag.elite{color:#9a7b34;background:rgba(168,137,78,.14);}
-.bwd-flag.flag{color:var(--red);background:var(--red-soft);}
-.bwd-flag.optimal{color:var(--green);background:var(--green-soft);}
-.bwd-flag.low{color:var(--amber);background:var(--amber-soft);}
-
-/* Biomarker progress table */
-.bp-table-wrap{background:#fff;border:1px solid var(--border);border-radius:2px;border-top:2px solid var(--gold);padding:6px 4px;margin-bottom:14px;overflow-x:auto;}
-.bp-table{width:100%;border-collapse:collapse;font-size:14px;}
-.bp-table thead th{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);padding:14px 14px 10px;text-align:left;border-bottom:1px solid var(--gold-border);}
-.bp-th-name{text-align:left;}
-.bp-th-num{text-align:right;}
-.bp-table tbody td{padding:11px 14px;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
-.bp-table tbody tr:last-child td{border-bottom:none;}
-.bp-table tbody tr:hover{background:rgba(122,101,48,0.03);}
-.bp-name{font-weight:500;color:var(--text);}
-.bp-from{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;color:var(--muted);text-align:right;white-space:nowrap;}
-.bp-from em{font-style:normal;font-family:'Montserrat',sans-serif;font-size:10px;color:var(--muted);font-weight:400;margin-left:3px;}
-.bp-to{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);text-align:right;white-space:nowrap;}
-.bp-to em{font-style:normal;font-family:'Montserrat',sans-serif;font-size:10px;color:var(--muted);font-weight:400;margin-left:3px;}
-.bp-dash{color:#ccc;font-family:'Montserrat',sans-serif;}
-.bp-delta{text-align:right;white-space:nowrap;font-size:11px;font-weight:600;color:var(--green);letter-spacing:0.02em;}
-.bp-delta.up{color:var(--gold);}
-.bp-delta.hold{color:var(--muted);font-weight:500;}
-.bp-delta.elite{color:#9a7b34;background:rgba(168,137,78,.14);padding:3px 9px;border-radius:10px;font-size:9.5px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;display:inline-block;}
-@media(max-width:640px){.bp-table thead th{padding:10px 8px;font-size:8px;letter-spacing:0.1em;}.bp-table tbody td{padding:10px 8px;}.bp-from,.bp-to{font-size:14px;}.bp-name{font-size:13px;}}
-
-/* Compound rows (legacy — keep CSS in case any old markup remains) */
-.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
-details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
-details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:nowrap;position:relative;border-bottom:1px solid transparent;}
-details.li-row > summary::-webkit-details-marker{display:none;}
-details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
-details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
-details.li-row > summary:hover::after{border-color:var(--gold);}
-details[open].li-row > summary{border-bottom-color:var(--border);}
-.li-summary-name{font-size:15px;font-weight:700;color:var(--text);flex:1 1 0;min-width:0;}
-.li-summary-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;}
-.li-summary-tag{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);}
-.li-summary-tag em{font-style:normal;color:var(--muted);font-weight:500;letter-spacing:0.08em;}
-.li-summary-dose{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);white-space:nowrap;line-height:1.2;}
-.li-body{padding:18px 22px;background:#fafafa;}
-.li-body > * + *{margin-top:14px;}
-.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
-.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
-.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:84px;flex-shrink:0;}
-.cmp-quick .qv{flex:1;min-width:200px;}
-.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
-.li-body .li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;font-size:13px;color:#3d2f10;line-height:1.7;}
-.li-body .li-callout strong{color:var(--gold);font-weight:700;}
-
-/* Daily meds time-block cards */
-.tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
-.tb-card{background:#fff;border:1px solid var(--border);border-radius:2px;border-top:2px solid var(--gold);padding:18px 20px;}
-.tb-card-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;gap:10px;}
-.tb-card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);}
-.tb-card-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:3px 9px;border-radius:99px;white-space:nowrap;}
-.tb-card-sub{font-size:11px;color:var(--muted);margin-bottom:10px;font-weight:500;letter-spacing:0.04em;}
-.tb-list{display:flex;flex-direction:column;gap:6px;}
-.tb-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px dotted rgba(122,101,48,0.18);font-size:14px;}
-.tb-row:last-child{border-bottom:none;}
-.tb-row .tb-name{color:var(--text);font-weight:500;}
-.tb-row .tb-dose{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--gold);white-space:nowrap;}
-.tb-mini{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border);}
-.tb-mini-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);}
-.tb-mini-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--gold);flex:none;}
-.tb-drink{font-size:14px;line-height:1.85;color:var(--text);}
-.tb-drink .hl{color:var(--gold);font-weight:600;}
-
-/* Schedule */
-.sched-card{background:#fff;border:1px solid var(--border);border-radius:2px;padding:18px 20px;margin-bottom:14px;}
-.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;flex-wrap:wrap;}
-.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
-.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.04em;margin-top:4px;line-height:1.6;}
-.sched-phase-pill{background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:4px 10px;border-radius:2px;white-space:nowrap;flex-shrink:0;}
-.sched-scroll{overflow-x:auto;}
-.sched-table{width:100%;border-collapse:collapse;min-width:520px;font-size:12px;}
-.sched-table th{text-align:left;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);padding:8px 6px;border-bottom:1px solid var(--border);}
-.sched-table th.right{text-align:right;}
-.sched-table td{padding:9px 6px;vertical-align:top;border-bottom:1px solid #f0f0f0;}
-.sched-table td.right{text-align:right;}
-.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
-.sched-pill{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
-.sched-pill strong{font-weight:800;font-size:11.5px;letter-spacing:-0.1px;margin-right:2px;}
-.sched-pill.am{background:rgba(185,122,31,0.14);border-color:rgba(185,122,31,0.36);color:#b97a1f;}
-.sched-pill.am-mwf{background:rgba(58,107,142,0.14);border-color:rgba(58,107,142,0.34);color:#3a6b8e;}
-.sched-pill.am-mth{background:rgba(184,85,116,0.14);border-color:rgba(184,85,116,0.36);color:#b85574;}
-.sched-pill.pm{background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.36);color:#6e4d92;}
-.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
-.sched-count{display:inline-block;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--gold);}
-.sched-count.off{color:#bbb;}
-.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
-.cal-left{flex:1;min-width:240px;}
-.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
-.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
-.cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
-.cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
-.cal-dl-btn:hover{background:#345d85;}
-
-/* Bloodwork panel cards */
-.bw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;}
-details.bw-card{background:#fff;border:1px solid var(--border);border-radius:2px;border-top:2px solid var(--gold);overflow:hidden;}
-details.bw-card.tinted{background:#fafaf6;}
-details.bw-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:background 0.18s;}
-details.bw-card > summary::-webkit-details-marker{display:none;}
-details.bw-card > summary:hover{background:rgba(122,101,48,0.04);}
-details[open].bw-card > summary{border-bottom:1px solid var(--border);}
-.bw-card-left{flex:1;min-width:0;}
-.bw-card-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);line-height:1.15;}
-.bw-card-meta{font-size:11px;color:var(--muted);margin-top:4px;letter-spacing:0.02em;}
-.bw-card-chev{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--gold);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.22s,background 0.22s;line-height:1;background:#fff;}
-details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gold-dim);}
-.bw-card-body{padding:8px 18px 18px;}
-.prog{display:grid;grid-template-columns:1fr auto auto;align-items:baseline;gap:4px 12px;padding:9px 0;font-size:13.5px;border-bottom:1px solid #f0eadb;}
+/* Body-metric progress rows */
+.prog{display:grid;grid-template-columns:1fr auto auto;align-items:baseline;gap:4px 14px;padding:10px 0;font-size:13px;border-bottom:1px solid var(--line-soft);}
 .prog:last-of-type{border-bottom:none;}
-.prog .name{white-space:nowrap;font-weight:500;}
-.prog .track{display:flex;align-items:baseline;gap:6px;white-space:nowrap;}
+.prog .name{white-space:nowrap;font-weight:600;color:var(--text);}
+.prog .track{display:flex;align-items:baseline;gap:7px;white-space:nowrap;font-variant-numeric:tabular-nums;}
 .prog .from{color:var(--muted);font-size:12px;}
-.prog .arr{color:var(--gold);font-size:11px;}
-.prog .to{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text);}
-.prog .delta{font-size:10px;font-weight:600;white-space:nowrap;color:var(--green);text-align:right;letter-spacing:0.02em;min-width:42px;}
-.prog .delta.up{color:var(--gold);}
-.prog .delta.hold{color:var(--muted);font-weight:500;}
-.prog .delta.elite{color:#9a7b34;font-weight:700;background:rgba(168,137,78,.14);border-radius:10px;padding:2px 8px;letter-spacing:0.08em;text-transform:uppercase;font-size:9px;}
+.prog .arr{color:var(--accent);font-size:11px;}
+.prog .to{font-size:15px;font-weight:700;color:var(--text);}
+.prog .delta{font-size:10.5px;font-weight:700;white-space:nowrap;color:var(--green);text-align:right;letter-spacing:0.02em;min-width:52px;background:var(--green-soft);border-radius:99px;padding:3px 8px;}
+.prog .delta.up{color:var(--accent);background:var(--accent-dim);}
+.prog .delta.hold{color:var(--muted);background:rgba(90,102,117,0.08);font-weight:600;}
 
-/* Elite markers grid */
-.elite-card{background:#fafaf6;border:1px solid var(--border);border-radius:2px;border-top:2px solid var(--gold);padding:18px 22px;margin-bottom:14px;}
-.elite-card-head{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:6px;}
-.elite-card-sub{font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.04em;}
-.elite-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px;}
-.emk{display:flex;align-items:baseline;gap:10px;padding:9px 0;border-bottom:1px solid #eee5cf;}
-.emk-name{flex:1;font-size:13px;white-space:nowrap;font-weight:500;}
-.emk-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);white-space:nowrap;}
-.emk-val em{font-family:'Montserrat',sans-serif;font-style:normal;font-size:10px;color:var(--muted);margin-left:2px;font-weight:400;}
+/* ===== Daily meds time-block cards ===== */
+.tb-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;}
+.tb-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;overflow:hidden;}
+.tb-card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 18px 11px;background:var(--head);border-bottom:1px solid var(--line);}
+.tb-card-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:0.005em;}
+.tb-card-pill{font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-line);padding:3px 9px;border-radius:99px;white-space:nowrap;}
+.tb-card-sub{font-size:10.5px;color:var(--muted);font-weight:500;letter-spacing:0.04em;padding:9px 18px 0;line-height:1.5;}
+.tb-list{display:flex;flex-direction:column;padding:4px 18px 14px;}
+.tb-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px solid var(--line-soft);font-size:13.5px;}
+.tb-row:last-child{border-bottom:none;}
+.tb-row .tb-name{color:var(--text);font-weight:500;min-width:0;}
+.tb-row .tb-dose{font-size:14px;font-weight:700;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums;}
+.tb-mini{display:grid;grid-template-columns:1fr 1fr;gap:0 16px;margin:0 18px 14px;padding-top:10px;border-top:1px solid var(--line);}
+.tb-mini-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text);padding:6px 0;}
+.tb-mini-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent);flex:none;}
+.tb-drink{display:grid;grid-template-columns:1fr 1fr;gap:0 18px;padding:4px 18px 14px;}
+.dk{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text);padding:7px 0;border-bottom:1px solid var(--line-soft);min-width:0;}
+.dk::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--accent-line);flex:none;}
+.dk.hl{font-weight:700;color:var(--accent);}
+.dk.hl::before{background:var(--accent);}
 
-/* Progress card (body metrics) */
-.prog-card{background:#fff;border:1px solid var(--border);border-radius:2px;border-top:2px solid var(--gold);padding:18px 22px;}
-.prog-card-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;gap:10px;flex-wrap:wrap;}
-.prog-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);}
-.prog-card-tag{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--gold);}
-.prog-card-sub{font-size:11px;color:var(--muted);margin-bottom:14px;letter-spacing:0.04em;}
+/* ===== Schedule ===== */
+.sched-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:var(--head);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.sched-card-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:0.005em;}
+.sched-card-sub{padding:6px 18px 12px;border-bottom:1px solid var(--line);}
+.sched-phase-pill{background:var(--accent);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:4px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table{width:100%;border-collapse:collapse;min-width:520px;font-size:12px;}
+.sched-table th{text-align:left;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:11px 12px;border-bottom:1px solid var(--line);background:#fbfcfe;white-space:nowrap;}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line-soft);}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);font-size:12.5px;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;margin:1px 3px 2px 0;border:1px solid var(--accent-line);background:var(--accent-dim);color:var(--accent);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.am{background:rgba(61,96,152,0.10);border-color:rgba(61,96,152,0.30);color:#31527f;}
+.sched-pill.am-mwf{background:rgba(31,110,102,0.10);border-color:rgba(31,110,102,0.30);color:#1f6e66;}
+.sched-pill.am-mth{background:rgba(140,80,96,0.10);border-color:rgba(140,80,96,0.30);color:#8c5060;}
+.sched-pill.pm{background:rgba(88,76,144,0.10);border-color:rgba(88,76,144,0.30);color:#584c90;}
+.sched-pill.off{background:rgba(90,102,117,0.05);border-color:var(--line);color:#8b97a6;font-weight:400;}
+.sched-count{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;border-radius:99px;background:var(--accent-dim);border:1px solid var(--accent-line);font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;}
+.sched-count.off{color:#8b97a6;background:rgba(90,102,117,0.05);border-color:var(--line);}
+.cal-banner{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:var(--muted);line-height:1.6;font-weight:400;}
+.cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:var(--bg-alt);border:1px solid var(--line);border-radius:5px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-dl-btn{background:var(--accent);color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:5px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-dl-btn:hover{background:#33507f;}
 
-/* Tip cards */
-.tip-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:18px 22px;margin-bottom:12px;}
-.tip-card.warn{border-top-color:var(--red);}
-.tip-card.heal{border-top-color:var(--green);}
-.tip-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+/* ===== Note / tip cards ===== */
+.tip-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:12px;overflow:hidden;}
+.tip-head{padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.tip-card.warn .tip-head{border-bottom-color:var(--red-border);}
+.tip-card.heal .tip-head{border-bottom-color:var(--green-border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
 .tip-card.warn .tip-eyebrow{color:var(--red);}
 .tip-card.heal .tip-eyebrow{color:var(--green);}
-.tip-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);margin-bottom:8px;line-height:1.2;}
-.tip-body{font-size:13.5px;line-height:1.75;color:var(--text);font-weight:400;}
-.tip-body p + p{margin-top:8px;}
-.tip-body strong{font-weight:700;color:var(--text);}
+.tip-title{font-size:16px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:6px 18px 14px;font-size:13.5px;line-height:1.7;color:var(--text);font-weight:400;}
+.tip-body strong{font-weight:700;}
 
-/* ===== Bloodwork tab — flat medical-report layout ===== */
-.lab-header{padding-bottom:14px;margin-bottom:18px;border-bottom:2px solid var(--gold);}
-.lab-header-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);line-height:1.1;}
+/* ===== Bloodwork tab ===== */
+.lab-header{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);border-top:3px solid var(--accent);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-size:20px;font-weight:700;color:var(--text);line-height:1.15;letter-spacing:-0.01em;}
 .lab-header-meta{font-size:12px;color:var(--muted);margin-top:5px;line-height:1.55;}
 
-.lab-score{background:linear-gradient(135deg,#fbf8ee,#f5efde);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:3px;padding:18px 22px;margin-bottom:22px;}
-.lab-score-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
-.lab-score-main{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:14px;border-bottom:1px dashed var(--gold-border);}
-.lab-score-number{font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:700;color:var(--gold);line-height:0.95;}
-.lab-score-denom{font-size:24px;color:var(--muted);font-weight:500;margin-left:2px;}
+.lab-score{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:16px;overflow:hidden;}
+.lab-score-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);padding:12px 20px;background:var(--head);border-bottom:1px solid var(--line);}
+.lab-score-main{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:18px 20px;border-bottom:1px solid var(--line);}
+.lab-score-number{font-size:54px;font-weight:700;color:var(--accent);line-height:0.95;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-denom{font-size:20px;color:var(--muted);font-weight:600;margin-left:2px;}
 .lab-score-meta{flex:1;min-width:200px;}
-.lab-score-grade{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.1;margin-bottom:4px;letter-spacing:0.02em;}
-.lab-score-context{font-size:12px;color:#3d2f10;line-height:1.55;}
-.lab-score-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px 18px;}
-.lab-score-item{font-size:12px;color:var(--text);display:flex;align-items:baseline;gap:8px;padding:4px 0;}
-.lab-score-num{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--gold);min-width:28px;text-align:right;}
+.lab-score-grade{font-size:17px;font-weight:700;color:var(--text);line-height:1.2;margin-bottom:4px;letter-spacing:0.02em;}
+.lab-score-context{font-size:12px;color:var(--muted);line-height:1.55;}
+.lab-score-breakdown{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 24px;padding:6px 20px 4px;}
+.lab-score-item{font-size:12.5px;color:var(--text);display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line-soft);font-weight:500;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--accent-dim);border:1px solid var(--accent-line);font-size:11px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;flex:none;}
 .lab-score-item .info-tip{margin-left:auto;}
-.lab-score-foot{font-size:10.5px;color:var(--muted);margin-top:10px;font-style:italic;}
+.lab-score-foot{font-size:10.5px;color:var(--muted);padding:10px 20px 14px;line-height:1.6;}
 @media(max-width:640px){
-  .lab-score{padding:14px 16px;}
-  .lab-score-main{gap:12px;padding-bottom:12px;}
-  .lab-score-number{font-size:48px;}
-  .lab-score-denom{font-size:18px;}
-  .lab-score-grade{font-size:18px;}
+  .lab-score-main{gap:14px;padding:14px 16px;}
+  .lab-score-number{font-size:42px;}
+  .lab-score-denom{font-size:17px;}
+  .lab-score-grade{font-size:15px;}
   .lab-score-context{font-size:11.5px;}
-  .lab-score-breakdown{grid-template-columns:repeat(2,1fr);gap:3px 12px;}
-  .lab-score-item{font-size:11px;padding:3px 0;}
-  .lab-score-num{font-size:14px;min-width:24px;}
+  .lab-score-breakdown{grid-template-columns:1fr;padding:4px 16px 2px;}
+  .lab-score-item{font-size:11.5px;padding:8px 0;}
+  .lab-score-eyebrow{padding:11px 16px;}
+  .lab-score-foot{padding:10px 16px 12px;}
 }
 
-.lab-section{margin-bottom:22px;}
-.lab-section-head{padding:8px 0 4px;margin-bottom:2px;border-bottom:1px solid var(--gold-border);}
-.lab-section-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--gold);letter-spacing:0.04em;text-transform:uppercase;}
-.lab-section-sub{font-size:10px;font-weight:500;color:var(--muted);margin-top:1px;letter-spacing:0.04em;}
+.lab-section{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.lab-section-title{font-size:12px;font-weight:700;color:var(--accent);letter-spacing:0.14em;text-transform:uppercase;}
+.lab-section-sub{font-size:10px;font-weight:500;color:var(--muted);margin-top:3px;letter-spacing:0.03em;line-height:1.5;}
 
-.lab-row{position:relative;display:grid;grid-template-columns:1.7fr 1fr auto auto;gap:10px 14px;align-items:baseline;padding:7px 4px;border-bottom:1px dotted #ebe5cf;font-size:13px;}
+.lab-row{position:relative;display:grid;grid-template-columns:1.7fr 1fr auto auto;gap:8px 14px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--line-soft);font-size:13px;}
+.lab-row:nth-child(even){background:#fbfcfe;}
 .lab-row:last-child{border-bottom:none;}
 .lab-name{font-weight:500;color:var(--text);min-width:0;}
-.lab-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--text);white-space:nowrap;text-align:right;}
-.lab-val.hi{color:#c25555;}
-.lab-val.lo{color:#4278a8;}
-.lab-val.ok{color:#5a8a5a;}
-.lab-val em{font-family:'Montserrat',sans-serif;font-style:normal;font-size:10px;color:var(--muted);margin-left:4px;font-weight:400;letter-spacing:0.02em;}
-.lab-ref{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:0.02em;text-align:right;}
-.lab-status{font-size:8.5px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:2px 8px;border-radius:99px;white-space:nowrap;text-align:center;min-width:62px;}
-.lab-status.ok{background:rgba(90,138,90,0.12);color:#3a6b3a;}
-.lab-status.hi{background:rgba(194,85,85,0.14);color:#8a3c3c;}
-.lab-status.lo{background:rgba(66,120,168,0.14);color:#2a5780;}
-.lab-status.normal{background:rgba(120,120,120,0.08);color:var(--muted);}
+.lab-val{font-size:16px;font-weight:700;color:var(--text);white-space:nowrap;text-align:right;font-variant-numeric:tabular-nums;}
+.lab-val.hi{color:var(--red);}
+.lab-val.lo{color:var(--accent);}
+.lab-val.ok{color:var(--green);}
+.lab-val em{font-style:normal;font-size:10px;color:var(--muted);margin-left:4px;font-weight:500;letter-spacing:0.02em;}
+.lab-ref{font-size:11px;color:var(--muted);white-space:nowrap;letter-spacing:0.02em;text-align:right;font-variant-numeric:tabular-nums;}
+.lab-status{font-size:8.5px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;padding:3px 9px;border-radius:99px;white-space:nowrap;text-align:center;min-width:64px;border:1px solid transparent;}
+.lab-status.ok{background:var(--green-soft);color:#24614a;border-color:var(--green-border);}
+.lab-status.hi{background:var(--red-soft);color:#8f3a33;border-color:var(--red-border);}
+.lab-status.lo{background:var(--info-soft);color:#2f4d7a;border-color:var(--info-border);}
+.lab-status.normal{background:var(--bg);color:var(--muted);border-color:var(--line);}
 
-.lab-index p{font-size:12px;line-height:1.7;color:var(--muted);margin:0;padding:3px 0;}
-.lab-index p strong{color:var(--text);font-weight:700;font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:0.02em;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{font-size:12px;line-height:1.6;color:var(--muted);margin:0;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.lab-index p:last-child{border-bottom:none;}
+.lab-index p strong{color:var(--text);font-weight:700;font-size:12px;letter-spacing:0.02em;font-variant-numeric:tabular-nums;}
+.lab-index p.lab-index-next{margin-top:4px;color:var(--muted);}
 
 .lab-row .info-tip-text{width:240px;}
 
 @media(max-width:640px){
-  .lab-row{grid-template-columns:1fr auto;grid-template-areas:'name val' 'ref status';gap:2px 10px;padding:9px 4px;}
-  .lab-name{grid-area:name;font-size:13px;}
+  .lab-row{grid-template-columns:1fr auto;grid-template-areas:'name val' 'ref status';gap:3px 10px;padding:10px 14px;}
+  .lab-name{grid-area:name;font-size:12.5px;}
   .lab-val{grid-area:val;font-size:15px;}
-  .lab-ref{grid-area:ref;font-size:10.5px;text-align:left;color:var(--muted);}
-  .lab-status{grid-area:status;font-size:8px;padding:1px 6px;min-width:auto;}
-  .lab-header-title{font-size:20px;}
-  .lab-section-title{font-size:14px;}
+  .lab-ref{grid-area:ref;font-size:10.5px;text-align:left;}
+  .lab-status{grid-area:status;font-size:8px;padding:2px 7px;min-width:auto;}
+  .lab-header-title{font-size:18px;}
+  .lab-section-title{font-size:11px;}
+  .lab-section-head{padding:11px 14px;}
+  .lab-index{padding:4px 14px 12px;}
 
-  /* On mobile, anchor lab-row tooltips to the ROW container (not the icon) so they span the row width and never clip off-screen */
+  /* Anchor lab-row tooltips to the ROW container (not the icon) so they span the row width and never clip off-screen */
   .lab-row .info-tip{position:static;}
   .lab-row .info-tip-text{
     position:absolute;
     bottom:auto;
-    top:calc(100% + 2px);
-    left:4px;
-    right:4px;
+    top:calc(100% - 4px);
+    left:10px;
+    right:10px;
     width:auto;
     max-width:none;
     transform:none;
@@ -365,7 +342,7 @@ details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gol
     bottom:auto;
     left:14px;
     transform:none;
-    border-bottom-color:#1a1a1a;
+    border-bottom-color:#1d2733;
     border-top-color:transparent;
   }
 
@@ -376,7 +353,7 @@ details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gol
      gutter on mobile Safari. Same fix as .lab-row above: anchor the bubble to a
      full-width host block with left/right insets instead of to the tiny icon,
      so it can never exceed the content column. */
-  .tb-row, .cmp-row, .tb-mini, .tb-drink, .lab-score-breakdown{position:relative;}
+  .tb-row, .cmp-row, .cmp-row-name, .tb-mini, .tb-drink, .lab-score-breakdown{position:relative;}
   .tb-row .info-tip,
   .cmp-row .info-tip,
   .tb-mini .info-tip,
@@ -397,6 +374,7 @@ details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gol
     transform:none;
     margin:0;
   }
+  .cmp-row-name .info-tip-text{top:calc(100% - 2px);left:6px;right:6px;}
   .tb-row .info-tip-text::after,
   .cmp-row .info-tip-text::after,
   .tb-mini .info-tip-text::after,
@@ -406,103 +384,56 @@ details[open].bw-card .bw-card-chev{transform:rotate(45deg);background:var(--gol
     bottom:auto;
     left:14px;
     transform:none;
-    border-bottom-color:#1a1a1a;
+    border-bottom-color:#1d2733;
     border-top-color:transparent;
   }
 }
 
-/* ===== Legacy Bloodwork tab styles (unused after the flat rebuild — kept for safety) ===== */
-.bw-summary{background:linear-gradient(135deg,rgba(122,101,48,0.06),rgba(122,101,48,0.02));border:1px solid rgba(122,101,48,0.35);border-left:3px solid var(--gold);padding:16px 20px;border-radius:2px;margin-bottom:20px;font-size:13px;color:#3d2f10;line-height:1.75;}
-.bw-summary p + p{margin-top:8px;}
-.bw-summary strong{color:var(--gold);font-weight:700;}
-.bw-flag-row{background:#fff;border:1px solid var(--border);border-left:4px solid #c25555;border-radius:2px;padding:14px 18px;margin-bottom:10px;}
-.bw-flag-row.yellow{border-left-color:#c89640;}
-.bw-flag-row.green{border-left-color:#5a8a5a;}
-.bw-flag-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
-.bw-flag-name{font-size:14px;font-weight:700;color:var(--text);}
-.bw-flag-val{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:#c25555;white-space:nowrap;}
-.bw-flag-val .ref{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:500;color:var(--muted);margin-left:6px;letter-spacing:0.04em;}
-.bw-flag-row.yellow .bw-flag-val{color:#c89640;}
-.bw-flag-row.green .bw-flag-val{color:#5a8a5a;}
-.bw-flag-desc{font-size:13px;color:var(--text);line-height:1.7;font-weight:400;}
-.bw-flag-desc strong{color:var(--gold);font-weight:700;}
-.bw-trend-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border:1px solid var(--border);border-radius:2px;}
-.bw-trend-table th{background:#f0f0f0;color:var(--gold);padding:8px 10px;text-align:left;font-size:9px;letter-spacing:0.10em;text-transform:uppercase;font-weight:700;border-bottom:1px solid rgba(122,101,48,0.35);}
-.bw-trend-table th.right{text-align:right;}
-.bw-trend-table td{padding:8px 10px;border-bottom:1px solid var(--border);font-size:12px;}
-.bw-trend-table td.right{text-align:right;font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;}
-.bw-trend-table tr:last-child td{border-bottom:none;}
-.bw-trend-table td .hi{color:#c25555;font-weight:700;}
-.bw-trend-table td .lo{color:#4278a8;font-weight:700;}
-.bw-trend-table td .ok{color:#5a8a5a;font-weight:600;}
-.bw-trend-table .dash{color:#bbb;}
-/* Mobile-friendly biomarker cards (replaces trend tables) */
-.bm-card{background:#fff;border:1px solid var(--border);border-radius:3px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--gold);}
-.bm-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:6px;}
-.bm-name{font-size:14px;font-weight:700;color:var(--text);line-height:1.25;flex:1 1 auto;}
-.bm-latest{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--text);line-height:1;white-space:nowrap;flex:0 0 auto;}
-.bm-latest.hi{color:#c25555;}
-.bm-latest.lo{color:#4278a8;}
-.bm-latest.ok{color:#5a8a5a;}
-.bm-latest .bm-unit{font-family:'Montserrat',sans-serif;font-size:11px;font-weight:400;color:var(--muted);margin-left:3px;letter-spacing:0.04em;}
-.bm-meta{font-size:11px;color:var(--muted);letter-spacing:0.04em;margin-bottom:8px;}
-.bm-meta .bm-status{color:#5a8a5a;font-weight:600;}
-.bm-meta .bm-status.hi{color:#c25555;}
-.bm-meta .bm-status.lo{color:#4278a8;}
-.bm-desc{font-size:12.5px;color:#3d2f10;line-height:1.6;background:rgba(122,101,48,0.04);padding:8px 11px;border-radius:2px;margin-bottom:8px;}
-.bm-desc strong{color:var(--gold);font-weight:700;}
-.bm-trend{display:flex;flex-wrap:wrap;gap:4px;align-items:center;}
-.bm-trend-label{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-right:4px;}
-.bm-trend-pill{display:inline-flex;align-items:baseline;gap:4px;background:#fafafa;border:1px solid var(--border);border-radius:99px;padding:3px 9px;font-size:11px;color:var(--text);font-family:'Montserrat',sans-serif;}
-.bm-trend-pill em{font-style:normal;font-size:9px;color:var(--muted);letter-spacing:0.02em;font-weight:600;}
-.bm-trend-pill.lo{background:rgba(66,120,168,0.10);border-color:rgba(66,120,168,0.30);color:#2a5780;}
-.bm-trend-pill.hi{background:rgba(194,85,85,0.10);border-color:rgba(194,85,85,0.30);color:#8a3c3c;}
-.bm-trend-pill.ok{background:rgba(90,138,90,0.10);border-color:rgba(90,138,90,0.30);color:#3a6b3a;}
-.bm-trend-pill.latest{font-weight:700;border-width:1.5px;}
-@media(max-width:480px){
-  .bm-card{padding:12px 13px;}
-  .bm-name{font-size:13px;}
-  .bm-latest{font-size:22px;}
-  .bm-desc{font-size:12px;padding:7px 10px;}
-  .bm-trend-pill{font-size:10.5px;padding:3px 8px;}
-}
+/* ===== Footer ===== */
+.inv-footer{background:var(--head);border-top:1px solid var(--line);padding:16px 34px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.footer-disc{font-size:10px;color:var(--muted);font-weight:500;line-height:1.55;flex:1;min-width:240px;}
+.footer-brand{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
 
-.bw-trend-table-wrap{margin-bottom:18px;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:18px auto 56px;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;box-shadow:var(--shadow);}
+.print-btn:hover{background:#33507f;}
+
+@media print{body{background:#fff;padding:0;}.invoice-wrap{border:none;width:100%;max-width:100%;box-shadow:none;}.print-btn,.tab-bar{display:none;}.tab-content{display:block !important;background:#fff;}details > summary{list-style:none;}.cmp-row,.tb-card,.lab-section,.sched-card,.data-card,.tip-card{box-shadow:none;break-inside:avoid;}}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:92%;}}
+@media(max-width:820px){
+  .invoice-wrap,.print-btn{width:96%;}
+  body{padding:20px 8px;}
+  .inv-header{padding:20px 20px;}
+  .tab-content{padding:22px 18px;}
+  .inv-footer{padding:14px 20px;}
+  .tb-grid{grid-template-columns:1fr;}
+  .lab-score-breakdown{grid-template-columns:1fr;}
+}
 @media(max-width:640px){
-  .bw-trend-table{font-size:11px;}
-  .bw-trend-table th{padding:6px 5px;font-size:8px;letter-spacing:0.05em;}
-  .bw-trend-table td{padding:6px 5px;font-size:11px;}
-  .bw-trend-table td.right{font-size:12px;padding:6px 5px;}
-  .bw-trend-table .info-tip{margin-left:3px;width:13px;height:13px;font-size:8px;}
+  .invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}
+  .print-btn{border-radius:6px;width:calc(100% - 24px);}
+  body{padding:0 0 8px;font-size:15px;}
+  .inv-header{flex-direction:column;gap:12px;padding:18px 16px;}
+  .inv-meta{text-align:left;}
+  .inv-brand-name{font-size:25px;}
+  .tab-content{padding:16px 12px 26px;}
+  .inv-footer{flex-direction:column;align-items:flex-start;padding:14px 16px;}
+  .program-title{font-size:22px;}
+  .program-intro{padding:16px 15px;}
+  .sec-divider-title{font-size:17px;}
+  .cmp-list{grid-template-columns:1fr;}
+  .tb-drink{grid-template-columns:1fr;}
+  .tb-mini{grid-template-columns:1fr;}
+  .cc-banner{padding:14px 15px;gap:10px;}
+  .cc-title{font-size:16px;}
+  .cc-arrow{font-size:20px;}
+  .tb-card-head,.sched-card-head{padding:12px 15px;}
+  .tb-list,.tb-drink{padding-left:15px;padding-right:15px;}
+  .tb-card-sub{padding-left:15px;padding-right:15px;}
+  .tb-mini{margin-left:15px;margin-right:15px;}
+  .sched-card-sub{padding-left:15px;padding-right:15px;}
+  .tip-head,.tip-body{padding-left:15px;padding-right:15px;}
+  .chart-note{padding:12px 14px;}
 }
-@media(max-width:480px){
-  .bw-trend-table{font-size:10px;}
-  .bw-trend-table th{padding:5px 3px;font-size:7.5px;}
-  .bw-trend-table td{padding:5px 3px;font-size:10px;}
-  .bw-trend-table td.right{font-size:11px;padding:5px 3px;}
-}
-details.bw-detail{background:#fff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:16px 20px;margin-bottom:12px;}
-details.bw-detail > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:42px;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text);}
-details.bw-detail > summary::-webkit-details-marker{display:none;}
-details.bw-detail > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid rgba(122,101,48,0.35);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
-details[open].bw-detail > summary::after{content:'\2212';background:rgba(122,101,48,0.10);}
-details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
-.bw-sec-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2px;display:block;}
-.bw-date-list{background:#fafafa;border:1px solid var(--border);border-radius:2px;padding:12px 16px;font-size:12px;line-height:1.8;color:var(--muted);}
-.bw-date-list strong{color:var(--text);font-weight:700;font-family:'Cormorant Garamond',serif;font-size:14px;}
-
-/* Footer */
-.inv-footer{background:#fafafa;border-top:1px solid var(--border);padding:16px 36px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
-.footer-disc{font-size:10px;color:var(--muted);font-weight:500;line-height:1.5;flex:1;min-width:240px;}
-.footer-brand{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
-
-.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 60px;padding:16px;background:var(--gold);color:#fff;border:none;border-radius:2px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;}
-.print-btn:hover{background:#5f4f26;}
-
-@media print{body{background:#fff;padding:0;}.invoice-wrap{border:none;width:100%;max-width:100%;}.print-btn,.tab-bar{display:none;}.tab-content{display:block !important;}details > summary{list-style:none;}}
-@media(max-width:1100px){.invoice-wrap,.print-btn{width:90%;}}
-@media(max-width:820px){.invoice-wrap,.print-btn{width:94%;}body{padding:24px 10px;}.inv-header{padding:22px 22px;}.tab-content{padding:24px 22px;}.inv-footer{padding:14px 22px;}.tb-grid{grid-template-columns:1fr;}.bw-grid{grid-template-columns:1fr 1fr;}.elite-grid{grid-template-columns:1fr;}}
-@media(max-width:640px){.invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}body{padding:8px 0;font-size:15px;}.inv-header{flex-direction:column;gap:14px;padding:20px 18px;}.inv-meta{text-align:left;}.inv-brand-name{font-size:26px;}.tab-content{padding:20px 16px;}.inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}.program-title{font-size:28px;}.sec-divider-title{font-size:19px;}.bw-grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -536,17 +467,22 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
       <div class="program-title">Micah&apos;s <em>10-Compound Stack</em></div>
       <div class="program-tag">8-week cycle &middot; TRT, Retatrutide &amp; HGH continue as year-round foundation</div>
       <div class="program-context">
-        <p>Ten active compounds split across an AM injectable block (7 compounds, logged ~6:24 AM) and a PM injectable block (3 compounds, logged ~8 PM). Each has its own cadence — daily, five days a week M&ndash;F, three days a week M/W/F, or twice-weekly M/Th. <strong>HGH runs 2 iu fasted every morning, year-round;</strong> the metabolic + bioregulator compounds run an 8-week cycle (Cortagen a 20-day course inside it). <strong>Plus a layered daily-meds + supplements stack</strong> built around an intermittent-fasting 12 PM &ndash; 7 PM eating window.</p>
+        <div class="note-list">
+          <div class="nr"><div class="nr-l">Compounds</div><div class="nr-v">Ten active compounds split across an AM injectable block (7 compounds, logged ~6:24 AM) and a PM injectable block (3 compounds, logged ~8 PM).</div></div>
+          <div class="nr"><div class="nr-l">Cadence</div><div class="nr-v">Each has its own cadence — daily, five days a week M&ndash;F, three days a week M/W/F, or twice-weekly M/Th.</div></div>
+          <div class="nr"><div class="nr-l">Cycle</div><div class="nr-v"><strong>HGH runs 2 iu fasted every morning, year-round;</strong> the metabolic + bioregulator compounds run an 8-week cycle (Cortagen a 20-day course inside it).</div></div>
+          <div class="nr"><div class="nr-l">Daily support</div><div class="nr-v"><strong>Plus a layered daily-meds + supplements stack</strong> built around an intermittent-fasting 12 PM &ndash; 7 PM eating window.</div></div>
+        </div>
       </div>
     </div>
 
-    <a href="/mpauldino/command-center/" onclick="event.preventDefault();switchTab('command',document.getElementById('cc-tab-btn'));" style="display:flex;align-items:center;justify-content:space-between;gap:16px;background:linear-gradient(135deg,rgba(122,101,48,0.12),rgba(122,101,48,0.03));border:1px solid rgba(122,101,48,0.35);border-left:3px solid #7A6530;border-radius:8px;padding:16px 20px;margin:6px 0 26px;text-decoration:none;color:inherit;">
+    <a class="cc-banner" href="/mpauldino/command-center/" onclick="event.preventDefault();switchTab('command',document.getElementById('cc-tab-btn'));">
       <div>
-        <div style="font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:4px;">&#129516; Archive &middot; Full Stack &middot; Rotation</div>
-        <div style="font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;line-height:1.1;">Open Your Command Center</div>
-        <div style="font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.5;">Your cycle archive, the full library by body system, overlap flags, and the 2026 rotation plan &mdash; everything you&apos;ve run and what&apos;s next. This page stays your <strong>current</strong> protocol.</div>
+        <div class="cc-eyebrow">&#129516; Archive &middot; Full Stack &middot; Rotation</div>
+        <div class="cc-title">Open Your Command Center</div>
+        <div class="cc-sub">Your cycle archive, the full library by body system, overlap flags, and the 2026 rotation plan &mdash; everything you&apos;ve run and what&apos;s next. This page stays your <strong>current</strong> protocol.</div>
       </div>
-      <div style="font-size:26px;color:#7A6530;flex-shrink:0;">&rarr;</div>
+      <div class="cc-arrow">&rarr;</div>
     </a>
 
     <div class="sec-divider">
@@ -554,58 +490,61 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
       <div class="sec-divider-title">10 Compounds &middot; 7 AM &middot; 3 PM</div>
     </div>
 
+    <div class="cmp-group">AM Block &middot; 7 Compounds</div>
     <div class="cmp-list">
 
-      <!-- ===== AM BLOCK (7) ===== -->
       <div class="cmp-row">
         <span class="cmp-row-name">MOTS-c <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondrial-derived peptide.</strong> Activates AMPK &mdash; the cell&apos;s metabolic master switch &mdash; driving fat oxidation, insulin sensitivity, and exercise-like metabolic adaptation. The mitochondrial fat-loss lever of the 8-week cycle. <em>40 mg vial &middot; 2 vials for the cycle.</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; M&ndash;F</em></span><span class="cmp-row-dose">2 mg</span></div>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M&ndash;F</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 mg</span></div></div>
       </div>
 
       <div class="cmp-row">
         <span class="cmp-row-name">5-Amino-1MQ <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>NNMT inhibitor.</strong> Blocks the enzyme that lets fat cells hoard energy &mdash; shifts fat-cell metabolism toward burning and supports NAD+ salvage. Small-molecule metabolic amplifier that pairs with the GLP-1 lever. <em>5 mg vial &middot; 4 vials for the cycle.</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; M&ndash;F</em></span><span class="cmp-row-dose">500 mcg</span></div>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M&ndash;F</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">500 mcg</span></div></div>
       </div>
 
       <div class="cmp-row">
         <span class="cmp-row-name">NAD+ <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Cellular energy substrate.</strong> Fuels mitochondrial ATP, DNA repair, sirtuin activation (longevity pathways). Levels drop ~1.5&ndash;2% per year after 30 &mdash; restoring it lifts the daytime energy floor. <em>Kept in the AM &mdash; NAD+ is stimulating and commonly disrupts sleep if dosed late.</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; M/W/F</em></span><span class="cmp-row-dose">100 mg</span></div>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M/W/F</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">100 mg</span></div></div>
       </div>
 
       <div class="cmp-row">
-        <span class="cmp-row-name">TRT (Testosterone Cypionate) <span style="display:inline-block;background:var(--gold);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:4px;vertical-align:middle;">Year-round</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Hormone replacement.</strong> Restores testosterone to physiological range &mdash; drives energy, libido, muscle protein synthesis, mood, recovery. Ongoing foundation, not cycled. Long ester, so time of day is immaterial.</span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; M/W/F</em></span><span class="cmp-row-dose">0.25 mL</span></div>
+        <span class="cmp-row-name">TRT (Testosterone Cypionate) <span class="cmp-badge">Year-round</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Hormone replacement.</strong> Restores testosterone to physiological range &mdash; drives energy, libido, muscle protein synthesis, mood, recovery. Ongoing foundation, not cycled. Long ester, so time of day is immaterial.</span></span></span>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M/W/F</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">0.25 mL</span></div></div>
       </div>
 
       <div class="cmp-row">
         <span class="cmp-row-name">Melanotan <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Pigmentation + libido.</strong> Synthetic melanocortin analog &mdash; stimulates melanin (skin tanning) and central melanocortin receptors that drive sexual desire / arousal. Kept in the AM block here for a single morning injection window; note many dose it in the evening so the flush/nausea peak is slept through &mdash; move it to PM if that suits you better.</span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; M/Th</em></span><span class="cmp-row-dose">0.5 mg</span></div>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M/Th</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">0.5 mg</span></div></div>
       </div>
 
       <div class="cmp-row">
-        <span class="cmp-row-name">Retatrutide <span style="display:inline-block;background:var(--gold);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:4px;vertical-align:middle;">Ongoing</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Triple agonist GLP-1 / GIP / glucagon.</strong> The glucagon arm differentiates Reta from semaglutide / tirzepatide &mdash; direct fat oxidation + energy expenditure on top of appetite control. Ongoing foundation. Long half-life, so clock time doesn&apos;t affect it.</span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; M/Th</em></span><span class="cmp-row-dose">1 mg</span></div>
+        <span class="cmp-row-name">Retatrutide <span class="cmp-badge">Ongoing</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Triple agonist GLP-1 / GIP / glucagon.</strong> The glucagon arm differentiates Reta from semaglutide / tirzepatide &mdash; direct fat oxidation + energy expenditure on top of appetite control. Ongoing foundation. Long half-life, so clock time doesn&apos;t affect it.</span></span></span>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M/Th</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">1 mg</span></div></div>
       </div>
 
       <div class="cmp-row">
-        <span class="cmp-row-name">HGH (Somatropin) <span style="display:inline-block;background:var(--gold);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:4px;vertical-align:middle;">Year-round</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Exogenous growth hormone.</strong> 2 iu every day, year-round &mdash; recovery, body composition, sleep depth, connective-tissue support. Kit 36 iu reconstituted with 3 mL BAC water &rarr; 12 iu/mL, so 2 iu &asymp; 0.17 mL (<strong>~17 units</strong> on a U-100 insulin syringe). One 36 iu kit lasts 18 days &rarr; ~20&ndash;21 kits/yr. <em>Dosed fasted in the AM on waking &mdash; insulin/carbs blunt GH, so take it before food and hold off eating 30&ndash;60 min (fits the fasted-wake window).</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">AM <em>&middot; Daily</em></span><span class="cmp-row-dose">2 iu &middot; ~17u</span></div>
+        <span class="cmp-row-name">HGH (Somatropin) <span class="cmp-badge">Year-round</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Exogenous growth hormone.</strong> 2 iu every day, year-round &mdash; recovery, body composition, sleep depth, connective-tissue support. Kit 36 iu reconstituted with 3 mL BAC water &rarr; 12 iu/mL, so 2 iu &asymp; 0.17 mL (<strong>~17 units</strong> on a U-100 insulin syringe). One 36 iu kit lasts 18 days &rarr; ~20&ndash;21 kits/yr. <em>Dosed fasted in the AM on waking &mdash; insulin/carbs blunt GH, so take it before food and hold off eating 30&ndash;60 min (fits the fasted-wake window).</em></span></span></span>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">Daily</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 iu &middot; ~17u</span></div></div>
       </div>
 
-      <!-- ===== PM BLOCK (3) ===== -->
+    </div>
+
+    <div class="cmp-group mt">PM Block &middot; 3 Compounds</div>
+    <div class="cmp-list">
       <div class="cmp-row">
-        <span class="cmp-row-name">Cortagen <span style="display:inline-block;background:var(--muted);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;margin-left:4px;vertical-align:middle;">20-day course</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Khavinson short-peptide bioregulator.</strong> Cartilage / connective-tissue + anti-inflammatory signaling. Run as an isolated ~20-day course (not continuous) so the signal stays clean. 2 mg daily. <em>20 mg vial &middot; 2 vials for the course. Vendor convention is AM &mdash; placed PM here to batch with the evening block; either window is acceptable.</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">PM <em>&middot; Daily &middot; 20 d</em></span><span class="cmp-row-dose">2 mg</span></div>
+        <span class="cmp-row-name">Cortagen <span class="cmp-badge grey">20-day course</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Khavinson short-peptide bioregulator.</strong> Cartilage / connective-tissue + anti-inflammatory signaling. Run as an isolated ~20-day course (not continuous) so the signal stays clean. 2 mg daily. <em>20 mg vial &middot; 2 vials for the course. Vendor convention is AM &mdash; placed PM here to batch with the evening block; either window is acceptable.</em></span></span></span>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">PM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">Daily &middot; 20 d</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 mg</span></div></div>
       </div>
 
       <div class="cmp-row">
         <span class="cmp-row-name">Vesugen <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Khavinson short-peptide bioregulator.</strong> Vascular / blood-vessel-wall support &mdash; targets endothelial tissue health. 2 mg M&ndash;F across the 8-week block. <em>20 mg vial &middot; 4 vials for the cycle. Timing is flexible &mdash; vendors say any time of day, consistency over clock.</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">PM <em>&middot; M&ndash;F</em></span><span class="cmp-row-dose">2 mg</span></div>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">PM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M&ndash;F</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 mg</span></div></div>
       </div>
 
       <div class="cmp-row">
         <span class="cmp-row-name">HCG <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Human chorionic gonadotropin.</strong> Mimics LH &mdash; keeps the testes producing intratesticular testosterone and preserves size/fertility while on TRT. 500 iu M/W/F. Reconstitute 5000 iu + 5 mL BAC water &rarr; 1000 iu/mL, so 500 iu = 0.5 mL. <em>Commonly dosed AM &mdash; a minority of men report nighttime stimulation / lighter sleep from evening HCG. Placed PM here to batch the small evening block; move to AM if you notice sleep changes.</em></span></span></span>
-        <div class="cmp-row-meta"><span class="cmp-row-tag">PM <em>&middot; M/W/F</em></span><span class="cmp-row-dose">500 iu</span></div>
+        <div class="cmp-fields"><div class="fld"><span class="fld-l">Block</span><span class="fld-v">PM</span></div><div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">M/W/F</span></div><div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">500 iu</span></div></div>
       </div>
 
     </div>
@@ -615,64 +554,65 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
       <div class="sec-divider-title">Vial Math &middot; What to Order</div>
     </div>
 
-    <div style="background:#fff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:6px 4px;margin-bottom:14px;overflow-x:auto;">
-      <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:560px;">
+    <div class="data-card"><div class="data-scroll">
+      <table class="data-table">
         <thead>
           <tr>
-            <th style="text-align:left;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);padding:12px 12px 8px;border-bottom:1px solid var(--gold-border);">Compound</th>
-            <th style="text-align:left;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);padding:12px 12px 8px;border-bottom:1px solid var(--gold-border);">Reconstitute</th>
-            <th style="text-align:left;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);padding:12px 12px 8px;border-bottom:1px solid var(--gold-border);">Per Dose</th>
-            <th style="text-align:left;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);padding:12px 12px 8px;border-bottom:1px solid var(--gold-border);">Doses &times; Amount</th>
-            <th style="text-align:right;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);padding:12px 12px 8px;border-bottom:1px solid var(--gold-border);">Vials</th>
+            <th>Compound</th>
+            <th>Reconstitute</th>
+            <th>Per Dose</th>
+            <th>Doses &times; Amount</th>
+            <th class="right">Vials</th>
           </tr>
         </thead>
-        <tbody style="font-weight:400;color:var(--text);">
+        <tbody>
           <tr>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;">HGH <span style="color:var(--muted);font-weight:400;font-size:11px;">year-round</span></td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">36 iu kit + 3 mL &rarr; 12 iu/mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">2 iu &middot; 0.17 mL &middot; ~17u</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">daily &middot; 1 kit = 18 days</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:right;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--gold);white-space:nowrap;">~20&ndash;21 / yr</td>
+            <td class="cmp">HGH <span class="sub">year-round</span></td>
+            <td>36 iu kit + 3 mL &rarr; 12 iu/mL</td>
+            <td>2 iu &middot; 0.17 mL &middot; ~17u</td>
+            <td>daily &middot; 1 kit = 18 days</td>
+            <td class="num">~20&ndash;21 / yr</td>
           </tr>
           <tr>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;">Cortagen</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">20 mg + 2 mL &rarr; 10 mg/mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">2 mg &middot; 0.2 mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">20 &times; 2 mg = 40 mg</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:right;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--gold);">2</td>
+            <td class="cmp">Cortagen</td>
+            <td>20 mg + 2 mL &rarr; 10 mg/mL</td>
+            <td>2 mg &middot; 0.2 mL</td>
+            <td>20 &times; 2 mg = 40 mg</td>
+            <td class="num">2</td>
           </tr>
           <tr>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;">HCG</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">5000 iu + 5 mL &rarr; 1000 iu/mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">500 iu &middot; 0.5 mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">24 &times; 500 iu = 12,000 iu</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:right;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--gold);">3</td>
+            <td class="cmp">HCG</td>
+            <td>5000 iu + 5 mL &rarr; 1000 iu/mL</td>
+            <td>500 iu &middot; 0.5 mL</td>
+            <td>24 &times; 500 iu = 12,000 iu</td>
+            <td class="num">3</td>
           </tr>
           <tr>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;">Vesugen</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">20 mg + 2 mL &rarr; 10 mg/mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">2 mg &middot; 0.2 mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">40 &times; 2 mg = 80 mg</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:right;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--gold);">4</td>
+            <td class="cmp">Vesugen</td>
+            <td>20 mg + 2 mL &rarr; 10 mg/mL</td>
+            <td>2 mg &middot; 0.2 mL</td>
+            <td>40 &times; 2 mg = 80 mg</td>
+            <td class="num">4</td>
           </tr>
           <tr>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;font-weight:600;">MOTS-c</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">40 mg + 2 mL &rarr; 20 mg/mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">2 mg &middot; 0.1 mL</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;">40 &times; 2 mg = 80 mg</td>
-            <td style="padding:10px 12px;border-bottom:1px solid #f0f0f0;text-align:right;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--gold);">2</td>
+            <td class="cmp">MOTS-c</td>
+            <td>40 mg + 2 mL &rarr; 20 mg/mL</td>
+            <td>2 mg &middot; 0.1 mL</td>
+            <td>40 &times; 2 mg = 80 mg</td>
+            <td class="num">2</td>
           </tr>
           <tr>
-            <td style="padding:10px 12px;font-weight:600;">5-Amino-1MQ</td>
-            <td style="padding:10px 12px;">5 mg + 2 mL &rarr; 2.5 mg/mL</td>
-            <td style="padding:10px 12px;">500 mcg &middot; 0.2 mL</td>
-            <td style="padding:10px 12px;">40 &times; 500 mcg = 20 mg</td>
-            <td style="padding:10px 12px;text-align:right;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--gold);">4</td>
+            <td class="cmp">5-Amino-1MQ</td>
+            <td>5 mg + 2 mL &rarr; 2.5 mg/mL</td>
+            <td>500 mcg &middot; 0.2 mL</td>
+            <td>40 &times; 500 mcg = 20 mg</td>
+            <td class="num">4</td>
           </tr>
         </tbody>
       </table>
-    </div>
-    <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:24px;font-style:italic;">
+    </div></div>
+    <div class="chart-note">
+      <span class="nl">Note</span>
       Doses assume the 8-week block (M&ndash;F = 40 doses, M/W/F = 24 doses) and Cortagen&apos;s 20-day daily course. HGH is year-round, every day. Reconstitution volumes are standard suggestions and only HGH (3 mL, specified) and HCG (5 mL) drive a draw-volume conversion &mdash; adjust BAC water to your preferred concentration; the mg / iu dose is what matters. Not medical advice &mdash; confirm with your prescriber.
     </div>
 
@@ -727,17 +667,17 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
         </div>
         <div class="tb-card-sub">Blended &middot; taken after fasted meds</div>
         <div class="tb-drink">
-          Apple Cider Vinegar <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Apple Cider Vinegar.</strong> Acetic acid &mdash; blunts post-meal glucose spikes, supports digestion + gut acid balance, may modestly improve insulin sensitivity. The fasted-stomach kick that primes the rest of the drink.</span></span> &middot;
-          warm water <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Warm water.</strong> Carrier base for everything else. Warmth helps dissolve the powders + opens GI motility. Hydration after overnight fast.</span></span> &middot;
-          creatine 10 g <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Creatine monohydrate.</strong> The most-studied performance + cognitive supplement. Boosts ATP regeneration in muscle + brain &mdash; supports strength, training output, working memory, neuroprotection. 10 g/day is the higher-end maintenance dose.</span></span> &middot;
-          turmeric <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Turmeric (curcumin).</strong> Potent anti-inflammatory + antioxidant. Modulates COX-2 + NF-&kappa;B inflammation pathways &mdash; joint health, recovery, cardiovascular support. Pairs with black pepper or fat to boost absorption (the EVOO in this drink does that).</span></span> &middot;
-          <strong style="color:var(--gold);">organic ginger powder <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Organic ginger root powder.</strong> Gingerols + shogaols &mdash; potent anti-inflammatory, anti-nausea, gut-motility booster, circulation enhancer. Pairs with turmeric for synergistic anti-inflammatory effect, supports digestion after the overnight fast, and modestly improves thermogenesis (light morning calorie-burn lift). Standard kitchen-spice dose (~&frac14;&ndash;&frac12; tsp) is plenty.</span></span></strong> &middot;
-          electrolytes <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Electrolytes (Na + K + Mg).</strong> Replenish overnight losses. Critical on a peptide stack &mdash; Reta-class compounds blunt thirst, so proactive electrolyte loading prevents the headaches / fatigue / cramps people blame on the peptide.</span></span> &middot;
-          sea salt <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Sea salt (unrefined).</strong> Sodium + trace minerals. Supports adrenal function, blood pressure regulation, hydration, and morning cortisol balance. The pinch in the drink covers the sodium baseline for the day's hydration target.</span></span> &middot;
-          Extra Virgin Olive Oil <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Extra Virgin Olive Oil.</strong> Monounsaturated fat + polyphenols (oleocanthal &mdash; natural ibuprofen-like anti-inflammatory). Supports lipid profile, cardiovascular health, and acts as the fat carrier that boosts absorption of fat-soluble compounds (turmeric, vitamin D, K2).</span></span> &middot;
-          cayenne <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Cayenne (capsaicin).</strong> Mild thermogenic &mdash; increases morning metabolic rate. Boosts circulation, supports digestion. Also has documented appetite-modulation + insulin-sensitivity benefits.</span></span> &middot;
-          lemon juice <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Fresh lemon juice.</strong> Vitamin C + citric acid. Brightens flavor, supports iron absorption, and the citric acid pairs with ACV to amplify the gut-pH + digestion-support effect.</span></span> &middot;
-          psyllium husk <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Psyllium husk fiber.</strong> Soluble fiber &mdash; binds bile acids (lowers LDL), feeds gut microbiome (short-chain fatty acid production), regularizes GI motility. Particularly important on a GLP-1-class peptide where gastric emptying slows.</span></span>
+          <div class="dk">Apple Cider Vinegar <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Apple Cider Vinegar.</strong> Acetic acid &mdash; blunts post-meal glucose spikes, supports digestion + gut acid balance, may modestly improve insulin sensitivity. The fasted-stomach kick that primes the rest of the drink.</span></span></div>
+          <div class="dk">warm water <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Warm water.</strong> Carrier base for everything else. Warmth helps dissolve the powders + opens GI motility. Hydration after overnight fast.</span></span></div>
+          <div class="dk">creatine 10 g <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Creatine monohydrate.</strong> The most-studied performance + cognitive supplement. Boosts ATP regeneration in muscle + brain &mdash; supports strength, training output, working memory, neuroprotection. 10 g/day is the higher-end maintenance dose.</span></span></div>
+          <div class="dk">turmeric <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Turmeric (curcumin).</strong> Potent anti-inflammatory + antioxidant. Modulates COX-2 + NF-&kappa;B inflammation pathways &mdash; joint health, recovery, cardiovascular support. Pairs with black pepper or fat to boost absorption (the EVOO in this drink does that).</span></span></div>
+          <div class="dk hl">organic ginger powder <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Organic ginger root powder.</strong> Gingerols + shogaols &mdash; potent anti-inflammatory, anti-nausea, gut-motility booster, circulation enhancer. Pairs with turmeric for synergistic anti-inflammatory effect, supports digestion after the overnight fast, and modestly improves thermogenesis (light morning calorie-burn lift). Standard kitchen-spice dose (~&frac14;&ndash;&frac12; tsp) is plenty.</span></span></div>
+          <div class="dk">electrolytes <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Electrolytes (Na + K + Mg).</strong> Replenish overnight losses. Critical on a peptide stack &mdash; Reta-class compounds blunt thirst, so proactive electrolyte loading prevents the headaches / fatigue / cramps people blame on the peptide.</span></span></div>
+          <div class="dk">sea salt <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Sea salt (unrefined).</strong> Sodium + trace minerals. Supports adrenal function, blood pressure regulation, hydration, and morning cortisol balance. The pinch in the drink covers the sodium baseline for the day's hydration target.</span></span></div>
+          <div class="dk">Extra Virgin Olive Oil <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Extra Virgin Olive Oil.</strong> Monounsaturated fat + polyphenols (oleocanthal &mdash; natural ibuprofen-like anti-inflammatory). Supports lipid profile, cardiovascular health, and acts as the fat carrier that boosts absorption of fat-soluble compounds (turmeric, vitamin D, K2).</span></span></div>
+          <div class="dk">cayenne <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Cayenne (capsaicin).</strong> Mild thermogenic &mdash; increases morning metabolic rate. Boosts circulation, supports digestion. Also has documented appetite-modulation + insulin-sensitivity benefits.</span></span></div>
+          <div class="dk">lemon juice <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Fresh lemon juice.</strong> Vitamin C + citric acid. Brightens flavor, supports iron absorption, and the citric acid pairs with ACV to amplify the gut-pH + digestion-support effect.</span></span></div>
+          <div class="dk">psyllium husk <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Psyllium husk fiber.</strong> Soluble fiber &mdash; binds bile acids (lowers LDL), feeds gut microbiome (short-chain fatty acid production), regularizes GI motility. Particularly important on a GLP-1-class peptide where gastric emptying slows.</span></span></div>
         </div>
       </div>
 
@@ -801,8 +741,9 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
       <div class="sec-divider-eyebrow">Bloodwork</div>
       <div class="sec-divider-title">Full Panel History in the Bloodwork Tab</div>
     </div>
-    <div style="background:rgba(122,101,48,0.06);border:1px solid rgba(122,101,48,0.35);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-bottom:24px;">
-      <p style="margin:0;">All 7 lab draws across Jan 2025 &rarr; May 2026 are organized in the dedicated <strong>Bloodwork</strong> tab above &mdash; hormone optimization trends, metabolic + lipid panel, hematology, liver / kidney / thyroid, single-point markers, and the lab-dates index. <strong>Headline:</strong> Total T 328 &rarr; 1073, lipids all elite, glucose 100 &rarr; 86.</p>
+    <div class="chart-note">
+      <span class="nl">Where to find it</span>
+      <p>All 7 lab draws across Jan 2025 &rarr; May 2026 are organized in the dedicated <strong>Bloodwork</strong> tab above &mdash; hormone optimization trends, metabolic + lipid panel, hematology, liver / kidney / thyroid, single-point markers, and the lab-dates index. <strong>Headline:</strong> Total T 328 &rarr; 1073, lipids all elite, glucose 100 &rarr; 86.</p>
     </div>
 
   </div><!-- /protocol tab -->
@@ -1154,7 +1095,7 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
       <p><strong>02/17/2026</strong> &middot; 1-month TRT follow-up &mdash; T panel only</p>
       <p><strong>03/03/2026</strong> &middot; Fasting comprehensive panel &mdash; full T + CMP + CBC + lipid panel + ApoB + IGF-1 + TSH/T4 + hs-CRP + HbA1c</p>
       <p><strong>05/06/2026</strong> &middot; Most recent &mdash; full T + CBC w/ diff + estradiol + TSH/T4 + T3 free + cortisol + Vit D + HbA1c</p>
-      <p style="margin-top:10px;font-style:italic;color:var(--muted);">Next full panel target: <strong>September 2026</strong> &mdash; standard recheck on the resolving TSH + a fresh lipid panel for cardiovascular tracking + full hormone trend continuation.</p>
+      <p class="lab-index-next">Next full panel target: <strong>September 2026</strong> &mdash; standard recheck on the resolving TSH + a fresh lipid panel for cardiovascular tracking + full hormone trend continuation.</p>
     </div>
   </div>
 
@@ -1181,11 +1122,17 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
 
     <div class="sched-card">
       <div class="sched-card-head">
-        <div>
-          <div class="sched-card-title">Weekly Cadence</div>
-          <div class="sched-card-sub">AM block ~6:24 AM (fasted), PM block ~8 PM. <strong>HGH runs every single day incl. weekends &mdash; in the AM fasted window;</strong> Cortagen is daily for the first 20 days only (marked &middot;20d). HGH is listed first per row (daily), then 5-day (M&ndash;F), then M/W/F, then M/Th. Shot counts show the peak Cortagen-active days &mdash; after day 20, drop one PM shot per day (weekends become HGH-only in the AM).</div>
-        </div>
+        <div class="sched-card-title">Weekly Cadence</div>
         <div class="sched-phase-pill">Active Cycle</div>
+      </div>
+      <div class="sched-card-sub">
+        <div class="note-list">
+          <div class="nr"><div class="nr-l">Injection times</div><div class="nr-v">AM block ~6:24 AM (fasted), PM block ~8 PM.</div></div>
+          <div class="nr"><div class="nr-l">HGH</div><div class="nr-v"><strong>HGH runs every single day incl. weekends &mdash; in the AM fasted window.</strong></div></div>
+          <div class="nr"><div class="nr-l">Cortagen</div><div class="nr-v">Cortagen is daily for the first 20 days only (marked &middot;20d).</div></div>
+          <div class="nr"><div class="nr-l">Row order</div><div class="nr-v">HGH is listed first per row (daily), then 5-day (M&ndash;F), then M/W/F, then M/Th.</div></div>
+          <div class="nr"><div class="nr-l">Shot counts</div><div class="nr-v">Shot counts show the peak Cortagen-active days &mdash; after day 20, drop one PM shot per day (weekends become HGH-only in the AM).</div></div>
+        </div>
       </div>
       <div class="sched-scroll"><table class="sched-table">
         <thead>
@@ -1287,13 +1234,17 @@ details[open].bw-detail > summary{margin-bottom:14px;padding-bottom:10px;border-
     </div>
 
     <div class="tip-card">
-      <div class="tip-eyebrow">Dose Timing &middot; Common Practice</div>
-      <div class="tip-title">Is the AM + PM timing OK?</div>
+      <div class="tip-head">
+        <div class="tip-eyebrow">Dose Timing &middot; Common Practice</div>
+        <div class="tip-title">Is the AM + PM timing OK?</div>
+      </div>
       <div class="tip-body">
-        <p><strong>Short version: dosing HGH fasted in the morning is a common, accepted approach</strong> &mdash; the two standard GH windows are fasted-AM and fasted-pre-bed, and the literature finds both work (morning aligns cleanly with your fasted-wake routine). The principle that actually protects the dose is the <strong>empty stomach</strong>: insulin/carbohydrate blunt GH, so take the morning HGH on waking before any food and hold off eating ~30&ndash;60 min. Inject each compound at a separate, rotated site.</p>
-        <p><strong>PM block (Cortagen &middot; Vesugen &middot; HCG):</strong> <strong>HCG</strong> is more commonly dosed in the <strong>morning</strong> &mdash; a minority of men report nighttime stimulation / vivid dreams / lighter sleep from evening HCG. That sleep point stands on its own; if you notice it, move HCG to AM. <strong>Cortagen</strong> is AM-by-vendor-convention (cognitive/cortical target), but nothing prohibits evening. <strong>Vesugen</strong> is the most flexible &mdash; vendors say any time, consistency over clock.</p>
-        <p><strong>Kept compounds:</strong> <strong>NAD+</strong> is correctly in the AM &mdash; it&apos;s stimulating and is the one compound with a genuine &ldquo;avoid the evening&rdquo; signal (insomnia); sharing the AM window with fasted HGH is fine. <strong>Melanotan</strong> sits in your AM block, though many actually prefer it in the evening so the flush/nausea is slept through &mdash; a candidate to move to PM if it bothers you. <strong>TRT</strong> and <strong>Retatrutide</strong> are timing-neutral (long esters/half-life).</p>
-        <p style="font-size:12px;color:var(--muted);font-style:italic;">For the research peptides here (HCG&apos;s adjunct use, Cortagen, Vesugen), timing guidance comes from clinics, vendors, and community practice &mdash; not controlled time-of-day trials. This is general information, <strong>not medical advice</strong>; confirm the plan with your prescriber (Dr. DiLorenzo). Sources: ExcelMale &amp; TrimBodyMD (HCG timing); PeptideDosages / Peptides.wiki (Cortagen, Vesugen); Frontiers in Endocrinology 2025 &amp; Path To Peptides (HGH fasted &mdash; AM or evening both viable); Genesis Lifestyle Medicine (NAD+ AM).</p>
+        <div class="note-list">
+        <div class="nr"><div class="nr-l">Short version</div><div class="nr-v"><strong>dosing HGH fasted in the morning is a common, accepted approach</strong> &mdash; the two standard GH windows are fasted-AM and fasted-pre-bed, and the literature finds both work (morning aligns cleanly with your fasted-wake routine). The principle that actually protects the dose is the <strong>empty stomach</strong>: insulin/carbohydrate blunt GH, so take the morning HGH on waking before any food and hold off eating ~30&ndash;60 min. Inject each compound at a separate, rotated site.</div></div>
+        <div class="nr"><div class="nr-l">PM block<br>Cortagen &middot; Vesugen &middot; HCG</div><div class="nr-v"><strong>HCG</strong> is more commonly dosed in the <strong>morning</strong> &mdash; a minority of men report nighttime stimulation / vivid dreams / lighter sleep from evening HCG. That sleep point stands on its own; if you notice it, move HCG to AM. <strong>Cortagen</strong> is AM-by-vendor-convention (cognitive/cortical target), but nothing prohibits evening. <strong>Vesugen</strong> is the most flexible &mdash; vendors say any time, consistency over clock.</div></div>
+        <div class="nr"><div class="nr-l">Kept compounds</div><div class="nr-v"><strong>NAD+</strong> is correctly in the AM &mdash; it&apos;s stimulating and is the one compound with a genuine &ldquo;avoid the evening&rdquo; signal (insomnia); sharing the AM window with fasted HGH is fine. <strong>Melanotan</strong> sits in your AM block, though many actually prefer it in the evening so the flush/nausea is slept through &mdash; a candidate to move to PM if it bothers you. <strong>TRT</strong> and <strong>Retatrutide</strong> are timing-neutral (long esters/half-life).</div></div>
+        <div class="nr full fine"><div class="nr-v">For the research peptides here (HCG&apos;s adjunct use, Cortagen, Vesugen), timing guidance comes from clinics, vendors, and community practice &mdash; not controlled time-of-day trials. This is general information, <strong>not medical advice</strong>; confirm the plan with your prescriber (Dr. DiLorenzo). Sources: ExcelMale &amp; TrimBodyMD (HCG timing); PeptideDosages / Peptides.wiki (Cortagen, Vesugen); Frontiers in Endocrinology 2025 &amp; Path To Peptides (HGH fasted &mdash; AM or evening both viable); Genesis Lifestyle Medicine (NAD+ AM).</div></div>
+        </div>
       </div>
     </div>
 
@@ -1395,16 +1346,16 @@ function downloadICS(){
 
 <!-- PWA install banner + service worker -->
 <style>
-.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(180deg,#ffffff,#eef2f7);border-top:2px solid #3d6098;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
 .bl-pwa-banner.show{display:flex;}
-.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
-.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#1a2230;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#3d6098;font-weight:700;}
 .bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
 .bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:inherit;}
-.bl-pwa-install{background:#7A6530;color:#fff;}
-.bl-pwa-install:hover{background:#5f4f26;}
-.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
-.bl-pwa-dismiss:hover{color:#1a1a1a;}
+.bl-pwa-install{background:#3d6098;color:#fff;}
+.bl-pwa-install:hover{background:#33507f;}
+.bl-pwa-dismiss{background:transparent;color:#5a6675;}
+.bl-pwa-dismiss:hover{color:#1a2230;}
 @media print{.bl-pwa-banner{display:none !important;}}
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
