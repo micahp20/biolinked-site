@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'jdauper-v2';
+const CACHE = 'jdauper-v3';
 const ASSETS = [
   '/jdauper/',
   '/jdauper/index.html',
