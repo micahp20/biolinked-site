@@ -1,5 +1,5 @@
 // BioLinked protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'gorilla-stack-2-v3';
+const CACHE = 'gorilla-stack-2-v4';
 const ASSETS = [
   '/gorilla-stack-2/',
   '/gorilla-stack-2/index.html',

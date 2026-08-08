@@ -195,6 +195,189 @@ details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bo
 details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
 details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 @media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
+
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
+
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
+
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
+
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
+
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
+
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
+
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
+
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
+
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
+
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -313,11 +496,7 @@ details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
         <div class="program-eyebrow">Personalized Protocol</div>
         <div class="program-title">Steven's <em>12-Week Recomp</em> Protocol</div>
         <div class="program-tag">260 &rarr; 230. Lean while holding muscle. Cut.</div>
-        <div class="program-context">
-          <p><strong>30 pounds off, muscle on.</strong> Your stack is built around the recomp problem at 54: drop ~2.5 lbs/week of fat over 12 weeks without losing the muscle you've earned from being active 5+ days a week. The strategy isn't aggressive caloric deficit (you'd lose lean tissue). It's a stack that drives appetite control + fat oxidation + muscle preservation in parallel, while you keep training hard.</p>
-          <p><strong>Four compounds, four jobs.</strong> Retatrutide is the body comp anchor &mdash; triple-agonist that controls appetite and drives fat oxidation. Tesamorelin amplifies the GH/IGF-1 axis to protect lean tissue and accelerate visceral fat loss. 5-Amino-1MQ blocks the NNMT enzyme that normally suppresses fat oxidation and muscle metabolism in middle age &mdash; the metabolic kickstarter. MOTS-C activates AMPK (the master metabolic switch), turning your training sessions into stronger fat-oxidation signals.</p>
-          <p><strong>First time injecting?</strong> Everything is SubQ &mdash; just under the skin, short thin needle. Most clients describe it as barely noticeable. Start with one compound on Day 1 to get comfortable, add the rest by end of Week 1, and you'll be in the rhythm by Week 2.</p>
-        </div>
+        <div class="program-context"><div class="note-list"><div class="nr"><div class="nr-l">30 pounds off, muscle on</div><div class="nr-v">Your stack is built around the recomp problem at 54: drop ~2.5 lbs/week of fat over 12 weeks without losing the muscle you've earned from being active 5+ days a week. The strategy isn't aggressive caloric deficit (you'd lose lean tissue). It's a stack that drives appetite control + fat oxidation + muscle preservation in parallel, while you keep training hard.</div></div><div class="nr"><div class="nr-l">Four compounds, four jobs</div><div class="nr-v">Retatrutide is the body comp anchor &mdash; triple-agonist that controls appetite and drives fat oxidation. Tesamorelin amplifies the GH/IGF-1 axis to protect lean tissue and accelerate visceral fat loss. 5-Amino-1MQ blocks the NNMT enzyme that normally suppresses fat oxidation and muscle metabolism in middle age &mdash; the metabolic kickstarter. MOTS-C activates AMPK (the master metabolic switch), turning your training sessions into stronger fat-oxidation signals.</div></div><div class="nr"><div class="nr-l">First time injecting?</div><div class="nr-v">Everything is SubQ &mdash; just under the skin, short thin needle. Most clients describe it as barely noticeable. Start with one compound on Day 1 to get comfortable, add the rest by end of Week 1, and you'll be in the rhythm by Week 2.</div></div></div></div>
         <div id="hero-pricing-pill" style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(122,101,48,0.08);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 16px;border-radius:2px;">
           <span style="font-size:18px;line-height:1;">&#128150;</span>
           <span style="text-align:left;">
@@ -561,12 +740,7 @@ details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
         </table></div>
       </details>
 
-      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
-        <strong style="color:var(--gold);">AM shot order:</strong> MOTS-C first (strictest fasted requirement &mdash; AMPK fires hardest in low-insulin state). Tesa second (also fasted-preferred &mdash; food blunts the GH pulse). 5-Amino + Reta third (neither requires fasted). Wait 30&ndash;45 min after the fasted compounds before breakfast.<br><br>
-        <strong style="color:var(--gold);">Site rotation:</strong> all 4 compounds are SubQ in the abdomen. With 3&ndash;4 shots per morning in Phase 1, rotate quadrants so no single 1&Prime; spot takes 2 shots in 48 hrs. A simple pattern: assign each compound a quadrant for the week (e.g. Mon: MOTS upper-left, Tesa lower-left, 5-Amino upper-right, Reta lower-right) and rotate one position clockwise on Tuesday, etc.<br><br>
-        <strong style="color:var(--gold);">Missed a dose?</strong> &lt;24 hrs: take when you remember and resume next M&ndash;F. &gt;24 hrs: skip and resume the next scheduled day. Don't double up. One miss isn't a big deal; missing 3+ consecutive M&ndash;F days breaks the compounding momentum.<br><br>
-        <strong style="color:var(--gold);">Saturday / Sunday off:</strong> all 5-on/2-off compounds get the weekend recovery window. AMPK + GH receptor sensitivity stays sharp when you give the signal a 2-day rest.
-      </div>
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">AM shot order</div><div class="nr-v">MOTS-C first (strictest fasted requirement &mdash; AMPK fires hardest in low-insulin state). Tesa second (also fasted-preferred &mdash; food blunts the GH pulse). 5-Amino + Reta third (neither requires fasted). Wait 30&ndash;45 min after the fasted compounds before breakfast.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">all 4 compounds are SubQ in the abdomen. With 3&ndash;4 shots per morning in Phase 1, rotate quadrants so no single 1&Prime; spot takes 2 shots in 48 hrs. A simple pattern: assign each compound a quadrant for the week (e.g. Mon: MOTS upper-left, Tesa lower-left, 5-Amino upper-right, Reta lower-right) and rotate one position clockwise on Tuesday, etc.</div></div><div class="nr"><div class="nr-l">Missed a dose?</div><div class="nr-v">&lt;24 hrs: take when you remember and resume next M&ndash;F. &gt;24 hrs: skip and resume the next scheduled day. Don't double up. One miss isn't a big deal; missing 3+ consecutive M&ndash;F days breaks the compounding momentum.</div></div><div class="nr"><div class="nr-l">Saturday / Sunday off</div><div class="nr-v">all 5-on/2-off compounds get the weekend recovery window. AMPK + GH receptor sensitivity stays sharp when you give the signal a 2-day rest.</div></div></div></div>
 
     </div><!-- /schedule tab -->
 
@@ -661,12 +835,7 @@ details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 
       <div class="storage-card">
         <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
-        <div class="storage-body">
-          <p><strong>Dry (lyophilized) vials:</strong> store refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</p>
-          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days. Reconstitute one vial at a time as the prior one empties &mdash; keeps every dose fresh.</p>
-          <p><strong>BAC water need:</strong> Reta 3 mL &times; 2 = 6 mL, Tesa 2 mL &times; 4 = 8 mL, 5-Amino 3 mL &times; 1 = 3 mL, MOTS-C 2 mL &times; 2 = 4 mL &mdash; <strong>21 mL total across the cycle</strong>. One 30 mL McGuff bottle covers with buffer.</p>
-          <p><strong>Site rotation:</strong> SubQ abdomen, 4 quadrants. Never inject the same 1&Prime; spot two consecutive days.</p>
-        </div>
+        <div class="storage-body"><div class="note-list"><div class="nr"><div class="nr-l">Dry (lyophilized) vials</div><div class="nr-v">store refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</div></div><div class="nr"><div class="nr-l">Reconstituted vials</div><div class="nr-v">refrigerate immediately after adding BAC water. Use within 30 days. Reconstitute one vial at a time as the prior one empties &mdash; keeps every dose fresh.</div></div><div class="nr"><div class="nr-l">BAC water need</div><div class="nr-v">Reta 3 mL &times; 2 = 6 mL, Tesa 2 mL &times; 4 = 8 mL, 5-Amino 3 mL &times; 1 = 3 mL, MOTS-C 2 mL &times; 2 = 4 mL &mdash; <strong>21 mL total across the cycle</strong>. One 30 mL McGuff bottle covers with buffer.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ abdomen, 4 quadrants. Never inject the same 1&Prime; spot two consecutive days.</div></div></div></div>
       </div>
 
     </div><!-- /supplies tab -->
@@ -680,82 +849,74 @@ details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
       </div>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 01 &mdash; The Recomp Logic</div>
-        <div class="tip-title">Why This Stack for 260 &rarr; 230 While Holding Muscle</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; The Recomp Logic</div><div class="tip-title">Why This Stack for 260 &rarr; 230 While Holding Muscle</div></div>
         </summary><div class="tip-body">
-          <p>The trap at 54 trying to drop 30 lbs is dropping muscle along with the fat. A standard caloric deficit alone &mdash; without the right peptide support &mdash; loses about 25&ndash;30% of weight as lean tissue. That's how people end up <em>smaller and softer</em> instead of <em>leaner and cut.</em> The stack is built specifically against that failure mode.</p>
-          <p><strong>Reta does the fat side</strong> (appetite + GLP-1/GIP/glucagon-driven oxidation). <strong>Tesa does the muscle side</strong> (GH/IGF-1 amplification &mdash; the single biggest lever for preserving lean tissue in a deficit, especially at 54 when natural GH output has dropped). <strong>5-Amino removes a metabolic brake</strong> (NNMT inhibition &mdash; the enzyme that gets worse with age and actively suppresses fat oxidation). <strong>MOTS-C amplifies your training</strong> (AMPK activation makes every workout do more metabolic work).</p>
-          <p><strong>What you bring:</strong> protein intake at <strong>1 g/lb bodyweight</strong> (~230&ndash;260 g/day) &mdash; non-negotiable for muscle preservation; <strong>heavy compound lifting 3&times;/wk minimum</strong> (mechanical tension is what tells the body to keep the muscle); and the <strong>5+ days of activity you're already doing</strong>. The peptides amplify what you do &mdash; they don't replace it.</p>
+          <div class="tip-lead">The trap at 54 trying to drop 30 lbs is dropping muscle along with the fat. A standard caloric deficit alone &mdash; without the right peptide support &mdash; loses about 25&ndash;30% of weight as lean tissue. That's how people end up <em>smaller and softer</em> instead of <em>leaner and cut.</em> The stack is built specifically against that failure mode.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Reta does the fat side</div><div class="nr-v">(appetite + GLP-1/GIP/glucagon-driven oxidation). <strong>Tesa does the muscle side</strong> (GH/IGF-1 amplification &mdash; the single biggest lever for preserving lean tissue in a deficit, especially at 54 when natural GH output has dropped). <strong>5-Amino removes a metabolic brake</strong> (NNMT inhibition &mdash; the enzyme that gets worse with age and actively suppresses fat oxidation). <strong>MOTS-C amplifies your training</strong> (AMPK activation makes every workout do more metabolic work).</div></div>
+          <div class="nr"><div class="nr-l">What you bring</div><div class="nr-v">protein intake at <strong>1 g/lb bodyweight</strong> (~230&ndash;260 g/day) &mdash; non-negotiable for muscle preservation; <strong>heavy compound lifting 3&times;/wk minimum</strong> (mechanical tension is what tells the body to keep the muscle); and the <strong>5+ days of activity you're already doing</strong>. The peptides amplify what you do &mdash; they don't replace it.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 02 &mdash; First Time Injecting</div>
-        <div class="tip-title">Start Slow on Day 1, Be Comfortable by Day 5</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; First Time Injecting</div><div class="tip-title">Start Slow on Day 1, Be Comfortable by Day 5</div></div>
         </summary><div class="tip-body">
-          <p>All four compounds are SubQ &mdash; just under the skin, short thin insulin needle (29&ndash;31G). Most people describe it as barely noticeable. Day 1 isn't the day to shoot all four.</p>
-          <p><strong>Day 1:</strong> reconstitute and inject ONE compound. Tesa is a good first choice &mdash; small dose, daily use, builds the habit. <strong>Day 2:</strong> add Reta (Mon is the first M/W/F day if you're starting Monday). <strong>Day 3:</strong> add MOTS-C (this is the fasted one &mdash; inject before any food). <strong>Day 4:</strong> add 5-Amino. You'll be running the full stack by end of Wk 1 with no GI shock.</p>
-          <p>Mild redness or a small bruise at the injection site is normal and resolves quickly. Always use a fresh needle. Wipe both the vial top and the injection site with an alcohol pad every time.</p>
+          <div class="tip-lead">All four compounds are SubQ &mdash; just under the skin, short thin insulin needle (29&ndash;31G). Most people describe it as barely noticeable. Day 1 isn't the day to shoot all four.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Day 1</div><div class="nr-v">reconstitute and inject ONE compound. Tesa is a good first choice &mdash; small dose, daily use, builds the habit. <strong>Day 2:</strong> add Reta (Mon is the first M/W/F day if you're starting Monday). <strong>Day 3:</strong> add MOTS-C (this is the fasted one &mdash; inject before any food). <strong>Day 4:</strong> add 5-Amino. You'll be running the full stack by end of Wk 1 with no GI shock.</div></div></div>
+          <div class="tip-lead">Mild redness or a small bruise at the injection site is normal and resolves quickly. Always use a fresh needle. Wipe both the vial top and the injection site with an alcohol pad every time.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 1&ndash;2</div>
-        <div class="tip-title">Foundation &middot; Reta GI Tolerance Window</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 1&ndash;2</div><div class="tip-title">Foundation &middot; Reta GI Tolerance Window</div></div>
         </summary><div class="tip-body">
-          <p>Don't expect dramatic scale changes &mdash; the compounds are building. The thing to manage is Reta's first 1&ndash;2 weeks of GI signaling: <strong>mild nausea and appetite suppression are normal</strong>, usually clears by end of Wk 2. If nausea is severe, drop to 0.5 mg (5 units) for a few doses before resuming the 1 mg schedule. Don't power through &mdash; let the gut adapt.</p>
-          <p>Tesa contribution shows up first as <strong>deeper sleep within 7&ndash;10 days</strong> &mdash; the nocturnal GH pulse amplification. 5-Amino + MOTS-C are quiet right now; both work on cellular signaling that takes a couple weeks to compound.</p>
-          <p><strong>Log baseline:</strong> weight, waist circumference, how you feel in workouts. These matter for evaluating Wk 4 vs. Wk 1 changes.</p>
+          <div class="tip-lead">Don't expect dramatic scale changes &mdash; the compounds are building. The thing to manage is Reta's first 1&ndash;2 weeks of GI signaling: <strong>mild nausea and appetite suppression are normal</strong>, usually clears by end of Wk 2. If nausea is severe, drop to 0.5 mg (5 units) for a few doses before resuming the 1 mg schedule. Don't power through &mdash; let the gut adapt.</div>
+          <div class="tip-lead">Tesa contribution shows up first as <strong>deeper sleep within 7&ndash;10 days</strong> &mdash; the nocturnal GH pulse amplification. 5-Amino + MOTS-C are quiet right now; both work on cellular signaling that takes a couple weeks to compound.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Log baseline</div><div class="nr-v">weight, waist circumference, how you feel in workouts. These matter for evaluating Wk 4 vs. Wk 1 changes.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 3&ndash;4</div>
-        <div class="tip-title">First Visible Shifts</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 3&ndash;4</div><div class="tip-title">First Visible Shifts</div></div>
         </summary><div class="tip-body">
-          <p>Where most clients notice the first real change. <strong>Appetite control is firm</strong> &mdash; you're naturally eating less and not white-knuckling it. <strong>Fat loss starts to register on the scale and in the mirror.</strong> Energy steadier through the day from the MOTS-C / Tesa GH layer.</p>
-          <p>Recovery between training sessions should be noticeably faster &mdash; the GH amplification + AMPK activation are working synergistically with your active 5-day schedule. Soreness clears in 24 hrs instead of 48.</p>
-          <p>Don't push the deficit aggressively. Reta does the appetite work for you &mdash; let it. <strong>Hit protein at 1 g/lb daily.</strong> This is where preserving the muscle starts paying off.</p>
+          <div class="tip-lead">Where most clients notice the first real change. <strong>Appetite control is firm</strong> &mdash; you're naturally eating less and not white-knuckling it. <strong>Fat loss starts to register on the scale and in the mirror.</strong> Energy steadier through the day from the MOTS-C / Tesa GH layer.</div>
+          <div class="tip-lead">Recovery between training sessions should be noticeably faster &mdash; the GH amplification + AMPK activation are working synergistically with your active 5-day schedule. Soreness clears in 24 hrs instead of 48.</div>
+          <div class="tip-lead">Don't push the deficit aggressively. Reta does the appetite work for you &mdash; let it. <strong>Hit protein at 1 g/lb daily.</strong> This is where preserving the muscle starts paying off.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 5&ndash;6</div>
-        <div class="tip-title">Peak Fat Loss &middot; 5-Amino Wraps</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 5&ndash;6</div><div class="tip-title">Peak Fat Loss &middot; 5-Amino Wraps</div></div>
         </summary><div class="tip-body">
-          <p>The steepest part of the fat loss curve. 5-Amino vial finishes end of Wk 6 (exact 30-dose fit). The NNMT-block contribution carries forward in cellular metabolism for several weeks even after the compound stops &mdash; it's not a switch that flips off the moment dosing ends.</p>
-          <p>Weight should be tracking close to 2&ndash;2.5 lbs/wk down at this point. If you're seeing less than ~1.5 lbs/wk over a rolling 2-week average, that's the signal to revisit the deficit (probably under-eating around training, which is more common than over-eating) or consider the Reta titration up to 1.5 mg using the vial 2 buffer.</p>
-          <p><strong>End of Wk 6:</strong> 5-Amino done. Reta + Tesa + MOTS-C carry into Phase 2.</p>
+          <div class="tip-lead">The steepest part of the fat loss curve. 5-Amino vial finishes end of Wk 6 (exact 30-dose fit). The NNMT-block contribution carries forward in cellular metabolism for several weeks even after the compound stops &mdash; it's not a switch that flips off the moment dosing ends.</div>
+          <div class="tip-lead">Weight should be tracking close to 2&ndash;2.5 lbs/wk down at this point. If you're seeing less than ~1.5 lbs/wk over a rolling 2-week average, that's the signal to revisit the deficit (probably under-eating around training, which is more common than over-eating) or consider the Reta titration up to 1.5 mg using the vial 2 buffer.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">End of Wk 6</div><div class="nr-v">5-Amino done. Reta + Tesa + MOTS-C carry into Phase 2.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 7&ndash;8</div>
-        <div class="tip-title">Mid-Cycle &middot; MOTS-C Wraps End of Wk 8</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 7&ndash;8</div><div class="tip-title">Mid-Cycle &middot; MOTS-C Wraps End of Wk 8</div></div>
         </summary><div class="tip-body">
-          <p>Stack is now Reta + Tesa + MOTS-C. The fat loss curve continues but the slope softens a bit without 5-Amino. Stay patient &mdash; this is normal in a phased protocol and Tesa is still building toward its payoff window.</p>
-          <p>MOTS-C vials finish end of Wk 8 (exact 40-dose fit). The AMPK activation contribution to training stays in the cellular machinery for ~1&ndash;2 weeks after dosing ends.</p>
-          <p><strong>Mid-cycle reassessment:</strong> if you're tracking ~2 lbs/wk and feeling good, hold the plan. If progress has slowed, consider the Reta titration up using vial 2 buffer (1.5 mg = 15 units instead of 10).</p>
+          <div class="tip-lead">Stack is now Reta + Tesa + MOTS-C. The fat loss curve continues but the slope softens a bit without 5-Amino. Stay patient &mdash; this is normal in a phased protocol and Tesa is still building toward its payoff window.</div>
+          <div class="tip-lead">MOTS-C vials finish end of Wk 8 (exact 40-dose fit). The AMPK activation contribution to training stays in the cellular machinery for ~1&ndash;2 weeks after dosing ends.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Mid-cycle reassessment</div><div class="nr-v">if you're tracking ~2 lbs/wk and feeling good, hold the plan. If progress has slowed, consider the Reta titration up using vial 2 buffer (1.5 mg = 15 units instead of 10).</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 9&ndash;10</div>
-        <div class="tip-title">Reta + Tesa Alone &middot; The GH Payoff Begins</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 9&ndash;10</div><div class="tip-title">Reta + Tesa Alone &middot; The GH Payoff Begins</div></div>
         </summary><div class="tip-body">
-          <p>Two compounds now &mdash; Reta carrying the fat-loss side, Tesa carrying the lean-tissue + visceral-fat side. <strong>This is the window where the Tesa-specific payoff starts compounding</strong>: visceral fat reduction becomes visible (midsection composition shifts), skin quality improves, muscle definition starts showing through.</p>
-          <p>Sleep should still be deep &mdash; Tesa carries the GH pulse on its own without MOTS-C support. If sleep dips for a week, that's the body adapting; usually self-corrects.</p>
-          <p>Don't add cardio aggressively this late. The compounds are doing the metabolic work &mdash; let them. Heavy lifting stays the priority for preserving muscle definition.</p>
+          <div class="tip-lead">Two compounds now &mdash; Reta carrying the fat-loss side, Tesa carrying the lean-tissue + visceral-fat side. <strong>This is the window where the Tesa-specific payoff starts compounding</strong>: visceral fat reduction becomes visible (midsection composition shifts), skin quality improves, muscle definition starts showing through.</div>
+          <div class="tip-lead">Sleep should still be deep &mdash; Tesa carries the GH pulse on its own without MOTS-C support. If sleep dips for a week, that's the body adapting; usually self-corrects.</div>
+          <div class="tip-lead">Don't add cardio aggressively this late. The compounds are doing the metabolic work &mdash; let them. Heavy lifting stays the priority for preserving muscle definition.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 11&ndash;12</div>
-        <div class="tip-title">Final Stretch &middot; Lock in 230 (or Below)</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 11&ndash;12</div><div class="tip-title">Final Stretch &middot; Lock in 230 (or Below)</div></div>
         </summary><div class="tip-body">
-          <p>Steepest part of the body comp curve in the Tesa clinical data. Whatever was set up in Wks 4&ndash;10 visibly consolidates here. Visceral fat, skin quality, muscle definition all compound.</p>
-          <p><strong>End-of-cycle questions:</strong> Where did the scale land? How does the mirror look vs. Wk 1? Strength in the gym holding? These answers determine whether to (a) run a maintenance cycle to lock in body comp, (b) repeat with adjustments, or (c) take 4&ndash;6 weeks off and reassess.</p>
-          <p>If the goal of 230 has been hit and you want to push to 220, you have the framework now &mdash; a similar 8&ndash;12 week stack run at lower body weight will hit different targets. But cycle off first.</p>
+          <div class="tip-lead">Steepest part of the body comp curve in the Tesa clinical data. Whatever was set up in Wks 4&ndash;10 visibly consolidates here. Visceral fat, skin quality, muscle definition all compound.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">End-of-cycle questions</div><div class="nr-v">Where did the scale land? How does the mirror look vs. Wk 1? Strength in the gym holding? These answers determine whether to (a) run a maintenance cycle to lock in body comp, (b) repeat with adjustments, or (c) take 4&ndash;6 weeks off and reassess.</div></div></div>
+          <div class="tip-lead">If the goal of 230 has been hit and you want to push to 220, you have the framework now &mdash; a similar 8&ndash;12 week stack run at lower body weight will hit different targets. But cycle off first.</div>
         </div>
       </details>
 
@@ -765,57 +926,52 @@ details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 03 &mdash; Protein at 1 g/lb</div>
-        <div class="tip-title">The Non-Negotiable for Holding Muscle</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; Protein at 1 g/lb</div><div class="tip-title">The Non-Negotiable for Holding Muscle</div></div>
         </summary><div class="tip-body">
-          <p>At Steven's weight (260 starting, 230 target), protein target is <strong>230&ndash;260 g/day</strong>. This is the single most important lifestyle variable for the "lean while cut" outcome. Tesa amplifies GH/IGF-1 but it needs amino acid substrate to actually build/preserve muscle. Underfeed protein and the GH signal hits a wall.</p>
-          <p>Practical split: 40&ndash;50 g protein at each of 4&ndash;5 meals across the day. Whey or protein powder for 1&ndash;2 of them is fine. Reta will suppress appetite &mdash; if you're not careful you'll hit calories low and protein lower. <strong>Eat protein even when you're not hungry.</strong> Especially around training (pre and post).</p>
+          <div class="tip-lead">At Steven's weight (260 starting, 230 target), protein target is <strong>230&ndash;260 g/day</strong>. This is the single most important lifestyle variable for the "lean while cut" outcome. Tesa amplifies GH/IGF-1 but it needs amino acid substrate to actually build/preserve muscle. Underfeed protein and the GH signal hits a wall.</div>
+          <div class="tip-lead">Practical split: 40&ndash;50 g protein at each of 4&ndash;5 meals across the day. Whey or protein powder for 1&ndash;2 of them is fine. Reta will suppress appetite &mdash; if you're not careful you'll hit calories low and protein lower. <strong>Eat protein even when you're not hungry.</strong> Especially around training (pre and post).</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 04 &mdash; Lift Heavy 3&times;/Wk Minimum</div>
-        <div class="tip-title">Mechanical Tension Preserves Muscle in a Deficit</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Lift Heavy 3&times;/Wk Minimum</div><div class="tip-title">Mechanical Tension Preserves Muscle in a Deficit</div></div>
         </summary><div class="tip-body">
-          <p>Your 5+ active days a week is great for total energy expenditure. But the muscle preservation signal comes specifically from <strong>heavy compound lifting</strong> &mdash; squat, deadlift, bench, row, overhead press patterns with progressive load. Not steady-state cardio. Not just yoga or hiking.</p>
-          <p>Three lifting sessions per week (e.g. M/W/F or Tu/Th/Sat), full body or upper/lower split, working sets in the 4&ndash;8 rep range with progressive overload. The other 2&ndash;3 active days can be anything &mdash; walking, biking, sport. The lifting is the muscle insurance policy.</p>
+          <div class="tip-lead">Your 5+ active days a week is great for total energy expenditure. But the muscle preservation signal comes specifically from <strong>heavy compound lifting</strong> &mdash; squat, deadlift, bench, row, overhead press patterns with progressive load. Not steady-state cardio. Not just yoga or hiking.</div>
+          <div class="tip-lead">Three lifting sessions per week (e.g. M/W/F or Tu/Th/Sat), full body or upper/lower split, working sets in the 4&ndash;8 rep range with progressive overload. The other 2&ndash;3 active days can be anything &mdash; walking, biking, sport. The lifting is the muscle insurance policy.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 05 &mdash; Sleep is Compound</div>
-        <div class="tip-title">Tesa Amplifies the Nocturnal GH Pulse &mdash; It Needs Sleep to Work</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 05 &mdash; Sleep is Compound</div><div class="tip-title">Tesa Amplifies the Nocturnal GH Pulse &mdash; It Needs Sleep to Work</div></div>
         </summary><div class="tip-body">
-          <p>Sleep self-reported at 3/5 going in. Tesa works almost entirely through amplifying the natural GH surge that happens during deep sleep stages. <strong>If sleep is the bottleneck, you're leaving the biggest Tesa benefit on the table.</strong></p>
-          <p>Targets: 7&ndash;8 hours consistently; same bedtime / wake time within 30 min on weekdays; no alcohol within 3 hrs of bed (the 1&ndash;2 drinks/wk is fine spacing-wise &mdash; just not the last thing before sleep). If sleep is still bad by Wk 3&ndash;4, that's the moment to add a sleep peptide (DSIP PRN, etc.) &mdash; flag for follow-up.</p>
+          <div class="tip-lead">Sleep self-reported at 3/5 going in. Tesa works almost entirely through amplifying the natural GH surge that happens during deep sleep stages. <strong>If sleep is the bottleneck, you're leaving the biggest Tesa benefit on the table.</strong></div>
+          <div class="tip-lead">Targets: 7&ndash;8 hours consistently; same bedtime / wake time within 30 min on weekdays; no alcohol within 3 hrs of bed (the 1&ndash;2 drinks/wk is fine spacing-wise &mdash; just not the last thing before sleep). If sleep is still bad by Wk 3&ndash;4, that's the moment to add a sleep peptide (DSIP PRN, etc.) &mdash; flag for follow-up.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 06 &mdash; Hydration + Reta GI</div>
-        <div class="tip-title">Constipation is the Most Common Reta Side Effect</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; Hydration + Reta GI</div><div class="tip-title">Constipation is the Most Common Reta Side Effect</div></div>
         </summary><div class="tip-body">
-          <p>GLP-1 agonists slow gut motility. Combined with a deficit (less food volume), constipation is the most common Reta complaint after the first 1&ndash;2 weeks of nausea pass. <strong>Hydration + fiber address it.</strong></p>
-          <p>Targets: <strong>100 oz water per day</strong> minimum (more if you sweat heavily training); fiber from vegetables + a daily psyllium husk or similar if veggie intake is inconsistent. If constipation persists past Wk 3 despite hydration, magnesium citrate 400 mg before bed helps.</p>
+          <div class="tip-lead">GLP-1 agonists slow gut motility. Combined with a deficit (less food volume), constipation is the most common Reta complaint after the first 1&ndash;2 weeks of nausea pass. <strong>Hydration + fiber address it.</strong></div>
+          <div class="tip-lead">Targets: <strong>100 oz water per day</strong> minimum (more if you sweat heavily training); fiber from vegetables + a daily psyllium husk or similar if veggie intake is inconsistent. If constipation persists past Wk 3 despite hydration, magnesium citrate 400 mg before bed helps.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div>
-        <div class="tip-title">Normal vs. Watch For</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div><div class="tip-title">Normal vs. Watch For</div></div>
         </summary><div class="tip-body">
           <p><strong>Normal (no action):</strong></p>
-          <p>&middot; Mild nausea / reduced appetite the first 1&ndash;2 weeks of Reta &mdash; subsides<br>
+          <div class="tip-lead">&middot; Mild nausea / reduced appetite the first 1&ndash;2 weeks of Reta &mdash; subsides<br>
           &middot; Constipation on Reta &mdash; hydration + fiber addresses it<br>
           &middot; Mild injection-site redness &mdash; rotate sites and use proper SubQ technique<br>
           &middot; Slight water retention first 1&ndash;2 weeks of Tesa &mdash; normal GH effect, resolves<br>
-          &middot; Mild tingling in hands occasionally on Tesa &mdash; normal GH effect, fades</p>
+          &middot; Mild tingling in hands occasionally on Tesa &mdash; normal GH effect, fades</div>
           <p><strong>Monitor (contact BioLinked):</strong></p>
-          <p>&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique issue or contamination<br>
+          <div class="tip-lead">&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique issue or contamination<br>
           &middot; Severe nausea or vomiting past Wk 2 of Reta &mdash; pause and drop to 0.5 mg<br>
           &middot; Fat loss faster than ~3 lbs/wk sustained &mdash; back off Reta dose or add calories around training; lean tissue is at risk<br>
           &middot; Persistent fatigue or workouts feeling flat &mdash; usually under-eating; add cals around training<br>
-          &middot; Numbness/tingling in hands beyond Wk 4 &mdash; can happen at higher GHRH exposure; flag</p>
+          &middot; Numbness/tingling in hands beyond Wk 4 &mdash; can happen at higher GHRH exposure; flag</div>
         </div>
       </details>
 
