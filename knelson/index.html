@@ -190,6 +190,189 @@ details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bo
 details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
 details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 @media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
+
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
+
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
+
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
+
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
+
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
+
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
+
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
+
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
+
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
+
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -287,10 +470,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <div class="program-eyebrow">Personalized Protocol</div>
         <div class="program-title">Kyle's <em>Test + Recomp</em> Stack</div>
         <div class="program-tag">Test for the base. Tesa + Reta for the recomp on top.</div>
-        <div class="program-context">
-          <p><strong>Three-item order &mdash; two layers of work.</strong> Testosterone provides the anabolic base &mdash; 185 mg once weekly IM, ~27 weeks of runway from the 2 vials. The peptide stack (Tesamorelin + Retatrutide) layers cleanly on top: Tesa amplifies the GH / IGF-1 axis for body comp, Reta drives fat loss and appetite control.</p>
-          <p><strong>Reta is the long runner.</strong> One vial active, one frozen as backup. Starting low at 1 mg M/W/F and titrating based on how your body responds &mdash; we let the data drive the dose, not the calendar. See the Notes &amp; Tips tab for the full titration logic.</p>
-        </div>
+        <div class="program-context"><div class="note-list"><div class="nr"><div class="nr-l">Three-item order &mdash; two layers of work</div><div class="nr-v">Testosterone provides the anabolic base &mdash; 185 mg once weekly IM, ~27 weeks of runway from the 2 vials. The peptide stack (Tesamorelin + Retatrutide) layers cleanly on top: Tesa amplifies the GH / IGF-1 axis for body comp, Reta drives fat loss and appetite control.</div></div><div class="nr"><div class="nr-l">Reta is the long runner</div><div class="nr-v">One vial active, one frozen as backup. Starting low at 1 mg M/W/F and titrating based on how your body responds &mdash; we let the data drive the dose, not the calendar. See the Notes &amp; Tips tab for the full titration logic.</div></div></div></div>
       </div>
 
       <div class="sec-divider">
@@ -516,11 +696,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </table></div>
       </details>
 
-      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
-        <strong style="color:var(--gold);">Tesa pre-bed timing:</strong> empty stomach, 2+ hours after your last meal &mdash; food blunts the GH pulse. Inject at the same time each night to keep the rhythm consistent (e.g. 10 PM if you eat at 8).<br><br>
-        <strong style="color:var(--gold);">Reta dose-bump decisions:</strong> only advance if tolerance is solid + you want more effect. The dose ladder is 0.5 / 1.0 / 1.5 / 2.0 mg &mdash; you can move in either direction. See the Notes &amp; Tips tab for the full titration logic.<br><br>
-        <strong style="color:var(--gold);">Test schedule:</strong> 185 mg IM, once weekly, same day each week (pick a fixed slot &mdash; e.g. Monday AM). Not represented in the peptide tables above; the two run in parallel without interaction. Track the shot day so bloodwork timing (see Notes &amp; Tips) lines up correctly.
-      </div>
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">Tesa pre-bed timing</div><div class="nr-v">empty stomach, 2+ hours after your last meal &mdash; food blunts the GH pulse. Inject at the same time each night to keep the rhythm consistent (e.g. 10 PM if you eat at 8).</div></div><div class="nr"><div class="nr-l">Reta dose-bump decisions</div><div class="nr-v">only advance if tolerance is solid + you want more effect. The dose ladder is 0.5 / 1.0 / 1.5 / 2.0 mg &mdash; you can move in either direction. See the Notes &amp; Tips tab for the full titration logic.</div></div><div class="nr"><div class="nr-l">Test schedule</div><div class="nr-v">185 mg IM, once weekly, same day each week (pick a fixed slot &mdash; e.g. Monday AM). Not represented in the peptide tables above; the two run in parallel without interaction. Track the shot day so bloodwork timing (see Notes &amp; Tips) lines up correctly.</div></div></div></div>
 
     </div><!-- /schedule tab -->
 
@@ -591,12 +767,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="storage-card">
         <div class="storage-title">❄ Refrigerated, Protected, Rotated</div>
-        <div class="storage-body">
-          <p><strong>Dry (lyophilized) vials &mdash; fridge:</strong> store at 36&ndash;46&deg;F before reconstitution. Protect from light. This applies to Tesa and the <em>active</em> Reta vial before recon.</p>
-          <p><strong>Reta vial #2 &mdash; freezer:</strong> store the second Reta vial in the freezer (0&deg;F or colder) in its dry/lyophilized state. Lyophilized peptides are stable in the freezer essentially indefinitely on the cycle timescale &mdash; protects potency for when you need it later. Do <em>not</em> freeze after reconstitution.</p>
-          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days. Reta active vial will be in the fridge for ~13&ndash;20 weeks &mdash; that's longer than the 30-day window. The convention with longer-cycle Reta is that potency holds well past 30 days at 4&deg;C when kept clean and dark; rotate to a fresh draw site on the stopper each time and avoid contamination.</p>
-          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row.</p>
-        </div>
+        <div class="storage-body"><div class="note-list"><div class="nr"><div class="nr-l">Dry (lyophilized) vials &mdash; fridge</div><div class="nr-v">store at 36&ndash;46&deg;F before reconstitution. Protect from light. This applies to Tesa and the <em>active</em> Reta vial before recon.</div></div><div class="nr"><div class="nr-l">Reta vial #2 &mdash; freezer</div><div class="nr-v">store the second Reta vial in the freezer (0&deg;F or colder) in its dry/lyophilized state. Lyophilized peptides are stable in the freezer essentially indefinitely on the cycle timescale &mdash; protects potency for when you need it later. Do <em>not</em> freeze after reconstitution.</div></div><div class="nr"><div class="nr-l">Reconstituted vials</div><div class="nr-v">refrigerate immediately after adding BAC water. Use within 30 days. Reta active vial will be in the fridge for ~13&ndash;20 weeks &mdash; that's longer than the 30-day window. The convention with longer-cycle Reta is that potency holds well past 30 days at 4&deg;C when kept clean and dark; rotate to a fresh draw site on the stopper each time and avoid contamination.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row.</div></div></div></div>
       </div>
 
     </div><!-- /supplies tab -->
@@ -610,30 +781,27 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Bloodwork &mdash; Cadence</div>
-        <div class="tip-title">When to Pull Labs Across the Cycle</div>
-        </summary><div class="tip-body">
-          <p><strong>1. Baseline &mdash; before Shot 1.</strong> If you haven't already pulled a recent panel (within ~3 months), do one before starting. Gives us the "before" picture to read everything else against.</p>
-          <p><strong>2. 6-week check.</strong> Six weeks after Shot 1 puts you at steady-state on the 185 mg/wk cypionate dose &mdash; the blood levels have stabilized and what you measure reflects what's actually happening. This is the most important draw of the cycle. If anything needs adjusting (dose, AI, hematocrit management), it gets adjusted here.</p>
-          <p><strong>3. 12-week recheck (only if anything changed at 6 wks).</strong> If we adjusted dose or added/removed an AI at 6 weeks, repeat at 12 weeks to confirm the change landed where we wanted it. If 6-week numbers were on target, skip this and go to maintenance cadence.</p>
-          <p><strong>4. Maintenance &mdash; every 3 to 6 months.</strong> Once you're stable, two-to-four labs per year is the rhythm. Closer to every 3 months in the first year, can stretch to every 6 months once a year of clean labs is on record.</p>
-          <p><strong>5. Symptom-driven draws.</strong> If something feels off &mdash; fatigue back, mood shift, libido drop, gym performance tanks, big water retention, persistent headaches &mdash; don't wait for the calendar. Pull labs and we read them against the current dose.</p>
+        <div class="tip-head"><div class="tip-eyebrow">Bloodwork &mdash; Cadence</div><div class="tip-title">When to Pull Labs Across the Cycle</div></div>
+        </summary><div class="tip-body"><div class="note-list">
+          <div class="nr"><div class="nr-l">1. Baseline &mdash; before Shot 1</div><div class="nr-v">If you haven't already pulled a recent panel (within ~3 months), do one before starting. Gives us the "before" picture to read everything else against.</div></div>
+          <div class="nr"><div class="nr-l">2. 6-week check</div><div class="nr-v">Six weeks after Shot 1 puts you at steady-state on the 185 mg/wk cypionate dose &mdash; the blood levels have stabilized and what you measure reflects what's actually happening. This is the most important draw of the cycle. If anything needs adjusting (dose, AI, hematocrit management), it gets adjusted here.</div></div></div>
+          <p><strong>3. 12-week recheck (only if anything changed at 6 wks).</strong> If we adjusted dose or added/removed an AI at 6 weeks, repeat at 12 weeks to confirm the change landed where we wanted it. If 6-week numbers were on target, skip this and go to maintenance cadence.</p><div class="note-list">
+          <div class="nr"><div class="nr-l">4. Maintenance &mdash; every 3 to 6 months</div><div class="nr-v">Once you're stable, two-to-four labs per year is the rhythm. Closer to every 3 months in the first year, can stretch to every 6 months once a year of clean labs is on record.</div></div>
+          <div class="nr"><div class="nr-l">5. Symptom-driven draws</div><div class="nr-v">If something feels off &mdash; fatigue back, mood shift, libido drop, gym performance tanks, big water retention, persistent headaches &mdash; don't wait for the calendar. Pull labs and we read them against the current dose.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Bloodwork &mdash; Timing</div>
-        <div class="tip-title">When in the Week to Draw</div>
+        <div class="tip-head"><div class="tip-eyebrow">Bloodwork &mdash; Timing</div><div class="tip-title">When in the Week to Draw</div></div>
         </summary><div class="tip-body">
-          <p>For once-weekly TRT, <strong>draw at TROUGH</strong> &mdash; Day 7, morning, <strong>immediately before</strong> your next scheduled shot. That gives the floor of the curve, which is the level you actually want to be therapeutic. Peak levels right after a shot will look fine on any reasonable dose &mdash; trough is the honest number.</p>
-          <p><strong>Practical:</strong> if you inject every Monday AM, schedule the draw for Monday AM, then go inject right after. Fasted (12 hr) is preferred for the lipid + glucose panels that ride along. No training, no sauna for 24 hrs before &mdash; both can transiently move some markers.</p>
-          <p>If trough timing is impossible for the visit, mid-cycle (Day 3 or 4) is the backup &mdash; tell the lab when you drew relative to last shot so we read it correctly.</p>
+          <div class="tip-lead">For once-weekly TRT, <strong>draw at TROUGH</strong> &mdash; Day 7, morning, <strong>immediately before</strong> your next scheduled shot. That gives the floor of the curve, which is the level you actually want to be therapeutic. Peak levels right after a shot will look fine on any reasonable dose &mdash; trough is the honest number.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Practical</div><div class="nr-v">if you inject every Monday AM, schedule the draw for Monday AM, then go inject right after. Fasted (12 hr) is preferred for the lipid + glucose panels that ride along. No training, no sauna for 24 hrs before &mdash; both can transiently move some markers.</div></div></div>
+          <div class="tip-lead">If trough timing is impossible for the visit, mid-cycle (Day 3 or 4) is the backup &mdash; tell the lab when you drew relative to last shot so we read it correctly.</div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Bloodwork &mdash; The Panel</div>
-        <div class="tip-title">What to Order Each Draw</div>
+        <div class="tip-head"><div class="tip-eyebrow">Bloodwork &mdash; The Panel</div><div class="tip-title">What to Order Each Draw</div></div>
         </summary><div class="tip-body">
           <table>
             <thead><tr><th>Marker</th><th>Why</th><th>Watch For</th></tr></thead>
@@ -648,31 +816,29 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
               <tr><td><strong>PSA</strong></td><td>Prostate marker. Baseline once even if young; annually thereafter on TRT.</td><td>Year-over-year jump &gt;0.75 ng/mL = urology referral.</td></tr>
               <tr><td><strong>TSH (+ Free T4 if abnormal)</strong></td><td>Thyroid screen &mdash; baseline + annually. Low thyroid masks as low-T symptoms.</td><td>TSH outside 0.4&ndash;4.0 = follow up.</td></tr>
             </tbody>
-          </table>
-          <p style="margin-top:10px;"><strong>Optional adds (good ideas, not required):</strong> Vitamin D (25-OH), HbA1c, hsCRP (inflammation), fasting insulin. None are TRT-specific but they round out the picture.</p>
+          </table><div class="note-list">
+          <div class="nr"><div class="nr-l">Optional adds (good ideas, not required)</div><div class="nr-v">Vitamin D (25-OH), HbA1c, hsCRP (inflammation), fasting insulin. None are TRT-specific but they round out the picture.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Bloodwork &mdash; Red Flags</div>
-        <div class="tip-title">When to Adjust the Dose or Add a Lever</div>
-        </summary><div class="tip-body">
-          <p><strong>Hct &gt; 52%:</strong> donate a unit of blood (Red Cross, every 56 days for men). If it stays high after two donations, drop the dose to 150&ndash;170 mg/wk and recheck. This is the #1 long-term monitoring concern on TRT &mdash; not optional to track.</p>
-          <p><strong>E2 &gt; 50 + symptoms (nipple sensitivity, water retention, mood):</strong> conversation about a low-dose anastrozole (typically 0.25&ndash;0.5 mg twice weekly). E2 &gt; 50 without symptoms doesn't necessarily need an AI &mdash; many men run high E2 fine.</p>
-          <p><strong>E2 &lt; 15:</strong> too low. Joints will hurt, libido will tank, mood drops. If on an AI, back off. If not, dose may need a small bump.</p>
-          <p><strong>Total T trough &gt; 1,200 ng/dL:</strong> consider dropping the weekly dose by 25&ndash;35 mg (to 150 mg/wk or 160 mg/wk). Higher isn't better past a certain point &mdash; just more side effect risk.</p>
-          <p><strong>Total T trough &lt; 500 ng/dL on 185 mg/wk:</strong> rare at this dose but possible (high SHBG, fast metabolizer). May need to split to twice-weekly (92.5 mg &times; 2) for better steady-state, or bump dose slightly.</p>
-          <p><strong>Big HDL drop, big LDL jump:</strong> usually diet / body fat / training related, not the test itself. Check those first. Persistent lipid shift across multiple labs &mdash; consider it.</p>
+        <div class="tip-head"><div class="tip-eyebrow">Bloodwork &mdash; Red Flags</div><div class="tip-title">When to Adjust the Dose or Add a Lever</div></div>
+        </summary><div class="tip-body"><div class="note-list">
+          <div class="nr"><div class="nr-l">Hct &gt; 52%</div><div class="nr-v">donate a unit of blood (Red Cross, every 56 days for men). If it stays high after two donations, drop the dose to 150&ndash;170 mg/wk and recheck. This is the #1 long-term monitoring concern on TRT &mdash; not optional to track.</div></div></div>
+          <p><strong>E2 &gt; 50 + symptoms (nipple sensitivity, water retention, mood):</strong> conversation about a low-dose anastrozole (typically 0.25&ndash;0.5 mg twice weekly). E2 &gt; 50 without symptoms doesn't necessarily need an AI &mdash; many men run high E2 fine.</p><div class="note-list">
+          <div class="nr"><div class="nr-l">E2 &lt; 15</div><div class="nr-v">too low. Joints will hurt, libido will tank, mood drops. If on an AI, back off. If not, dose may need a small bump.</div></div>
+          <div class="nr"><div class="nr-l">Total T trough &gt; 1,200 ng/dL</div><div class="nr-v">consider dropping the weekly dose by 25&ndash;35 mg (to 150 mg/wk or 160 mg/wk). Higher isn't better past a certain point &mdash; just more side effect risk.</div></div>
+          <div class="nr"><div class="nr-l">Total T trough &lt; 500 ng/dL on 185 mg/wk</div><div class="nr-v">rare at this dose but possible (high SHBG, fast metabolizer). May need to split to twice-weekly (92.5 mg &times; 2) for better steady-state, or bump dose slightly.</div></div>
+          <div class="nr"><div class="nr-l">Big HDL drop, big LDL jump</div><div class="nr-v">usually diet / body fat / training related, not the test itself. Check those first. Persistent lipid shift across multiple labs &mdash; consider it.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Bloodwork &mdash; Where to Get Labs</div>
-        <div class="tip-title">Order Direct or Through a Doc</div>
-        </summary><div class="tip-body">
-          <p><strong>Through your doctor / TRT clinic:</strong> easiest if you have a relationship. Insurance often covers most of the panel.</p>
-          <p><strong>Direct-order (no doctor required):</strong> services like Marek Health, Discounted Labs, Quest's Quest Direct, or LabCorp's OnDemand let you order the full TRT panel out of pocket. Typical cost: $150&ndash;$300 for the full panel above. Convenient for the 6-week and maintenance checks if you're not in the clinic for them.</p>
-          <p><strong>What to ask for:</strong> "Full TRT monitoring panel: Total T, Free T, Estradiol (sensitive / LC-MS), SHBG, CBC w/ diff, CMP, lipid panel, PSA, TSH." That phrasing gets you the right test codes at most labs.</p>
+        <div class="tip-head"><div class="tip-eyebrow">Bloodwork &mdash; Where to Get Labs</div><div class="tip-title">Order Direct or Through a Doc</div></div>
+        </summary><div class="tip-body"><div class="note-list">
+          <div class="nr"><div class="nr-l">Through your doctor / TRT clinic</div><div class="nr-v">easiest if you have a relationship. Insurance often covers most of the panel.</div></div>
+          <div class="nr"><div class="nr-l">Direct-order (no doctor required)</div><div class="nr-v">services like Marek Health, Discounted Labs, Quest's Quest Direct, or LabCorp's OnDemand let you order the full TRT panel out of pocket. Typical cost: $150&ndash;$300 for the full panel above. Convenient for the 6-week and maintenance checks if you're not in the clinic for them.</div></div>
+          <div class="nr"><div class="nr-l">What to ask for</div><div class="nr-v">"Full TRT monitoring panel: Total T, Free T, Estradiol (sensitive / LC-MS), SHBG, CBC w/ diff, CMP, lipid panel, PSA, TSH." That phrasing gets you the right test codes at most labs.</div></div></div>
         </div>
       </details>
 
@@ -682,10 +848,9 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 01 &mdash; Reta Dose Ladder</div>
-        <div class="tip-title">Data-Driven, Not Calendar-Driven</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; Reta Dose Ladder</div><div class="tip-title">Data-Driven, Not Calendar-Driven</div></div>
         </summary><div class="tip-body">
-          <p>Reta is the long runner here &mdash; the active vial alone is 13&ndash;20 weeks depending on how you titrate. The dose ladder gives you four steps to move between:</p>
+          <div class="tip-lead">Reta is the long runner here &mdash; the active vial alone is 13&ndash;20 weeks depending on how you titrate. The dose ladder gives you four steps to move between:</div>
           <table>
             <thead><tr><th>Window</th><th>Dose</th><th>Units (5u = 1 mg)</th><th>Weekly</th><th>Trigger</th></tr></thead>
             <tbody>
@@ -694,20 +859,19 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
               <tr><td><strong>Wks 9+</strong></td><td>2.0 mg (cap)</td><td>10u</td><td>6 mg/wk</td><td>Only if 1.5 has plateaued &mdash; final ceiling</td></tr>
               <tr><td><strong>Drop step</strong></td><td>0.5 mg</td><td>2.5u</td><td>1.5 mg/wk</td><td>Back-off dose if GI issues / fat loss too fast</td></tr>
             </tbody>
-          </table>
-          <p><strong>Move UP signals:</strong> GI tolerance is solid (no nausea / vomiting / persistent constipation), appetite control is effective but not extreme, fat loss has slowed or plateaued. <strong>Move DOWN signals:</strong> persistent nausea past Week 2, vomiting at all, fat loss faster than ~2 lbs/wk sustained, energy dropping or workouts feeling flat (likely under-eating).</p>
-          <p><strong>The rule:</strong> never advance because of the calendar. Advance because the body is asking for it. Hold a dose for an extra 2&ndash;4 weeks if you're getting what you want at the current step.</p>
+          </table><div class="note-list">
+          <div class="nr"><div class="nr-l">Move UP signals</div><div class="nr-v">GI tolerance is solid (no nausea / vomiting / persistent constipation), appetite control is effective but not extreme, fat loss has slowed or plateaued. <strong>Move DOWN signals:</strong> persistent nausea past Week 2, vomiting at all, fat loss faster than ~2 lbs/wk sustained, energy dropping or workouts feeling flat (likely under-eating).</div></div>
+          <div class="nr"><div class="nr-l">The rule</div><div class="nr-v">never advance because of the calendar. Advance because the body is asking for it. Hold a dose for an extra 2&ndash;4 weeks if you're getting what you want at the current step.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 02 &mdash; The Frozen Vial Strategy</div>
-        <div class="tip-title">Two Ways to Use Vial #2</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; The Frozen Vial Strategy</div><div class="tip-title">Two Ways to Use Vial #2</div></div>
         </summary><div class="tip-body">
-          <p><strong>Lyophilized Reta in the freezer (0&deg;F or colder)</strong> stays viable on any cycle timescale you'd realistically use it on. Keep it sealed in its original packaging, in the original vial, dry &mdash; do not reconstitute until ready.</p>
-          <p><strong>Strategy A &mdash; Continuous extension:</strong> when the active vial is empty, pull the frozen vial, let it come to fridge temp (don't shock it &mdash; transfer to fridge for 24 hrs before reconstitution), then reconstitute and continue. This gives you a single ~26&ndash;40 week continuous run.</p>
-          <p><strong>Strategy B &mdash; Maintenance restart:</strong> finish vial #1, take 4&ndash;8 weeks off Reta (keep training and Tesa cycle behind you), then restart with vial #2 for a second push. Lets the body's metabolic adaptation reset before the second wave hits.</p>
-          <p><strong>Which to pick:</strong> depends on what's happening at the end of vial #1. Still losing? Continue (Strategy A). Stalled or feel run-down? Take the break (Strategy B). The frozen vial gives you that choice &mdash; it's not committed.</p>
+          <p><strong>Lyophilized Reta in the freezer (0&deg;F or colder)</strong> stays viable on any cycle timescale you'd realistically use it on. Keep it sealed in its original packaging, in the original vial, dry &mdash; do not reconstitute until ready.</p><div class="note-list">
+          <div class="nr"><div class="nr-l">Strategy A &mdash; Continuous extension</div><div class="nr-v">when the active vial is empty, pull the frozen vial, let it come to fridge temp (don't shock it &mdash; transfer to fridge for 24 hrs before reconstitution), then reconstitute and continue. This gives you a single ~26&ndash;40 week continuous run.</div></div>
+          <div class="nr"><div class="nr-l">Strategy B &mdash; Maintenance restart</div><div class="nr-v">finish vial #1, take 4&ndash;8 weeks off Reta (keep training and Tesa cycle behind you), then restart with vial #2 for a second push. Lets the body's metabolic adaptation reset before the second wave hits.</div></div>
+          <div class="nr"><div class="nr-l">Which to pick</div><div class="nr-v">depends on what's happening at the end of vial #1. Still losing? Continue (Strategy A). Stalled or feel run-down? Take the break (Strategy B). The frozen vial gives you that choice &mdash; it's not committed.</div></div></div>
         </div>
       </details>
 
@@ -717,38 +881,34 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 1&ndash;2</div>
-        <div class="tip-title">Foundation &middot; First Reta GI Window</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 1&ndash;2</div><div class="tip-title">Foundation &middot; First Reta GI Window</div></div>
         </summary><div class="tip-body">
-          <p>Tesa starts kicking sleep depth + recovery within the first week. Reta at 1 mg M/W/F is the conservative entry &mdash; the first 1&ndash;2 weeks are the GI tolerance window. <strong>Mild nausea or appetite suppression is expected;</strong> usually clears by Week 2. If nausea is severe or persistent, drop to 0.5 mg (2.5 units) for a few doses before resuming the climb.</p>
-          <p>Log appetite, energy, and any GI signals. This baseline matters for whether to advance at Week 5.</p>
+          <div class="tip-lead">Tesa starts kicking sleep depth + recovery within the first week. Reta at 1 mg M/W/F is the conservative entry &mdash; the first 1&ndash;2 weeks are the GI tolerance window. <strong>Mild nausea or appetite suppression is expected;</strong> usually clears by Week 2. If nausea is severe or persistent, drop to 0.5 mg (2.5 units) for a few doses before resuming the climb.</div>
+          <div class="tip-lead">Log appetite, energy, and any GI signals. This baseline matters for whether to advance at Week 5.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 3&ndash;4</div>
-        <div class="tip-title">Tesa Closing Out &middot; Reta Building</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 3&ndash;4</div><div class="tip-title">Tesa Closing Out &middot; Reta Building</div></div>
         </summary><div class="tip-body">
-          <p>Tesa runs out around Week 4 &mdash; the GH-axis work it did is locked in. You should be sleeping better, recovering faster, lean tissue protected. Reta concentration is now therapeutic &mdash; appetite control firm, fat loss starting to show.</p>
-          <p><strong>End of Week 4 decision point:</strong> bump Reta to 1.5 mg (7.5 units) starting Week 5, or hold at 1 mg if you're getting what you need.</p>
+          <div class="tip-lead">Tesa runs out around Week 4 &mdash; the GH-axis work it did is locked in. You should be sleeping better, recovering faster, lean tissue protected. Reta concentration is now therapeutic &mdash; appetite control firm, fat loss starting to show.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">End of Week 4 decision point</div><div class="nr-v">bump Reta to 1.5 mg (7.5 units) starting Week 5, or hold at 1 mg if you're getting what you need.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 5&ndash;8</div>
-        <div class="tip-title">Reta Mid-Cycle &middot; Body Comp Curve</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 5&ndash;8</div><div class="tip-title">Reta Mid-Cycle &middot; Body Comp Curve</div></div>
         </summary><div class="tip-body">
-          <p>Tesa is done; Reta carries the cycle. Fat loss curve at its steepest here if dosing is right &mdash; expect 1&ndash;1.5 lbs/wk sustained at 1.5 mg dose. If faster than that, drop back to 1 mg (you're risking lean tissue).</p>
-          <p>Energy and workout quality matter here &mdash; if they drop, you're under-eating. Add 200&ndash;300 cal of protein/carbs around training rather than holding the deficit hard.</p>
+          <div class="tip-lead">Tesa is done; Reta carries the cycle. Fat loss curve at its steepest here if dosing is right &mdash; expect 1&ndash;1.5 lbs/wk sustained at 1.5 mg dose. If faster than that, drop back to 1 mg (you're risking lean tissue).</div>
+          <div class="tip-lead">Energy and workout quality matter here &mdash; if they drop, you're under-eating. Add 200&ndash;300 cal of protein/carbs around training rather than holding the deficit hard.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 9+</div>
-        <div class="tip-title">Cap Decision &middot; Vial Runway</div>
-        </summary><div class="tip-body">
-          <p><strong>Bump to 2 mg only if:</strong> 1.5 mg has plateaued, appetite control has weakened, GI tolerance has been clean for 4+ weeks. Otherwise hold at 1.5 mg through to vial empty. 2 mg is the cap &mdash; no benefit going above that on a recomp cycle.</p>
-          <p>Track vial fill level weekly. When the active vial gets to ~10 doses remaining, decide on Strategy A (extend with frozen vial) or Strategy B (finish, break, restart later).</p>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 9+</div><div class="tip-title">Cap Decision &middot; Vial Runway</div></div>
+        </summary><div class="tip-body"><div class="note-list">
+          <div class="nr"><div class="nr-l">Bump to 2 mg only if</div><div class="nr-v">1.5 mg has plateaued, appetite control has weakened, GI tolerance has been clean for 4+ weeks. Otherwise hold at 1.5 mg through to vial empty. 2 mg is the cap &mdash; no benefit going above that on a recomp cycle.</div></div></div>
+          <div class="tip-lead">Track vial fill level weekly. When the active vial gets to ~10 doses remaining, decide on Strategy A (extend with frozen vial) or Strategy B (finish, break, restart later).</div>
         </div>
       </details>
 
@@ -758,48 +918,44 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 03 &mdash; Tesa Pre-Bed Window</div>
-        <div class="tip-title">Empty Stomach, 2+ Hrs After Last Meal</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; Tesa Pre-Bed Window</div><div class="tip-title">Empty Stomach, 2+ Hrs After Last Meal</div></div>
         </summary><div class="tip-body">
-          <p>Tesa rides the body's natural nocturnal GH pulse &mdash; food blunts the pulse, so fasted is non-negotiable. If you ate at 8 PM, inject at 10 PM or later. Water, black coffee, and tea are fine in the fasted window. Skip the dose if you snacked late.</p>
-          <p>Same time each night &mdash; the body locks onto the rhythm.</p>
+          <div class="tip-lead">Tesa rides the body's natural nocturnal GH pulse &mdash; food blunts the pulse, so fasted is non-negotiable. If you ate at 8 PM, inject at 10 PM or later. Water, black coffee, and tea are fine in the fasted window. Skip the dose if you snacked late.</div>
+          <div class="tip-lead">Same time each night &mdash; the body locks onto the rhythm.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 04 &mdash; Reta Timing</div>
-        <div class="tip-title">Morning Is Easiest &middot; Same Time Each Dose Day</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Reta Timing</div><div class="tip-title">Morning Is Easiest &middot; Same Time Each Dose Day</div></div>
         </summary><div class="tip-body">
-          <p>Reta has a long half-life (~6 days), so the exact time of day doesn't matter much from a pharmacology standpoint. But for habit + GI predictability, <strong>morning dosing is the cleanest</strong> &mdash; any nausea spike happens during waking hours rather than ruining sleep.</p>
-          <p>Same time each M/W/F holds the rhythm. If you miss a dose by &lt;24 hrs, take it when you remember and continue the schedule. Miss by &gt;24 hrs &mdash; skip and resume next scheduled day.</p>
+          <div class="tip-lead">Reta has a long half-life (~6 days), so the exact time of day doesn't matter much from a pharmacology standpoint. But for habit + GI predictability, <strong>morning dosing is the cleanest</strong> &mdash; any nausea spike happens during waking hours rather than ruining sleep.</div>
+          <div class="tip-lead">Same time each M/W/F holds the rhythm. If you miss a dose by &lt;24 hrs, take it when you remember and continue the schedule. Miss by &gt;24 hrs &mdash; skip and resume next scheduled day.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 05 &mdash; Site Rotation</div>
-        <div class="tip-title">Four Abdomen Quadrants, Cycle Through</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 05 &mdash; Site Rotation</div><div class="tip-title">Four Abdomen Quadrants, Cycle Through</div></div>
         </summary><div class="tip-body">
-          <p>SubQ shots go in the abdomen, 2+ inches from the navel. Four quadrants: upper-left, upper-right, lower-left, lower-right. Rotate every shot &mdash; never inject the same 1&Prime; spot two days in a row. Same-quadrant repeat is fine if the spot is &gt;1&Prime; from the last shot.</p>
-          <p>Test IM goes in a different zone entirely (quad / glute / delt &mdash; Kyle's own rotation). No overlap with the peptide sites.</p>
+          <div class="tip-lead">SubQ shots go in the abdomen, 2+ inches from the navel. Four quadrants: upper-left, upper-right, lower-left, lower-right. Rotate every shot &mdash; never inject the same 1&Prime; spot two days in a row. Same-quadrant repeat is fine if the spot is &gt;1&Prime; from the last shot.</div>
+          <div class="tip-lead">Test IM goes in a different zone entirely (quad / glute / delt &mdash; Kyle's own rotation). No overlap with the peptide sites.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 06 &mdash; What to Monitor</div>
-        <div class="tip-title">Normal vs. Watch For</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; What to Monitor</div><div class="tip-title">Normal vs. Watch For</div></div>
         </summary><div class="tip-body">
           <p><strong>Normal (no action):</strong></p>
-          <p>&middot; Mild nausea / appetite drop with first 1&ndash;2 Reta shots &mdash; subsides<br>
+          <div class="tip-lead">&middot; Mild nausea / appetite drop with first 1&ndash;2 Reta shots &mdash; subsides<br>
           &middot; Mild injection-site redness or small bruising &mdash; rotate sites and use proper SubQ technique<br>
           &middot; Slight warmth or "fullness" feeling 30 min after Tesa &mdash; normal GH response<br>
           &middot; Mild water retention in first 2 weeks of Tesa &mdash; normal, resolves as the body adapts<br>
-          &middot; Constipation on Reta &mdash; common; hydration + fiber addresses it</p>
+          &middot; Constipation on Reta &mdash; common; hydration + fiber addresses it</div>
           <p><strong>Monitor (contact BioLinked):</strong></p>
-          <p>&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique issue or contamination<br>
+          <div class="tip-lead">&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique issue or contamination<br>
           &middot; Severe nausea or vomiting past Week 2 of Reta &mdash; drop to 0.5 mg or pause<br>
           &middot; Fat loss faster than ~2 lbs/wk sustained &mdash; drop Reta dose, lean tissue is at risk<br>
           &middot; Persistent fatigue or workouts feeling flat &mdash; usually under-eating; add cals around training<br>
-          &middot; Numbness/tingling in hands beyond Week 4 of Tesa &mdash; flag to reassess dosing</p>
+          &middot; Numbness/tingling in hands beyond Week 4 of Tesa &mdash; flag to reassess dosing</div>
         </div>
       </details>
 

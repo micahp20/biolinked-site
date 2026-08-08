@@ -182,6 +182,189 @@ details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bo
 details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
 details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 @media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
+
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
+
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
+
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
+
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
+
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
+
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
+
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
+
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
+
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
+
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -270,11 +453,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <div class="program-eyebrow">Personalized Protocol</div>
         <div class="program-title">David's <em>Mito Reset + Cut</em></div>
         <div class="program-tag">Repair the engine first. Then the 10&ndash;15 lbs come off without the energy crash.</div>
-        <div class="program-context">
-          <p><strong>You're 45, recently off TRT, and want to drop 10&ndash;15 lbs.</strong> On paper that's a simple problem. In reality, coming off TRT exposes something most people don't think about &mdash; testosterone was quietly supporting your mitochondrial function. <strong>Without TRT in the picture, the metabolic floor drops.</strong> That's why guys coming off T often describe weight loss feeling "harder than it used to be" and energy that crashes in the afternoon.</p>
-          <p><strong>The piece nobody talks about &mdash; mitochondria and weight loss.</strong> Fat is stored chemical energy. To burn it, your cells need functioning mitochondria (the energy-producing machinery inside every cell). When the mitochondria are damaged, slow, or inefficient &mdash; which happens with aging, post-TRT, chronic stress, poor sleep &mdash; <strong>weight loss becomes harder and energy depletes faster.</strong> Diet alone hits a wall. Cardio alone hits a wall. You can be in a deficit and still not see the scale move. That's mitochondrial dysfunction blocking the fat-burning pathway.</p>
-          <p><strong>The fix is sequential, not parallel.</strong> You don't want to push a damaged engine harder &mdash; you want to repair it first, then run it. <strong>Phase 1 (SS-31 + Humanin)</strong> repairs and protects the mitochondria at the membrane and cell level. <strong>Phase 2 (MOTS-C + Retatrutide)</strong> then activates the now-healthy engine: MOTS-C drives metabolic activity (AMPK signaling), Reta drives the calorie deficit (appetite + fat oxidation). <strong>Repair, then activate, then cut.</strong> That's the whole logic.</p>
-        </div>
+        <div class="program-context"><div class="note-list"><div class="nr full"><div class="nr-v"><strong>You're 45, recently off TRT, and want to drop 10&ndash;15 lbs.</strong> On paper that's a simple problem. In reality, coming off TRT exposes something most people don't think about &mdash; testosterone was quietly supporting your mitochondrial function. <strong>Without TRT in the picture, the metabolic floor drops.</strong> That's why guys coming off T often describe weight loss feeling "harder than it used to be" and energy that crashes in the afternoon.</div></div><div class="nr full"><div class="nr-v"><strong>The piece nobody talks about &mdash; mitochondria and weight loss.</strong> Fat is stored chemical energy. To burn it, your cells need functioning mitochondria (the energy-producing machinery inside every cell). When the mitochondria are damaged, slow, or inefficient &mdash; which happens with aging, post-TRT, chronic stress, poor sleep &mdash; <strong>weight loss becomes harder and energy depletes faster.</strong> Diet alone hits a wall. Cardio alone hits a wall. You can be in a deficit and still not see the scale move. That's mitochondrial dysfunction blocking the fat-burning pathway.</div></div><div class="nr"><div class="nr-l">The fix is sequential, not parallel</div><div class="nr-v">You don't want to push a damaged engine harder &mdash; you want to repair it first, then run it. <strong>Phase 1 (SS-31 + Humanin)</strong> repairs and protects the mitochondria at the membrane and cell level. <strong>Phase 2 (MOTS-C + Retatrutide)</strong> then activates the now-healthy engine: MOTS-C drives metabolic activity (AMPK signaling), Reta drives the calorie deficit (appetite + fat oxidation). <strong>Repair, then activate, then cut.</strong> That's the whole logic.</div></div></div></div>
       </div>
 
       <div class="sec-divider">
@@ -536,11 +715,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </table></div>
       </details>
 
-      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
-        <strong style="color:var(--gold);">MOTS-C AM fasted requirement:</strong> First thing in the morning, water/black coffee only. Wait 30&ndash;45 min after dosing before eating. Food blunts the AMPK signal.<br><br>
-        <strong style="color:var(--gold);">Reta timing flexibility:</strong> Reta has a long half-life (~6 days) so exact time of day matters less than consistency. Just take it the same time on each scheduled day. Most people prefer morning so any GI side effects happen during waking hours rather than disrupting sleep.<br><br>
-        <strong style="color:var(--gold);">Level-down protocol at goal weight:</strong> When you hit your 10&ndash;15 lb goal, drop Reta to maintenance &mdash; either 0.5 mg per dose (5 units / 0.05 mL) OR drop frequency to Mon + Thu only. Don't overshoot the target. Full level-down logic in the Notes &amp; Tips tab.
-      </div>
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">MOTS-C AM fasted requirement</div><div class="nr-v">First thing in the morning, water/black coffee only. Wait 30&ndash;45 min after dosing before eating. Food blunts the AMPK signal.</div></div><div class="nr"><div class="nr-l">Reta timing flexibility</div><div class="nr-v">Reta has a long half-life (~6 days) so exact time of day matters less than consistency. Just take it the same time on each scheduled day. Most people prefer morning so any GI side effects happen during waking hours rather than disrupting sleep.</div></div><div class="nr"><div class="nr-l">Level-down protocol at goal weight</div><div class="nr-v">When you hit your 10&ndash;15 lb goal, drop Reta to maintenance &mdash; either 0.5 mg per dose (5 units / 0.05 mL) OR drop frequency to Mon + Thu only. Don't overshoot the target. Full level-down logic in the Notes &amp; Tips tab.</div></div></div></div>
 
     </div><!-- /schedule tab -->
 
@@ -597,11 +772,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="storage-card">
         <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
-        <div class="storage-body">
-          <p><strong>Dry (lyophilized) vials:</strong> refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</p>
-          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days. Fresh insulin syringe for each draw &mdash; never reuse.</p>
-          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row.</p>
-        </div>
+        <div class="storage-body"><div class="note-list"><div class="nr"><div class="nr-l">Dry (lyophilized) vials</div><div class="nr-v">refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</div></div><div class="nr"><div class="nr-l">Reconstituted vials</div><div class="nr-v">refrigerate immediately after adding BAC water. Use within 30 days. Fresh insulin syringe for each draw &mdash; never reuse.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row.</div></div></div></div>
       </div>
 
     </div><!-- /supplies tab -->
@@ -615,51 +786,47 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 01 &mdash; Mitochondria + Weight Loss + Coming Off TRT</div>
-        <div class="tip-title">Why Weight Loss Got Harder Once You Stopped TRT</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; Mitochondria + Weight Loss + Coming Off TRT</div><div class="tip-title">Why Weight Loss Got Harder Once You Stopped TRT</div></div>
         </summary><div class="tip-body">
-          <p>Most guys coming off TRT notice something within a few months &mdash; the body composition that was easy to maintain on testosterone suddenly feels harder. Weight loss attempts hit a wall. Energy crashes in the afternoon. Workouts feel flat. <strong>The reason isn't willpower or "metabolism slowing with age."</strong> It's mitochondrial.</p>
-          <p>Testosterone has a direct supportive effect on mitochondrial function &mdash; it upregulates the genes that produce mitochondrial proteins, improves the efficiency of the electron transport chain, and supports the cellular processes that convert stored fat into usable energy. <strong>When you come off T, that scaffolding goes away.</strong> The mitochondria are still there, but they're operating without the support they were used to.</p>
+          <div class="tip-lead">Most guys coming off TRT notice something within a few months &mdash; the body composition that was easy to maintain on testosterone suddenly feels harder. Weight loss attempts hit a wall. Energy crashes in the afternoon. Workouts feel flat. <strong>The reason isn't willpower or "metabolism slowing with age."</strong> It's mitochondrial.</div>
+          <div class="tip-lead">Testosterone has a direct supportive effect on mitochondrial function &mdash; it upregulates the genes that produce mitochondrial proteins, improves the efficiency of the electron transport chain, and supports the cellular processes that convert stored fat into usable energy. <strong>When you come off T, that scaffolding goes away.</strong> The mitochondria are still there, but they're operating without the support they were used to.</div>
           <p><strong>How this affects weight loss specifically:</strong></p>
           <ul style="margin-left:18px;margin-top:8px;">
             <li><strong>Fat = stored chemical energy.</strong> To burn it, you need functioning mitochondria. Slow mitochondria = slow fat burning, regardless of how good your diet is.</li>
             <li><strong>Energy depletes faster.</strong> Less efficient ATP production = afternoon crashes, gym sessions that feel harder than they should, and the "tired but wired" feeling of being in a deficit.</li>
             <li><strong>Plateaus hit early.</strong> Your body senses the metabolic stress and downregulates further to conserve energy. Cuts that should produce 1&ndash;2 lbs/week start producing nothing.</li>
-          </ul>
-          <p><strong>The protocol fix:</strong> repair the mitochondria <em>before</em> driving the deficit. SS-31 + Humanin in Phase 1 directly address the cellular machinery &mdash; <strong>20 days of daily dosing (including weekends)</strong>, which is the intensive-course format the research supports for mitochondrial peptides. By Day 20, you're heading into Phase 2 with mitochondria that are functioning closer to where they were on T. Then MOTS-C activates them and Reta does the fat-loss work &mdash; without the energy crash that most cuts produce.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">The protocol fix</div><div class="nr-v">repair the mitochondria <em>before</em> driving the deficit. SS-31 + Humanin in Phase 1 directly address the cellular machinery &mdash; <strong>20 days of daily dosing (including weekends)</strong>, which is the intensive-course format the research supports for mitochondrial peptides. By Day 20, you're heading into Phase 2 with mitochondria that are functioning closer to where they were on T. Then MOTS-C activates them and Reta does the fat-loss work &mdash; without the energy crash that most cuts produce.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 02 &mdash; Phase Sequencing</div>
-        <div class="tip-title">Why Reta Doesn't Start in Week 1</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; Phase Sequencing</div><div class="tip-title">Why Reta Doesn't Start in Week 1</div></div>
         </summary><div class="tip-body">
-          <p>Most people would buy Reta and start it Day 1. We're not doing that for you. The reason: <strong>Reta drives a calorie deficit, and calorie deficits stress mitochondria.</strong> Stressing already-stressed mitochondria (post-TRT) makes everything worse &mdash; more energy crashes, more plateaus, worse adherence.</p>
-          <p>The sequence: <strong>repair (Days 1&ndash;20) &rarr; activate (Wks 4+) &rarr; cut (Wks 4+).</strong> By the time Reta kicks in, you've spent 20 days of daily intensive repair on the engine. MOTS-C activates that repaired engine in Phase 2. Reta then drives the deficit on top of a metabolic system that can <em>handle</em> the deficit without falling apart.</p>
-          <p>You'll still lose the 10&ndash;15 lbs &mdash; possibly faster than a Reta-only approach &mdash; just with stable energy the whole way instead of the gas-out crash most cuts produce.</p>
+          <div class="tip-lead">Most people would buy Reta and start it Day 1. We're not doing that for you. The reason: <strong>Reta drives a calorie deficit, and calorie deficits stress mitochondria.</strong> Stressing already-stressed mitochondria (post-TRT) makes everything worse &mdash; more energy crashes, more plateaus, worse adherence.</div>
+          <div class="tip-lead">The sequence: <strong>repair (Days 1&ndash;20) &rarr; activate (Wks 4+) &rarr; cut (Wks 4+).</strong> By the time Reta kicks in, you've spent 20 days of daily intensive repair on the engine. MOTS-C activates that repaired engine in Phase 2. Reta then drives the deficit on top of a metabolic system that can <em>handle</em> the deficit without falling apart.</div>
+          <div class="tip-lead">You'll still lose the 10&ndash;15 lbs &mdash; possibly faster than a Reta-only approach &mdash; just with stable energy the whole way instead of the gas-out crash most cuts produce.</div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 03 &mdash; Level-Down Protocol at Goal</div>
-        <div class="tip-title">Don't Overshoot. Drop the Dose When You're There.</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; Level-Down Protocol at Goal</div><div class="tip-title">Don't Overshoot. Drop the Dose When You're There.</div></div>
         </summary><div class="tip-body">
-          <p>10&ndash;15 lbs is your target. Reta will keep producing fat loss past that target if you let it. Most people don't level down in time and end up underweight or losing muscle they didn't want to lose.</p>
+          <div class="tip-lead">10&ndash;15 lbs is your target. Reta will keep producing fat loss past that target if you let it. Most people don't level down in time and end up underweight or losing muscle they didn't want to lose.</div>
           <p><strong>The protocol:</strong></p>
           <ul style="margin-left:18px;margin-top:8px;">
             <li><strong>~3 lbs from goal:</strong> drop Reta from M/W/F back to Mon + Thu only (cuts weekly dose 33%)</li>
             <li><strong>At goal:</strong> drop Reta dose from 1 mg to 0.5 mg (5 units / 0.05 mL instead of 10 units / 0.10 mL) OR drop frequency to once weekly (Mon only)</li>
             <li><strong>1&ndash;2 lbs past goal:</strong> stop Reta entirely. MOTS-C can continue if you want metabolic support.</li>
           </ul>
-          <p>The point isn't to keep losing weight forever. The point is to land at your target, lock it in, and maintain. Reta is a tool, not a lifestyle &mdash; use it for the cut, then back off cleanly.</p>
+          <div class="tip-lead">The point isn't to keep losing weight forever. The point is to land at your target, lock it in, and maintain. Reta is a tool, not a lifestyle &mdash; use it for the cut, then back off cleanly.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 04 &mdash; Reta GI Side Effects</div>
-        <div class="tip-title">What to Expect During the Ramp-Up</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Reta GI Side Effects</div><div class="tip-title">What to Expect During the Ramp-Up</div></div>
         </summary><div class="tip-body">
-          <p>Reta in the first 1&ndash;2 weeks (Wks 4&ndash;5) is when GI side effects are most likely &mdash; nausea, slow gastric emptying, occasional constipation. The Mon + Thu titration is specifically designed to minimize this.</p>
+          <div class="tip-lead">Reta in the first 1&ndash;2 weeks (Wks 4&ndash;5) is when GI side effects are most likely &mdash; nausea, slow gastric emptying, occasional constipation. The Mon + Thu titration is specifically designed to minimize this.</div>
           <p><strong>If nausea hits hard:</strong></p>
           <ul style="margin-left:18px;margin-top:8px;">
             <li>Drop to once weekly (Mon only) for an additional 2 weeks before resuming Mon + Thu</li>
@@ -667,7 +834,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <li>Eat smaller meals more frequently &mdash; large meals on Reta = guaranteed nausea</li>
             <li>Hydrate aggressively (3+ L/day) and add electrolytes</li>
           </ul>
-          <p>By Week 9&ndash;10 most GI effects fade as tolerance builds. The bump to M/W/F should feel manageable.</p>
+          <div class="tip-lead">By Week 9&ndash;10 most GI effects fade as tolerance builds. The bump to M/W/F should feel manageable.</div>
         </div>
       </details>
 
@@ -677,55 +844,49 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Days 1&ndash;7 &middot; Phase 1 Start</div>
-        <div class="tip-title">Daily Intensive Begins</div>
+        <div class="tip-head"><div class="tip-eyebrow">Days 1&ndash;7 &middot; Phase 1 Start</div><div class="tip-title">Daily Intensive Begins</div></div>
         </summary><div class="tip-body">
-          <p>SS-31 + Humanin AM, every single day including weekends. No scale movement yet &mdash; this isn't a weight loss phase. What you might notice: slightly more stable energy through the day, mild improvement in sleep depth, less "afternoon crash" feeling. Mild injection-site redness is normal.</p>
+          <div class="tip-lead">SS-31 + Humanin AM, every single day including weekends. No scale movement yet &mdash; this isn't a weight loss phase. What you might notice: slightly more stable energy through the day, mild improvement in sleep depth, less "afternoon crash" feeling. Mild injection-site redness is normal.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Days 8&ndash;14 &middot; Phase 1 Build</div>
-        <div class="tip-title">Mito Repair Compounds</div>
+        <div class="tip-head"><div class="tip-eyebrow">Days 8&ndash;14 &middot; Phase 1 Build</div><div class="tip-title">Mito Repair Compounds</div></div>
         </summary><div class="tip-body">
-          <p>By Day 10&ndash;14 the mitochondrial benefits start being noticeable. Energy is more consistent. Workouts feel like they did pre-TRT-cessation. Recovery between sessions improves. <strong>You'll start to feel "more like yourself"</strong> in terms of baseline energy.</p>
-          <p>Weight may shift slightly (a couple lbs either way) from water/glycogen changes &mdash; that's expected, not the goal.</p>
+          <div class="tip-lead">By Day 10&ndash;14 the mitochondrial benefits start being noticeable. Energy is more consistent. Workouts feel like they did pre-TRT-cessation. Recovery between sessions improves. <strong>You'll start to feel "more like yourself"</strong> in terms of baseline energy.</div>
+          <div class="tip-lead">Weight may shift slightly (a couple lbs either way) from water/glycogen changes &mdash; that's expected, not the goal.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Days 15&ndash;20 &middot; Phase 1 Wraps</div>
-        <div class="tip-title">Foundation Locked In</div>
+        <div class="tip-head"><div class="tip-eyebrow">Days 15&ndash;20 &middot; Phase 1 Wraps</div><div class="tip-title">Foundation Locked In</div></div>
         </summary><div class="tip-body">
-          <p>Final days of the 20-day intensive. The mitochondrial repair compounds over time &mdash; by Day 20 you've built a foundation that will hold through the Phase 2 cut.</p>
-          <p>End of Day 20: Humanin done (exact 2-vial fit); SS-31 has ~10 doses leftover for PRN or future bridge. Phase 2 (MOTS-C + Reta) starts Monday of Week 4 (Day 21).</p>
+          <div class="tip-lead">Final days of the 20-day intensive. The mitochondrial repair compounds over time &mdash; by Day 20 you've built a foundation that will hold through the Phase 2 cut.</div>
+          <div class="tip-lead">End of Day 20: Humanin done (exact 2-vial fit); SS-31 has ~10 doses leftover for PRN or future bridge. Phase 2 (MOTS-C + Reta) starts Monday of Week 4 (Day 21).</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 4&ndash;6 &middot; Phase 2a</div>
-        <div class="tip-title">MOTS-C Activates, Reta Ramps</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 4&ndash;6 &middot; Phase 2a</div><div class="tip-title">MOTS-C Activates, Reta Ramps</div></div>
         </summary><div class="tip-body">
-          <p>MOTS-C starts AM fasted M&ndash;F. Reta begins Mon + Thu only (gut acclimation). Expect: noticeable energy bump from MOTS-C (AMPK activation), appetite suppression from Reta within the first week, mild GI adjustment.</p>
-          <p>Weight should start dropping by end of Week 4 &mdash; expect 1&ndash;1.5 lbs/wk over Wks 4&ndash;6.</p>
+          <div class="tip-lead">MOTS-C starts AM fasted M&ndash;F. Reta begins Mon + Thu only (gut acclimation). Expect: noticeable energy bump from MOTS-C (AMPK activation), appetite suppression from Reta within the first week, mild GI adjustment.</div>
+          <div class="tip-lead">Weight should start dropping by end of Week 4 &mdash; expect 1&ndash;1.5 lbs/wk over Wks 4&ndash;6.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 7&ndash;10 &middot; Phase 2b Start</div>
-        <div class="tip-title">Reta at Steady State, Cut Accelerates</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 7&ndash;10 &middot; Phase 2b Start</div><div class="tip-title">Reta at Steady State, Cut Accelerates</div></div>
         </summary><div class="tip-body">
-          <p>Reta bumps to M/W/F at Week 7. Weekly dose now 3 mg vs 2 mg previously. Fat loss accelerates &mdash; expect 1.5&ndash;2 lbs/wk through this stretch. Energy stays solid thanks to the Phase 1 foundation + MOTS-C support.</p>
-          <p>Most clients hit their 10&ndash;15 lb goal somewhere in Weeks 9&ndash;12.</p>
+          <div class="tip-lead">Reta bumps to M/W/F at Week 7. Weekly dose now 3 mg vs 2 mg previously. Fat loss accelerates &mdash; expect 1.5&ndash;2 lbs/wk through this stretch. Energy stays solid thanks to the Phase 1 foundation + MOTS-C support.</div>
+          <div class="tip-lead">Most clients hit their 10&ndash;15 lb goal somewhere in Weeks 9&ndash;12.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 11&ndash;14 &middot; Phase 2b Close</div>
-        <div class="tip-title">Approaching Goal &middot; Level Down</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 11&ndash;14 &middot; Phase 2b Close</div><div class="tip-title">Approaching Goal &middot; Level Down</div></div>
         </summary><div class="tip-body">
-          <p>Once you're within 3 lbs of goal, start the level-down (see Tip 03). At goal, drop Reta to maintenance. MOTS-C can continue to the end of the cycle (~Wk 14 when Reta vial empties).</p>
-          <p><strong>End-of-cycle questions:</strong> 10&ndash;15 lbs down vs Day 1? Energy compared to start? How does maintenance feel? These answers determine whether to take a 4&ndash;8 week break, restart at a maintenance dose, or run a different protocol next.</p>
+          <div class="tip-lead">Once you're within 3 lbs of goal, start the level-down (see Tip 03). At goal, drop Reta to maintenance. MOTS-C can continue to the end of the cycle (~Wk 14 when Reta vial empties).</div><div class="note-list">
+          <div class="nr"><div class="nr-l">End-of-cycle questions</div><div class="nr-v">10&ndash;15 lbs down vs Day 1? Energy compared to start? How does maintenance feel? These answers determine whether to take a 4&ndash;8 week break, restart at a maintenance dose, or run a different protocol next.</div></div></div>
         </div>
       </details>
 
@@ -735,19 +896,17 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 05 &mdash; AM Cluster Logistics</div>
-        <div class="tip-title">Phase 1 vs. Phase 2 Morning Routine</div>
-        </summary><div class="tip-body">
-          <p><strong>Phase 1 mornings (Days 1&ndash;20, every day):</strong> SS-31 + Humanin together, 5 min. Same window, rotate to different abdomen quadrants. Doesn't have to be fasted &mdash; can be before or after breakfast. Easiest right after you wake up. <strong>Weekends included &mdash; the 20-day intensive needs daily continuity.</strong></p>
-          <p><strong>Phase 2 mornings (Wks 4+):</strong> MOTS-C fasted only &mdash; first thing AM, water/black coffee only, wait 30&ndash;45 min before eating. On Reta days (Mon + Thu in Phase 2a, M/W/F in Phase 2b), Reta can go in the same window &mdash; doesn't need to be fasted, just convenient to cluster the shots.</p>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 05 &mdash; AM Cluster Logistics</div><div class="tip-title">Phase 1 vs. Phase 2 Morning Routine</div></div>
+        </summary><div class="tip-body"><div class="note-list">
+          <div class="nr"><div class="nr-l">Phase 1 mornings (Days 1&ndash;20, every day)</div><div class="nr-v">SS-31 + Humanin together, 5 min. Same window, rotate to different abdomen quadrants. Doesn't have to be fasted &mdash; can be before or after breakfast. Easiest right after you wake up. <strong>Weekends included &mdash; the 20-day intensive needs daily continuity.</strong></div></div>
+          <div class="nr"><div class="nr-l">Phase 2 mornings (Wks 4+)</div><div class="nr-v">MOTS-C fasted only &mdash; first thing AM, water/black coffee only, wait 30&ndash;45 min before eating. On Reta days (Mon + Thu in Phase 2a, M/W/F in Phase 2b), Reta can go in the same window &mdash; doesn't need to be fasted, just convenient to cluster the shots.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 06 &mdash; Diet During the Cut</div>
-        <div class="tip-title">Reta Does the Hard Part &mdash; You Just Have to Eat Smart</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; Diet During the Cut</div><div class="tip-title">Reta Does the Hard Part &mdash; You Just Have to Eat Smart</div></div>
         </summary><div class="tip-body">
-          <p>Reta will kill your appetite. The trap most guys fall into: they eat too little and end up under-fueling, which crashes energy AND costs muscle. Hit these baselines:</p>
+          <div class="tip-lead">Reta will kill your appetite. The trap most guys fall into: they eat too little and end up under-fueling, which crashes energy AND costs muscle. Hit these baselines:</div>
           <ul style="margin-left:18px;margin-top:8px;">
             <li><strong>Protein:</strong> 0.8&ndash;1 g per lb of bodyweight, daily. Non-negotiable for preserving muscle on a GLP-1.</li>
             <li><strong>Total calories:</strong> aim for a ~500 kcal/day deficit, not more. Reta will make it feel easy &mdash; resist the urge to push the deficit harder.</li>
@@ -758,20 +917,19 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div>
-        <div class="tip-title">Normal vs. Watch For</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div><div class="tip-title">Normal vs. Watch For</div></div>
         </summary><div class="tip-body">
           <p><strong>Normal (no action):</strong></p>
-          <p>&middot; Mild injection-site redness or small bruising &mdash; rotate sites and use clean technique<br>
+          <div class="tip-lead">&middot; Mild injection-site redness or small bruising &mdash; rotate sites and use clean technique<br>
           &middot; Improved sleep depth + slightly more vivid dreams Wks 1&ndash;2<br>
           &middot; Mild flushing 5&ndash;10 min after MOTS-C &mdash; normal AMPK-related vascular response<br>
           &middot; Reta GI effects in the first 1&ndash;2 weeks of Phase 2a &mdash; subsides as tolerance builds<br>
-          &middot; Appetite gone within 3&ndash;5 days of starting Reta &mdash; that's the compound working</p>
+          &middot; Appetite gone within 3&ndash;5 days of starting Reta &mdash; that's the compound working</div>
           <p><strong>Monitor (contact BioLinked):</strong></p>
-          <p>&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique or contamination<br>
+          <div class="tip-lead">&middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique or contamination<br>
           &middot; Severe nausea or vomiting past Week 2 of Reta &mdash; drop to 0.5 mg or pause and contact us<br>
           &middot; Weight loss faster than 2 lbs/wk sustained &mdash; level down to protect lean tissue<br>
-          &middot; Persistent fatigue past Week 3 of Phase 1 &mdash; rare but worth flagging; may need to adjust dose timing</p>
+          &middot; Persistent fatigue past Week 3 of Phase 1 &mdash; rare but worth flagging; may need to adjust dose timing</div>
         </div>
       </details>
 
