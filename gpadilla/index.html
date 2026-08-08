@@ -243,6 +243,189 @@ details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bo
 details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
 details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 @media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
+
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
+
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
+
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
+
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
+
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
+
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
+
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
+
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
+
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
+
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -327,12 +510,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="program-eyebrow">Personalized Protocol</div>
         <div class="program-title">Gabe's <em>Recovery &amp; Rebuild</em></div>
         <div class="program-tag">8-week injectable stack &mdash; eliminate pain, restore training, rebuild the physique from the inside out.</div>
-        <div class="program-context">
-          <p>Gabe, you built your body through real work &mdash; years of competitive bodybuilding and daily hard labor have shaped who you are, but they've also put serious mileage on your joints, connective tissue, and recovery systems. The aches that stop you from training the way you used to aren't weakness &mdash; they're <strong>accumulated physical debt</strong> that the body can no longer clear on its own.</p>
-          <p>You tried BPC-157 orally and felt nothing, which makes sense: oral peptides have extremely low bioavailability and rarely produce the results people expect. <strong>This protocol is injectable &mdash; a completely different experience.</strong> The compounds go directly into your system where they're needed, targeting the root causes: systemic inflammation, mitochondrial fatigue, tissue damage, and the hormonal decline that comes with years of hard use.</p>
-          <p><strong>This 8-week stack is designed to eliminate the pain, restore your ability to train, rebuild your physique, and reignite your energy and drive</strong> &mdash; from the inside out. Twelve compounds working in parallel: mitochondrial repair (MOTS-C + SS-31 + NAD+), nervous-system support (Semax + Selank), tissue healing (KLOW), GH optimization (CJC/Ipa + HGH + IGF-1 LR3), hormonal axis (Kisspeptin-10 + PT-141), and fat metabolism (L-Carnitine).</p>
-          <p><strong>First-time injector note:</strong> all of these are <strong>subcutaneous (SubQ) injections</strong> &mdash; shallow injections just under the skin, not into muscle. Use a 29&ndash;31 gauge insulin syringe, pinch the skin on your abdomen or outer thigh, insert at a 45&deg; angle, and inject slowly. It should be nearly painless. Rotate sites daily. You'll be a pro by week 2.</p>
-        </div>
+        <div class="program-context"><div class="note-list"><div class="nr full"><div class="nr-v">Gabe, you built your body through real work &mdash; years of competitive bodybuilding and daily hard labor have shaped who you are, but they've also put serious mileage on your joints, connective tissue, and recovery systems. The aches that stop you from training the way you used to aren't weakness &mdash; they're <strong>accumulated physical debt</strong> that the body can no longer clear on its own.</div></div><div class="nr full"><div class="nr-v">You tried BPC-157 orally and felt nothing, which makes sense: oral peptides have extremely low bioavailability and rarely produce the results people expect. <strong>This protocol is injectable &mdash; a completely different experience.</strong> The compounds go directly into your system where they're needed, targeting the root causes: systemic inflammation, mitochondrial fatigue, tissue damage, and the hormonal decline that comes with years of hard use.</div></div><div class="nr full"><div class="nr-v"><strong>This 8-week stack is designed to eliminate the pain, restore your ability to train, rebuild your physique, and reignite your energy and drive</strong> &mdash; from the inside out. Twelve compounds working in parallel: mitochondrial repair (MOTS-C + SS-31 + NAD+), nervous-system support (Semax + Selank), tissue healing (KLOW), GH optimization (CJC/Ipa + HGH + IGF-1 LR3), hormonal axis (Kisspeptin-10 + PT-141), and fat metabolism (L-Carnitine).</div></div><div class="nr"><div class="nr-l">First-time injector note</div><div class="nr-v">all of these are <strong>subcutaneous (SubQ) injections</strong> &mdash; shallow injections just under the skin, not into muscle. Use a 29&ndash;31 gauge insulin syringe, pinch the skin on your abdomen or outer thigh, insert at a 45&deg; angle, and inject slowly. It should be nearly painless. Rotate sites daily. You'll be a pro by week 2.</div></div></div></div>
       </div>
 
       <div class="sec-divider">
@@ -710,12 +888,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </table></div>
       </details>
 
-      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
-        <strong style="color:var(--gold);">AM injection technique:</strong> rotate SubQ sites daily &mdash; abdomen (preferred), outer thigh, or glute. Pinch 1" of skin, insert at 45&deg;, inject slowly. With this many compounds AM, group 2&ndash;3 shots per site on opposite sides so no single quadrant takes more than ~2 shots in 24 hrs.<br><br>
-        <strong style="color:var(--gold);">NAD+ flushing:</strong> mild warmth or flushing during injection is normal. <strong>Slow your injection to 30&ndash;60 seconds.</strong> Resolves after week 1&ndash;2.<br><br>
-        <strong style="color:var(--gold);">IGF-1 LR3 glucose watch:</strong> dizziness or shakiness after injection indicates low blood glucose. Eat a small meal or glucose source after the morning shot. <strong>Do not inject IGF-1 LR3 and fast all day.</strong><br><br>
-        <strong style="color:var(--gold);">Missed a dose?</strong> One miss isn't a problem &mdash; skip it and resume the next scheduled day. Missing 3+ consecutive days on the mitochondrial / GH compounds dulls the compounding effect &mdash; restart the week.
-      </div>
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">AM injection technique</div><div class="nr-v">rotate SubQ sites daily &mdash; abdomen (preferred), outer thigh, or glute. Pinch 1" of skin, insert at 45&deg;, inject slowly. With this many compounds AM, group 2&ndash;3 shots per site on opposite sides so no single quadrant takes more than ~2 shots in 24 hrs.</div></div><div class="nr"><div class="nr-l">NAD+ flushing</div><div class="nr-v">mild warmth or flushing during injection is normal. <strong>Slow your injection to 30&ndash;60 seconds.</strong> Resolves after week 1&ndash;2.</div></div><div class="nr"><div class="nr-l">IGF-1 LR3 glucose watch</div><div class="nr-v">dizziness or shakiness after injection indicates low blood glucose. Eat a small meal or glucose source after the morning shot. <strong>Do not inject IGF-1 LR3 and fast all day.</strong></div></div><div class="nr"><div class="nr-l">Missed a dose?</div><div class="nr-v">One miss isn't a problem &mdash; skip it and resume the next scheduled day. Missing 3+ consecutive days on the mitochondrial / GH compounds dulls the compounding effect &mdash; restart the week.</div></div></div></div>
 
     </div><!-- /schedule tab -->
 
@@ -772,12 +945,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="storage-card">
         <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
-        <div class="storage-body">
-          <p><strong>Dry (lyophilized) vials &mdash; before reconstitution:</strong> refrigerate at 36&ndash;46&deg;F (2&ndash;8&deg;C). Keep away from light and moisture. Do not freeze. Shelf life is 12&ndash;24 months unopened. <strong>L-Carnitine arrives as a liquid &mdash; refrigerate from day one.</strong></p>
-          <p><strong>After reconstitution:</strong> refrigerate immediately. Use within <strong>30 days</strong> &mdash; with two exceptions: <strong>NAD+ within 14 days</strong> for peak potency, and <strong>HGH within 21 days</strong>. Never freeze a reconstituted peptide. Always use a fresh insulin syringe for every draw.</p>
-          <p><strong>Bacteriostatic water:</strong> required for all reconstitution except L-Carnitine (pre-mixed). The benzyl alcohol preservative extends shelf life. Do not substitute plain sterile water &mdash; it lacks the preservative needed for multi-draw vials.</p>
-          <p><strong>Injection technique:</strong> 29&ndash;31 gauge insulin syringes (0.5 mL or 1 mL). Never reuse. Dispose in a sharps container. Rotate injection sites daily &mdash; abdomen (preferred SubQ), outer thigh, or glute. Pinch 1" of skin, insert at 45&deg;, inject slowly.</p>
-        </div>
+        <div class="storage-body"><div class="note-list"><div class="nr full"><div class="nr-v"><strong>Dry (lyophilized) vials &mdash; before reconstitution:</strong> refrigerate at 36&ndash;46&deg;F (2&ndash;8&deg;C). Keep away from light and moisture. Do not freeze. Shelf life is 12&ndash;24 months unopened. <strong>L-Carnitine arrives as a liquid &mdash; refrigerate from day one.</strong></div></div><div class="nr"><div class="nr-l">After reconstitution</div><div class="nr-v">refrigerate immediately. Use within <strong>30 days</strong> &mdash; with two exceptions: <strong>NAD+ within 14 days</strong> for peak potency, and <strong>HGH within 21 days</strong>. Never freeze a reconstituted peptide. Always use a fresh insulin syringe for every draw.</div></div><div class="nr"><div class="nr-l">Bacteriostatic water</div><div class="nr-v">required for all reconstitution except L-Carnitine (pre-mixed). The benzyl alcohol preservative extends shelf life. Do not substitute plain sterile water &mdash; it lacks the preservative needed for multi-draw vials.</div></div><div class="nr"><div class="nr-l">Injection technique</div><div class="nr-v">29&ndash;31 gauge insulin syringes (0.5 mL or 1 mL). Never reuse. Dispose in a sharps container. Rotate injection sites daily &mdash; abdomen (preferred SubQ), outer thigh, or glute. Pinch 1" of skin, insert at 45&deg;, inject slowly.</div></div></div></div>
       </div>
 
     </div><!-- /supplies tab -->
@@ -791,54 +959,50 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 01 &mdash; First-Time Injector</div>
-        <div class="tip-title">SubQ Is Shallow, Painless, and Forgiving</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; First-Time Injector</div><div class="tip-title">SubQ Is Shallow, Painless, and Forgiving</div></div>
         </summary><div class="tip-body">
-          <p>You noted you've never injected before &mdash; that's completely fine. All of these are <strong>subcutaneous (SubQ) injections</strong> &mdash; shallow injections just under the skin, not into muscle.</p>
-          <ul>
+          <div class="tip-lead">You noted you've never injected before &mdash; that's completely fine. All of these are <strong>subcutaneous (SubQ) injections</strong> &mdash; shallow injections just under the skin, not into muscle.</div>
+          <ul class="tip-list">
             <li>Use a 29&ndash;31 gauge insulin syringe (the thin, short needle).</li>
             <li>Pinch 1" of skin on your abdomen or outer thigh.</li>
             <li>Insert at a 45&deg; angle, slowly.</li>
             <li>Inject the contents slowly &mdash; if it stings, slow down further.</li>
             <li>Pull out, dispose in sharps container. Done.</li>
-          </ul>
-          <p><strong>Rotate sites every day.</strong> With this many AM shots, you'll be moving between abdomen quadrants and thighs constantly &mdash; that's the right pattern. <strong>You'll be a pro by week 2.</strong></p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Rotate sites every day</div><div class="nr-v">With this many AM shots, you'll be moving between abdomen quadrants and thighs constantly &mdash; that's the right pattern. <strong>You'll be a pro by week 2.</strong></div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 02 &mdash; Why Injectable Beats Oral</div>
-        <div class="tip-title">Why You Didn't Feel Oral BPC-157</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; Why Injectable Beats Oral</div><div class="tip-title">Why You Didn't Feel Oral BPC-157</div></div>
         </summary><div class="tip-body">
-          <p>You tried BPC-157 orally and felt nothing. That makes sense: <strong>oral peptides have extremely low bioavailability</strong> &mdash; most of the molecule is destroyed in the stomach before it ever reaches the bloodstream. What's left is a fraction of the intended dose, often not enough to produce noticeable effects.</p>
+          <div class="tip-lead">You tried BPC-157 orally and felt nothing. That makes sense: <strong>oral peptides have extremely low bioavailability</strong> &mdash; most of the molecule is destroyed in the stomach before it ever reaches the bloodstream. What's left is a fraction of the intended dose, often not enough to produce noticeable effects.</div>
           <p><strong>Injectable BPC-157 (inside the KLOW blend) goes directly into your bloodstream at full potency.</strong> Same compound, completely different experience. Most clients notice meaningful joint and tissue changes within 2&ndash;3 weeks of starting injectable KLOW &mdash; the kind of shift oral BPC simply can't produce.</p>
-          <p>The same logic applies across the rest of the stack: L-Carnitine is ~15% absorbed orally vs. near-100% injectable; HGH and IGF-1 don't survive oral delivery at all. The injectable route isn't a preference &mdash; it's what makes the protocol work.</p>
+          <div class="tip-lead">The same logic applies across the rest of the stack: L-Carnitine is ~15% absorbed orally vs. near-100% injectable; HGH and IGF-1 don't survive oral delivery at all. The injectable route isn't a preference &mdash; it's what makes the protocol work.</div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 03 &mdash; NAD+ Half-Dose Start</div>
-        <div class="tip-title">Start at 30 Units (50 mg) for First 1&ndash;2 Sessions</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; NAD+ Half-Dose Start</div><div class="tip-title">Start at 30 Units (50 mg) for First 1&ndash;2 Sessions</div></div>
         </summary><div class="tip-body">
-          <p>NAD+ is the one compound in this stack with a notable acute side effect: <strong>mild flushing, warmth, or a slightly intense feeling during injection</strong>. It's harmless and resolves within minutes, but it's surprising the first time.</p>
-          <p><strong>The fix:</strong> start at <strong>30 units (50 mg)</strong> for your first 1&ndash;2 injections, then titrate up to the full 60 units (100 mg). And <strong>inject slowly</strong> &mdash; 30 to 60 seconds, not 5 seconds. Fast injection = stronger flush. Slow injection = barely any flush.</p>
-          <p>By week 2 you'll be doing the full dose with no issue.</p>
+          <div class="tip-lead">NAD+ is the one compound in this stack with a notable acute side effect: <strong>mild flushing, warmth, or a slightly intense feeling during injection</strong>. It's harmless and resolves within minutes, but it's surprising the first time.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">The fix</div><div class="nr-v">start at <strong>30 units (50 mg)</strong> for your first 1&ndash;2 injections, then titrate up to the full 60 units (100 mg). And <strong>inject slowly</strong> &mdash; 30 to 60 seconds, not 5 seconds. Fast injection = stronger flush. Slow injection = barely any flush.</div></div></div>
+          <div class="tip-lead">By week 2 you'll be doing the full dose with no issue.</div>
         </div>
       </details>
 
       <details class="tip-card warn"><summary>
-        <div class="tip-eyebrow">Tip 04 &mdash; What to Monitor</div>
-        <div class="tip-title">Normal Signals vs. Watch Signals</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; What to Monitor</div><div class="tip-title">Normal Signals vs. Watch Signals</div></div>
         </summary><div class="tip-body">
           <p><strong>Normal &mdash; no action needed:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li>Mild flushing or warmth during NAD+ injection &mdash; slow your injection to 30&ndash;60 seconds. Resolves after week 1&ndash;2.</li>
             <li>Small redness, minor bruising, or mild soreness at injection sites &mdash; rotate daily to prevent buildup.</li>
             <li>Increased hunger during week 1&ndash;2 as metabolism activates &mdash; especially with the GH stack and L-Carnitine.</li>
             <li>Mild nausea with first 1&ndash;2 PT-141 doses &mdash; reduce to 250 mcg (5u) and titrate up.</li>
           </ul>
           <p><strong>Monitor &mdash; pause and reassess:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li><strong>Dizziness or shakiness after IGF-1 LR3</strong> &mdash; low blood glucose. Eat a small meal or glucose source after the morning injection. Do not inject IGF-1 LR3 and fast all day.</li>
             <li><strong>Injection site hot, swollen, or red beyond 24 hours</strong> &mdash; stop using that site. May indicate technique issue. Contact BioLinked.</li>
             <li><strong>Water retention or tingling in extremities with HGH</strong> &mdash; if significant, reduce HGH from 1 IU to 0.5 IU (5u) and contact BioLinked.</li>
@@ -852,38 +1016,34 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 1&ndash;2 &mdash; Ramp-Up &amp; First Signals</div>
-        <div class="tip-title">Sleep Deepens, Internal Shifts Begin</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 1&ndash;2 &mdash; Ramp-Up &amp; First Signals</div><div class="tip-title">Sleep Deepens, Internal Shifts Begin</div></div>
         </summary><div class="tip-body">
-          <p>Your body begins clearing accumulated oxidative stress and inflammation. Some clients feel <strong>more fatigued in week 1</strong> as cellular cleanup begins &mdash; this is normal and temporary.</p>
-          <p>You may notice <strong>sleep deepening noticeably</strong> within the first 5&ndash;7 days from the CJC/Ipamorelin and Kisspeptin. Mild flushing with NAD+ is normal &mdash; slow down your injection. The joints and aches may not show dramatic change yet, but inflammation markers internally are already shifting.</p>
+          <div class="tip-lead">Your body begins clearing accumulated oxidative stress and inflammation. Some clients feel <strong>more fatigued in week 1</strong> as cellular cleanup begins &mdash; this is normal and temporary.</div>
+          <div class="tip-lead">You may notice <strong>sleep deepening noticeably</strong> within the first 5&ndash;7 days from the CJC/Ipamorelin and Kisspeptin. Mild flushing with NAD+ is normal &mdash; slow down your injection. The joints and aches may not show dramatic change yet, but inflammation markers internally are already shifting.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 3&ndash;4 &mdash; Pain Shifts, Energy Arrives</div>
-        <div class="tip-title">First Meaningful Changes</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 3&ndash;4 &mdash; Pain Shifts, Energy Arrives</div><div class="tip-title">First Meaningful Changes</div></div>
         </summary><div class="tip-body">
-          <p>This is usually when clients first notice the protocol working. <strong>Joint discomfort and body aches should begin reducing noticeably</strong> as KLOW's BPC-157 / TB-500 components reach full tissue penetration and the mitochondrial stack (MOTS-C + SS-31 + NAD+) kicks in fully.</p>
-          <p>Physical energy improves &mdash; you may feel ready to test the gym again. <strong>Start light and controlled.</strong> The HGH + IGF-1 LR3 combination begins laying the groundwork for muscle rebuilding.</p>
+          <div class="tip-lead">This is usually when clients first notice the protocol working. <strong>Joint discomfort and body aches should begin reducing noticeably</strong> as KLOW's BPC-157 / TB-500 components reach full tissue penetration and the mitochondrial stack (MOTS-C + SS-31 + NAD+) kicks in fully.</div>
+          <div class="tip-lead">Physical energy improves &mdash; you may feel ready to test the gym again. <strong>Start light and controlled.</strong> The HGH + IGF-1 LR3 combination begins laying the groundwork for muscle rebuilding.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 5&ndash;6 &mdash; Peak Protocol Window</div>
-        <div class="tip-title">Tissue Healing at Maximum</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 5&ndash;6 &mdash; Peak Protocol Window</div><div class="tip-title">Tissue Healing at Maximum</div></div>
         </summary><div class="tip-body">
-          <p>The stack is operating at full capacity. <strong>Tissue healing is deepest in this phase</strong> &mdash; tendons, ligaments, and joints benefit most from the sustained KLOW presence. Training should feel manageable and rewarding again.</p>
-          <p>Most clients in your goals profile report <strong>noticeable strength gains, improved body composition, better sexual drive</strong> (Kisspeptin + PT-141 combination in effect), <strong>and mental sharpness</strong> from the Semax/Selank pair. This is the window to train consistently.</p>
+          <div class="tip-lead">The stack is operating at full capacity. <strong>Tissue healing is deepest in this phase</strong> &mdash; tendons, ligaments, and joints benefit most from the sustained KLOW presence. Training should feel manageable and rewarding again.</div>
+          <div class="tip-lead">Most clients in your goals profile report <strong>noticeable strength gains, improved body composition, better sexual drive</strong> (Kisspeptin + PT-141 combination in effect), <strong>and mental sharpness</strong> from the Semax/Selank pair. This is the window to train consistently.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 7&ndash;8 &mdash; Consolidation &amp; Evaluation</div>
-        <div class="tip-title">Lock In + Plan the Next Cycle</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 7&ndash;8 &mdash; Consolidation &amp; Evaluation</div><div class="tip-title">Lock In + Plan the Next Cycle</div></div>
         </summary><div class="tip-body">
-          <p>The neurological and tissue gains begin to stabilize and feel natural. At end of week 8: <strong>how much pain are you in? How's training? Libido? Sleep? Energy?</strong> This 3-question assessment determines your next cycle.</p>
-          <p>Many clients move from a full recovery cycle like this into a <strong>leaner maintenance protocol</strong> &mdash; keeping MOTS-C, CJC/Ipamorelin, and HGH while dropping some of the acute-phase healers. Consider adding standalone BPC-157 for any remaining joint issues.</p>
+          <div class="tip-lead">The neurological and tissue gains begin to stabilize and feel natural. At end of week 8: <strong>how much pain are you in? How's training? Libido? Sleep? Energy?</strong> This 3-question assessment determines your next cycle.</div>
+          <div class="tip-lead">Many clients move from a full recovery cycle like this into a <strong>leaner maintenance protocol</strong> &mdash; keeping MOTS-C, CJC/Ipamorelin, and HGH while dropping some of the acute-phase healers. Consider adding standalone BPC-157 for any remaining joint issues.</div>
         </div>
       </details>
 
@@ -893,38 +1053,35 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 05 &mdash; AM Stack Logistics</div>
-        <div class="tip-title">Group Your Shots, Rotate Sites</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 05 &mdash; AM Stack Logistics</div><div class="tip-title">Group Your Shots, Rotate Sites</div></div>
         </summary><div class="tip-body">
-          <p>M/W/F mornings carry the heaviest load &mdash; up to <strong>7 shots fasted on waking</strong> (MOTS-C, SS-31, KLOW, CJC/Ipa AM, HGH, L-Carnitine, IGF-1 LR3). That sounds like a lot; in practice it's a 5-minute routine once you get the pattern down.</p>
+          <div class="tip-lead">M/W/F mornings carry the heaviest load &mdash; up to <strong>7 shots fasted on waking</strong> (MOTS-C, SS-31, KLOW, CJC/Ipa AM, HGH, L-Carnitine, IGF-1 LR3). That sounds like a lot; in practice it's a 5-minute routine once you get the pattern down.</div>
           <p><strong>Practical pattern:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li>Lay all reconstituted vials and syringes out on a clean surface before starting.</li>
             <li>Wipe each vial stopper with an alcohol pad.</li>
             <li>Draw and inject one compound at a time &mdash; right abdomen quadrant, then left, then right thigh, then left, rotating across the 4 main sites.</li>
             <li>Each shot takes ~30&ndash;45 seconds. Total time: 5&ndash;7 minutes.</li>
-          </ul>
-          <p><strong>Tip:</strong> keep a Sharpie note on the storage container with the day's compound order so you don't have to think about it half-awake.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Tip</div><div class="nr-v">keep a Sharpie note on the storage container with the day's compound order so you don't have to think about it half-awake.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 06 &mdash; Pre-Bed Routine</div>
-        <div class="tip-title">CJC/Ipa PM + Kisspeptin for Overnight Recovery</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; Pre-Bed Routine</div><div class="tip-title">CJC/Ipa PM + Kisspeptin for Overnight Recovery</div></div>
         </summary><div class="tip-body">
-          <p>The pre-bed window is when the anabolic signaling lands during your body's natural overnight repair phase. On M/W/F you'll have <strong>CJC/Ipa PM + Kisspeptin</strong>; Tue/Thu and weekends are just Kisspeptin.</p>
-          <p><strong>Timing matters:</strong> CJC/Ipa pre-bed should be 30&ndash;60 minutes before sleep, on an empty stomach (no food 2 hours before). Kisspeptin should be ~1 hour before bed, same time nightly for hormonal entrainment.</p>
-          <p>Most clients report the deepest sleep of the cycle on these nights &mdash; the GH pulse plus the upstream hormonal signal compound into a particularly restorative window.</p>
+          <div class="tip-lead">The pre-bed window is when the anabolic signaling lands during your body's natural overnight repair phase. On M/W/F you'll have <strong>CJC/Ipa PM + Kisspeptin</strong>; Tue/Thu and weekends are just Kisspeptin.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Timing matters</div><div class="nr-v">CJC/Ipa pre-bed should be 30&ndash;60 minutes before sleep, on an empty stomach (no food 2 hours before). Kisspeptin should be ~1 hour before bed, same time nightly for hormonal entrainment.</div></div></div>
+          <div class="tip-lead">Most clients report the deepest sleep of the cycle on these nights &mdash; the GH pulse plus the upstream hormonal signal compound into a particularly restorative window.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 07 &mdash; PT-141 Use</div>
-        <div class="tip-title">As-Needed, Not Daily</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 07 &mdash; PT-141 Use</div><div class="tip-title">As-Needed, Not Daily</div></div>
         </summary><div class="tip-body">
-          <p>PT-141 is the one as-needed compound in your stack. Inject SubQ 30&ndash;60 minutes before activity &mdash; not part of the daily schedule. <strong>Max 8 uses per month.</strong></p>
-          <p>If you experience nausea on the first 1&ndash;2 uses (common), drop to 250 mcg (5u) and titrate up over the next couple of uses. Most clients find the full 500 mcg dose well-tolerated once their body has acclimated.</p>
-          <p>2 vials = 40 doses at 500 mcg &mdash; well above what you'd use in 8 weeks at the 8&times;/month cap.</p>
+          <div class="tip-lead">PT-141 is the one as-needed compound in your stack. Inject SubQ 30&ndash;60 minutes before activity &mdash; not part of the daily schedule. <strong>Max 8 uses per month.</strong></div>
+          <div class="tip-lead">If you experience nausea on the first 1&ndash;2 uses (common), drop to 250 mcg (5u) and titrate up over the next couple of uses. Most clients find the full 500 mcg dose well-tolerated once their body has acclimated.</div>
+          <div class="tip-lead">2 vials = 40 doses at 500 mcg &mdash; well above what you'd use in 8 weeks at the 8&times;/month cap.</div>
         </div>
       </details>
 

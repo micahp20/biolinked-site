@@ -195,6 +195,189 @@ details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bo
 details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
 details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 @media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
+
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
+
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
+
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
+
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
+
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
+
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
+
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
+
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
+
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
+
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -279,11 +462,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="program-eyebrow">Personalized Protocol</div>
         <div class="program-title">Taylor's <em>Thyroid-Aware Reta Reset</em></div>
         <div class="program-tag">Feel good in your body again. Without the weight fluctuations. Built around your thyroid timeline.</div>
-        <div class="program-context">
-          <p><strong>You want to feel good in your body again without the weight whiplash that comes with a thyroid/hormonal disorder.</strong> That's the real goal. The 135 &rarr; 115 number is the visible target, but the underlying ask is steadier &mdash; a body comp + energy state that holds, instead of cycling on and off with hormone shifts. This protocol is built around exactly that.</p>
-          <p><strong>The plan: an ongoing Retatrutide reset with an escalating-dose ladder that bridges through your thyroid surgery.</strong> You were on Semaglutide at 3.5 mg before stopping. Reta is the upgrade &mdash; triple-agonist GLP-1 + GIP + glucagon, meaning it covers appetite/blood sugar AND adds the glucagon arm that drives energy expenditure + lean mass preservation. <strong>The conservative entry (2 mg/wk for the first 2 weeks)</strong> lets your GI system re-acclimate to GLP-1 effects after the Sema gap, then we climb to 3 mg/wk for Wks 3&ndash;4, and hold the 4 mg/wk maintenance dose from Wk 5 onward &mdash; <strong>ongoing as long as the protocol is working for you</strong>. Cap is 4 mg/wk; if you hit goal weight, we taper down to a maintenance hold; if energy or response stalls, we reassess. Each Reta vial covers ~9 weeks of the maintenance phase, so the rhythm is: cycle 2 vials &rarr; check in &rarr; continue or adjust.</p>
-          <p><strong>About the thyroid surgery.</strong> Most likely you'll be on synthroid post-op. Reta and synthroid are compatible &mdash; no known interaction. The peptide layer keeps the fat-loss + energy work on track while your thyroid axis is being rebuilt pharmacologically. <strong>For the energy drag you've been feeling:</strong> NAD+, 5-Amino-1MQ, and MOTS-C are the cellular-energy add-ons most clients with thyroid issues benefit from &mdash; they target mitochondrial function and metabolic pathways directly. Those are <em>recommendations only</em>, not in this bundle. See the Notes tab for the full breakdown of why each one matters for thyroid-affected energy.</p>
-        </div>
+        <div class="program-context"><div class="note-list"><div class="nr full"><div class="nr-v"><strong>You want to feel good in your body again without the weight whiplash that comes with a thyroid/hormonal disorder.</strong> That's the real goal. The 135 &rarr; 115 number is the visible target, but the underlying ask is steadier &mdash; a body comp + energy state that holds, instead of cycling on and off with hormone shifts. This protocol is built around exactly that.</div></div><div class="nr full"><div class="nr-v"><strong>The plan: an ongoing Retatrutide reset with an escalating-dose ladder that bridges through your thyroid surgery.</strong> You were on Semaglutide at 3.5 mg before stopping. Reta is the upgrade &mdash; triple-agonist GLP-1 + GIP + glucagon, meaning it covers appetite/blood sugar AND adds the glucagon arm that drives energy expenditure + lean mass preservation. <strong>The conservative entry (2 mg/wk for the first 2 weeks)</strong> lets your GI system re-acclimate to GLP-1 effects after the Sema gap, then we climb to 3 mg/wk for Wks 3&ndash;4, and hold the 4 mg/wk maintenance dose from Wk 5 onward &mdash; <strong>ongoing as long as the protocol is working for you</strong>. Cap is 4 mg/wk; if you hit goal weight, we taper down to a maintenance hold; if energy or response stalls, we reassess. Each Reta vial covers ~9 weeks of the maintenance phase, so the rhythm is: cycle 2 vials &rarr; check in &rarr; continue or adjust.</div></div><div class="nr"><div class="nr-l">About the thyroid surgery</div><div class="nr-v">Most likely you'll be on synthroid post-op. Reta and synthroid are compatible &mdash; no known interaction. The peptide layer keeps the fat-loss + energy work on track while your thyroid axis is being rebuilt pharmacologically. <strong>For the energy drag you've been feeling:</strong> NAD+, 5-Amino-1MQ, and MOTS-C are the cellular-energy add-ons most clients with thyroid issues benefit from &mdash; they target mitochondrial function and metabolic pathways directly. Those are <em>recommendations only</em>, not in this bundle. See the Notes tab for the full breakdown of why each one matters for thyroid-affected energy.</div></div></div></div>
         <div style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(122,101,48,0.08);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 16px;border-radius:2px;">
           <span style="font-size:18px;line-height:1;">&#128150;</span>
           <span style="text-align:left;">
@@ -516,14 +695,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </table></div>
       </details>
 
-      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
-        <strong style="color:var(--gold);">Shot timing:</strong> Monday AM and Thursday AM (any time before noon works). Reta doesn't require fasting. Take with your morning routine &mdash; rotate the abdomen quadrant between Mon and Thu shots.<br><br>
-        <strong style="color:var(--gold);">If you miss a dose:</strong> if it's been &lt;24 hrs, take it as soon as you remember and resume the next M/Th day on schedule. If &gt;24 hrs, skip and resume on the next scheduled day. Don't double up.<br><br>
-        <strong style="color:var(--gold);">Tier transitions:</strong> climb on the first Monday of each tier (Wk 3 Mon = 1.5 mg, Wk 5 Mon = 2 mg). If GI side effects are bothersome at the climb point, hold the current tier an extra week before climbing.<br><br>
-        <strong style="color:var(--gold);">Thyroid surgery pause:</strong> stop Reta 1 week BEFORE surgery and resume 1 week AFTER. The 2-week pause shifts the supply math &mdash; Vial #2 ordering moves out by ~2 weeks too. Notify me when surgery is scheduled and we'll re-plan around it.<br><br>
-        <strong style="color:var(--gold);">Ongoing vial reorder:</strong> message me around Wk 7&ndash;8 to reorder Vial #2 ($150). Each vial covers ~9 weeks of maintenance dosing &mdash; ongoing cadence is reorder every ~9 wks. Protocol continues as long as it's working for you.<br><br>
-        <strong style="color:var(--gold);">iPhone / iOS install:</strong> tap the Share button in Safari then "Add to Home Screen" &mdash; this protocol becomes a one-tap app. Tap "Download .ics" above to load the first 16 weeks of dose events into Apple Calendar with reminders &mdash; re-download for continuation past that.
-      </div>
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">Shot timing</div><div class="nr-v">Monday AM and Thursday AM (any time before noon works). Reta doesn't require fasting. Take with your morning routine &mdash; rotate the abdomen quadrant between Mon and Thu shots.</div></div><div class="nr"><div class="nr-l">If you miss a dose</div><div class="nr-v">if it's been &lt;24 hrs, take it as soon as you remember and resume the next M/Th day on schedule. If &gt;24 hrs, skip and resume on the next scheduled day. Don't double up.</div></div><div class="nr"><div class="nr-l">Tier transitions</div><div class="nr-v">climb on the first Monday of each tier (Wk 3 Mon = 1.5 mg, Wk 5 Mon = 2 mg). If GI side effects are bothersome at the climb point, hold the current tier an extra week before climbing.</div></div><div class="nr"><div class="nr-l">Thyroid surgery pause</div><div class="nr-v">stop Reta 1 week BEFORE surgery and resume 1 week AFTER. The 2-week pause shifts the supply math &mdash; Vial #2 ordering moves out by ~2 weeks too. Notify me when surgery is scheduled and we'll re-plan around it.</div></div><div class="nr"><div class="nr-l">Ongoing vial reorder</div><div class="nr-v">message me around Wk 7&ndash;8 to reorder Vial #2 ($150). Each vial covers ~9 weeks of maintenance dosing &mdash; ongoing cadence is reorder every ~9 wks. Protocol continues as long as it's working for you.</div></div><div class="nr"><div class="nr-l">iPhone / iOS install</div><div class="nr-v">tap the Share button in Safari then "Add to Home Screen" &mdash; this protocol becomes a one-tap app. Tap "Download .ics" above to load the first 16 weeks of dose events into Apple Calendar with reminders &mdash; re-download for continuation past that.</div></div></div></div>
 
       <!-- ============= DAILY TRACKER ============= -->
       <div class="sec-divider mt">
@@ -652,11 +824,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="storage-card">
         <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
-        <div class="storage-body">
-          <p><strong>Dry (lyophilized) vial:</strong> refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</p>
-          <p><strong>Reconstituted vial:</strong> refrigerate immediately after recon. Stable for ~30 days. Vial #1 will be reconstituted at the start of the cycle and run for ~9 weeks of M/Th dosing &mdash; well within the stability window. Fresh insulin syringe for each draw &mdash; never reuse.</p>
-          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants. Mon upper-right &rarr; Thu upper-left (or your own pattern). Never inject the same 1&Prime; spot two times in a row.</p>
-        </div>
+        <div class="storage-body"><div class="note-list"><div class="nr"><div class="nr-l">Dry (lyophilized) vial</div><div class="nr-v">refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</div></div><div class="nr"><div class="nr-l">Reconstituted vial</div><div class="nr-v">refrigerate immediately after recon. Stable for ~30 days. Vial #1 will be reconstituted at the start of the cycle and run for ~9 weeks of M/Th dosing &mdash; well within the stability window. Fresh insulin syringe for each draw &mdash; never reuse.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ abdomen rotates between 4 quadrants. Mon upper-right &rarr; Thu upper-left (or your own pattern). Never inject the same 1&Prime; spot two times in a row.</div></div></div></div>
       </div>
 
     </div><!-- /supplies tab -->
@@ -670,82 +838,73 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <div class="tip-card featured" style="border-left:4px solid #3a6b8e;background:rgba(58,107,142,0.05);">
-        <div class="tip-eyebrow" style="color:#3a6b8e;">Tip 01 &mdash; Sema &rarr; Reta Transition &middot; Why the Slow Ramp</div>
-        <div class="tip-title">Restarting GLP-1 After a Gap = Conservative Entry, Not Previous Dose</div>
-        <div class="tip-body">
-          <p>You were on Sema at 3.5 mg/wk before stopping. The instinct might be to restart Reta at a "matching" dose &mdash; but that almost always crashes with nausea. <strong>Coming off a GLP-1 for any meaningful gap re-sensitizes your GI system.</strong> Restarting at the previous dose hits a now-untrained gut and produces 2&ndash;3 weeks of unnecessary misery.</p>
+        <div class="tip-head"><div class="tip-eyebrow" style="color:#3a6b8e;">Tip 01 &mdash; Sema &rarr; Reta Transition &middot; Why the Slow Ramp</div><div class="tip-title">Restarting GLP-1 After a Gap = Conservative Entry, Not Previous Dose</div></div><div class="tip-body">
+          <div class="tip-lead">You were on Sema at 3.5 mg/wk before stopping. The instinct might be to restart Reta at a "matching" dose &mdash; but that almost always crashes with nausea. <strong>Coming off a GLP-1 for any meaningful gap re-sensitizes your GI system.</strong> Restarting at the previous dose hits a now-untrained gut and produces 2&ndash;3 weeks of unnecessary misery.</div>
           <p><strong>The escalation ladder:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li><strong>Wks 1&ndash;2:</strong> 1 mg Mon + 1 mg Thu = 2 mg/wk. Gentle. Most people feel mild appetite suppression by Day 3&ndash;5; mild GI awareness in the first 24&ndash;48 hrs after each shot is normal.</li>
             <li><strong>Wks 3&ndash;4:</strong> 1.5 mg Mon + 1.5 mg Thu = 3 mg/wk. Moderate. By here you should feel steady appetite control through the whole week. If GI is still rough at the start of Wk 3, hold at 1 mg for another week before climbing.</li>
             <li><strong>Wks 5+ ongoing:</strong> 2 mg Mon + 2 mg Thu = 4 mg/wk. Maintenance cap. This is where the bulk of the body-comp shift happens &mdash; and where you stay until goal weight or protocol reassessment.</li>
-          </ul>
-          <p><strong>4 mg/wk is your cap.</strong> Clinical Reta studies go up to 12 mg+ for max weight loss, but pushing higher costs in GI side effects and isn't necessary for your goal. <strong>When you hit 115, we taper down 0.5 mg/wk &mdash; not push higher.</strong> Below the cap stays available if you ever want to push more aggressively in a future cycle.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">4 mg/wk is your cap</div><div class="nr-v">Clinical Reta studies go up to 12 mg+ for max weight loss, but pushing higher costs in GI side effects and isn't necessary for your goal. <strong>When you hit 115, we taper down 0.5 mg/wk &mdash; not push higher.</strong> Below the cap stays available if you ever want to push more aggressively in a future cycle.</div></div></div>
         </div>
       </div>
 
       <div class="tip-card featured" style="border-left:4px solid #c9462c;background:rgba(201,70,44,0.04);">
-        <div class="tip-eyebrow" style="color:#c9462c;">Tip 02 &mdash; Thyroid Surgery &middot; The Bridge Plan</div>
-        <div class="tip-title">Pause Reta 1 Week Before + 1 Week After Surgery</div>
-        <div class="tip-body">
-          <p>You'll likely be on synthroid (levothyroxine) after thyroidectomy. <strong>Reta and synthroid don't interact</strong> &mdash; they work on completely separate pathways. The peptide stays on track while your thyroid axis is being rebuilt pharmacologically.</p>
+        <div class="tip-head"><div class="tip-eyebrow" style="color:#c9462c;">Tip 02 &mdash; Thyroid Surgery &middot; The Bridge Plan</div><div class="tip-title">Pause Reta 1 Week Before + 1 Week After Surgery</div></div><div class="tip-body">
+          <div class="tip-lead">You'll likely be on synthroid (levothyroxine) after thyroidectomy. <strong>Reta and synthroid don't interact</strong> &mdash; they work on completely separate pathways. The peptide stays on track while your thyroid axis is being rebuilt pharmacologically.</div>
           <p><strong>What changes around the surgery:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li><strong>1 week BEFORE surgery:</strong> pause Reta. The GI effects can compound with anesthesia/surgery prep (which often includes fasting + meds that affect GI motility).</li>
             <li><strong>The surgery week:</strong> off Reta entirely. Focus on the procedure + immediate recovery.</li>
             <li><strong>1 week AFTER surgery:</strong> still off Reta. Let your incision heal and your synthroid titration start.</li>
             <li><strong>Resume Reta on the next regular Monday</strong> after that 2-week pause. At whatever tier dose you were on when you paused.</li>
-          </ul>
-          <p><strong>Synthroid timing:</strong> levothyroxine is usually taken first thing AM, 30&ndash;60 min before food/coffee. <strong>Take it 30+ min BEFORE your Reta shot</strong> on Mon and Thu &mdash; that protects the synthroid absorption window. Reta doesn't have an absorption-window issue (subcutaneous, not oral), so it's flexible.</p>
-          <p><strong>Tell your surgeon</strong> you're using a peptide-based GLP-1 (don't need to use the brand name &mdash; "GLP-1 receptor agonist" is what they'll understand). They may have a specific pre-op fasting protocol. Follow theirs over the general 1-week pause if they're stricter.</p>
-          <p><strong>Watch for:</strong> increased fatigue or weight regain in the immediate post-op weeks is mostly the thyroid axis adjusting &mdash; not the Reta. Synthroid takes 4&ndash;6 weeks to find the right dose. Be patient with both processes simultaneously.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Synthroid timing</div><div class="nr-v">levothyroxine is usually taken first thing AM, 30&ndash;60 min before food/coffee. <strong>Take it 30+ min BEFORE your Reta shot</strong> on Mon and Thu &mdash; that protects the synthroid absorption window. Reta doesn't have an absorption-window issue (subcutaneous, not oral), so it's flexible.</div></div>
+          <div class="nr"><div class="nr-l">Tell your surgeon</div><div class="nr-v">you're using a peptide-based GLP-1 (don't need to use the brand name &mdash; "GLP-1 receptor agonist" is what they'll understand). They may have a specific pre-op fasting protocol. Follow theirs over the general 1-week pause if they're stricter.</div></div>
+          <div class="nr"><div class="nr-l">Watch for</div><div class="nr-v">increased fatigue or weight regain in the immediate post-op weeks is mostly the thyroid axis adjusting &mdash; not the Reta. Synthroid takes 4&ndash;6 weeks to find the right dose. Be patient with both processes simultaneously.</div></div></div>
         </div>
       </div>
 
       <div class="tip-card featured" style="border-left:4px solid #2f7a4a;background:rgba(47,122,74,0.04);">
-        <div class="tip-eyebrow" style="color:#2f7a4a;">Tip 03 &mdash; Cellular Energy Add-Ons (Recommendations Only &mdash; Not in Your Bundle)</div>
-        <div class="tip-title">Three Compounds for Thyroid-Affected Energy Drag</div>
-        <div class="tip-body">
-          <p>You mentioned bad energy &mdash; that's the thyroid talking. Even on the right synthroid dose, the cellular-energy layer often takes longer to recover than the bloodwork suggests. The peptide world has three compounds that target that specific layer. <strong>Not in this bundle</strong> &mdash; recommendations only &mdash; but worth knowing about if energy stays low through Wks 4&ndash;6 of the Reta cycle (after the GLP-1 acclimation):</p>
-          <ul>
+        <div class="tip-head"><div class="tip-eyebrow" style="color:#2f7a4a;">Tip 03 &mdash; Cellular Energy Add-Ons (Recommendations Only &mdash; Not in Your Bundle)</div><div class="tip-title">Three Compounds for Thyroid-Affected Energy Drag</div></div><div class="tip-body">
+          <div class="tip-lead">You mentioned bad energy &mdash; that's the thyroid talking. Even on the right synthroid dose, the cellular-energy layer often takes longer to recover than the bloodwork suggests. The peptide world has three compounds that target that specific layer. <strong>Not in this bundle</strong> &mdash; recommendations only &mdash; but worth knowing about if energy stays low through Wks 4&ndash;6 of the Reta cycle (after the GLP-1 acclimation):</div>
+          <ul class="tip-list">
             <li><strong>NAD+</strong> &mdash; nicotinamide adenine dinucleotide. Coenzyme that's central to mitochondrial ATP production. <strong>Why it helps:</strong> thyroid disorders deplete NAD+ pools faster than normal metabolism; supplementing restores the substrate your mitochondria need to actually produce energy. Subcutaneous injection (not oral NMN/NR &mdash; very different bioavailability). Most users feel a daytime clarity + energy lift within 1&ndash;2 weeks. <strong>Approx cost:</strong> $80&ndash;150/vial depending on size + supplier.</li>
             <li><strong>5-Amino-1MQ</strong> &mdash; NNMT (nicotinamide N-methyltransferase) inhibitor. Translation: blocks the enzyme that <em>uses up</em> your NAD+ in adipose tissue, so more NAD+ stays available for energy production. <strong>Why it helps:</strong> drives metabolic flexibility (your body switches more easily between burning glucose and fat for fuel &mdash; thyroid disorders impair this). Oral compound (not injection), which makes it the lowest-friction add-on. <strong>Approx cost:</strong> $60&ndash;90/month supply.</li>
             <li><strong>MOTS-C</strong> &mdash; mitochondrial-derived peptide that activates AMPK (the metabolic master switch). <strong>Why it helps:</strong> AMPK activation drives fat oxidation, mitochondrial biogenesis, and exercise capacity. For someone with thyroid-related metabolic drag, MOTS-C stacks well with Reta's glucagon arm &mdash; both push energy expenditure but through different mechanisms. <strong>Approx cost:</strong> $60&ndash;100/vial; typical cycle uses 2 vials.</li>
           </ul>
           <p><strong>Most-recommended starting order if you want to add one:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li><strong>5-Amino-1MQ first</strong> &mdash; oral, lowest friction, no injection. Try for 4 weeks; if energy improves, you have your answer cheaply.</li>
             <li><strong>NAD+ second</strong> &mdash; if 5-Amino-1MQ alone isn't enough, add NAD+ subQ. The two stack well (5-Amino preserves the NAD+ pool you're supplementing).</li>
             <li><strong>MOTS-C third</strong> &mdash; if you want the AMPK/mitochondrial biogenesis layer on top. Best added in Cycle 2 or after the thyroid axis is settled with synthroid.</li>
-          </ul>
-          <p><strong>None of these conflict with Reta or synthroid.</strong> Message me when you want to layer one in &mdash; we'll order it standalone outside the Reta bundle.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">None of these conflict with Reta or synthroid</div><div class="nr-v">Message me when you want to layer one in &mdash; we'll order it standalone outside the Reta bundle.</div></div></div>
         </div>
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 04 &mdash; Alcohol on Reta Days</div>
-        <div class="tip-title">Skip or Minimize Sun + Wed Nights</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Alcohol on Reta Days</div><div class="tip-title">Skip or Minimize Sun + Wed Nights</div></div>
         </summary><div class="tip-body">
-          <p>You mentioned 3&ndash;7 drinks/week. Reta + alcohol increases the risk of nausea, GI discomfort, and dehydration &mdash; especially in the 24&ndash;48 hrs after a shot. Most people who get sick on Reta did so after drinking the night before a dose.</p>
-          <p><strong>Practical rule:</strong> minimize alcohol Sunday night and Wednesday night (the nights before your Mon + Thu shots). Save drinks for Fri or Sat when you have a buffer day to recover before the next shot. <strong>Bonus:</strong> alcohol within 4 hrs of bed cuts deep sleep &mdash; and your sleep score is already 3/5. Pulling alcohol away from shot-prep nights gives you sleep depth AND smoother Reta tolerance for the price of two boring weeknights.</p>
+          <div class="tip-lead">You mentioned 3&ndash;7 drinks/week. Reta + alcohol increases the risk of nausea, GI discomfort, and dehydration &mdash; especially in the 24&ndash;48 hrs after a shot. Most people who get sick on Reta did so after drinking the night before a dose.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Practical rule</div><div class="nr-v">minimize alcohol Sunday night and Wednesday night (the nights before your Mon + Thu shots). Save drinks for Fri or Sat when you have a buffer day to recover before the next shot. <strong>Bonus:</strong> alcohol within 4 hrs of bed cuts deep sleep &mdash; and your sleep score is already 3/5. Pulling alcohol away from shot-prep nights gives you sleep depth AND smoother Reta tolerance for the price of two boring weeknights.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 05 &mdash; The Ramp Logic Recap</div>
-        <div class="tip-title">Why Mon + Thu (Not Once-Weekly)</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 05 &mdash; The Ramp Logic Recap</div><div class="tip-title">Why Mon + Thu (Not Once-Weekly)</div></div>
         </summary><div class="tip-body">
-          <p>Reta's half-life is ~6 days, so the standard clinical pattern is once-weekly dosing. That pattern creates a sharp peak in the 24&ndash;48 hours after the shot &mdash; nausea, fatigue, "blah" feeling. Twice-weekly Mon + Thu splits the same weekly mg total into two smaller doses, smoothing the curve.</p>
-          <p><strong>Result:</strong> lower peaks, fewer side effects, steadier appetite control through the whole week instead of front-loaded into Mon&ndash;Wed. For someone managing thyroid-related energy variability, the steadier curve matters &mdash; you don't want post-shot fatigue stacked on top of thyroid fatigue.</p>
+          <div class="tip-lead">Reta's half-life is ~6 days, so the standard clinical pattern is once-weekly dosing. That pattern creates a sharp peak in the 24&ndash;48 hours after the shot &mdash; nausea, fatigue, "blah" feeling. Twice-weekly Mon + Thu splits the same weekly mg total into two smaller doses, smoothing the curve.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Result</div><div class="nr-v">lower peaks, fewer side effects, steadier appetite control through the whole week instead of front-loaded into Mon&ndash;Wed. For someone managing thyroid-related energy variability, the steadier curve matters &mdash; you don't want post-shot fatigue stacked on top of thyroid fatigue.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 06 &mdash; Ongoing Vial Reorder Cadence</div>
-        <div class="tip-title">Reorder Every ~9 Weeks &middot; Message Me Around Wk 7&ndash;8</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; Ongoing Vial Reorder Cadence</div><div class="tip-title">Reorder Every ~9 Weeks &middot; Message Me Around Wk 7&ndash;8</div></div>
         </summary><div class="tip-body">
-          <p>Each Reta vial (30 mg) carries you through ~9 weeks of the maintenance dose (2 mg Mon + 2 mg Thu = 4 mg/wk = ~3.3 mg used per 5-shot two-week stretch). <strong>Message me around Wk 7&ndash;8 of each vial</strong> so we can order the next one in time &mdash; shipping + delivery before Wk 10 means no missed shots.</p>
-          <p><strong>Per-vial cost:</strong> $150. <strong>Ongoing rhythm:</strong> every ~9 weeks, $150, until goal weight or protocol reassessment. <strong>When you hit 115</strong> (or whatever weight feels right), we taper down 0.5 mg/wk &mdash; which stretches each vial further or transitions you to a lower ongoing cadence. <strong>No hard stop date</strong> &mdash; the protocol runs as long as it's working for you.</p>
+          <div class="tip-lead">Each Reta vial (30 mg) carries you through ~9 weeks of the maintenance dose (2 mg Mon + 2 mg Thu = 4 mg/wk = ~3.3 mg used per 5-shot two-week stretch). <strong>Message me around Wk 7&ndash;8 of each vial</strong> so we can order the next one in time &mdash; shipping + delivery before Wk 10 means no missed shots.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Per-vial cost</div><div class="nr-v">$150. <strong>Ongoing rhythm:</strong> every ~9 weeks, $150, until goal weight or protocol reassessment. <strong>When you hit 115</strong> (or whatever weight feels right), we taper down 0.5 mg/wk &mdash; which stretches each vial further or transitions you to a lower ongoing cadence. <strong>No hard stop date</strong> &mdash; the protocol runs as long as it's working for you.</div></div></div>
         </div>
       </details>
 
@@ -755,46 +914,41 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 1&ndash;2 &middot; Tier 1 Acclimation</div>
-        <div class="tip-title">GI Re-Tolerance &middot; Soft Appetite Drop</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 1&ndash;2 &middot; Tier 1 Acclimation</div><div class="tip-title">GI Re-Tolerance &middot; Soft Appetite Drop</div></div>
         </summary><div class="tip-body">
-          <p>2 shots/wk at 1 mg (10u) each. <strong>Day 3&ndash;5:</strong> noticeable appetite drop, you'll start finishing meals earlier. Mild GI awareness (slight nausea / "full quickly") in the 24&ndash;48 hrs after each shot is normal &mdash; this is the re-tolerance window. Sleep + energy may shift subtly but Reta's not a stimulant; don't expect a daytime lift yet.</p>
+          <div class="tip-lead">2 shots/wk at 1 mg (10u) each. <strong>Day 3&ndash;5:</strong> noticeable appetite drop, you'll start finishing meals earlier. Mild GI awareness (slight nausea / "full quickly") in the 24&ndash;48 hrs after each shot is normal &mdash; this is the re-tolerance window. Sleep + energy may shift subtly but Reta's not a stimulant; don't expect a daytime lift yet.</div>
           <p><strong>Take a baseline photo + waist measurement on Day 1.</strong> Weight may not move much in Wks 1&ndash;2 &mdash; that's expected.</p>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 3&ndash;4 &middot; Tier 2 Climb</div>
-        <div class="tip-title">Steady Appetite Control &middot; Scale Starts Moving</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 3&ndash;4 &middot; Tier 2 Climb</div><div class="tip-title">Steady Appetite Control &middot; Scale Starts Moving</div></div>
         </summary><div class="tip-body">
-          <p>2 shots/wk at 1.5 mg (15u). Appetite suppression deepens &mdash; you'll feel steady control through the whole week, not just shot day. Energy expenditure (glucagon arm) starts contributing measurably; some users feel a slight daytime energy lift here. <strong>Scale should start moving:</strong> 1&ndash;2 lbs/wk in this window is typical.</p>
+          <div class="tip-lead">2 shots/wk at 1.5 mg (15u). Appetite suppression deepens &mdash; you'll feel steady control through the whole week, not just shot day. Energy expenditure (glucagon arm) starts contributing measurably; some users feel a slight daytime energy lift here. <strong>Scale should start moving:</strong> 1&ndash;2 lbs/wk in this window is typical.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 5&ndash;8 &middot; Tier 3 Maintenance Lands</div>
-        <div class="tip-title">Body Comp Shift &middot; The Visible Window</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 5&ndash;8 &middot; Tier 3 Maintenance Lands</div><div class="tip-title">Body Comp Shift &middot; The Visible Window</div></div>
         </summary><div class="tip-body">
-          <p>2 shots/wk at 2 mg (20u). This is where most of the body-comp shift compounds. Expect 1&ndash;1.5 lbs/wk steady. Clothes fit differently. Energy from the glucagon arm + smaller body to carry around starts to feel real.</p>
-          <p><strong>If thyroid surgery is in this window:</strong> pause Reta 1 wk before + 1 wk after. Resume on the next regular Monday.</p>
+          <div class="tip-lead">2 shots/wk at 2 mg (20u). This is where most of the body-comp shift compounds. Expect 1&ndash;1.5 lbs/wk steady. Clothes fit differently. Energy from the glucagon arm + smaller body to carry around starts to feel real.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">If thyroid surgery is in this window</div><div class="nr-v">pause Reta 1 wk before + 1 wk after. Resume on the next regular Monday.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 9&ndash;18 &middot; First Reassessment Window (Vials 1 &rarr; 2)</div>
-        <div class="tip-title">Vial Transition &middot; First Major Checkpoint</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 9&ndash;18 &middot; First Reassessment Window (Vials 1 &rarr; 2)</div><div class="tip-title">Vial Transition &middot; First Major Checkpoint</div></div>
         </summary><div class="tip-body">
-          <p>Vial #1 finishes mid-Wk 9. Vial #2 (ordered around Wk 7&ndash;8) carries you through Wk 18. Same dose, same cadence. <strong>This is the first natural reassessment window</strong> &mdash; how does your energy feel vs. Wk 1? Clothes fit? Tracking ahead of pace or right on?</p>
+          <div class="tip-lead">Vial #1 finishes mid-Wk 9. Vial #2 (ordered around Wk 7&ndash;8) carries you through Wk 18. Same dose, same cadence. <strong>This is the first natural reassessment window</strong> &mdash; how does your energy feel vs. Wk 1? Clothes fit? Tracking ahead of pace or right on?</div>
           <p><strong>If you're already at goal or close (~117&ndash;120 lbs) by end of Vial #2:</strong> we taper down 0.5 mg/wk to maintenance. <strong>If you're still working toward 115:</strong> order Vial #3, continue. <strong>If energy or response shifts after thyroid surgery:</strong> we plan cellular-energy add-ons (NAD+, 5-Amino-1MQ, MOTS-C) for the next vial cycle.</p>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Ongoing &middot; After the First Reassessment</div>
-        <div class="tip-title">Maintain &middot; Taper &middot; Or Layer Up</div>
+        <div class="tip-head"><div class="tip-eyebrow">Ongoing &middot; After the First Reassessment</div><div class="tip-title">Maintain &middot; Taper &middot; Or Layer Up</div></div>
         </summary><div class="tip-body">
-          <p>Once you've passed the first ~18-week mark, the protocol is straightforward: reorder Reta every ~9 weeks ongoing, dose stays at the working maintenance level (likely 2 mg Mon + Thu), and we check in every ~2 vials to decide if anything needs to shift.</p>
-          <p><strong>Possible directions:</strong> (a) hit goal weight and taper to a lower maintenance dose (e.g. 1 mg Mon + Thu or just 1 mg/wk); (b) continue at 4 mg/wk maintenance to settle the body comp; (c) add cellular-energy compounds for the thyroid layer. Each direction extends from the same ongoing base &mdash; no restart required.</p>
+          <div class="tip-lead">Once you've passed the first ~18-week mark, the protocol is straightforward: reorder Reta every ~9 weeks ongoing, dose stays at the working maintenance level (likely 2 mg Mon + Thu), and we check in every ~2 vials to decide if anything needs to shift.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Possible directions</div><div class="nr-v">(a) hit goal weight and taper to a lower maintenance dose (e.g. 1 mg Mon + Thu or just 1 mg/wk); (b) continue at 4 mg/wk maintenance to settle the body comp; (c) add cellular-energy compounds for the thyroid layer. Each direction extends from the same ongoing base &mdash; no restart required.</div></div></div>
         </div>
       </details>
 
@@ -804,10 +958,9 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 07 &mdash; Normal Effects (No Action Needed)</div>
-        <div class="tip-title">Expected on Reta Acclimation + Maintenance</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 07 &mdash; Normal Effects (No Action Needed)</div><div class="tip-title">Expected on Reta Acclimation + Maintenance</div></div>
         </summary><div class="tip-body">
-          <ul>
+          <ul class="tip-list">
             <li>Mild appetite suppression starting Wk 1 &mdash; the signal you want.</li>
             <li>Mild nausea or GI awareness 24&ndash;48 hrs after each shot in Wks 1&ndash;2 &mdash; the re-tolerance window. Settles by Wk 3.</li>
             <li>Slightly fuller feeling at smaller meals &mdash; learn to stop earlier.</li>
@@ -819,10 +972,9 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 08 &mdash; Watch For (Message BioLinked)</div>
-        <div class="tip-title">Anything Below Warrants a Quick Check-In</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 08 &mdash; Watch For (Message BioLinked)</div><div class="tip-title">Anything Below Warrants a Quick Check-In</div></div>
         </summary><div class="tip-body">
-          <ul>
+          <ul class="tip-list">
             <li>Severe nausea, vomiting, or appetite loss that doesn't settle within 72 hrs of a tier climb &mdash; hold the current tier or step back, then flag.</li>
             <li>Injection site hot, swollen, or red &gt;24 hrs &mdash; possible technique or contamination.</li>
             <li>Energy got <em>worse</em> on Reta than baseline &mdash; should be the same or better by Wk 4&ndash;5; flag if it's worse, especially given the thyroid context.</li>
@@ -830,8 +982,8 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <li>Any allergic reaction symptoms (rash, itching, throat tightness) &mdash; stop and seek medical attention immediately.</li>
             <li>Heart rate consistently elevated at rest &mdash; uncommon at 2 mg dosing but worth flagging.</li>
             <li>Significant weight regain in the 2&ndash;4 weeks post-thyroidectomy &mdash; usually the thyroid axis adjusting, but flag so we can decide if dose needs to bump or hold.</li>
-          </ul>
-          <p><strong>Important:</strong> this protocol is educational/research and does not constitute medical advice. Continue working with your endocrinologist and surgeon throughout. Discontinue and seek medical attention if adverse reactions occur.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Important</div><div class="nr-v">this protocol is educational/research and does not constitute medical advice. Continue working with your endocrinologist and surgeon throughout. Discontinue and seek medical attention if adverse reactions occur.</div></div></div>
         </div>
       </details>
 

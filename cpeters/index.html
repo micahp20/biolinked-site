@@ -215,6 +215,189 @@ details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bo
 details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
 details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
 @media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
+
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
+
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
+
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
+
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
+
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
+
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
+
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
+
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
+
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
+
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
@@ -303,13 +486,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <div class="program-eyebrow">Personalized Protocol</div>
         <div class="program-title">Corrina's <em>Phased Reset</em></div>
         <div class="program-tag">Anti-aging foundation first, hormonal balance second, recovery and recomp third &mdash; running one block at a time so MCAS, mood, and brain fog each get a clean look at their own compound.</div>
-        <div class="program-context">
-          <p><strong>You're running a lot in your stack, so we're sequencing it.</strong> Instead of layering all 8 compounds at once (which makes it impossible to tell what's working and risky for MCAS), the protocol runs in three sequential 4&ndash;8 week phases. Each phase has a clear job, a paired AM/PM rhythm, and finishes before the next one starts.</p>
-          <p><strong>Phase 1 &mdash; Anti-Aging Foundation (Wks 1&ndash;4).</strong> Pinealon AM + Epitalon PM. The pineal-peptide pair targets your two biggest complaints first &mdash; brain fog (Pinealon, day-side cognitive) and sleep architecture (Epitalon, night-side cellular reset). 20-day intensive that locks in a cleaner baseline before anything else.</p>
-          <p><strong>Phase 2 &mdash; Hormonal Balance (Wks 5&ndash;12).</strong> Kisspeptin AM (M&ndash;F) + PT-141 PM (Mon + Thu only). The two compounds with the strongest evidence in women for restoring the libido / mood / drive that often go flat on hormonal birth control &mdash; both work alongside your Nuvaring without disrupting contraception.</p>
-          <p><strong>Phase 3 &mdash; Recovery + Recomp (Wks 13&ndash;16).</strong> BPC-157 AM + CJC/Ipa PM. BPC for the gut bloating you flagged; CJC/Ipa for the muscle preservation Tirz can't do on its own. Recovery-layer finish to the cycle.</p>
-          <p><strong>PRN throughout all 16 weeks:</strong> Selank (anti-stress, fast-acting) and DSIP (deep-sleep nudge) are available the whole time but not on the daily schedule &mdash; use them on the days you need them, not as habits. MCAS-aware introduction notes in the Notes &amp; Tips tab apply at the start of each phase.</p>
-        </div>
+        <div class="program-context"><div class="note-list"><div class="nr full"><div class="nr-v"><strong>You're running a lot in your stack, so we're sequencing it.</strong> Instead of layering all 8 compounds at once (which makes it impossible to tell what's working and risky for MCAS), the protocol runs in three sequential 4&ndash;8 week phases. Each phase has a clear job, a paired AM/PM rhythm, and finishes before the next one starts.</div></div><div class="nr"><div class="nr-l">Phase 1 &mdash; Anti-Aging Foundation (Wks 1&ndash;4)</div><div class="nr-v">Pinealon AM + Epitalon PM. The pineal-peptide pair targets your two biggest complaints first &mdash; brain fog (Pinealon, day-side cognitive) and sleep architecture (Epitalon, night-side cellular reset). 20-day intensive that locks in a cleaner baseline before anything else.</div></div><div class="nr"><div class="nr-l">Phase 2 &mdash; Hormonal Balance (Wks 5&ndash;12)</div><div class="nr-v">Kisspeptin AM (M&ndash;F) + PT-141 PM (Mon + Thu only). The two compounds with the strongest evidence in women for restoring the libido / mood / drive that often go flat on hormonal birth control &mdash; both work alongside your Nuvaring without disrupting contraception.</div></div><div class="nr"><div class="nr-l">Phase 3 &mdash; Recovery + Recomp (Wks 13&ndash;16)</div><div class="nr-v">BPC-157 AM + CJC/Ipa PM. BPC for the gut bloating you flagged; CJC/Ipa for the muscle preservation Tirz can't do on its own. Recovery-layer finish to the cycle.</div></div><div class="nr"><div class="nr-l">PRN throughout all 16 weeks</div><div class="nr-v">Selank (anti-stress, fast-acting) and DSIP (deep-sleep nudge) are available the whole time but not on the daily schedule &mdash; use them on the days you need them, not as habits. MCAS-aware introduction notes in the Notes &amp; Tips tab apply at the start of each phase.</div></div></div></div>
       </div>
 
       <!-- PHASE OVERVIEW -->
@@ -745,12 +922,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </ul>
       </div>
 
-      <div style="background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:14px 18px;border-radius:2px;font-size:13px;color:#3d2f10;line-height:1.7;margin-top:14px;">
-        <strong style="color:var(--gold);">Phase 1 timing:</strong> Pinealon fasted AM (water/black coffee only, eat 30&ndash;45 min after). Epitalon evening before bed prep.<br><br>
-        <strong style="color:var(--gold);">Phase 2 timing:</strong> Kisspeptin AM (not fasted-dependent). PT-141 PM on Mon + Thu only &mdash; <strong>start the first dose at 5 units / 0.05 mL (250 mcg) for MCAS safety check</strong>, scale to full 10u on next Mon if clean.<br><br>
-        <strong style="color:var(--gold);">Phase 3 timing:</strong> BPC AM. CJC/Ipa 30 min pre-bed, empty stomach 2+ hrs &mdash; GH pulse needs low insulin to fire.<br><br>
-        <strong style="color:var(--gold);">Tirz is on its own schedule</strong> &mdash; weekly dose continuing from your existing protocol. No interaction with the peptide schedule above.
-      </div>
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">Phase 1 timing</div><div class="nr-v">Pinealon fasted AM (water/black coffee only, eat 30&ndash;45 min after). Epitalon evening before bed prep.</div></div><div class="nr"><div class="nr-l">Phase 2 timing</div><div class="nr-v">Kisspeptin AM (not fasted-dependent). PT-141 PM on Mon + Thu only &mdash; <strong>start the first dose at 5 units / 0.05 mL (250 mcg) for MCAS safety check</strong>, scale to full 10u on next Mon if clean.</div></div><div class="nr"><div class="nr-l">Phase 3 timing</div><div class="nr-v">BPC AM. CJC/Ipa 30 min pre-bed, empty stomach 2+ hrs &mdash; GH pulse needs low insulin to fire.</div></div><div class="nr"><div class="nr-l">Tirz is on its own schedule</div><div class="nr-v">&mdash; weekly dose continuing from your existing protocol. No interaction with the peptide schedule above.</div></div></div></div>
 
     </div><!-- /schedule tab -->
 
@@ -814,12 +986,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="storage-card">
         <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
-        <div class="storage-body">
-          <p><strong>Dry (lyophilized) vials:</strong> store refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</p>
-          <p><strong>Reconstituted vials:</strong> refrigerate immediately after adding BAC water. Use within 30 days. Always use a fresh insulin syringe for each draw &mdash; never reuse.</p>
-          <p><strong>BAC water + MCAS:</strong> standard bacteriostatic water contains benzyl alcohol as a preservative. If you've ever had a reaction to benzyl alcohol (it's in some IV meds and cosmetics), request <em>preservative-free sterile water for injection (SWFI)</em> from McGuff instead &mdash; but you'll need to reconstitute less BAC water at a time since SWFI doesn't preserve open vials. For most MCAS folks, standard BAC water is fine.</p>
-          <p><strong>Site rotation:</strong> SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row. With 7 shots/day in Phase 1, plan your rotation pattern &mdash; e.g. AM shots in upper quadrants, PM shots in lower quadrants.</p>
-        </div>
+        <div class="storage-body"><div class="note-list"><div class="nr"><div class="nr-l">Dry (lyophilized) vials</div><div class="nr-v">store refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</div></div><div class="nr"><div class="nr-l">Reconstituted vials</div><div class="nr-v">refrigerate immediately after adding BAC water. Use within 30 days. Always use a fresh insulin syringe for each draw &mdash; never reuse.</div></div><div class="nr"><div class="nr-l">BAC water + MCAS</div><div class="nr-v">standard bacteriostatic water contains benzyl alcohol as a preservative. If you've ever had a reaction to benzyl alcohol (it's in some IV meds and cosmetics), request <em>preservative-free sterile water for injection (SWFI)</em> from McGuff instead &mdash; but you'll need to reconstitute less BAC water at a time since SWFI doesn't preserve open vials. For most MCAS folks, standard BAC water is fine.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row. With 7 shots/day in Phase 1, plan your rotation pattern &mdash; e.g. AM shots in upper quadrants, PM shots in lower quadrants.</div></div></div></div>
       </div>
 
     </div><!-- /supplies tab -->
@@ -833,11 +1000,10 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card warn"><summary>
-        <div class="tip-eyebrow">Tip 01 &mdash; MCAS / Histamine Sensitivity (Important)</div>
-        <div class="tip-title">Slow-Introduction Plan for Week 1</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; MCAS / Histamine Sensitivity (Important)</div><div class="tip-title">Slow-Introduction Plan for Week 1</div></div>
         </summary><div class="tip-body">
-          <p>You mentioned MCAS &mdash; mast cell activation syndrome. This matters for peptide intro because mast cells can react to several mechanisms peptides touch (melanocortin pathways, GH secretagogue effects, even the bacteriostatic water itself). The risk is real but manageable. <strong>The protocol: introduce ONE new compound per day in Week 1</strong>, observe for 24 hours, then add the next. This lets us cleanly identify any reactor without confounding from multiple new compounds at once.</p>
-          <p><strong>The phased structure IS the MCAS safety plan.</strong> Each new compound gets isolated when it's introduced &mdash; if you flare, the suspect is unambiguous.</p>
+          <div class="tip-lead">You mentioned MCAS &mdash; mast cell activation syndrome. This matters for peptide intro because mast cells can react to several mechanisms peptides touch (melanocortin pathways, GH secretagogue effects, even the bacteriostatic water itself). The risk is real but manageable. <strong>The protocol: introduce ONE new compound per day in Week 1</strong>, observe for 24 hours, then add the next. This lets us cleanly identify any reactor without confounding from multiple new compounds at once.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">The phased structure IS the MCAS safety plan</div><div class="nr-v">Each new compound gets isolated when it's introduced &mdash; if you flare, the suspect is unambiguous.</div></div></div>
           <p><strong>Phase 1 intro (Wks 1&ndash;4) &mdash; low reactivity pair:</strong></p>
           <ol>
             <li><strong>Day 1:</strong> Start Pinealon AM only. Skip Epitalon.</li>
@@ -853,77 +1019,72 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <ol>
             <li><strong>Wk 13 Mon:</strong> Start BPC-157 AM only. Often MCAS-friendly (may stabilize mast cells). Skip CJC/Ipa.</li>
             <li><strong>Wk 13 Tue:</strong> If BPC is clean, add CJC/Ipa PM. Run both for the rest of Phase 3.</li>
-          </ol>
-          <p><strong>What to watch for after each new compound:</strong> flushing (face/chest redness), itching, hives, GI cramping/diarrhea, sudden headache, racing heart, brain fog spike. These are mast-cell flare signs.</p>
-          <p><strong>If a flare happens:</strong> take your usual antihistamine immediately, drop the suspect compound, message us. We can either pause that compound or try a much lower dose later.</p>
+          </ol><div class="note-list">
+          <div class="nr"><div class="nr-l">What to watch for after each new compound</div><div class="nr-v">flushing (face/chest redness), itching, hives, GI cramping/diarrhea, sudden headache, racing heart, brain fog spike. These are mast-cell flare signs.</div></div>
+          <div class="nr"><div class="nr-l">If a flare happens</div><div class="nr-v">take your usual antihistamine immediately, drop the suspect compound, message us. We can either pause that compound or try a much lower dose later.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 02 &mdash; Why PT-141 + Kisspeptin for Women</div>
-        <div class="tip-title">The Hormonal Balance Pair (And Why It Works With Your Birth Control)</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; Why PT-141 + Kisspeptin for Women</div><div class="tip-title">The Hormonal Balance Pair (And Why It Works With Your Birth Control)</div></div>
         </summary><div class="tip-body">
-          <p>Most peptide protocols are male-focused. PT-141 and Kisspeptin-10 are notable exceptions &mdash; both have <em>women-specific</em> research backing, which is why they're paired in your protocol. Here's the case:</p>
-          <p><strong>The problem they solve:</strong> hormonal birth control (your Nuvaring) gives you contraception &mdash; that part works. But it also flattens downstream effects that aren't part of the contraceptive design: libido, motivation, the felt "drive" or "spark," sometimes brain fog. Conventional medicine doesn't have great answers for these because the conventional approach is to add more hormones, which conflicts with the birth control. Both PT-141 and Kisspeptin work through <em>non-hormonal</em> brain pathways &mdash; so they restore those downstream effects without disrupting the contraception.</p>
+          <div class="tip-lead">Most peptide protocols are male-focused. PT-141 and Kisspeptin-10 are notable exceptions &mdash; both have <em>women-specific</em> research backing, which is why they're paired in your protocol. Here's the case:</div><div class="note-list">
+          <div class="nr"><div class="nr-l">The problem they solve</div><div class="nr-v">hormonal birth control (your Nuvaring) gives you contraception &mdash; that part works. But it also flattens downstream effects that aren't part of the contraceptive design: libido, motivation, the felt "drive" or "spark," sometimes brain fog. Conventional medicine doesn't have great answers for these because the conventional approach is to add more hormones, which conflicts with the birth control. Both PT-141 and Kisspeptin work through <em>non-hormonal</em> brain pathways &mdash; so they restore those downstream effects without disrupting the contraception.</div></div></div>
           <p><strong>PT-141 (Bremelanotide):</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li>The only FDA-approved on-demand medication for hypoactive sexual desire in premenopausal women</li>
             <li>Works on MC3R/MC4R melanocortin receptors in the brain &mdash; not estrogen, not progesterone, not testosterone</li>
             <li>Effects: increased desire, improved arousal, central reward + motivation activation</li>
             <li>Doesn't require timing with sexual activity &mdash; Mon + Thu dosing (2&times;/wk) builds steady-state benefit through Phase 2</li>
           </ul>
           <p><strong>Kisspeptin-10:</strong></p>
-          <ul>
+          <ul class="tip-list">
             <li>The master regulator of the HPG (hypothalamic-pituitary-gonadal) axis</li>
             <li>Recent Imperial College London studies (2017&ndash;2023) show kisspeptin improves both sexual responsiveness AND mood in women specifically &mdash; both pre- and post-menopausal</li>
             <li>Works upstream &mdash; helps "wake up" the brain's natural reward circuits that hormonal contraception tends to flatten</li>
             <li>Doesn't override your birth control's contraceptive effect &mdash; works on signaling, not hormone replacement</li>
-          </ul>
-          <p><strong>Why the pair vs. either alone:</strong> Kisspeptin is upstream (signaling), PT-141 is downstream (receptor activation). Running them together hits both ends of the same pathway, which is why women on the combo often describe a more complete "lifting" of the flatness than either compound delivers solo.</p>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Why the pair vs. either alone</div><div class="nr-v">Kisspeptin is upstream (signaling), PT-141 is downstream (receptor activation). Running them together hits both ends of the same pathway, which is why women on the combo often describe a more complete "lifting" of the flatness than either compound delivers solo.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card featured"><summary>
-        <div class="tip-eyebrow">Tip 03 &mdash; You're On Tirz Already &mdash; This is Recomposition, Not Weight Loss</div>
-        <div class="tip-title">Reframe What "Success" Looks Like</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; You're On Tirz Already &mdash; This is Recomposition, Not Weight Loss</div><div class="tip-title">Reframe What "Success" Looks Like</div></div>
         </summary><div class="tip-body">
-          <p>Tirz handles the weight loss part. You're going from 140 to 132 &mdash; an 8-pound drop. The scale will move and that's not the impressive part of this protocol. <strong>The impressive part will be what you look like at 132.</strong></p>
-          <p>Most GLP-1 weight loss comes with significant muscle loss alongside the fat &mdash; this is the "ozempic face" / "deflated" look people describe. CJC + Ipamorelin runs Phase 3 (Wks 13&ndash;16) to amplify your body's natural GH pulse for muscle preservation during the deficit. At your goal weight with this protocol, you'll look distinctly different than at the same weight on Tirz alone &mdash; more toned, more defined, less "small but soft."</p>
-          <p><strong>What to measure besides the scale:</strong> waist circumference, photos in the same outfit every 2 weeks, how clothes fit (a "tight" pair of jeans is a better marker than a number). The body comp shift will be more dramatic than the 8 lbs suggests.</p>
+          <div class="tip-lead">Tirz handles the weight loss part. You're going from 140 to 132 &mdash; an 8-pound drop. The scale will move and that's not the impressive part of this protocol. <strong>The impressive part will be what you look like at 132.</strong></div>
+          <div class="tip-lead">Most GLP-1 weight loss comes with significant muscle loss alongside the fat &mdash; this is the "ozempic face" / "deflated" look people describe. CJC + Ipamorelin runs Phase 3 (Wks 13&ndash;16) to amplify your body's natural GH pulse for muscle preservation during the deficit. At your goal weight with this protocol, you'll look distinctly different than at the same weight on Tirz alone &mdash; more toned, more defined, less "small but soft."</div><div class="note-list">
+          <div class="nr"><div class="nr-l">What to measure besides the scale</div><div class="nr-v">waist circumference, photos in the same outfit every 2 weeks, how clothes fit (a "tight" pair of jeans is a better marker than a number). The body comp shift will be more dramatic than the 8 lbs suggests.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 04 &mdash; Sleep + Stress as PRN Tools</div>
-        <div class="tip-title">DSIP + Selank Are For The Hard Days, Not Daily</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Sleep + Stress as PRN Tools</div><div class="tip-title">DSIP + Selank Are For The Hard Days, Not Daily</div></div>
         </summary><div class="tip-body">
-          <p>3/5 sleep and 4/5 stress are the chronic background driving most of what you're complaining about &mdash; bloat, brain fog, hormonal flatness, MCAS load. The phased protocol addresses the underlying drivers (gut, hormones, pineal reset) but you'll still have hard days. <strong>That's what DSIP + Selank are for.</strong></p>
-          <p><strong>DSIP starting (10u / 0.10 mL = 250 mcg) pre-bed:</strong> use on nights when sleep needs help &mdash; travel, stress, schedule disruption. Not nightly. Doesn't sedate &mdash; just nudges sleep architecture deeper. <strong>Ramp to 20u / 0.20 mL (500 mcg) if 250 mcg isn't deep enough</strong> &mdash; the higher dose extends slow-wave duration noticeably.</p>
-          <p><strong>Selank (20u / 0.20 mL = 1 mg afternoon):</strong> use when stress peaks, you feel wired, or MCAS is warning. Onset 15&ndash;30 min, lasts 4&ndash;6 hours, "calm focus" not drowsiness. Don't burn through it daily; the 2 vials easily cover 16 weeks at PRN cadence.</p>
+          <div class="tip-lead">3/5 sleep and 4/5 stress are the chronic background driving most of what you're complaining about &mdash; bloat, brain fog, hormonal flatness, MCAS load. The phased protocol addresses the underlying drivers (gut, hormones, pineal reset) but you'll still have hard days. <strong>That's what DSIP + Selank are for.</strong></div>
+          <p><strong>DSIP starting (10u / 0.10 mL = 250 mcg) pre-bed:</strong> use on nights when sleep needs help &mdash; travel, stress, schedule disruption. Not nightly. Doesn't sedate &mdash; just nudges sleep architecture deeper. <strong>Ramp to 20u / 0.20 mL (500 mcg) if 250 mcg isn't deep enough</strong> &mdash; the higher dose extends slow-wave duration noticeably.</p><div class="note-list">
+          <div class="nr"><div class="nr-l">Selank (20u / 0.20 mL = 1 mg afternoon)</div><div class="nr-v">use when stress peaks, you feel wired, or MCAS is warning. Onset 15&ndash;30 min, lasts 4&ndash;6 hours, "calm focus" not drowsiness. Don't burn through it daily; the 2 vials easily cover 16 weeks at PRN cadence.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 05 &mdash; Why Sequential, Not Concurrent</div>
-        <div class="tip-title">One Block at a Time &mdash; You'll Know What's Working</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 05 &mdash; Why Sequential, Not Concurrent</div><div class="tip-title">One Block at a Time &mdash; You'll Know What's Working</div></div>
         </summary><div class="tip-body">
-          <p>The biggest mistake with peptide stacks is running everything at once. You can't tell which compound is doing what, and for MCAS the layering risk multiplies. <strong>This protocol runs in 3 sequential phases so each block gets a clean look.</strong></p>
-          <p><strong>Phase 1 isolates anti-aging:</strong> if brain fog lifts during Wks 1&ndash;4, it's unambiguously Pinealon (+ Epitalon supporting sleep). If it doesn't lift, you know to look elsewhere &mdash; not waste 16 weeks wondering.</p>
-          <p><strong>Phase 2 isolates hormonal:</strong> if the Nuvaring-related flatness lifts during Wks 5&ndash;12, it's the Kiss + PT-141 pair. The 8-week run gives the upstream HPG signaling time to do its work.</p>
-          <p><strong>Phase 3 isolates gut + recomp:</strong> if bloat resolves in Wks 13&ndash;16, it's BPC-157. If muscle preservation shows in mirror photos, it's CJC/Ipa.</p>
-          <p>By end of cycle you'll know which compounds were the heavy lifters &mdash; informs the next cycle.</p>
+          <div class="tip-lead">The biggest mistake with peptide stacks is running everything at once. You can't tell which compound is doing what, and for MCAS the layering risk multiplies. <strong>This protocol runs in 3 sequential phases so each block gets a clean look.</strong></div><div class="note-list">
+          <div class="nr"><div class="nr-l">Phase 1 isolates anti-aging</div><div class="nr-v">if brain fog lifts during Wks 1&ndash;4, it's unambiguously Pinealon (+ Epitalon supporting sleep). If it doesn't lift, you know to look elsewhere &mdash; not waste 16 weeks wondering.</div></div>
+          <div class="nr"><div class="nr-l">Phase 2 isolates hormonal</div><div class="nr-v">if the Nuvaring-related flatness lifts during Wks 5&ndash;12, it's the Kiss + PT-141 pair. The 8-week run gives the upstream HPG signaling time to do its work.</div></div>
+          <div class="nr"><div class="nr-l">Phase 3 isolates gut + recomp</div><div class="nr-v">if bloat resolves in Wks 13&ndash;16, it's BPC-157. If muscle preservation shows in mirror photos, it's CJC/Ipa.</div></div></div>
+          <div class="tip-lead">By end of cycle you'll know which compounds were the heavy lifters &mdash; informs the next cycle.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 06 &mdash; AM &amp; PM Cluster Logistics</div>
-        <div class="tip-title">2 Shots a Day &mdash; ~3 Minutes Total</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; AM &amp; PM Cluster Logistics</div><div class="tip-title">2 Shots a Day &mdash; ~3 Minutes Total</div></div>
         </summary><div class="tip-body">
-          <p>The phased structure keeps daily shot count low. Each phase has 2 scheduled shots (AM + PM), with Phase 2 dropping to 1 shot on Tue/Wed/Fri (Kisspeptin only). PRN compounds add 0&ndash;1 extra shot on the days you use them.</p>
-          <p><strong>Phase 1 daily cluster (Wks 1&ndash;4):</strong> Pinealon AM fasted (water/black coffee, eat 30&ndash;45 min after). Epitalon PM evening before bed prep. ~3 min total.</p>
-          <p><strong>Phase 2 daily cluster (Wks 5&ndash;12):</strong> Kisspeptin AM (not fasted-dependent). PT-141 PM Mon + Thu only. ~2 min total.</p>
-          <p><strong>Phase 3 daily cluster (Wks 13&ndash;16):</strong> BPC-157 AM. CJC/Ipa 30 min pre-bed, empty stomach 2+ hrs. ~3 min total.</p>
-          <p><strong>PRN:</strong> Selank when stress peaks, DSIP when sleep needs help. Keep one Selank syringe ready in case the afternoon goes sideways.</p>
+          <div class="tip-lead">The phased structure keeps daily shot count low. Each phase has 2 scheduled shots (AM + PM), with Phase 2 dropping to 1 shot on Tue/Wed/Fri (Kisspeptin only). PRN compounds add 0&ndash;1 extra shot on the days you use them.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">Phase 1 daily cluster (Wks 1&ndash;4)</div><div class="nr-v">Pinealon AM fasted (water/black coffee, eat 30&ndash;45 min after). Epitalon PM evening before bed prep. ~3 min total.</div></div>
+          <div class="nr"><div class="nr-l">Phase 2 daily cluster (Wks 5&ndash;12)</div><div class="nr-v">Kisspeptin AM (not fasted-dependent). PT-141 PM Mon + Thu only. ~2 min total.</div></div>
+          <div class="nr"><div class="nr-l">Phase 3 daily cluster (Wks 13&ndash;16)</div><div class="nr-v">BPC-157 AM. CJC/Ipa 30 min pre-bed, empty stomach 2+ hrs. ~3 min total.</div></div>
+          <div class="nr"><div class="nr-l">PRN</div><div class="nr-v">Selank when stress peaks, DSIP when sleep needs help. Keep one Selank syringe ready in case the afternoon goes sideways.</div></div></div>
         </div>
       </details>
 
@@ -933,81 +1094,73 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Week 1</div>
-        <div class="tip-title">Phase 1 Starts &middot; Pineal Reset Begins</div>
+        <div class="tip-head"><div class="tip-eyebrow">Week 1</div><div class="tip-title">Phase 1 Starts &middot; Pineal Reset Begins</div></div>
         </summary><div class="tip-body">
-          <p>Pinealon AM + Epitalon PM kick off. Follow the Phase 1 MCAS intro in Tip 01 &mdash; start Pinealon alone Day 1, add Epitalon Day 2. Subtle effects in Week 1 &mdash; possibly slightly clearer head, slightly deeper sleep. The big shifts come Wks 2&ndash;3.</p>
+          <div class="tip-lead">Pinealon AM + Epitalon PM kick off. Follow the Phase 1 MCAS intro in Tip 01 &mdash; start Pinealon alone Day 1, add Epitalon Day 2. Subtle effects in Week 1 &mdash; possibly slightly clearer head, slightly deeper sleep. The big shifts come Wks 2&ndash;3.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 2&ndash;4</div>
-        <div class="tip-title">Anti-Aging Phase &middot; Brain Fog Lifts</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 2&ndash;4</div><div class="tip-title">Anti-Aging Phase &middot; Brain Fog Lifts</div></div>
         </summary><div class="tip-body">
-          <p>This is the brain-fog-clears window. By end of Week 3 expect noticeably clearer head, better mental processing speed, deeper sleep, and a sense of "having more bandwidth." End of Week 4: both vials empty. The gains stay locked in even after the compounds stop.</p>
-          <p>Tirz fat loss continues in parallel. Expect 2&ndash;4 lbs lost by end of Week 4 (Tirz-driven).</p>
+          <div class="tip-lead">This is the brain-fog-clears window. By end of Week 3 expect noticeably clearer head, better mental processing speed, deeper sleep, and a sense of "having more bandwidth." End of Week 4: both vials empty. The gains stay locked in even after the compounds stop.</div>
+          <div class="tip-lead">Tirz fat loss continues in parallel. Expect 2&ndash;4 lbs lost by end of Week 4 (Tirz-driven).</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Week 5</div>
-        <div class="tip-title">Phase 2 Starts &middot; Hormonal Pair Intro</div>
+        <div class="tip-head"><div class="tip-eyebrow">Week 5</div><div class="tip-title">Phase 2 Starts &middot; Hormonal Pair Intro</div></div>
         </summary><div class="tip-body">
-          <p>Pinealon + Epitalon done. Kisspeptin starts AM M&ndash;F. First PT-141 dose on Wk 5 Thu at half (5u / 0.05 mL) for MCAS safety. If clean, scale to full 10u (0.10 mL) on Wk 6 Mon and continue Mon + Thu through Phase 2.</p>
-          <p>Brain fog improvements from Phase 1 should hold.</p>
+          <div class="tip-lead">Pinealon + Epitalon done. Kisspeptin starts AM M&ndash;F. First PT-141 dose on Wk 5 Thu at half (5u / 0.05 mL) for MCAS safety. If clean, scale to full 10u (0.10 mL) on Wk 6 Mon and continue Mon + Thu through Phase 2.</div>
+          <div class="tip-lead">Brain fog improvements from Phase 1 should hold.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 6&ndash;9</div>
-        <div class="tip-title">Hormonal Effects Compound</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 6&ndash;9</div><div class="tip-title">Hormonal Effects Compound</div></div>
         </summary><div class="tip-body">
-          <p>Kisspeptin upstream + PT-141 downstream working together. Most women describe a distinct "I feel like myself again" shift around Wk 7&ndash;9 &mdash; libido lifting, motivation returning, the flatness from Nuvaring downstream effects starting to release.</p>
-          <p>Tirz weight loss continues &mdash; you should be 4&ndash;7 lbs down by end of Week 9.</p>
+          <div class="tip-lead">Kisspeptin upstream + PT-141 downstream working together. Most women describe a distinct "I feel like myself again" shift around Wk 7&ndash;9 &mdash; libido lifting, motivation returning, the flatness from Nuvaring downstream effects starting to release.</div>
+          <div class="tip-lead">Tirz weight loss continues &mdash; you should be 4&ndash;7 lbs down by end of Week 9.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 10&ndash;12</div>
-        <div class="tip-title">Phase 2 Locks In</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 10&ndash;12</div><div class="tip-title">Phase 2 Locks In</div></div>
         </summary><div class="tip-body">
-          <p>Hormonal balance stabilizes. The "lifting" felt earlier becomes the new baseline. End of Week 12: Kisspeptin vials empty. PT-141 has ~24 doses leftover (for next cycle or PRN). Phase 3 starts Monday of Week 13.</p>
+          <div class="tip-lead">Hormonal balance stabilizes. The "lifting" felt earlier becomes the new baseline. End of Week 12: Kisspeptin vials empty. PT-141 has ~24 doses leftover (for next cycle or PRN). Phase 3 starts Monday of Week 13.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Week 13</div>
-        <div class="tip-title">Phase 3 Starts &middot; Gut Reset Begins</div>
+        <div class="tip-head"><div class="tip-eyebrow">Week 13</div><div class="tip-title">Phase 3 Starts &middot; Gut Reset Begins</div></div>
         </summary><div class="tip-body">
-          <p>BPC-157 AM starts Mon. Add CJC/Ipa PM Tue if BPC is clean (per Phase 3 MCAS intro in Tip 01). First gut effects (less bloat) usually show within 7&ndash;14 days of BPC.</p>
+          <div class="tip-lead">BPC-157 AM starts Mon. Add CJC/Ipa PM Tue if BPC is clean (per Phase 3 MCAS intro in Tip 01). First gut effects (less bloat) usually show within 7&ndash;14 days of BPC.</div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Weeks 14&ndash;16</div>
-        <div class="tip-title">Recomposition Visible &middot; Cycle Closes</div>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 14&ndash;16</div><div class="tip-title">Recomposition Visible &middot; Cycle Closes</div></div>
         </summary><div class="tip-body">
-          <p>This is where the body comp shift becomes obvious in the mirror. CJC/Ipa GH pulses preserve muscle while Tirz continues fat loss &mdash; the "toned not deflated" outcome. BPC-157 has resolved chronic bloat. Mirror photos from Week 1 vs Week 16 should be the most meaningful metric.</p>
-          <p><strong>End-of-cycle decisions:</strong> stay on Tirz at maintenance, run another peptide cycle, take 4&ndash;8 weeks off, or rotate to a different focus. The answers depend on which phase moved the needle most &mdash; that's the conversation we have around Week 14&ndash;15.</p>
+          <div class="tip-lead">This is where the body comp shift becomes obvious in the mirror. CJC/Ipa GH pulses preserve muscle while Tirz continues fat loss &mdash; the "toned not deflated" outcome. BPC-157 has resolved chronic bloat. Mirror photos from Week 1 vs Week 16 should be the most meaningful metric.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">End-of-cycle decisions</div><div class="nr-v">stay on Tirz at maintenance, run another peptide cycle, take 4&ndash;8 weeks off, or rotate to a different focus. The answers depend on which phase moved the needle most &mdash; that's the conversation we have around Week 14&ndash;15.</div></div></div>
         </div>
       </details>
 
       <details class="tip-card"><summary>
-        <div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div>
-        <div class="tip-title">Normal vs. Watch For</div>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 07 &mdash; What to Monitor</div><div class="tip-title">Normal vs. Watch For</div></div>
         </summary><div class="tip-body">
           <p><strong>Normal (no action):</strong></p>
-          <p>&middot; Mild injection-site redness or small bruising &mdash; rotate sites and use proper SubQ technique<br>
+          <div class="tip-lead">&middot; Mild injection-site redness or small bruising &mdash; rotate sites and use proper SubQ technique<br>
           &middot; Increased dream vividness on DSIP &mdash; normal, can be pleasant<br>
           &middot; Mild flush or warmth 15&ndash;30 min after PT-141 &mdash; normal melanocortin response<br>
           &middot; Improved sleep + reduced bloat by Week 2&ndash;3 &mdash; the protocol working<br>
-          &middot; Slight uptick in libido / "lifted" mood Week 2&ndash;4 &mdash; PT-141 + Kiss kicking in</p>
+          &middot; Slight uptick in libido / "lifted" mood Week 2&ndash;4 &mdash; PT-141 + Kiss kicking in</div>
           <p><strong>Monitor (contact BioLinked):</strong></p>
-          <p>&middot; Any MCAS flare signs after a new compound &mdash; flushing, hives, GI cramping (see Tip 01)<br>
+          <div class="tip-lead">&middot; Any MCAS flare signs after a new compound &mdash; flushing, hives, GI cramping (see Tip 01)<br>
           &middot; Injection site hot, swollen, or red beyond 24 hours &mdash; technique issue or contamination<br>
           &middot; Significant nausea on PT-141 &mdash; drop to 5u (250 mcg) or pause<br>
           &middot; Persistent insomnia despite DSIP &mdash; timing may need adjustment<br>
-          &middot; Any changes to your cycle or hormonal pattern &mdash; flag for awareness</p>
+          &middot; Any changes to your cycle or hormonal pattern &mdash; flag for awareness</div>
         </div>
       </details>
 
