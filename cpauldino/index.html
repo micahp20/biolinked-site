@@ -1694,6 +1694,22 @@ function downloadICS(){
 .bl-pwa-dismiss{background:transparent;color:#6b6b65;}
 .bl-pwa-dismiss:hover{color:#1a1a1a;}
 @media print{.bl-pwa-banner{display:none !important;}}
+
+/* ===== Tooltip clipping fix (card-layer regression) =====
+   .tb-card / .lab-section / .lab-score carried overflow:hidden so their
+   header bars stayed inside the 8px rounded corners. That also clipped the
+   absolutely-positioned .info-tip-text bubble, so a tooltip on a row near a
+   card's bottom edge rendered as a cut-off dark bar with its text invisible.
+   Unclip those cards and restore the corner masking on the only children that
+   actually paint a background, so the rounding is visually identical. */
+.tb-card,.lab-section,.lab-score{overflow:visible;}
+.tb-card-head{border-radius:8px 8px 0 0;}
+.lab-section-head{border-radius:8px 8px 0 0;}
+.lab-score-eyebrow{border-radius:8px 8px 0 0;}
+.lab-section .lab-row:last-child{border-radius:0 0 8px 8px;}
+/* Open bubble must paint above later sibling rows, which are position:relative
+   on mobile from the earlier horizontal-overflow fix. */
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{z-index:400;}
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
   <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
