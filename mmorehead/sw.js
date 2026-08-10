@@ -1,9 +1,9 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'mmoorehead-v3';
+const CACHE = 'mmorehead-v1';
 const ASSETS = [
-  '/mmoorehead/',
-  '/mmoorehead/index.html',
-  '/mmoorehead/manifest.json',
+  '/mmorehead/',
+  '/mmorehead/index.html',
+  '/mmorehead/manifest.json',
   '/icon-180.png',
   '/icon-192.png',
   '/icon-512.png',
@@ -33,6 +33,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(e.request, clone));
       }
       return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/mmoorehead/index.html')))
+    }).catch(() => caches.match(e.request).then(r => r || caches.match('/mmorehead/index.html')))
   );
 });
