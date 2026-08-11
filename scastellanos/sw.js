@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'scastellanos-v6';
+const CACHE = 'scastellanos-v7';
 const ASSETS = [
   '/scastellanos/',
   '/scastellanos/index.html',
