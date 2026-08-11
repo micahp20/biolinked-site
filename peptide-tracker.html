@@ -56,6 +56,8 @@ body {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   overflow-x: hidden;
 }
 
@@ -216,6 +218,10 @@ button, input, select, textarea { font: inherit; }
   gap: 28px;
   align-items: start;
 }
+/* Grid and flex items default to min-width:auto, which lets wide content
+   (the log tables' min-width:560px) push the whole column past the viewport
+   instead of scrolling inside .table-wrap. min-width:0 lets them shrink. */
+.left-col, .right-col, .page-body > * { min-width: 0; }
 
 /* ── PANELS ── */
 .panel {
@@ -224,6 +230,7 @@ button, input, select, textarea { font: inherit; }
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow);
+  min-width: 0;
 }
 .panel-header {
   padding: 18px 22px 14px;
@@ -274,6 +281,18 @@ button, input, select, textarea { font: inherit; }
   outline: none;
   transition: border-color 0.15s, box-shadow 0.15s;
   -webkit-appearance: none;
+  appearance: none;
+  min-width: 0;
+  max-width: 100%;
+}
+/* -webkit-appearance:none strips the native dropdown arrow, which leaves a
+   select looking identical to a text input. Put a chevron back. */
+.field select {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5 11 1.5' fill='none' stroke='%239A7B2F' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 11px 8px;
+  padding-right: 34px;
 }
 .field textarea { min-height: 80px; resize: vertical; }
 .field input:focus,
@@ -445,9 +464,12 @@ button, input, select, textarea { font: inherit; }
 /* ── TABLES ── */
 .table-wrap {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   margin-top: 14px;
+  min-width: 0;
 }
 table { width: 100%; border-collapse: collapse; min-width: 560px; }
 th, td { padding: 11px 13px; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
@@ -534,32 +556,129 @@ tr:hover td { background: var(--gold-glow); }
   .page-body { grid-template-columns: 1fr; }
   .banner-stats { min-width: auto; grid-template-columns: repeat(2,1fr); }
 }
+
 @media (max-width: 768px) {
-  .banner { padding: 36px 20px 32px; }
-  .banner-inner { flex-direction: column; }
+  .warning-top { padding: 9px 16px; }
+  .warning-top-inner { gap: 8px; }
+  .warning-top-text { font-size: 12px; }
+
+  .banner { padding: 28px 16px 24px; }
+  .banner-inner { flex-direction: column; gap: 20px; }
+  .banner-eyebrow { font-size: 10px; letter-spacing: 0.2em; margin-bottom: 10px; }
+  .banner-sub { font-size: 13px; line-height: 1.65; margin-top: 10px; }
   .banner-stats { width: 100%; grid-template-columns: repeat(2, 1fr); min-width: 0; }
-  .page-body { padding: 20px 14px 60px; gap: 20px; }
+  .bstat { padding: 14px 10px; }
+  .bstat-num { font-size: 24px; }
+  .bstat-label { font-size: 9.5px; letter-spacing: 0.08em; }
+
+  .page-body { padding: 18px 14px 56px; gap: 18px; }
+  .panel-header { padding: 15px 16px 12px; }
+  .panel-title { font-size: 19px; }
+  .panel-label { font-size: 9.5px; letter-spacing: 0.18em; }
   .panel-body { padding: 16px; }
   .tab-pane { padding: 16px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .result-grid { grid-template-columns: 1fr 1fr; }
-  .disclaimer { padding: 14px 20px; }
-  .site-footer { padding: 36px 20px 0; }
-  .site-footer-inner { grid-template-columns: 1fr; gap: 28px; }
-  .site-footer-links { grid-template-columns: 1fr 1fr; }
-  .warning-top { padding: 8px 16px; }
-  .btn-row { flex-direction: column; }
+
+  /* one field per row: full-width inputs are far easier to hit than 2-up */
+  .form-grid { grid-template-columns: 1fr; gap: 13px; }
+  .field label { font-size: 10.5px; letter-spacing: 0.12em; }
+  /* 16px keeps iOS Safari from auto-zooming the page on focus */
+  .field input, .field select, .field textarea { font-size: 16px; padding: 13px 12px; min-height: 48px; }
+  .field select { padding-right: 36px; }
+  .field textarea { min-height: 88px; }
+
+  .result-grid { grid-template-columns: 1fr 1fr; gap: 9px; }
+  .result-card { padding: 13px 12px; }
+  .result-card strong { font-size: 25px; }
+  .result-card span { font-size: 11px; }
+  .calc-summary { font-size: 12.5px; line-height: 1.65; }
+  .schedule-preview { font-size: 12.5px; }
+
+  .btn-row { flex-direction: column; gap: 9px; }
   .btn-row .btn { width: 100%; }
-  .field input, .field select, .field textarea { font-size: 16px; padding: 12px; min-width: 0; max-width: 100%; }
-  .panel { max-width: 100%; }
-  .tab-bar { flex-wrap: wrap; }
+  .btn { min-height: 50px; font-size: 11.5px; }
+
+  /* scroll the tab strip rather than wrapping it onto a ragged second line */
+  .tab-bar { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .tab-bar::-webkit-scrollbar { display: none; }
+  .tab-btn { flex: 1 0 auto; white-space: nowrap; font-size: 10.5px; padding: 15px 12px; min-height: 48px; letter-spacing: 0.1em; }
+
+  .disclaimer { padding: 14px 16px; font-size: 11px; line-height: 1.6; }
+  .site-footer { padding: 32px 16px 0; }
+  .site-footer-inner { grid-template-columns: 1fr; gap: 26px; padding-bottom: 30px; }
+  .site-footer-disclaimer { max-width: none; }
+  .site-footer-links { grid-template-columns: 1fr 1fr; gap: 18px; }
+  .site-footer-col a { font-size: 13px; padding: 7px 0; margin-bottom: 0; }
+  .site-footer-bottom { padding: 16px 0; }
+
+  /* ── Log tables → stacked cards ──
+     A 7–8 column table can only ever be a side-scroll on a phone. Each row
+     becomes its own card with the column name as an inline label, so nothing
+     is hidden and nothing needs horizontal scrolling. */
+  .table-wrap { border: none; border-radius: 0; margin-top: 0; overflow-x: visible; }
+  .table-wrap table { min-width: 0; width: 100%; display: block; }
+  .table-wrap thead { display: none; }
+  .table-wrap tbody { display: block; }
+  .table-wrap tr {
+    display: block;
+    padding: 13px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .table-wrap tr:last-child { border-bottom: none; }
+  .table-wrap tr:hover td { background: none; }
+  .table-wrap td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 14px;
+    max-width: none !important;
+    padding: 5px 0;
+    border-bottom: none;
+    font-size: 13.5px;
+    color: var(--text);
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+  .table-wrap td::before {
+    content: attr(data-label);
+    flex: 0 0 auto;
+    font-size: 9.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    text-align: left;
+    padding-top: 2px;
+  }
+  /* first cell of each card reads as its heading */
+  .table-wrap td:first-child {
+    font-size: 15px;
+    font-weight: 600;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+  /* the delete button gets its own full-width row at the bottom */
+  .table-wrap td.cell-action { display: block; text-align: left; padding-top: 11px; }
+  .table-wrap td.cell-action::before { content: none; }
+  .table-wrap td.cell-action .btn-danger-sm { width: 100%; min-height: 44px; font-size: 10.5px; }
+  .empty-state { padding: 30px 18px; font-size: 13.5px; }
 }
-@media (max-width: 480px) {
+
+@media (max-width: 430px) {
+  .banner-title { font-size: 30px; }
+  .page-body { padding: 16px 12px 52px; }
+  .panel-body, .tab-pane { padding: 14px; }
+  .table-wrap tr { padding: 12px 14px 13px; }
+  .tab-btn { font-size: 10px; padding: 15px 10px; letter-spacing: 0.07em; }
+}
+
+@media (max-width: 360px) {
   .result-grid { grid-template-columns: 1fr; }
-  .tab-btn { font-size: 9px; padding: 12px 6px; letter-spacing: 0.08em; }
-  .page-body { padding: 16px 12px 60px; }
-  .panel-body { padding: 14px; }
-  .tab-pane { padding: 14px; }
+  .banner-stats { grid-template-columns: 1fr 1fr; }
+  .site-footer-links { grid-template-columns: 1fr; }
+  .warning-top-badge { font-size: 9.5px; }
+  .table-wrap td { flex-wrap: wrap; gap: 2px; text-align: left; }
+  .table-wrap td::before { flex: 1 0 100%; }
 }
 </style>
 </head>
@@ -934,13 +1053,13 @@ tr:hover td { background: var(--gold-glow); }
     els.doseLogEmpty.style.display = 'none';
     els.doseLogBody.innerHTML = state.doseLog.map(e => `
       <tr>
-        <td>${esc(e.date)}<br><span style="color:var(--muted);font-size:11px">${esc(e.time)}</span></td>
-        <td><span class="pill">${esc(e.peptide)}</span></td>
-        <td>${esc(String(e.dose))} ${esc(e.doseUnit)}</td>
-        <td>${e.units || '—'}</td>
-        <td>${esc(e.site)}</td>
-        <td style="max-width:160px;word-break:break-word">${e.notes ? esc(e.notes) : '—'}</td>
-        <td><button class="btn-danger-sm" data-del-dose="${e.id}">Delete</button></td>
+        <td data-label="Date / Time">${esc(e.date)}<br><span style="color:var(--muted);font-size:11px">${esc(e.time)}</span></td>
+        <td data-label="Peptide"><span class="pill">${esc(e.peptide)}</span></td>
+        <td data-label="Dose">${esc(String(e.dose))} ${esc(e.doseUnit)}</td>
+        <td data-label="Units">${e.units || '—'}</td>
+        <td data-label="Site">${esc(e.site)}</td>
+        <td data-label="Notes" style="max-width:160px;word-break:break-word">${e.notes ? esc(e.notes) : '—'}</td>
+        <td class="cell-action"><button class="btn-danger-sm" data-del-dose="${e.id}">Delete</button></td>
       </tr>`).join('');
   }
 
@@ -953,14 +1072,14 @@ tr:hover td { background: var(--gold-glow); }
     els.metricsLogEmpty.style.display = 'none';
     els.metricsLogBody.innerHTML = state.metricsLog.map(e => `
       <tr>
-        <td>${esc(e.date)}</td>
-        <td>${e.weight || '—'}</td>
-        <td>${e.energy || '—'}</td>
-        <td>${e.sleep || '—'}</td>
-        <td>${e.appetite || '—'}</td>
-        <td>${e.waist || '—'}</td>
-        <td style="max-width:140px;word-break:break-word">${e.notes ? esc(e.notes) : '—'}</td>
-        <td><button class="btn-danger-sm" data-del-metric="${e.id}">Delete</button></td>
+        <td data-label="Date">${esc(e.date)}</td>
+        <td data-label="Weight">${e.weight || '—'}</td>
+        <td data-label="Energy">${e.energy || '—'}</td>
+        <td data-label="Sleep">${e.sleep || '—'}</td>
+        <td data-label="Appetite">${e.appetite || '—'}</td>
+        <td data-label="Waist">${e.waist || '—'}</td>
+        <td data-label="Notes" style="max-width:140px;word-break:break-word">${e.notes ? esc(e.notes) : '—'}</td>
+        <td class="cell-action"><button class="btn-danger-sm" data-del-metric="${e.id}">Delete</button></td>
       </tr>`).join('');
   }
 
