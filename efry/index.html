@@ -107,9 +107,36 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 
 /* ===== Compound cards ===== */
 .cmp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
-.cmp-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;padding:0;overflow:visible;}
+.cmp-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:block;padding:0;overflow:visible;}
 .cmp-row-name{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;font-weight:700;color:var(--text);padding:12px 16px;border-bottom:1px solid var(--line);background:var(--head);border-radius:8px 8px 0 0;line-height:1.3;letter-spacing:0.005em;}
 .cmp-badge{display:inline-block;background:var(--accent);color:var(--on-accent);font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;vertical-align:middle;white-space:nowrap;}
+
+/* Collapsible compound cards — same +/- summary convention the rest of the
+   site uses on details.li-row, mapped onto this page's .cmp-row classes. */
+details.cmp-row > summary.cmp-row-name{
+  cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap;gap:12px;
+  padding:12px 46px 12px 16px;min-height:56px;
+}
+details.cmp-row > summary.cmp-row-name::-webkit-details-marker{display:none;}
+details.cmp-row > summary.cmp-row-name::after{
+  content:'+';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;
+}
+details[open].cmp-row > summary.cmp-row-name::after{content:'\2212';background:var(--accent-dim);}
+details.cmp-row > summary.cmp-row-name:hover::after{border-color:var(--accent);}
+/* closed: the summary IS the whole card, so lose the divider and round all corners */
+details.cmp-row:not([open]) > summary.cmp-row-name{border-bottom-color:transparent;border-radius:8px;}
+.cmp-head-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto;}
+.cmp-head-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px;line-height:1.3;}
+.cmp-head-key{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.01em;line-height:1.4;}
+.cmp-price{flex:0 0 auto;font-size:16px;font-weight:700;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums;}
+@media print{
+  details.cmp-row > summary.cmp-row-name::after{display:none;}
+  details.cmp-row:not([open]) > summary.cmp-row-name{border-bottom-color:var(--line);border-radius:8px 8px 0 0;}
+}
 .cmp-fields{display:flex;flex-direction:column;padding:2px 16px 10px;}
 .fld{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
 .fld:last-child{border-bottom:none;}
@@ -253,6 +280,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
   .sec-divider-title{font-size:17px;}
   .cmp-list,.supplies-wrap{grid-template-columns:1fr;}
   .cmp-row-name,.supply-info-name{padding:12px 15px;}
+  details.cmp-row > summary.cmp-row-name{padding:12px 44px 12px 15px;}
+  .cmp-price{font-size:15px;}
   .cmp-fields,.cmp-note,.supply-info-desc{padding-left:15px;padding-right:15px;}
   .supply-link{margin-left:15px;margin-right:15px;}
   .sched-card-head{padding:12px 15px;}
@@ -430,13 +459,19 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
     <div class="sec-divider">
       <div class="sec-divider-eyebrow">Your Stack</div>
-      <div class="sec-divider-title">6 Compounds &middot; Healing-Led</div>
+      <div class="sec-divider-title">6 Compounds &middot; Tap to Expand</div>
     </div>
 
     <div class="cmp-list">
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">KLOW Blend &middot; 80 mg &middot; 2 vials <span class="cmp-badge">Repair</span></div>
+      <details class="cmp-row">
+        <summary class="cmp-row-name">
+          <span class="cmp-head-main">
+            <span class="cmp-head-title">KLOW Blend &middot; 80 mg &middot; 2 vials <span class="cmp-badge">Repair</span></span>
+            <span class="cmp-head-key">15u &middot; Mon&ndash;Fri AM</span>
+          </span>
+          <span class="cmp-price">$120</span>
+        </summary>
         <div class="cmp-fields">
           <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM &middot; fasted</span></div>
           <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC per vial</span></div>
@@ -446,10 +481,16 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
         <div class="cmp-note"><span class="nl">Why it's here</span>This is the one aimed at your <strong>knees, left wrist and lower back</strong>. KLOW is a four-part repair blend &mdash; BPC-157 and TB-500 for tendon, ligament and soft-tissue healing, GHK-Cu for collagen and tissue remodeling, KPV for calming the inflammation sitting on top of it. If one compound here earns its place for you, it's this one.</div>
         <div class="cmp-note"><span class="nl">Vial life</span>3 mL gives <strong>26.67 mg/mL</strong>; a 15u draw is 0.15 mL = <strong>~4 mg</strong>. That's <strong>20 doses per vial = 4 weeks</strong> at Mon&ndash;Fri. Two vials run <strong>8 weeks</strong>. Mix one at a time.</div>
-      </div>
+      </details>
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">KPV &middot; 10 mg &middot; 2 vials <span class="cmp-badge">Anti-Inflam</span></div>
+      <details class="cmp-row">
+        <summary class="cmp-row-name">
+          <span class="cmp-head-main">
+            <span class="cmp-head-title">KPV &middot; 10 mg &middot; 2 vials <span class="cmp-badge">Anti-Inflam</span></span>
+            <span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM</span>
+          </span>
+          <span class="cmp-price">$50</span>
+        </summary>
         <div class="cmp-fields">
           <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM &middot; fasted</span></div>
           <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC per vial</span></div>
@@ -459,10 +500,16 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
         <div class="cmp-note"><span class="nl">Why it's here</span>Standalone KPV on top of what's already in KLOW, because your aches are in <strong>three separate places at once</strong> &mdash; that's a systemic inflammation picture, not one bad joint. KPV works body-wide rather than at a single site, so it lowers the background noise the repair compounds are fighting through.</div>
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>5 mg/mL</strong>; 500 mcg is 0.10 mL = <strong>10u</strong>. <strong>20 doses per vial = 4 weeks</strong>; two vials run <strong>8 weeks</strong>, matching KLOW.</div>
-      </div>
+      </details>
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">NAD+ &middot; 1000 mg &middot; 2 vials <span class="cmp-badge">Cognitive</span></div>
+      <details class="cmp-row">
+        <summary class="cmp-row-name">
+          <span class="cmp-head-main">
+            <span class="cmp-head-title">NAD+ &middot; 1000 mg &middot; 2 vials <span class="cmp-badge">Cognitive</span></span>
+            <span class="cmp-head-key">37.5u &middot; Mon/Wed/Fri AM</span>
+          </span>
+          <span class="cmp-price">$130</span>
+        </summary>
         <div class="cmp-fields">
           <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM &middot; fasted</span></div>
           <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC per vial</span></div>
@@ -473,10 +520,16 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Why it's here</span>You said you wanted to start here, and that instinct is good. NAD+ is the coenzyme your mitochondria run on &mdash; it drops with age and it's usually the piece people <em>feel</em> first, as clearer thinking and steadier energy rather than a jolt. It also underwrites the repair work: healing tissue is expensive, and this is the fuel it's spent from.</div>
         <div class="cmp-note"><span class="nl">Drawing 37.5u</span>The <strong>half-mark between 37 and 38</strong> on a 100-unit syringe &mdash; your biggest draw, so line it up in good light. <strong>Push it in slowly</strong>; NAD+ is the one that stings if you rush it, and going slow all but removes that.</div>
         <div class="cmp-note"><span class="nl">Vial life</span>5 mL gives <strong>200 mg/mL</strong>; 75 mg is 0.375 mL. <strong>13 full doses per vial</strong> &mdash; about 4.3 weeks at 3&times;/wk. Two vials run <strong>~8.5 weeks</strong>.</div>
-      </div>
+      </details>
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">Semax &middot; 10 mg &middot; 1 vial <span class="cmp-badge">As Needed</span></div>
+      <details class="cmp-row">
+        <summary class="cmp-row-name">
+          <span class="cmp-head-main">
+            <span class="cmp-head-title">Semax &middot; 10 mg &middot; 1 vial <span class="cmp-badge">As Needed</span></span>
+            <span class="cmp-head-key">10u &middot; as needed</span>
+          </span>
+          <span class="cmp-price">$25</span>
+        </summary>
         <div class="cmp-fields">
           <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM &middot; fasted</span></div>
           <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC</span></div>
@@ -486,10 +539,16 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
         <div class="cmp-note"><span class="nl">Why it's here</span>The sharp-focus tool. Semax is a nootropic peptide that lifts BDNF and working memory &mdash; noticeably more acute than NAD+, which is why it's <strong>on-demand rather than scheduled</strong>. Save it for days that need it: heavy work, early starts, or a night of poor sleep.</div>
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>5 mg/mL</strong>; 500 mcg = 0.10 mL = <strong>10u</strong>. <strong>20 doses in the vial</strong> &mdash; how long that lasts is entirely up to how often you reach for it.</div>
-      </div>
+      </details>
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">CJC-1295 / Ipamorelin &middot; 10 mg &middot; 2 vials <span class="cmp-badge">PM</span></div>
+      <details class="cmp-row">
+        <summary class="cmp-row-name">
+          <span class="cmp-head-main">
+            <span class="cmp-head-title">CJC-1295 / Ipamorelin &middot; 10 mg &middot; 2 vials <span class="cmp-badge">PM</span></span>
+            <span class="cmp-head-key">10u &middot; Mon&ndash;Fri PM</span>
+          </span>
+          <span class="cmp-price">$90</span>
+        </summary>
         <div class="cmp-fields">
           <div class="fld"><span class="fld-l">Block</span><span class="fld-v">PM &middot; fasted</span></div>
           <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC per vial</span></div>
@@ -500,10 +559,16 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Why it's here</span>Your recovery and your muscle goal both route through the same place &mdash; the overnight GH pulse. CJC/Ipa amplifies your own natural release rather than replacing it, and the payoff lands as <strong>deeper sleep, faster recovery between sessions, and better lean-mass response</strong> to the training you're already doing. With sleep self-rated 4/5 there's real room for this one to earn its keep.</div>
         <div class="cmp-note"><span class="nl">Timing matters here</span>Fasted PM, <strong>at least 2 hours after your last food</strong> &mdash; carbs and insulin blunt the GH pulse this is designed to amplify. Routine: dinner &rarr; wait 2 hrs &rarr; inject &rarr; lights out within 30&ndash;60 min. If you ate too close to bed, skip it rather than dose it.</div>
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>5 mg/mL</strong>; 500 mcg = <strong>10u</strong>. <strong>20 doses per vial = 4 weeks</strong>; two vials run <strong>8 weeks</strong>.</div>
-      </div>
+      </details>
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">IGF-1 LR3 &middot; 1 mg &middot; 1 vial <span class="cmp-badge">10 Days On</span></div>
+      <details class="cmp-row">
+        <summary class="cmp-row-name">
+          <span class="cmp-head-main">
+            <span class="cmp-head-title">IGF-1 LR3 &middot; 1 mg &middot; 1 vial <span class="cmp-badge">10 Days On</span></span>
+            <span class="cmp-head-key">10u &middot; post-workout</span>
+          </span>
+          <span class="cmp-price">$40</span>
+        </summary>
         <div class="cmp-fields">
           <div class="fld"><span class="fld-l">Block</span><span class="fld-v">Post-workout</span></div>
           <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC</span></div>
@@ -514,7 +579,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Why it's here</span>The muscle-building piece, and it doubles as localized repair &mdash; IGF-1 drives satellite-cell activity, which is the same machinery that rebuilds damaged tissue. Run <strong>right after training</strong>, when blood flow to the worked tissue is highest.</div>
         <div class="cmp-note"><span class="nl">The 10-day block</span>Per your note: <strong>10 days straight, then off</strong> (you mentioned roughly 4 weeks off before the next block). Short blocks are the point &mdash; they get the anabolic signal without running it long enough for receptors to stop listening.</div>
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>0.5 mg/mL</strong>; 50 mcg = 0.10 mL = <strong>10u</strong>. <strong>20 doses in the vial = two full 10-day blocks.</strong></div>
-      </div>
+      </details>
 
     </div>
 
