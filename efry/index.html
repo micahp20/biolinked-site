@@ -33,6 +33,24 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-K8D30QZ2W8');
+// ===== COMPOUND ACCORDION =====
+// Only one compound card open at a time. details[name] handles this natively in
+// newer browsers; this listener does the same for older Safari, and is harmless
+// where the native behaviour already applies.
+(function(){
+  var list = document.querySelector('#tab-protocol .cmp-list');
+  if (!list) return;
+  var cards = [].slice.call(list.querySelectorAll('details.cmp-row'));
+  cards.forEach(function(d){
+    d.addEventListener('toggle', function(){
+      if (!d.open) return;
+      cards.forEach(function(other){
+        if (other !== d && other.open) other.open = false;
+      });
+    });
+  });
+})();
+
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -225,6 +243,25 @@ details.cmp-row:not([open]) > summary.cmp-row-name{border-bottom-color:transpare
 .tip-title{font-size:16px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:0.005em;}
 .tip-body{padding:6px 18px 14px;font-size:13.5px;line-height:1.7;color:var(--text);font-weight:400;}
 .tip-body strong{font-weight:700;}
+
+/* Collapsible tip cards — same +/- summary convention as the compound cards. */
+details.tip-card > summary.tip-head{
+  cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;
+  padding:13px 46px 13px 18px;min-height:56px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+details.tip-card > summary.tip-head::-webkit-details-marker{display:none;}
+details.tip-card > summary.tip-head::after{
+  content:'+';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;
+}
+details[open].tip-card > summary.tip-head::after{content:'\2212';background:var(--accent-dim);}
+details.tip-card > summary.tip-head:hover::after{border-color:var(--accent);}
+details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;}
+@media print{details.tip-card > summary.tip-head::after{display:none;}}
+@media(max-width:640px){details.tip-card > summary.tip-head{padding:13px 44px 13px 15px;}}
 .tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding:6px 0 4px;}
 .tip-list{list-style:none;margin:0;padding:0;}
 .tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--line-soft);overflow-wrap:break-word;margin:0;}
@@ -304,56 +341,8 @@ details.cmp-row:not([open]) > summary.cmp-row-name{border-bottom-color:transpare
 .pf-v{font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere;}
 .pf-v.alert{color:#b85555;}
 
-/* ===== Daily tracker ===== */
-.trk-intro{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:14px;}
-.trk-intro strong{color:var(--text);font-weight:700;}
-.trk-start{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:13px 16px;margin-bottom:12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.trk-start label{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);}
-.trk-start input[type=date]{background:var(--head);border:1px solid var(--line);border-radius:5px;padding:9px 10px;font-size:15px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;min-height:44px;}
-.trk-saved{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--green);background:var(--green-soft);border:1px solid rgba(58,122,90,0.3);padding:5px 10px;border-radius:99px;opacity:0;transition:opacity 0.3s;}
-.trk-saved.show{opacity:1;}
-.trk-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
-.trk-stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:13px 10px;text-align:center;}
-.trk-stat-v{font-size:23px;color:var(--accent);font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;}
-.trk-stat-l{font-size:8.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:4px;font-weight:700;}
-.trk-prog{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:11px 14px;margin-bottom:12px;}
-.trk-prog-top{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:7px;font-weight:700;}
-.trk-prog-bar{height:5px;background:var(--line);border-radius:3px;overflow:hidden;}
-.trk-prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:3px;transition:width 0.4s;width:0;}
-.trk-week-nav{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0;}
-.trk-wnav{width:44px;height:44px;background:var(--surface);border:1px solid var(--line);color:var(--accent);border-radius:6px;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;}
-.trk-wnav:hover{background:var(--hover);}
-.trk-wnav:disabled{opacity:0.3;cursor:not-allowed;}
-.trk-wlbl{font-size:17px;color:var(--text);font-weight:700;min-width:150px;text-align:center;line-height:1.2;}
-.trk-wlbl small{display:block;font-size:9px;font-weight:700;color:var(--accent);letter-spacing:0.14em;text-transform:uppercase;margin-top:3px;}
-.trk-grid-wrap{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:12px;margin-bottom:12px;overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.trk-grid-inner{min-width:440px;}
-.trk-dhr{display:grid;grid-template-columns:104px 1fr;gap:5px;margin-bottom:3px;}
-.trk-dhi{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
-.trk-dh{text-align:center;font-size:9px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--muted);padding:6px 2px;background:var(--head);border:1px solid var(--line);border-radius:4px 4px 0 0;}
-.trk-cmp-row{display:grid;grid-template-columns:104px 1fr;gap:5px;margin-bottom:4px;}
-.trk-cmp-lbl{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding-right:6px;text-align:right;}
-.trk-cmp-lbl-name{font-size:10px;font-weight:700;color:var(--accent);line-height:1.2;}
-.trk-cmp-lbl-sub{font-size:8px;color:var(--muted);font-weight:500;margin-top:1px;}
-.trk-drow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
-.trk-dc{background:var(--head);border:1px solid var(--line);min-height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.12s;font-size:13px;border-radius:4px;-webkit-tap-highlight-color:transparent;}
-.trk-dc.sched:hover{background:var(--accent-dim);}
-.trk-dc.taken{background:var(--green-soft);border-color:rgba(58,122,90,0.4);}
-.trk-dc.taken::after{content:'\2713';color:var(--green);font-weight:700;font-size:15px;}
-.trk-dc.sched:not(.taken)::after{content:'\25CB';color:var(--accent-line);font-size:12px;}
-.trk-dc.opt{background:transparent;border-style:dashed;}
-.trk-dc.opt:not(.taken)::after{content:'\25CB';color:var(--line);font-size:11px;}
-.trk-dc.rest{background:transparent;border-color:transparent;cursor:default;}
-.trk-dc.rest::after{content:'\2014';color:#d5d5d5;font-size:11px;}
-.trk-legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted);padding:2px 2px 0;}
-.trk-legend span{display:inline-flex;align-items:center;gap:5px;}
-.trk-reset{background:none;border:none;color:var(--muted);font-size:11px;text-decoration:underline;cursor:pointer;font-family:'Montserrat',sans-serif;padding:8px 4px;min-height:40px;}
 @media(max-width:640px){
-  .trk-stat-row{gap:6px;}
-  .trk-stat-v{font-size:20px;}
-  .trk-grid-inner{min-width:400px;}
   .profile-grid{padding-left:15px;padding-right:15px;}
-  .trk-intro,.trk-start,.trk-prog,.trk-grid-wrap{padding-left:14px;padding-right:14px;}
 }
 </style>
 </head>
@@ -420,7 +409,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
     <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
-    <button class="tab-btn" onclick="switchTab('tracker',this)">Tracker</button>
     <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
     <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
   </div>
@@ -464,7 +452,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
     <div class="cmp-list">
 
-      <details class="cmp-row">
+      <details class="cmp-row" name="efry-compounds">
         <summary class="cmp-row-name">
           <span class="cmp-head-main">
             <span class="cmp-head-title">KLOW Blend &middot; 80 mg &middot; 2 vials <span class="cmp-badge">Repair</span></span>
@@ -483,7 +471,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Vial life</span>3 mL gives <strong>26.67 mg/mL</strong>; a 15u draw is 0.15 mL = <strong>~4 mg</strong>. That's <strong>20 doses per vial = 4 weeks</strong> at Mon&ndash;Fri. Two vials run <strong>8 weeks</strong>. Mix one at a time.</div>
       </details>
 
-      <details class="cmp-row">
+      <details class="cmp-row" name="efry-compounds">
         <summary class="cmp-row-name">
           <span class="cmp-head-main">
             <span class="cmp-head-title">KPV &middot; 10 mg &middot; 2 vials <span class="cmp-badge">Anti-Inflam</span></span>
@@ -502,7 +490,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>5 mg/mL</strong>; 500 mcg is 0.10 mL = <strong>10u</strong>. <strong>20 doses per vial = 4 weeks</strong>; two vials run <strong>8 weeks</strong>, matching KLOW.</div>
       </details>
 
-      <details class="cmp-row">
+      <details class="cmp-row" name="efry-compounds">
         <summary class="cmp-row-name">
           <span class="cmp-head-main">
             <span class="cmp-head-title">NAD+ &middot; 1000 mg &middot; 2 vials <span class="cmp-badge">Cognitive</span></span>
@@ -522,7 +510,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Vial life</span>5 mL gives <strong>200 mg/mL</strong>; 75 mg is 0.375 mL. <strong>13 full doses per vial</strong> &mdash; about 4.3 weeks at 3&times;/wk. Two vials run <strong>~8.5 weeks</strong>.</div>
       </details>
 
-      <details class="cmp-row">
+      <details class="cmp-row" name="efry-compounds">
         <summary class="cmp-row-name">
           <span class="cmp-head-main">
             <span class="cmp-head-title">Semax &middot; 10 mg &middot; 1 vial <span class="cmp-badge">As Needed</span></span>
@@ -541,7 +529,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>5 mg/mL</strong>; 500 mcg = 0.10 mL = <strong>10u</strong>. <strong>20 doses in the vial</strong> &mdash; how long that lasts is entirely up to how often you reach for it.</div>
       </details>
 
-      <details class="cmp-row">
+      <details class="cmp-row" name="efry-compounds">
         <summary class="cmp-row-name">
           <span class="cmp-head-main">
             <span class="cmp-head-title">CJC-1295 / Ipamorelin &middot; 10 mg &middot; 2 vials <span class="cmp-badge">PM</span></span>
@@ -561,7 +549,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="cmp-note"><span class="nl">Vial life</span>2 mL gives <strong>5 mg/mL</strong>; 500 mcg = <strong>10u</strong>. <strong>20 doses per vial = 4 weeks</strong>; two vials run <strong>8 weeks</strong>.</div>
       </details>
 
-      <details class="cmp-row">
+      <details class="cmp-row" name="efry-compounds">
         <summary class="cmp-row-name">
           <span class="cmp-head-main">
             <span class="cmp-head-title">IGF-1 LR3 &middot; 1 mg &middot; 1 vial <span class="cmp-badge">10 Days On</span></span>
@@ -671,63 +659,11 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     <div class="chart-note"><div class="note-list">
       <div class="nr"><div class="nr-l">The morning window</div><div class="nr-v">All AM compounds go in <strong>fasted</strong>, back to back, using a <strong>different abdomen quadrant for each</strong>. Wait 30&ndash;45 min before eating. Mon/Wed/Fri is three draws; Tue/Thu is two.</div></div>
       <div class="nr"><div class="nr-l">The evening window</div><div class="nr-v">CJC/Ipamorelin needs <strong>2+ hours after your last food</strong> and works best 30&ndash;60 min before sleep. If you ate late, skip that night rather than dosing it &mdash; a skipped dose costs you nothing, a blunted one is just wasted.</div></div>
-      <div class="nr"><div class="nr-l">Three different draw marks</div><div class="nr-v"><strong>KLOW 15u</strong>, <strong>NAD+ 37.5u</strong>, and <strong>everything else 10u</strong>. Only three numbers to remember, and the tracker tab lists them next to each compound.</div></div>
+      <div class="nr"><div class="nr-l">Three different draw marks</div><div class="nr-v"><strong>KLOW 15u</strong>, <strong>NAD+ 37.5u</strong>, and <strong>everything else 10u</strong>. Only three numbers to remember, and each compound card lists its own draw on the header.</div></div>
       <div class="nr"><div class="nr-l">Then we reassess</div><div class="nr-v">Around week 8 most of the stack finishes together. Message Micah with how the knees, wrist and back are doing, how you're sleeping, and how your focus feels &mdash; that's when we decide what to rerun and whether you want the fat-loss piece added.</div></div>
     </div></div>
 
   </div><!-- /schedule -->
-
-  <!-- ================= TRACKER ================= -->
-  <div class="tab-content" id="tab-tracker">
-
-    <div class="sec-divider">
-      <div class="sec-divider-eyebrow">Daily Tracker</div>
-      <div class="sec-divider-title">Check Off Every Shot</div>
-    </div>
-
-    <div class="trk-intro"><strong>Tap a circle to log a dose.</strong> Your progress saves to this device automatically &mdash; close the page, come back later, it's still here. Dashed cells are Semax (on-demand, never counted against you); dashes are rest days.</div>
-
-    <div class="trk-start">
-      <label for="trkStart">Week 1 Monday</label>
-      <input type="date" id="trkStart">
-      <span class="trk-saved" id="trkSaved">&#10003; Saved</span>
-    </div>
-
-    <div class="trk-stat-row">
-      <div class="trk-stat"><div class="trk-stat-v" id="trkDone">0</div><div class="trk-stat-l">Doses Logged</div></div>
-      <div class="trk-stat"><div class="trk-stat-v" id="trkPct">0%</div><div class="trk-stat-l">This Week</div></div>
-      <div class="trk-stat"><div class="trk-stat-v" id="trkStreak">0</div><div class="trk-stat-l">Day Streak</div></div>
-    </div>
-
-    <div class="trk-prog">
-      <div class="trk-prog-top"><span>Cycle Progress</span><span id="trkProgLbl">0 / 0</span></div>
-      <div class="trk-prog-bar"><div class="trk-prog-fill" id="trkProgFill"></div></div>
-    </div>
-
-    <div class="trk-week-nav">
-      <button class="trk-wnav" id="trkPrev" aria-label="Previous week">&#8249;</button>
-      <div class="trk-wlbl" id="trkWlbl">Week 1<small>Set your start date</small></div>
-      <button class="trk-wnav" id="trkNext" aria-label="Next week">&#8250;</button>
-    </div>
-
-    <div class="trk-grid-wrap"><div class="trk-grid-inner">
-      <div class="trk-dhr">
-        <div></div>
-        <div class="trk-dhi">
-          <div class="trk-dh">Mon</div><div class="trk-dh">Tue</div><div class="trk-dh">Wed</div>
-          <div class="trk-dh">Thu</div><div class="trk-dh">Fri</div><div class="trk-dh">Sat</div><div class="trk-dh">Sun</div>
-        </div>
-      </div>
-      <div id="trkRows"></div>
-    </div></div>
-
-    <div class="trk-legend">
-      <span>&#9711; Scheduled</span><span style="color:var(--green)">&#10003; Logged</span><span>&#9711; Dashed = as-needed</span><span>&mdash; Rest</span>
-    </div>
-
-    <div style="text-align:center;margin-top:8px;"><button class="trk-reset" id="trkReset">Reset all tracking</button></div>
-
-  </div><!-- /tracker -->
 
   <!-- ================= SUPPLIES ================= -->
   <div class="tab-content" id="tab-supplies">
@@ -792,8 +728,8 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       <div class="sec-divider-title">Read Before Day 1</div>
     </div>
 
-    <div class="tip-card featured">
-      <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; The First One</div><div class="tip-title">Getting Past the Needle</div></div>
+    <details class="tip-card featured">
+      <summary class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; The First One</div><div class="tip-title">Getting Past the Needle</div></summary>
       <div class="tip-body">
         <div class="tip-lead">You said you wanted to see if you can stand the needle. You can &mdash; and here's how to make the first one as easy as possible.</div>
         <ul class="tip-list">
@@ -804,10 +740,10 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <li><strong>It gets boring fast.</strong> Almost everyone stops thinking about it by the end of week one. The anticipation really is the hard part.</li>
         </ul>
       </div>
-    </div>
+    </details>
 
-    <div class="tip-card featured">
-      <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; The Routine</div><div class="tip-title">Two Windows, Weekdays Only</div></div>
+    <details class="tip-card featured">
+      <summary class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; The Routine</div><div class="tip-title">Two Windows, Weekdays Only</div></summary>
       <div class="tip-body">
         <div class="tip-lead">Everything sits in one of two windows. Build them into things you already do and there's nothing to remember.</div>
         <ul class="tip-list">
@@ -818,10 +754,10 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <li><strong>Missed one? Skip it.</strong> Don't double up. Nothing here is dependent on a perfect streak.</li>
         </ul>
       </div>
-    </div>
+    </details>
 
-    <div class="tip-card featured">
-      <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; Week by Week</div><div class="tip-title">What to Expect</div></div>
+    <details class="tip-card featured">
+      <summary class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; Week by Week</div><div class="tip-title">What to Expect</div></summary>
       <div class="tip-body">
         <div class="tip-lead">Healing peptides are quieter than stimulants &mdash; the changes show up as things that stop bothering you rather than something you feel switch on.</div>
         <ul class="tip-list">
@@ -831,10 +767,10 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <li><strong>Weeks 7&ndash;8 &mdash; the picture.</strong> Most vials finish together here. Best judgment isn't the scale &mdash; it's whether the knees, wrist and back are better than in week 1, and whether you're recovering faster. Message Micah and we'll decide what to rerun.</li>
         </ul>
       </div>
-    </div>
+    </details>
 
-    <div class="tip-card">
-      <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Getting the Most Out of It</div><div class="tip-title">What You Control</div></div>
+    <details class="tip-card">
+      <summary class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Getting the Most Out of It</div><div class="tip-title">What You Control</div></summary>
       <div class="tip-body">
         <div class="tip-lead">The stack raises your ceiling. These are the things that decide how much of it you actually collect.</div>
         <ul class="tip-list">
@@ -845,7 +781,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <li><strong>Hydrate.</strong> NAD+ especially goes down easier and stings less when you're not underhydrated.</li>
         </ul>
       </div>
-    </div>
+    </details>
 
   </div><!-- /notes -->
 
@@ -867,7 +803,7 @@ function switchTab(tab, btn){
   btn.classList.add('active');
 }
 
-// ===== PROTOCOL DEFINITION (shared by .ics + tracker) =====
+// ===== PROTOCOL DEFINITION (drives the .ics export) =====
 // weekday: 0=Mon .. 6=Sun. dayIdx = days since Week 1 Monday.
 var PROTOCOL = [
   { key:'klow',  name:'KLOW',      sub:'15u AM',    draw:'15u',   label:'KLOW Blend ~4 mg -> 15u (SubQ abdomen, fasted)',        block:'AM',
@@ -937,116 +873,6 @@ function downloadICS(){
   setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 1000);
 }
 
-// ===== DAILY TRACKER =====
-(function(){
-  var KEY = 'bl-tracker-efry';
-  var WEEKS = 8;
-  var state = { start:'', done:{} };
-  var week = 0;
-
-  function load(){
-    try { var raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch(e){}
-    if (!state.done) state.done = {};
-  }
-  function save(){
-    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
-    var s = document.getElementById('trkSaved');
-    s.classList.add('show'); setTimeout(function(){ s.classList.remove('show'); }, 1200);
-  }
-  function startDate(){
-    if (!state.start) return null;
-    var p = state.start.split('-');
-    return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
-  }
-  function fmtRange(w){
-    var sd = startDate(); if (!sd) return 'Set your start date';
-    var a = new Date(sd); a.setDate(a.getDate() + w*7);
-    var b = new Date(a);  b.setDate(b.getDate() + 6);
-    var M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    return M[a.getMonth()]+' '+a.getDate()+' – '+M[b.getMonth()]+' '+b.getDate();
-  }
-  function render(){
-    var rows = document.getElementById('trkRows');
-    var html = '';
-    PROTOCOL.forEach(function(c){
-      html += '<div class="trk-cmp-row"><div class="trk-cmp-lbl">' +
-              '<div class="trk-cmp-lbl-name">' + c.name + '</div>' +
-              '<div class="trk-cmp-lbl-sub">' + c.sub + '</div></div><div class="trk-drow">';
-      for (var wd=0; wd<7; wd++){
-        var dayIdx = week*7 + wd;
-        var st = c.on(dayIdx, wd);
-        var id = c.key + '-' + dayIdx;
-        var taken = !!state.done[id];
-        var cls = 'trk-dc ' + st + (taken ? ' taken' : '');
-        html += (st === 'rest')
-          ? '<div class="' + cls + '"></div>'
-          : '<div class="' + cls + '" data-cell="' + id + '" role="button" tabindex="0" aria-label="' + c.name + '"></div>';
-      }
-      html += '</div></div>';
-    });
-    rows.innerHTML = html;
-
-    // stats
-    var weekSched = 0, weekDone = 0, allSched = 0, allDone = 0;
-    for (var w=0; w<WEEKS; w++){
-      for (var wd=0; wd<7; wd++){
-        var di = w*7+wd;
-        PROTOCOL.forEach(function(c){
-          if (c.on(di, wd) !== 'sched') return;      // 'opt' never counts against him
-          allSched++;
-          var t = !!state.done[c.key + '-' + di];
-          if (t) allDone++;
-          if (w === week){ weekSched++; if (t) weekDone++; }
-        });
-      }
-    }
-    var totalLogged = Object.keys(state.done).filter(function(k){ return state.done[k]; }).length;
-    document.getElementById('trkDone').textContent = totalLogged;
-    document.getElementById('trkPct').textContent = weekSched ? Math.round(weekDone/weekSched*100) + '%' : '0%';
-
-    // streak: consecutive days (ending at the last logged day) with every scheduled dose logged
-    var streak = 0;
-    for (var d = WEEKS*7 - 1; d >= 0; d--){
-      var wd2 = d % 7, need = 0, got = 0;
-      PROTOCOL.forEach(function(c){
-        if (c.on(d, wd2) !== 'sched') return;
-        need++; if (state.done[c.key + '-' + d]) got++;
-      });
-      if (!need) continue;
-      if (got === need && need > 0){ streak++; }
-      else if (got > 0 || streak > 0){ if (streak > 0) break; }
-    }
-    document.getElementById('trkStreak').textContent = streak;
-    document.getElementById('trkProgLbl').textContent = allDone + ' / ' + allSched;
-    document.getElementById('trkProgFill').style.width = allSched ? (allDone/allSched*100) + '%' : '0%';
-    document.getElementById('trkWlbl').innerHTML = 'Week ' + (week+1) + '<small>' + fmtRange(week) + '</small>';
-    document.getElementById('trkPrev').disabled = (week === 0);
-    document.getElementById('trkNext').disabled = (week === WEEKS-1);
-  }
-
-  document.getElementById('trkRows').addEventListener('click', function(e){
-    var cell = e.target.closest('[data-cell]'); if (!cell) return;
-    var id = cell.getAttribute('data-cell');
-    state.done[id] = !state.done[id];
-    if (!state.done[id]) delete state.done[id];
-    save(); render();
-  });
-  document.getElementById('trkPrev').addEventListener('click', function(){ if (week>0){ week--; render(); } });
-  document.getElementById('trkNext').addEventListener('click', function(){ if (week<WEEKS-1){ week++; render(); } });
-  document.getElementById('trkStart').addEventListener('change', function(){
-    state.start = this.value; save(); render();
-    var cs = document.getElementById('cycleStart');
-    if (cs && !cs.value) cs.value = this.value;
-  });
-  document.getElementById('trkReset').addEventListener('click', function(){
-    if (!confirm('Reset all tracked doses? This cannot be undone.')) return;
-    state.done = {}; save(); render();
-  });
-
-  load();
-  if (state.start) document.getElementById('trkStart').value = state.start;
-  render();
-})();
 </script>
 
 <!-- PWA install banner + service worker -->
