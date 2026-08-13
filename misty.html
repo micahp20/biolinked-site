@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>BioLinked · Misty</title>
+
+<script>
+/* ============================================================================
+   ██  CONFIG — THIS IS THE ONLY BLOCK YOU EDIT FOR A NEW CLIENT  ██
+   ============================================================================
+   Copy this file, change the values below, save as <clientname>.html. Done.
+   Nothing outside this block ever needs to be touched.
+
+   QUICK RULES
+   -----------
+   • compounds[].status   must be exactly "Active", "Next", or "As needed"
+                          Active    = green pill, AND shows up in the Schedule tab
+                          Next      = amber pill, hidden from Schedule until you
+                                      switch it to "Active"
+                          As needed = gold pill, never on the Schedule
+   • compounds[].days     which weekdays it shows on the Schedule tab.
+                          Use "Mon","Tue","Wed","Thu","Fri","Sat","Sun".
+                          Any day with nothing on it prints "Rest day".
+   • compounds[].price    free text — "$70", "$70/vial", "included", whatever.
+   • orders[].amount      must be a NUMBER (230, not "$230"). The running total,
+                          the balance-owed tile and the order count are all added
+                          up from this list automatically — don't hand-total them.
+   • orders[].paid        true or false. Anything false adds to "Balance owed".
+   • inventory[].status   "Reorder now" (red), "Soon" (amber), "Good" or
+                          "Stocked" (green).
+============================================================================ */
+
+const CONFIG = {
+
+  /* ---- Brand (rarely changes) ------------------------------------------ */
+  brand: {
+    name: "BioLinked",
+    mark: "B"                       // the letter in the little gold square
+  },
+
+  /* ---- Who this page is for -------------------------------------------- */
+  client: {
+    greeting:      "Hi, Misty 👋",   // big hello on the Client view
+    subtitle:      "What to take, when, and what you've ordered.",
+    tags:          ["Recovery", "Energy", "Longevity"],   // little pills under the hello
+    fullName:      "Misty Jirikils", // header on the Admin view
+    adminSubtitle: "Protocol, orders, and inventory — one client."
+  },
+
+  /* ---- The protocol ----------------------------------------------------- */
+  compounds: [
+    {
+      name:        "KLOW",
+      category:    "Healing & Recovery",
+      status:      "Active",
+      dose:        "15 units",
+      when:        "AM · M–F",              // short label on the card
+      price:       "$70",
+      time:        "Morning (fasted)",      // longer label, shown in the pop-up
+      schedule:    "Monday–Friday",         // longer label, shown in the pop-up
+      days:        ["Mon","Tue","Wed","Thu","Fri"],
+      description: "Recovery blend (BPC-157, TB-500, GHK-Cu, KPV) for soft-tissue and joint healing."
+    },
+    {
+      name:        "MOTS-C",
+      category:    "Energy",
+      status:      "Active",
+      dose:        "10 units",
+      when:        "AM · M–F",
+      price:       "$80",
+      time:        "Morning",
+      schedule:    "Monday–Friday",
+      days:        ["Mon","Tue","Wed","Thu","Fri"],
+      description: "Activates AMPK for a cellular energy boost. Run ~4 weeks."
+    },
+    {
+      name:        "NAD+",
+      category:    "Cellular Energy",
+      status:      "Next",
+      dose:        "25→37.5 units",
+      when:        "AM · M/W/F",
+      price:       "$75",
+      time:        "Morning",
+      schedule:    "Mon / Wed / Fri — starts next cycle",
+      days:        ["Mon","Wed","Fri"],
+      description: "Slow-push protocol. Start at 25 units and titrate up as tolerated."
+    },
+    {
+      name:        "Selank",
+      category:    "Calm",
+      status:      "As needed",
+      dose:        "10 units",
+      when:        "When needed",
+      price:       "$45",
+      time:        "Any time",
+      schedule:    "As needed (PRN)",
+      days:        [],
+      description: "Fast-acting calm, 30–60 min relief for situational anxiety."
+    }
+  ],
+
+  /* ---- Orders (newest first). amount = number, no dollar sign ----------- */
+  orders: [
+    { date: "Aug 8, 2026",  items: "MOTS-C ×1 · NAD+ ×2", amount: 230, paid: true },
+    { date: "Jul 12, 2026", items: "KLOW ×2 (1 free)",    amount:  70, paid: true },
+    { date: "May 2, 2026",  items: "Starter stack",       amount: 570, paid: true }
+  ],
+
+  /* Left-hand label on the running-total bar when nothing is owed.
+     If any order is unpaid the bar switches to "Balance due" on its own. */
+  paidInFullLabel: "Paid in full · Venmo",
+
+  /* ---- "What changed" timeline on the Orders tab ------------------------ */
+  history: [
+    { date: "Aug 8",  text: "MOTS-C added" },
+    { date: "Jul 12", text: "NAD+ and Semax added" },
+    { date: "Jun 20", text: "KLOW added" },
+    { date: "May 10", text: "Protocol started" }
+  ],
+
+  /* ---- Admin: vial / dose counts --------------------------------------- */
+  inventory: [
+    { name: "KLOW",   detail: "~0.6 vial · out Aug 22", status: "Reorder now" },
+    { name: "NAD+",   detail: "~3 doses · out Aug 17",  status: "Soon"        },
+    { name: "MOTS-C", detail: "~12 doses left",         status: "Good"        },
+    { name: "Selank", detail: "2 vials stocked",        status: "Stocked"     }
+  ],
+
+  /* ---- Admin: running activity log ------------------------------------- */
+  activity: [
+    { date: "Aug 8",  text: "MOTS-C ×1 ordered · $230 paid" },
+    { date: "Aug 8",  text: "MOTS-C added to protocol" },
+    { date: "Jul 12", text: "NAD+ ×2 ordered · $160 paid" },
+    { date: "Jun 20", text: "KLOW added to protocol" }
+  ]
+
+};
+/* =========================== END OF CONFIG ============================== */
+</script>
+
+<style>
+  :root{
+    --cream:#f4f1e8; --card:#fffdf7; --card-2:#faf6ec;
+    --ink:#201c13; --muted:#7c766b; --gold:#7a6530; --gold-2:#63501d;
+    --line:#e7dfcb; --line-2:#f0eadb;
+    --green:#2c7a54; --green-bg:#e3f1e8; --amber:#9c7418; --amber-bg:#f7eccd; --red:#b34635; --red-bg:#f6e2dc;
+    --gold-bg:#f0e7d2;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    --shadow:0 1px 2px rgba(60,45,20,.04),0 8px 22px rgba(60,45,20,.07);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{background:#e8e2d3;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;
+       display:flex;justify-content:center}
+
+  /* phone frame */
+  .app{width:100%;max-width:440px;min-height:100vh;background:var(--cream);position:relative;
+       box-shadow:0 0 0 1px rgba(0,0,0,.03),0 30px 80px rgba(60,45,20,.14)}
+  .scroll{padding:0 16px calc(24px + env(safe-area-inset-bottom))}
+
+  /* sticky header */
+  .head{position:sticky;top:0;z-index:30;background:rgba(244,241,232,.92);backdrop-filter:blur(12px);
+        padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:-.01em}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#a2894a);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
+  .switch{display:flex;gap:5px;background:#e5dcc7;padding:5px;border-radius:13px;margin-top:12px}
+  .switch button{flex:1;border:0;padding:12px;border-radius:9px;background:transparent;font:inherit;font-weight:700;font-size:14.5px;color:var(--muted);cursor:pointer;transition:.15s}
+  .switch button.on{background:#fff;color:var(--gold-2);box-shadow:var(--shadow)}
+
+  .view{display:none} .view.on{display:block;animation:f .25s ease}
+  @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .hero{padding:20px 4px 6px}
+  .eyebrow{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+  .hero h1{margin:6px 0 4px;font-size:28px;letter-spacing:-.02em;line-height:1.15}
+  .hero .muted{font-size:15px}
+  .muted{color:var(--muted)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
+  .chip{background:var(--card);border:1px solid var(--line);color:var(--gold-2);padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:700}
+
+  /* sticky tab bar */
+  .tabs{position:sticky;top:112px;z-index:20;display:flex;gap:4px;background:var(--cream);padding:12px 0 8px}
+  .tabs button{flex:1;border:0;background:var(--card-2);font:inherit;font-weight:700;font-size:14px;color:var(--muted);
+                padding:11px 4px;cursor:pointer;border-radius:11px;border:1px solid var(--line-2)}
+  .tabs button.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+
+  .panel{display:none} .panel.on{display:block}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
+  h2{font-size:18px;letter-spacing:-.01em;margin:2px 0 2px}
+  .sec-sub{font-size:14px;color:var(--muted);margin:0 0 14px}
+
+  /* compound cards — full width, big */
+  .compound-name{font-size:23px;font-weight:800;letter-spacing:-.01em;margin:8px 0 2px}
+  .status{font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;float:right}
+  .st-active{background:var(--green-bg);color:var(--green)}
+  .st-next{background:var(--amber-bg);color:var(--amber)}
+  .st-prn{background:var(--gold-bg);color:var(--gold-2)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
+  .mini{background:var(--card-2);border:1px solid var(--line-2);border-radius:13px;padding:11px 13px;min-width:0}
+  .mini span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.03em;font-weight:700}
+  .mini b{font-size:15.5px;overflow-wrap:break-word}
+  .row3 .mini{padding:11px 10px}
+  .row3 .mini b{font-size:14.5px}
+  .mini.price b{color:var(--gold-2)}
+  .details{width:100%;margin-top:14px;background:transparent;border:1.5px solid var(--line);color:var(--gold-2);
+           padding:13px;border-radius:12px;font:inherit;font-weight:800;font-size:14.5px;cursor:pointer}
+  .details:active{background:var(--gold-bg)}
+
+  /* weekly schedule — vertical day rows */
+  .dayrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line-2)}
+  .dayrow:last-child{border:0}
+  .dbadge{width:52px;height:52px;flex-shrink:0;border-radius:14px;background:var(--gold-bg);color:var(--gold-2);
+          display:grid;place-content:center;text-align:center;font-weight:800;font-size:13px;line-height:1}
+  .dayrow.off .dbadge{background:var(--card-2);color:var(--muted)}
+  .doses{display:flex;flex-wrap:wrap;gap:7px}
+  .dose{font-size:14px;font-weight:700;color:var(--gold-2);background:var(--card-2);border:1px solid var(--line);
+        border-radius:9px;padding:6px 11px}
+  .restlab{font-size:14.5px;color:var(--muted)}
+
+  /* orders */
+  .listrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line-2)}
+  .listrow:last-child{border:0}
+  .listrow .lt b{font-size:15.5px}
+  .listrow .lt .muted{font-size:13.5px}
+  .amt{text-align:right;font-weight:800;font-size:16px;white-space:nowrap}
+  .paid{color:var(--green);font-weight:800;font-size:12px;margin-top:2px}
+  .unpaid{color:var(--red);font-weight:800;font-size:12px;margin-top:2px}
+  .totbar{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:16px 18px;
+          background:var(--gold-bg);border:1px solid var(--line);border-radius:14px;font-weight:800;font-size:15px}
+  .totbar .big{font-size:22px}
+
+  .timeline{border-left:2px solid #cdbb8c;padding-left:18px;margin-top:6px}
+  .event{margin-bottom:16px;position:relative;font-size:15px}
+  .event:last-child{margin-bottom:0}
+  .event::before{content:"";position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--card)}
+
+  /* admin */
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 17px;box-shadow:var(--shadow)}
+  .stat b{font-size:27px;display:block;letter-spacing:-.02em;line-height:1.1}
+  .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-weight:700}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .actions button{border:0;border-radius:13px;padding:15px 10px;font:inherit;font-weight:800;font-size:14.5px;background:var(--gold);color:#fff;cursor:pointer}
+  .actions button:active{background:var(--gold-2)}
+  .actions .secondary{background:var(--card);color:var(--gold-2);border:1.5px solid var(--line)}
+  .pillstat{font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;white-space:nowrap}
+  .ps-good{background:var(--green-bg);color:var(--green)}
+  .ps-soon{background:var(--amber-bg);color:var(--amber)}
+  .ps-low{background:var(--red-bg);color:var(--red)}
+
+  /* modal — slides up from bottom, sheet style */
+  .modal{display:none;position:fixed;inset:0;background:rgba(25,20,12,.5);z-index:60;align-items:flex-end;justify-content:center}
+  .modal.on{display:flex;animation:f .2s ease}
+  .modalbox{width:100%;max-width:440px;background:var(--card);padding:22px 20px calc(24px + env(safe-area-inset-bottom));
+            border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:up .28s cubic-bezier(.2,.8,.2,1);
+            max-height:92vh;overflow-y:auto}
+  @keyframes up{from{transform:translateY(60px)}to{transform:none}}
+  .grab{width:40px;height:5px;border-radius:3px;background:#e0d6bf;margin:0 auto 14px}
+  .close{float:right;border:0;background:#ece3d1;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:800;color:var(--muted)}
+  .field{margin:14px 0}
+  .field label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted);font-weight:700}
+  input,select,textarea{width:100%;padding:14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font:inherit;font-size:16px;font-family:var(--sans)}
+  textarea{min-height:84px;resize:vertical}
+  .save{width:100%;border:0;background:var(--gold);color:#fff;padding:15px;border-radius:12px;font:inherit;font-weight:800;font-size:15.5px;cursor:pointer;margin-top:6px}
+  .save:active{background:var(--gold-2)}
+  .hint{font-size:13px;color:var(--muted);margin:2px 0 0}
+
+  /* day picker in the add-compound sheet */
+  .daysel{display:flex;flex-wrap:wrap;gap:6px}
+  .daysel label{display:inline-flex;align-items:center;gap:6px;background:var(--card-2);border:1.5px solid var(--line);
+                border-radius:10px;padding:9px 11px;font-size:14px;font-weight:700;color:var(--gold-2);cursor:pointer;margin:0}
+  .daysel input{width:auto;padding:0;margin:0}
+
+  /* "paste this into CONFIG" output */
+  .cfgout{display:none;margin-top:14px;background:#2a2418;color:#f4e9cf;border-radius:12px;padding:14px;
+          font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;
+          word-break:break-word;-webkit-user-select:all;user-select:all}
+  .cfgout.on{display:block}
+  .cfglab{font-size:12px;color:var(--muted);font-weight:700;margin-top:14px}
+
+  /* edit-protocol rows */
+  .editrow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line-2)}
+  .editrow:last-child{border:0}
+  .editrow b{flex:1;font-size:15.5px}
+  .editrow select{width:auto;padding:9px 10px;font-size:14px;border-radius:10px}
+  .rm{border:0;background:var(--red-bg);color:var(--red);border-radius:10px;padding:10px 12px;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+
+  @media(min-width:441px){ .app{margin:22px 0;min-height:auto;border-radius:26px;overflow:hidden}
+    .head{border-radius:26px 26px 0 0} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="head">
+    <div class="brand"><span class="mark" id="brandMark"></span><span id="brandName"></span></div>
+    <div class="switch">
+      <button id="cb" class="on" onclick="view('client')">Client</button>
+      <button id="ab" onclick="view('admin')">Admin</button>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+  <!-- ===================== CLIENT ===================== -->
+  <section id="client" class="view on">
+    <div class="hero">
+      <div class="eyebrow">My Protocol</div>
+      <h1 id="greeting"></h1>
+      <div class="muted" id="subtitle"></div>
+      <div class="chips" id="tags"></div>
+    </div>
+
+    <div class="tabs">
+      <button class="on" onclick="tab('protocol',this)">Protocol</button>
+      <button onclick="tab('schedule',this)">Schedule</button>
+      <button onclick="tab('orders',this)">Orders</button>
+    </div>
+
+    <div id="protocol" class="panel on"></div>
+
+    <div id="schedule" class="panel">
+      <div class="card">
+        <h2>Your week</h2>
+        <p class="sec-sub">Everything active, in one place.</p>
+        <div id="week"></div>
+      </div>
+    </div>
+
+    <div id="orders" class="panel">
+      <div class="card">
+        <h2>Your orders</h2>
+        <p class="sec-sub">One running total — no scattered numbers.</p>
+        <div id="orderList"></div>
+        <div class="totbar"><span id="totLabel"></span><span class="big" id="totAmount"></span></div>
+      </div>
+      <div class="card">
+        <h2>What changed</h2>
+        <p class="sec-sub">Your protocol history.</p>
+        <div class="timeline" id="historyList"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN ===================== -->
+  <section id="admin" class="view">
+    <div class="hero">
+      <div class="eyebrow">Admin · Client</div>
+      <h1 id="adminName"></h1>
+      <div class="muted" id="adminSubtitle"></div>
+    </div>
+
+    <div class="stats" id="statTiles"></div>
+
+    <div class="actions">
+      <button onclick="show('orderModal')">+ Add order</button>
+      <button onclick="show('compoundModal')">+ Add compound</button>
+      <button class="secondary" onclick="openEdit()">Edit protocol</button>
+      <button class="secondary" onclick="show('noteModal')">Add note</button>
+    </div>
+
+    <div class="card">
+      <h2>Inventory</h2>
+      <p class="sec-sub">Doses left, so you reorder in time.</p>
+      <div id="inventoryList"></div>
+    </div>
+
+    <div class="card">
+      <h2>Recent activity</h2>
+      <p class="sec-sub">The running log for this client.</p>
+      <div id="activityList"></div>
+    </div>
+  </section>
+
+  </div>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+<div id="detailsModal" class="modal" onclick="bg(event,'detailsModal')"><div class="modalbox">
+  <div class="grab"></div>
+  <button class="close" onclick="hide('detailsModal')">✕</button>
+  <div class="eyebrow" id="dcat">Details</div>
+  <h2 id="dn" style="margin:6px 0 14px;font-size:24px"></h2>
+  <div class="row2"><div class="mini"><span>Dose</span><b id="dd"></b></div><div class="mini"><span>When</span><b id="dt"></b></div></div>
+  <div class="row2"><div class="mini"><span>Schedule</span><b id="ds"></b></div><div class="mini price"><span>Price</span><b id="dp"></b></div></div>
+  <p class="muted" id="dwhy" style="font-size:14.5px;margin-top:16px"></p>
+</div></div>
+
+<div id="orderModal" class="modal" onclick="bg(event,'orderModal')"><div class="modalbox">
+  <div class="grab"></div>
+  <button class="close" onclick="hide('orderModal')">✕</button>
+  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Add order</h2>
+  <p class="hint">Type anything you want — nothing here is locked to a list.</p>
+  <div class="field"><label>Date</label><input id="o_date" placeholder="Aug 20, 2026"></div>
+  <div class="field"><label>Items</label><input id="o_items" placeholder="MOTS-C ×1 · NAD+ ×2"></div>
+  <div class="field"><label>Amount (numbers only)</label><input id="o_amount" placeholder="230" inputmode="decimal"></div>
+  <div class="field"><label>Payment</label><select id="o_paid"><option value="yes">Paid</option><option value="no">Unpaid</option></select></div>
+  <button class="save" onclick="addOrder()">Save order</button>
+  <div class="cfglab" id="o_lab" style="display:none">Paste this into the <b>orders</b> list in CONFIG to keep it:</div>
+  <div class="cfgout" id="o_out"></div>
+</div></div>
+
+<div id="compoundModal" class="modal" onclick="bg(event,'compoundModal')"><div class="modalbox">
+  <div class="grab"></div>
+  <button class="close" onclick="hide('compoundModal')">✕</button>
+  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Add to protocol</h2>
+  <p class="hint">Type anything you want — nothing here is locked to a list.</p>
+  <div class="field"><label>Compound name</label><input id="c_name" placeholder="Epithalon"></div>
+  <div class="field"><label>Category</label><input id="c_cat" placeholder="Longevity"></div>
+  <div class="field"><label>Dose</label><input id="c_dose" placeholder="10 units"></div>
+  <div class="field"><label>When (short label)</label><input id="c_when" placeholder="AM · M–F"></div>
+  <div class="field"><label>Price</label><input id="c_price" placeholder="$90"></div>
+  <div class="field"><label>Status</label><select id="c_status"><option>Active</option><option>Next</option><option>As needed</option></select></div>
+  <div class="field"><label>Days on the schedule</label><div class="daysel" id="c_days"></div></div>
+  <div class="field"><label>Description</label><textarea id="c_desc" placeholder="What it does and why it's in the protocol."></textarea></div>
+  <button class="save" onclick="addCompound()">Add to protocol</button>
+  <div class="cfglab" id="c_lab" style="display:none">Paste this into the <b>compounds</b> list in CONFIG to keep it:</div>
+  <div class="cfgout" id="c_out"></div>
+</div></div>
+
+<div id="noteModal" class="modal" onclick="bg(event,'noteModal')"><div class="modalbox">
+  <div class="grab"></div>
+  <button class="close" onclick="hide('noteModal')">✕</button>
+  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Add note</h2>
+  <div class="field"><label>Date</label><input id="n_date" placeholder="Aug 20"></div>
+  <div class="field"><label>Note</label><textarea id="n_text" placeholder="Called about the NAD+ flush — told her to slow the push."></textarea></div>
+  <button class="save" onclick="addNote()">Save note</button>
+  <div class="cfglab" id="n_lab" style="display:none">Paste this into the <b>activity</b> list in CONFIG to keep it:</div>
+  <div class="cfgout" id="n_out"></div>
+</div></div>
+
+<div id="editModal" class="modal" onclick="bg(event,'editModal')"><div class="modalbox">
+  <div class="grab"></div>
+  <button class="close" onclick="hide('editModal')">✕</button>
+  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Edit protocol</h2>
+  <p class="hint">Change a status or remove a compound. Active compounds appear on the client's Schedule tab.</p>
+  <div id="editList"></div>
+  <button class="save" onclick="hide('editModal')">Done</button>
+</div></div>
+
+<script>
+/* ---------------------------------------------------------------------------
+   Rendering. Nothing below here needs editing for a new client — it just draws
+   whatever is in CONFIG above.
+--------------------------------------------------------------------------- */
+const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
+const STATUS_CLASS = { "Active":"st-active", "Next":"st-next", "As needed":"st-prn" };
+const STOCK_CLASS  = { "Reorder now":"ps-low", "Soon":"ps-soon", "Good":"ps-good", "Stocked":"ps-good" };
+const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const money = n => "$" + Number(n||0).toLocaleString("en-US");
+const $ = id => document.getElementById(id);
+
+function renderHeader(){
+  $("brandMark").textContent = CONFIG.brand.mark;
+  $("brandName").textContent = CONFIG.brand.name;
+  $("greeting").textContent  = CONFIG.client.greeting;
+  $("subtitle").textContent  = CONFIG.client.subtitle;
+  $("tags").innerHTML = (CONFIG.client.tags||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join("");
+  $("adminName").textContent = CONFIG.client.fullName;
+  $("adminSubtitle").textContent = CONFIG.client.adminSubtitle;
+  document.title = CONFIG.brand.name + " · " + CONFIG.client.fullName;
+}
+
+function renderProtocol(){
+  $("protocol").innerHTML = CONFIG.compounds.map((c,i) => `
+      <div class="card">
+        <span class="status ${STATUS_CLASS[c.status]||"st-prn"}">● ${esc(c.status)}</span>
+        <div class="eyebrow">${esc(c.category)}</div>
+        <div class="compound-name">${esc(c.name)}</div>
+        <div class="row3">
+          <div class="mini"><span>Dose</span><b>${esc(c.dose)}</b></div>
+          <div class="mini"><span>When</span><b>${esc(c.when)}</b></div>
+          <div class="mini price"><span>Price</span><b>${esc(c.price)}</b></div>
+        </div>
+        <button class="details" onclick="details(${i})">View details</button>
+      </div>`).join("");
+}
+
+function renderSchedule(){
+  const active = CONFIG.compounds.filter(c => c.status === "Active");
+  $("week").innerHTML = DAYS.map(day => {
+    const on = active.filter(c => (c.days||[]).includes(day));
+    if(!on.length){
+      return `<div class="dayrow off"><div class="dbadge">${day.toUpperCase()}</div><span class="restlab">Rest day</span></div>`;
+    }
+    const pills = on.map(c => `<span class="dose">${esc(c.name)} ${esc(c.dose)}</span>`).join("");
+    return `<div class="dayrow"><div class="dbadge">${day.toUpperCase()}</div><div class="doses">${pills}</div></div>`;
+  }).join("");
+}
+
+function totals(){
+  const total = CONFIG.orders.reduce((s,o) => s + Number(o.amount||0), 0);
+  const owed  = CONFIG.orders.filter(o => !o.paid).reduce((s,o) => s + Number(o.amount||0), 0);
+  return { total, owed };
+}
+
+function renderOrders(){
+  $("orderList").innerHTML = CONFIG.orders.map(o => `
+      <div class="listrow">
+        <div class="lt"><b>${esc(o.date)}</b><div class="muted">${esc(o.items)}</div></div>
+        <div class="amt">${money(o.amount)}<div class="${o.paid?"paid":"unpaid"}">${o.paid?"PAID ✓":"UNPAID"}</div></div>
+      </div>`).join("");
+  const { total, owed } = totals();
+  $("totLabel").textContent  = owed > 0 ? ("Balance due · " + money(owed)) : CONFIG.paidInFullLabel;
+  $("totAmount").textContent = money(total);
+  $("historyList").innerHTML = CONFIG.history.map(h =>
+      `<div class="event"><b>${esc(h.date)}</b> · ${esc(h.text)}</div>`).join("");
+}
+
+function renderAdmin(){
+  const { total, owed } = totals();
+  const last = CONFIG.orders.length ? String(CONFIG.orders[0].date).replace(/,.*$/,"") : "—";
+  const tiles = [
+    [CONFIG.compounds.length, "Compounds"],
+    [CONFIG.orders.length,    "Orders"],
+    [money(owed),             "Balance owed"],
+    [last,                    "Last order"]
+  ];
+  $("statTiles").innerHTML = tiles.map(t =>
+      `<div class="stat"><b>${esc(t[0])}</b><span>${esc(t[1])}</span></div>`).join("");
+  $("inventoryList").innerHTML = CONFIG.inventory.map(v => `
+      <div class="listrow">
+        <div class="lt"><b>${esc(v.name)}</b><div class="muted">${esc(v.detail)}</div></div>
+        <span class="pillstat ${STOCK_CLASS[v.status]||"ps-good"}">${esc(v.status)}</span>
+      </div>`).join("");
+  $("activityList").innerHTML = CONFIG.activity.map(a => `
+      <div class="listrow"><div class="lt"><b>${esc(a.date)}</b><div class="muted">${esc(a.text)}</div></div></div>`).join("");
+}
+
+function renderAll(){ renderHeader(); renderProtocol(); renderSchedule(); renderOrders(); renderAdmin(); }
+
+/* ---- navigation ---- */
+function view(v){
+  $("client").classList.toggle("on", v==="client");
+  $("admin").classList.toggle("on", v==="admin");
+  $("cb").classList.toggle("on", v==="client");
+  $("ab").classList.toggle("on", v==="admin");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function tab(id,b){
+  document.querySelectorAll("#client .panel").forEach(x=>x.classList.remove("on"));
+  $(id).classList.add("on");
+  document.querySelectorAll("#client .tabs button").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on");
+}
+function show(id){ $(id).classList.add("on"); }
+function hide(id){ $(id).classList.remove("on"); }
+function bg(e,id){ if(e.target.classList.contains("modal")) hide(id); }
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape") document.querySelectorAll(".modal.on").forEach(m=>m.classList.remove("on"));
+});
+
+/* ---- compound details sheet ---- */
+function details(i){
+  const c = CONFIG.compounds[i];
+  $("dcat").textContent = c.category;
+  $("dn").textContent   = c.name;
+  $("dd").textContent   = c.dose;
+  $("dt").textContent   = c.time || c.when;
+  $("ds").textContent   = c.schedule || c.when;
+  $("dp").textContent   = c.price;
+  $("dwhy").textContent = c.description;
+  show("detailsModal");
+}
+
+/* ---- admin: add order ---- */
+function addOrder(){
+  const date   = $("o_date").value.trim()   || "Today";
+  const items  = $("o_items").value.trim()  || "—";
+  const amount = parseFloat(String($("o_amount").value).replace(/[^0-9.]/g,"")) || 0;
+  const paid   = $("o_paid").value === "yes";
+  CONFIG.orders.unshift({ date, items, amount, paid });
+  CONFIG.activity.unshift({ date: date.replace(/,.*$/,""), text: `${items} ordered · ${money(amount)} ${paid?"paid":"unpaid"}` });
+  renderAll();
+  $("o_lab").style.display = "block";
+  $("o_out").classList.add("on");
+  $("o_out").textContent =
+    `{ date: "${date}", items: "${items}", amount: ${amount}, paid: ${paid} },`;
+  ["o_date","o_items","o_amount"].forEach(id => $(id).value = "");
+}
+
+/* ---- admin: add compound ---- */
+function addCompound(){
+  const days = [...document.querySelectorAll("#c_days input:checked")].map(x=>x.value);
+  const c = {
+    name:        $("c_name").value.trim()  || "New compound",
+    category:    $("c_cat").value.trim()   || "General",
+    status:      $("c_status").value,
+    dose:        $("c_dose").value.trim()  || "—",
+    when:        $("c_when").value.trim()  || "—",
+    price:       $("c_price").value.trim() || "—",
+    time:        $("c_when").value.trim()  || "—",
+    schedule:    days.length ? days.join(" · ") : ($("c_when").value.trim() || "—"),
+    days:        days,
+    description: $("c_desc").value.trim()  || ""
+  };
+  CONFIG.compounds.push(c);
+  renderAll();
+  $("c_lab").style.display = "block";
+  $("c_out").classList.add("on");
+  $("c_out").textContent =
+`{
+  name:        "${c.name}",
+  category:    "${c.category}",
+  status:      "${c.status}",
+  dose:        "${c.dose}",
+  when:        "${c.when}",
+  price:       "${c.price}",
+  time:        "${c.time}",
+  schedule:    "${c.schedule}",
+  days:        [${days.map(d=>`"${d}"`).join(",")}],
+  description: "${c.description.replace(/"/g,'\\"')}"
+},`;
+  ["c_name","c_cat","c_dose","c_when","c_price","c_desc"].forEach(id => $(id).value = "");
+  document.querySelectorAll("#c_days input:checked").forEach(x => x.checked = false);
+}
+
+/* ---- admin: add note ---- */
+function addNote(){
+  const date = $("n_date").value.trim() || "Today";
+  const text = $("n_text").value.trim() || "—";
+  CONFIG.activity.unshift({ date, text });
+  renderAll();
+  $("n_lab").style.display = "block";
+  $("n_out").classList.add("on");
+  $("n_out").textContent = `{ date: "${date}", text: "${text.replace(/"/g,'\\"')}" },`;
+  $("n_text").value = "";
+}
+
+/* ---- admin: edit protocol ---- */
+function openEdit(){
+  $("editList").innerHTML = CONFIG.compounds.map((c,i) => `
+    <div class="editrow">
+      <b>${esc(c.name)}</b>
+      <select onchange="setStatus(${i},this.value)">
+        ${["Active","Next","As needed"].map(s=>`<option ${s===c.status?"selected":""}>${s}</option>`).join("")}
+      </select>
+      <button class="rm" onclick="removeCompound(${i})">Remove</button>
+    </div>`).join("") || `<p class="hint">No compounds yet.</p>`;
+  show("editModal");
+}
+function setStatus(i,v){ CONFIG.compounds[i].status = v; renderAll(); openEdit(); }
+function removeCompound(i){ CONFIG.compounds.splice(i,1); renderAll(); openEdit(); }
+
+/* ---- boot ---- */
+$("c_days").innerHTML = DAYS.map(d =>
+  `<label><input type="checkbox" value="${d}">${d}</label>`).join("");
+renderAll();
+</script>
+</body>
+</html>
