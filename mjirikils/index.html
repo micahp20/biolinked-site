@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <title>Your BioLinked Protocol</title>
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BioLinked Solutions">
@@ -18,7 +20,6 @@
 <meta name="twitter:title" content="Your BioLinked Protocol">
 <meta name="twitter:description" content="Personalized peptide protocol — saved for quick reference.">
 <meta name="twitter:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
-<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="manifest" href="/mjirikils/manifest.json">
 <link rel="apple-touch-icon" href="/icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -26,656 +27,1430 @@
 <meta name="apple-mobile-web-app-title" content="Misty">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#7A6530">
-
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
 <script>
-/* ============================================================================
-   ██  CONFIG — THIS IS THE ONLY BLOCK YOU EDIT FOR A NEW CLIENT  ██
-   ============================================================================
-   Copy this file, change the values below, save as <clientname>.html. Done.
-   Nothing outside this block ever needs to be touched.
-
-   QUICK RULES
-   -----------
-   • compounds[].status   must be exactly "Active", "Next", or "As needed"
-                          Active    = green pill, AND shows up in the Schedule tab
-                          Next      = amber pill, hidden from Schedule until you
-                                      switch it to "Active"
-                          As needed = gold pill, never on the Schedule
-   • compounds[].days     which weekdays it shows on the Schedule tab.
-                          Use "Mon","Tue","Wed","Thu","Fri","Sat","Sun".
-                          Any day with nothing on it prints "Rest day".
-   • compounds[].price    free text — "$70", "$70/vial", "included", whatever.
-   • orders[].amount      must be a NUMBER (230, not "$230"). The running total,
-                          the balance-owed tile and the order count are all added
-                          up from this list automatically — don't hand-total them.
-   • orders[].paid        true or false. Anything false adds to "Balance owed".
-   • inventory[].status   "Reorder now" (red), "Soon" (amber), "Good" or
-                          "Stocked" (green).
-============================================================================ */
-
-const CONFIG = {
-
-  /* ---- Brand (rarely changes) ------------------------------------------ */
-  brand: {
-    name: "BioLinked",
-    mark: "B"                       // the letter in the little gold square
-  },
-
-  /* ---- Who this page is for -------------------------------------------- */
-  client: {
-    greeting:      "Hi, Misty 👋",   // big hello on the Client view
-    subtitle:      "What to take, when, and what you've ordered.",
-    tags:          ["Recovery", "Energy", "Longevity"],   // little pills under the hello
-    fullName:      "Misty Jirikils", // header on the Admin view
-    adminSubtitle: "Protocol, orders, and inventory — one client."
-  },
-
-  /* ---- The protocol ----------------------------------------------------- */
-  compounds: [
-    {
-      name:        "KLOW",
-      category:    "Healing & Recovery",
-      status:      "Active",
-      dose:        "15 units",
-      when:        "AM · M–F",              // short label on the card
-      price:       "$70",
-      time:        "Morning (fasted)",      // longer label, shown in the pop-up
-      schedule:    "Monday–Friday",         // longer label, shown in the pop-up
-      days:        ["Mon","Tue","Wed","Thu","Fri"],
-      description: "Recovery blend (BPC-157, TB-500, GHK-Cu, KPV) for soft-tissue and joint healing."
-    },
-    {
-      name:        "MOTS-C",
-      category:    "Energy",
-      status:      "Active",
-      dose:        "10 units",
-      when:        "AM · M–F",
-      price:       "$80",
-      time:        "Morning",
-      schedule:    "Monday–Friday",
-      days:        ["Mon","Tue","Wed","Thu","Fri"],
-      description: "Activates AMPK for a cellular energy boost. Run ~4 weeks."
-    },
-    {
-      name:        "NAD+",
-      category:    "Cellular Energy",
-      status:      "Next",
-      dose:        "25→37.5 units",
-      when:        "AM · M/W/F",
-      price:       "$75",
-      time:        "Morning",
-      schedule:    "Mon / Wed / Fri — starts next cycle",
-      days:        ["Mon","Wed","Fri"],
-      description: "Slow-push protocol. Start at 25 units and titrate up as tolerated."
-    },
-    {
-      name:        "Selank",
-      category:    "Calm",
-      status:      "As needed",
-      dose:        "10 units",
-      when:        "When needed",
-      price:       "$45",
-      time:        "Any time",
-      schedule:    "As needed (PRN)",
-      days:        [],
-      description: "Fast-acting calm, 30–60 min relief for situational anxiety."
-    }
-  ],
-
-  /* ---- Orders (newest first). amount = number, no dollar sign ----------- */
-  orders: [
-    { date: "Aug 8, 2026",  items: "MOTS-C ×1 · NAD+ ×2", amount: 230, paid: true },
-    { date: "Jul 12, 2026", items: "KLOW ×2 (1 free)",    amount:  70, paid: true },
-    { date: "May 2, 2026",  items: "Starter stack",       amount: 570, paid: true }
-  ],
-
-  /* Left-hand label on the running-total bar when nothing is owed.
-     If any order is unpaid the bar switches to "Balance due" on its own. */
-  paidInFullLabel: "Paid in full · Venmo",
-
-  /* ---- "What changed" timeline on the Orders tab ------------------------ */
-  history: [
-    { date: "Aug 8",  text: "MOTS-C added" },
-    { date: "Jul 12", text: "NAD+ and Semax added" },
-    { date: "Jun 20", text: "KLOW added" },
-    { date: "May 10", text: "Protocol started" }
-  ],
-
-  /* ---- Admin: vial / dose counts --------------------------------------- */
-  inventory: [
-    { name: "KLOW",   detail: "~0.6 vial · out Aug 22", status: "Reorder now" },
-    { name: "NAD+",   detail: "~3 doses · out Aug 17",  status: "Soon"        },
-    { name: "MOTS-C", detail: "~12 doses left",         status: "Good"        },
-    { name: "Selank", detail: "2 vials stocked",        status: "Stocked"     }
-  ],
-
-  /* ---- Admin: running activity log ------------------------------------- */
-  activity: [
-    { date: "Aug 8",  text: "MOTS-C ×1 ordered · $230 paid" },
-    { date: "Aug 8",  text: "MOTS-C added to protocol" },
-    { date: "Jul 12", text: "NAD+ ×2 ordered · $160 paid" },
-    { date: "Jun 20", text: "KLOW added to protocol" }
-  ]
-
-};
-/* =========================== END OF CONFIG ============================== */
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
 </script>
-
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --cream:#f4f1e8; --card:#fffdf7; --card-2:#faf6ec;
-    --ink:#201c13; --muted:#7c766b; --gold:#7a6530; --gold-2:#63501d;
-    --line:#e7dfcb; --line-2:#f0eadb;
-    --green:#2c7a54; --green-bg:#e3f1e8; --amber:#9c7418; --amber-bg:#f7eccd; --red:#b34635; --red-bg:#f6e2dc;
-    --gold-bg:#f0e7d2;
-    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
-    --shadow:0 1px 2px rgba(60,45,20,.04),0 8px 22px rgba(60,45,20,.07);
-  }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  html,body{margin:0}
-  body{background:#e8e2d3;color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;
-       display:flex;justify-content:center}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--gold:#7A6530;--gold-light:#8F7940;--gold-dim:rgba(122,101,48,0.10);--gold-border:rgba(122,101,48,0.35);--bg:#f5f5f5;--surface:#ffffff;--text:#000000;--muted:#4a4a44;--border:rgba(0,0,0,0.14);}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:40px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;}
+.invoice-wrap{width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--gold-border);border-radius:3px;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--gold-border);padding:28px 36px;display:flex;justify-content:space-between;align-items:flex-start;border-top-left-radius:3px;border-top-right-radius:3px;}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
+.inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
+.tab-bar{display:flex;background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
+.tab-btn{flex:1;padding:14px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;}
+.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.inv-body{padding:32px 36px;}
+.totals-block{background:#f8f8f8;border:1px solid var(--border);border-radius:2px;padding:18px 22px;margin-bottom:24px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:15px;color:var(--text);font-weight:400;}
+.total-row.sub{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:600;}
+.total-row.grand{border-top:1px solid var(--gold-border);margin-top:10px;padding-top:14px;font-size:18px;font-weight:700;color:var(--text);}
+.total-row.grand .val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--gold);}
+.payment-block{background:linear-gradient(135deg,#f8f5ee,#f2ede0);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:20px 22px;margin-bottom:24px;}
+.payment-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.payment-row:last-child{margin-bottom:0;}
+.payment-icon{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:15px;color:var(--text);font-weight:500;}
+.payment-handle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--gold);}
+.inv-footer{padding:16px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;border-bottom-left-radius:3px;border-bottom-right-radius:3px;}
+.footer-disc{font-size:12px;color:var(--muted);line-height:1.65;font-weight:400;max-width:420px;}
+.footer-brand{font-size:11px;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;white-space:nowrap;}
+.print-btn{display:block;width:75%;max-width:1200px;margin:20px auto 0;padding:16px;background:var(--gold);color:#fff;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;border:none;border-radius:2px;cursor:pointer;}
+.program-intro{text-align:center;padding:20px 0 26px;margin-bottom:28px;border-bottom:1px solid var(--border);}
+.program-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.program-title{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:600;color:var(--text);line-height:1.05;letter-spacing:0.01em;}
+.program-title em{font-style:italic;color:var(--gold);}
+.program-tag{font-family:'Cormorant Garamond',serif;font-size:17px;font-style:italic;color:var(--muted);margin-top:8px;}
+.program-context{margin:14px 0 0;font-size:13px;line-height:1.75;color:var(--muted);font-weight:400;text-align:left;background:rgba(122,101,48,0.04);border-left:2px solid var(--gold-border);padding:14px 18px;border-radius:2px;}
+.program-context strong{color:var(--text);font-weight:600;}
+.program-context p+p{margin-top:10px;}
+.program-badges{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:18px;}
+.program-badge{background:#f8f8f8;border:1px solid var(--border);padding:5px 11px;font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);border-radius:2px;}
+.program-badge strong{color:var(--gold);font-weight:700;}
+.sec-divider{margin:0 0 18px;padding-bottom:10px;border-bottom:1px solid var(--gold-border);}
+.sec-divider.mt{margin-top:32px;}
+.sec-divider-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--text);margin-top:3px;line-height:1.2;}
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:104px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+.sched-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:16px;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sched-card-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);line-height:1.15;}
+.sched-card-sub{font-size:11px;color:var(--muted);letter-spacing:0.06em;margin-top:2px;}
+.sched-phase-pill{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:5px 11px;border-radius:2px;white-space:nowrap;}
+.sched-table{width:100%;border-collapse:collapse;font-size:12px;}
+.sched-table th{background:#f0f0f0;color:var(--gold);padding:7px 8px;text-align:left;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--gold-border);}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);font-weight:400;vertical-align:top;font-size:12px;line-height:1.5;}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);}
+.sched-count{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;}
+.sched-count.off{background:#eeeeee;color:#999;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:99px;margin:1px 2px 1px 0;border:1px solid var(--gold-border);background:var(--gold-dim);color:var(--gold);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11.5px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.bpc{background:rgba(58,122,90,0.14);border-color:rgba(58,122,90,0.34);color:#2f7a4a;}
+.sched-pill.cart{background:rgba(58,107,142,0.14);border-color:rgba(58,107,142,0.34);color:#3a6b8e;}
+.sched-pill.glow{background:rgba(184,108,21,0.14);border-color:rgba(184,108,21,0.34);color:#b97a1f;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--border);color:#999;font-weight:400;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-scroll .sched-table{min-width:580px;}
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03));border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:2px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-banner .cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-banner .cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:2px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-banner .cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:2px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.tip-card{background:#ffffff;border:1px solid var(--border);border-top:2px solid var(--gold);border-radius:2px;padding:20px 24px;margin-bottom:14px;}
+.tip-card.featured{border-top-width:3px;border-left:3px solid var(--gold);background:rgba(122,101,48,0.04);}
+.tip-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.tip-title{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--text);margin-bottom:10px;line-height:1.2;}
+.tip-body{font-size:14px;line-height:1.75;color:var(--text);font-weight:400;}
+.tip-body p + p{margin-top:10px;}
+.tip-body strong{font-weight:700;color:var(--text);}
+.tip-body em{font-style:italic;color:var(--muted);}
+.tip-body ul{margin-left:18px;margin-top:8px;}
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+/* paid-archive collapsible */
+details.paid-archive{background:rgba(58,122,90,0.05);border:1px solid rgba(58,122,90,0.32);border-radius:3px;padding:16px 20px;margin-bottom:24px;}
+details.paid-archive[open]{background:#fbfcfb;}
+details.paid-archive > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:40px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+details.paid-archive > summary::-webkit-details-marker{display:none;}
+details.paid-archive > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid rgba(58,122,90,0.40);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#2f7a4a;font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].paid-archive > summary::after{content:'\2212';background:rgba(58,122,90,0.10);}
+details.paid-archive > summary:hover::after{border-color:#2f7a4a;}
+details[open].paid-archive > summary{margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(58,122,90,0.22);}
+.pa-pill{font-size:9.5px;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:#fff;background:#2f7a4a;padding:4px 10px;border-radius:99px;flex-shrink:0;}
+.pa-title{font-size:14.5px;font-weight:700;color:#0e3a1e;}
+.pa-sub{font-size:12px;color:#3a6b52;font-weight:500;}
+/* collapsed compound header: dose + cadence key line under the name */
+.li-summary-name{display:block;}
+.cmp-head-key{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.01em;line-height:1.45;margin-top:3px;}
+@media(max-width:640px){.cmp-head-key{font-size:10.5px;}}
+/* paid-in-full banner — standard settled-order convention */
+.paid-banner{background:linear-gradient(135deg,rgba(58,122,90,0.10),rgba(58,122,90,0.04));border:1px solid rgba(58,122,90,0.35);border-left:3px solid #3a7a5a;border-radius:2px;padding:18px 22px;margin-bottom:24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.paid-icon{width:42px;height:42px;border-radius:50%;background:#3a7a5a;color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.paid-info{flex:1;min-width:200px;}
+.paid-label{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#3a7a5a;margin-bottom:4px;}
+.paid-text{font-size:15px;color:var(--text);font-weight:500;line-height:1.5;}
+.paid-text strong{color:#3a7a5a;font-weight:700;}
+@media(max-width:640px){.paid-banner{padding:14px 16px;}.paid-text{font-size:13.5px;}}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{font-size:15px;font-weight:700;color:var(--text);}
+.li-summary-price{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--gold);}
+.li-summary-price .vials{font-family:'Montserrat',sans-serif;font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.06em;}
+.li-summary-price.free{color:#2f7a4a;}
+.li-body{padding:18px 22px;background:#fafafa;}
+.li-body .li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.7;}
+.li-body .li-callout strong{color:var(--gold);font-weight:700;}
+.li-body .li-callout.why{background:rgba(58,107,142,0.07);border-color:rgba(58,107,142,0.35);border-left-color:#3a6b8e;color:#1f3f5a;}
+.li-body .li-callout.why strong{color:#3a6b8e;}
+.li-body .li-callout.free{background:rgba(58,122,90,0.07);border-color:rgba(58,122,90,0.40);border-left-color:#2f7a4a;color:#0e3a1e;}
+.li-body .li-callout.free strong{color:#2f7a4a;}
+.phase-pill-inline{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;}
+.pp-p1{background:#3a7a5a;}
+.pp-p2{background:#b97a1f;}
+.pp-reta{background:#3a6b8e;}
+.pp-prn{background:#6e4d92;}
+.pp-free{background:#2f7a4a;}
+.stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-top:8px;margin-bottom:24px;}
+.stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
+.stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
+.stack-item:last-of-type{border-bottom:none;padding-bottom:0;}
+.stack-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px;}
+.stack-right{flex:1;}
+.stack-compound{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.stack-desc{font-size:14px;color:var(--text);font-weight:400;line-height:1.7;}
+.stack-synergy{background:rgba(139,115,53,0.08);border:1px solid var(--gold-border);border-radius:2px;padding:15px 18px;margin-top:16px;font-size:14px;color:#3d2f10;line-height:1.75;font-weight:400;}
+.stack-synergy strong{font-weight:700;color:var(--gold);}
+.supplies-wrap{margin-bottom:20px;}
+.supply-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;padding:13px 16px;margin-bottom:7px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.supply-row:hover{border-color:var(--gold-border);}
+.supply-row.included{background:rgba(58,122,90,0.04);border-left:3px solid #2f7a4a;}
+.supply-info{flex:1;min-width:220px;}
+.supply-info-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.supply-info-desc{font-size:12px;color:var(--muted);font-weight:400;line-height:1.6;}
+.supply-link{display:inline-block;background:var(--gold);color:#fff;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:2px;text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.supply-link:hover{background:#5f4f26;}
+.supply-link.included{background:#2f7a4a;cursor:default;}
+.storage-card{background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:18px 22px;border-radius:2px;margin-bottom:24px;}
+.storage-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.storage-body{font-size:13px;line-height:1.75;color:#3d2f10;font-weight:400;}
+.storage-body p + p{margin-top:10px;}
+.storage-body strong{color:var(--text);font-weight:700;}
+@media print{body{background:#fff;padding:0}.print-btn,.tab-bar{display:none}.invoice-wrap{border:none;width:100%;max-width:100%;}.tab-content{display:block !important;}details > summary{list-style:none;}}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:90%;}}
+@media(max-width:820px){.invoice-wrap,.print-btn{width:94%;}body{padding:24px 10px;}.inv-header{padding:22px 22px;}.inv-body{padding:24px 22px;}.inv-footer{padding:14px 22px;}}
+@media(max-width:640px){.invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}body{padding:8px 0;font-size:15px;}.inv-header{flex-direction:column;gap:14px;padding:20px 18px;}.inv-meta{text-align:left;}.inv-brand-name{font-size:26px;}.inv-body{padding:20px 16px;}.inv-footer{flex-direction:column;align-items:flex-start;padding:14px 18px;}.total-row{font-size:13px;}.total-row.grand .val{font-size:24px;}.program-title{font-size:30px;}.program-intro{padding:14px 0 18px;}.program-badge{font-size:8px;padding:4px 8px;}.tab-bar{position:sticky;top:56px;}.tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}.sec-divider-title{font-size:19px;}.sched-card{padding:16px 16px;}.sched-card-title{font-size:17px;}.sched-table{font-size:11px;}.sched-table th{font-size:8px;padding:6px 4px;letter-spacing:0.08em;}.sched-table td{padding:7px 4px;font-size:11px;}.sched-pill{font-size:9px;padding:1px 5px;margin:1px 1px 1px 0;}.sched-pill strong{font-size:10.5px;}.storage-card{padding:14px 16px;}.storage-body{font-size:12px;}.payment-block{padding:16px 18px;}.tip-card{padding:16px 18px;}.tip-title{font-size:17px;}.tip-body{font-size:13px;}.cal-banner{flex-direction:column;align-items:stretch;}.cal-banner .cal-controls{flex-direction:column;align-items:stretch;}.cal-banner .cal-dl-btn{width:100%;}.cal-banner input[type=date]{width:100%;}.cmp-quick .ql{min-width:88px;}}
 
-  /* phone frame */
-  .app{width:100%;max-width:440px;min-height:100vh;background:var(--cream);position:relative;
-       box-shadow:0 0 0 1px rgba(0,0,0,.03),0 30px 80px rgba(60,45,20,.14)}
-  .scroll{padding:0 16px calc(24px + env(safe-area-inset-bottom))}
 
-  /* sticky header */
-  .head{position:sticky;top:0;z-index:30;background:rgba(244,241,232,.92);backdrop-filter:blur(12px);
-        padding:14px 16px 10px;border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:19px;letter-spacing:-.01em}
-  .brand .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--gold),#a2894a);color:#fff;display:grid;place-items:center;font-weight:800;font-size:15px}
-  .switch{display:flex;gap:5px;background:#e5dcc7;padding:5px;border-radius:13px;margin-top:12px}
-  .switch button{flex:1;border:0;padding:12px;border-radius:9px;background:transparent;font:inherit;font-weight:700;font-size:14.5px;color:var(--muted);cursor:pointer;transition:.15s}
-  .switch button.on{background:#fff;color:var(--gold-2);box-shadow:var(--shadow)}
+/* Collapsible cards (sched-card, tip-card, stack-card) — Drew Holm master pattern */
+details.sched-card,details.tip-card,details.stack-card{display:block;}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:42px;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
+details.sched-card > summary:hover::after,details.tip-card > summary:hover::after,details.stack-card > summary:hover::after{border-color:var(--gold);}
+details.sched-card > summary.sched-card-head{margin-bottom:0;padding-bottom:0;border-bottom:none;}
+details[open].sched-card > summary.sched-card-head{margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+details[open].tip-card > summary > .tip-title{margin-bottom:10px;}
+details[open].stack-card > summary > .stack-card-title{margin-bottom:16px;}
+@media print{details.sched-card,details.tip-card,details.stack-card{display:block;}details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}}
 
-  .view{display:none} .view.on{display:block;animation:f .25s ease}
-  @keyframes f{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+/* ===================================================================
+   BioLinked card layer — "doctor's chart" block layout.
+   Appended after the page's own rules so it wins on equal specificity.
+   Uses only the page's existing palette tokens (--gold / --border / …),
+   so each client's original gold-and-cream colours are untouched.
+   =================================================================== */
+:root{--c-head:#fafafa;--c-line:#f0f0f0;--c-well:#f5f5f5;--c-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);}
 
-  .hero{padding:20px 4px 6px}
-  .eyebrow{color:var(--gold);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
-  .hero h1{margin:6px 0 4px;font-size:28px;letter-spacing:-.02em;line-height:1.15}
-  .hero .muted{font-size:15px}
-  .muted{color:var(--muted)}
-  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
-  .chip{background:var(--card);border:1px solid var(--line);color:var(--gold-2);padding:7px 12px;border-radius:999px;font-size:12.5px;font-weight:700}
+.inv-body{background:var(--c-well);padding:26px 26px 34px;}
 
-  /* sticky tab bar */
-  .tabs{position:sticky;top:112px;z-index:20;display:flex;gap:4px;background:var(--cream);padding:12px 0 8px}
-  .tabs button{flex:1;border:0;background:var(--card-2);font:inherit;font-weight:700;font-size:14px;color:var(--muted);
-                padding:11px 4px;cursor:pointer;border-radius:11px;border:1px solid var(--line-2)}
-  .tabs button.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+/* --- section rules --- */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--gold-border);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.sec-divider-title{font-family:'Montserrat',sans-serif;font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
 
-  .panel{display:none} .panel.on{display:block}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);margin-bottom:14px}
-  h2{font-size:18px;letter-spacing:-.01em;margin:2px 0 2px}
-  .sec-sub{font-size:14px;color:var(--muted);margin:0 0 14px}
+/* --- label -> value rows (replaces flowing prose) --- */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:150px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--c-line);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.7;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;color:var(--text);}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
 
-  /* compound cards — full width, big */
-  .compound-name{font-size:23px;font-weight:800;letter-spacing:-.01em;margin:8px 0 2px}
-  .status{font-size:12px;font-weight:800;padding:5px 11px;border-radius:999px;float:right}
-  .st-active{background:var(--green-bg);color:var(--green)}
-  .st-next{background:var(--amber-bg);color:var(--amber)}
-  .st-prn{background:var(--gold-bg);color:var(--gold-2)}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:14px}
-  .mini{background:var(--card-2);border:1px solid var(--line-2);border-radius:13px;padding:11px 13px;min-width:0}
-  .mini span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.03em;font-weight:700}
-  .mini b{font-size:15.5px;overflow-wrap:break-word}
-  .row3 .mini{padding:11px 10px}
-  .row3 .mini b{font-size:14.5px}
-  .mini.price b{color:var(--gold-2)}
-  .details{width:100%;margin-top:14px;background:transparent;border:1.5px solid var(--line);color:var(--gold-2);
-           padding:13px;border-radius:12px;font:inherit;font-weight:800;font-size:14.5px;cursor:pointer}
-  .details:active{background:var(--gold-bg)}
+/* --- intro block --- */
+.program-intro{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:20px 22px;margin-bottom:18px;text-align:left;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold);margin-bottom:0;}
+.program-title{font-family:'Montserrat',sans-serif;font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--gold);font-weight:700;}
+.program-tag{font-family:'Montserrat',sans-serif;font-size:13px;font-style:normal;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin:14px 0 0;padding:12px 0 0;background:none;border:none;border-top:1px solid var(--border);border-radius:0;font-size:inherit;color:inherit;}
 
-  /* weekly schedule — vertical day rows */
-  .dayrow{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line-2)}
-  .dayrow:last-child{border:0}
-  .dbadge{width:52px;height:52px;flex-shrink:0;border-radius:14px;background:var(--gold-bg);color:var(--gold-2);
-          display:grid;place-content:center;text-align:center;font-weight:800;font-size:13px;line-height:1}
-  .dayrow.off .dbadge{background:var(--card-2);color:var(--muted)}
-  .doses{display:flex;flex-wrap:wrap;gap:7px}
-  .dose{font-size:14px;font-weight:700;color:var(--gold-2);background:var(--card-2);border:1px solid var(--line);
-        border-radius:9px;padding:6px 11px}
-  .restlab{font-size:14.5px;color:var(--muted)}
+/* --- compound cards --- */
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);overflow:visible;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;display:block;padding:0;position:relative;border-bottom:none;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary::after{content:'+';position:absolute;right:14px;top:12px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details.li-row > summary:hover::after{border-color:var(--gold);}
+details[open].li-row > summary{border-bottom-color:transparent;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 48px 12px 16px;border-bottom:1px solid var(--border);background:var(--c-head);border-radius:8px 8px 0 0;line-height:1.35;letter-spacing:0.005em;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-summary-price .strike{text-decoration:line-through;color:var(--muted);font-weight:500;margin-right:6px;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+.li-body > * + *{margin-top:0;}
 
-  /* orders */
-  .listrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:15px 0;border-bottom:1px solid var(--line-2)}
-  .listrow:last-child{border:0}
-  .listrow .lt b{font-size:15.5px}
-  .listrow .lt .muted{font-size:13.5px}
-  .amt{text-align:right;font-weight:800;font-size:16px;white-space:nowrap}
-  .paid{color:var(--green);font-weight:800;font-size:12px;margin-top:2px}
-  .unpaid{color:var(--red);font-weight:800;font-size:12px;margin-top:2px}
-  .totbar{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:16px 18px;
-          background:var(--gold-bg);border:1px solid var(--line);border-radius:14px;font-weight:800;font-size:15px}
-  .totbar .big{font-size:22px}
+/* compound detail rows */
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0;padding:0;margin:0;}
+.cmp-quick li{display:grid;grid-template-columns:82px 1fr;gap:3px 14px;align-items:baseline;font-size:13px;color:var(--text);line-height:1.65;font-weight:400;padding:9px 0;border-bottom:1px solid var(--c-line);flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);min-width:0;flex-shrink:1;}
+.cmp-quick .qv{flex:none;min-width:0;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;margin-left:0;white-space:nowrap;}
+@media(max-width:640px){.cmp-quick li{grid-template-columns:1fr;gap:2px;}}
 
-  .timeline{border-left:2px solid #cdbb8c;padding-left:18px;margin-top:6px}
-  .event{margin-bottom:16px;position:relative;font-size:15px}
-  .event:last-child{margin-bottom:0}
-  .event::before{content:"";position:absolute;left:-25px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--card)}
+.li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.li-body .li-callout{border-radius:6px;padding:11px 13px;margin-top:12px;font-size:12.5px;line-height:1.7;}
 
-  /* admin */
-  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 17px;box-shadow:var(--shadow)}
-  .stat b{font-size:27px;display:block;letter-spacing:-.02em;line-height:1.1}
-  .stat span{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em;font-weight:700}
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-  .actions button{border:0;border-radius:13px;padding:15px 10px;font:inherit;font-weight:800;font-size:14.5px;background:var(--gold);color:#fff;cursor:pointer}
-  .actions button:active{background:var(--gold-2)}
-  .actions .secondary{background:var(--card);color:var(--gold-2);border:1.5px solid var(--line)}
-  .pillstat{font-size:12px;font-weight:800;padding:6px 12px;border-radius:999px;white-space:nowrap}
-  .ps-good{background:var(--green-bg);color:var(--green)}
-  .ps-soon{background:var(--amber-bg);color:var(--amber)}
-  .ps-low{background:var(--red-bg);color:var(--red)}
+/* --- totals / payment blocks --- */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:16px;}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.total-row{padding:9px 0;border-bottom:1px solid var(--c-line);}
+.total-row:last-child{border-bottom:none;}
 
-  /* modal — slides up from bottom, sheet style */
-  .modal{display:none;position:fixed;inset:0;background:rgba(25,20,12,.5);z-index:60;align-items:flex-end;justify-content:center}
-  .modal.on{display:flex;animation:f .2s ease}
-  .modalbox{width:100%;max-width:440px;background:var(--card);padding:22px 20px calc(24px + env(safe-area-inset-bottom));
-            border-radius:22px 22px 0 0;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:up .28s cubic-bezier(.2,.8,.2,1);
-            max-height:92vh;overflow-y:auto}
-  @keyframes up{from{transform:translateY(60px)}to{transform:none}}
-  .grab{width:40px;height:5px;border-radius:3px;background:#e0d6bf;margin:0 auto 14px}
-  .close{float:right;border:0;background:#ece3d1;border-radius:10px;padding:9px 12px;cursor:pointer;font-weight:800;color:var(--muted)}
-  .field{margin:14px 0}
-  .field label{display:block;margin-bottom:6px;font-size:13px;color:var(--muted);font-weight:700}
-  input,select,textarea{width:100%;padding:14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font:inherit;font-size:16px;font-family:var(--sans)}
-  textarea{min-height:84px;resize:vertical}
-  .save{width:100%;border:0;background:var(--gold);color:#fff;padding:15px;border-radius:12px;font:inherit;font-weight:800;font-size:15.5px;cursor:pointer;margin-top:6px}
-  .save:active{background:var(--gold-2)}
-  .hint{font-size:13px;color:var(--muted);margin:2px 0 0}
+/* --- schedule / tip / stack / storage cards --- */
+details.sched-card,.sched-card,details.tip-card,.tip-card,details.stack-card,.stack-card,.storage-card{background:var(--surface);border:1px solid var(--border);border-top:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--gold);background:var(--surface);border-top-width:1px;}
+.tip-card.warn{border-left:3px solid #b85555;border-top:1px solid var(--border);background:var(--surface);}
+details.sched-card > summary,details.tip-card > summary,details.stack-card > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding:0;display:block;}
+details.sched-card > summary::-webkit-details-marker,details.tip-card > summary::-webkit-details-marker,details.stack-card > summary::-webkit-details-marker{display:none;}
+details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{content:'+';position:absolute;right:16px;top:16px;width:24px;height:24px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;transform:none;}
+details[open].sched-card > summary::after,details[open].tip-card > summary::after,details[open].stack-card > summary::after{content:'\2212';background:var(--gold-dim);}
 
-  /* day picker in the add-compound sheet */
-  .daysel{display:flex;flex-wrap:wrap;gap:6px}
-  .daysel label{display:inline-flex;align-items:center;gap:6px;background:var(--card-2);border:1.5px solid var(--line);
-                border-radius:10px;padding:9px 11px;font-size:14px;font-weight:700;color:var(--gold-2);cursor:pointer;margin:0}
-  .daysel input{width:auto;padding:0;margin:0}
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);flex-wrap:wrap;margin:0 !important;}
+details[open].sched-card > summary.sched-card-head,details.sched-card > summary.sched-card-head{margin:0 !important;padding:14px 48px 14px 18px !important;border-bottom:1px solid var(--border) !important;}
+.sched-card-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);line-height:1.25;letter-spacing:0.005em;}
+.sched-card-sub{font-size:12px;color:var(--muted);letter-spacing:0.01em;margin-top:4px;line-height:1.6;}
+.sched-phase-pill{border-radius:99px;padding:4px 10px;font-size:9px;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table th{padding:11px 12px;background:var(--c-head);border-bottom:1px solid var(--border);letter-spacing:0.14em;}
+.sched-table td{padding:10px 12px;border-bottom:1px solid var(--c-line);}
+.sched-table tr:last-child td{border-bottom:none;}
 
-  /* "paste this into CONFIG" output */
-  .cfgout{display:none;margin-top:14px;background:#2a2418;color:#f4e9cf;border-radius:12px;padding:14px;
-          font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;line-height:1.6;white-space:pre-wrap;
-          word-break:break-word;-webkit-user-select:all;user-select:all}
-  .cfgout.on{display:block}
-  .cfglab{font-size:12px;color:var(--muted);font-weight:700;margin-top:14px}
+.tip-head{padding:13px 48px 13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:0;}
+.tip-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:var(--text);margin:3px 0 0 !important;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:12px 18px 15px;font-size:13.5px;line-height:1.7;color:var(--text);}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding-bottom:9px;}
+.tip-body ul,.tip-list{list-style:none;margin:0;padding:0;}
+.tip-body li,.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--c-line);overflow-wrap:break-word;margin:0;}
+.tip-body li:last-child,.tip-list li:last-child{border-bottom:none;}
+.tip-body li::before,.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--gold);}
+.tip-body .tip-list + .note-list,.tip-body ul + .note-list{margin-top:6px;padding-top:4px;border-top:1px solid var(--c-line);}
 
-  /* edit-protocol rows */
-  .editrow{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line-2)}
-  .editrow:last-child{border:0}
-  .editrow b{flex:1;font-size:15.5px}
-  .editrow select{width:auto;padding:9px 10px;font-size:14px;border-radius:10px}
-  .rm{border:0;background:var(--red-bg);color:var(--red);border-radius:10px;padding:10px 12px;font:inherit;font-weight:800;font-size:13px;cursor:pointer}
+.stack-card-title{padding:14px 48px 14px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.stack-item{padding:13px 18px;border-bottom:1px solid var(--c-line);margin:0;}
+.stack-item:last-of-type{border-bottom:none;}
+.stack-synergy{margin:0;border-radius:0;border-left:none;border-right:none;border-bottom:none;border-top:1px solid var(--border);padding:14px 18px;}
 
-  @media(min-width:441px){ .app{margin:22px 0;min-height:auto;border-radius:26px;overflow:hidden}
-    .head{border-radius:26px 26px 0 0} }
+.storage-title{padding:13px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);}
+.storage-body{padding:6px 18px 12px;font-size:13.5px;line-height:1.7;}
+
+/* --- supplies as cards --- */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:22px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);padding:0;display:flex;flex-direction:column;align-items:stretch;gap:0;margin-bottom:0;flex-wrap:nowrap;}
+.supply-info{padding:0;min-width:0;flex:none;}
+.supply-info-name{font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--c-head);border-bottom:1px solid var(--border);border-radius:8px 8px 0 0;line-height:1.35;margin-bottom:0;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;border-radius:5px;flex-shrink:0;}
+
+/* --- calendar banner --- */
+.cal-banner{border-radius:8px;box-shadow:var(--c-shadow);padding:15px 18px;}
+
+/* --- bloodwork lab sections as cards --- */
+.lab-header{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:16px 20px;margin-bottom:14px;}
+.lab-header-title{font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:-0.01em;}
+.lab-score{border-radius:8px;box-shadow:var(--c-shadow);padding:0;overflow:hidden;}
+.lab-score-eyebrow{padding:12px 20px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-score-main{padding:18px 20px;margin:0 !important;border-bottom:1px solid var(--border);align-items:center;}
+.lab-score-number{font-family:'Montserrat',sans-serif;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}
+.lab-score-grade{font-family:'Montserrat',sans-serif;}
+.lab-score-breakdown{padding:6px 20px 4px;gap:0 24px;}
+.lab-score-item{padding:9px 0;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-score-num{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:21px;border-radius:99px;background:var(--gold-dim);border:1px solid var(--gold-border);font-family:'Montserrat',sans-serif;font-size:11px;font-variant-numeric:tabular-nums;flex:none;}
+.lab-score-foot{padding:10px 20px 14px;margin:0 !important;font-style:normal;}
+.lab-section{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--c-shadow);margin-bottom:14px;overflow:hidden;}
+.lab-section-head{padding:12px 18px;background:var(--c-head);border-bottom:1px solid var(--border);margin:0 !important;}
+.lab-section-title{font-family:'Montserrat',sans-serif;font-size:12px;letter-spacing:0.14em;}
+.lab-row{padding:10px 18px;border-bottom:1px solid var(--c-line);align-items:center;}
+.lab-row:nth-child(even){background:#fafafa;}
+.lab-row:last-child{border-bottom:none;}
+.lab-val{font-family:'Montserrat',sans-serif;font-size:16px;font-variant-numeric:tabular-nums;}
+.lab-status{border-radius:99px;padding:3px 9px;min-width:64px;}
+.lab-index{padding:4px 18px 14px;}
+.lab-index p{padding:9px 0;border-bottom:1px solid var(--c-line);margin:0;}
+.lab-index p:last-child{border-bottom:none;}
+
+/* --- chart note (converted prose blocks) --- */
+.chart-note{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--c-shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:18px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:5px;}
+
+/* --- responsive --- */
+@media(max-width:820px){.inv-body{padding:22px 18px 30px;}}
+@media(max-width:640px){
+  .inv-body{padding:16px 12px 26px;}
+  .line-items,.supplies-wrap{grid-template-columns:1fr;}
+  .program-intro{padding:16px 15px;}
+  .program-title{font-size:22px;}
+  .sec-divider-title{font-size:17px;}
+  .li-summary-name{padding:12px 46px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .sched-card-head,details.sched-card > summary.sched-card-head{padding:12px 46px 12px 15px !important;}
+  .tip-head{padding:12px 46px 12px 15px;}
+  .tip-body{padding-left:15px;padding-right:15px;font-size:13px;}
+  .tip-title{font-size:15px;}
+  .stack-card-title,.storage-title{padding-left:15px;padding-right:15px;}
+  .stack-item,.stack-synergy,.storage-body{padding-left:15px;padding-right:15px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .lab-section-head,.lab-row,.lab-index{padding-left:14px;padding-right:14px;}
+  .lab-score-eyebrow,.lab-score-main,.lab-score-breakdown,.lab-score-foot{padding-left:16px;padding-right:16px;}
+  .chart-note{padding:12px 14px;}
+
+  /* viewport-safe tooltips: anchor the bubble to a full-width host block */
+  .cmp-quick li,.tip-body li,.tip-list li,.lab-row,.supply-info-name,.li-summary-name,.nr{position:relative;}
+  .cmp-quick li .info-tip,.tip-body li .info-tip,.lab-row .info-tip,.li-summary-name .info-tip,.nr .info-tip{position:static;}
+  .cmp-quick li .info-tip-text,.tip-body li .info-tip-text,.lab-row .info-tip-text,.li-summary-name .info-tip-text,.nr .info-tip-text{
+    position:absolute;bottom:auto;top:calc(100% + 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+  .cmp-quick li .info-tip-text::after,.tip-body li .info-tip-text::after,.lab-row .info-tip-text::after,.li-summary-name .info-tip-text::after,.nr .info-tip-text::after{
+    top:-9px;bottom:auto;left:14px;transform:none;border-bottom-color:#1a1a1a;border-top-color:transparent;}
+}
+@media print{
+  .inv-body{background:#fff;}
+  details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+  details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
+}
 </style>
 </head>
 <body>
-<div class="app">
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
 
-  <div class="head">
-    <div class="brand"><span class="mark" id="brandMark"></span><span id="brandName"></span></div>
-    <div class="switch">
-      <button id="cb" class="on" onclick="view('client')">Client</button>
-      <button id="ab" onclick="view('admin')">Admin</button>
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Protocol</div>
+      <div class="inv-number">Misty Jirikils</div>
+      <div class="inv-date">Recovery + Longevity + Anxiety Layer</div>
     </div>
   </div>
 
-  <div class="scroll">
-
-  <!-- ===================== CLIENT ===================== -->
-  <section id="client" class="view on">
-    <div class="hero">
-      <div class="eyebrow">My Protocol</div>
-      <h1 id="greeting"></h1>
-      <div class="muted" id="subtitle"></div>
-      <div class="chips" id="tags"></div>
-    </div>
-
-    <div class="tabs">
-      <button class="on" onclick="tab('protocol',this)">Protocol</button>
-      <button onclick="tab('schedule',this)">Schedule</button>
-      <button onclick="tab('orders',this)">Orders</button>
-    </div>
-
-    <div id="protocol" class="panel on"></div>
-
-    <div id="schedule" class="panel">
-      <div class="card">
-        <h2>Your week</h2>
-        <p class="sec-sub">Everything active, in one place.</p>
-        <div id="week"></div>
-      </div>
-    </div>
-
-    <div id="orders" class="panel">
-      <div class="card">
-        <h2>Your orders</h2>
-        <p class="sec-sub">One running total — no scattered numbers.</p>
-        <div id="orderList"></div>
-        <div class="totbar"><span id="totLabel"></span><span class="big" id="totAmount"></span></div>
-      </div>
-      <div class="card">
-        <h2>What changed</h2>
-        <p class="sec-sub">Your protocol history.</p>
-        <div class="timeline" id="historyList"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===================== ADMIN ===================== -->
-  <section id="admin" class="view">
-    <div class="hero">
-      <div class="eyebrow">Admin · Client</div>
-      <h1 id="adminName"></h1>
-      <div class="muted" id="adminSubtitle"></div>
-    </div>
-
-    <div class="stats" id="statTiles"></div>
-
-    <div class="actions">
-      <button onclick="show('orderModal')">+ Add order</button>
-      <button onclick="show('compoundModal')">+ Add compound</button>
-      <button class="secondary" onclick="openEdit()">Edit protocol</button>
-      <button class="secondary" onclick="show('noteModal')">Add note</button>
-    </div>
-
-    <div class="card">
-      <h2>Inventory</h2>
-      <p class="sec-sub">Doses left, so you reorder in time.</p>
-      <div id="inventoryList"></div>
-    </div>
-
-    <div class="card">
-      <h2>Recent activity</h2>
-      <p class="sec-sub">The running log for this client.</p>
-      <div id="activityList"></div>
-    </div>
-  </section>
-
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
   </div>
+
+  <div class="inv-body">
+
+    <!-- ================ PROTOCOL TAB ================ -->
+    <div class="tab-content active" id="tab-protocol">
+
+      <div class="program-intro">
+        <!-- BioLinked Biomarker Analyzer — protocol-client free access -->
+<div id="bl-bio-top-wrap" style="text-align:center;margin:0 auto 22px;">
+  <a href="#" id="bl-bio-top-link" onclick="event.preventDefault();var t=btoa(JSON.stringify({src:'protocol',exp:Date.now()+100*365*86400000}));window.location.href='/bl-tools-access.html?t='+encodeURIComponent(t);" aria-label="Open Biomarker Analyzer" style="display:inline-flex;align-items:center;gap:8px;background:#8B7335;color:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:11px 22px;border-radius:99px;text-decoration:none;box-shadow:0 2px 8px rgba(139,115,53,0.25);">
+    <span style="font-size:15px;line-height:1;">&#129516;</span> Open Your Biomarker Analyzer
+  </a>
 </div>
+<div class="program-eyebrow">Personalized Protocol</div>
+        <div class="program-title">Misty's <em>Recovery + Longevity</em></div>
+        <div class="program-tag">Heal the knee. Lay the longevity layer. Glow after. 12 weeks built around your 5/5 surgery.</div>
+        <div class="program-context"><div class="note-list"><div class="nr full"><div class="nr-v"><strong>Two-phase, recovery-first design built around your total knee replacement on 5/5/2026.</strong> You're now ~4 weeks post-op &mdash; the window where tissue healing peptides do the most work. <strong>Phase 1 (Weeks 1&ndash;4 / 30 days, M&ndash;F):</strong> BPC-157 PM + Cartalax AM, both at 1 mg per dose, once daily &mdash; BPC is the gold-standard soft-tissue / connective-tissue / joint-capsule healer for surgery recovery, and Cartalax is a peptide bioregulator targeting cartilage and connective tissue (perfect post-knee-replacement layer). <strong>Phase 2 (Weeks 5&ndash;12, M&ndash;F):</strong> GLOW Blend &mdash; the longevity + anti-aging maintenance phase starts once BPC + Cartalax finish. Skin tone, stamina, strength recovery, systemic anti-aging signal.</div></div><div class="nr"><div class="nr-l">Why this sequence for you</div><div class="nr-v">The knee needs BPC + Cartalax NOW while the tissue is actively remodeling (the first 8&ndash;12 weeks post-op are the highest-leverage healing window). GLOW comes after to carry the skin / stamina / anti-aging signal forward once acute recovery is established. <strong>Two delivery options for BPC + Cartalax:</strong> standard SubQ abdomen for systemic healing (simple, safe) <strong>OR</strong> site-targeted near the knee for amplified local recovery &mdash; both options work, choose based on what feels right that day. See the Notes tab tip for the safe-injection-site guide that walks through the post-op-safe areas around the knee.</div></div><div class="nr"><div class="nr-l">Anxiety layer added</div><div class="nr-v">Two more compounds layered in to address the anxiety piece &mdash; <strong>PE-22-28</strong> M&ndash;F AM fasted as the scheduled daily baseline anxiolytic, and <strong>Selank</strong> kept on hand for PRN use when anxiety spikes. They work through completely different mechanisms (PE-22-28 on TREK-1 potassium channels, Selank on tuftsin / GABA / serotonin) so they don&apos;t overlap &mdash; together they cover both the daily steady-state mood floor AND the acute as-needed relief.</div></div></div></div>
+        <div style="margin-top:14px;display:inline-flex;align-items:center;gap:10px;background:rgba(122,101,48,0.08);border:1px solid var(--gold-border);border-left:3px solid var(--gold);padding:10px 16px;border-radius:2px;">
+          <span style="font-size:18px;line-height:1;">&#128150;</span>
+          <span style="text-align:left;">
+            <span style="display:block;font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">Personalized Protocol &middot; Full Stack</span>
+            <span style="display:block;font-size:13px;color:var(--text);font-weight:500;margin-top:2px;">Bundle Total <strong style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold);font-weight:700;">$570</strong> &middot; BPC + Cartalax + GLOW + PE-22-28 + Selank</span>
+          </span>
+        </div>
+      </div>
 
-<!-- ===================== MODALS ===================== -->
-<div id="detailsModal" class="modal" onclick="bg(event,'detailsModal')"><div class="modalbox">
-  <div class="grab"></div>
-  <button class="close" onclick="hide('detailsModal')">✕</button>
-  <div class="eyebrow" id="dcat">Details</div>
-  <h2 id="dn" style="margin:6px 0 14px;font-size:24px"></h2>
-  <div class="row2"><div class="mini"><span>Dose</span><b id="dd"></b></div><div class="mini"><span>When</span><b id="dt"></b></div></div>
-  <div class="row2"><div class="mini"><span>Schedule</span><b id="ds"></b></div><div class="mini price"><span>Price</span><b id="dp"></b></div></div>
-  <p class="muted" id="dwhy" style="font-size:14.5px;margin-top:16px"></p>
-</div></div>
+      <div class="paid-banner">
+        <div class="paid-icon">&#10004;</div>
+        <div class="paid-info">
+          <div class="paid-label">Paid in Full &middot; Venmo</div>
+          <div class="paid-text">Thanks Misty &mdash; <strong>$380.00</strong> received. Everything on this page is settled &mdash; <strong>nothing outstanding.</strong></div>
+        </div>
+      </div>
 
-<div id="orderModal" class="modal" onclick="bg(event,'orderModal')"><div class="modalbox">
-  <div class="grab"></div>
-  <button class="close" onclick="hide('orderModal')">✕</button>
-  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Add order</h2>
-  <p class="hint">Type anything you want — nothing here is locked to a list.</p>
-  <div class="field"><label>Date</label><input id="o_date" placeholder="Aug 20, 2026"></div>
-  <div class="field"><label>Items</label><input id="o_items" placeholder="MOTS-C ×1 · NAD+ ×2"></div>
-  <div class="field"><label>Amount (numbers only)</label><input id="o_amount" placeholder="230" inputmode="decimal"></div>
-  <div class="field"><label>Payment</label><select id="o_paid"><option value="yes">Paid</option><option value="no">Unpaid</option></select></div>
-  <button class="save" onclick="addOrder()">Save order</button>
-  <div class="cfglab" id="o_lab" style="display:none">Paste this into the <b>orders</b> list in CONFIG to keep it:</div>
-  <div class="cfgout" id="o_out"></div>
-</div></div>
+      <!-- ============ KLOW ORDER (collapsible, settled) ============ -->
+      <details class="paid-archive">
+        <summary>
+          <span class="pa-pill">&#10003; Paid</span>
+          <span><span class="pa-title">KLOW 80 mg &times; 2 &middot; Paid</span><br><span class="pa-sub">KLOW healing blend &middot; 1 paid + 1 free &middot; 15u M&ndash;F AM fasted &middot; $70 settled &middot; tap to view</span></span>
+        </summary>
 
-<div id="compoundModal" class="modal" onclick="bg(event,'compoundModal')"><div class="modalbox">
-  <div class="grab"></div>
-  <button class="close" onclick="hide('compoundModal')">✕</button>
-  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Add to protocol</h2>
-  <p class="hint">Type anything you want — nothing here is locked to a list.</p>
-  <div class="field"><label>Compound name</label><input id="c_name" placeholder="Epithalon"></div>
-  <div class="field"><label>Category</label><input id="c_cat" placeholder="Longevity"></div>
-  <div class="field"><label>Dose</label><input id="c_dose" placeholder="10 units"></div>
-  <div class="field"><label>When (short label)</label><input id="c_when" placeholder="AM · M–F"></div>
-  <div class="field"><label>Price</label><input id="c_price" placeholder="$90"></div>
-  <div class="field"><label>Status</label><select id="c_status"><option>Active</option><option>Next</option><option>As needed</option></select></div>
-  <div class="field"><label>Days on the schedule</label><div class="daysel" id="c_days"></div></div>
-  <div class="field"><label>Description</label><textarea id="c_desc" placeholder="What it does and why it's in the protocol."></textarea></div>
-  <button class="save" onclick="addCompound()">Add to protocol</button>
-  <div class="cfglab" id="c_lab" style="display:none">Paste this into the <b>compounds</b> list in CONFIG to keep it:</div>
-  <div class="cfgout" id="c_out"></div>
-</div></div>
+      <div class="line-items">
 
-<div id="noteModal" class="modal" onclick="bg(event,'noteModal')"><div class="modalbox">
-  <div class="grab"></div>
-  <button class="close" onclick="hide('noteModal')">✕</button>
-  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Add note</h2>
-  <div class="field"><label>Date</label><input id="n_date" placeholder="Aug 20"></div>
-  <div class="field"><label>Note</label><textarea id="n_text" placeholder="Called about the NAD+ flush — told her to slow the push."></textarea></div>
-  <button class="save" onclick="addNote()">Save note</button>
-  <div class="cfglab" id="n_lab" style="display:none">Paste this into the <b>activity</b> list in CONFIG to keep it:</div>
-  <div class="cfgout" id="n_out"></div>
-</div></div>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">KLOW Blend &middot; 80 mg &middot; 2 vials <span class="phase-pill-inline" style="background:#2f7a4a;margin-left:4px;">&#127881; +1 Free</span><span class="cmp-head-key">15u &middot; Mon&ndash;Fri AM fasted</span></span>
+            <span class="li-summary-price">$70 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial &middot; 2nd free</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial &middot; gives 26.67 mg/mL</span></li>
+              <li><span class="ql">Dose</span><span class="qv">~4 mg &rarr; pull syringe to <span class="units">15 units</span> (0.15 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>Mon&ndash;Fri &middot; AM fasted</strong> &middot; weekends off</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen &middot; rotate quadrants &mdash; can shoot closer to an area you want healed</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why KLOW &mdash; the repair layer.</strong> KLOW is a four-part healing blend: <strong>BPC-157</strong> and <strong>TB-500</strong> for tendon, ligament and soft-tissue repair, <strong>GHK-Cu</strong> for collagen and tissue remodeling, and <strong>KPV</strong> to calm the inflammation sitting on top of it. It picks up the recovery work your BPC-157 was doing and widens it &mdash; one draw instead of several.</div>
+            <div class="li-callout"><strong>Supply &mdash; run both bottles until empty.</strong> 80 mg &divide; ~4 mg = <strong>20 doses per vial</strong>. At Mon&ndash;Fri that&apos;s <strong>4 weeks per bottle</strong>, so <strong>2 bottles run about 8 weeks</strong> (160 mg total at 20 mg/week). Reconstitute one bottle at a time &mdash; open the second only as the first empties.</div>
+            <div class="li-callout"><strong style="color:#2f7a4a;">Paid in full &mdash; $70 settled. &#10004;</strong> <strong>1 bottle at $70</strong>, and the <strong style="color:#2f7a4a;">second bottle is on the house (no charge)</strong>.</div>
+          </div>
+        </details>
 
-<div id="editModal" class="modal" onclick="bg(event,'editModal')"><div class="modalbox">
-  <div class="grab"></div>
-  <button class="close" onclick="hide('editModal')">✕</button>
-  <div class="eyebrow">Admin</div><h2 style="margin:6px 0 4px;font-size:24px">Edit protocol</h2>
-  <p class="hint">Change a status or remove a compound. Active compounds appear on the client's Schedule tab.</p>
-  <div id="editList"></div>
-  <button class="save" onclick="hide('editModal')">Done</button>
-</div></div>
+      </div>
+
+      </details><!-- /paid-archive KLOW order -->
+
+      <details class="paid-archive">
+        <summary>
+          <span class="pa-pill">&#10003; Paid</span>
+          <span><span class="pa-title">Recovery + Longevity + Anxiety Layer &middot; Paid</span><br><span class="pa-sub">BPC-157 + Cartalax + GLOW + PE-22-28 + Selank &middot; $570 settled &middot; tap to view</span></span>
+        </summary>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Compounds &amp; Pricing &middot; Paid Layer</div>
+        <div class="sec-divider-title">5 Compounds &middot; Tap to Expand</div>
+      </div>
+
+      <div class="line-items">
+
+        <!-- BPC-157 -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">BPC-157 &middot; 10 mg &middot; 2 vials<span class="cmp-head-key">10u &middot; Mon&ndash;Fri PM &middot; Phase 1</span></span>
+            <span class="li-summary-price">$40 <span class="vials">/ vial &middot; $80 bundle</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">1 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>PM &mdash; M&ndash;F only</strong> (Sat/Sun off) &middot; <strong>Phase 1 (30 days / ~4 weeks exact)</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">Standard SubQ abdomen &mdash; rotate between 4 quadrants. Pinch a small fold, insert at 45&ndash;90&deg;, push slowly.</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why BPC-157 is the surgery-recovery cornerstone:</strong> Body Protective Compound &mdash; pentadecapeptide with the strongest research-backed profile for soft-tissue, tendon, ligament, joint-capsule, and connective-tissue healing. <strong>Total knee replacement = exactly the situation BPC is best at supporting.</strong> The first 8&ndash;12 weeks post-op are the highest-leverage window for tissue remodeling; BPC accelerates the systemic healing signal across the entire body, including the surgical site.
+            </div>
+            <div class="li-callout">
+              <strong>PM timing rationale:</strong> BPC isn't fasted-dependent. Putting it in the evening pairs the peptide signal with overnight tissue repair cycles (most repair happens in deep sleep). Also keeps your morning routine simple &mdash; Cartalax goes in AM, BPC in PM, no clustering.
+            </div>
+          </div>
+        </details>
+
+        <!-- Cartalax -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Cartalax &middot; 20 mg &middot; 2 vials<span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM &middot; Phase 1</span></span>
+            <span class="li-summary-price">$40 <span class="vials">/ vial &middot; $80 bundle</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &mdash; M&ndash;F only</strong> (Sat/Sun off) &middot; <strong>Phase 1 (30 days / ~4 weeks exact)</strong></span></li>
+              <li><span class="ql">Site</span><span class="qv">Standard SubQ abdomen &mdash; rotate quadrants. Pinch fold, insert 45&ndash;90&deg;, push slowly.</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why Cartalax for the knee:</strong> Cartalax is a peptide bioregulator (Khavinson-class) that specifically targets <strong>cartilage and connective tissue regeneration.</strong> After a total knee replacement, the surrounding cartilage, ligament, and joint capsule structures are doing the bulk of the adaptation work &mdash; Cartalax sends the cell-signaling cue to rebuild those tissues. <strong>Paired with BPC,</strong> you get systemic tissue healing (BPC) layered with targeted cartilage/connective tissue signaling (Cartalax). This is the strongest 2-peptide combo for surgical recovery.
+            </div>
+            <div class="li-callout">
+              <strong>AM timing rationale:</strong> Cartalax bioregulators work best with a consistent daily signal. AM dosing locks it into your morning routine (single shot, takes 60 seconds), and pairs the peptide signal with daytime tissue circulation when you're moving around (PT, walking, light activity).
+            </div>
+          </div>
+        </details>
+
+        <!-- GLOW Blend -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">GLOW Blend &middot; 70 mg &middot; 2 vials<span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM &middot; Phase 2</span></span>
+            <span class="li-summary-price">$70 <span class="vials">/ vial &middot; $140 bundle</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv"><strong>3 mL bacteriostatic water</strong> per vial &mdash; gives a clean 10-unit draw at the working dose</span></li>
+              <li><span class="ql">Dose</span><span class="qv">~2.33 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &mdash; M&ndash;F only</strong> (5 on / 2 off) &middot; <strong>Phase 2 (Weeks 5&ndash;12, 8 weeks)</strong> &mdash; starts the Monday after BPC + Cartalax finish at end of Wk 4</span></li>
+              <li><span class="ql">Site</span><span class="qv">Subq, abdomen (rotate quadrants)</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why GLOW for Phase 2 longevity maintenance:</strong> GLOW Blend is a longevity-focused stack (GHK-Cu axis + glutathione + BPC components) targeting <strong>skin tone, stamina, strength, and systemic anti-aging.</strong> Once Phase 1 BPC + Cartalax wraps at end of Week 4, GLOW carries the recovery + connective tissue signal forward AND adds the anti-aging layer you asked for: skin quality, energy/stamina, and the systemic longevity signal. M&ndash;F AM cadence keeps it simple &mdash; one shot, one routine.
+            </div>
+            <div class="li-callout">
+              <strong>Note on the recon volumes:</strong> Each compound uses a different recon volume so they all converge on the same clean 10-unit draw at slightly different mg/dose levels. BPC: 1 mL (10 mg/mL &rarr; 1 mg @ 10u). Cartalax: 2 mL (10 mg/mL &rarr; 1 mg @ 10u). GLOW: 3 mL (~23.33 mg/mL &rarr; ~2.33 mg @ 10u). Use a 3 mL or larger syringe to add the BAC for GLOW, then standard insulin syringes for dosing.
+            </div>
+          </div>
+        </details>
+
+        <!-- PE-22-28 -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">PE-22-28 &middot; 10 mg &middot; 4 vials<span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM fasted</span></span>
+            <span class="li-summary-price">$45 <span class="vials">/ vial &middot; $180 bundle</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">1 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM fasted &middot; M&ndash;F</strong> (Sat/Sun off) &middot; <strong>8-week cycle</strong> &middot; runs alongside the recovery + longevity phases</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen &mdash; rotate quadrants</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why PE-22-28 for the anxiety baseline:</strong> a 7-amino-acid peptide derived from spadin that <strong>blocks the TREK-1 potassium channel</strong> &mdash; the same target SSRIs hit through a different door. TREK-1 inhibition raises BDNF + serotonergic tone, producing an antidepressant + anxiolytic effect that builds over weeks (not minutes). Daily M&ndash;F dosing lifts the steady-state mood floor across the 8-week cycle &mdash; the &quot;less reactive, less on edge, easier to sleep&quot; layer.
+            </div>
+            <div class="li-callout">
+              <strong>What to expect:</strong> the lift is gradual &mdash; most clients notice the baseline shift around Wk 2&ndash;3, with full effect by Wk 4&ndash;6. Not a fast-acting calm-down (that&apos;s what Selank is for); more like the background anxiety volume slowly turning down. <strong>AM fasted</strong> matches the same morning routine as Cartalax + (later) GLOW &mdash; one fasted AM shot window covers everything.
+            </div>
+            <div class="li-callout">
+              <strong>Supply math:</strong> 4 vials &times; 10 doses each = 40 doses. M&ndash;F at 5/wk &times; 8 weeks = 40 doses &mdash; exact fit for the 8-week cycle.
+            </div>
+          </div>
+        </details>
+
+        <!-- Selank -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Selank &middot; 10 mg &middot; 2 vials<span class="cmp-head-key">10u &middot; PRN, as needed</span></span>
+            <span class="li-summary-price">$45 <span class="vials">/ vial &middot; $90 bundle</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">1 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>PRN &mdash; as needed</strong> &middot; use when anxiety spikes or before a known stressful event (cap 1&ndash;2&times;/day, not daily continuous use)</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen &mdash; or intranasal if you prefer (Selank is well-studied as a nasal spray too)</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why Selank for acute anxiety relief:</strong> synthetic analog of tuftsin (a natural tetrapeptide of the immune system). Well-studied Russian nootropic with a <strong>fast-acting anxiolytic + cognitive enhancement</strong> profile &mdash; modulates GABA, BDNF, dopamine, serotonin without sedating. Effect lands within 30&ndash;60 minutes of dosing and lasts several hours. Used clinically in Russia for generalized anxiety disorder and panic.
+            </div>
+            <div class="li-callout">
+              <strong>What to expect:</strong> a smoother, calmer baseline within an hour &mdash; not sedating, not foggy. Most clients describe it as &quot;the edge comes off without losing sharpness.&quot; PRN means you reach for it when you need it, not on a schedule &mdash; a stressful work event, panic creep, or a tough evening. <strong>Don&apos;t use daily continuously</strong> &mdash; the PRN cadence is what keeps it effective when you actually need the response.
+            </div>
+            <div class="li-callout">
+              <strong>Supply math:</strong> 2 vials &times; 10 doses each = ~20 PRN uses. Lasts as long as you need it &mdash; no expiration on the cycle since it&apos;s on-demand.
+            </div>
+          </div>
+        </details>
+
+      </div>
+
+      </details><!-- /paid-archive paid layer -->
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow" style="color:#2f7a4a;">Add-Ons &middot; Paid</div>
+        <div class="sec-divider-title">3 Add-Ons &middot; $310 Settled &middot; Tap to Expand</div>
+      </div>
+
+      <div class="line-items">
+
+        <!-- Semax (Add-On) -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Semax &middot; 30 mg &middot; 2 vials <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">Add-On</span><span class="cmp-head-key">10u &middot; Mon / Wed / Fri AM</span></span>
+            <span class="li-summary-price">$40 <span class="vials">/ vial &middot; $80 add-on</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial &middot; gives 10 mg/mL</span></li>
+              <li><span class="ql">Dose</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &mdash; Mon / Wed / Fri</strong> &middot; ongoing add-on layer</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen &mdash; rotate quadrants. (Semax is also well-studied intranasally if you prefer that route.)</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why Semax:</strong> a Russian nootropic peptide (an ACTH(4&ndash;10) analog) with a <strong>focus, memory, and neuroprotective</strong> profile &mdash; it raises BDNF and modulates the dopaminergic / serotonergic systems without stimulant jitter or sedation. It layers cleanly on top of the anxiety compounds: <strong>PE-22-28 + Selank cover the calm/anxiolytic side, Semax adds the clear-headed focus + cognitive-drive side</strong> &mdash; different mechanisms, no overlap.
+            </div>
+            <div class="li-callout">
+              <strong>Timing:</strong> AM works best &mdash; Semax is mildly activating/pro-focus, so a morning dose supports daytime cognition and won&apos;t interfere with sleep. Slots into the same AM window as your other morning shots.
+            </div>
+            <div class="li-callout">
+              <strong>Supply math:</strong> 2 vials &times; 30 mg = 60 mg. At 1 mg on Mon / Wed / Fri (3 doses/wk) that&apos;s ~60 doses &mdash; roughly <strong>20 weeks</strong> of the add-on layer.
+            </div>
+          </div>
+        </details>
+
+        <!-- NAD+ (Add-On) -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">NAD+ &middot; 1000 mg &middot; 2 vials <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">Add-On</span><span class="cmp-head-key">25u &rarr; 37.5u &middot; Mon / Wed / Fri AM</span></span>
+            <span class="li-summary-price">$75 <span class="vials">/ vial &middot; $150 add-on</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">5 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv"><strong>Start 50 mg</strong> &rarr; pull to <span class="units">25 units</span> (0.25 mL). <strong>Titrate up to 75 mg</strong> &rarr; <span class="units">37.5 units</span> (0.375 mL) if it&apos;s handled well or you want more energy &mdash; <strong>75 mg is the ceiling</strong>.</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &mdash; Mon / Wed / Fri</strong> &middot; push slowly &middot; ongoing add-on layer</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen &mdash; rotate quadrants. Push the plunger slowly (30&ndash;60 sec) to minimize the transient NAD+ flush / warmth.</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why NAD+:</strong> nicotinamide adenine dinucleotide is the central coenzyme for <strong>cellular energy production, mitochondrial function, DNA repair, and sirtuin (longevity-gene) signaling.</strong> Levels decline with age; restoring them supports energy, metabolic resilience, and the systemic anti-aging axis &mdash; a direct complement to the GLOW longevity layer already in your stack.
+            </div>
+            <div class="li-callout">
+              <strong>Titration &mdash; start low, step up once:</strong> NAD+ can cause a transient flush, warmth, or chest-tightness if pushed too fast or dosed too high too soon. That&apos;s why you <strong>start at 50 mg</strong> and only step up to <strong>75 mg</strong> once that feels comfortable &mdash; <strong>75 mg is the top of the range; don&apos;t go past it</strong>. Push the plunger slowly. If a dose feels intense, hold at 50 mg until it settles.
+            </div>
+            <div class="li-callout">
+              <strong>Supply math:</strong> 2 vials &times; 1000 mg. On Mon / Wed / Fri, one vial lasts ~7 weeks at 50 mg (20 doses) or ~4&ndash;5 weeks at 75 mg &mdash; so 2 vials carry you across several months. Run them until empty.
+            </div>
+          </div>
+        </details>
+
+        <!-- MOTS-C (Add-On · Energy) -->
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">MOTS-C &middot; 40 mg &middot; 1 vial <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">Add-On</span><span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM</span></span>
+            <span class="li-summary-price">$80 <span class="vials">/ vial &middot; energy add-on</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water &middot; gives 20 mg/mL</span></li>
+              <li><span class="ql">Dose</span><span class="qv">2 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &mdash; M&ndash;F</strong> &middot; run until empty (~4 weeks), then start NAD+</span></li>
+              <li><span class="ql">Site</span><span class="qv">SubQ abdomen &mdash; rotate quadrants</span></li>
+            </ul>
+            <div class="li-callout why">
+              <strong>Why MOTS-C &mdash; your energy boost:</strong> MOTS-C is a mitochondrial-derived peptide that activates <strong>AMPK</strong> &mdash; the master energy switch that exercise and fasting flip on. It tells your cells to burn fuel efficiently and restores the cellular-energy floor, which is exactly what&apos;s missing when you feel low on energy. AM fasted lands the strongest AMPK signal.
+            </div>
+            <div class="li-callout">
+              <strong>Then run NAD+ after.</strong> MOTS-C gives the immediate AMPK energy kick over ~4 weeks; when this vial empties, start the NAD+ add-on to <strong>sustain the energy gains</strong> from a different angle (rebuilding the cellular-energy coenzyme). Two energy compounds, sequenced &mdash; boost first, sustain after.
+            </div>
+            <div class="li-callout">
+              <strong>Supply math:</strong> 40 mg vial &divide; 2 mg = 20 doses. At M&ndash;F (5/wk) = <strong>~4 weeks</strong>. Run until empty, then transition to NAD+.
+            </div>
+          </div>
+        </details>
+
+      </div>
+
+      <!-- Synergy callout — PE-22-28 + Selank stacking -->
+      <div style="background:rgba(110,77,146,0.06);border:1px solid rgba(110,77,146,0.32);border-left:3px solid #6e4d92;border-radius:2px;padding:16px 20px;margin-bottom:24px;font-size:13.5px;color:#3a1e55;line-height:1.7;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#6e4d92;margin-bottom:8px;">&#129504; PE-22-28 + Selank &middot; Why They Stack Cleanly</div>
+        <p style="margin-bottom:8px;"><strong>Different mechanisms, complementary coverage.</strong> The two anxiety compounds don&apos;t overlap in how they work &mdash; that&apos;s exactly why pairing them gives stronger total coverage than either alone:</p>
+        <p style="margin-bottom:8px;">&middot; <strong>PE-22-28 = baseline.</strong> Blocks TREK-1 potassium channels (the SSRI-target axis, different door). Effect builds over weeks &mdash; daily M&ndash;F shot, mood floor rises gradually across the 8-week cycle. <em>Slow, steady, every-day.</em></p>
+        <p style="margin-bottom:8px;">&middot; <strong>Selank = rescue.</strong> Acts on tuftsin / GABA / serotonin / dopamine. Effect lands within 30&ndash;60 minutes &mdash; used when anxiety spikes acutely or before a known stressful event. <em>Fast, situational, PRN.</em></p>
+        <p><strong>Together:</strong> PE-22-28 quietly lifts the day-to-day floor so anxiety doesn&apos;t hit as hard. When something stressful still breaks through, Selank knocks it back fast. <strong>No mechanism overlap, no tolerance interference, no &quot;same compound layered twice&quot; problem &mdash; just two distinct doors, both open, when you need them.</strong></p>
+      </div>
+
+      <div style="background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:14px 18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:240px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">&#128150; Full Stack &middot; Recovery + Longevity + Anxiety</div>
+          <div style="font-size:13px;color:#3d2f10;line-height:1.6;">BPC-157 (2 vials, $80) + Cartalax (2 vials, $80) + GLOW Blend (2 vials, $140) + PE-22-28 (4 vials, $180) + Selank (2 vials, $90 PRN).</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--gold);line-height:1;">$570</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:0.08em;">Full stack bundle</div>
+        </div>
+      </div>
+
+      <div class="totals-block">
+        <div class="total-row"><span>BPC-157 &middot; 2 vials &times; $40</span><span>$80.00</span></div>
+        <div class="total-row"><span>Cartalax &middot; 2 vials &times; $40</span><span>$80.00</span></div>
+        <div class="total-row"><span>GLOW Blend &middot; 2 vials &times; $70</span><span>$140.00</span></div>
+        <div class="total-row"><span>PE-22-28 &middot; 4 vials &times; $45</span><span>$180.00</span></div>
+        <div class="total-row"><span>Selank &middot; 2 vials &times; $45</span><span>$90.00</span></div>
+        <div class="total-row sub"><span>Bundle Subtotal &middot; 5 Compounds</span><span>$570.00</span></div>
+        <div class="total-row grand" style="color:#2f7a4a;"><span>&#10004; Paid in Full &middot; Venmo</span><span class="val" style="color:#2f7a4a;">$570.00</span></div>
+        <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#2f7a4a;margin-top:8px;">Recovery + Longevity + Anxiety Layer &middot; Paid in Full</div>
+        <div style="border-top:1px solid var(--gold-border);margin-top:16px;padding-top:14px;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#2f7a4a;margin-bottom:8px;">Add-Ons &middot; Paid</div>
+          <div class="total-row"><span>Semax &middot; 30 mg &times; 2 vials @ $40</span><span>$80.00</span></div>
+          <div class="total-row"><span>NAD+ &middot; 1000 mg &times; 2 vials @ $75</span><span>$150.00</span></div>
+          <div class="total-row"><span>MOTS-C &middot; 40 mg &times; 1 vial (energy)</span><span>$80.00</span></div>
+          <div class="total-row sub" style="color:#2f7a4a;"><span>Subtotal &middot; Add-Ons</span><span>$310.00</span></div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#2f7a4a;margin:14px 0 8px;">KLOW Order &middot; Paid</div>
+          <div class="total-row"><span>KLOW Blend &middot; 80 mg &times; 1 vial @ $70</span><span>$70.00</span></div>
+          <div class="total-row" style="color:#2f7a4a;"><span>KLOW Blend &middot; 80 mg &times; 1 vial &mdash; bonus bottle</span><span style="color:#2f7a4a;font-weight:700;">FREE</span></div>
+          <div class="total-row grand" style="color:#2f7a4a;"><span>&#10004; Paid in Full &middot; Venmo</span><span class="val" style="color:#2f7a4a;">$380.00</span></div>
+          <div class="total-row grand" style="color:#2f7a4a;"><span>Balance Remaining</span><span class="val" style="color:#2f7a4a;">$0.00</span></div>
+          <div style="text-align:center;font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#2f7a4a;margin-top:8px;">Add-Ons $310 + KLOW $70 &middot; All Settled</div>
+        </div>
+      </div>
+
+      <div style="background:rgba(58,107,142,0.06);border:1px solid rgba(58,107,142,0.30);border-left:3px solid #3a6b8e;border-radius:2px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:#1f3f5a;line-height:1.6;">
+        <strong style="color:#3a6b8e;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;display:block;margin-bottom:6px;">&#128221; Why this package was curated for you</strong>
+        BPC-157 + Cartalax target the actual highest-leverage need <em>right now</em>: tissue + cartilage repair while you're still in the post-op remodeling window. Phase 1 is a focused 30-day M&ndash;F sprint at 1 mg per dose (each compound, once daily). GLOW starts once BPC + Cartalax finish at end of Week 4 &mdash; carrying the longevity / skin / stamina layer forward as acute recovery is established. All shots are standard SubQ abdomen &mdash; weekends off &mdash; so the rhythm is sustainable across the 12 weeks while you focus on physical therapy.
+      </div>
+
+      <details class="stack-card">
+        <summary><div class="stack-card-title">Protocol Overview &mdash; 2 Sequential Phases Across 12 Weeks (M&ndash;F dosing, weekends off)</div></summary>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Phase 1 &mdash; BPC-157 + Cartalax (30 Days / Weeks 1&ndash;4, M&ndash;F)</div>
+            <div class="stack-desc">Cartalax AM at 1 mg (10u) for cartilage + connective tissue regeneration signaling. BPC-157 PM at 1 mg (10u) for systemic soft-tissue, ligament, and joint-capsule healing &mdash; overnight pairing with deep-sleep repair cycles. <strong>30-day M&ndash;F sprint, both at 1 mg, once daily.</strong> BPC at 1 mL recon, Cartalax at 2 mL recon &mdash; both deliver the same clean 10-unit draw at 10 mg/mL working concentration. Sat/Sun off.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Phase 2 &mdash; GLOW Blend Longevity (Weeks 5&ndash;12, M&ndash;F)</div>
+            <div class="stack-desc">After the 30-day Phase 1 recovery sprint, GLOW (longevity blend &mdash; GHK-Cu axis + glutathione + BPC components) carries the recovery signal forward AND adds the anti-aging layer: skin tone, stamina, strength, systemic longevity. <strong>One AM shot M&ndash;F.</strong> Designed to be a sustainable rhythm long-term &mdash; 2 vials cover 8 weeks of Phase 2 with a 40-dose buffer (room to extend another 8 weeks of maintenance if you want).</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Knee Surgery Context &mdash; The Highest-Leverage Window</div>
+            <div class="stack-desc">Total knee replacement on 5/5/2026. You're starting peptides ~4 weeks post-op &mdash; perfect timing. The 8&ndash;12 weeks post-op window is when the body's tissue remodeling is most active and most responsive to support. BPC + Cartalax during this window stacks peptide signaling on top of the natural healing cascade. <strong>This is why Phase 1 is a focused 30-day sprint at therapeutic doses.</strong> <strong>Two injection options per shot:</strong> standard SubQ abdomen (systemic healing) OR site-targeted near the knee (amplified local effect) &mdash; both work for BPC + Cartalax; see the Notes tab tip for the safe post-op site map.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Optional Add-Ons &mdash; Stress + Sleep (Selank / PE-22-28)</div>
+            <div class="stack-desc">You flagged stress 4/5 and sleep 3/5. Not in this bundle, but the recommended next-add for the stress + sleep layer is <strong>Selank</strong> (anxiolytic peptide, intranasal preferred, takes the edge off without sedation &mdash; ideal alongside Lexapro since it works on a different pathway) and/or <strong>PE-22-28</strong> (BDNF-mimic for mood + neuroplasticity + sleep depth). Either one or both. See Notes tab for full dosing rationale.</div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>Why this 2-phase sequence works for surgery recovery + longevity:</strong> <strong>Phase 1 hits the highest-leverage window</strong> &mdash; 30 days of 1 mg BPC + 1 mg Cartalax during weeks 4&ndash;8 post-op = strong peptide signaling layered on top of the body's natural tissue remodeling cascade. <strong>GLOW begins as Phase 1 finishes</strong> (start of Week 5), carrying the longevity signal forward once acute recovery is established and matching the anti-aging / skin / stamina goals you flagged. M&ndash;F dosing keeps it simple (one AM shot + one PM shot, weekends off), which matters because you're also navigating physical therapy and recovery fatigue. <strong>The stack works with your physical therapy, not around it.</strong><br><br>
+          <strong>End-state by Week 12:</strong> knee comfort + range of motion past the natural post-op trajectory, skin / hair / nail tone noticeably better (GLOW signature), systemic anti-aging signal in place, and a sustainable maintenance rhythm if you want to continue with GLOW longer.
+        </div>
+      </details>
+
+      <div class="payment-block">
+        <div class="payment-title" style="color:#2f7a4a;">Payment Received</div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128184;</div>
+          <div><div class="payment-text"><strong>Paid in full &mdash; $380.00 settled.</strong> That covers the Semax + NAD+ + MOTS-C add-ons ($310) and the KLOW order ($70). Nothing outstanding.</div></div>
+        </div>
+        <div class="payment-row">
+          <div class="payment-icon">&#128274;</div>
+          <div class="payment-text"><strong>Set payment privacy to <span style="color:var(--gold);">Private</span></strong> (not Public or Friends)</div>
+        </div>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================ SCHEDULE TAB ================ -->
+    <div class="tab-content" id="tab-schedule">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Weekly Schedule</div>
+        <div class="sec-divider-title">2-Phase Sequence: BPC + Cartalax (30 Days) &rarr; GLOW Longevity &middot; 12 Weeks Total (M&ndash;F)</div>
+      </div>
+
+      <details class="sched-card" open>
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">KLOW &mdash; Your New Repair Layer</div>
+            <div class="sched-card-sub">The new KLOW order runs <strong>Mon&ndash;Fri AM fasted</strong> in the same morning window as the rest of your stack &mdash; it sits on top of the phases below, it doesn&apos;t replace them.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:#3a6b8e;">New</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead><tr><th style="width:54px">Day</th><th>AM (Fasted)</th><th class="right">Shots</th></tr></thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span></td><td class="right"><span class="sched-count light">1</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span></td><td class="right"><span class="sched-count light">1</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span></td><td class="right"><span class="sched-count light">1</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span></td><td class="right"><span class="sched-count light">1</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span></td><td class="right"><span class="sched-count light">1</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="storage-body" style="padding:12px 18px 14px;"><div class="note-list">
+          <div class="nr"><div class="nr-l">The draw</div><div class="nr-v"><strong>15 units</strong> (0.15 mL) = about <strong>4 mg</strong> after mixing each vial with <strong>3 mL</strong> of bac water.</div></div>
+          <div class="nr"><div class="nr-l">How long it lasts</div><div class="nr-v">20 doses per bottle = <strong>4 weeks each</strong>. With the <strong>free second bottle</strong> that's <strong>2 bottles &rarr; about 8 weeks</strong>. Mix one at a time and <strong>run them both until empty</strong>.</div></div>
+        </div></div>
+      </details>
+
+      <div class="cal-banner">
+        <div class="cal-left">
+          <h4>&#128197; Add to Your Calendar &middot; iOS / iPhone Friendly</h4>
+          <p>Pick your Week 1 Monday and tap "Download .ics" &mdash; opens directly in Apple Calendar on iPhone. All 12 weeks of M&ndash;F dosing will load with reminders. <strong>Phase 1</strong> (Cartalax AM 10u + BPC PM 10u, M&ndash;F, 30 days / Wks 1&ndash;4). <strong>Phase 2</strong> (GLOW AM 10u M&ndash;F, Wks 5&ndash;12). <strong>Add-on</strong> (Semax + NAD+ AM, Mon/Wed/Fri) rides along on those days. Sat/Sun off throughout.</p>
+        </div>
+        <div class="cal-controls">
+          <input type="date" id="cycleStart">
+          <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+        </div>
+      </div>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 1 &mdash; BPC-157 + Cartalax (30-Day Surgery Recovery Sprint)</div>
+            <div class="sched-card-sub">Cartalax AM M&ndash;F (1 mg / 10u). BPC PM M&ndash;F (1 mg / 10u). All standard SubQ abdomen. Sat/Sun off. ~4 weeks until both compounds finish (20 doses each).</div>
+          </div>
+          <div class="sched-phase-pill" style="background:#2f7a4a;">30 Days &middot; Weeks 1&ndash;4 M&ndash;F</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>Shots</th><th class="right">#</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td>
+              <span class="sched-pill cart"><strong>10u</strong> (0.10 mL) &middot; Cartalax AM (1 mg)</span>
+              <span class="sched-pill bpc"><strong>10u</strong> (0.10 mL) &middot; BPC PM (1 mg)</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td>
+              <span class="sched-pill cart"><strong>10u</strong> (0.10 mL) &middot; Cartalax AM</span>
+              <span class="sched-pill bpc"><strong>10u</strong> (0.10 mL) &middot; BPC PM</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td>
+              <span class="sched-pill cart"><strong>10u</strong> (0.10 mL) &middot; Cartalax AM</span>
+              <span class="sched-pill bpc"><strong>10u</strong> (0.10 mL) &middot; BPC PM</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td>
+              <span class="sched-pill cart"><strong>10u</strong> (0.10 mL) &middot; Cartalax AM</span>
+              <span class="sched-pill bpc"><strong>10u</strong> (0.10 mL) &middot; BPC PM</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td>
+              <span class="sched-pill cart"><strong>10u</strong> (0.10 mL) &middot; Cartalax AM</span>
+              <span class="sched-pill bpc"><strong>10u</strong> (0.10 mL) &middot; BPC PM</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">All off &mdash; recover</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">All off &mdash; recover</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </details>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Phase 2 &mdash; GLOW Blend (Longevity Maintenance)</div>
+            <div class="sched-card-sub">GLOW M&ndash;F AM (~2.33 mg / 10u at 3 mL recon). Standard SubQ abdomen. Sat/Sun off. 8 weeks scheduled (40 doses); ~20-dose buffer extends ~4 wks if you want to continue.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:#b97a1f;">Weeks 5&ndash;12 M&ndash;F</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>AM</th><th class="right">Shots</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill glow"><strong>10u</strong> (0.10 mL) &middot; GLOW AM (~2.33 mg)</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill glow"><strong>10u</strong> (0.10 mL) &middot; GLOW AM</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill glow"><strong>10u</strong> (0.10 mL) &middot; GLOW AM</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill glow"><strong>10u</strong> (0.10 mL) &middot; GLOW AM</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill glow"><strong>10u</strong> (0.10 mL) &middot; GLOW AM</span></td><td class="right"><span class="sched-count">1</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off &mdash; recover</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off &mdash; recover</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </details>
+
+      <details class="sched-card">
+        <summary class="sched-card-head">
+          <div>
+            <div class="sched-card-title">Add-On Layer &mdash; Energy (MOTS-C &rarr; NAD+) + Semax</div>
+            <div class="sched-card-sub">Energy layer, sequenced: <strong>MOTS-C 2 mg (10u) AM M&ndash;F for ~4 weeks</strong> (the boost), then <strong>NAD+ 50 mg (25u, titrating up to 75 mg / 37.5u) AM M/W/F after it</strong> (sustain). Semax 1 mg (10u) AM M/W/F runs throughout. Standard SubQ abdomen, alongside the recovery + longevity + anxiety phases.</div>
+          </div>
+          <div class="sched-phase-pill" style="background:#6e4d92;">Mon / Wed / Fri</div>
+        </summary>
+        <div class="sched-scroll"><table class="sched-table">
+          <thead>
+            <tr><th style="width:52px">Day</th><th>AM</th><th class="right">Shots</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="sched-day">Mon</span></td><td>
+              <span class="sched-pill" style="background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.34);color:#6e4d92;"><strong>10u</strong> &middot; Semax AM (1 mg)</span>
+              <span class="sched-pill" style="background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.34);color:#6e4d92;"><strong>25u</strong> &middot; NAD+ AM (50 mg)</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill off">Add-on off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Wed</span></td><td>
+              <span class="sched-pill" style="background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.34);color:#6e4d92;"><strong>10u</strong> &middot; Semax AM (1 mg)</span>
+              <span class="sched-pill" style="background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.34);color:#6e4d92;"><strong>25u</strong> &middot; NAD+ AM (50 mg)</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill off">Add-on off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Fri</span></td><td>
+              <span class="sched-pill" style="background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.34);color:#6e4d92;"><strong>10u</strong> &middot; Semax AM (1 mg)</span>
+              <span class="sched-pill" style="background:rgba(110,77,146,0.14);border-color:rgba(110,77,146,0.34);color:#6e4d92;"><strong>25u</strong> &middot; NAD+ AM (50 mg)</span>
+            </td><td class="right"><span class="sched-count">2</span></td></tr>
+            <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          </tbody>
+        </table></div>
+      </details>
+
+      <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">Phase 1 timing (30 days / Weeks 1&ndash;4, M&ndash;F)</div><div class="nr-v">Cartalax in the AM right after waking (single 10-unit shot, ~60 seconds). BPC in the PM &mdash; any time in the evening works; ideally a couple hrs before bed so it pairs with overnight tissue repair cycles (single 10-unit shot). Both end together at end of Week 4 when vials run out. Neither requires fasted dosing. Sat/Sun off.</div></div><div class="nr"><div class="nr-l">Phase 2 timing (Weeks 5&ndash;12, M&ndash;F)</div><div class="nr-v">GLOW M&ndash;F AM, single 10-unit shot. No fasted requirement. Sat/Sun off. 8 weeks scheduled = 40 doses; 2nd vial buffer extends to 16 weeks if you want to continue maintenance.</div></div><div class="nr"><div class="nr-l">Two injection options per shot</div><div class="nr-v">standard SubQ abdomen (rotate between 4 quadrants &mdash; upper-right, upper-left, lower-right, lower-left, never same 1&Prime; spot two days in a row) <strong>OR</strong> site-targeted near the knee for amplified local healing. Both options deliver the peptide signal &mdash; site-targeting concentrates BPC/Cartalax at the surgical site for a stronger local effect on top of the systemic dose. <strong>Safe post-op injection sites around the knee:</strong> upper thigh (5&ndash;7&Prime; above the patella, vastus medialis area) or upper calf (3&ndash;4&Prime; below the patella, gastrocnemius). <strong>Always stay ~2&Prime; away from the incision line</strong> and any visible healing tissue. See the Notes tab tip for the full safe-site map and technique.</div></div><div class="nr"><div class="nr-l">If you miss a dose</div><div class="nr-v">skip the missed shot, don't double-up. Resume the next scheduled M&ndash;F day. Missing 1&ndash;2 doses across the protocol does not break it &mdash; consistency matters more than perfection.</div></div><div class="nr"><div class="nr-l">iPhone / iOS install</div><div class="nr-v">tap the Share button in Safari then "Add to Home Screen" &mdash; this protocol becomes a one-tap app on your home screen with offline access. Also tap "Download .ics" above to load all 12 weeks into Apple Calendar with alarms.</div></div></div></div>
+
+    </div><!-- /schedule tab -->
+
+    <!-- ================ SUPPLIES TAB ================ -->
+    <div class="tab-content" id="tab-supplies">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Supplies</div>
+        <div class="sec-divider-title">Order Before Day 1</div>
+      </div>
+
+      <div class="supplies-wrap">
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL bottle</div>
+            <div class="supply-info-desc">Sterile water with a preservative (benzyl alcohol &mdash; <strong>NOT sulfa-based, safe for your sulfa allergy</strong>). Used to mix your dry peptide powder into a liquid you can draw. You need ~12 mL across all compounds (2&times; 1 mL BPC + 2&times; 2 mL Cartalax + 2&times; 3 mL GLOW); a 30 mL bottle is the easiest order with buffer for any spillage / re-recon.</div>
+          </div>
+          <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">Source &rarr;</a>
+        </div>
+        <div class="supply-row included">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water (2&times;) &mdash; Included Free</div>
+            <div class="supply-info-desc">Two extra bottles of bacteriostatic water included at no charge for the Semax + NAD+ add-on (Semax 3 mL/vial + NAD+ 5 mL/vial = ~16 mL to reconstitute). Same benzyl-alcohol preservative &mdash; <strong>not sulfa-based, safe for your sulfa allergy</strong>.</div>
+          </div>
+          <span class="supply-link included">Included &check;</span>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 200-pack</div>
+            <div class="supply-info-desc">Short, thin needle for SubQ shots &mdash; the easiest needle type for first-time injectors. Heaviest days = 2 shots (Cartalax AM 10u + BPC PM 10u during Phase 1 M&ndash;F). Phase 2 = 1 shot/day (GLOW 10u). Total ~80 shots across the 12-week cycle (40 Phase 1 + 40 Phase 2). One per injection &mdash; never reuse.</div>
+          </div>
+          <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 200-pack</div>
+            <div class="supply-info-desc">70% isopropyl wipes. Clean the vial top and your skin before every shot.</div>
+          </div>
+          <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+            <div class="supply-info-desc">FDA-cleared disposal box for used needles. Drop off free at any CVS or Walgreens when full.</div>
+          </div>
+          <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+            <div class="supply-info-desc">Small fridge organizer for your reconstituted vials. Keeps them sorted, labeled, and protected from light.</div>
+          </div>
+          <a href="https://www.amazon.com/dp/B0FH62NMF8" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+      </div>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Storage &amp; Handling</div>
+        <div class="sec-divider-title">Keep It Cold &middot; Keep It Clean</div>
+      </div>
+
+      <div class="storage-card">
+        <div class="storage-title">&#10052; Refrigerated, Protected, Rotated</div>
+        <div class="storage-body"><div class="note-list"><div class="nr"><div class="nr-l">Dry (lyophilized) vials</div><div class="nr-v">refrigerated at 36&ndash;46&deg;F before reconstitution. Protect from light. Never freeze.</div></div><div class="nr"><div class="nr-l">Reconstituted vials</div><div class="nr-v">refrigerate immediately. Use within 30 days. Fresh insulin syringe for each draw &mdash; never reuse.</div></div><div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ abdomen rotates between 4 quadrants. Never inject the same 1&Prime; spot two days in a row. During Phase 1 M&ndash;F use different quadrants for Cartalax AM and BPC PM (e.g., Cartalax AM upper-right, BPC PM upper-left). <strong>OR site-target near the knee</strong> for amplified local healing &mdash; safe post-op sites are upper thigh (5&ndash;7&Prime; above patella) or upper calf (3&ndash;4&Prime; below patella), staying ~2&Prime; clear of the incision line. See the Notes tab tip for the full safe-site map. Either option works for BPC + Cartalax.</div></div></div></div>
+      </div>
+
+    </div><!-- /supplies tab -->
+
+    <!-- ================ NOTES TAB ================ -->
+    <div class="tab-content" id="tab-notes">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Read Before Day 1</div>
+        <div class="sec-divider-title">Featured Tips for Your Stack</div>
+      </div>
+
+      <details class="tip-card featured"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 01 &mdash; First-Time Injector? Read This First</div><div class="tip-title">SubQ Injection 101 &middot; You've Got This</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">You flagged never having injected before. That's completely normal &mdash; SubQ (subcutaneous) injections with insulin syringes are the easiest type of injection there is. 29&ndash;31G needles are <em>thin</em> &mdash; you'll barely feel them. Here's the routine:</div>
+          <ul class="tip-list">
+            <li><strong>Wash hands.</strong> Pull out a fresh syringe + alcohol pad.</li>
+            <li><strong>Wipe the vial top with alcohol.</strong> Let it dry 5 sec.</li>
+            <li><strong>Draw your dose to 10 units</strong> (the mark on the syringe).</li>
+            <li><strong>Pick a spot on your abdomen,</strong> ~2&Prime; from belly button. Wipe with alcohol.</li>
+            <li><strong>Pinch a small fold of skin.</strong> Insert needle at 45&ndash;90&deg; (perpendicular is fine for SubQ).</li>
+            <li><strong>Push the plunger slowly</strong> (~5 sec). Pull needle out. Light pressure with the pad if any bleeding.</li>
+            <li><strong>Drop syringe in sharps container.</strong> Done. ~60 seconds total.</li>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Fear-management tips</div><div class="nr-v">(1) ice the spot 30 sec before the shot &mdash; numbs the surface, makes the needle invisible. (2) The first shot is the hardest. By shot #3 you'll wonder why you were worried. (3) The needle is shorter than most eyelashes &mdash; truly tiny.</div></div></div>
+        </div>
+      </details>
+
+      <details class="tip-card featured"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; SubQ Abdomen Default + Site-Targeting Option</div><div class="tip-title">Two Delivery Routes &middot; Both Work for BPC + Cartalax</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">You have <strong>two valid injection options per shot</strong> &mdash; both deliver the peptide signal effectively. Pick whichever feels right for that day; you can also alternate between the two during the week.</div>
+
+          <p><strong>Option A &mdash; Standard SubQ Abdomen (the safe default):</strong></p>
+          <ul class="tip-list">
+            <li>Pick a quadrant roughly 2&Prime; from your belly button (upper-right, upper-left, lower-right, lower-left).</li>
+            <li>Rotate daily &mdash; never inject the same 1&Prime; spot two days in a row.</li>
+            <li>Phase 1 (Cartalax AM + BPC PM): use different quadrants for AM and PM (e.g., Cartalax upper-right, BPC upper-left).</li>
+            <li>Phase 2 (GLOW only): rotate quadrant each day.</li>
+            <li><strong>What it delivers:</strong> strong systemic healing signal that reaches the entire body including the surgical site.</li>
+          </ul>
+
+          <p><strong>Option B &mdash; Site-Targeted Near the Knee (amplified local effect):</strong> See <strong>Tip 05 below</strong> for the full safe-site map. Short version: shoot 5&ndash;7&Prime; above the patella (upper thigh) or 3&ndash;4&Prime; below the patella (upper calf), staying ~2&Prime; away from the incision line. <strong>What it delivers:</strong> the same systemic signal PLUS a higher local concentration of BPC + Cartalax right at the surgical site &mdash; can accelerate local tissue/cartilage recovery during the 8&ndash;12 week post-op window.</p>
+
+          <div class="tip-lead">Standard SubQ technique (either option): pinch a small fold of skin, insert needle at 45&ndash;90&deg;, push the plunger slowly. ~60 seconds total per shot. The needle is shorter than most eyelashes &mdash; you'll barely feel it once you've done a few.</div>
+        </div>
+      </details>
+
+      <details class="tip-card featured"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 03 &mdash; Optional Add-On for Stress 4/5 + Sleep 3/5</div><div class="tip-title">Selank and/or PE-22-28 &mdash; The Calm-Brain Layer</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">You flagged stress 4/5 and sleep 3/5. Your current Lexapro covers the SSRI baseline, but there's a clean peptide layer on top that won't conflict &mdash; both work through different mechanisms than SSRIs. <strong>Not in this bundle, but the recommended next-add</strong> if you want to address the stress + sleep piece directly:</div>
+          <p><strong>Option A &mdash; Selank (anxiolytic peptide):</strong></p>
+          <ul class="tip-list">
+            <li><strong>Intranasal preferred</strong> (Selank nasal spray) &mdash; 250&ndash;500 mcg per spray, 1&ndash;3 sprays/day PRN. Crosses blood-brain barrier well, effect within 15&ndash;30 min.</li>
+            <li><strong>Or SubQ:</strong> 250&ndash;500 mcg, daily or PRN.</li>
+            <li><strong>Effect:</strong> takes the edge off anxious/stressed states without sedation. You stay alert but the racing-thoughts/tension layer quiets down. Works well alongside Lexapro.</li>
+          </ul>
+          <p><strong>Option B &mdash; PE-22-28 (BDNF-mimic):</strong></p>
+          <ul class="tip-list">
+            <li><strong>SubQ:</strong> 250&ndash;500 mcg, daily, PM preferred.</li>
+            <li><strong>Effect:</strong> increases BDNF (brain-derived neurotrophic factor) signaling &mdash; mood, neuroplasticity, sleep depth. Slower onset than Selank (multi-week buildup) but the deeper layer.</li>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Recommendation</div><div class="nr-v">Selank first (faster relief for the daily stress); add PE-22-28 if the sleep piece needs the extra layer after Week 4. Both are very well-tolerated and stack cleanly with your current meds. <strong>Message BioLinked if you want to add either to your next order.</strong></div></div></div>
+        </div>
+      </details>
+
+      <details class="tip-card featured"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 04 &mdash; Knee Recovery + Physical Therapy Synergy</div><div class="tip-title">Peptides Layer ON Top of Your PT, Not Around It</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">Total knee replacement recovery has two halves: <strong>mechanical</strong> (range of motion, strength, gait &mdash; that's your PT) and <strong>tissue</strong> (healing, inflammation control, cartilage remodeling &mdash; that's where BPC + Cartalax come in). They reinforce each other:</div>
+          <ul class="tip-list">
+            <li><strong>Better tissue healing</strong> = PT exercises hurt less, you can push further faster.</li>
+            <li><strong>More PT range-of-motion work</strong> = the tissue being healed is being moved + remodeled into functional positions.</li>
+            <li><strong>The 30-day Phase 1 sprint is timed for this</strong> &mdash; the high-leverage early post-op window when both your PT and the peptides are doing their most consequential work.</li>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Light exercise (1&ndash;2&times;/week) is fine</div><div class="nr-v">with this protocol &mdash; just listen to your knee and your PT. Don't push through actual pain. Soreness 24&ndash;48 hrs after PT/exercise is normal; sharp pain in the surgical site is not.</div></div></div>
+        </div>
+      </details>
+
+      <details class="tip-card featured" style="border-left:4px solid #a01840;"><summary>
+        <div class="tip-head"><div class="tip-eyebrow" style="color:#a01840;">Tip 05 &mdash; Site-Targeted Injections Near the Knee (Optional, Accelerates Local Recovery)</div><div class="tip-title">The Safe Post-Op Injection Site Map</div></div>
+        </summary><div class="tip-body">
+          <p><strong>You have the option to inject BPC and Cartalax closer to the knee instead of in the abdomen.</strong> Same compound, same dose, same SubQ depth &mdash; just delivered into the local tissue around the surgical site instead of routed through the systemic circulation. Many post-op clients use this approach during the 8&ndash;12 week recovery window to accelerate local tissue healing on top of the systemic effect.</p><div class="note-list">
+
+          <div class="nr"><div class="nr-l">Why it works</div><div class="nr-v">BPC-157 and Cartalax both drive tissue-level healing signals. When you inject near a tissue that's actively remodeling (like your knee right now), you create a higher local concentration of the peptide at the exact site doing the most recovery work. The systemic effect still happens, but you stack a stronger local response on top.</div></div></div>
+
+          <p><strong>The safe post-op injection site map &mdash; pick from these areas:</strong></p>
+          <ul class="tip-list">
+            <li><strong>Upper thigh / vastus medialis area</strong> &mdash; ~5&ndash;7&Prime; above the patella, on the inner thigh. Strong choice for routing BPC + Cartalax into the quadriceps-tendon side of the knee.</li>
+            <li><strong>Upper calf / gastrocnemius area</strong> &mdash; ~3&ndash;4&Prime; below the patella, on the upper calf muscle. Good for routing into the patellar tendon and below-knee tissue.</li>
+            <li><strong>Outer side of thigh, just above the knee</strong> &mdash; lateral side, ~4&Prime; above the patella. Hits the iliotibial band side.</li>
+          </ul>
+
+          <p><strong>What to AVOID &mdash; non-negotiable safety rules:</strong></p>
+          <ul class="tip-list">
+            <li><strong>Stay ~2&Prime; away from the incision line</strong> at all times. Do not inject through, over, or directly next to the surgical scar / sutures / healing wound.</li>
+            <li><strong>Do not inject directly into the joint itself.</strong> Stay SubQ &mdash; just under the skin, not into muscle and definitely not into the joint capsule.</li>
+            <li><strong>Do not inject into areas with visible redness, drainage, or unusual warmth</strong> &mdash; those are signs of localized inflammation or infection that need to be evaluated, not injected into.</li>
+            <li><strong>If the site looks or feels wrong, default to the abdomen.</strong> The systemic SubQ route still delivers the peptide &mdash; you don't lose the effect, you just don't get the local amplification.</li>
+          </ul><div class="note-list">
+
+          <div class="nr"><div class="nr-l">Technique (same as abdomen SubQ)</div><div class="nr-v">pinch a small fold of skin, insert needle at 45&ndash;90&deg;, push the plunger slowly. ~60 seconds per shot.</div></div></div>
+
+          <p><strong>Suggested rotation pattern if you want to mix both:</strong> alternate &mdash; Monday upper thigh (site-targeted), Tuesday abdomen quadrant A, Wednesday upper calf (site-targeted), Thursday abdomen quadrant B, Friday upper thigh again. <strong>Or just abdomen the whole time</strong> if you prefer the simpler routine. The protocol works either way; site-targeting is the amplifier, not the requirement.</p><div class="note-list">
+
+          <div class="nr"><div class="nr-l">Mention it to your PT</div><div class="nr-v">let your physical therapist know you're using peptides and that you may site-target on certain days. They don't need to change your PT plan; it's just useful context for them to know.</div></div></div>
+        </div>
+      </details>
+
+      <details class="tip-card featured"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 06 &mdash; AM + PM Routine Logistics (Phase 1 M&ndash;F)</div><div class="tip-title">2 Shots a Day &middot; ~2 Minutes Each &middot; Sat/Sun Off</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">Phase 1 has two short injection windows on Mon&ndash;Fri only: AM (Cartalax) and PM (BPC). Total ~2&ndash;3 min/day. Weekends fully off. <strong>Either standard SubQ abdomen OR site-targeted near the knee</strong> &mdash; see Tip 05 for the safe-site map.</div>
+          <p><strong>AM (any time after waking):</strong></p>
+          <ul class="tip-list">
+            <li>Cartalax 10u (0.10 mL) in abdomen quadrant A &mdash; e.g., upper-right.</li>
+            <li>Doesn't need fasted. Take it with your morning routine.</li>
+          </ul>
+          <p><strong>PM (any time in the evening; ideally a couple hrs before bed):</strong></p>
+          <ul class="tip-list">
+            <li>BPC 10u (0.10 mL) in abdomen quadrant B &mdash; e.g., upper-left (different from AM).</li>
+            <li>No food requirement.</li>
+          </ul><div class="note-list">
+          <div class="nr"><div class="nr-l">Sat + Sun</div><div class="nr-v">no shots. Your knee continues healing on its own; the M&ndash;F signal carries through. <strong>Phase 2 (Wks 5&ndash;12):</strong> single GLOW shot 10u M&ndash;F AM. Even simpler.</div></div></div>
+        </div>
+      </details>
+
+      <details class="tip-card featured"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 07 &mdash; Medication / Allergy Considerations</div><div class="tip-title">Sulfa Allergy + Lexapro + Female Hormones &middot; All Compatible</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">Quick rundown on the safety side based on your intake:</div>
+          <ul class="tip-list">
+            <li><strong>Sulfa allergy:</strong> BPC-157, Cartalax, and GLOW Blend contain no sulfa compounds. Bacteriostatic water uses benzyl alcohol as the preservative (not a sulfa drug) and is also fine. <strong>You're clear.</strong></li>
+            <li><strong>Lexapro (escitalopram):</strong> no known interactions with the peptides in this stack. SSRIs work on serotonin reuptake; these peptides work on tissue-healing and longevity-signaling pathways &mdash; completely different mechanisms.</li>
+            <li><strong>Female hormones:</strong> no conflicts with this stack. If anything, GLOW's anti-aging signal (skin, stamina) tends to complement hormone-replacement effects.</li>
+            <li><strong>Alcohol (1&ndash;2 drinks/wk):</strong> doesn't interfere with the peptides. BPC actually has some protective effects on gut lining if anything.</li>
+          </ul>
+          <div class="tip-lead">If anything unusual comes up &mdash; especially in the first 1&ndash;2 weeks &mdash; flag it. See "Watch For" below.</div>
+        </div>
+      </details>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Week-by-Week</div>
+        <div class="sec-divider-title">What to Expect Across 12 Weeks</div>
+      </div>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Week 1 &middot; Phase 1 Starts (Day 1&ndash;5)</div><div class="tip-title">First-Shot Adjustment &middot; Routine Locks In</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">Cartalax AM + BPC PM, M&ndash;F, both at 10u (small clean draw &mdash; BPC at 1 mL recon, Cartalax at 2 mL recon, both at 10 mg/mL working concentration). <strong>First thing you'll notice:</strong> the routine itself is much easier than you expected (60 sec/shot). By end of Week 1 you'll have your 4-quadrant rotation worked out.</div>
+        </div>
+      </details>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Week 2 &middot; Tissue Signal Building</div><div class="tip-title">Subtle Stiffness Reduction &middot; Sleep Slightly Better</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">By end of Week 2 some clients report subtle stiffness reduction at the knee and slightly better sleep. Big tissue changes haven't shown up yet &mdash; that's normal. Just stay consistent with the M&ndash;F rhythm. If sleep is still rough or stress is still high, this is when to consider adding Selank (Tip 03).</div>
+        </div>
+      </details>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Week 3 &middot; Tissue Effects Show Up</div><div class="tip-title">Knee Comfort Climbs &middot; PT Easier</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">By Week 3 the tissue-healing signal compounds. Expected: easier PT sessions, less knee stiffness on waking, slightly better skin/hair tone starting to show (Cartalax's bioregulator effects). Your knee should be tracking ahead of the natural post-op recovery curve at this point &mdash; PT progress is faster, ROM is better, soreness recovery between sessions is quicker.</div>
+        </div>
+      </details>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Week 4 &middot; Phase 1 Wraps (30 Days)</div><div class="tip-title">Vials Empty End of Week 4 &middot; Phase 2 Starts Monday Wk 5</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">BPC and Cartalax vials run out at end of Week 4 (20 doses each, exact fit for the 30-day cycle). Expected state: knee comfort + ROM noticeably ahead of where you'd be without peptides, skin/hair quality up a tick, sleep depth on a slow climb. <strong>Phase 2 (GLOW) starts Monday of Week 5.</strong></div>
+        </div>
+      </details>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 5&ndash;8 &middot; Phase 2 Starts (GLOW)</div><div class="tip-title">Longevity Layer In &middot; Skin + Stamina Visible</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">GLOW 10u M&ndash;F AM only &mdash; single shot, simplest routine yet. The recovery signal continues (GLOW contains BPC + GHK-Cu axis) AND the anti-aging layer turns on. <strong>By Week 7&ndash;8,</strong> skin tone, stamina, and energy levels should be noticeably better than baseline. The knee is now in its consolidation phase &mdash; functional, recovered, and benefiting from the systemic anti-aging signal.</div>
+        </div>
+      </details>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Weeks 9&ndash;12 &middot; Phase 2 Continues</div><div class="tip-title">Maintenance Rhythm Locked In</div></div>
+        </summary><div class="tip-body">
+          <div class="tip-lead">GLOW continues at the same M&ndash;F AM cadence. End of Week 12: Phase 2 wraps. <strong>Buffer:</strong> 2nd GLOW vial unopened by end of Week 12 (you've used 40 of 80 available doses) &mdash; could extend another 8 weeks of maintenance if you want to keep the longevity signal running.</div><div class="note-list">
+          <div class="nr"><div class="nr-l">End-of-cycle questions</div><div class="nr-v">knee vs. start of protocol? Skin tone? Stamina? Sleep? These shape whether to: continue with GLOW maintenance, layer in Selank/PE-22-28 for stress + sleep, or rotate compounds for the next cycle.</div></div></div>
+        </div>
+      </details>
+
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">What to Monitor</div>
+        <div class="sec-divider-title">Normal vs. Watch For</div>
+      </div>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 08 &mdash; Normal Effects</div><div class="tip-title">No Action Needed</div></div>
+        </summary><div class="tip-body">
+          <ul class="tip-list">
+            <li>Mild injection-site redness or small bruising &mdash; rotate sites, clean technique</li>
+            <li>Slight tingling at the BPC injection site for a few minutes &mdash; normal</li>
+            <li>Subtle stiffness reduction or better PT sessions starting Week 2&ndash;3 &mdash; this is the signal you want</li>
+            <li>Slightly more vivid dreams once you start GLOW &mdash; mild GH-axis signal</li>
+            <li>Skin / hair / nail quality improvement starting Phase 2 &mdash; the GLOW signature</li>
+            <li>Mild stiffness reduction in the knee starting Wks 2&ndash;3 &mdash; the systemic BPC + Cartalax signal at work</li>
+          </ul>
+        </div>
+      </details>
+
+      <details class="tip-card"><summary>
+        <div class="tip-head"><div class="tip-eyebrow">Tip 09 &mdash; Watch For (Message BioLinked)</div><div class="tip-title">Anything Below Warrants a Quick Check-In</div></div>
+        </summary><div class="tip-body">
+          <ul class="tip-list">
+            <li>Injection site hot, swollen, or red &gt;24 hrs &mdash; possible technique or contamination issue</li>
+            <li>Any change around the surgical site &mdash; redness, drainage, warmth, increased pain &mdash; message immediately (unrelated to the peptides but worth flagging)</li>
+            <li>New PT pain that isn't normal post-session soreness &mdash; could be doing too much, not a peptide issue but worth flagging</li>
+            <li>Allergic reaction symptoms (rash, itching, throat tightness) &mdash; very rare with these peptides but stop and flag immediately given your sulfa-allergy background</li>
+            <li>Significant mood change &mdash; SSRIs + new layers can occasionally need a tweak; flag if anything feels off</li>
+            <li>No change in knee comfort/PT by end of Week 4 &mdash; flag, may need dose or site adjustment</li>
+          </ul>
+        </div>
+      </details>
+
+    </div><!-- /notes tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
 
 <script>
-/* ---------------------------------------------------------------------------
-   Rendering. Nothing below here needs editing for a new client — it just draws
-   whatever is in CONFIG above.
---------------------------------------------------------------------------- */
-const DAYS = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-const STATUS_CLASS = { "Active":"st-active", "Next":"st-next", "As needed":"st-prn" };
-const STOCK_CLASS  = { "Reorder now":"ps-low", "Soon":"ps-soon", "Good":"ps-good", "Stocked":"ps-good" };
-const esc = s => String(s==null?"":s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const money = n => "$" + Number(n||0).toLocaleString("en-US");
-const $ = id => document.getElementById(id);
-
-function renderHeader(){
-  $("brandMark").textContent = CONFIG.brand.mark;
-  $("brandName").textContent = CONFIG.brand.name;
-  $("greeting").textContent  = CONFIG.client.greeting;
-  $("subtitle").textContent  = CONFIG.client.subtitle;
-  $("tags").innerHTML = (CONFIG.client.tags||[]).map(t=>`<span class="chip">${esc(t)}</span>`).join("");
-  $("adminName").textContent = CONFIG.client.fullName;
-  $("adminSubtitle").textContent = CONFIG.client.adminSubtitle;
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
 }
 
-function renderProtocol(){
-  $("protocol").innerHTML = CONFIG.compounds.map((c,i) => `
-      <div class="card">
-        <span class="status ${STATUS_CLASS[c.status]||"st-prn"}">● ${esc(c.status)}</span>
-        <div class="eyebrow">${esc(c.category)}</div>
-        <div class="compound-name">${esc(c.name)}</div>
-        <div class="row3">
-          <div class="mini"><span>Dose</span><b>${esc(c.dose)}</b></div>
-          <div class="mini"><span>When</span><b>${esc(c.when)}</b></div>
-          <div class="mini price"><span>Price</span><b>${esc(c.price)}</b></div>
-        </div>
-        <button class="details" onclick="details(${i})">View details</button>
-      </div>`).join("");
-}
-
-function renderSchedule(){
-  const active = CONFIG.compounds.filter(c => c.status === "Active");
-  $("week").innerHTML = DAYS.map(day => {
-    const on = active.filter(c => (c.days||[]).includes(day));
-    if(!on.length){
-      return `<div class="dayrow off"><div class="dbadge">${day.toUpperCase()}</div><span class="restlab">Rest day</span></div>`;
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Week 1 Monday first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-mjirikils@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  // 12-week M–F schedule.
+  // Phase 1 (Wks 1–4, M–F): Cartalax AM (10u / 1 mg, 20mg vial / 2 mL recon) + BPC PM (10u / 1 mg, 10mg vial / 1 mL recon). 20 doses scheduled; Cartalax 2 vials = 40 doses (20-dose buffer), BPC 2 vials = 20 doses (exact fit).
+  // Phase 2 (Wks 5–12, M–F): GLOW Blend AM (10u / ~2.33 mg at 3 mL recon). 40 doses scheduled across ~1.33 vials; 2 vials = ~60 doses (~20-dose buffer).
+  // Sat/Sun off throughout.
+  var phase1Weeks = 4;
+  var phase2Weeks = 8;
+  // Phase 1 — M–F for 4 weeks (Cartalax AM + BPC PM)
+  for(var w=1;w<=phase1Weeks;w++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(w-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var lines=[];
+      lines.push('AM: Cartalax 10u / 0.10 mL (1 mg) — SubQ abdomen, rotate quadrants');
+      lines.push('PM: BPC-157 10u / 0.10 mL (1 mg) — SubQ abdomen, rotate from AM site');
+      if(d===0||d===2||d===4){
+        lines.push('AM add-on: Semax 10u / 0.10 mL (1 mg) — SubQ abdomen, M/W/F');
+        lines.push('AM add-on: NAD+ 25u / 0.25 mL (50 mg) — titrate up to 75mg (38u) then 100mg (50u) as tolerated, push slowly, M/W/F');
+      }
+      var phase='Phase 1 — Cartalax AM + BPC PM (Wk '+w+' of 4, 30-day sprint)';
+      var title='BLS · Misty · W'+w+' '+dayNames[dow]+' · '+phase;
+      var desc='Misty Jirikils — Recovery + Longevity · Phase 1 Week '+w+'\\n'+phase+'\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'P1W'+w+'D'+d);
     }
-    const pills = on.map(c => `<span class="dose">${esc(c.name)} ${esc(c.dose)}</span>`).join("");
-    return `<div class="dayrow"><div class="dbadge">${day.toUpperCase()}</div><div class="doses">${pills}</div></div>`;
-  }).join("");
+  }
+  // Phase 2 — GLOW M–F for 8 weeks, starting Monday of Week 5
+  for(var w2=1;w2<=phase2Weeks;w2++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(phase1Weeks+w2-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var lines=['AM: GLOW Blend 10u / 0.10 mL (~2.33 mg) — SubQ abdomen, longevity maintenance blend (GHK-Cu axis + glutathione + BPC). Recon at 3 mL BAC water per vial.'];
+      if(d===0||d===2||d===4){
+        lines.push('AM add-on: Semax 10u / 0.10 mL (1 mg) — SubQ abdomen, M/W/F');
+        lines.push('AM add-on: NAD+ 25u / 0.25 mL (50 mg) — titrate up to 75mg (38u) then 100mg (50u) as tolerated, push slowly, M/W/F');
+      }
+      var phase='Phase 2 — GLOW Longevity Maintenance (Wk '+w2+' of 8)';
+      var title='BLS · Misty · W'+(phase1Weeks+w2)+' '+dayNames[dow]+' · '+phase;
+      var desc='Misty Jirikils — Recovery + Longevity · Phase 2 Week '+w2+' (Cycle Wk '+(phase1Weeks+w2)+')\\n'+phase+'\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'P2W'+w2+'D'+d);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Misty Jirikils//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Misty Recovery + Longevity','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='Misty-Jirikils-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
 }
+</script>
 
-function totals(){
-  const total = CONFIG.orders.reduce((s,o) => s + Number(o.amount||0), 0);
-  const owed  = CONFIG.orders.filter(o => !o.paid).reduce((s,o) => s + Number(o.amount||0), 0);
-  return { total, owed };
-}
-
-function renderOrders(){
-  $("orderList").innerHTML = CONFIG.orders.map(o => `
-      <div class="listrow">
-        <div class="lt"><b>${esc(o.date)}</b><div class="muted">${esc(o.items)}</div></div>
-        <div class="amt">${money(o.amount)}<div class="${o.paid?"paid":"unpaid"}">${o.paid?"PAID ✓":"UNPAID"}</div></div>
-      </div>`).join("");
-  const { total, owed } = totals();
-  $("totLabel").textContent  = owed > 0 ? ("Balance due · " + money(owed)) : CONFIG.paidInFullLabel;
-  $("totAmount").textContent = money(total);
-  $("historyList").innerHTML = CONFIG.history.map(h =>
-      `<div class="event"><b>${esc(h.date)}</b> · ${esc(h.text)}</div>`).join("");
-}
-
-function renderAdmin(){
-  const { total, owed } = totals();
-  const last = CONFIG.orders.length ? String(CONFIG.orders[0].date).replace(/,.*$/,"") : "—";
-  const tiles = [
-    [CONFIG.compounds.length, "Compounds"],
-    [CONFIG.orders.length,    "Orders"],
-    [money(owed),             "Balance owed"],
-    [last,                    "Last order"]
-  ];
-  $("statTiles").innerHTML = tiles.map(t =>
-      `<div class="stat"><b>${esc(t[0])}</b><span>${esc(t[1])}</span></div>`).join("");
-  $("inventoryList").innerHTML = CONFIG.inventory.map(v => `
-      <div class="listrow">
-        <div class="lt"><b>${esc(v.name)}</b><div class="muted">${esc(v.detail)}</div></div>
-        <span class="pillstat ${STOCK_CLASS[v.status]||"ps-good"}">${esc(v.status)}</span>
-      </div>`).join("");
-  $("activityList").innerHTML = CONFIG.activity.map(a => `
-      <div class="listrow"><div class="lt"><b>${esc(a.date)}</b><div class="muted">${esc(a.text)}</div></div></div>`).join("");
-}
-
-function renderAll(){ renderHeader(); renderProtocol(); renderSchedule(); renderOrders(); renderAdmin(); }
-
-/* ---- navigation ---- */
-function view(v){
-  $("client").classList.toggle("on", v==="client");
-  $("admin").classList.toggle("on", v==="admin");
-  $("cb").classList.toggle("on", v==="client");
-  $("ab").classList.toggle("on", v==="admin");
-  window.scrollTo({top:0,behavior:"smooth"});
-}
-function tab(id,b){
-  document.querySelectorAll("#client .panel").forEach(x=>x.classList.remove("on"));
-  $(id).classList.add("on");
-  document.querySelectorAll("#client .tabs button").forEach(x=>x.classList.remove("on"));
-  b.classList.add("on");
-}
-function show(id){ $(id).classList.add("on"); }
-function hide(id){ $(id).classList.remove("on"); }
-function bg(e,id){ if(e.target.classList.contains("modal")) hide(id); }
-document.addEventListener("keydown", e => {
-  if(e.key === "Escape") document.querySelectorAll(".modal.on").forEach(m=>m.classList.remove("on"));
-});
-
-/* ---- compound details sheet ---- */
-function details(i){
-  const c = CONFIG.compounds[i];
-  $("dcat").textContent = c.category;
-  $("dn").textContent   = c.name;
-  $("dd").textContent   = c.dose;
-  $("dt").textContent   = c.time || c.when;
-  $("ds").textContent   = c.schedule || c.when;
-  $("dp").textContent   = c.price;
-  $("dwhy").textContent = c.description;
-  show("detailsModal");
-}
-
-/* ---- admin: add order ---- */
-function addOrder(){
-  const date   = $("o_date").value.trim()   || "Today";
-  const items  = $("o_items").value.trim()  || "—";
-  const amount = parseFloat(String($("o_amount").value).replace(/[^0-9.]/g,"")) || 0;
-  const paid   = $("o_paid").value === "yes";
-  CONFIG.orders.unshift({ date, items, amount, paid });
-  CONFIG.activity.unshift({ date: date.replace(/,.*$/,""), text: `${items} ordered · ${money(amount)} ${paid?"paid":"unpaid"}` });
-  renderAll();
-  $("o_lab").style.display = "block";
-  $("o_out").classList.add("on");
-  $("o_out").textContent =
-    `{ date: "${date}", items: "${items}", amount: ${amount}, paid: ${paid} },`;
-  ["o_date","o_items","o_amount"].forEach(id => $(id).value = "");
-}
-
-/* ---- admin: add compound ---- */
-function addCompound(){
-  const days = [...document.querySelectorAll("#c_days input:checked")].map(x=>x.value);
-  const c = {
-    name:        $("c_name").value.trim()  || "New compound",
-    category:    $("c_cat").value.trim()   || "General",
-    status:      $("c_status").value,
-    dose:        $("c_dose").value.trim()  || "—",
-    when:        $("c_when").value.trim()  || "—",
-    price:       $("c_price").value.trim() || "—",
-    time:        $("c_when").value.trim()  || "—",
-    schedule:    days.length ? days.join(" · ") : ($("c_when").value.trim() || "—"),
-    days:        days,
-    description: $("c_desc").value.trim()  || ""
-  };
-  CONFIG.compounds.push(c);
-  renderAll();
-  $("c_lab").style.display = "block";
-  $("c_out").classList.add("on");
-  $("c_out").textContent =
-`{
-  name:        "${c.name}",
-  category:    "${c.category}",
-  status:      "${c.status}",
-  dose:        "${c.dose}",
-  when:        "${c.when}",
-  price:       "${c.price}",
-  time:        "${c.time}",
-  schedule:    "${c.schedule}",
-  days:        [${days.map(d=>`"${d}"`).join(",")}],
-  description: "${c.description.replace(/"/g,'\\"')}"
-},`;
-  ["c_name","c_cat","c_dose","c_when","c_price","c_desc"].forEach(id => $(id).value = "");
-  document.querySelectorAll("#c_days input:checked").forEach(x => x.checked = false);
-}
-
-/* ---- admin: add note ---- */
-function addNote(){
-  const date = $("n_date").value.trim() || "Today";
-  const text = $("n_text").value.trim() || "—";
-  CONFIG.activity.unshift({ date, text });
-  renderAll();
-  $("n_lab").style.display = "block";
-  $("n_out").classList.add("on");
-  $("n_out").textContent = `{ date: "${date}", text: "${text.replace(/"/g,'\\"')}" },`;
-  $("n_text").value = "";
-}
-
-/* ---- admin: edit protocol ---- */
-function openEdit(){
-  $("editList").innerHTML = CONFIG.compounds.map((c,i) => `
-    <div class="editrow">
-      <b>${esc(c.name)}</b>
-      <select onchange="setStatus(${i},this.value)">
-        ${["Active","Next","As needed"].map(s=>`<option ${s===c.status?"selected":""}>${s}</option>`).join("")}
-      </select>
-      <button class="rm" onclick="removeCompound(${i})">Remove</button>
-    </div>`).join("") || `<p class="hint">No compounds yet.</p>`;
-  show("editModal");
-}
-function setStatus(i,v){ CONFIG.compounds[i].status = v; renderAll(); openEdit(); }
-function removeCompound(i){ CONFIG.compounds.splice(i,1); renderAll(); openEdit(); }
-
-/* ---- boot ---- */
-$("c_days").innerHTML = DAYS.map(d =>
-  `<label><input type="checkbox" value="${d}">${d}</label>`).join("");
-renderAll();
-
-/* keep the existing /mjirikils/ service worker + home-screen install alive */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('/mjirikils/sw.js').catch(function(){});
+<!-- PWA install banner + service worker -->
+<style>
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner.show{display:flex;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
+.bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.bl-pwa-install{background:#7A6530;color:#fff;}
+.bl-pwa-install:hover{background:#5f4f26;}
+.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
+.bl-pwa-dismiss:hover{color:#1a1a1a;}
+@media print{.bl-pwa-banner{display:none !important;}}
+</style>
+<div class="bl-pwa-banner" id="bl-pwa-banner">
+  <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
+  <div class="bl-pwa-banner-actions">
+    <button class="bl-pwa-banner-btn bl-pwa-install" id="bl-pwa-install-btn" style="display:none">Install</button>
+    <button class="bl-pwa-banner-btn bl-pwa-dismiss" id="bl-pwa-dismiss-btn">Not now</button>
+  </div>
+</div>
+<script>
+(function(){
+  if ('serviceWorker' in navigator) { let hadController_=!!navigator.serviceWorker.controller; navigator.serviceWorker.addEventListener("controllerchange",()=>{if(hadController_)window.location.reload();}); window.addEventListener('load', () => { navigator.serviceWorker.register('/mjirikils/sw.js').catch(()=>{}); }); }
+  var DISMISS_KEY = 'bl-pwa-dismiss-mjirikils';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; installBtn.style.display = 'inline-block'; });
+  function show(){
+    if (isIOS) textEl.innerHTML = '<strong>Misty, save this protocol as an app:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    else if (isAndroid) textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access on your home screen.';
+    else textEl.innerHTML = '<strong>Tip:</strong> install this protocol as an app on your phone. Open in mobile Safari or Chrome.';
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){ banner.classList.remove('show'); localStorage.setItem(DISMISS_KEY, '1'); });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') { banner.classList.remove('show'); localStorage.setItem(DISMISS_KEY, '1'); }
   });
-}
+  if (isIOS || isAndroid) setTimeout(show, 1500);
+})();
+</script>
+<script>
+// ===== ACCORDION: opening a <details> closes its sibling <details> in the same parent =====
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('details').forEach(function(d){
+    d.addEventListener('toggle', function(){
+      if (!d.open) return;
+      var parent = d.parentElement;
+      if (!parent) return;
+      Array.prototype.forEach.call(parent.children, function(sib){
+        if (sib !== d && sib.tagName === 'DETAILS' && sib.open){
+          sib.removeAttribute('open');
+        }
+      });
+    });
+  });
+});
 </script>
 </body>
 </html>
