@@ -625,30 +625,86 @@ async function loadLiveInventoryPresets() {
     const inStock = (inv || []).filter(i => i.status !== 'out' && (i.vials || 0) > 0);
     if (!inStock.length) return false;
 
-    // Build a name->peptide-data lookup so we can grab dosing for matched items.
-    const norm = window.normPeptideName || (s => String(s||'').toLowerCase().trim());
-    const byName = {};
-    (window.PEPTIDE_DATA || []).forEach(p => { byName[norm(p.name)] = p; });
+    // ── Name reconciliation ───────────────────────────────────────────────
+    // Inventory and peptide-data.js describe the same compounds differently
+    // ("Epithalon - 50mg" vs "Epitalon", "BPC157: 10mg" vs "BPC-157 (10mg)").
+    // We match on a TIGHT base key (size stripped, all punctuation removed) plus
+    // the size parsed separately, so "Name: 10mg", "Name - 10mg" and
+    // "Name (10mg)" all collapse to the same key.
+    const SIZE_RE   = /(\d+(?:\.\d+)?)\s*(mg|mcg|iu|g)\b/i;
+    const SUPPLY_RE = /\bbac\b|bacteriostatic|\bwater\b|syringe|needle|alcohol|sharps/i;
+
+    // Inventory label -> peptide-data base key. Only for genuine product-name
+    // differences and inventory typos; add new rows here as they come up.
+    const NAME_ALIASES = {
+      'epithalon'                      : 'epitalon',                    // spelling: inventory has an extra h
+      '1gf1lr3'                        : 'igf1lr3',                     // TYPO in inventory: digit 1 for letter I
+      'cjc1295ipa'                     : 'cjcipamorelinblend',
+      'klow'                           : 'klowblendghkbpctbkpv',
+      'bpc157tb500'                    : 'wolverinestackbpctb55',
+      'fox04'                          : 'foxo4dri',                    // TYPO in inventory: digit 0 for letter O
+      'kisspeptin'                     : 'kisspeptin10',
+      'vipvasoactiveintestinalpeptide' : 'vip',
+      'p21acdgglagnh2'                 : 'p21'
+    };
+
+    // Strip sizes + all punctuation -> comparable key ("BPC157: 10mg" -> "bpc157").
+    function tightKey(v) {
+      return String(v || '').toLowerCase()
+        .replace(new RegExp(SIZE_RE.source, 'gi'), ' ')
+        .replace(/\b\d+(?:\.\d+)?\s*ml\b/gi, ' ')
+        .replace(/[^a-z0-9]/g, '');
+    }
+    function baseKey(v) { const k = tightKey(v); return NAME_ALIASES[k] || k; }
+    // "10mg" / "10 MG" / "5000IU" -> canonical "10mg" / "5000iu". null if none.
+    function sizeKey(v) {
+      const m = SIZE_RE.exec(String(v || ''));
+      if (!m) return null;
+      const n = parseFloat(m[1]);
+      return (Number.isInteger(n) ? String(n) : String(n)) + m[2].toLowerCase();
+    }
+
+    // Index peptide-data by base key, and by base+size for exact hits.
+    const bySize = {}, byBase = {};
+    (window.PEPTIDE_DATA || []).forEach(pd => {
+      const b = baseKey(pd.name);
+      const sz = sizeKey(pd.name) || sizeKey(pd.vial);
+      const k = b + '|' + (sz || '');
+      if (!bySize[k]) bySize[k] = pd;
+      (byBase[b] = byBase[b] || []).push(pd);
+    });
 
     const next = { 'Custom': PRESETS['Custom'] };
     inStock.forEach(item => {
-      // Try several name variants to match the peptide-data entry. Inventory rows
-      // often store size separately ("Tirzepatide" + vial_size "10mg") while
-      // peptide-data folds it into the name ("Tirzepatide (10mg)").
-      const candidates = [
-        item.name,
-        item.vial_size ? (item.name + ' (' + item.vial_size + ')') : null,
-        item.vial_size ? (item.name + ' ' + item.vial_size) : null
-      ].filter(Boolean);
-      let match = null;
-      for (let i = 0; i < candidates.length; i++) {
-        const hit = byName[norm(candidates[i])];
-        if (hit) { match = hit; break; }
+      // Supplies (bac water etc.) are stocked but are not selectable compounds.
+      if (SUPPLY_RE.test(item.name || '')) return;
+
+      const b = baseKey(item.name);
+      // vial_size is dirty in places ("3mL" volumes, nulls, sizes that disagree
+      // with the name) so the name wins and vial_size is only a fallback.
+      const sz = sizeKey(item.name) || sizeKey(item.vial_size);
+      const exact = bySize[b + '|' + (sz || '')];
+      const match = exact || (byBase[b] ? byBase[b][0] : null);
+
+      const label = item.name;
+      if (match) {
+        next[label] = {
+          vial:     sz || match.vial || (sizeKey(item.vial_size) ? item.vial_size : '') || '',
+          dose:     match.dose     || '',
+          bac:      match.bac      || '',
+          units:    match.units    || '',
+          schedule: match.schedule || '',
+          timing:   match.timing   || '',
+          // Only carry price when the SIZE matched too — a 10mg price on a 40mg
+          // vial would be silently wrong. Base-only matches fill dosing, not price.
+          price:    exact ? (match.price || 0) : 0
+        };
+      } else {
+        next[label] = {
+          vial: sz || (sizeKey(item.vial_size) ? item.vial_size : '') || '',
+          dose: '', bac: '', units: '', schedule: '', timing: '', price: 0
+        };
       }
-      const label = match ? match.name : (item.vial_size ? (item.name + ' (' + item.vial_size + ')') : item.name);
-      next[label] = match
-        ? { vial: match.vial, dose: match.dose, bac: match.bac, units: match.units, schedule: match.schedule, timing: match.timing, price: match.price }
-        : { vial: item.vial_size || '', dose: '', bac: '', units: '', schedule: '', timing: '', price: 0 };
     });
 
     // Alphabetize keys (Custom always first).
