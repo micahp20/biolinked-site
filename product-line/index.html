@@ -204,9 +204,69 @@ button, input { font: inherit; }
   .filter-btns { gap: 5px; }
   .fbtn { font-size: 11px !important; padding: 8px 10px !important; letter-spacing: .05em; }
 }
+
+/* ── passcode gate ── */
+body.pl-locked{overflow:hidden;}
+body.pl-locked > *:not(.pl-gate):not(script):not(noscript){display:none !important;}
+.pl-gate{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:linear-gradient(135deg,#1c1b18 0%,#2b2924 50%,#1c1b18 100%);}
+.pl-gate-card{background:var(--surface);border:1px solid var(--gold-bdr);border-top:3px solid var(--gold);
+  border-radius:var(--r);padding:40px 28px 32px;max-width:400px;width:100%;text-align:center;
+  box-shadow:0 24px 80px rgba(0,0,0,0.5);}
+.pl-gate-brand{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:600;color:var(--text);letter-spacing:0.02em;line-height:1.1;}
+.pl-gate-brand em{color:var(--gold);font-style:italic;}
+.pl-gate-sub{font-size:9.5px;letter-spacing:0.24em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-top:5px;margin-bottom:28px;}
+.pl-gate-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:6px;}
+.pl-gate-hint{font-size:12.5px;color:var(--muted);margin-bottom:22px;line-height:1.6;}
+.pl-gate-input{width:100%;padding:15px 16px;border:1px solid var(--border);border-radius:4px;background:var(--surface2);
+  color:var(--text);font-family:inherit;font-size:17px;letter-spacing:0.32em;text-align:center;min-height:52px;
+  transition:border-color .15s,box-shadow .15s;margin-bottom:12px;-webkit-appearance:none;}
+.pl-gate-input:focus{outline:none;border-color:var(--gold-bdr-bright);box-shadow:0 0 0 3px var(--gold-glow);background:var(--surface);}
+.pl-gate-btn{width:100%;padding:15px;min-height:52px;background:var(--gold);color:#fff;border:none;border-radius:4px;
+  font-family:inherit;font-size:11px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;cursor:pointer;
+  transition:background .15s;-webkit-tap-highlight-color:transparent;}
+.pl-gate-btn:hover{background:var(--gold-l);}
+.pl-gate-error{color:#b03030;font-size:12.5px;margin-top:10px;min-height:18px;line-height:1.5;}
+@media(max-width:420px){.pl-gate{padding:14px;}.pl-gate-card{padding:32px 20px 26px;}.pl-gate-brand{font-size:28px;}}
 </style>
 </head>
-<body>
+<body class="pl-locked">
+
+<!-- ── PASSCODE GATE ──────────────────────────────────────────────────────
+     Soft gate only. This is a static site: the code and the page content are
+     both in the source, so this deters casual/link-shared access, it is not
+     real access control. Real protection needs server-side auth.
+     ──────────────────────────────────────────────────────────────────── -->
+<div class="pl-gate" id="plGate">
+  <div class="pl-gate-card">
+    <div class="pl-gate-brand">Bio<em>Linked</em></div>
+    <div class="pl-gate-sub">Peptide Solutions</div>
+    <div class="pl-gate-title">Enter Passcode</div>
+    <div class="pl-gate-hint">This product line is for authorized access.</div>
+    <form id="plGateForm" autocomplete="off">
+      <input type="password" id="plGateInput" class="pl-gate-input"
+             inputmode="numeric" pattern="[0-9]*" placeholder="••••"
+             autocomplete="off" autocorrect="off" autocapitalize="off"
+             spellcheck="false" aria-label="Passcode">
+      <button type="submit" class="pl-gate-btn">Unlock</button>
+      <div class="pl-gate-error" id="plGateError" role="alert"></div>
+    </form>
+  </div>
+</div>
+<noscript>
+  <div style="max-width:420px;margin:60px auto;padding:24px;font-family:'Montserrat',sans-serif;text-align:center;color:#3d3d3d;">
+    This page needs JavaScript enabled to unlock.
+  </div>
+</noscript>
+<script>
+  // Run before paint: if this session already unlocked, never show the gate.
+  try {
+    if (sessionStorage.getItem('biolinked_admin_auth') === 'granted') {
+      document.body.classList.remove('pl-locked');
+      document.getElementById('plGate').style.display = 'none';
+    }
+  } catch (e) {}
+</script>
 
 <div class="warning-top">
   <div class="warning-top-inner">
@@ -774,5 +834,44 @@ applyFilters();
 </script>
 
 <script src="/nav.js" defer></script>
+
+<script>
+  // ── Passcode gate ──
+  // Soft gate: static hosting means this is a deterrent, not access control.
+  (function () {
+    var CODE = '1211';
+    var KEY  = 'biolinked_admin_auth';
+    var gate = document.getElementById('plGate');
+    var form = document.getElementById('plGateForm');
+    var input = document.getElementById('plGateInput');
+    var err  = document.getElementById('plGateError');
+    if (!gate || !form) return;
+
+    function unlock() {
+      try { sessionStorage.setItem(KEY, 'granted'); } catch (e) {}
+      document.body.classList.remove('pl-locked');
+      gate.style.display = 'none';
+      err.textContent = '';
+    }
+
+    var already = false;
+    try { already = sessionStorage.getItem(KEY) === 'granted'; } catch (e) {}
+    if (already) { unlock(); return; }
+
+    setTimeout(function () { try { input.focus(); } catch (e) {} }, 60);
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (input.value.trim() === CODE) {
+        unlock();
+      } else {
+        err.textContent = 'Incorrect code — try again.';
+        input.value = '';
+        input.focus();
+      }
+    });
+    input.addEventListener('input', function () { if (err.textContent) err.textContent = ''; });
+  })();
+</script>
 </body>
 </html>
