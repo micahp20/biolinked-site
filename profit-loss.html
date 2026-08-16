@@ -393,7 +393,7 @@
   <div class="panel" data-panel="money">
     <div class="kpi-grid">
       <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Cash on Hand</div><div class="kpi-value gold" id="kpi-cash">—</div><div class="kpi-sub" id="kpi-cash-sub">net month-over-month</div></div>
-      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label"> Orders</div><div class="kpi-value warn" id="kpi">—</div><div class="kpi-sub" id="kpi-sub">vendors · in transit</div></div>
+      <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Outstanding Orders</div><div class="kpi-value warn" id="kpi-outstanding">—</div><div class="kpi-sub" id="kpi-outstanding-sub">vendors · in transit</div></div>
       <div class="kpi"><div class="kpi-accent" style="background:var(--success)"></div><div class="kpi-label">Revenue (MTD)</div><div class="kpi-value success" id="kpi-revenue">—</div><div class="kpi-sub" id="kpi-revenue-sub">vs last month</div></div>
       <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Net Profit (MTD)</div><div class="kpi-value gold" id="kpi-profit">—</div><div class="kpi-sub" id="kpi-margin-sub">margin %</div></div>
     </div>
@@ -901,16 +901,16 @@ function renderMoney(){
     return t>=mtdStart && o.status!=="ordered";
   }).reduce((s,r)=>s+(r.total||0),0);
 
-  // orders = paid but not yet received
-  const = orders.filter(o=>o.status==="ordered"||o.status==="in_transit");
-  const outstandingTotal =.reduce((s,r)=>s+(r.total||0),0);
-  const outstandingVendors = new Set(.map(o=>o.vendor_id||o.party_name)).size;
-  const inTransit =.filter(o=>o.status==="in_transit").length;
+  // Outstanding orders = paid but not yet received
+  const outstanding = orders.filter(o=>o.status==="ordered"||o.status==="in_transit");
+  const outstandingTotal = outstanding.reduce((s,r)=>s+(r.total||0),0);
+  const outstandingVendors = new Set(outstanding.map(o=>o.vendor_id||o.party_name)).size;
+  const inTransit = outstanding.filter(o=>o.status==="in_transit").length;
 
   document.getElementById("kpi-cash").textContent = fmt$(cashOnHand);
   document.getElementById("kpi-cash-sub").textContent = `${cashThisMonth>=0?'+':''}${fmt$(cashThisMonth)} this month`;
-  document.getElementById("kpi").textContent = fmt$(outstandingTotal);
-  document.getElementById("kpi-sub").textContent = `${outstandingVendors} vendor${outstandingVendors===1?'':'s'} · ${inTransit} in transit`;
+  document.getElementById("kpi-outstanding").textContent = fmt$(outstandingTotal);
+  document.getElementById("kpi-outstanding-sub").textContent = `${outstandingVendors} vendor${outstandingVendors===1?'':'s'} · ${inTransit} in transit`;
   document.getElementById("kpi-revenue").textContent = fmt$(mtdRevenue);
   document.getElementById("kpi-revenue-sub").textContent = lastMoRevenue ? `${revDelta>=0?'+':''}${revDelta.toFixed(0)}% vs last mo` : "first month tracked";
   document.getElementById("kpi-profit").textContent = fmt$(mtdProfit);
