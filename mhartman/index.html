@@ -449,6 +449,11 @@ details[open].sched-card > summary.sched-card-head,details.sched-card > summary.
   details.li-row,.sched-card,.tip-card,.stack-card,.storage-card,.supply-row,.lab-section,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
   details.li-row > summary::after,details.sched-card > summary::after,details.tip-card > summary::after,details.stack-card > summary::after{display:none;}
 }
+
+/* collapsed compound header: dose + cadence key line under the name */
+.li-summary-name{display:block;}
+.cmp-head-key{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.01em;line-height:1.45;margin-top:3px;}
+@media(max-width:640px){.cmp-head-key{font-size:10.5px;}}
 </style>
 </head>
 <body>
@@ -513,6 +518,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
     <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
     <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
     <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
@@ -538,20 +544,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <!-- ============ NEW ORDER · STOCK-UP (collapsible) ============ -->
       <!-- ===== ACCOUNT SUMMARY (standard multi-order convention) ===== -->
-      <div class="totals-block" style="border-left:3px solid var(--gold);">
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
-          <div style="width:34px;height:34px;border-radius:50%;background:var(--gold);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">$</div>
-          <div style="flex:1;min-width:200px;">
-            <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">Balance Due &middot; Venmo @micahp20</div>
-            <div style="font-size:13.5px;color:var(--text);line-height:1.55;margin-top:3px;"><strong style="color:var(--gold);">$844.00</strong> outstanding &mdash; Stock-Up Vials &middot; KLOW + Wolverine + Tesa + Tirz (20% F&amp;F). The other <strong style="color:#2f7a4a;">$190.00</strong> is paid.</div>
-          </div>
-        </div>
-          <div class="total-row"><span>Shoulder Recovery &middot; KLOW + Wolverine Stack</span><span style="color:#2f7a4a;font-weight:700;white-space:nowrap;">$190.00 &middot; &#10004; Paid</span></div>
-          <div class="total-row"><span>Stock-Up Vials &middot; KLOW + Wolverine + Tesa + Tirz (20% F&amp;F)</span><span style="color:var(--gold);font-weight:700;white-space:nowrap;">$844.00 &middot; Due</span></div>
-          <div class="total-row grand"><span>Account Total &middot; 2 Orders</span><span class="val">$1,034.00</span></div>
-          <div class="total-row grand" style="color:#2f7a4a;"><span>&#10004; Paid to Date</span><span class="val" style="color:#2f7a4a;">$190.00</span></div>
-          <div class="total-row grand"><span>Balance Due</span><span class="val" style="color:var(--gold);">$844.00</span></div>
-      </div>
+      
 
       <details class="order-fold">
         <summary>
@@ -572,7 +565,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">KLOW Blend &middot; 80 mg</span>
+            <span class="li-summary-name">KLOW Blend &middot; 80 mg<span class="cmp-head-key">15u</span></span>
             <span class="li-summary-price">$60 <span style="font-size:12px;color:var(--muted);font-weight:500;">/ vial</span></span>
           </summary>
           <div class="li-body">
@@ -587,7 +580,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">Wolverine &middot; 10 mg</span>
+            <span class="li-summary-name">Wolverine &middot; 10 mg<span class="cmp-head-key">20u</span></span>
             <span class="li-summary-price">$35 <span style="font-size:12px;color:var(--muted);font-weight:500;">/ vial</span></span>
           </summary>
           <div class="li-body">
@@ -602,7 +595,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">Tesamorelin &middot; 20 mg</span>
+            <span class="li-summary-name">Tesamorelin &middot; 20 mg<span class="cmp-head-key">10u</span></span>
             <span class="li-summary-price">$75 <span style="font-size:12px;color:var(--muted);font-weight:500;">/ vial</span></span>
           </summary>
           <div class="li-body">
@@ -617,7 +610,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">Tirzepatide &middot; 30 mg</span>
+            <span class="li-summary-name">Tirzepatide &middot; 30 mg<span class="cmp-head-key">10u</span></span>
             <span class="li-summary-price">$75 <span style="font-size:12px;color:var(--muted);font-weight:500;">/ vial</span></span>
           </summary>
           <div class="li-body">
@@ -632,7 +625,118 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       </div>
 
-      <div class="totals-block">
+      
+
+      </details><!-- /order-fold new order -->
+
+      <!-- ============ PAID PROTOCOL (collapsed) ============ -->
+      <details class="paid-archive">
+        <summary>
+          <span class="pa-pill">&#10004; Paid</span>
+          <span><span class="pa-title">Shoulder Recovery Protocol &middot; Paid</span><br><span class="pa-sub">KLOW + Wolverine Stack &middot; $190 settled &middot; tap to view</span></span>
+        </summary>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Compounds &amp; Pricing &middot; Paid</div>
+        <div class="sec-divider-title">2 Compounds</div>
+      </div>
+
+      <div class="line-items">
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">KLOW Blend &middot; GHK-Cu + BPC-157 + TB-500 + KPV &middot; 80 mg<span class="cmp-head-key">15u</span></span>
+            <span class="li-summary-price"><span class="strike">$80</span>$60 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">4 mg total blend (2.5 mg GHK + 0.5 mg each of BPC / TB / KPV) &rarr; pull syringe to <span class="units">15 units (0.15 mL)</span></span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it's in your protocol:</strong> the systemic healing layer running the full 8-week cycle. Four peptides covering four mechanisms simultaneously &mdash; GHK-Cu (collagen synthesis + antioxidant), BPC-157 (angiogenesis + soft tissue), TB-500 (tissue regeneration + actin), KPV (anti-inflammatory + immune). Running M&ndash;F gives your body a daily systemic signal to repair tissue across the entire body, with the shoulder benefiting from every angle of the blend at once. 2 vials at 20 doses each = 40 M&ndash;F doses = 8 weeks of continuous systemic healing signal.</div>
+            <div class="li-callout heal"><strong>Why this matters for the shoulder specifically:</strong> the shoulder hasn't healed because the cellular repair machinery isn't firing &mdash; either due to chronic low-level inflammation blocking the signal, age-related slowdown in collagen turnover, or both. KLOW pushes all four levers at once: KPV calms the inflammation that's blocking repair, GHK-Cu activates collagen synthesis, TB-500 accelerates tissue regeneration, BPC drives angiogenesis. The 8-week runway is intentional &mdash; 4 weeks gets you "feels better"; 8 weeks gets you "tissue actually remodeled."</div>
+            <div class="li-callout"><strong>Vial timing:</strong> reconstitute the first vial on Day 1; the second vial when the first empties around end of Week 4.</div>
+          </div>
+        </details>
+
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Wolverine Stack &middot; BPC-157 + TB-500 &middot; 5 mg + 5 mg<span class="cmp-head-key">20u</span></span>
+            <span class="li-summary-price"><span class="strike">$40</span>$35 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">0.5 mg BPC + 0.5 mg TB-500 &rarr; pull syringe to <span class="units">20 units (0.20 mL)</span> &middot; <strong>PM fasted, injected at the shoulder site</strong></span></li>
+            </ul>
+            <div class="li-callout heal"><strong>Wolverine Stack &mdash; the dual-mechanism shoulder intensive.</strong> This is what makes the new build "better" than the previous BPC-only at-site approach. Wolverine pre-blends BPC-157 + TB-500 in one vial &mdash; two of the strongest soft-tissue healing peptides hitting the shoulder from complementary angles. Injected SubQ <em>at the site of injury</em>, the combined signal compounds on itself:<br><br>
+            &middot; <strong>BPC-157 &mdash; angiogenesis + anti-inflammatory.</strong> Drives new blood vessel growth at the injury (more oxygen + nutrients to healing tissue) and calms the chronic inflammation that's been blocking the repair cycle. Strongest peptide data for soft-tissue and tendon healing.<br><br>
+            &middot; <strong>TB-500 &mdash; cell migration + tissue regeneration + anti-fibrosis.</strong> Thymosin Beta-4 fragment that drives cell migration to the injury site, supports actin assembly for tissue regeneration, and reduces fibrotic scar tissue formation. Different mechanism, same target.<br><br>
+            &middot; <strong>Together &mdash; faster healing, cleaner rebuild.</strong> BPC + TB work on different pathways. Pairing them means the shoulder gets the angiogenesis signal (BPC) AND the tissue regeneration signal (TB) AND the anti-scarring signal (TB) at the same time, every day, at the exact site of damage. The result is faster repair with less scar tissue than BPC alone would produce.</div>
+            <div class="li-callout"><strong>Why PM fasted:</strong> the body does most of its repair work during sleep &mdash; growth hormone pulses, cellular regeneration, tissue rebuilding. Dosing Wolverine pre-bed in a fasted state (last food 2+ hrs prior) puts the dual-peptide signal in the body right when those overnight pathways are most active. Aim for the last 1&ndash;2 hours of your evening.</div>
+            <div class="li-callout"><strong>How this layers with KLOW:</strong> KLOW gives you 0.5 mg of BPC + 0.5 mg of TB per AM shot as part of the systemic blend &mdash; distributed across the whole body. The Wolverine PM shot, <em>injected at the shoulder</em>, concentrates a much stronger local signal exactly where the damage is, AM + PM bookending the day. Same peptides but pointed two ways: systemic via KLOW in the morning, local intensive via Wolverine in the evening.</div>
+            <div class="li-callout"><strong>Supply note:</strong> 2 vials at 10 doses each = 20 doses total. Running M&ndash;F PM at the shoulder = 4 weeks of intensive at-site coverage (~4&times; the duration of the previous BPC-only 10-day window). After Wolverine wraps at end of Week 4, KLOW continues alone for Weeks 5&ndash;8 to lock in the gains while the deep tissue remodels.</div>
+          </div>
+        </details>
+
+      </div>
+
+      
+
+      <details class="stack-card">
+        <summary><div class="stack-card-title">Why This Stack Is the Aggressive Build &mdash; Better and Longer</div></summary>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">KLOW &mdash; The Systemic Healing Blend (AM, M&ndash;F, 8 Weeks)</div>
+            <div class="stack-desc">Four peptides in one shot: GHK-Cu (collagen + antioxidant), BPC-157 (low dose, ~0.5 mg/shot), TB-500 (tissue regeneration), KPV (anti-inflammatory + immune). Covers the full systemic healing context across the entire body. 2 vials at 20 doses each = 40 M&ndash;F doses = 8 weeks of continuous systemic signal.</div>
+          </div>
+        </div>
+
+        <div class="stack-item">
+          <div class="stack-dot"></div>
+          <div class="stack-right">
+            <div class="stack-compound">Wolverine Stack &mdash; The Dual-Mechanism Shoulder Intensive (PM at Site, Weeks 1&ndash;4)</div>
+            <div class="stack-desc">Pre-blended BPC-157 + TB-500 in one vial. Two different soft-tissue healing peptides hitting the shoulder from complementary mechanisms: BPC drives angiogenesis and anti-inflammatory; TB drives cell migration, tissue regeneration, and anti-scarring. 2 vials at 10 doses each = 20 M&ndash;F doses = 4 weeks of intensive at-site coverage.</div>
+          </div>
+        </div>
+
+        <div class="stack-synergy">
+          <strong>Why this is the better build:</strong> the previous protocol used BPC-only at the shoulder for ~10 days. This build runs BPC + TB-500 (the Wolverine combo) at the shoulder for a full 4 weeks &mdash; <strong>4&times; the duration of at-site coverage, plus the TB-500 addition.</strong> BPC alone drives angiogenesis; TB-500 adds cell migration and reduces fibrotic scarring. Different mechanisms = faster healing, cleaner tissue rebuild, less scar formation.<br><br>
+          <strong>Why this is the longer build:</strong> 2 KLOW vials gives a full 8-week systemic healing signal. For chronic soft-tissue that hasn't healed on its own, the 6&ndash;8 week window is where tissue remodeling fully consolidates. <strong>4 weeks gets you "feels better"; 8 weeks gets you "tissue actually remodeled."</strong><br><br>
+          <strong>The cycle structure:</strong> Weeks 1&ndash;4 = both stacks running together (KLOW systemic AM + Wolverine local PM at shoulder). Weeks 5&ndash;8 = KLOW alone, continuing the systemic signal while the deep tissue remodels. The combined effect on stubborn soft-tissue healing is substantially stronger than the original BPC-only build.
+        </div>
+      </details>
+
+      
+
+      </details><!-- /paid-archive -->
+
+    </div>
+<div class="tab-content" id="tab-invoice">
+
+<div class="sec-divider"><div class="sec-divider-eyebrow">Invoice &amp; Account Summary</div><div class="sec-divider-title">Everything Ordered &amp; What&apos;s Paid</div></div>
+<div class="totals-block" style="border-left:3px solid var(--gold);">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+          <div style="width:34px;height:34px;border-radius:50%;background:var(--gold);color:#fff;font-size:17px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">$</div>
+          <div style="flex:1;min-width:200px;">
+            <div style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);">Balance Due &middot; Venmo @micahp20</div>
+            <div style="font-size:13.5px;color:var(--text);line-height:1.55;margin-top:3px;"><strong style="color:var(--gold);">$844.00</strong> outstanding &mdash; Stock-Up Vials &middot; KLOW + Wolverine + Tesa + Tirz (20% F&amp;F). The other <strong style="color:#2f7a4a;">$190.00</strong> is paid.</div>
+          </div>
+        </div>
+          <div class="total-row"><span>Shoulder Recovery &middot; KLOW + Wolverine Stack</span><span style="color:#2f7a4a;font-weight:700;white-space:nowrap;">$190.00 &middot; &#10004; Paid</span></div>
+          <div class="total-row"><span>Stock-Up Vials &middot; KLOW + Wolverine + Tesa + Tirz (20% F&amp;F)</span><span style="color:var(--gold);font-weight:700;white-space:nowrap;">$844.00 &middot; Due</span></div>
+          <div class="total-row grand"><span>Account Total &middot; 2 Orders</span><span class="val">$1,034.00</span></div>
+          <div class="total-row grand" style="color:#2f7a4a;"><span>&#10004; Paid to Date</span><span class="val" style="color:#2f7a4a;">$190.00</span></div>
+          <div class="total-row grand"><span>Balance Due</span><span class="val" style="color:var(--gold);">$844.00</span></div>
+      </div>
+<details class="order-fold">
+<summary>
+          <span class="of-pill">Due</span>
+          <span><span class="of-title">New Order &middot; Stock-Up Vials</span><br><span class="of-sub">KLOW + Wolverine + Tesamorelin + Tirzepatide &middot; $844 (20% off) &middot; tap to view</span></span>
+        </summary>
+<div class="totals-block">
         <div class="total-row"><span>KLOW Blend 80 mg &times; 4 vials @ $60</span><span>$240.00</span></div>
         <div class="total-row"><span>Wolverine 10 mg &times; 4 vials @ $35</span><span>$140.00</span></div>
         <div class="total-row"><span>Tesamorelin 20 mg &times; 5 vials @ $75</span><span>$375.00</span></div>
@@ -664,62 +768,14 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <div class="payment-text">Set payment privacy to <strong>Private</strong> (not Public or Friends)</div>
         </div>
       </div>
+</details>
 
-      </details><!-- /order-fold new order -->
-
-      <!-- ============ PAID PROTOCOL (collapsed) ============ -->
-      <details class="paid-archive">
-        <summary>
+<details class="paid-archive">
+<summary>
           <span class="pa-pill">&#10004; Paid</span>
           <span><span class="pa-title">Shoulder Recovery Protocol &middot; Paid</span><br><span class="pa-sub">KLOW + Wolverine Stack &middot; $190 settled &middot; tap to view</span></span>
         </summary>
-
-      <div class="sec-divider">
-        <div class="sec-divider-eyebrow">Compounds &amp; Pricing &middot; Paid</div>
-        <div class="sec-divider-title">2 Compounds</div>
-      </div>
-
-      <div class="line-items">
-
-        <details class="li-row">
-          <summary>
-            <span class="li-summary-name">KLOW Blend &middot; GHK-Cu + BPC-157 + TB-500 + KPV &middot; 80 mg</span>
-            <span class="li-summary-price"><span class="strike">$80</span>$60 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial</span></li>
-              <li><span class="ql">Dose</span><span class="qv">4 mg total blend (2.5 mg GHK + 0.5 mg each of BPC / TB / KPV) &rarr; pull syringe to <span class="units">15 units (0.15 mL)</span></span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it's in your protocol:</strong> the systemic healing layer running the full 8-week cycle. Four peptides covering four mechanisms simultaneously &mdash; GHK-Cu (collagen synthesis + antioxidant), BPC-157 (angiogenesis + soft tissue), TB-500 (tissue regeneration + actin), KPV (anti-inflammatory + immune). Running M&ndash;F gives your body a daily systemic signal to repair tissue across the entire body, with the shoulder benefiting from every angle of the blend at once. 2 vials at 20 doses each = 40 M&ndash;F doses = 8 weeks of continuous systemic healing signal.</div>
-            <div class="li-callout heal"><strong>Why this matters for the shoulder specifically:</strong> the shoulder hasn't healed because the cellular repair machinery isn't firing &mdash; either due to chronic low-level inflammation blocking the signal, age-related slowdown in collagen turnover, or both. KLOW pushes all four levers at once: KPV calms the inflammation that's blocking repair, GHK-Cu activates collagen synthesis, TB-500 accelerates tissue regeneration, BPC drives angiogenesis. The 8-week runway is intentional &mdash; 4 weeks gets you "feels better"; 8 weeks gets you "tissue actually remodeled."</div>
-            <div class="li-callout"><strong>Vial timing:</strong> reconstitute the first vial on Day 1; the second vial when the first empties around end of Week 4.</div>
-          </div>
-        </details>
-
-        <details class="li-row">
-          <summary>
-            <span class="li-summary-name">Wolverine Stack &middot; BPC-157 + TB-500 &middot; 5 mg + 5 mg</span>
-            <span class="li-summary-price"><span class="strike">$40</span>$35 <span style="font-size:11px;color:var(--muted);font-weight:500;letter-spacing:0.08em;font-family:'Montserrat',sans-serif;">/ vial</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial</span></li>
-              <li><span class="ql">Dose</span><span class="qv">0.5 mg BPC + 0.5 mg TB-500 &rarr; pull syringe to <span class="units">20 units (0.20 mL)</span> &middot; <strong>PM fasted, injected at the shoulder site</strong></span></li>
-            </ul>
-            <div class="li-callout heal"><strong>Wolverine Stack &mdash; the dual-mechanism shoulder intensive.</strong> This is what makes the new build "better" than the previous BPC-only at-site approach. Wolverine pre-blends BPC-157 + TB-500 in one vial &mdash; two of the strongest soft-tissue healing peptides hitting the shoulder from complementary angles. Injected SubQ <em>at the site of injury</em>, the combined signal compounds on itself:<br><br>
-            &middot; <strong>BPC-157 &mdash; angiogenesis + anti-inflammatory.</strong> Drives new blood vessel growth at the injury (more oxygen + nutrients to healing tissue) and calms the chronic inflammation that's been blocking the repair cycle. Strongest peptide data for soft-tissue and tendon healing.<br><br>
-            &middot; <strong>TB-500 &mdash; cell migration + tissue regeneration + anti-fibrosis.</strong> Thymosin Beta-4 fragment that drives cell migration to the injury site, supports actin assembly for tissue regeneration, and reduces fibrotic scar tissue formation. Different mechanism, same target.<br><br>
-            &middot; <strong>Together &mdash; faster healing, cleaner rebuild.</strong> BPC + TB work on different pathways. Pairing them means the shoulder gets the angiogenesis signal (BPC) AND the tissue regeneration signal (TB) AND the anti-scarring signal (TB) at the same time, every day, at the exact site of damage. The result is faster repair with less scar tissue than BPC alone would produce.</div>
-            <div class="li-callout"><strong>Why PM fasted:</strong> the body does most of its repair work during sleep &mdash; growth hormone pulses, cellular regeneration, tissue rebuilding. Dosing Wolverine pre-bed in a fasted state (last food 2+ hrs prior) puts the dual-peptide signal in the body right when those overnight pathways are most active. Aim for the last 1&ndash;2 hours of your evening.</div>
-            <div class="li-callout"><strong>How this layers with KLOW:</strong> KLOW gives you 0.5 mg of BPC + 0.5 mg of TB per AM shot as part of the systemic blend &mdash; distributed across the whole body. The Wolverine PM shot, <em>injected at the shoulder</em>, concentrates a much stronger local signal exactly where the damage is, AM + PM bookending the day. Same peptides but pointed two ways: systemic via KLOW in the morning, local intensive via Wolverine in the evening.</div>
-            <div class="li-callout"><strong>Supply note:</strong> 2 vials at 10 doses each = 20 doses total. Running M&ndash;F PM at the shoulder = 4 weeks of intensive at-site coverage (~4&times; the duration of the previous BPC-only 10-day window). After Wolverine wraps at end of Week 4, KLOW continues alone for Weeks 5&ndash;8 to lock in the gains while the deep tissue remodels.</div>
-          </div>
-        </details>
-
-      </div>
-
-      <div class="totals-block">
+<div class="totals-block">
         <div class="total-row sub"><span>Subtotal &middot; Standard would be</span><span style="color:var(--muted);text-decoration:line-through;">$240.00</span></div>
         <div style="background:rgba(122,101,48,0.06);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:14px 18px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;">
           <div style="flex:1;min-width:240px;">
@@ -733,44 +789,24 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </div>
         <div class="total-row grand"><span>&#10004; Paid in Full</span><span class="val" style="color:#2f7a4a;">$190.00</span></div>
       </div>
+</details>
 
-      <details class="stack-card">
-        <summary><div class="stack-card-title">Why This Stack Is the Aggressive Build &mdash; Better and Longer</div></summary>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">KLOW &mdash; The Systemic Healing Blend (AM, M&ndash;F, 8 Weeks)</div>
-            <div class="stack-desc">Four peptides in one shot: GHK-Cu (collagen + antioxidant), BPC-157 (low dose, ~0.5 mg/shot), TB-500 (tissue regeneration), KPV (anti-inflammatory + immune). Covers the full systemic healing context across the entire body. 2 vials at 20 doses each = 40 M&ndash;F doses = 8 weeks of continuous systemic signal.</div>
-          </div>
-        </div>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">Wolverine Stack &mdash; The Dual-Mechanism Shoulder Intensive (PM at Site, Weeks 1&ndash;4)</div>
-            <div class="stack-desc">Pre-blended BPC-157 + TB-500 in one vial. Two different soft-tissue healing peptides hitting the shoulder from complementary mechanisms: BPC drives angiogenesis and anti-inflammatory; TB drives cell migration, tissue regeneration, and anti-scarring. 2 vials at 10 doses each = 20 M&ndash;F doses = 4 weeks of intensive at-site coverage.</div>
-          </div>
-        </div>
-
-        <div class="stack-synergy">
-          <strong>Why this is the better build:</strong> the previous protocol used BPC-only at the shoulder for ~10 days. This build runs BPC + TB-500 (the Wolverine combo) at the shoulder for a full 4 weeks &mdash; <strong>4&times; the duration of at-site coverage, plus the TB-500 addition.</strong> BPC alone drives angiogenesis; TB-500 adds cell migration and reduces fibrotic scarring. Different mechanisms = faster healing, cleaner tissue rebuild, less scar formation.<br><br>
-          <strong>Why this is the longer build:</strong> 2 KLOW vials gives a full 8-week systemic healing signal. For chronic soft-tissue that hasn't healed on its own, the 6&ndash;8 week window is where tissue remodeling fully consolidates. <strong>4 weeks gets you "feels better"; 8 weeks gets you "tissue actually remodeled."</strong><br><br>
-          <strong>The cycle structure:</strong> Weeks 1&ndash;4 = both stacks running together (KLOW systemic AM + Wolverine local PM at shoulder). Weeks 5&ndash;8 = KLOW alone, continuing the systemic signal while the deep tissue remodels. The combined effect on stubborn soft-tissue healing is substantially stronger than the original BPC-only build.
-        </div>
-      </details>
-
-      <div class="payment-block">
+<details class="paid-archive">
+<summary>
+          <span class="pa-pill">&#10004; Paid</span>
+          <span><span class="pa-title">Shoulder Recovery Protocol &middot; Paid</span><br><span class="pa-sub">KLOW + Wolverine Stack &middot; $190 settled &middot; tap to view</span></span>
+        </summary>
+<div class="payment-block">
         <div class="payment-title">Payment &middot; Paid in Full</div>
         <div class="payment-row">
           <div class="payment-icon">&#9989;</div>
           <div><div class="payment-text"><strong>Paid in full &mdash; thank you, Matt.</strong></div><div class="payment-handle" style="font-size:15px;">Shoulder recovery protocol settled &middot; $190</div></div>
         </div>
       </div>
+</details>
 
-      </details><!-- /paid-archive -->
-
-    </div><!-- /protocol tab -->
+</div><!-- /invoice tab -->
+<!-- /protocol tab -->
 
     <!-- ================ SCHEDULE TAB ================ -->
     <div class="tab-content" id="tab-schedule">
