@@ -265,6 +265,29 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
   .fld-v{font-size:12.5px;}
   .fld.dose .fld-v{font-size:16px;}
 }
+
+/* ---- standard compound rows (mjirikils structure) ---- */
+.line-items{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;}
+details.li-row{background:#ffffff;border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+details.li-row > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:14px 56px 14px 18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;position:relative;border-bottom:1px solid transparent;}
+details.li-row > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--gold-border);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--gold);font-size:18px;font-weight:300;line-height:1;background:#fff;transition:all 0.18s;}
+details[open].li-row > summary::after{content:'\2212';background:var(--gold-dim);}
+details[open].li-row > summary{border-bottom-color:var(--border);}
+.li-summary-name{display:block;}
+.cmp-head-key{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.01em;line-height:1.45;margin-top:3px;}
+.li-body{padding:18px 22px;background:#fafafa;}
+.cmp-quick{list-style:none;display:flex;flex-direction:column;gap:0.6rem;padding:0;margin:0;}
+.cmp-quick li{font-size:14px;color:var(--text);line-height:1.55;font-weight:400;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);min-width:104px;flex-shrink:0;}
+.cmp-quick .qv{flex:1;min-width:200px;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:13px;margin-left:2px;}
+.li-callout{background:rgba(122,101,48,0.07);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:2px;padding:12px 14px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.7;}
+.li-callout.why{background:rgba(58,107,142,0.07);border-color:rgba(58,107,142,0.35);border-left-color:#3a6b8e;color:#1f3f5a;}
+.li-callout strong{color:var(--gold);font-weight:700;}
+.phase-pill-inline{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#fff;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle;}
+details.li-row > summary::-webkit-details-marker{display:none;}
+details.li-row > summary:hover::after{border-color:var(--gold);background:var(--gold-dim);}
+@media(max-width:640px){.cmp-head-key{font-size:10.5px;}.cmp-quick .ql{min-width:88px;}.cmp-quick li{flex-direction:column;gap:2px;}}
 </style>
 </head>
 <body>
@@ -329,6 +352,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
   <div class="tab-bar">
     <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+      <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
     <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
     <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
     <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
@@ -354,69 +378,60 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       <div class="sec-divider-title">3 Compounds &middot; All AM</div>
     </div>
 
-    <div class="cmp-list">
-
-      <div class="cmp-row">
-        <div class="cmp-row-name">Retatrutide &middot; 30 mg &middot; 2 vials <span class="cmp-badge">Titrate</span></div>
-        <div class="cmp-fields">
-          <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM &middot; Monday</span></div>
-          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC &rarr; 10 mg/mL</span></div>
-          <div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">Once weekly</span></div>
-          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">1 &rarr; 4 mg &middot; 10 &rarr; 40u</span></div>
-          <div class="fld"><span class="fld-l">Site</span><span class="fld-v">SubQ abdomen</span></div>
-        </div>
-        <div class="cmp-note"><span class="nl">Why it's here</span>The weight lever. Triple agonist &mdash; GLP-1 + GIP for appetite, and a <strong>glucagon arm</strong> that raises resting energy expenditure, so the deficit comes partly from burning more rather than only from eating less.</div>
-        <div class="cmp-note"><span class="nl">The titration</span>Start at <strong>1 mg (10u)</strong> and add <strong>1 mg every week</strong> &mdash; 2 mg (20u), 3 mg (30u), then <strong>4 mg (40u) is the cap</strong>. Hold at 4 mg and <strong>message Micah to reevaluate</strong> before anything changes. Full week-by-week table is in the Schedule tab.</div>
-        <div class="cmp-note"><span class="nl">Vial life</span>The titration weeks use 1 + 2 + 3 + 4 = <strong>10 mg</strong>. The remaining 20 mg covers <strong>5 more weekly doses at 4 mg</strong> &mdash; about <strong>9 weekly doses per vial</strong>. You have <strong>2 vials &mdash; roughly 18 weekly doses, about 18 weeks</strong>. Mix one vial at a time.</div>
+    <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide &middot; 30 mg<span class="cmp-head-key">10 &rarr; 40u &middot; Monday AM &middot; weekly</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv"><strong>1 mg &rarr; 4 mg</strong>, stepping up 1 mg each Monday &mdash; pull syringe to <span class="units">10 &rarr; 40 units</span></span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &middot; Monday only</strong> (once weekly) &middot; titrate to the 4 mg cap, then hold</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it&apos;s here:</strong> The weight lever. Triple agonist &mdash; GLP-1 + GIP for appetite, and a <strong>glucagon arm</strong> that raises resting energy expenditure, so the deficit comes partly from burning more rather than only from eating less.</div>
+            <div class="li-callout"><strong>The titration:</strong> Start at <strong>1 mg (10u)</strong> and add <strong>1 mg every week</strong> &mdash; 2 mg (20u), 3 mg (30u), then <strong>4 mg (40u) is the cap</strong>. Hold at 4 mg and <strong>message Micah to reevaluate</strong> before anything changes. Full week-by-week table is in the Schedule tab.</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">MOTS-c &middot; 40 mg<span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM fasted</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">2 mg &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM fasted &middot; Mon&ndash;Fri</strong> (5&times;/wk) &middot; wait 30&ndash;45 min before eating &middot; Sat/Sun off</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it&apos;s here:</strong> The energy and performance lever. A mitochondria-derived peptide that <strong>activates AMPK</strong> &mdash; the same metabolic switch training flips &mdash; so it pushes fat oxidation and makes the work you already do pay off more. This is the one that shows up as steadier energy through the day.</div>
+          </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">NAD+ &middot; 1000 mg<span class="cmp-head-key">37.5u &middot; Mon / Wed / Fri AM</span></span>
+          </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">5 mL bacteriostatic water per vial</span></li>
+              <li><span class="ql">Dose</span><span class="qv">75 mg &rarr; pull syringe to <span class="units">37.5 units</span> (0.375 mL)</span></li>
+              <li><span class="ql">Schedule</span><span class="qv"><strong>AM &middot; Mon / Wed / Fri</strong> &middot; push slowly</span></li>
+            </ul>
+            <div class="li-callout why"><strong>Why it&apos;s here:</strong> The fuel. NAD+ is the coenzyme your mitochondria run on, and it drops steadily with age &mdash; at 45 it's usually the piece that's lowest. Topping it up is what lets the MOTS-c signal actually translate into output instead of just a signal.</div>
+            <div class="li-callout"><strong>Drawing 37.5u:</strong> That's the <strong>half-mark between 37 and 38</strong> on a 100-unit syringe. Line it up in good light &mdash; and <strong>push it in slowly</strong>, NAD+ stings if you go fast.</div>
+          </div>
+        </details>
       </div>
 
-      <div class="cmp-row">
-        <div class="cmp-row-name">MOTS-c &middot; 40 mg &middot; 2 vials <span class="cmp-badge">M&ndash;F</span></div>
-        <div class="cmp-fields">
-          <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM &middot; fasted</span></div>
-          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC &rarr; 20 mg/mL</span></div>
-          <div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">Mon&ndash;Fri &middot; 5&times;/wk</span></div>
-          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 mg &middot; 10u</span></div>
-          <div class="fld"><span class="fld-l">Site</span><span class="fld-v">SubQ abdomen</span></div>
-        </div>
-        <div class="cmp-note"><span class="nl">Why it's here</span>The energy and performance lever. A mitochondria-derived peptide that <strong>activates AMPK</strong> &mdash; the same metabolic switch training flips &mdash; so it pushes fat oxidation and makes the work you already do pay off more. This is the one that shows up as steadier energy through the day.</div>
-        <div class="cmp-note"><span class="nl">Vial life</span>5 doses/week &times; 2 mg = 10 mg per week, so each 40 mg vial runs <strong>exactly 4 weeks</strong>. With <strong>2 vials that's about 8 weeks</strong>. Open the second only as the first empties.</div>
-      </div>
-
-      <div class="cmp-row">
-        <div class="cmp-row-name">NAD+ &middot; 1000 mg &middot; 2 vials <span class="cmp-badge">M/W/F</span></div>
-        <div class="cmp-fields">
-          <div class="fld"><span class="fld-l">Block</span><span class="fld-v">AM</span></div>
-          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC &rarr; 200 mg/mL</span></div>
-          <div class="fld"><span class="fld-l">Cadence</span><span class="fld-v">Mon / Wed / Fri</span></div>
-          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">75 mg &middot; 37.5u</span></div>
-          <div class="fld"><span class="fld-l">Site</span><span class="fld-v">SubQ abdomen</span></div>
-        </div>
-        <div class="cmp-note"><span class="nl">Why it's here</span>The fuel. NAD+ is the coenzyme your mitochondria run on, and it drops steadily with age &mdash; at 45 it's usually the piece that's lowest. Topping it up is what lets the MOTS-c signal actually translate into output instead of just a signal.</div>
-        <div class="cmp-note"><span class="nl">Drawing 37.5u</span>That's the <strong>half-mark between 37 and 38</strong> on a 100-unit syringe. Line it up in good light &mdash; and <strong>push it in slowly</strong>, NAD+ stings if you go fast.</div>
-        <div class="cmp-note"><span class="nl">Vial life</span>3 doses/week &times; 75 mg = 225 mg per week. Each 1000 mg vial gives <strong>13 full doses &mdash; about 4.4 weeks</strong>; <strong>2 vials = 26 doses, about 9 weeks</strong>. Still the first compound you'll finish.</div>
-      </div>
-
-    </div>
-
-    <div class="sec-divider mt">
-      <div class="sec-divider-eyebrow">The Numbers</div>
-      <div class="sec-divider-title">Vial Math &middot; What Each One Covers</div>
-    </div>
-
-    <div class="data-card"><div class="data-scroll"><table class="data-table">
-      <thead><tr><th>Compound</th><th>Recon</th><th>Concentration</th><th>Dose</th><th class="right">Draw</th><th class="right">Vial Lasts</th></tr></thead>
-      <tbody>
-        <tr><td class="cmp">Retatrutide<span class="sub">30 mg &times; 2 &middot; weekly</span></td><td>3 mL BAC / vial</td><td>10 mg/mL</td><td>1 &rarr; 4 mg</td><td class="num">10 &rarr; 40u</td><td class="num">~18 weeks</td></tr>
-        <tr><td class="cmp">MOTS-c<span class="sub">40 mg &times; 2 &middot; M&ndash;F</span></td><td>2 mL BAC / vial</td><td>20 mg/mL</td><td>2 mg</td><td class="num">10u</td><td class="num">~8 weeks</td></tr>
-        <tr><td class="cmp">NAD+<span class="sub">1000 mg &times; 2 &middot; M/W/F</span></td><td>5 mL BAC / vial</td><td>200 mg/mL</td><td>75 mg</td><td class="num">37.5u</td><td class="num">~9 weeks</td></tr>
-        <tr><td class="cmp">Bacteriostatic Water<span class="sub">10 mL &times; 2 &middot; included free</span></td><td colspan="4">Covers all six vials: (3 + 2 + 5) mL &times; 2</td><td class="num">20 mL total</td></tr>
-      </tbody>
-    </table></div></div>
+    
 
     <div class="chart-note"><span class="nl">Read this one twice</span><p>Your free 10 mL bac-water bottle covers the stack <strong>exactly</strong> &mdash; 3 for Reta + 2 for MOTS-c + 5 for NAD+ = 10 mL, with nothing to spare. Mix carefully and don't waste any; if a vial gets away from you, message Micah for another bottle rather than under-filling and throwing the concentrations off.</p></div>
 
-    <div class="sec-divider mt">
+    
+
+  </div>
+  <!-- ================= INVOICE ================= -->
+  <div class="tab-content" id="tab-invoice">
+<div class="sec-divider mt">
       <div class="sec-divider-eyebrow">Your Order</div>
       <div class="sec-divider-title">3 Compounds &middot; $200</div>
     </div>
@@ -440,8 +455,8 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="payment-text">Set payment privacy to <strong>Private</strong> (not Public or Friends)</div>
       </div>
     </div>
-
-  </div><!-- /protocol -->
+  </div><!-- /invoice -->
+<!-- /protocol -->
 
   <!-- ================= SCHEDULE ================= -->
   <div class="tab-content" id="tab-schedule">
