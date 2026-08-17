@@ -51,11 +51,28 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .inv-number{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--text);margin-top:2px;}
 .inv-date{font-size:13px;color:var(--text);font-weight:500;margin-top:4px;}
 
-/* TABS */
-.tab-bar{display:flex;background:#ffffff;border-bottom:1px solid var(--gold-border);position:sticky;top:56px;z-index:50;}
-.tab-btn{flex:1;padding:14px 10px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border:none;border-top:none;border-left:none;border-right:none;border-bottom:2px solid transparent;background:none;transition:all 0.2s;white-space:nowrap;}
-.tab-btn:hover{color:var(--gold);background:#fcfcfa;}
-.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);background:#fcfcfa;}
+/* TABS — one horizontally-scrolling row of segmented pills.
+   Never wraps to a second row: the strip scrolls, the page does not. */
+.tab-bar{display:flex;flex-wrap:nowrap;align-items:center;gap:8px;
+  padding:10px 14px;background:#fffdf7;border-bottom:1px solid var(--gold-border);
+  position:sticky;top:56px;z-index:50;
+  overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;-ms-overflow-style:none;
+  scroll-behavior:smooth;scroll-padding-inline:14px;overscroll-behavior-x:contain;}
+.tab-bar::-webkit-scrollbar{display:none;height:0;width:0;}
+.tab-btn{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
+  min-height:44px;padding:0 16px;
+  font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--muted);cursor:pointer;white-space:nowrap;
+  background:var(--surface);border:1px solid var(--gold-border);border-radius:99px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.04);
+  transition:background 0.18s,color 0.18s,border-color 0.18s,box-shadow 0.18s;
+  -webkit-tap-highlight-color:transparent;}
+.tab-btn:hover{color:var(--gold);border-color:var(--gold);background:#fcfaf3;}
+.tab-btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+.tab-btn.active{color:#ffffff;background:var(--gold);border-color:var(--gold);
+  box-shadow:0 2px 8px rgba(122,101,48,0.30);}
+.tab-btn.active:hover{color:#ffffff;background:var(--gold);}
 .tab-content{display:none;}
 .tab-content.active{display:block;}
 
@@ -246,8 +263,9 @@ details[open].paid-archive > summary{margin-bottom:18px;padding-bottom:14px;bord
   .program-title{font-size:30px;}
   .program-intro{padding:14px 0 18px;}
   .program-badge{font-size:8px;padding:4px 8px;}
-  .tab-bar{position:sticky;top:56px;}
-  .tab-btn{padding:11px 4px;font-size:9px;letter-spacing:0.08em;}
+  /* the strip keeps its full-size pills on mobile and scrolls instead of shrinking */
+  .tab-bar{position:sticky;top:56px;gap:7px;padding:9px 12px;}
+  .tab-btn{padding:0 15px;font-size:10px;letter-spacing:0.10em;min-height:44px;}
   .sec-divider-title{font-size:19px;}
   .sched-card{padding:16px 16px;}
   .sched-card-title{font-size:17px;}
@@ -1138,6 +1156,8 @@ function switchTab(tab,btn){
   document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
   document.getElementById('tab-'+tab).classList.add('active');
   btn.classList.add('active');
+  /* the strip scrolls, so pull the tab you just tapped fully into view */
+  if(btn.scrollIntoView){btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}
 }
 
 function downloadICS(){
