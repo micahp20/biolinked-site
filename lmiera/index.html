@@ -985,7 +985,17 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </tbody>
     </table></div>
     <div class="chart-note"><div class="note-list"><div class="nr"><div class="nr-l">From week 3</div><div class="nr-v">Semax steps from 5 units to <strong>10 units</strong>. Cortagen and Cerebrolysin stop at day 20 &mdash; that is the end of the course, not a missed dose.</div></div></div></div>
-  </details>
+      <div class="cal-banner" style="margin-top:16px;">
+      <div class="cal-left">
+        <h4>&#128197; Add the Cognitive Cycle to Your Calendar</h4>
+        <p>Same 20-day cognitive block Zach is running. Pick the Monday you start and download &mdash; Cortagen and Cerebrolysin every morning, Semax on Mon/Wed/Fri, and the Semax step-up to 10 units from week 3 is already built in.</p>
+      </div>
+      <div class="cal-controls">
+        <input type="date" id="cogStart">
+        <button class="cal-dl-btn" onclick="downloadCognitiveICS()">&#11015; Download .ics</button>
+      </div>
+    </div>
+</details>
 
   <details class="sched-card">
     <summary class="sched-card-head">
@@ -1196,6 +1206,29 @@ function switchTab(tab,btn){
   btn.classList.add('active');
 }
 
+function downloadCognitiveICS(){
+  var v=document.getElementById('cogStart').value;
+  if(!v){alert('Pick the Monday you start the cognitive cycle.');return;}
+  var p=v.split('-'); var start=new Date(+p[0],+p[1]-1,+p[2]);
+  function pad(n){return (n<10?'0':'')+n;}
+  function d(dt){return dt.getFullYear()+pad(dt.getMonth()+1)+pad(dt.getDate());}
+  function add(dt,n){var x=new Date(dt);x.setDate(x.getDate()+n);return x;}
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Cognitive Cycle//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS \u2014 Cognitive Cycle (20 Days)'];
+  for(var i=0;i<20;i++){
+    var day=add(start,i); var dow=day.getDay();
+    var lines=['Cortagen \u2014 20 units (2 mg)','Cerebrolysin \u2014 30 units (6 mg), push slowly'];
+    if(dow===1||dow===3||dow===5){ lines.unshift(i<14?'Semax \u2014 5 units (500 mcg), fasted':'Semax \u2014 10 units (1 mg), fasted'); }
+    var desc='Cognitive cycle \u00b7 Day '+(i+1)+' of 20\\n\\n'+lines.join('\\n');
+    ics.push('BEGIN:VEVENT','UID:cog-'+i+'@biolinked','DTSTART;VALUE=DATE:'+d(day),'DTEND;VALUE=DATE:'+d(add(day,1)),
+             'SUMMARY:BLS \u00b7 Cognitive AM ('+lines.length+' shots)','DESCRIPTION:'+desc,
+             'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked \u2014 morning shots','END:VALARM','END:VEVENT');
+  }
+  ics.push('END:VCALENDAR');
+  var blob=new Blob([ics.join('\r\n')],{type:'text/calendar'});
+  var url=URL.createObjectURL(blob); var a=document.createElement('a');
+  a.href=url; a.download='cognitive-cycle-20-days.ics'; document.body.appendChild(a); a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
 function downloadICS(){
   var v=document.getElementById('cycleStart').value;
   if(!v){alert('Pick your Cycle 1 start date first.');return;}
