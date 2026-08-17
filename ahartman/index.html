@@ -190,7 +190,7 @@ details[open].paid-archive > summary{margin-bottom:18px;padding-bottom:14px;bord
 .li-body .li-callout{background:rgba(183,148,244,0.10);border:1px solid rgba(183,148,244,0.35);border-left:3px solid #8965cc;border-radius:2px;padding:12px 14px;margin-top:14px;font-size:13px;color:#3d2f10;line-height:1.7;}
 .li-body .li-callout strong{color:#6f4fb8;font-weight:700;}
 
-/* GS2-STYLE STACK OVERVIEW (Protocol Overview / How This Stack Works Together) */
+/* GS2-STYLE STACK CARD (used by the next-stack recommendation) */
 .stack-card{background:#f8f8f8;border:1px solid var(--border);border-top:2px solid var(--gold-border);border-radius:2px;padding:22px 24px;margin-top:8px;margin-bottom:24px;}
 .stack-card-title{font-size:11px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;}
 .stack-item{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border);}
@@ -465,6 +465,89 @@ details[open].sched-card > summary.sched-card-head,details.sched-card > summary.
 .li-summary-name{display:block;}
 .cmp-head-key{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.01em;line-height:1.45;margin-top:3px;}
 @media(max-width:640px){.cmp-head-key{font-size:10.5px;}}
+
+/* ═══════════════════════════════════════════════════════════════════
+   DESIGN PASS — tooltips, mpauldino-style stack cards, section panels
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 1. info-tip base (only the mobile overrides existed, so tooltips
+      were rendering as raw text) ── */
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;
+  background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:9px;font-weight:700;
+  cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;
+  outline:none;flex-shrink:0;vertical-align:middle;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--gold);color:#fff;border-color:var(--gold);}
+.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a1a;
+  color:#fff;border:1px solid transparent;padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;
+  line-height:1.55;letter-spacing:0.01em;text-transform:none;width:250px;text-align:left;opacity:0;
+  pointer-events:none;transition:opacity 0.18s;z-index:400;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
+.info-tip-text strong{color:#e9c66c;font-weight:600;}
+.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
+  border:5px solid transparent;border-top-color:#1a1a1a;}
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
+
+/* ── 2. compound cards -> mpauldino stack-card treatment ── */
+details.li-row{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);overflow:visible;margin-bottom:0;}
+details.li-row > summary{display:block;padding:0;position:relative;}
+.li-summary-name{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;font-weight:700;
+  color:var(--text);padding:12px 46px 12px 16px;border-bottom:1px solid var(--border);background:#fafafa;
+  border-radius:8px 8px 0 0;line-height:1.35;}
+details.li-row:not([open]) > summary .li-summary-name{border-bottom-color:transparent;border-radius:8px;}
+.li-summary-price{display:block;padding:9px 16px 0;font-family:'Montserrat',sans-serif;font-size:15px;
+  font-weight:700;color:var(--gold);text-align:left;white-space:normal;}
+.li-body{padding:6px 16px 14px;background:transparent;}
+/* label -> value rows, matching mpauldino's .fld */
+.cmp-quick{display:flex;flex-direction:column;gap:0;}
+.cmp-quick li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;
+  border-bottom:1px solid #f0f0f0;font-size:13px;line-height:1.6;flex-wrap:nowrap;}
+.cmp-quick li:last-child{border-bottom:none;}
+.cmp-quick .ql{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);
+  white-space:nowrap;min-width:0;flex:none;}
+.cmp-quick .qv{flex:1 1 auto;min-width:0;text-align:right;font-weight:600;color:var(--text);overflow-wrap:anywhere;}
+.cmp-quick li:has(.ql:first-child)>.qv strong{font-weight:700;}
+.cmp-quick .units{display:inline-block;font-weight:700;color:var(--gold);background:var(--gold-dim);
+  border:1px solid var(--gold-border);padding:1px 9px;border-radius:99px;font-size:12.5px;white-space:nowrap;}
+.li-body .li-callout{border-radius:6px;margin-top:12px;font-size:12.5px;line-height:1.7;}
+.line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:start;}
+
+/* ── 3. section separation: distinct bordered blocks ── */
+.inv-header{border-radius:8px 8px 0 0;}
+.tab-content{background:#f2f2f0;padding:22px 18px 30px;}
+/* every section header becomes a labelled band that opens its block */
+.tab-content > .sec-divider,
+.order-fold > .sec-divider,
+.paid-archive > .sec-divider{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--gold);
+  border-radius:8px;padding:13px 16px;margin:0 0 12px;box-shadow:0 1px 2px rgba(0,0,0,0.04);}
+.tab-content > .sec-divider.mt{margin-top:26px;}
+.sec-divider-eyebrow{margin-bottom:2px;}
+/* the loose compound grid gets its own contained field */
+.tab-content > .line-items{background:rgba(0,0,0,0.02);border:1px solid var(--border);border-radius:8px;
+  padding:12px;margin-bottom:22px;}
+/* breathing room between the major blocks */
+.tab-content > details,
+.tab-content > .totals-block,
+.tab-content > .payment-block,
+.tab-content > .chart-note{margin-bottom:20px;}
+.tab-content > details:last-child{margin-bottom:0;}
+
+@media(max-width:640px){
+  .tab-content{padding:16px 12px 26px;}
+  .line-items{grid-template-columns:1fr;}
+  .li-summary-name{padding:12px 44px 12px 15px;}
+  .li-summary-price,.li-body{padding-left:15px;padding-right:15px;}
+  .cmp-quick li{flex-direction:column;align-items:flex-start;gap:2px;}
+  .cmp-quick .qv{text-align:left;}
+  .tab-content > .sec-divider{padding:12px 14px;}
+}
+
+/* callouts to the site gold accent (page previously used a violet tint) */
+.li-body .li-callout{background:rgba(122,101,48,0.07)!important;border:1px solid var(--gold-border)!important;
+  border-left:3px solid var(--gold)!important;color:#3d2f10!important;}
+.li-body .li-callout strong{color:var(--gold)!important;}
+.li-body .li-callout.why{background:rgba(58,107,142,0.07)!important;border-color:rgba(58,107,142,0.35)!important;
+  border-left-color:#3a6b8e!important;color:#1f3f5a!important;}
+.li-body .li-callout.why strong{color:#3a6b8e!important;}
 </style>
 </head>
 <body>
@@ -572,7 +655,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="line-items">
         <details class="li-row">
-          <summary><span class="li-summary-name">Epithalon &middot; 50 mg &middot; 2 vials</span><span class="li-summary-price">$45 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
+          <summary><span class="li-summary-name">Epithalon &middot; 50 mg &middot; 2 vials <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Pineal bioregulator (Khavinson class).</strong> Reactivates the pineal gland&apos;s own melatonin production and restores its nightly rhythm &mdash; the hormonal &ldquo;it&apos;s night&rdquo; signal. Also studied for telomerase and cellular longevity.</span></span></span><span class="li-summary-price">$45 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
           <div class="li-body"><ul class="cmp-quick">
             <li><span class="ql">Recon</span><span class="qv">2 mL bacteriostatic water per vial &middot; gives 25 mg/mL</span></li>
             <li><span class="ql">Dose</span><span class="qv"><strong>10 mg</strong> &rarr; pull syringe to <span class="units">40 units</span> (0.40 mL)</span></li>
@@ -584,7 +667,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </details>
 
         <details class="li-row">
-          <summary><span class="li-summary-name">Pinealon &middot; 20 mg &middot; 2 vials</span><span class="li-summary-price">$30 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
+          <summary><span class="li-summary-name">Pinealon &middot; 20 mg &middot; 2 vials <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Short pineal / CNS bioregulator.</strong> A three-amino-acid peptide aimed at brain-side sleep-cycle regulation and neuroprotection. Runs on the same pulsed course as Epithalon, working the clock from the CNS rather than the gland.</span></span></span><span class="li-summary-price">$30 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
           <div class="li-body"><ul class="cmp-quick">
             <li><span class="ql">Recon</span><span class="qv">1 mL bacteriostatic water per vial &middot; gives 20 mg/mL</span></li>
             <li><span class="ql">Dose</span><span class="qv"><strong>4 mg</strong> &rarr; pull syringe to <span class="units">20 units</span> (0.20 mL)</span></li>
@@ -603,7 +686,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="line-items">
         <details class="li-row">
-          <summary><span class="li-summary-name">GHK-Cu &middot; 50 mg &middot; 2 vials</span><span class="li-summary-price">$25 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
+          <summary><span class="li-summary-name">GHK-Cu &middot; 50 mg &middot; 2 vials <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Copper tripeptide.</strong> Drives collagen and elastin synthesis, skin remodeling and wound repair. One of the most-studied peptides for skin quality and connective-tissue turnover.</span></span></span><span class="li-summary-price">$25 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
           <div class="li-body"><ul class="cmp-quick">
             <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial &middot; gives 16.67 mg/mL</span></li>
             <li><span class="ql">Dose</span><span class="qv"><strong>~1.67 mg</strong> &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
@@ -615,7 +698,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </details>
 
         <details class="li-row">
-          <summary><span class="li-summary-name">Tirzepatide &middot; 30 mg &middot; 3 vials</span><span class="li-summary-price">$50 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
+          <summary><span class="li-summary-name">Tirzepatide &middot; 30 mg &middot; 3 vials <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Dual GLP-1 / GIP agonist.</strong> Works two incretin pathways at once &mdash; appetite regulation plus insulin sensitivity and glucose handling. Standard cadence for this class is one injection per week.</span></span></span><span class="li-summary-price">$50 <span style="font-size:11px;color:var(--muted);font-weight:500;">/ vial</span></span></summary>
           <div class="li-body"><ul class="cmp-quick">
             <li><span class="ql">Recon</span><span class="qv">3 mL bacteriostatic water per vial &middot; gives 10 mg/mL</span></li>
             <li><span class="ql">Dose</span><span class="qv"><strong>1 mg</strong> &rarr; pull syringe to <span class="units">10 units</span> (0.10 mL)</span></li>
@@ -663,7 +746,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- DSIP -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">DSIP (Delta Sleep-Inducing Peptide) &middot; 10 mg<span class="cmp-head-key">20u &middot; M / W / F &middot; PM</span></span>
+            <span class="li-summary-name">DSIP (Delta Sleep-Inducing Peptide) &middot; 10 mg<span class="cmp-head-key">20u &middot; M / W / F &middot; PM</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Delta Sleep-Inducing Peptide.</strong> A naturally occurring nonapeptide that promotes delta (deep, slow-wave) sleep &mdash; it works on sleep onset and depth rather than sedating you, so you fall asleep easier and spend more time in the restorative stages.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Sleep <em>&middot; M/W/F PM</em></span>
               
@@ -683,7 +766,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- N-ACETYL SELANK AMIDATE -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">N-Acetyl Selank Amidate &middot; 30 mg<span class="cmp-head-key">10u &middot; M / W / F</span></span>
+            <span class="li-summary-name">N-Acetyl Selank Amidate &middot; 30 mg<span class="cmp-head-key">10u &middot; M / W / F</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Stabilised Selank analog.</strong> A tuftsin-derived anxiolytic that modulates GABA and BDNF &mdash; calming without sedation or cognitive dulling. The N-acetyl amidate form is longer-acting than plain Selank.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Calm <em>&middot; M/W/F After Work</em></span>
               
@@ -760,7 +843,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- KLOW -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">KLOW Blend &middot; 80 mg<span class="cmp-head-key">15u &middot; M&ndash;F</span></span>
+            <span class="li-summary-name">KLOW Blend &middot; 80 mg<span class="cmp-head-key">15u &middot; M&ndash;F</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Four-part healing blend.</strong> GHK-Cu for collagen and tissue remodeling, BPC-157 and TB-500 for tendon, ligament and soft-tissue repair, and KPV to calm the inflammation sitting on top. One draw instead of four.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Foundation <em>&middot; Both Phases</em></span>
               
@@ -778,7 +861,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- SS-31 -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">SS-31 (Elamipretide) &middot; 50 mg<span class="cmp-head-key">10u &middot; M&ndash;F</span></span>
+            <span class="li-summary-name">SS-31 (Elamipretide) &middot; 50 mg<span class="cmp-head-key">10u &middot; M&ndash;F</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondria-targeted peptide (Elamipretide).</strong> Binds cardiolipin in the inner mitochondrial membrane, restoring the structure ATP production depends on. Cellular-hardware repair rather than a stimulant.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Phase 1 <em>&middot; Repair &middot; Wks 1&ndash;8</em></span>
               
@@ -797,7 +880,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- MOTS-C -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">MOTS-C &middot; 40 mg<span class="cmp-head-key">10u &middot; M&ndash;F</span></span>
+            <span class="li-summary-name">MOTS-C &middot; 40 mg<span class="cmp-head-key">10u &middot; M&ndash;F</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondria-derived peptide.</strong> Activates AMPK &mdash; the same metabolic switch exercise and fasting flip on &mdash; pushing fat oxidation, insulin sensitivity and steadier daytime energy.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Phase 2 <em>&middot; Optimize &middot; Wks 9&ndash;16</em></span>
               
@@ -815,7 +898,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- TESAMORELIN -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">Tesamorelin &middot; 15 mg<span class="cmp-head-key">20u &middot; M&ndash;F</span></span>
+            <span class="li-summary-name">Tesamorelin &middot; 15 mg<span class="cmp-head-key">20u &middot; M&ndash;F</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>GHRH analog.</strong> Triggers your own pituitary to release growth hormone in natural pulses rather than flooding the system. Strongest clinical data of the GH peptides for visceral fat reduction and lean-tissue preservation.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">GH Axis <em>&middot; ~15 Weeks</em></span>
               
@@ -833,7 +916,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- RETATRUTIDE -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">Retatrutide &middot; 40 mg<span class="cmp-head-key">10u &middot; M / W / F AM fasted</span></span>
+            <span class="li-summary-name">Retatrutide &middot; 40 mg<span class="cmp-head-key">10u &middot; M / W / F AM fasted</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Triple agonist (GLP-1 + GIP + glucagon).</strong> The GLP-1/GIP arms handle appetite; the glucagon arm raises resting energy expenditure, so the deficit comes partly from burning more rather than only eating less.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Throughout <em>&middot; M / W / F AM Fasted</em></span>
               
@@ -855,7 +938,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <!-- 5-AMINO-1MQ -->
         <details class="li-row">
           <summary>
-            <span class="li-summary-name">5-Amino-1MQ &middot; 5 mg<span class="cmp-head-key">20u &middot; Right before workout</span></span>
+            <span class="li-summary-name">5-Amino-1MQ &middot; 5 mg<span class="cmp-head-key">20u &middot; Right before workout</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>NNMT inhibitor.</strong> Blocks an enzyme that builds up in fat tissue with age and suppresses fat oxidation &mdash; removing a metabolic brake so fat cells stay in burn mode.</span></span></span>
             <div class="li-summary-meta">
               <span class="li-summary-phase">Pre-Workout <em>&middot; All 16 Weeks</em></span>
               
@@ -872,63 +955,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       </div>
 
-      <details class="stack-card">
-        <summary><div class="stack-card-title">Protocol Overview &mdash; How This Stack Works Together</div></summary>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">KLOW &mdash; The Systemic Foundation</div>
-            <div class="stack-desc">Kpv + GHK-Cu + BPC-157 + TB-500 blend that creates a systemic anti-inflammatory and repair environment &mdash; reduces gut inflammation, heals connective tissue, supports skin and vascular health, lowers oxidative load. <strong>KLOW sets the terrain.</strong> You do not upregulate mitochondrial activity inside an inflamed system, so KLOW runs all 16 weeks as the backbone underneath everything else.</div>
-          </div>
-        </div>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">SS-31 (Elamipretide) &mdash; Repair the Engine</div>
-            <div class="stack-desc">Mitochondrial-targeted peptide that binds cardiolipin on the inner mitochondrial membrane. Stabilizes the electron transport chain and dramatically reduces ROS leakage from damaged mitochondria. <strong>Servicing the engine</strong> &mdash; fixing the broken, leaky machinery so it stops producing oxidative damage. Runs weeks 1&ndash;8; finishes before MOTS-C begins.</div>
-          </div>
-        </div>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">MOTS-C &mdash; Optimize the Engine</div>
-            <div class="stack-desc">Mitochondrial-derived peptide that activates AMPK, mimics the metabolic effects of exercise, improves insulin sensitivity, and drives mitochondrial biogenesis &mdash; the creation of new mitochondria. <strong>Tuning the engine for performance and building more of them</strong>, once the existing ones are running clean. Starts week 9, immediately after SS-31 finishes; runs through week 16.</div>
-          </div>
-        </div>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">Tesamorelin &mdash; The GH Axis Backdrop</div>
-            <div class="stack-desc">GHRH analog that stimulates endogenous growth hormone release from the pituitary. Drives recovery, sleep quality, lean tissue preservation, and visceral fat reduction. <strong>The systemic recovery layer</strong> &mdash; while SS-31 and MOTS-C work on mitochondria, Tesamorelin amplifies the GH/IGF-1 axis that all that cellular repair benefits from. Runs M&ndash;F throughout the cycle until the 5-vial supply is exhausted (~15 weeks).</div>
-          </div>
-        </div>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">Retatrutide &mdash; The Metabolic Amplifier</div>
-            <div class="stack-desc">Triple agonist (GLP-1 / GIP / glucagon) that drives fat loss, improves insulin sensitivity, and reduces visceral adiposity. Operates from a different angle than the mitochondrial peptides but feeds the same downstream result: less inflammation (complements KLOW), sharper insulin signaling (amplifies MOTS-C and SS-31). <strong>Better terrain for mitochondrial work.</strong> M/W/F AM fasted (10u / ~1.33 mg) at the starting dose, tier up or down based on how you're feeling. 2 vials run ~20 weeks &mdash; outlasts the 16-week core cycle.</div>
-          </div>
-        </div>
-
-        <div class="stack-item">
-          <div class="stack-dot"></div>
-          <div class="stack-right">
-            <div class="stack-compound">5-Amino-1MQ &mdash; The NAD+ Lever</div>
-            <div class="stack-desc">NNMT inhibitor that blocks the enzyme depleting NAD+, raising intracellular NAD+ availability &mdash; the critical cofactor for mitochondrial energy production. While MOTS-C and SS-31 fix and optimize the machinery, 5-Amino <strong>raises the fuel currency that machinery runs on</strong>. Pre-workout: sharpens performance, supports lean mass retention during fat loss.</div>
-          </div>
-        </div>
-
-        <div class="stack-synergy">
-          <strong>Stack Synergy &mdash; Repair First. Then Optimize. Never Both at Once.</strong> Running MOTS-C on damaged, ROS-leaking mitochondria is like flooring the gas pedal on a car with a blown head gasket &mdash; you amplify output, but you also amplify the damage. The sequencing is strict: <strong>SS-31 first (weeks 1&ndash;8)</strong> establishes mitochondrial integrity by repairing the existing fleet. <strong>MOTS-C then (weeks 9&ndash;16)</strong> drives those healthy mitochondria harder and stimulates the creation of new ones. They <strong>do not overlap</strong> &mdash; the order respects the <em>repair &rarr; optimize</em> hierarchy. KLOW runs underneath the entire 16-week cycle so neither peptide is fighting an inflamed systemic environment. Reta and 5-Amino layer in around this core sequence &mdash; Reta as the metabolic backdrop, 5-Amino as the on-demand performance lever.
-        </div>
-      </details>
-
-      
+            
 
       <!-- /paid-archive mitochondrial reset -->
 
