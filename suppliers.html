@@ -351,6 +351,23 @@
 
   .view { display: none; }
   .view.active { display: block; }
+
+    .wh-switch { display:flex; gap:0; border:1px solid var(--line, rgba(0,0,0,.14)); border-radius:8px; overflow:hidden; width:fit-content; }
+    .wh-btn { padding:8px 14px; font-size:12px; font-weight:600; background:#fff; border:none; cursor:pointer;
+              color:var(--text-soft,#666); border-right:1px solid var(--line, rgba(0,0,0,.14)); white-space:nowrap; }
+    .wh-btn:last-child { border-right:none; }
+    .wh-btn.active { background:var(--gold,#7A6530); color:#fff; }
+    .wh-flag { font-size:10px; opacity:.85; margin-left:4px; }
+    .supplier-col .wh-ship { display:block; font-size:9px; font-weight:400; color:var(--text-soft,#888); letter-spacing:.02em; margin-top:2px; }
+    .price-cell .wh-pair { display:flex; flex-direction:column; gap:2px; }
+    .price-cell .wh-line { display:flex; gap:6px; align-items:baseline; justify-content:flex-end; }
+    .price-cell .wh-tag { font-size:9px; font-weight:700; letter-spacing:.06em; color:var(--text-soft,#999); }
+    .price-cell .wh-delta { font-size:10px; font-weight:600; color:#8a3c3c; }
+    .price-cell .wh-delta.down { color:#3a6b3a; }
+    .price-cell.no-us { color:var(--text-soft,#aaa); font-style:italic; font-size:11px; }
+    .wh-banner { background:rgba(122,101,48,.07); border:1px solid rgba(122,101,48,.28); border-left:3px solid var(--gold,#7A6530);
+                 border-radius:4px; padding:10px 14px; margin:0 0 14px; font-size:12.5px; line-height:1.55; }
+    @media(max-width:640px){ .wh-btn{ padding:8px 10px; font-size:11px; } }
 </style>
 </head>
 <body>
@@ -407,6 +424,8 @@
     <div class="supplier-filters" id="supplier-filters"></div>
 
     <div class="table-wrap">
+    <div class="wh-banner" id="wh-banner" style="display:none"></div>
+
       <table class="compare">
         <thead>
           <tr id="table-head"></tr>
@@ -478,6 +497,24 @@
 
   const SUPPLIERS = ["Peptide Pole", "APS", "ERP", "HYB", "MIX", "Aurora", "Maddox", "ZJ", "Laixian"];
 
+    // ---- where each supplier actually ships from -------------------------
+  // warehouses: which price sets this supplier can quote. 'us' entries read
+  // from the `us` object on each SKU (see getPriceForTier).
+  const SUPPLIER_META = {
+    "Peptide Pole": { region: "HK", flag: "\u{1F1ED}\u{1F1F0}", ships: "10\u201320 days", warehouses: ["cn"] },
+    "APS":          { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days", warehouses: ["cn"] },
+    "ERP":          { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days", warehouses: ["cn"] },
+    "HYB":          { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days \u00b7 US option", warehouses: ["cn","us"] },
+    "MIX":          { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days", warehouses: ["cn"] },
+    "Aurora":       { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days", warehouses: ["cn"] },
+    "Maddox":       { region: "US", flag: "\u{1F1FA}\u{1F1F8}", ships: "3 days", warehouses: ["us"] },
+    "ZJ":           { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days", warehouses: ["cn"] },
+    "Laixian":      { region: "CN", flag: "\u{1F1E8}\u{1F1F3}", ships: "10\u201320 days", warehouses: ["cn"] },
+  };
+  const hasWarehouse = (sName, wh) => (SUPPLIER_META[sName]?.warehouses || ["cn"]).includes(wh);
+  // Maddox quotes domestic only, so its base price IS the US price.
+  const usIsBase = sName => (SUPPLIER_META[sName]?.warehouses || []).join() === "us";
+
   const SUPPLIER_NOTES = {
     "Peptide Pole": "Hong Kong • Broad catalog",
     "APS": "Andy Peps China Warehouse",
@@ -490,7 +527,7 @@
     "Laixian": "Guangzhou Laixian • Also ~80 tablet + ~68 injectable-oil SKUs"
   };
 
-  let state = {
+  let state = { warehouse: "both",
     search: "",
     sortBy: "name",
     tier: "1",
@@ -499,13 +536,30 @@
   };
 
   // --- Helpers ---
-  function getPriceForTier(s, tier) {
+  function tierOf(o, tier) {
+    if (!o) return null;
+    if (tier === "1") return o.price ?? null;
+    if (tier === "2") return o.tier2 ?? o.price ?? null;
+    if (tier === "3") return o.tier3 ?? o.tier2 ?? o.price ?? null;
+    if (tier === "4") return o.tier4 ?? o.tier3 ?? o.tier2 ?? o.price ?? null;
+    return o.price ?? null;
+  }
+
+  // Price for a supplier entry in the selected warehouse.
+  //   cn -> the base fields (what the sheet has always held)
+  //   us -> the `us` object, except for US-only suppliers where base IS the US price
+  function priceIn(s, tier, wh, sName) {
     if (!s) return null;
-    if (tier === "1") return s.price;
-    if (tier === "2") return s.tier2 ?? s.price;
-    if (tier === "3") return s.tier3 ?? s.tier2 ?? s.price;
-    if (tier === "4") return s.tier4 ?? s.tier3 ?? s.tier2 ?? s.price;
-    return s.price;
+    if (wh === "us") {
+      if (usIsBase(sName)) return tierOf(s, tier);
+      return tierOf(s.us, tier);
+    }
+    if (usIsBase(sName)) return null;      // Maddox has no China price
+    return tierOf(s, tier);
+  }
+
+  function getPriceForTier(s, tier, sName) {
+    return priceIn(s, tier, state.warehouse === "both" ? "cn" : state.warehouse, sName);
   }
 
   function pricePerMg(price, dose, unit) {
@@ -522,7 +576,7 @@
       if (!state.activeSuppliers.has(sName)) continue;
       const s = row.suppliers[sName];
       if (!s) continue;
-      const price = getPriceForTier(s, tier);
+      const price = getPriceForTier(s, tier, sName);
       if (price == null) continue;
       const perMg = pricePerMg(price, row.dose, row.unit);
       // For non-mg items (iu, ml), use price directly
@@ -627,6 +681,37 @@
         <td class="orals-price"><span class="amt">${fmtOralPrice(p.price)}</span><span class="unit">${p.unit}</span></td>
       </tr>
     `).join("");
+  }
+
+
+  // ---- warehouse switch ------------------------------------------------
+  function renderWarehouseSwitch() {
+    document.querySelectorAll("#wh-switch .wh-btn").forEach(b => {
+      b.classList.toggle("active", b.dataset.wh === state.warehouse);
+    });
+    const banner = document.getElementById("wh-banner");
+    if (!banner) return;
+    const withUs = SUPPLIERS.filter(x => hasWarehouse(x, "us"));
+    let filled = 0, total = 0;
+    DATA.forEach(r => withUs.forEach(x => {
+      const e = r.suppliers[x]; if (!e) return;
+      total++;
+      if (priceIn(e, "1", "us", x) != null) filled++;
+    }));
+    if (state.warehouse === "cn") { banner.style.display = "none"; return; }
+    banner.style.display = "block";
+    banner.innerHTML = state.warehouse === "us"
+      ? `<strong>USA warehouse.</strong> ${withUs.length} supplier${withUs.length === 1 ? "" : "s"} quote domestic pricing so far
+         (${withUs.join(", ")}) &mdash; <strong>${filled} of ${total}</strong> of their SKUs have a US price loaded.
+         Everything else shows <em>no US price</em> until those numbers are uploaded.`
+      : `<strong>Both warehouses.</strong> Each cell shows the China price above the USA price, with the domestic premium underneath.
+         A dash means that warehouse has no price for the SKU yet.`;
+  }
+
+  function setWarehouse(wh) {
+    state.warehouse = wh;
+    renderWarehouseSwitch();
+    renderStats(); renderTable(); renderWinners(); renderSupplierCards();
   }
 
   function renderStats() {
@@ -739,7 +824,31 @@
       const supplierCells = activeSuppliers.map(sName => {
         const s = r.suppliers[sName];
         if (!s) return `<td class="price-cell empty">—</td>`;
-        const price = getPriceForTier(s, state.tier);
+
+        // Both: show the China and USA prices together with the domestic premium
+        if (state.warehouse === "both") {
+          const cn = priceIn(s, state.tier, "cn", sName);
+          const us = priceIn(s, state.tier, "us", sName);
+          if (cn == null && us == null) return `<td class="price-cell empty">—</td>`;
+          let delta = "";
+          if (cn != null && us != null && cn !== us) {
+            const d = us - cn, pct = Math.round(Math.abs(d) / cn * 100);
+            delta = `<div class="wh-delta ${d < 0 ? 'down' : ''}">${d > 0 ? '+' : '−'}$${Math.abs(d).toFixed(0)} · ${pct}%</div>`;
+          }
+          return `
+            <td class="price-cell">
+              <div class="wh-pair">
+                <div class="wh-line"><span class="wh-tag">CN</span><span class="kit-price">${cn == null ? '—' : fmtPrice(cn)}</span></div>
+                <div class="wh-line"><span class="wh-tag">US</span><span class="kit-price">${us == null ? '—' : fmtPrice(us)}</span></div>
+                ${delta}
+              </div>
+            </td>`;
+        }
+
+        const price = getPriceForTier(s, state.tier, sName);
+        if (price == null) {
+          return `<td class="price-cell no-us">${state.warehouse === "us" ? "no US price" : "—"}</td>`;
+        }
         const perMg = pricePerMg(price, r.dose, r.unit);
         const isBest = best && best.supplier === sName;
         return `
@@ -888,6 +997,7 @@
   }
 
   // --- Wire up controls ---
+  document.querySelectorAll("#wh-switch .wh-btn").forEach(b => b.addEventListener("click", () => setWarehouse(b.dataset.wh)));
   document.getElementById("search").addEventListener("input", (e) => {
     state.search = e.target.value;
     renderTable();
