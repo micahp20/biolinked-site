@@ -303,10 +303,19 @@ details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;
 @media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
 
 /* Viewport-safe tooltip anchoring inside the narrow compound cards — the
-   260px bubble would overflow a 290px card, so pin it to the card box. */
+   260px bubble would overflow a 290px card, so pin it to the header band with
+   left/right insets instead of centering it on the tiny icon.
+   .cmp-row-name MUST be the containing block. Anchored to .cmp-row instead,
+   top:calc(100% - 2px) resolved against the WHOLE CARD height, so the bubble
+   opened ~115px below the ? that was tapped — over the next card, or off the
+   bottom on the last one. Reads as "tapping does nothing". Same host element
+   mpauldino uses. */
+.cmp-row-name{position:relative;}
 .cmp-row-name .info-tip{position:static;}
-.cmp-row-name .info-tip-text{position:absolute;bottom:auto;top:calc(100% - 2px);left:6px;right:6px;width:auto;transform:none;}
+.cmp-row-name .info-tip-text{position:absolute;bottom:auto;top:calc(100% - 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
 .cmp-row-name .info-tip-text::after{top:-9px;bottom:auto;left:14px;transform:none;border:5px solid transparent;border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+/* Open bubble must paint above later sibling cards, which are position:relative. */
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{z-index:400;}
 </style>
 </head>
 <body>
@@ -638,12 +647,21 @@ function switchTab(tab,btn){
   if(btn.scrollIntoView){btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}
 }
 
-/* tap-to-open tooltips on touch devices */
-document.addEventListener('click',function(e){
-  var tip=e.target.closest ? e.target.closest('.info-tip') : null;
-  document.querySelectorAll('.info-tip.is-open').forEach(function(el){if(el!==tip)el.classList.remove('is-open');});
-  if(tip){tip.classList.toggle('is-open');}
-});
+// ===== INFO-TIP TAP/CLICK TOGGLE — fixes iOS Safari tap not showing tooltips =====
+// Tap the ? once to open; tap again (or anywhere else) to close. Stops propagation so the
+// click doesn't toggle anything underneath. Capture phase so we run first.
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  // Close every open tooltip that's not the one being clicked
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if (t !== tip) t.classList.remove('is-open');
+  });
+  if (tip){
+    e.preventDefault();
+    e.stopPropagation();
+    tip.classList.toggle('is-open');
+  }
+}, true);
 
 function downloadICS(){
   var v=document.getElementById('cycleStart').value;
