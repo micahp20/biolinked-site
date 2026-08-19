@@ -33,23 +33,6 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-K8D30QZ2W8');
-// ===== COMPOUND ACCORDION =====
-// Only one compound card open at a time. details[name] handles this natively in
-// newer browsers; this listener does the same for older Safari, and is harmless
-// where the native behaviour already applies.
-(function(){
-  var list = document.querySelector('#tab-protocol .cmp-list');
-  if (!list) return;
-  var cards = [].slice.call(list.querySelectorAll('details.cmp-row'));
-  cards.forEach(function(d){
-    d.addEventListener('toggle', function(){
-      if (!d.open) return;
-      cards.forEach(function(other){
-        if (other !== d && other.open) other.open = false;
-      });
-    });
-  });
-})();
 
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -73,6 +56,14 @@
   --accent-dim:rgba(122,101,48,0.10);
   --accent-line:rgba(122,101,48,0.35);
   --on-accent:#ffffff;
+  /* Tooltip tokens — .info-tip-text below references these. Without them the
+     custom properties are invalid at computed-value time, so the bubble's
+     background falls back to transparent and its text inherits the open
+     icon's white --on-accent: white-on-white, i.e. invisible. */
+  --tip-bg:#1a1a1a;
+  --tip-border:transparent;
+  --tip-text:#ffffff;
+  --tip-strong:#e9c66c;
   --green:#3a7a5a;--green-soft:rgba(90,138,90,0.12);--green-text:#2f7a4a;
   --info:#3a6b8e;
   --shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);
@@ -129,32 +120,6 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .cmp-row-name{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:14px;font-weight:700;color:var(--text);padding:12px 16px;border-bottom:1px solid var(--line);background:var(--head);border-radius:8px 8px 0 0;line-height:1.3;letter-spacing:0.005em;}
 .cmp-badge{display:inline-block;background:var(--accent);color:var(--on-accent);font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;vertical-align:middle;white-space:nowrap;}
 
-/* Collapsible compound cards — same +/- summary convention the rest of the
-   site uses on details.li-row, mapped onto this page's .cmp-row classes. */
-details.cmp-row > summary.cmp-row-name{
-  cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;
-  display:flex;justify-content:space-between;align-items:center;flex-wrap:nowrap;gap:12px;
-  padding:12px 46px 12px 16px;min-height:56px;
-}
-details.cmp-row > summary.cmp-row-name::-webkit-details-marker{display:none;}
-details.cmp-row > summary.cmp-row-name::after{
-  content:'+';position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;
-  display:flex;align-items:center;justify-content:center;color:var(--accent);
-  font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;
-}
-details[open].cmp-row > summary.cmp-row-name::after{content:'\2212';background:var(--accent-dim);}
-details.cmp-row > summary.cmp-row-name:hover::after{border-color:var(--accent);}
-/* closed: the summary IS the whole card, so lose the divider and round all corners */
-details.cmp-row:not([open]) > summary.cmp-row-name{border-bottom-color:transparent;border-radius:8px;}
-.cmp-head-main{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1 1 auto;}
-.cmp-head-title{display:flex;align-items:center;flex-wrap:wrap;gap:6px;line-height:1.3;}
-.cmp-head-key{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0.01em;line-height:1.4;}
-.cmp-price{flex:0 0 auto;font-size:16px;font-weight:700;color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums;}
-@media print{
-  details.cmp-row > summary.cmp-row-name::after{display:none;}
-  details.cmp-row:not([open]) > summary.cmp-row-name{border-bottom-color:var(--line);border-radius:8px 8px 0 0;}
-}
 .cmp-fields{display:flex;flex-direction:column;padding:2px 16px 10px;}
 .fld{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
 .fld:last-child{border-bottom:none;}
@@ -341,6 +306,27 @@ details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;
 .pf-v{font-weight:600;text-align:right;min-width:0;overflow-wrap:anywhere;}
 .pf-v.alert{color:#b85555;}
 
+/* ===== Info tooltip — ? icon (mpauldino base) ===== */
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
+.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--tip-bg);color:var(--tip-text);border:1px solid var(--tip-border);padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
+.info-tip-text strong{color:var(--tip-strong);font-weight:600;}
+.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tip-bg);}
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
+@media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
+/* Viewport-safe anchoring inside the narrow compound cards — a 260px bubble
+   would overflow a 300px card, so pin it to the header band with left/right
+   insets instead of centring it on the tiny icon. .cmp-row-name must be the
+   containing block: anchored to .cmp-row instead, top:calc(100% - 2px) would
+   resolve against the WHOLE card height and open the bubble far below the ?
+   that was tapped, which reads as "tapping does nothing". */
+.cmp-row-name{position:relative;}
+.cmp-row-name .info-tip{position:static;}
+.cmp-row-name .info-tip-text{position:absolute;bottom:auto;top:calc(100% - 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+.cmp-row-name .info-tip-text::after{top:-9px;bottom:auto;left:14px;transform:none;border:5px solid transparent;border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+/* An open bubble must paint above later sibling cards, which are position:relative. */
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{z-index:400;}
+
 @media(max-width:640px){
   .profile-grid{padding-left:15px;padding-right:15px;}
 }
@@ -419,14 +405,15 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
     <div class="program-intro">
       <div class="program-eyebrow">Personalized Protocol</div>
-      <div class="program-title">Erik's <em>Repair &amp; Rebuild</em> Protocol</div>
-      <div class="program-tag">Healing-led, cognition close behind, muscle underneath &mdash; built to ease into.</div>
+      <div class="program-title">Erik&apos;s <em>Aggressive Recovery</em> Protocol</div>
+      <div class="program-tag">Four compounds, one job &mdash; repair the knees, wrist and back as fast as your body will allow.</div>
       <div class="program-context"><div class="note-list">
-        <div class="nr"><div class="nr-l">Where you're starting</div><div class="nr-v">You train hard and you're carrying the receipts &mdash; <strong>knees, left wrist, lower back</strong>. You wanted to know whether peptides can actually do something for healing and recovery. That question is what this whole stack is built around, and it's the right one to lead with.</div></div>
-        <div class="nr"><div class="nr-l">About the needle</div><div class="nr-v">You said you're a bit nervous about injecting, and that's completely normal &mdash; almost everyone is before the first one. Here's the honest version: these are <strong>insulin syringes</strong>, the needle is about half an inch and thinner than a strand of spaghetti, and it goes into the fat just under the skin, not into muscle. Most people describe it as less than a mosquito bite, and a lot of them say the anticipation was worse than anything they actually felt. <strong>You do not have to start with all six.</strong> Start with one, do it once, and let yourself find out it's a non-event &mdash; then add the others as you get comfortable.</div></div>
-        <div class="nr"><div class="nr-l">How this stack works</div><div class="nr-v"><strong>KLOW + KPV</strong> are the repair layer &mdash; that's the joint, tendon and soft-tissue work aimed straight at the knees, wrist and back. <strong>NAD+</strong> is your lead interest and does the cellular-energy and mental-clarity job. <strong>Semax</strong> is a focus tool you reach for on the days you want it. <strong>CJC-1295 / Ipamorelin</strong> works the GH axis overnight, which is where recovery and sleep quality actually get paid. <strong>IGF-1 LR3</strong> is the muscle-building and localized-repair piece, run in a short 10-day block.</div></div>
-        <div class="nr"><div class="nr-l">On fat loss</div><div class="nr-v">You listed fat loss as a goal, and you asked to hold off on anything GLP-1 for now &mdash; so <strong>we did, and there's no GLP-1 in this stack.</strong> Straight answer: this set supports fat loss <em>indirectly</em>, by improving recovery, sleep, energy and lean mass so you can train more and move better. It is not a dedicated fat-loss tool. When you're ready for that, the GLP-1 option is there and we'll add it then &mdash; no rush, and nothing here has to change first.</div></div>
-        <div class="nr"><div class="nr-l">The timeline</div><div class="nr-v">Run it until the bottles finish. Most of the stack lands around <strong>8 weeks</strong>, which is a natural point to check in and decide what to keep, what to drop, and whether you want to add the fat-loss piece.</div></div>
+        <div class="nr"><div class="nr-l">What changed</div><div class="nr-v">You asked to <strong>go at the healing hard</strong>, so the stack has been rebuilt around that single goal. The pieces that were doing cognitive and general-wellness work &mdash; NAD+, Semax &mdash; are out, and so is the short IGF-1 block. What replaces them is a tighter, more aggressive repair engine: <strong>Wolverine every weekday night</strong>, with everything else supporting it.</div></div>
+        <div class="nr"><div class="nr-l">Where you&apos;re starting</div><div class="nr-v">You train hard and you&apos;re carrying the receipts &mdash; <strong>knees, left wrist, lower back</strong>. Three separate sites is the important detail: that is a systemic inflammation and repair problem, not one bad joint, and it is why the stack works body-wide rather than at one spot.</div></div>
+        <div class="nr"><div class="nr-l">How this stack works</div><div class="nr-v"><strong>Wolverine (BPC-157 + TB-500)</strong> is the repair driver &mdash; tendon, ligament and soft tissue, five nights a week. <strong>KPV</strong> runs beside it to clear the inflammation sitting on top of the damage. <strong>CJC-1295 / Ipamorelin</strong> works the overnight GH axis, which is where tissue repair actually gets paid. <strong>MOTS-C</strong> is the morning energy and metabolic layer &mdash; the cellular fuel that healing is expensive in.</div></div>
+        <div class="nr"><div class="nr-l">The rhythm</div><div class="nr-v"><strong>One shot in the morning, three at night, weekdays only.</strong> MOTS-C fasted on waking; Wolverine, KPV and CJC/Ipamorelin before bed, fasted, in three different sites. Weekends fully off. <strong>Two draw marks total &mdash; 20u for Wolverine, 10u for everything else.</strong></div></div>
+        <div class="nr"><div class="nr-l">About the needle</div><div class="nr-v">You said you were a bit nervous about injecting, and that is completely normal. These are <strong>insulin syringes</strong> &mdash; the needle is about half an inch and thinner than a strand of spaghetti, and it goes into the fat just under the skin, not into muscle. Most people find the anticipation was worse than anything they felt. <strong>You do not have to start with all four.</strong> Start with one, once, and let yourself find out it is a non-event.</div></div>
+        <div class="nr"><div class="nr-l">The timeline</div><div class="nr-v">Run it until the bottles finish. <strong>Wolverine and MOTS-C land around 4 weeks; KPV and CJC/Ipamorelin carry to about 8.</strong> Durations are approximate &mdash; run the bottles out rather than watching a date, and we reassess when the repair compounds are done.</div></div>
       </div></div>
     </div>
 
@@ -448,101 +435,56 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
     <div class="sec-divider">
       <div class="sec-divider-eyebrow">Your Stack</div>
-      <div class="sec-divider-title">6 Compounds</div>
+      <div class="sec-divider-title">Repair-Led, Recovery-Backed</div>
     </div>
 
     <div class="cmp-list">
 
-              <details class="li-row">
-          <summary>
-            <span class="li-summary-name">KLOW Blend &middot; 80 mg <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">Repair</span><span class="cmp-head-key">15u &middot; Mon&ndash;Fri AM</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">3 mL BAC per vial</span></li>
-              <li><span class="ql">Dose</span><span class="qv">~4 mg &middot; 15u</span></li>
-              <li><span class="ql">Schedule</span><span class="qv"><strong>Mon&ndash;Fri &middot; 5&times;/wk</strong> &middot; AM &middot; fasted</span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it&apos;s here:</strong>This is the one aimed at your <strong>knees, left wrist and lower back</strong>. KLOW is a four-part repair blend &mdash; BPC-157 and TB-500 for tendon, ligament and soft-tissue healing, GHK-Cu for collagen and tissue remodeling, KPV for calming the inflammation sitting on top of it. If one compound here earns its place for you, it's this one.</div>
-          </div>
-        </details>
+      <div class="cmp-row">
+        <span class="cmp-row-name">Wolverine Blend &middot; 10 mg <span class="cmp-badge">Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one draw.</strong> BPC-157 drives tissue and connective-structure repair and improves the blood supply that feeds healing; TB-500 supports cell migration and flexibility through injured areas. Together they are the standard pairing for tendon, ligament and soft-tissue recovery &mdash; one injection instead of two.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; before bed</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 1 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>This is the engine of the whole protocol now &mdash; the compound aimed squarely at your <strong>knees, left wrist and lower back</strong>. You said you want to heal aggressively, so this runs <strong>every weekday night</strong> rather than as an occasional add-on. Taken before bed it lines up with your body&apos;s own overnight repair window, which is when the tissue work actually happens.</div>
+        <div class="cmp-note"><span class="nl">Run it with KPV</span>Wolverine and KPV go in <strong>together, same evening, two different sites</strong>. Wolverine does the structural repair; KPV clears the inflammation sitting on top of it. Neither works as well alone, which is why they are scheduled as a pair.</div>
+      </div>
 
-              <details class="li-row">
-          <summary>
-            <span class="li-summary-name">KPV &middot; 10 mg <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">Anti-Inflam</span><span class="cmp-head-key">10u &middot; Mon&ndash;Fri AM</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">2 mL BAC per vial</span></li>
-              <li><span class="ql">Dose</span><span class="qv">500 mcg &middot; 10u</span></li>
-              <li><span class="ql">Schedule</span><span class="qv"><strong>Mon&ndash;Fri &middot; 5&times;/wk</strong> &middot; AM &middot; fasted</span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it&apos;s here:</strong>Standalone KPV on top of what's already in KLOW, because your aches are in <strong>three separate places at once</strong> &mdash; that's a systemic inflammation picture, not one bad joint. KPV works body-wide rather than at a single site, so it lowers the background noise the repair compounds are fighting through.</div>
-          </div>
-        </details>
+      <div class="cmp-row">
+        <span class="cmp-row-name">KPV &middot; 10 mg <span class="cmp-badge">Anti-Inflam</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A small anti-inflammatory peptide</strong> derived from alpha-MSH. It works <em>body-wide</em> rather than at one site, calming the low-grade systemic inflammation that quietly slows recovery and digestion. It is also gut-friendly, which matters on a stack you are running alongside omeprazole.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; with Wolverine</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 500 mcg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>Your aches are in <strong>three separate places at once</strong> &mdash; that is a systemic inflammation picture, not one bad joint. KPV lowers the background noise the repair work is fighting through, so Wolverine is not working uphill. <strong>Moved to the evening</strong> so it runs beside Wolverine instead of on its own in the morning; the dose is unchanged.</div>
+      </div>
 
-              <details class="li-row">
-          <summary>
-            <span class="li-summary-name">NAD+ &middot; 1000 mg <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">Cognitive</span><span class="cmp-head-key">37.5u &middot; Mon/Wed/Fri AM</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">5 mL BAC per vial</span></li>
-              <li><span class="ql">Dose</span><span class="qv">75 mg &middot; 37.5u</span></li>
-              <li><span class="ql">Schedule</span><span class="qv"><strong>Mon / Wed / Fri</strong> &middot; AM &middot; fasted</span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it&apos;s here:</strong>You said you wanted to start here, and that instinct is good. NAD+ is the coenzyme your mitochondria run on &mdash; it drops with age and it's usually the piece people <em>feel</em> first, as clearer thinking and steadier energy rather than a jolt. It also underwrites the repair work: healing tissue is expensive, and this is the fuel it's spent from.</div>
-            <div class="li-callout"><strong>Drawing 37.5u:</strong>The <strong>half-mark between 37 and 38</strong> on a 100-unit syringe &mdash; your biggest draw, so line it up in good light. <strong>Push it in slowly</strong>; NAD+ is the one that stings if you rush it, and going slow all but removes that.</div>
-          </div>
-        </details>
+      <div class="cmp-row">
+        <span class="cmp-row-name">CJC-1295 / Ipamorelin &middot; 10 mg <span class="cmp-badge">GH Axis</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A GHRH analog paired with a ghrelin-receptor agonist.</strong> Together they amplify your own overnight growth-hormone pulse rather than replacing it. On a healing protocol this is the compound that turns sleep into repair &mdash; deeper sleep, faster turnaround between sessions, better lean-mass response. 250 mcg of each, one draw.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; fasted, 2+ hrs after food</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 500 mcg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>Tissue repair is paid for during deep sleep, so on a healing-first protocol this is not a &ldquo;muscle&rdquo; compound &mdash; it is the one that makes the other three work harder. With sleep self-rated 4/5 there is real room for it to earn its keep.</div>
+        <div class="cmp-note"><span class="nl">Timing matters here</span>Fasted, <strong>at least 2 hours after your last food</strong> &mdash; carbs and insulin blunt the GH pulse this is designed to amplify. Routine: dinner &rarr; wait 2 hrs &rarr; inject &rarr; lights out within 30&ndash;60 min. If you ate too close to bed, <strong>skip it rather than dose it</strong>.</div>
+      </div>
 
-              <details class="li-row">
-          <summary>
-            <span class="li-summary-name">Semax &middot; 10 mg <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">As Needed</span><span class="cmp-head-key">10u &middot; as needed</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">2 mL BAC</span></li>
-              <li><span class="ql">Dose</span><span class="qv">500 mcg &middot; 10u</span></li>
-              <li><span class="ql">Schedule</span><span class="qv"><strong>As needed</strong> &middot; AM &middot; fasted</span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it&apos;s here:</strong>The sharp-focus tool. Semax is a nootropic peptide that lifts BDNF and working memory &mdash; noticeably more acute than NAD+, which is why it's <strong>on-demand rather than scheduled</strong>. Save it for days that need it: heavy work, early starts, or a night of poor sleep.</div>
-          </div>
-        </details>
-
-              <details class="li-row">
-          <summary>
-            <span class="li-summary-name">CJC-1295 / Ipamorelin &middot; 10 mg <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">PM</span><span class="cmp-head-key">10u &middot; Mon&ndash;Fri PM</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">2 mL BAC per vial</span></li>
-              <li><span class="ql">Dose</span><span class="qv">500 mcg &middot; 10u</span></li>
-              <li><span class="ql">Schedule</span><span class="qv"><strong>Mon&ndash;Fri &middot; 5&times;/wk</strong> &middot; PM &middot; fasted</span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it&apos;s here:</strong>Your recovery and your muscle goal both route through the same place &mdash; the overnight GH pulse. CJC/Ipa amplifies your own natural release rather than replacing it, and the payoff lands as <strong>deeper sleep, faster recovery between sessions, and better lean-mass response</strong> to the training you're already doing. With sleep self-rated 4/5 there's real room for this one to earn its keep.</div>
-            <div class="li-callout"><strong>Timing matters here:</strong>Fasted PM, <strong>at least 2 hours after your last food</strong> &mdash; carbs and insulin blunt the GH pulse this is designed to amplify. Routine: dinner &rarr; wait 2 hrs &rarr; inject &rarr; lights out within 30&ndash;60 min. If you ate too close to bed, skip it rather than dose it.</div>
-          </div>
-        </details>
-
-              <details class="li-row">
-          <summary>
-            <span class="li-summary-name">IGF-1 LR3 &middot; 1 mg <span class="phase-pill-inline" style="background:#6e4d92;margin-left:4px;">10 Days On</span><span class="cmp-head-key">10u &middot; post-workout</span></span>
-          </summary>
-          <div class="li-body">
-            <ul class="cmp-quick">
-              <li><span class="ql">Recon</span><span class="qv">2 mL BAC</span></li>
-              <li><span class="ql">Dose</span><span class="qv">50 mcg &middot; 10u</span></li>
-              <li><span class="ql">Schedule</span><span class="qv"><strong>10 days on, then off</strong> &middot; Post-workout</span></li>
-            </ul>
-            <div class="li-callout why"><strong>Why it&apos;s here:</strong>The muscle-building piece, and it doubles as localized repair &mdash; IGF-1 drives satellite-cell activity, which is the same machinery that rebuilds damaged tissue. Run <strong>right after training</strong>, when blood flow to the worked tissue is highest.</div>
-            <div class="li-callout"><strong>The 10-day block:</strong>Per your note: <strong>10 days straight, then off</strong> (you mentioned roughly 4 weeks off before the next block). Short blocks are the point &mdash; they get the anabolic signal without running it long enough for receptors to stop listening.</div>
-          </div>
-        </details>
+      <div class="cmp-row">
+        <span class="cmp-row-name">MOTS-C &middot; 40 mg <span class="cmp-badge">Energy</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A mitochondrial-derived peptide.</strong> It switches on the AMPK pathway, signalling cells to burn fuel more efficiently and improving how well muscle takes up glucose. It shows up as steadier all-day energy and better work capacity &mdash; the supply side of the equation rather than a stimulant hit.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 2 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>The one morning shot, and the energy layer of the stack. Healing is expensive &mdash; MOTS-C works on the cellular fuel that repair is paid out of, which is why it belongs on a recovery protocol rather than only a fat-loss one. It also gives you the capacity to keep training while the repair compounds do their work underneath.</div>
+      </div>
 
     </div>
 
-    <div class="chart-note"><p><strong>Bac water isn't included</strong> &mdash; grab one 30 mL bottle, it covers the whole run. Only mix a vial when you're ready to start it.</p></div>
+    <div class="chart-note"><p><strong>Bac water isn&apos;t included</strong> &mdash; your seven vials need <strong>14 mL total</strong>, so one 30 mL bottle covers the whole run with margin. Only mix a vial when you&apos;re ready to start it.</p></div>
 
     
 
@@ -552,19 +494,18 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
   <details class="paid-archive">
     <summary>
       <span class="pa-pill">&#10004; Paid</span>
-      <span><span class="pa-title">Order 1</span><br><span class="pa-sub">$455.00</span></span>
+      <span><span class="pa-title">Revised Stack</span><br><span class="pa-sub">$295.00</span></span>
     </summary>
-<div class="total-row"><span class="tr-name"><strong>KLOW Blend</strong> 80 mg &times; 2 vials @ $60<span class="sub">Joint, tendon &amp; soft-tissue repair</span></span><span class="tr-val">$120.00</span></div>
+<div class="total-row"><span class="tr-name"><strong>Wolverine Blend</strong> 10 mg &times; 2 vials @ $40<span class="sub">BPC-157 + TB-500 &middot; tendon, ligament &amp; soft-tissue repair</span></span><span class="tr-val">$80.00</span></div>
       <div class="total-row"><span class="tr-name"><strong>KPV</strong> 10 mg &times; 2 vials @ $25<span class="sub">Systemic anti-inflammatory</span></span><span class="tr-val">$50.00</span></div>
-      <div class="total-row"><span class="tr-name"><strong>NAD+</strong> 1000 mg &times; 2 vials @ $65<span class="sub">Cognitive, energy &amp; cellular</span></span><span class="tr-val">$130.00</span></div>
-      <div class="total-row"><span class="tr-name"><strong>Semax</strong> 10 mg &times; 1 vial<span class="sub">On-demand focus</span></span><span class="tr-val">$25.00</span></div>
       <div class="total-row"><span class="tr-name"><strong>CJC-1295 / Ipamorelin</strong> 10 mg &times; 2 vials @ $45<span class="sub">GH axis &middot; recovery &amp; sleep</span></span><span class="tr-val">$90.00</span></div>
-      <div class="total-row"><span class="tr-name"><strong>IGF-1 LR3</strong> 1 mg &times; 1 vial<span class="sub">Muscle building &amp; localized repair</span></span><span class="tr-val">$40.00</span></div>
-      <div class="total-row grand"><span class="tr-name">Full Stack Total</span><span class="tr-val">$455.00</span></div>
+      <div class="total-row"><span class="tr-name"><strong>MOTS-C</strong> 40 mg &times; 1 vial<span class="sub">Cellular energy &amp; metabolic support</span></span><span class="tr-val">$75.00</span></div>
+      <div class="total-row grand"><span class="tr-name">Revised Stack Total</span><span class="tr-val">$295.00</span></div>
   </details>
   <div class="totals-block">
     <div class="total-row grand"><span>Balance Due</span><span class="val" style="color:#2f7a4a;">$0.00</span></div>
   </div>
+  <div class="chart-note"><p>Your original order was <strong>$455.00, paid in full</strong>. The stack has since been reworked around aggressive recovery &mdash; four compounds instead of six &mdash; which brings it to <strong>$295.00</strong>. <strong>Nothing is owed.</strong> The difference is being reconciled separately, so no action is needed from you here.</p></div>
   </div><!-- /invoice -->
 <!-- /protocol -->
 
@@ -579,7 +520,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     <div class="cal-banner">
       <div class="cal-left">
         <h4>&#128197; Add to Your iPhone Calendar</h4>
-        <p>Pick your Week 1 Monday and download the .ics file. Loads 8 weeks of reminders &mdash; KLOW and KPV Mon&ndash;Fri AM, NAD+ M/W/F AM, CJC/Ipamorelin Mon&ndash;Fri PM, plus your IGF-1 10-day block. Semax stays off the calendar on purpose &mdash; it's on-demand.</p>
+        <p>Pick your Week 1 Monday and download the .ics file. Loads 8 weeks of reminders &mdash; MOTS-C Mon&ndash;Fri AM, and Wolverine + KPV + CJC/Ipamorelin together Mon&ndash;Fri PM. Wolverine and MOTS-C run out around week 4; KPV and CJC/Ipamorelin carry through week 8.</p>
       </div>
       <div class="cal-controls">
         <input type="date" id="cycleStart">
@@ -590,43 +531,43 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     <div class="sched-card">
       <div class="sched-card-head">
         <div class="sched-card-title">Your Week &mdash; Every Week</div>
-        <div class="sched-phase-pill">Wks 1&ndash;8</div>
+        <div class="sched-phase-pill">20 Shots / Week</div>
       </div>
-      <div class="sched-card-sub">Two windows a day, weekdays only. Mornings are fasted: KLOW and KPV every weekday, NAD+ on Mon/Wed/Fri. Evenings are CJC/Ipamorelin, fasted, 2+ hrs after food. Weekends are fully off.</div>
+      <div class="sched-card-sub">One shot in the morning, three at night, weekdays only. MOTS-C fasted on waking. Wolverine, KPV and CJC/Ipamorelin all go in before bed, fasted, 2+ hrs after food &mdash; <strong>three different sites</strong>. Weekends are fully off.</div>
       <div class="sched-scroll"><table class="sched-table">
-        <thead><tr><th style="width:52px">Day</th><th>AM (Fasted)</th><th>PM (Fasted)</th><th class="right">Shots</th></tr></thead>
+        <thead><tr><th style="width:52px">Day</th><th>AM (Fasted)</th><th>PM (Fasted, Before Bed)</th><th class="right">Shots</th></tr></thead>
         <tbody>
-          <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span><span class="sched-pill mots"><strong>10u</strong> &middot; KPV</span><span class="sched-pill nad"><strong>37.5u</strong> &middot; NAD+</span></td><td><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
-          <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span><span class="sched-pill mots"><strong>10u</strong> &middot; KPV</span></td><td><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">3</span></td></tr>
-          <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span><span class="sched-pill mots"><strong>10u</strong> &middot; KPV</span><span class="sched-pill nad"><strong>37.5u</strong> &middot; NAD+</span></td><td><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
-          <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span><span class="sched-pill mots"><strong>10u</strong> &middot; KPV</span></td><td><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">3</span></td></tr>
-          <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>15u</strong> &middot; KLOW</span><span class="sched-pill mots"><strong>10u</strong> &middot; KPV</span><span class="sched-pill nad"><strong>37.5u</strong> &middot; NAD+</span></td><td><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
+          <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill mots"><strong>10u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill"><strong>20u</strong> &middot; Wolverine</span><span class="sched-pill"><strong>10u</strong> &middot; KPV</span><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
+          <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill mots"><strong>10u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill"><strong>20u</strong> &middot; Wolverine</span><span class="sched-pill"><strong>10u</strong> &middot; KPV</span><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
+          <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill mots"><strong>10u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill"><strong>20u</strong> &middot; Wolverine</span><span class="sched-pill"><strong>10u</strong> &middot; KPV</span><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
+          <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill mots"><strong>10u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill"><strong>20u</strong> &middot; Wolverine</span><span class="sched-pill"><strong>10u</strong> &middot; KPV</span><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
+          <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill mots"><strong>10u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill"><strong>20u</strong> &middot; Wolverine</span><span class="sched-pill"><strong>10u</strong> &middot; KPV</span><span class="sched-pill pm"><strong>10u</strong> &middot; CJC/Ipa</span></td><td class="right"><span class="sched-count">4</span></td></tr>
           <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
           <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
         </tbody>
       </table></div>
     </div>
 
-    <div class="sched-card">
-      <div class="sched-card-head">
-        <div class="sched-card-title">The Two That Don't Live on the Grid</div>
-        <div class="sched-phase-pill" style="background:#4278a8;">Flexible</div>
-      </div>
-      <div class="sched-card-sub">These two are deliberately off the fixed weekly pattern &mdash; they key off your day, not the calendar.</div>
-      <div class="sched-scroll"><table class="sched-table">
-        <thead><tr><th>Compound</th><th>When</th><th class="right">Draw</th><th>How to Run It</th></tr></thead>
-        <tbody>
-          <tr><td><span class="sched-day">Semax</span></td><td>As needed &middot; AM fasted</td><td class="right"><span class="sched-pill"><strong>10u</strong></span></td><td>Reach for it on days that need focus &mdash; heavy workload, early start, or after a bad night. No schedule to keep.</td></tr>
-          <tr><td><span class="sched-day">IGF-1 LR3</span></td><td>Right after training</td><td class="right"><span class="sched-pill"><strong>10u</strong></span></td><td><strong>10 days straight</strong>, then off (~4 weeks) before the next block. Your vial holds two complete blocks.</td></tr>
-        </tbody>
-      </table></div>
+    <div class="sec-divider mt">
+      <div class="sec-divider-eyebrow">Vial Life</div>
+      <div class="sec-divider-title">How Long Each One Lasts</div>
     </div>
 
+    <div class="data-card"><div class="data-scroll"><table class="data-table">
+      <thead><tr><th>Compound</th><th>Recon</th><th class="right">Draw</th><th class="right">Doses / Vial</th><th>Cadence</th><th class="right">Covers</th></tr></thead>
+      <tbody>
+        <tr><td class="cmp">Wolverine Blend<span class="sub">10 mg &middot; 2 vials</span></td><td>2 mL ea</td><td class="num">20u</td><td class="num">10 ea &middot; 20</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~4 wks</td></tr>
+        <tr><td class="cmp">KPV<span class="sub">10 mg &middot; 2 vials</span></td><td>2 mL ea</td><td class="num">10u</td><td class="num">20 ea &middot; 40</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~8 wks</td></tr>
+        <tr><td class="cmp">CJC-1295 / Ipamorelin<span class="sub">10 mg &middot; 2 vials</span></td><td>2 mL ea</td><td class="num">10u</td><td class="num">20 ea &middot; 40</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~8 wks</td></tr>
+        <tr><td class="cmp">MOTS-C<span class="sub">40 mg &middot; 1 vial</span></td><td>2 mL</td><td class="num">10u</td><td class="num">20</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~4 wks</td></tr>
+      </tbody>
+    </table></div></div>
+
     <div class="chart-note"><div class="note-list">
-      <div class="nr"><div class="nr-l">The morning window</div><div class="nr-v">All AM compounds go in <strong>fasted</strong>, back to back, using a <strong>different abdomen quadrant for each</strong>. Wait 30&ndash;45 min before eating. Mon/Wed/Fri is three draws; Tue/Thu is two.</div></div>
-      <div class="nr"><div class="nr-l">The evening window</div><div class="nr-v">CJC/Ipamorelin needs <strong>2+ hours after your last food</strong> and works best 30&ndash;60 min before sleep. If you ate late, skip that night rather than dosing it &mdash; a skipped dose costs you nothing, a blunted one is just wasted.</div></div>
-      <div class="nr"><div class="nr-l">Three different draw marks</div><div class="nr-v"><strong>KLOW 15u</strong>, <strong>NAD+ 37.5u</strong>, and <strong>everything else 10u</strong>. Only three numbers to remember, and each compound card lists its own draw on the header.</div></div>
-      <div class="nr"><div class="nr-l">Then we reassess</div><div class="nr-v">Around week 8 most of the stack finishes together. Message Micah with how the knees, wrist and back are doing, how you're sleeping, and how your focus feels &mdash; that's when we decide what to rerun and whether you want the fat-loss piece added.</div></div>
+      <div class="nr"><div class="nr-l">The morning window</div><div class="nr-v"><strong>One shot &mdash; MOTS-C 10u, fasted, on waking.</strong> Wait 30&ndash;45 min before eating. That is the whole morning now.</div></div>
+      <div class="nr"><div class="nr-l">The evening window</div><div class="nr-v">Three shots together: <strong>Wolverine 20u, KPV 10u, CJC/Ipamorelin 10u</strong>, in <strong>three different abdomen quadrants</strong>. All need <strong>2+ hours after your last food</strong>, and they work best 30&ndash;60 min before sleep. If you ate late, skip that night rather than dosing it &mdash; a skipped dose costs you nothing, a blunted one is just wasted.</div></div>
+      <div class="nr"><div class="nr-l">Two draw marks</div><div class="nr-v"><strong>Wolverine is 20u; everything else is 10u.</strong> Two numbers to remember, and each compound card lists its own draw.</div></div>
+      <div class="nr"><div class="nr-l">When things finish</div><div class="nr-v"><strong>Wolverine and MOTS-C run out around week 4</strong>; KPV and CJC/Ipamorelin carry to about week 8. If the joints are clearly better at week 4, that is the natural point to decide whether Wolverine gets reordered to keep the repair going.</div></div>
     </div></div>
 
   </div><!-- /schedule -->
@@ -642,27 +583,27 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     <div class="supplies-wrap">
       <div class="supply-row">
         <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 100-pack</div>
-        <div class="supply-info-desc">Short, thin needle for the SubQ shots &mdash; this is the one that makes the first injection a non-event. One per shot, never reuse. At full stack you'll use <strong>~18 a week</strong>, so plan on a second pack partway through. Get the 100-unit markings so the 37.5u NAD+ draw is easy to read.</div>
+        <div class="supply-info-desc">Short, thin needle for the SubQ shots &mdash; this is the one that makes the first injection a non-event. One per shot, never reuse. At full stack you&apos;ll use <strong>20 a week</strong>, so plan on a second pack partway through. Get the 100-unit markings so the 20u and 10u draws are easy to read.</div>
         <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
       </div>
       <div class="supply-row">
         <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL <span class="supply-free" style="background:#b97a1f;">Not Included</span></div>
-        <div class="supply-info-desc">Sterile preserved water for mixing the powders. Your ten vials need <strong>28 mL total</strong> &mdash; KLOW 3 mL &times;2, KPV 2 mL &times;2, NAD+ 5 mL &times;2, Semax 2 mL, CJC/Ipa 2 mL &times;2, IGF-1 2 mL. <strong>One 30 mL bottle covers the whole run.</strong> This isn't included in your order &mdash; grab it before Day 1.</div>
+        <div class="supply-info-desc">Sterile preserved water for mixing the powders. Your seven vials need <strong>14 mL total</strong> &mdash; Wolverine 2 mL &times;2, KPV 2 mL &times;2, CJC/Ipa 2 mL &times;2, MOTS-C 2 mL. <strong>One 30 mL bottle covers the whole run with margin.</strong> This isn't included in your order &mdash; grab it before Day 1.</div>
         <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">McGuff &rarr;</a>
       </div>
       <div class="supply-row">
         <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 100-pack</div>
-        <div class="supply-info-desc">Wipe every vial top and every injection site &mdash; one per vial draw plus one per site. On a Mon/Wed/Fri morning that's a few of each, so buy the big box.</div>
+        <div class="supply-info-desc">Wipe every vial top and every injection site &mdash; one per vial draw plus one per site. An evening alone is three vials and three sites, so buy the big box.</div>
         <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
       </div>
       <div class="supply-row">
         <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
-        <div class="supply-info-desc">Disposal box for used needles &mdash; drop off free at any CVS or Walgreens when it's full. At ~18 shots a week you'll want the quart, not the small one.</div>
+        <div class="supply-info-desc">Disposal box for used needles &mdash; drop off free at any CVS or Walgreens when it's full. At 20 shots a week you&apos;ll want the quart, not the small one.</div>
         <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
       </div>
       <div class="supply-row">
         <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
-        <div class="supply-info-desc">Small fridge organizer for your reconstituted vials. With six compounds at three different draw marks this is genuinely worth it &mdash; everything sorted, labeled and out of the light.</div>
+        <div class="supply-info-desc">Small fridge organizer for your reconstituted vials. With four compounds and seven vials this is genuinely worth it &mdash; everything sorted, labeled and out of the light, with the dry spares kept separate from what&apos;s in play.</div>
         <a href="https://www.amazon.com/dp/B0FH62NMF8" target="_blank" class="supply-link">Amazon &rarr;</a>
       </div>
     </div>
@@ -676,10 +617,10 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       <div class="storage-title">&#10052; Refrigerated, Protected, Labeled</div>
       <div class="storage-body"><div class="note-list">
         <div class="nr"><div class="nr-l">Dry vials</div><div class="nr-v">refrigerate at 36&ndash;46&deg;F, protected from light. Never freeze. Unmixed powder keeps a long time, which is why there's no rush to start everything at once.</div></div>
-        <div class="nr"><div class="nr-l">Mix one at a time</div><div class="nr-v">You have <strong>ten vials but only six compounds</strong> &mdash; open the second KLOW, KPV, NAD+ or CJC vial only as the first one empties. Each one lasts about 4 weeks once mixed.</div></div>
-        <div class="nr"><div class="nr-l">Reconstitution</div><div class="nr-v">KLOW <strong>3 mL</strong>, KPV <strong>2 mL</strong>, NAD+ <strong>5 mL</strong>, Semax <strong>2 mL</strong>, CJC/Ipa <strong>2 mL</strong>, IGF-1 LR3 <strong>2 mL</strong>. Add water slowly down the vial wall, swirl gently, never shake.</div></div>
-        <div class="nr"><div class="nr-l">Label them</div><div class="nr-v">Write the compound and its unit mark on each vial &mdash; <strong>KLOW 15u, NAD+ 37.5u, everything else 10u</strong>. Six vials in a fridge door look identical at 6am.</div></div>
-        <div class="nr"><div class="nr-l">After mixing</div><div class="nr-v">refrigerate and use within about 30 days &mdash; which lines up almost exactly with how long each vial lasts at your cadence.</div></div>
+        <div class="nr"><div class="nr-l">Mix one at a time</div><div class="nr-v">You have <strong>seven vials but only four compounds</strong> &mdash; open the second Wolverine, KPV or CJC vial only as the first one empties. Wolverine runs about 2 weeks per vial; KPV and CJC about 4.</div></div>
+        <div class="nr"><div class="nr-l">Reconstitution</div><div class="nr-v"><strong>2 mL each &mdash; every vial in this stack.</strong> Wolverine, KPV, CJC/Ipa and MOTS-C all take 2 mL. Add water slowly down the vial wall, swirl gently, never shake.</div></div>
+        <div class="nr"><div class="nr-l">Label them</div><div class="nr-v">Write the compound and its unit mark on each vial &mdash; <strong>Wolverine 20u, everything else 10u</strong>. Four vials in a fridge door look identical at 10pm, and three of them share the same mark.</div></div>
+        <div class="nr"><div class="nr-l">After mixing</div><div class="nr-v">refrigerate and use within about 30 days &mdash; which comfortably covers how long each vial lasts at your cadence.</div></div>
         <div class="nr"><div class="nr-l">Every shot</div><div class="nr-v">fresh single-use syringe, wipe the stopper and your skin with alcohol, rotate injection sites.</div></div>
       </div></div>
     </div>
@@ -702,7 +643,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <li><strong>Pinch, don't stab.</strong> Pinch an inch of soft belly fat, slide the needle in at 45&ndash;90&deg;, push slow, pull out. The whole thing takes about five seconds.</li>
           <li><strong>Let the alcohol dry.</strong> Wiping and going in wet is what actually stings for most people &mdash; give it ten seconds.</li>
           <li><strong>Don't watch the needle if you'd rather not.</strong> Plenty of people look away for the first few. It works exactly the same.</li>
-          <li><strong>Start with one compound.</strong> NAD+ on a Monday, nothing else that day. One shot is a much smaller thing to talk yourself into than four.</li>
+          <li><strong>Start with one compound.</strong> MOTS-C on a Monday morning, nothing else that day &mdash; it&apos;s the single easiest shot in the stack. One is a much smaller thing to talk yourself into than four.</li>
           <li><strong>It gets boring fast.</strong> Almost everyone stops thinking about it by the end of week one. The anticipation really is the hard part.</li>
         </ul>
       </div>
@@ -711,13 +652,13 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     <details class="tip-card featured">
       <summary class="tip-head"><div class="tip-eyebrow">Tip 02 &mdash; The Routine</div><div class="tip-title">Two Windows, Weekdays Only</div></summary>
       <div class="tip-body">
-        <div class="tip-lead">Everything sits in one of two windows. Build them into things you already do and there's nothing to remember.</div>
+        <div class="tip-lead">Everything sits in one of two windows. Build them into things you already do and there&apos;s nothing to remember.</div>
         <ul class="tip-list">
-          <li><strong>AM fasted &mdash; before breakfast.</strong> KLOW 15u and KPV 10u every weekday; add NAD+ 37.5u on Mon/Wed/Fri. Different quadrant for each, wait 30&ndash;45 min to eat.</li>
-          <li><strong>PM fasted &mdash; before bed.</strong> CJC/Ipa 10u, at least 2 hrs after food, 30&ndash;60 min before lights out.</li>
-          <li><strong>Post-workout &mdash; during your IGF-1 block.</strong> 10u right after training, 10 days straight.</li>
+          <li><strong>AM fasted &mdash; before breakfast.</strong> MOTS-C <strong>10u</strong>, every weekday. One shot, then wait 30&ndash;45 min to eat.</li>
+          <li><strong>PM fasted &mdash; before bed.</strong> Wolverine <strong>20u</strong>, KPV <strong>10u</strong> and CJC/Ipa <strong>10u</strong>, at least 2 hrs after food, 30&ndash;60 min before lights out. <strong>Three different quadrants</strong> &mdash; never stack them in one spot.</li>
+          <li><strong>The evening is where the healing happens.</strong> All three repair-side compounds are deliberately in the same window, because overnight is when your body does the tissue work.</li>
           <li><strong>Weekends off.</strong> Built in on purpose &mdash; it gives receptors a break and gives you two days without thinking about it.</li>
-          <li><strong>Missed one? Skip it.</strong> Don't double up. Nothing here is dependent on a perfect streak.</li>
+          <li><strong>Missed one? Skip it.</strong> Don&apos;t double up. Nothing here is dependent on a perfect streak.</li>
         </ul>
       </div>
     </details>
@@ -727,10 +668,10 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       <div class="tip-body">
         <div class="tip-lead">Healing peptides are quieter than stimulants &mdash; the changes show up as things that stop bothering you rather than something you feel switch on.</div>
         <ul class="tip-list">
-          <li><strong>Weeks 1&ndash;2 &mdash; easing in.</strong> Getting comfortable with the routine is the whole job. NAD+ tends to land first as steadier energy and clearer mornings. Sleep often improves early once CJC/Ipa is in &mdash; that's usually the first unmistakable sign something's working.</li>
-          <li><strong>Weeks 3&ndash;4 &mdash; the aches get quieter.</strong> This is where KLOW and KPV start showing up. It rarely arrives as "my knee is healed" &mdash; it's more that you notice you got through a session, or up the stairs, without thinking about it. Wrists and smaller joints often respond before knees and lower backs, which carry more load.</li>
-          <li><strong>Weeks 5&ndash;6 &mdash; recovery compounds.</strong> Shorter turnaround between hard sessions, better sleep quality, and the training starts feeling more productive. Good window to run your first IGF-1 block if you haven't.</li>
-          <li><strong>Weeks 7&ndash;8 &mdash; the picture.</strong> Most vials finish together here. Best judgment isn't the scale &mdash; it's whether the knees, wrist and back are better than in week 1, and whether you're recovering faster. Message Micah and we'll decide what to rerun.</li>
+          <li><strong>Weeks 1&ndash;2 &mdash; easing in.</strong> Getting comfortable with the routine is the whole job. Sleep often improves early once CJC/Ipa is in &mdash; that&apos;s usually the first unmistakable sign something&apos;s working. MOTS-C tends to land as steadier daytime energy.</li>
+          <li><strong>Weeks 3&ndash;4 &mdash; the aches get quieter.</strong> This is where Wolverine and KPV start showing up. It rarely arrives as &ldquo;my knee is healed&rdquo; &mdash; it&apos;s more that you notice you got through a session, or up the stairs, without thinking about it. <strong>Wrists and smaller joints usually respond before knees and lower backs</strong>, which carry more load.</li>
+          <li><strong>Around week 4 &mdash; first decision point.</strong> Wolverine&apos;s two vials and the MOTS-C vial finish here. If the joints are clearly better, this is where you decide whether to reorder Wolverine and keep the repair running while KPV and CJC/Ipa carry on underneath.</li>
+          <li><strong>Weeks 5&ndash;8 &mdash; consolidation.</strong> KPV keeps the inflammation down and CJC/Ipa keeps converting sleep into recovery. The honest measure isn&apos;t the scale &mdash; it&apos;s whether the knees, wrist and back are better than they were in week 1, and whether you&apos;re recovering faster between sessions.</li>
         </ul>
       </div>
     </details>
@@ -744,7 +685,7 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <li><strong>Sleep is where CJC/Ipa gets paid.</strong> You rated sleep 4/5, so there's room here. The PM shot amplifies your overnight GH pulse &mdash; going to bed 30&ndash;60 min after it, consistently, is what converts that into recovery.</li>
           <li><strong>Alcohol works against this specific stack.</strong> At 3&ndash;7 drinks a week you're not doing anything unusual &mdash; but alcohol blunts the overnight GH pulse and slows tissue repair, so drinking nights are nights CJC/Ipa mostly doesn't work. Not a lecture, just where the trade-off is: shifting a couple of those to non-training, non-dosing nights buys you real return.</li>
           <li><strong>Keep training, but let the sore joints lead.</strong> Load drives the repair signal &mdash; but if the knees or back are barking, work around them for a few weeks rather than through them. You have eight weeks of healing support; use it to get back to full load, not to push through at full load.</li>
-          <li><strong>Hydrate.</strong> NAD+ especially goes down easier and stings less when you're not underhydrated.</li>
+          <li><strong>Hydrate.</strong> Repair runs on it, and well-hydrated tissue simply takes an injection better &mdash; less sting, fewer site reactions across 20 shots a week.</li>
         </ul>
       </div>
     </details>
@@ -767,23 +708,35 @@ function switchTab(tab, btn){
   document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
   document.getElementById('tab-' + tab).classList.add('active');
   btn.classList.add('active');
+  if (btn.scrollIntoView) { btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'}); }
 }
+
+// ===== INFO-TIP TAP/CLICK TOGGLE — fixes iOS Safari tap not showing tooltips =====
+// Tap the ? once to open; tap again (or anywhere else) to close. Stops propagation so the
+// click doesn't toggle anything underneath. Capture phase so we run first.
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if (t !== tip) t.classList.remove('is-open');
+  });
+  if (tip){
+    e.preventDefault();
+    e.stopPropagation();
+    tip.classList.toggle('is-open');
+  }
+}, true);
 
 // ===== PROTOCOL DEFINITION (drives the .ics export) =====
 // weekday: 0=Mon .. 6=Sun. dayIdx = days since Week 1 Monday.
 var PROTOCOL = [
-  { key:'klow',  name:'KLOW',      sub:'15u AM',    draw:'15u',   label:'KLOW Blend ~4 mg -> 15u (SubQ abdomen, fasted)',        block:'AM',
+  { key:'mots', name:'MOTS-C',    sub:'10u AM', draw:'10u', label:'MOTS-C 2 mg -> 10u (SubQ abdomen, fasted)',                    block:'AM',
     on:function(d,wd){ return wd<=4 ? 'sched' : 'rest'; } },
-  { key:'kpv',   name:'KPV',       sub:'10u AM',    draw:'10u',   label:'KPV 500 mcg -> 10u (SubQ abdomen, fasted)',             block:'AM',
+  { key:'wolv', name:'Wolverine', sub:'20u PM', draw:'20u', label:'Wolverine (BPC-157 + TB-500) 1 mg -> 20u (SubQ, before bed)',  block:'PM',
     on:function(d,wd){ return wd<=4 ? 'sched' : 'rest'; } },
-  { key:'nad',   name:'NAD+',      sub:'37.5u AM',  draw:'37.5u', label:'NAD+ 75 mg -> 37.5u (SubQ abdomen, push slowly)',       block:'AM',
-    on:function(d,wd){ return (wd===0||wd===2||wd===4) ? 'sched' : 'rest'; } },
-  { key:'semax', name:'Semax',     sub:'10u, PRN',  draw:'10u',   label:'Semax 500 mcg -> 10u (optional, focus)',                block:'AM',
-    on:function(d,wd){ return wd<=4 ? 'opt' : 'rest'; } },
-  { key:'cjc',   name:'CJC/Ipa',   sub:'10u PM',    draw:'10u',   label:'CJC-1295 / Ipamorelin 500 mcg -> 10u (2+ hrs after food)', block:'PM',
+  { key:'kpv',  name:'KPV',       sub:'10u PM', draw:'10u', label:'KPV 500 mcg -> 10u (SubQ, with Wolverine, different site)',    block:'PM',
     on:function(d,wd){ return wd<=4 ? 'sched' : 'rest'; } },
-  { key:'igf',   name:'IGF-1 LR3', sub:'10u post-WO', draw:'10u', label:'IGF-1 LR3 50 mcg -> 10u (right after training)',        block:'POST',
-    on:function(d,wd){ return d<10 ? 'sched' : 'rest'; } }
+  { key:'cjc',  name:'CJC/Ipa',   sub:'10u PM', draw:'10u', label:'CJC-1295 / Ipamorelin 500 mcg -> 10u (2+ hrs after food)',     block:'PM',
+    on:function(d,wd){ return wd<=4 ? 'sched' : 'rest'; } }
 ];
 
 // ===== ICS CALENDAR EXPORT =====
@@ -805,14 +758,12 @@ function downloadICS(){
       'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),'SUMMARY:'+title,'DESCRIPTION:'+desc,
       'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM','END:VEVENT');
   }
-  // iterate all 7 days: weekends are normally empty, but the IGF-1 block runs
-  // 10 days STRAIGHT, so Sat/Sun inside that block still need an event.
+  // Weekdays only — Sat/Sun are fully off, so those days emit no event.
   for (var w=0; w<8; w++){
     for (var wd=0; wd<7; wd++){
       var dayIdx = w*7+wd;
       var am=[], pm=[], post=[];
       PROTOCOL.forEach(function(c){
-        if (c.key === 'semax') return;            // on-demand: intentionally not scheduled
         if (c.on(dayIdx, wd) !== 'sched') return;
         if (c.block === 'AM') am.push('  - ' + c.label);
         else if (c.block === 'PM') pm.push('  - ' + c.label);
@@ -821,16 +772,16 @@ function downloadICS(){
       var shots = am.length + pm.length + post.length;
       if (!shots) continue;
       var date = addDays(start, dayIdx);
-      var desc = 'Erik Fry - Repair & Rebuild Protocol - Week '+(w+1)+' of 8 - '+DN[wd]+NL+NL;
+      var desc = 'Erik Fry - Aggressive Recovery Protocol - Week '+(w+1)+' of 8 - '+DN[wd]+NL+NL;
       if (am.length)   desc += 'AM (fasted) - wait 30-45 min before eating:'+NL+am.join(NL)+NL+NL;
       if (post.length) desc += 'RIGHT AFTER TRAINING:'+NL+post.join(NL)+NL+NL;
       if (pm.length)   desc += 'PM (fasted) - 2+ hrs after food, 30-60 min before bed:'+NL+pm.join(NL)+NL+NL;
       desc += 'Different abdomen quadrant per shot. Fresh syringe every time.'+NL;
-      desc += 'Semax (10u) is on-demand and not scheduled - take it on days you want the focus.';
+      desc += 'Evening is three shots in three sites - Wolverine 20u, KPV 10u, CJC/Ipa 10u.';
       addE(date, 'BLS - Erik - W'+(w+1)+' '+DN[wd]+' - '+shots+' shot'+(shots>1?'s':''), desc, 'W'+(w+1)+'D'+wd);
     }
   }
-  var ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Erik Fry Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS - Erik - Repair & Rebuild','X-APPLE-CALENDAR-COLOR:#7A6530']
+  var ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Erik Fry Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS - Erik - Aggressive Recovery','X-APPLE-CALENDAR-COLOR:#7A6530']
     .concat(evts).concat(['END:VCALENDAR']).join(CRLF);
   var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
   var url = URL.createObjectURL(blob);
