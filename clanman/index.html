@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Your BioLinked Protocol</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BioLinked Solutions">
+<meta property="og:title" content="Your BioLinked Protocol">
+<meta property="og:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta property="og:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BioLinked — Peptide Solutions">
+<meta property="og:url" content="https://biolinkedsolutions.com/clanman/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your BioLinked Protocol">
+<meta name="twitter:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta name="twitter:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
+<!-- PWA — installable home-screen app -->
+<link rel="manifest" href="/clanman/manifest.json">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Charles">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7A6530">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+/* ===== Original BioLinked palette — gold accent on white / light gray ===== */
+:root{
+  --bg:#f5f5f5;
+  --bg-alt:#f5f5f5;
+  --head:#fafafa;
+  --surface:#ffffff;
+  --line:rgba(0,0,0,0.14);
+  --line-soft:#f0f0f0;
+  --zebra:#fafafa;
+  --hover:rgba(122,101,48,0.04);
+  --text:#000000;
+  --muted:#4a4a44;
+  --accent:#7A6530;
+  --accent-2:#8F7940;
+  --accent-hover:#5f4f26;
+  --accent-dim:rgba(122,101,48,0.10);
+  --accent-line:rgba(122,101,48,0.35);
+  --on-accent:#ffffff;
+  /* Tooltip tokens — the .info-tip-text rules below reference these. Without
+     them the custom properties are invalid at computed-value time, so the
+     bubble's background fell back to transparent and its text inherited the
+     open icon's white --on-accent: white-on-white, i.e. invisible. */
+  --tip-bg:#1a1a1a;
+  --tip-border:transparent;
+  --tip-text:#ffffff;
+  --tip-strong:#e9c66c;
+  --green:#3a7a5a;--green-soft:rgba(90,138,90,0.12);--green-text:#2f7a4a;
+  --info:#3a6b8e;
+  --shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:34px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;-webkit-text-size-adjust:100%;}
+
+/* ===== Chart shell ===== */
+.invoice-wrap{position:relative;z-index:1;width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05),0 6px 22px rgba(0,0,0,0.06);overflow:hidden;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--accent-line);padding:26px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}
+.inv-brand-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:9.5px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:var(--accent);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-size:21px;font-weight:700;color:var(--text);margin-top:3px;letter-spacing:0.01em;}
+.inv-date{font-size:12px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.5;}
+
+.tab-bar{display:flex;background:#fafafa;border-bottom:1px solid var(--line);padding:0;position:sticky;top:0;z-index:50;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:1 0 auto;white-space:nowrap;background:transparent;border:none;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;}
+.tab-btn:hover{color:var(--text);background:var(--hover);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface);}
+.tab-content{display:none;padding:30px 34px 38px;background:var(--bg-alt);}
+.tab-content.active{display:block;}
+
+/* ===== Intro block ===== */
+.program-intro{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
+.program-title{font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--accent);font-weight:700;}
+.program-tag{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+
+/* ===== Section rules ===== */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--accent-line);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);}
+.sec-divider-title{font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* ===== Label → value rows ===== */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:126px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--line-soft);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.65;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);line-height:1.7;}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* ===== Compound cards ===== */
+.cmp-group{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:12px;}
+.cmp-group::after{content:'';flex:1;height:1px;background:var(--line);}
+.cmp-group.mt{margin-top:18px;}
+.cmp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:6px;align-items:start;}
+.cmp-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;padding:0;overflow:visible;position:relative;}
+.cmp-row-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 16px;border-bottom:1px solid var(--line);background:var(--head);border-radius:8px 8px 0 0;line-height:1.3;letter-spacing:0.005em;}
+.cmp-badge{display:inline-block;background:var(--accent);color:var(--on-accent);font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;vertical-align:middle;white-space:nowrap;}
+.cmp-fields{display:flex;flex-direction:column;padding:2px 16px 10px;}
+.fld{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.fld:last-child{border-bottom:none;}
+.fld-l{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.fld-v{font-size:13px;font-weight:600;color:var(--text);text-align:right;font-variant-numeric:tabular-nums;min-width:0;}
+.fld.dose{border-top:1px solid var(--line-soft);}
+.fld.dose .fld-v{font-size:17px;font-weight:700;color:var(--accent);white-space:nowrap;}
+.cmp-note{padding:0 16px 14px;font-size:12.5px;line-height:1.7;color:var(--muted);}
+.cmp-note strong{color:var(--text);font-weight:700;}
+.cmp-note + .cmp-note{padding-top:0;}
+.cmp-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Data tables (vial math, titration) ===== */
+.data-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
+.data-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:540px;}
+.data-table thead th{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);padding:12px 14px 9px;text-align:left;background:var(--head);border-bottom:1px solid var(--line);white-space:nowrap;}
+.data-table thead th.right{text-align:right;}
+.data-table tbody td{padding:11px 14px;border-bottom:1px solid var(--line-soft);vertical-align:middle;color:var(--text);}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.data-table tbody tr:nth-child(even) td{background:var(--zebra);}
+.data-table td.cmp{font-weight:700;white-space:nowrap;}
+.data-table td.cmp .sub{color:var(--muted);font-weight:400;font-size:11px;display:block;margin-top:2px;}
+.data-table td.num{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px;}
+.data-table tr.is-cap td{background:var(--accent-dim) !important;}
+
+/* ===== Chart note ===== */
+.chart-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:20px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Totals / payment ===== */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;font-size:13.5px;padding:10px 0;border-bottom:1px solid var(--line-soft);}
+.total-row:last-child{border-bottom:none;}
+.total-row .tr-name strong{font-weight:700;}
+.total-row .tr-name .sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;}
+.total-row .tr-val{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.total-row.free .tr-name,.total-row.free .tr-val{color:var(--green-text);}
+.total-row.grand{border-top:2px solid var(--accent-line);border-bottom:none;margin-top:6px;padding-top:14px;font-size:16px;font-weight:700;}
+.total-row.grand .tr-val{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;color:var(--accent);line-height:1;}
+.payment-block{border-left:3px solid var(--accent);}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;padding:7px 0;}
+.payment-icon{font-size:19px;width:26px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:13.5px;color:var(--text);font-weight:500;line-height:1.55;}
+.payment-handle{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:var(--accent);line-height:1.2;}
+
+/* ===== Schedule ===== */
+.sched-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:var(--head);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.sched-card-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:0.005em;}
+.sched-card-sub{padding:8px 18px 12px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.65;}
+.sched-phase-pill{background:var(--accent);color:var(--on-accent);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:4px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table{width:100%;border-collapse:collapse;min-width:520px;font-size:12px;}
+.sched-table th{text-align:left;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:11px 12px;border-bottom:1px solid var(--line);background:var(--zebra);white-space:nowrap;}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line-soft);}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);font-size:12.5px;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;margin:1px 3px 2px 0;border:1px solid var(--accent-line);background:var(--accent-dim);color:var(--accent);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.pm{background:rgba(58,122,90,0.14);border-color:rgba(58,122,90,0.34);color:#3a7a5a;}
+.sched-pill.nad{background:rgba(58,107,142,0.14);border-color:rgba(58,107,142,0.34);color:#3a6b8e;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--line);color:#999;font-weight:400;}
+.sched-count{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;border-radius:99px;background:var(--accent-dim);border:1px solid var(--accent-line);font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;}
+.sched-count.off{color:#bbb;background:rgba(0,0,0,0.03);border-color:var(--line);}
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03)),#ffffff;border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:8px;box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:5px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:5px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-dl-btn:hover{background:#345d85;}
+
+/* ===== Note / tip cards ===== */
+.tip-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:12px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--accent);}
+.tip-head{padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
+.tip-title{font-size:16px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:6px 18px 14px;font-size:13.5px;line-height:1.7;color:var(--text);font-weight:400;}
+.tip-body strong{font-weight:700;}
+
+/* Collapsible tip cards — same +/- summary convention as the compound cards. */
+details.tip-card > summary.tip-head{
+  cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;
+  padding:13px 46px 13px 18px;min-height:56px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+details.tip-card > summary.tip-head::-webkit-details-marker{display:none;}
+details.tip-card > summary.tip-head::after{
+  content:'+';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;
+}
+details[open].tip-card > summary.tip-head::after{content:'\2212';background:var(--accent-dim);}
+details.tip-card > summary.tip-head:hover::after{border-color:var(--accent);}
+details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;}
+@media print{details.tip-card > summary.tip-head::after{display:none;}}
+@media(max-width:640px){details.tip-card > summary.tip-head{padding:13px 44px 13px 15px;}}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding:6px 0 4px;}
+.tip-list{list-style:none;margin:0;padding:0;}
+.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--line-soft);overflow-wrap:break-word;margin:0;}
+.tip-list li:last-child{border-bottom:none;}
+.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+
+/* ===== Supplies ===== */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:20px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:stretch;padding:0;}
+.supply-info-name{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--head);border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;line-height:1.3;}
+.supply-free{display:inline-block;background:var(--green);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;white-space:nowrap;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-info-desc strong{color:var(--text);font-weight:700;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;background:var(--accent);color:var(--on-accent);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:5px;text-decoration:none;white-space:nowrap;}
+.supply-link:hover{background:var(--accent-hover);}
+.storage-card{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;}
+.storage-title{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.storage-body{padding:6px 18px 12px;}
+
+/* ===== Footer ===== */
+.inv-footer{background:var(--head);border-top:1px solid var(--line);padding:16px 34px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.footer-disc{font-size:10px;color:var(--muted);font-weight:500;line-height:1.55;flex:1;min-width:240px;}
+.footer-brand{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
+.print-btn{position:relative;z-index:1;display:block;width:75%;max-width:1200px;margin:18px auto 56px;padding:15px;background:var(--accent);color:var(--on-accent);border:none;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;box-shadow:var(--shadow);}
+.print-btn:hover{background:var(--accent-hover);}
+
+@media print{
+  body{background:#fff;padding:0;}
+  .invoice-wrap{border:none;width:100%;max-width:100%;box-shadow:none;}
+  .print-btn,.tab-bar{display:none;}
+  .tab-content{display:block !important;background:#fff;}
+  .cmp-row,.lab-section,.sched-card,.data-card,.tip-card,.supply-row,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:92%;}}
+@media(max-width:820px){
+  .invoice-wrap,.print-btn{width:96%;}
+  body{padding:20px 8px;}
+  .inv-header{padding:20px 20px;}
+  .tab-content{padding:22px 18px;}
+  .inv-footer{padding:14px 20px;}
+}
+@media(max-width:640px){
+  .invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}
+  .print-btn{border-radius:6px;width:calc(100% - 24px);}
+  body{padding:0 0 8px;font-size:15px;}
+  .inv-header{flex-direction:column;gap:12px;padding:18px 16px;}
+  .inv-meta{text-align:left;}
+  .inv-brand-name{font-size:25px;}
+  .tab-content{padding:16px 12px 26px;}
+  .inv-footer{flex-direction:column;align-items:flex-start;padding:14px 16px;}
+  .program-title{font-size:22px;}
+  .program-intro{padding:16px 15px;}
+  .sec-divider-title{font-size:17px;}
+  .cmp-list,.supplies-wrap{grid-template-columns:1fr;}
+  .cmp-row-name,.supply-info-name{padding:12px 15px;}
+  details.cmp-row > summary.cmp-row-name{padding:12px 44px 12px 15px;}
+  .cmp-price{font-size:15px;}
+  .cmp-fields,.cmp-note,.supply-info-desc{padding-left:15px;padding-right:15px;}
+  .supply-link{margin-left:15px;margin-right:15px;}
+  .sched-card-head{padding:12px 15px;}
+  .sched-card-sub{padding-left:15px;padding-right:15px;}
+  .tip-head,.tip-body,.storage-title,.storage-body{padding-left:15px;padding-right:15px;}
+  .chart-note{padding:12px 14px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .total-row.grand .tr-val{font-size:25px;}
+  .fld{gap:10px;}
+  .fld-v{font-size:12.5px;}
+  .fld.dose .fld-v{font-size:16px;}
+}
+
+
+
+/* ===== Info tooltip — ? icon (mpauldino base) ===== */
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
+.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--tip-bg);color:var(--tip-text);border:1px solid var(--tip-border);padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
+.info-tip-text strong{color:var(--tip-strong);font-weight:600;}
+.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tip-bg);}
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
+@media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
+
+/* Viewport-safe tooltip anchoring inside the narrow compound cards — the
+   260px bubble would overflow a 290px card, so pin it to the header band with
+   left/right insets instead of centering it on the tiny icon.
+   .cmp-row-name MUST be the containing block. Anchored to .cmp-row instead,
+   top:calc(100% - 2px) resolved against the WHOLE CARD height, so the bubble
+   opened ~115px below the ? that was tapped — over the next card, or off the
+   bottom on the last one. Reads as "tapping does nothing". Same host element
+   mpauldino uses. */
+.cmp-row-name{position:relative;}
+.cmp-row-name .info-tip{position:static;}
+.cmp-row-name .info-tip-text{position:absolute;bottom:auto;top:calc(100% - 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+.cmp-row-name .info-tip-text::after{top:-9px;bottom:auto;left:14px;transform:none;border:5px solid transparent;border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+/* Open bubble must paint above later sibling cards, which are position:relative. */
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{z-index:400;}
+</style>
+</head>
+<body>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Client Protocol &middot; BLS-CL-0819</div>
+      <div class="inv-number">Charles Lanman</div>
+      <div class="inv-date">August 2026 &middot; Fat Loss, Body Composition &amp; Cognition</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  </div>
+
+  <!-- ================= PROTOCOL ================= -->
+  <div class="tab-content active" id="tab-protocol">
+
+    <div class="program-intro">
+      <div class="program-eyebrow">Client Protocol</div>
+      <div class="program-title">Charles&apos;s <em>Fat Loss &amp; Cognition Stack</em></div>
+      <div class="program-tag">Built around one number you gave us &mdash; <em>43&Prime; to 41&Prime; at the belly button</em> &mdash; and the 29 lb behind it.</div>
+      <div class="program-context">
+        <div class="note-list">
+          <div class="nr"><div class="nr-l">Where this starts</div><div class="nr-v">You did not give us a vague goal, you gave us a <strong>tape measure</strong>: <strong>43&Prime; down to 41&Prime; at the belly button</strong>, and <strong>209 lb down to 180 lb</strong>. That specificity is genuinely useful, because it tells us exactly which kind of fat we are aiming at. Waist circumference at the navel is the practical read on <strong>visceral fat</strong> &mdash; the deep abdominal fat that sits around the organs &mdash; and that is a different target than simply losing weight. Half this stack is pointed straight at it.</div></div>
+          <div class="nr"><div class="nr-l">What you bring to it</div><div class="nr-v">A lot, honestly. You already <strong>train and eat like a bodybuilder</strong>, protein is high, and you are an <strong>experienced injector</strong> &mdash; none of the usual friction applies to you. You are also <strong>on TRT (testosterone pellets, every 4 months)</strong>, which means your androgen floor is already handled and the lean mass you have built is defended while you diet. That is a real advantage on a 29 lb cut at 57: most people lose muscle alongside the fat. You are much better protected than that.</div></div>
+          <div class="nr"><div class="nr-l">The stack</div><div class="nr-v"><strong>Retatrutide</strong>, <strong>Tesamorelin</strong> and <strong>HGH</strong> are the fat-loss core &mdash; appetite and blood sugar, visceral belly fat, and whole-body composition respectively. <strong>MOTS-C</strong> sits underneath them on the metabolic side. <strong>NAD+</strong> and <strong>Semax</strong> are the cognitive half of your goals &mdash; clarity and focus, which also happens to be what a long calorie deficit erodes first.</div></div>
+          <div class="nr"><div class="nr-l">Cadence</div><div class="nr-v"><strong>Weekdays on, weekends off.</strong> Mornings are fasted &mdash; HGH and MOTS-C every weekday, Retatrutide and NAD+ on Mon / Wed / Fri. Evenings are Tesamorelin alone, fasted, before bed. Semax is as-needed on the mornings you want the focus. <strong>Saturday and Sunday are fully off.</strong></div></div>
+          <div class="nr"><div class="nr-l">Length</div><div class="nr-v">The peptide core runs <strong>roughly 8 weeks</strong> &mdash; that is where Tesamorelin&apos;s four vials and MOTS-C&apos;s two land. <strong>HGH is on a completely different timeline</strong>: 22 vials at 2 iu, five days a week, is about <strong>53 weeks &mdash; a year of coverage</strong>. Run bottles out rather than watching a calendar; the durations here are approximate.</div></div>
+          <div class="nr"><div class="nr-l">Shots per week</div><div class="nr-v"><strong>21</strong> &mdash; 5 HGH, 5 MOTS-C, 5 Tesamorelin, 3 Retatrutide, 3 NAD+, plus Semax as needed. Five draw marks total: <strong>17u</strong>, <strong>15u</strong>, <strong>20u</strong>, <strong>10u</strong> and <strong>25u</strong>.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Active Stack</div>
+      <div class="sec-divider-title">What You&apos;re Running</div>
+    </div>
+
+    <div class="cmp-group">AM Block &middot; Fasted</div>
+    <div class="cmp-list">
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">HGH &middot; 24 iu <span class="cmp-badge">Body Comp</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Growth hormone itself, not a secretagogue.</strong> Where Tesamorelin asks your pituitary to release more of your own, this supplies it directly. At <strong>2 iu</strong> it is a body-composition dose, not a bodybuilding one &mdash; it shifts fuel use toward stored fat, protects lean mass through a deficit, and improves recovery and skin/connective-tissue quality. Effects build slowly over months, not weeks.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">17u &middot; 2 iu</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>The long lever on a <strong>209 &rarr; 180</strong> goal. A 29 lb cut at 57 is where most people quietly lose muscle along with the fat &mdash; HGH is the piece that biases the loss toward fat and away from the tissue you spent years building. Between this and your TRT, your body composition is defended from both ends. Expect recovery and sleep quality to shift first; the visible body-comp change arrives over <strong>months</strong>.</div>
+        <div class="cmp-note"><span class="nl">About the supply</span><strong>Read this one.</strong> Each 24 iu vial gives you <strong>12 doses at 2 iu</strong>. At five mornings a week that is <strong>about 2&frac12; weeks per vial</strong> &mdash; and <strong>22 vials is roughly 53 weeks, close to a full year</strong>. This is deliberately the long-horizon compound in the stack, and it is the single biggest commitment in the stack. Keep the unmixed vials refrigerated and only mix one at a time; a mixed vial lasts about a month, so <strong>never mix ahead</strong>.</div>
+      </div>
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">MOTS-C &middot; 40 mg <span class="cmp-badge">Metabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A mitochondrial-derived peptide.</strong> It signals cells to burn fuel more efficiently and improves how well muscle takes up and uses glucose. In practice that shows up as steadier all-day energy and better fat oxidation &mdash; the supply side of the equation rather than a stimulant hit.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">15u &middot; 2 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>A deficit costs you energy, and a tired week is the week the training and the food both slip. MOTS-C works on <strong>fat oxidation and insulin sensitivity</strong> &mdash; it makes the deficit run cleaner rather than making you feel wired through it. It also pairs directly with the other four: better glucose handling underneath a GLP-1 and a GH-axis pair is exactly where you want it.</div>
+      </div>
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">Retatrutide &middot; 30 mg <span class="cmp-badge">Fat Loss</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A triple agonist &mdash; GLP-1, GIP and glucagon.</strong> It slows gastric emptying, blunts appetite and improves blood-sugar control, and the glucagon arm adds a direct push on energy expenditure and liver fat. It is the most effective fat-loss compound available in this category, which is exactly why the dose and the cadence matter as much as the drug.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why the microdose is better &mdash; you asked</span>Fair question, and the answer is about <strong>steadiness</strong>. One large weekly shot creates a spike and then a long decay: the first two days you feel over-suppressed &mdash; nausea, no appetite, food aversion &mdash; and by day six the effect has faded and hunger comes back hard. <strong>1 mg three times a week gives you the same weekly exposure without the peaks and troughs.</strong> Three practical consequences: (1) <strong>GI tolerability is dramatically better</strong> &mdash; the nausea and reflux people quit over mostly come from the peak, not the drug; (2) <strong>appetite control is flat and predictable</strong> all week instead of feast-then-famine; (3) <strong>you keep eating</strong> &mdash; which matters enormously for you specifically, because you are eating high protein to hold muscle through a 29 lb cut, and a compound that kills your appetite for two days a week is a compound that costs you lean mass. Microdosing keeps Reta doing metabolic work without it taking over your week.</div>
+        <div class="cmp-note"><span class="nl">Tier up &middot; tier down</span><strong>1 mg is a starting point, not a fixed dose &mdash; you drive this one.</strong> If after <strong>2&ndash;3 weeks</strong> the weight is not moving and the appetite effect has faded, step up to <strong>1.5 mg (15u)</strong>, hold two weeks, then <strong>2 mg (20u)</strong> if you still want more. If nausea, reflux or food aversion is meaningfully affecting how you eat, come down to <strong>0.75 mg (7.5u)</strong> or <strong>0.5 mg (5u)</strong> and hold there &mdash; a dose you tolerate every week beats a dose you skip. Move in one step at a time and tell Micah which way you went.</div>
+      </div>
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">NAD+ &middot; 1000 mg <span class="cmp-badge">Cognitive</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The coenzyme your mitochondria run on.</strong> It is the currency cells spend on repair, DNA maintenance and energy production, and levels fall meaningfully with age. Most people notice it as clearer thinking and steadier mornings rather than a jolt. It also supports liver and cellular repair pathways.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">25u &middot; 50 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span><strong>Cognitive is one of your two stated goals</strong>, and NAD+ is the foundational piece of it &mdash; cellular energy rather than stimulation. It is also the compound that ages best into this stack: NAD+ declines with age, and at 57 restoring it tends to show up as sharper mornings and less of a mid-afternoon drop. It supports cellular and liver repair pathways too, which is worth having in a stack this size. <strong>Push the plunger slowly &mdash; see the Notes tab.</strong></div>
+      </div>
+
+    </div>
+
+    <div class="cmp-group mt">PM Block &middot; Fasted, Before Bed</div>
+    <div class="cmp-list">
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">Tesamorelin &middot; 20 mg <span class="cmp-badge">Visceral Fat</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A GHRH analog with one unusually specific effect.</strong> It amplifies your own overnight growth-hormone pulse, and the fat it moves preferentially is <strong>visceral adipose tissue</strong> &mdash; the deep abdominal fat around the organs. It is the one compound in this category with published data specifically on reducing waist circumference, which is why it is here.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; fasted, before bed</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 2 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here &mdash; this is the waist compound</span>You measured at the belly button, so this is the compound aimed most literally at the number you gave us. <strong>Tesamorelin targets visceral fat specifically</strong> &mdash; not subcutaneous fat, not general weight, but the deep abdominal fat that determines waist circumference at the navel. That is a meaningfully different mechanism than the rest of the stack, and it is the reason <strong>43&Prime; &rarr; 41&Prime;</strong> is a realistic ask rather than just a hope attached to the scale. <strong>Two hours clear of food and 30&ndash;60 minutes before bed</strong> &mdash; food blunts it, so a late dinner and a good dose are mutually exclusive. If you ate late, skip that night rather than wasting the shot.</div>
+      </div>
+
+    </div>
+
+    <div class="cmp-group mt">As Needed &middot; AM</div>
+    <div class="cmp-list">
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">N-Acetyl Semax Amidate &middot; 30 mg <span class="cmp-badge">Focus</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A nootropic peptide derived from ACTH.</strong> The N-acetyl amidated form is the more stable, longer-acting version. It raises BDNF and modulates dopamine and serotonin &mdash; the practical effect is sharper focus and mental stamina without a stimulant&apos;s edge or crash. It works acutely, within an hour, which is why it belongs on the days that demand it.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">As needed &middot; AM</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Why it&apos;s here</span>The acute half of your cognitive goal &mdash; NAD+ is the foundation, this is the tool you reach for on a specific morning. It is also genuinely useful <strong>during a deficit</strong>, which is when focus and drive are the first things to go. Start at <strong>1 mg (10u)</strong>; if that is well tolerated and you want more, <strong>2 mg is 20u</strong>. Save it for the days that matter &mdash; used every single day it stops being noticeable.</div>
+      </div>
+
+    </div>
+
+    <div class="chart-note">
+      <span class="nl">Draw math</span>
+      <p><strong>HGH</strong> 24 iu in 2 mL is 12 iu/mL &rarr; 17u (0.17 mL) is ~2 iu. <strong>MOTS-C</strong> 40 mg in 3 mL is 13.3 mg/mL &rarr; 15u (0.15 mL) is 2 mg. <strong>Retatrutide</strong> 30 mg in 3 mL is 10 mg/mL &rarr; 10u (0.10 mL) is 1 mg. <strong>NAD+</strong> 1000 mg in 5 mL is 200 mg/mL &rarr; 25u (0.25 mL) is 50 mg. <strong>Tesamorelin</strong> 20 mg in 2 mL is 10 mg/mL &rarr; 20u (0.20 mL) is 2 mg. <strong>Semax</strong> 30 mg in 3 mL is 10 mg/mL &rarr; 10u (0.10 mL) is 1 mg. All SubQ into the abdomen, rotating sites &mdash; and with a 43&Prime; waist you have plenty of real estate, so keep the rotation wide rather than working one patch.</p>
+    </div>
+
+  </div><!-- /protocol -->
+
+  <!-- ================= INVOICE ================= -->
+  <div class="tab-content" id="tab-invoice">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Invoice &middot; BLS-CL-0819</div>
+      <div class="sec-divider-title">Order 1 &middot; Opening Stack</div>
+    </div>
+
+    <div class="totals-block">
+      <div class="total-row"><span class="tr-name"><strong>Retatrutide</strong> 30 mg &times; 2 vials @ $80<span class="sub">Appetite, blood sugar &amp; fat loss &mdash; microdosed M/W/F</span></span><span class="tr-val">$160.00</span></div>
+      <div class="total-row"><span class="tr-name"><strong>Tesamorelin</strong> 20 mg &times; 4 vials @ $75<span class="sub">Visceral belly fat &mdash; the waist compound</span></span><span class="tr-val">$300.00</span></div>
+      <div class="total-row"><span class="tr-name"><strong>HGH</strong> 24 iu &times; 22 vials @ $95<span class="sub">Body composition &amp; recovery &mdash; ~53 weeks of coverage</span></span><span class="tr-val">$2,090.00</span></div>
+      <div class="total-row"><span class="tr-name"><strong>MOTS-C</strong> 40 mg &times; 2 vials @ $100<span class="sub">Cellular energy &amp; fat oxidation</span></span><span class="tr-val">$200.00</span></div>
+      <div class="total-row"><span class="tr-name"><strong>NAD+</strong> 1000 mg &times; 2 vials @ $75<span class="sub">Cognitive clarity &amp; cellular energy</span></span><span class="tr-val">$150.00</span></div>
+      <div class="total-row"><span class="tr-name"><strong>N-Acetyl Semax Amidate</strong> 30 mg &times; 1 vial @ $75<span class="sub">Focus &mdash; as-needed nootropic</span></span><span class="tr-val">$75.00</span></div>
+      <div class="total-row grand"><span class="tr-name">Order Total</span><span class="tr-val">$2,975.00</span></div>
+    </div>
+
+    <div class="totals-block">
+      <div class="total-row grand"><span class="tr-name">Balance Due</span><span class="tr-val">$2,975.00</span></div>
+    </div>
+
+    <div class="payment-block">
+      <div class="payment-title">How To Pay</div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128184;</div>
+        <div>
+          <div class="payment-text">Send via Venmo &mdash; note it <strong>&ldquo;BLS-CL-0819&rdquo;</strong></div>
+          <div class="payment-handle">@micahp20</div>
+        </div>
+      </div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128274;</div>
+        <div class="payment-text">Keep Venmo payment privacy set to <strong>Private</strong> &mdash; not Public or Friends.</div>
+      </div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128230;</div>
+        <div class="payment-text">Ships within 24&ndash;48 hours of payment. <strong>Thirty-three vials total</strong> &mdash; it is a big box. Refrigerate the whole thing on arrival and mix one compound at a time.</div>
+      </div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128172;</div>
+        <div class="payment-text">Questions on anything here &mdash; a dose, a mark, the Reta step-up &mdash; text Micah. Adjusting is normal and expected.</div>
+      </div>
+    </div>
+
+    <div class="chart-note">
+      <span class="nl">Why this stack, for this money</span>
+      <p>Two things are worth naming plainly. First, <strong>HGH is $2,090 of the $2,975</strong> &mdash; 70% of the order &mdash; and that is because <strong>22 vials is about a year of coverage</strong>, not an 8-week cycle. You are buying the long horizon up front rather than reordering every month. Second, nothing else here is duplicated: <strong>Retatrutide</strong> ($160) works on appetite and blood sugar, <strong>Tesamorelin</strong> ($300) works on visceral fat specifically, <strong>MOTS-C</strong> ($200) works on cellular fuel use &mdash; three genuinely different mechanisms pointed at the same 29 lb. <strong>NAD+ and Semax</strong> ($225) are the cognitive half of your goals and the cheapest part of the page. If anything on this order should be revisited before you pay, it is the HGH vial count &mdash; talk it through with Micah.</p>
+    </div>
+
+  </div><!-- /invoice -->
+
+  <!-- ================= SCHEDULE ================= -->
+  <div class="tab-content" id="tab-schedule">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Weekly Schedule</div>
+      <div class="sec-divider-title">Mon&ndash;Fri &middot; AM + PM &middot; Weekends Off</div>
+    </div>
+
+    <div class="cal-banner">
+      <div class="cal-left">
+        <h4>&#128197; Put It On Your Calendar</h4>
+        <p>Pick your Week 1 Monday and download the .ics file. Opens in Apple Calendar (iOS) and Google Calendar (Android) &mdash; every dosing day becomes an event with that day&apos;s shot list and draw marks. Twelve weeks are generated; Tesamorelin and MOTS-C run out around week 8, HGH keeps going well past the end of the file. Semax is as-needed and is not on the calendar.</p>
+      </div>
+      <div class="cal-controls">
+        <input type="date" id="cycleStart">
+        <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+      </div>
+    </div>
+
+    <div class="sched-card">
+      <div class="sched-card-head">
+        <div class="sched-card-title">Your Week</div>
+        <div class="sched-phase-pill">21 Shots / Week</div>
+      </div>
+      <div class="sched-card-sub">Two windows a day, weekdays only. Mornings are fasted, before food &mdash; HGH and MOTS-C every weekday, Retatrutide and NAD+ on Mon / Wed / Fri. Evenings are Tesamorelin alone, at least 2 hours after your last food and 30&ndash;60 min before sleep. Saturday and Sunday are fully off. Semax (10u) sits outside the count &mdash; take it on the mornings you want it.</div>
+      <div class="sched-scroll"><table class="sched-table">
+        <thead><tr><th style="width:56px">Day</th><th>AM &middot; Fasted</th><th>PM &middot; Before Bed</th><th class="right">Shots</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>17u</strong> &middot; HGH</span><span class="sched-pill"><strong>15u</strong> &middot; MOTS-C</span><span class="sched-pill"><strong>10u</strong> &middot; Reta</span><span class="sched-pill nad"><strong>25u</strong> &middot; NAD+</span></td><td><span class="sched-pill pm"><strong>20u</strong> &middot; Tesamorelin</span></td><td class="right"><span class="sched-count">5</span></td></tr>
+          <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill"><strong>17u</strong> &middot; HGH</span><span class="sched-pill"><strong>15u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill pm"><strong>20u</strong> &middot; Tesamorelin</span></td><td class="right"><span class="sched-count">3</span></td></tr>
+          <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>17u</strong> &middot; HGH</span><span class="sched-pill"><strong>15u</strong> &middot; MOTS-C</span><span class="sched-pill"><strong>10u</strong> &middot; Reta</span><span class="sched-pill nad"><strong>25u</strong> &middot; NAD+</span></td><td><span class="sched-pill pm"><strong>20u</strong> &middot; Tesamorelin</span></td><td class="right"><span class="sched-count">5</span></td></tr>
+          <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill"><strong>17u</strong> &middot; HGH</span><span class="sched-pill"><strong>15u</strong> &middot; MOTS-C</span></td><td><span class="sched-pill pm"><strong>20u</strong> &middot; Tesamorelin</span></td><td class="right"><span class="sched-count">3</span></td></tr>
+          <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>17u</strong> &middot; HGH</span><span class="sched-pill"><strong>15u</strong> &middot; MOTS-C</span><span class="sched-pill"><strong>10u</strong> &middot; Reta</span><span class="sched-pill nad"><strong>25u</strong> &middot; NAD+</span></td><td><span class="sched-pill pm"><strong>20u</strong> &middot; Tesamorelin</span></td><td class="right"><span class="sched-count">5</span></td></tr>
+          <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="sec-divider mt">
+      <div class="sec-divider-eyebrow">Vial Life</div>
+      <div class="sec-divider-title">How Long Each One Lasts</div>
+    </div>
+
+    <div class="data-card"><div class="data-scroll"><table class="data-table">
+      <thead><tr><th>Compound</th><th>Recon</th><th class="right">Draw</th><th class="right">Doses / Vial</th><th>Cadence</th><th class="right">Covers</th></tr></thead>
+      <tbody>
+        <tr class="is-cap"><td class="cmp">HGH<span class="sub">24 iu &middot; 22 vials</span></td><td>2 mL ea</td><td class="num">17u</td><td class="num">12 ea &middot; 264</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~53 wks</td></tr>
+        <tr><td class="cmp">Tesamorelin<span class="sub">20 mg &middot; 4 vials</span></td><td>2 mL ea</td><td class="num">20u</td><td class="num">10 ea &middot; 40</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~8 wks</td></tr>
+        <tr><td class="cmp">MOTS-C<span class="sub">40 mg &middot; 2 vials</span></td><td>3 mL ea</td><td class="num">15u</td><td class="num">20 ea &middot; 40</td><td>Mon&ndash;Fri &middot; 5/wk</td><td class="num">~8 wks</td></tr>
+        <tr><td class="cmp">Retatrutide<span class="sub">30 mg &middot; 2 vials</span></td><td>3 mL ea</td><td class="num">10u</td><td class="num">30 ea &middot; 60</td><td>M / W / F &middot; 3/wk</td><td class="num">shelf-capped</td></tr>
+        <tr><td class="cmp">NAD+<span class="sub">1000 mg &middot; 2 vials</span></td><td>5 mL ea</td><td class="num">25u</td><td class="num">20 ea &middot; 40</td><td>M / W / F &middot; 3/wk</td><td class="num">shelf-capped</td></tr>
+        <tr><td class="cmp">N-Acetyl Semax Amidate<span class="sub">30 mg &middot; 1 vial</span></td><td>3 mL</td><td class="num">10u</td><td class="num">30</td><td>As needed</td><td class="num">shelf-capped</td></tr>
+      </tbody>
+    </table></div></div>
+
+    <div class="chart-note">
+      <span class="nl">Read this one &mdash; mix one vial at a time</span>
+      <p><strong>HGH is the headline number.</strong> Each vial is <strong>12 doses at 2 iu</strong>, which at five mornings a week is about <strong>2&frac12; weeks per vial</strong> &mdash; so 22 vials is roughly <strong>53 weeks, close to a full year</strong>. That also means <strong>21 of them sit dry in the fridge at any given time</strong>. Dry powder keeps for a long time; a mixed vial keeps about <strong>30 days refrigerated</strong>, so mix the next one only as the current one empties. <strong>Tesamorelin and MOTS-C run out on schedule</strong> around week 8 &mdash; four Tesa vials at 2 weeks each, two MOTS vials at 4 weeks each. <strong>Retatrutide and NAD+ hold far more doses than a mixed vial&apos;s shelf life</strong>: one Reta vial is 30 doses (10 weeks at 3/wk) but only ~13 land inside the 30-day window, so <strong>keep the second Reta and the second NAD+ vial dry</strong> and open them when the first is done. Same for Semax &mdash; one vial, mixed once, used as needed.</p>
+    </div>
+
+  </div><!-- /schedule -->
+
+  <!-- ================= SUPPLIES ================= -->
+  <div class="tab-content" id="tab-supplies">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Supplies</div>
+      <div class="sec-divider-title">Have These Before Day 1</div>
+    </div>
+
+    <div class="supplies-wrap">
+      <div class="supply-row">
+        <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 100-pack</div>
+        <div class="supply-info-desc">You already know the drill &mdash; the only thing that matters here is quantity. At <strong>21 shots a week</strong> a 100-pack is under five weeks, so buy two or three up front. Get the 100-unit markings so 10u, 15u, 17u, 20u and 25u are all easy to read at 6am.</div>
+        <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL</div>
+        <div class="supply-info-desc">Sterile preserved water for mixing the powders. Because you mix one vial at a time you never need it all at once &mdash; but note the <strong>HGH alone takes 2 mL per vial across 22 vials, roughly 44 mL over the year</strong>. Buy <strong>two or three 30 mL bottles</strong> up front and expect to restock.</div>
+        <a href="https://www.mcguff.com/water-for-injection-bacteriostatic-alcohol-mdv-30ml-2?productId=3372" target="_blank" class="supply-link">McGuff &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 100-pack</div>
+        <div class="supply-info-desc">One per vial top and one per injection site. A Monday morning alone is four vials and four sites &mdash; buy the big box.</div>
+        <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+        <div class="supply-info-desc">Disposal box for used needles &mdash; drop off free at any CVS or Walgreens when it&apos;s full. At 21 shots a week get the quart, not the small one.</div>
+        <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+        <div class="supply-info-desc">Small fridge organizer for your vials. With <strong>33 vials arriving in one box</strong> this one is genuinely not optional &mdash; you need the dry spares clearly separated from the two or three that are actually in play, sorted, labeled and out of the light.</div>
+        <a href="https://www.amazon.com/dp/B0FH62NMF8" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Tape Measure &mdash; Soft / Cloth</div>
+        <div class="supply-info-desc">Your goal is a <strong>waist number</strong>, not a scale number, so measure it. At the belly button, first thing in the morning, relaxed &mdash; not sucked in, not pushed out. <strong>Once a week, same conditions.</strong> On a visceral-fat protocol the tape often moves before the scale does, and it is the honest read on whether Tesamorelin is doing its job.</div>
+      </div>
+    </div>
+
+    <div class="sec-divider mt">
+      <div class="sec-divider-eyebrow">Storage &amp; Handling</div>
+      <div class="sec-divider-title">Keep It Cold &middot; Keep It Clean</div>
+    </div>
+
+    <div class="storage-card">
+      <div class="storage-title">&#10052; Refrigerated, Protected, Labeled</div>
+      <div class="storage-body"><div class="note-list">
+        <div class="nr"><div class="nr-l">Dry vials</div><div class="nr-v">Refrigerate at 36&ndash;46&deg;F, protected from light. Never freeze. Unmixed powder keeps a long time &mdash; which with <strong>22 HGH vials</strong> is the whole reason this works.</div></div>
+        <div class="nr"><div class="nr-l">Reconstitution</div><div class="nr-v">HGH <strong>2 mL</strong>, Tesamorelin <strong>2 mL</strong>, MOTS-C <strong>3 mL</strong>, Retatrutide <strong>3 mL</strong>, NAD+ <strong>5 mL</strong>, Semax <strong>3 mL</strong>. Add the water slowly down the inside wall of the vial, swirl gently, never shake &mdash; HGH and Tesamorelin are the two least tolerant of rough handling.</div></div>
+        <div class="nr"><div class="nr-l">Mix one at a time</div><div class="nr-v"><strong>Thirty-three vials, six compounds.</strong> Open the next vial only as the current one empties &mdash; HGH about every 2&frac12; weeks, Tesamorelin every 2 weeks, MOTS-C every 4. The <strong>second Retatrutide and second NAD+ vials stay dry</strong> until the firsts are finished.</div></div>
+        <div class="nr"><div class="nr-l">Label them</div><div class="nr-v">Write the compound and its unit mark on every vial you mix &mdash; <strong>HGH 17u, MOTS-C 15u, Reta 10u, NAD+ 25u, Tesa 20u, Semax 10u</strong>. Five different marks in a fridge door at 6am is exactly how a mistake happens.</div></div>
+        <div class="nr"><div class="nr-l">After mixing</div><div class="nr-v">Refrigerate and use within about 30 days. If a vial has been open longer than that with doses left in it, that is the shelf life talking &mdash; not a reason to double up.</div></div>
+        <div class="nr"><div class="nr-l">Every shot</div><div class="nr-v">Fresh single-use syringe, wipe the stopper and your skin with alcohol, rotate injection sites. Four AM shots on a Monday means four different spots.</div></div>
+      </div></div>
+    </div>
+
+  </div><!-- /supplies -->
+
+  <!-- ================= NOTES ================= -->
+  <div class="tab-content" id="tab-notes">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Notes &amp; Tips</div>
+      <div class="sec-divider-title">How To Run It Well</div>
+    </div>
+
+    <details class="tip-card featured">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Start Here</div>
+        <div class="tip-title">Your Two Daily Windows</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>AM, fasted, before breakfast.</strong> HGH <strong>17u</strong> and MOTS-C <strong>15u</strong> every weekday; add Retatrutide <strong>10u</strong> and NAD+ <strong>25u</strong> on Mon / Wed / Fri. Different spot for each, then wait 30&ndash;45 min before food.</li>
+          <li><strong>PM, fasted, before bed.</strong> Tesamorelin <strong>20u</strong>, at least 2 hours after your last food and 30&ndash;60 min before lights out. This one is timing-sensitive &mdash; food genuinely blunts it.</li>
+          <li><strong>Semax is separate.</strong> <strong>10u</strong> in the morning on the days you want the focus &mdash; not a daily habit.</li>
+          <li><strong>Weekends off.</strong> Saturday and Sunday are built in &mdash; nothing to catch up on Monday.</li>
+          <li><strong>Missed a dose?</strong> Skip it and carry on. Never double up. Consistency across weeks beats perfection in any single one.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">The Goal</div>
+        <div class="tip-title">Measuring 43&Prime; &rarr; 41&Prime; Honestly</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>Measure the waist weekly, at the belly button, first thing in the morning.</strong> Relaxed &mdash; not sucked in, not pushed out, tape level all the way around. Same day, same conditions, every week. This is your primary metric, not the scale.</li>
+          <li><strong>Weigh 2&ndash;3 mornings a week and use the weekly average.</strong> Never a single day. Daily weight swings 2&ndash;4 lb on water alone, and on this stack the first two weeks can move in either direction for reasons that have nothing to do with fat.</li>
+          <li><strong>Expect the tape and the scale to disagree at times.</strong> That is normal and it is often good news: visceral fat can come off while the scale sits still, particularly with HGH and TRT both defending lean mass. If the waist is shrinking and the weight is flat, <strong>the protocol is working.</strong></li>
+          <li><strong>Two inches is roughly 15&ndash;20 lb for most men</strong> at your size &mdash; so <strong>41&Prime; and 180 lb are broadly the same milestone</strong>, not two separate ones. Reaching 180 will very likely land you at or under 41&Prime;.</li>
+          <li><strong>Take a photo the morning you start.</strong> Same light, same spot, same time of day. A year is long enough that you will not trust your memory of where you began, and the photo is the only thing that will settle it.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Retatrutide</div>
+        <div class="tip-title">Running The Microdose &mdash; And When To Move It</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>1 mg on Mon / Wed / Fri, mornings, fasted.</strong> The three-times-weekly cadence is the entire point &mdash; it holds a steady level instead of a weekly spike-and-crash, which is what makes it both tolerable and predictable.</li>
+          <li><strong>Give it 2&ndash;3 weeks before judging it.</strong> Appetite effects settle in the first week or two; the fat-loss effect is a multi-week read, not a daily one.</li>
+          <li><strong>Tier up if the weight stalls</strong> and the appetite effect has clearly faded: <strong>1.5 mg (15u)</strong>, hold two weeks, then <strong>2 mg (20u)</strong> if you still want more. One step at a time &mdash; never jump.</li>
+          <li><strong>Tier down if it is costing you food:</strong> <strong>0.75 mg (7.5u)</strong> or <strong>0.5 mg (5u)</strong>. Nausea, reflux or genuine food aversion means the dose is too high for you, not that the drug is wrong. A dose you take every week beats a dose you skip.</li>
+          <li><strong>Protect the protein.</strong> You eat like a bodybuilder and that is exactly what should carry you through a 29 lb cut with your muscle intact. If Reta ever starts eating into your protein intake, <strong>that is the signal to come down</strong> &mdash; the appetite suppression is a side effect here, not the goal.</li>
+          <li><strong>Hydrate and keep fiber up.</strong> Slowed gastric emptying plus a deficit is the standard recipe for constipation on this class of compound. Water and fiber solve most of it before it starts.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">The Evening Shot</div>
+        <div class="tip-title">Where Tesamorelin Gets Paid</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>Food blunts it, and there is no way around that.</strong> Tesamorelin needs <strong>2+ hours clear of your last meal</strong>. If dinner ran late, <strong>skip that night</strong> rather than dosing it &mdash; a skipped dose costs you nothing, a blunted one is just a wasted vial.</li>
+          <li><strong>Then go to bed.</strong> It amplifies your overnight GH pulse, so getting into bed 30&ndash;60 minutes after the shot is what converts it into the result you want.</li>
+          <li><strong>Sleep at 3/5 is the constraint here.</strong> This compound and HGH both do their work in deep sleep. Anything that improves sleep quality &mdash; a consistent bedtime, a dark cool room, cutting caffeine earlier &mdash; makes both of them work better without costing you anything.</li>
+          <li><strong>Watch for water retention or hand/wrist tingling</strong> in the first few weeks. Mild is common with GH-axis compounds and usually settles. If it does not settle, or it gets worse, tell Micah &mdash; the answer is a dose adjustment, not toughing it out.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">NAD+</div>
+        <div class="tip-title">Push It Slowly &mdash; And It&apos;s Adjustable</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>This is the one you&apos;ll feel.</strong> NAD+ commonly causes flushing, a warm wave, or chest / gut pressure going in. It is <strong>dose- and speed-dependent, not dangerous</strong>.</li>
+          <li><strong>Thirty to sixty seconds on the plunger</strong> is the single biggest thing that keeps it comfortable. You are an experienced injector, so the instinct to push at a normal pace is exactly the instinct to override here.</li>
+          <li><strong>50 mg (25u) is a starting dose, not a fixed one.</strong> If it is comfortable after a couple of weeks you can step to 75 mg (<strong>37.5u</strong>). If 25u is rough, drop to <strong>12.5u</strong> for a few doses and build back up. Tell Micah either way.</li>
+          <li><strong>Hydrate.</strong> It goes down noticeably easier when you are well hydrated &mdash; and hydration matters more than usual on a stack with a GLP-1 in it.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Food, Alcohol &amp; Recovery</div>
+        <div class="tip-title">The Half This Page Can&apos;t Do For You</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>Keep the protein high &mdash; this is your biggest asset.</strong> You already eat this way. Aim for roughly <strong>0.8&ndash;1 g per pound of goal weight (about 145&ndash;180 g)</strong> and hold it there the whole way down. On a 29 lb cut, protein is what decides whether the weight you lose is fat or muscle.</li>
+          <li><strong>A moderate deficit beats an aggressive one here.</strong> With Retatrutide suppressing appetite, under-eating is easier than you would expect. <strong>1&ndash;1.5 lb a week</strong> is the pace that keeps the loss lean; faster than 2 lb a week and you are giving back muscle you spent decades building.</li>
+          <li><strong>Alcohol is the piece worth being straight about.</strong> You reported drinking daily, and it works against several things on this page at once: it <strong>flattens the overnight GH pulse</strong> that Tesamorelin and HGH are both aimed at, it <strong>blunts fat oxidation</strong> for hours after, it adds calories that do not register as food, and it <strong>puts load on the liver</strong> alongside a six-compound stack. This is not a lecture and nobody is asking for zero &mdash; but <strong>every drink you take out is progress you get back</strong>, and the highest-value ones to cut are the ones on Tesamorelin nights. If you want a single concrete change: make <strong>Sunday through Thursday dry</strong> and keep the drinking to the weekend, when you are off protocol anyway. Worth raising with your TRT provider too, since alcohol and hormone therapy share liver pathways.</li>
+          <li><strong>Sleep at 3/5 is the other lever.</strong> Two of your six compounds do their work during deep sleep. You cannot buy that back with a peptide &mdash; and alcohol in the evening is one of the most reliable ways to wreck sleep architecture even when it makes you fall asleep faster.</li>
+          <li><strong>Stress at 2/5 is genuinely a good starting point.</strong> Nothing to fix here &mdash; just worth naming that it is one fewer thing working against you.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Timeline</div>
+        <div class="tip-title">What To Expect, Roughly</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>Weeks 1&ndash;2 &mdash; settling in.</strong> Retatrutide&apos;s appetite effect shows up first; some mild GI adjustment is normal and usually fades. NAD+ will be the one you feel going in. Expect a couple of pounds of quick change that is mostly water. <strong>Take your baseline waist measurement and photo before day one.</strong></li>
+          <li><strong>Weeks 3&ndash;4 &mdash; the deficit gets real.</strong> Appetite control is steady by now and the scale should be moving at <strong>1&ndash;1.5 lb a week</strong>. MOTS-C and NAD+ tend to land here as steadier energy through the day rather than a hit. If the scale is flat by end of week 3, this is the point to consider stepping Reta to 1.5 mg.</li>
+          <li><strong>Weeks 5&ndash;8 &mdash; the waist starts to answer.</strong> This is where Tesamorelin&apos;s visceral effect becomes measurable &mdash; the tape usually moves later than the scale, and often faster than the scale once it starts. Expect somewhere around <strong>8&ndash;14 lb down</strong> and the first honest half-inch or inch off the waist. Tesamorelin and MOTS-C finish out around week 8.</li>
+          <li><strong>Weeks 9&ndash;12 &mdash; reassess with Micah.</strong> HGH continues; everything else is a decision. Look at the tape, the scale and the photo together and decide whether Tesamorelin gets reordered &mdash; on a 43&Prime; &rarr; 41&Prime; goal there is a strong case that it does.</li>
+          <li><strong>Months 3&ndash;12 &mdash; HGH&apos;s window.</strong> This is the compound whose payoff is measured in months. Body composition, recovery, skin and connective tissue all shift slowly on it. <strong>180 lb is realistically a 5&ndash;7 month project at a sane pace</strong>, and your HGH supply comfortably outlasts that.</li>
+          <li><strong>Anything that doesn&apos;t settle</strong> &mdash; persistent water retention or numbness in the hands, GI symptoms that worsen rather than ease, or anything that simply feels wrong &mdash; stop that compound and text Micah.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Your Profile</div>
+        <div class="tip-title">What We Built Around</div>
+      </summary>
+      <div class="tip-body">
+        <div class="note-list">
+          <div class="nr"><div class="nr-l">Client</div><div class="nr-v">Charles Lanman &middot; 57 &middot; Male &middot; <strong>209 lb &rarr; goal 180 lb</strong></div></div>
+          <div class="nr"><div class="nr-l">Stated goal</div><div class="nr-v"><strong>Waist at the belly button from 43&Prime; to 41&Prime;</strong>, and leaning out from 209 to 180. A circumference target, not just a scale target &mdash; which is why visceral fat is treated as its own problem in this stack.</div></div>
+          <div class="nr"><div class="nr-l">Goals</div><div class="nr-v"><strong>Fat loss</strong> (primary) and <strong>cognitive</strong>. Four compounds serve the first, two serve the second.</div></div>
+          <div class="nr"><div class="nr-l">Hormone therapy</div><div class="nr-v"><strong>On TRT &mdash; testosterone pellets, every 4 months.</strong> This continues unchanged. It is a genuine advantage here: an established androgen floor protects lean mass through a deficit, and it stacks cleanly with the GH-axis compounds in this protocol rather than conflicting with them. Keep your TRT provider in the loop about anything you add.</div></div>
+          <div class="nr"><div class="nr-l">Training &amp; diet</div><div class="nr-v"><strong>High-protein, bodybuilder-style eating and training.</strong> The most useful thing on this list &mdash; it is what will keep the 29 lb coming off as fat rather than muscle. Do not change it; the only adjustment is total calories.</div></div>
+          <div class="nr"><div class="nr-l">Injection experience</div><div class="nr-v"><strong>Experienced injector.</strong> No onboarding needed &mdash; the only new habits here are the slow NAD+ push and keeping five different draw marks straight.</div></div>
+          <div class="nr"><div class="nr-l">Sleep &amp; stress</div><div class="nr-v"><strong>Sleep 3/5</strong>, <strong>stress 2/5</strong>. Low stress is working for you. Sleep is the piece with room in it &mdash; two of your compounds do their work in deep sleep, so improving it improves the protocol at no extra cost.</div></div>
+          <div class="nr"><div class="nr-l">Alcohol</div><div class="nr-v"><strong>Daily.</strong> Reported honestly and worth treating as a real variable rather than a footnote: it works against the GH-axis compounds, fat oxidation and the calorie deficit all at once, and it adds liver load alongside a six-compound stack and TRT. <strong>Reducing it is the single highest-leverage change available to you</strong> and it costs nothing. See the food and recovery card above for the practical version.</div></div>
+          <div class="nr"><div class="nr-l">Allergies</div><div class="nr-v"><strong>None reported.</strong></div></div>
+          <div class="nr fine"><div class="nr-l">Note</div><div class="nr-v">Nothing here is a prescription and none of it replaces a conversation with your own provider &mdash; particularly the one managing your TRT. If anything on this page changes &mdash; a new medication, an injury, a diagnosis, a change to your pellets &mdash; tell Micah before the next dose.</div></div>
+        </div>
+      </div>
+    </details>
+
+  </div><!-- /notes -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before use.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div>
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(btn.scrollIntoView){btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}
+}
+
+// ===== INFO-TIP TAP/CLICK TOGGLE — fixes iOS Safari tap not showing tooltips =====
+// Tap the ? once to open; tap again (or anywhere else) to close. Stops propagation so the
+// click doesn't toggle anything underneath. Capture phase so we run first.
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  // Close every open tooltip that's not the one being clicked
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if (t !== tip) t.classList.remove('is-open');
+  });
+  if (tip){
+    e.preventDefault();
+    e.stopPropagation();
+    tip.classList.toggle('is-open');
+  }
+}, true);
+
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Week 1 Monday first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-clanman@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  for(var w=1;w<=12;w++){
+    for(var d=0;d<5;d++){
+      var date=addDays(week1Mon,(w-1)*7+d);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var lines=[];
+      var shots=0;
+      /* AM: HGH + MOTS-C every weekday; Reta + NAD+ on Mon/Wed/Fri. MOTS-C is 2 vials = ~8 weeks. */
+      var am='AM (fasted): HGH 17u (2 iu)';
+      shots++;
+      if(w<=8){am+=' + MOTS-C 15u (2 mg)';shots++;}
+      if(dow===1||dow===3||dow===5){
+        am+=' + Retatrutide 10u (1 mg) - tier up/down per protocol';shots++;
+        am+=' + NAD+ 25u (50 mg) - push slowly, 30-60 sec';shots++;
+      }
+      lines.push(am);
+      /* Tesamorelin is 4 vials at 20u - 40 doses, about 8 weeks. */
+      if(w<=8){
+        lines.push('PM (fasted, 2+ hrs after food, 30-60 min before bed): Tesamorelin 20u (2 mg)');
+        shots++;
+      }else{
+        lines.push('PM: Tesamorelin supply finished around week 8 - check in with Micah about reordering.');
+      }
+      lines.push('Optional: N-Acetyl Semax Amidate 10u (1 mg) in the AM if you want the focus today.');
+      var title='BLS · Charles · W'+w+' '+dayNames[dow]+' · '+shots+' shot'+(shots>1?'s':'');
+      var desc='Charles - Fat Loss & Cognition Stack · Week '+w+'\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'W'+w+'D'+d);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Charles Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Charles Protocol','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='Charles-BioLinked-Protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+</script>
+<!-- PWA install banner + service worker -->
+<style>
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner.show{display:flex;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
+.bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.bl-pwa-install{background:#7A6530;color:#fff;}
+.bl-pwa-install:hover{background:#5f4f26;}
+.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
+.bl-pwa-dismiss:hover{color:#1a1a1a;}
+@media print{.bl-pwa-banner{display:none !important;}}
+</style>
+<div class="bl-pwa-banner" id="bl-pwa-banner">
+  <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
+  <div class="bl-pwa-banner-actions">
+    <button class="bl-pwa-banner-btn bl-pwa-install" id="bl-pwa-install-btn" style="display:none">Install</button>
+    <button class="bl-pwa-banner-btn bl-pwa-dismiss" id="bl-pwa-dismiss-btn">Not now</button>
+  </div>
+</div>
+<script>
+(function(){
+  if ('serviceWorker' in navigator) {
+    let hadController_ = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController_) window.location.reload(); });
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register('/clanman/sw.js').catch(()=>{});
+    });
+  }
+  var DISMISS_KEY = 'bl-pwa-dismiss-clanman';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  function show(){
+    if (isIOS) {
+      textEl.innerHTML = '<strong>Charles, save this protocol as an app:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    } else if (isAndroid) {
+      textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access on your home screen.';
+    } else {
+      textEl.innerHTML = '<strong>Tip:</strong> install this protocol as an app on your phone for quick access. Open this page in mobile Safari or Chrome.';
+    }
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){
+    banner.classList.remove('show');
+    localStorage.setItem(DISMISS_KEY, '1');
+  });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') {
+      banner.classList.remove('show');
+      localStorage.setItem(DISMISS_KEY, '1');
+    }
+  });
+  if (isIOS || isAndroid) {
+    setTimeout(show, 1500);
+  }
+})();
+</script>
+</body>
+</html>
