@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'mnevermann-v16';
+const CACHE = 'mnevermann-v17';
 const ASSETS = [
   '/mnevermann/',
   '/mnevermann/index.html',
