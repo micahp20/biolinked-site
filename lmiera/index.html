@@ -1497,6 +1497,29 @@ body{padding:34px 20px;}
   .line-items{grid-template-columns:1fr;}
   .fld-v{text-align:right;}
 }
+
+/* ===== Tooltip + mobile normalisation =========================================
+   Appended last, deliberately: these pages carry several generations of stacked
+   CSS from earlier rebuilds (five separate max-width:640px blocks, body padding
+   declared three times), so the current-standard values only reliably win from
+   the end of the cascade. Values below match mpauldino exactly. */
+.info-tip-text{max-width:calc(100vw - 28px);box-sizing:border-box;}
+@media(max-width:640px){
+  body{padding:0 0 8px;font-size:15px;}
+  .invoice-wrap{width:100%;border-left:none;border-right:none;border-radius:0;}
+  .tab-content{padding:16px 12px 26px;}
+  .inv-header{flex-direction:column;gap:12px;padding:18px 16px;}
+  .line-items,.supplies-wrap,.cmp-list{grid-template-columns:1fr;}
+  .cmp-row-name{padding:12px 15px;}
+  .cmp-fields,.cmp-note{padding-left:15px;padding-right:15px;}
+  /* anchored bubbles span their host row, so the viewport clamp must not shrink them */
+  .lab-row .info-tip-text,.cmp-row-name .info-tip-text,.nr .info-tip-text,
+  .tip-body li .info-tip-text,.lab-score-breakdown .info-tip-text{max-width:none;}
+}
+@media(max-width:360px){
+  .tab-content{padding:14px 10px 22px;}
+  .info-tip-text{font-size:11px;padding:9px 11px;}
+}
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
   <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
@@ -1560,6 +1583,24 @@ document.addEventListener('DOMContentLoaded', function(){
     });
   });
 });
+</script>
+
+<script>
+// ===== INFO-TIP TAP/CLICK TOGGLE =====
+// These pages shipped with the .is-open styling but no handler to apply it, so on
+// touch devices — where there is no :hover — tapping a "?" did nothing and the
+// bubble never populated. Capture phase so we run before anything underneath.
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if (t !== tip) t.classList.remove('is-open');
+  });
+  if (tip){
+    e.preventDefault();
+    e.stopPropagation();
+    tip.classList.toggle('is-open');
+  }
+}, true);
 </script>
 </body>
 </html>
