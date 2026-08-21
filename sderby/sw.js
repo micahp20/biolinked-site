@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'sderby-v4';
+const CACHE = 'sderby-v5';
 const ASSETS = [
   '/sderby/',
   '/sderby/index.html',

@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'tkretzer-v4';
+const CACHE = 'tkretzer-v5';
 const ASSETS = [
   '/tkretzer/',
   '/tkretzer/index.html',
