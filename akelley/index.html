@@ -424,8 +424,8 @@ details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;
 
 /* ===== Invoice order fold — collapsible, default collapsed ===== */
 details.order-fold{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
-details.order-fold > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:40px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-details.order-fold > summary::-webkit-details-marker{display:none;}
+details.order-fold > summary,details.paid-archive > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:40px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+details.order-fold > summary::-webkit-details-marker,details.paid-archive > summary::-webkit-details-marker{display:none;}
 details.order-fold > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:18px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;}
 details[open].order-fold > summary::after{content:'\2212';background:var(--accent-dim);}
 details.order-fold > summary:hover::after{border-color:var(--accent);}
@@ -434,9 +434,19 @@ details[open].order-fold > summary{margin-bottom:16px;padding-bottom:14px;border
 .of-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
 .of-sub{display:block;font-size:11.5px;font-weight:500;color:var(--muted);margin-top:3px;line-height:1.5;}
 .of-status{font-size:8.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-border);white-space:nowrap;flex-shrink:0;}
-details.order-fold .totals-block{border:none;box-shadow:none;padding:0;margin-bottom:0;background:transparent;}
-@media print{details.order-fold{box-shadow:none;break-inside:avoid;}details.order-fold > summary::after{display:none;}}
-@media(max-width:640px){details.order-fold{padding:14px 15px;}}
+details.order-fold .totals-block,details.paid-archive .totals-block{border:none;box-shadow:none;padding:0;margin-bottom:0;background:transparent;}
+/* Paid fold — green variant, matching the mjirikils / ngillan paid-archive convention. */
+details.paid-archive{background:rgba(58,122,90,0.05);border:1px solid rgba(58,122,90,0.32);border-left:3px solid var(--green-text);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+details.paid-archive[open]{background:#fbfcfb;}
+details.paid-archive > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid rgba(58,122,90,0.40);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--green-text);font-size:18px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;}
+details[open].paid-archive > summary::after{content:'\2212';background:rgba(58,122,90,0.10);}
+details.paid-archive > summary:hover::after{border-color:var(--green-text);}
+details[open].paid-archive > summary{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(58,122,90,0.32);}
+details.paid-archive .of-title{color:#0e3a1e;}
+details.paid-archive .of-sub{color:#3a6b52;}
+.pa-pill{font-size:9.5px;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:#fff;background:var(--green-text);padding:4px 10px;border-radius:99px;flex-shrink:0;white-space:nowrap;}
+@media print{details.order-fold,details.paid-archive{box-shadow:none;break-inside:avoid;}details.order-fold > summary::after,details.paid-archive > summary::after{display:none;}}
+@media(max-width:640px){details.order-fold,details.paid-archive{padding:14px 15px;}}
 
 /* Domain grade chip on the bloodwork score breakdown */
 .lab-score-grade-chip{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:19px;padding:0 6px;border-radius:99px;background:rgba(0,0,0,0.05);border:1px solid var(--line);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:0.04em;flex:none;}
@@ -865,22 +875,22 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
     <div class="sec-divider">
       <div class="sec-divider-eyebrow">Invoice &middot; BLS-AK-0822</div>
-      <div class="sec-divider-title">Four Cycles &middot; All Outstanding</div>
+      <div class="sec-divider-title">Four Cycles &middot; Cycle 1 Settled</div>
     </div>
 
-    <details class="order-fold">
+    <details class="paid-archive">
       <summary>
-        <span class="of-status">Due &middot; $230.00</span>
+        <span class="pa-pill">&#10004; Paid</span>
         <span class="of-head">
           <span class="of-title">Cycle 1 &middot; Muscle Building + Fat Loss</span>
-          <span class="of-sub">Weeks 1&ndash;8 &middot; Retatrutide + CJC-1295/Ipamorelin + MOTS-c &middot; 4 vials &middot; tap to view</span>
+          <span class="of-sub">Weeks 1&ndash;8 &middot; Retatrutide + CJC-1295/Ipamorelin + MOTS-c &middot; 4 vials &middot; $230.00 paid in full &middot; tap to view</span>
         </span>
       </summary>
       <div class="totals-block">
         <div class="total-row"><span class="tr-name"><strong>Retatrutide</strong> 30 mg &times; 1 vial @ $80<span class="sub">Triple agonist &mdash; once weekly, Monday AM fasted, 1 &rarr; 2 mg</span></span><span class="tr-val">$80.00</span></div>
         <div class="total-row"><span class="tr-name"><strong>CJC-1295 / Ipamorelin</strong> 5 mg + 5 mg &times; 2 vials @ $45<span class="sub">GH axis &mdash; lean tissue &amp; recovery, Mon&ndash;Fri PM fasted</span></span><span class="tr-val">$90.00</span></div>
         <div class="total-row"><span class="tr-name"><strong>MOTS-c</strong> 40 mg &times; 1 vial @ $60<span class="sub">Mitochondrial energy &amp; fat oxidation &mdash; Mon&ndash;Fri AM fasted</span></span><span class="tr-val">$60.00</span></div>
-        <div class="total-row grand"><span class="tr-name">Cycle 1 Total</span><span class="tr-val">$230.00</span></div>
+        <div class="total-row grand"><span class="tr-name">Cycle 1 Total &middot; Paid in Full</span><span class="tr-val" style="color:var(--green-text);">$230.00</span></div>
       </div>
     </details>
 
@@ -935,18 +945,18 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </details>
 
     <div class="totals-block">
-      <div class="total-row"><span class="tr-name">Cycle 1 &middot; Muscle Building + Fat Loss<span class="sub">Weeks 1&ndash;8</span></span><span class="tr-val">$230.00</span></div>
+      <div class="total-row"><span class="tr-name">Cycle 1 &middot; Muscle Building + Fat Loss<span class="sub">Weeks 1&ndash;8 &middot; &#10004; Paid in full</span></span><span class="tr-val">$230.00</span></div>
       <div class="total-row"><span class="tr-name">Cycle 2 &middot; Cognitive Enhancement<span class="sub">Weeks 9&ndash;16</span></span><span class="tr-val">$300.00</span></div>
       <div class="total-row"><span class="tr-name">Cycle 3 &middot; Sleep &amp; Stress<span class="sub">Weeks 17&ndash;24</span></span><span class="tr-val">$245.00</span></div>
       <div class="total-row"><span class="tr-name">Cycle 4 &middot; Hormonal Balance<span class="sub">Weeks 25&ndash;32</span></span><span class="tr-val">$245.00</span></div>
       <div class="total-row"><span class="tr-name">Account Total</span><span class="tr-val">$1,020.00</span></div>
-      <div class="total-row"><span class="tr-name">Paid to Date</span><span class="tr-val">$0.00</span></div>
-      <div class="total-row grand"><span class="tr-name">Balance Due</span><span class="tr-val">$1,020.00</span></div>
+      <div class="total-row"><span class="tr-name">Paid to Date</span><span class="tr-val" style="color:var(--green-text);">&minus;$230.00</span></div>
+      <div class="total-row grand"><span class="tr-name">Balance Due</span><span class="tr-val">$790.00</span></div>
     </div>
 
     <div class="chart-note">
       <span class="nl">Where this stands</span>
-      <p><strong>All four cycles are quoted and none is paid.</strong> They are billed separately because they ship and run separately, eight weeks apart. <strong>Cycle 1 is $230 and is the only one you need to settle to begin</strong> &mdash; each later cycle is its own decision at its own time, and nothing is owed on a cycle you have not started.</p>
+      <p><strong>Cycle 1 is paid in full &mdash; $230.00 settled.</strong> Cycles 2, 3 and 4 are quoted and outstanding, leaving a balance of <strong>$790.00</strong>. They are billed separately because they ship and run separately, eight weeks apart, so <strong>each later cycle is its own decision at its own time</strong> and nothing is owed on a cycle you have not started.</p>
     </div>
 
     <div class="payment-block">
