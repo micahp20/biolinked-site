@@ -9,7 +9,6 @@
   const links = [
     {href:'/index.html', label:'Home'},
     {href:'/peptide-index.html', label:'Index'},
-    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
     {href:'/stacks-blends.html', label:'Stacks & Blends'},
   ];
 
