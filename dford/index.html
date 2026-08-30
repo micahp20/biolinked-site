@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Your BioLinked Protocol</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BioLinked Solutions">
+<meta property="og:title" content="Your BioLinked Protocol">
+<meta property="og:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta property="og:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BioLinked — Peptide Solutions">
+<meta property="og:url" content="https://biolinkedsolutions.com/dford/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your BioLinked Protocol">
+<meta name="twitter:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta name="twitter:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
+<!-- PWA — installable home-screen app -->
+<link rel="manifest" href="/dford/manifest.json">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deri">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fbf7ec">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+/* ===== Original BioLinked palette — gold accent on white / light gray ===== */
+:root{
+  --bg:#f5f5f5;
+  --bg-alt:#f5f5f5;
+  --head:#fafafa;
+  --surface:#ffffff;
+  --line:rgba(0,0,0,0.14);
+  --line-soft:#f0f0f0;
+  --zebra:#fafafa;
+  --hover:rgba(122,101,48,0.04);
+  --text:#000000;
+  --muted:#4a4a44;
+  --accent:#7A6530;
+  --accent-2:#8F7940;
+  --accent-hover:#5f4f26;
+  --accent-dim:rgba(122,101,48,0.10);
+  --accent-line:rgba(122,101,48,0.35);
+  --on-accent:#ffffff;
+  /* Tooltip tokens — the .info-tip-text rules below reference these. Without
+     them the custom properties are invalid at computed-value time, so the
+     bubble's background falls back to transparent and its text inherits the
+     open icon's white --on-accent: white-on-white, i.e. invisible. */
+  --tip-bg:#1a1a1a;
+  --tip-border:transparent;
+  --tip-text:#ffffff;
+  --tip-strong:#e9c66c;
+  --green:#3a7a5a;--green-soft:rgba(90,138,90,0.12);--green-text:#2f7a4a;--green-border:transparent;
+  --amber:#b97a1f;--amber-soft:rgba(185,122,31,0.12);--amber-border:rgba(185,122,31,0.40);
+  --red:#b85555;--red-soft:rgba(194,85,85,0.14);--red-border:transparent;--red-text:#8a3c3c;
+  --info:#3a6b8e;--info-soft:rgba(66,120,168,0.14);--info-border:transparent;--info-text:#2a5780;
+  --shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:34px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;-webkit-text-size-adjust:100%;}
+
+/* ===== Chart shell ===== */
+.invoice-wrap{position:relative;z-index:1;width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05),0 6px 22px rgba(0,0,0,0.06);overflow:hidden;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--accent-line);padding:26px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}
+.inv-brand-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:9.5px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:var(--accent);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-size:21px;font-weight:700;color:var(--text);margin-top:3px;letter-spacing:0.01em;}
+.inv-date{font-size:12px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.5;}
+
+.tab-bar{display:flex;background:#fafafa;border-bottom:1px solid var(--line);padding:0;position:sticky;top:0;z-index:50;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:1 0 auto;white-space:nowrap;background:transparent;border:none;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;}
+.tab-btn:hover{color:var(--text);background:var(--hover);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface);}
+.tab-content{display:none;}
+.inv-body{background:var(--bg-alt);padding:26px 26px 34px;}
+.tab-content.active{display:block;}
+
+/* ===== Intro block ===== */
+.program-intro{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
+.program-title{font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--accent);font-weight:700;}
+.program-tag{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+
+/* ===== Section rules ===== */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--accent-line);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);}
+.sec-divider-title{font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* ===== Label → value rows ===== */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:126px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--line-soft);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.65;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);line-height:1.7;}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* ===== Compound cards — plain, non-collapsible ===== */
+.cmp-group{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:12px;}
+.cmp-group::after{content:'';flex:1;height:1px;background:var(--line);}
+.cmp-group.mt{margin-top:18px;}
+.cmp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:6px;align-items:start;}
+.cmp-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;padding:0;overflow:visible;position:relative;}
+.cmp-row-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 16px;border-bottom:1px solid var(--line);background:var(--head);border-radius:8px 8px 0 0;line-height:1.3;letter-spacing:0.005em;}
+.cmp-badge{display:inline-block;background:var(--accent);color:var(--on-accent);font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;vertical-align:middle;white-space:nowrap;}
+.cmp-fields{display:flex;flex-direction:column;padding:2px 16px 10px;}
+.fld{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.fld:last-child{border-bottom:none;}
+.fld-l{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.fld-v{font-size:13px;font-weight:600;color:var(--text);text-align:right;font-variant-numeric:tabular-nums;min-width:0;}
+.fld.dose{border-top:1px solid var(--line-soft);}
+.fld.dose .fld-v{font-size:17px;font-weight:700;color:var(--accent);white-space:nowrap;}
+.cmp-note{padding:0 16px 14px;font-size:12.5px;line-height:1.7;color:var(--muted);}
+.cmp-note strong{color:var(--text);font-weight:700;}
+.cmp-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Data tables ===== */
+.data-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
+.data-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:460px;}
+.data-table thead th{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);padding:12px 14px 9px;text-align:left;background:var(--head);border-bottom:1px solid var(--line);white-space:nowrap;}
+.data-table thead th.right{text-align:right;}
+.data-table tbody td{padding:11px 14px;border-bottom:1px solid var(--line-soft);vertical-align:middle;color:var(--text);}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.data-table tbody tr:nth-child(even) td{background:var(--zebra);}
+.data-table td.cmp{font-weight:700;white-space:nowrap;}
+.data-table td.cmp .sub{color:var(--muted);font-weight:400;font-size:11px;display:block;margin-top:2px;}
+.data-table td.num{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px;}
+
+/* ===== Chart note ===== */
+.chart-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:20px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Totals / payment ===== */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;font-size:13.5px;padding:10px 0;border-bottom:1px solid var(--line-soft);}
+.total-row:last-child{border-bottom:none;}
+.total-row .tr-name strong{font-weight:700;}
+.total-row .tr-name .sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;}
+.total-row .tr-val{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.total-row.grand{border-top:2px solid var(--accent-line);border-bottom:none;margin-top:6px;padding-top:14px;font-size:16px;font-weight:700;}
+.total-row.grand .tr-val{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;color:var(--accent);line-height:1;}
+.payment-block{border-left:3px solid var(--accent);}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;padding:7px 0;}
+.payment-icon{font-size:19px;width:26px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:13.5px;color:var(--text);font-weight:500;line-height:1.55;}
+.payment-handle{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:var(--accent);line-height:1.2;}
+
+/* ===== Schedule ===== */
+.sched-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:var(--head);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.sched-card-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:0.005em;}
+.sched-phase-pill{background:var(--accent);color:var(--on-accent);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:4px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table{width:100%;border-collapse:collapse;min-width:460px;font-size:12px;}
+.sched-table th{text-align:left;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:11px 12px;border-bottom:1px solid var(--line);background:var(--zebra);white-space:nowrap;}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line-soft);}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);font-size:12.5px;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;margin:1px 3px 2px 0;border:1px solid var(--accent-line);background:var(--accent-dim);color:var(--accent);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.pm{background:rgba(58,122,90,0.14);border-color:rgba(58,122,90,0.34);color:#3a7a5a;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--line);color:#999;font-weight:400;}
+.sched-count{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;border-radius:99px;background:var(--accent-dim);border:1px solid var(--accent-line);font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;}
+.sched-count.off{color:#bbb;background:rgba(0,0,0,0.03);border-color:var(--line);}
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03)),#ffffff;border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:8px;box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:5px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:5px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-dl-btn:hover{background:#345d85;}
+
+/* ===== Note / tip cards ===== */
+.tip-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:12px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--accent);}
+.tip-head{padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
+.tip-title{font-size:16px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:6px 18px 14px;font-size:13.5px;line-height:1.7;color:var(--text);font-weight:400;}
+.tip-body strong{font-weight:700;}
+
+/* Collapsible tip cards — same +/- summary convention as the invoice fold. */
+details.tip-card > summary.tip-head{
+  cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;
+  padding:13px 46px 13px 18px;min-height:56px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+details.tip-card > summary.tip-head::-webkit-details-marker{display:none;}
+details.tip-card > summary.tip-head::after{
+  content:'+';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;
+}
+details[open].tip-card > summary.tip-head::after{content:'\2212';background:var(--accent-dim);}
+details.tip-card > summary.tip-head:hover::after{border-color:var(--accent);}
+details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;}
+@media print{details.tip-card > summary.tip-head::after{display:none;}}
+@media(max-width:640px){details.tip-card > summary.tip-head{padding:13px 44px 13px 15px;}}
+.tip-list{list-style:none;margin:0;padding:0;}
+.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--line-soft);overflow-wrap:break-word;margin:0;}
+.tip-list li:last-child{border-bottom:none;}
+.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+
+/* ===== Supplies ===== */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:20px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:stretch;padding:0;}
+.supply-info-name{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--head);border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;line-height:1.3;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-info-desc strong{color:var(--text);font-weight:700;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;background:var(--accent);color:var(--on-accent);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:5px;text-decoration:none;white-space:nowrap;}
+.supply-link:hover{background:var(--accent-hover);}
+.storage-card{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;}
+.storage-title{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.storage-body{padding:6px 18px 12px;}
+
+/* ===== Footer ===== */
+.inv-footer{background:var(--head);border-top:1px solid var(--line);padding:16px 34px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.footer-disc{font-size:10px;color:var(--muted);font-weight:500;line-height:1.55;flex:1;min-width:240px;}
+.footer-brand{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
+.print-btn{position:relative;z-index:1;display:block;width:75%;max-width:1200px;margin:18px auto 56px;padding:15px;background:var(--accent);color:var(--on-accent);border:none;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;box-shadow:var(--shadow);}
+.print-btn:hover{background:var(--accent-hover);}
+
+@media print{
+  body{background:#fff;padding:0;}
+  .invoice-wrap{border:none;width:100%;max-width:100%;box-shadow:none;}
+  .print-btn,.tab-bar{display:none;}
+  .tab-content{display:block !important;}
+  .inv-body{background:#fff;padding:0;}
+  .cmp-row,.sched-card,.data-card,.tip-card,.supply-row,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:92%;}}
+@media(max-width:820px){
+  .invoice-wrap,.print-btn{width:96%;}
+  body{padding:20px 8px;}
+  .inv-header{padding:20px 20px;}
+  .inv-body{padding:22px 18px 28px;}
+  .inv-footer{padding:14px 20px;}
+}
+@media(max-width:640px){
+  .invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}
+  .print-btn{border-radius:6px;width:calc(100% - 24px);}
+  body{padding:0 0 8px;font-size:15px;}
+  .inv-header{flex-direction:column;gap:12px;padding:18px 16px;}
+  .inv-meta{text-align:left;}
+  .inv-brand-name{font-size:25px;}
+  .inv-body{padding:16px 12px 26px;}
+  .inv-footer{flex-direction:column;align-items:flex-start;padding:14px 16px;}
+  .program-title{font-size:22px;}
+  .program-intro{padding:16px 15px;}
+  .sec-divider-title{font-size:17px;}
+  .cmp-list,.supplies-wrap{grid-template-columns:1fr;}
+  .cmp-row-name,.supply-info-name{padding:12px 15px;}
+  .cmp-fields,.cmp-note,.supply-info-desc{padding-left:15px;padding-right:15px;}
+  .supply-link{margin-left:15px;margin-right:15px;}
+  .sched-card-head{padding:12px 15px;}
+  .tip-head,.tip-body,.storage-title,.storage-body{padding-left:15px;padding-right:15px;}
+  .chart-note{padding:12px 14px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .total-row.grand .tr-val{font-size:25px;}
+  .fld{gap:10px;}
+  .fld-v{font-size:12.5px;}
+  .fld.dose .fld-v{font-size:16px;}
+}
+
+/* ===== Info tooltip — ? icon (mpauldino base) ===== */
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
+.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--tip-bg);color:var(--tip-text);border:1px solid var(--tip-border);padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
+.info-tip-text strong{color:var(--tip-strong);font-weight:600;}
+.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tip-bg);}
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
+@media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
+
+/* Viewport-safe tooltip anchoring inside the narrow compound cards — the
+   260px bubble would overflow a 290px card, so pin it to the header band with
+   left/right insets instead of centering it on the tiny icon.
+   .cmp-row-name MUST be the containing block. */
+.cmp-row-name{position:relative;}
+.cmp-row-name .info-tip{position:static;}
+.cmp-row-name .info-tip-text{position:absolute;bottom:auto;top:calc(100% - 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+.cmp-row-name .info-tip-text::after{top:-9px;bottom:auto;left:14px;transform:none;border:5px solid transparent;border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+/* Open bubble must paint above later sibling cards, which are position:relative. */
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{z-index:400;}
+
+/* ===== Invoice order fold — collapsible, default collapsed ===== */
+details.order-fold{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+details.order-fold > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:40px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+details.order-fold > summary::-webkit-details-marker{display:none;}
+details.order-fold > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:18px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;}
+details[open].order-fold > summary::after{content:'\2212';background:var(--accent-dim);}
+details.order-fold > summary:hover::after{border-color:var(--accent);}
+details[open].order-fold > summary{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--accent-line);}
+.of-head{flex:1;min-width:0;}
+.of-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.of-sub{display:block;font-size:11.5px;font-weight:500;color:var(--muted);margin-top:3px;line-height:1.5;}
+.of-status{font-size:8.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-border);white-space:nowrap;flex-shrink:0;}
+details.order-fold .totals-block{border:none;box-shadow:none;padding:0;margin-bottom:0;background:transparent;}
+@media print{details.order-fold{box-shadow:none;break-inside:avoid;}details.order-fold > summary::after{display:none;}}
+@media(max-width:640px){details.order-fold{padding:14px 15px;}}
+</style>
+<!-- BioLinked site theme - light default, dark on toggle -->
+<script>(function(){try{var t=localStorage.getItem('bl-theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
+<link rel="stylesheet" href="/bl-theme.css">
+<script src="/bl-theme.js" defer></script>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Peptide Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-link">Cheat Sheet</a>
+    </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Peptide Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    <a href="https://biolinkedsolutions.com/cheat-sheet" class="bl-nav-mobile-link">Cheat Sheet</a>
+  </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Protocol &middot; BLS-DF-0830</div>
+      <div class="inv-number">Deri Ford</div>
+      <div class="inv-date">Fat Loss &amp; Metabolic &middot; Eight Weeks</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  </div>
+
+  <div class="inv-body">
+
+  <!-- ================= PROTOCOL ================= -->
+  <div class="tab-content active" id="tab-protocol">
+
+    <div class="program-intro">
+      <div class="program-eyebrow">Personalized Protocol</div>
+      <div class="program-title">Deri&apos;s <em>Fat Loss Cycle</em></div>
+      <div class="program-tag">Eight weeks, three compounds, mornings only. Weekends off.</div>
+      <div class="program-context">
+        <div class="note-list">
+          <div class="nr"><div class="nr-l">The target</div><div class="nr-v"><strong>Fat loss with the metabolism kept switched on</strong> &mdash; appetite control from the Retatrutide, and two metabolic peptides working underneath it.</div></div>
+          <div class="nr"><div class="nr-l">How it runs</div><div class="nr-v"><strong>Monday, Wednesday and Friday mornings, fasted.</strong> Retatrutide is Monday only. <strong>Seven shots a week</strong>, every vial mixed with <strong>3 mL</strong>.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cmp-group">Goal Group &middot; Fat Loss &amp; Metabolic</div>
+    <div class="cmp-list">
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">Retatrutide &middot; 40 mg <span class="cmp-badge">Fat Loss</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A triple agonist &mdash; GLP-1, GIP and glucagon.</strong> It slows gastric emptying and quiets appetite, and the glucagon arm adds a direct push on energy expenditure and liver fat. <strong>40 mg in 3 mL is 13.33 mg/mL</strong>, so 15 units is exactly 2 mg.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Monday AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">15u &middot; 2 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Once a week</span>One shot, Monday morning. <strong>Two vials &mdash; mix the second on the Monday of Week 5.</strong></div>
+      </div>
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="cmp-badge">Metabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> NNMT builds up inside fat cells with age and acts as a brake on fat oxidation. Blocking it releases the brake and raises cellular NAD+ in the same tissue. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so 6 units is 1 mg.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">6u &middot; 1 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">A small draw</span>Six units is a short pull &mdash; go slow and read it at eye level. <strong>Two vials, second one mixed Week 5.</strong></div>
+      </div>
+
+      <div class="cmp-row">
+        <span class="cmp-row-name">MOTS-c &middot; 40 mg <span class="cmp-badge">Mitochondrial</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A mitochondrial-derived peptide.</strong> It activates AMPK &mdash; the cell&apos;s low-fuel switch &mdash; which pushes glucose uptake and fat oxidation in muscle and improves insulin sensitivity. <strong>40 mg in 3 mL is 13.33 mg/mL</strong>, so 7.5 units is 1 mg.</span></span></span>
+        <div class="cmp-fields">
+          <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
+          <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted</span></div>
+          <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">7.5u &middot; 1 mg</span></div>
+        </div>
+        <div class="cmp-note"><span class="nl">Halfway between marks</span>7.5u sits between the 7 and the 8 on the barrel. <strong>Two vials, second one mixed Week 5.</strong></div>
+      </div>
+
+    </div>
+
+  </div><!-- /protocol -->
+
+  <!-- ================= INVOICE ================= -->
+  <div class="tab-content" id="tab-invoice">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Invoice &middot; BLS-DF-0830</div>
+      <div class="sec-divider-title">Fat Loss Cycle &middot; Eight Weeks</div>
+    </div>
+
+    <details class="order-fold">
+      <summary>
+        <span class="of-status">Due &middot; $400.00</span>
+        <span class="of-head">
+          <span class="of-title">Fat Loss Cycle &middot; Weeks 1&ndash;8</span>
+          <span class="of-sub">Retatrutide + 5-Amino-1MQ + MOTS-c &middot; 6 vials &middot; tap to view</span>
+        </span>
+      </summary>
+      <div class="totals-block">
+        <div class="total-row"><span class="tr-name"><strong>Retatrutide</strong> 40 mg &times; 2 vials @ $100<span class="sub">Triple agonist &mdash; Monday AM, 15u</span></span><span class="tr-val">$200.00</span></div>
+        <div class="total-row"><span class="tr-name"><strong>5-Amino-1MQ</strong> 50 mg &times; 2 vials @ $50<span class="sub">NNMT inhibitor &mdash; Mon/Wed/Fri AM, 6u</span></span><span class="tr-val">$100.00</span></div>
+        <div class="total-row"><span class="tr-name"><strong>MOTS-c</strong> 40 mg &times; 2 vials @ $50<span class="sub">Mitochondrial / AMPK &mdash; Mon/Wed/Fri AM, 7.5u</span></span><span class="tr-val">$100.00</span></div>
+        <div class="total-row grand"><span class="tr-name">Order Total</span><span class="tr-val">$400.00</span></div>
+      </div>
+    </details>
+
+    <div class="totals-block">
+      <div class="total-row"><span class="tr-name">Fat Loss Cycle<span class="sub">Weeks 1&ndash;8 &middot; 6 vials</span></span><span class="tr-val">$400.00</span></div>
+      <div class="total-row"><span class="tr-name">Account Total</span><span class="tr-val">$400.00</span></div>
+      <div class="total-row"><span class="tr-name">Paid to Date</span><span class="tr-val">$0.00</span></div>
+      <div class="total-row grand"><span class="tr-name">Balance Due</span><span class="tr-val">$400.00</span></div>
+    </div>
+
+    <div class="payment-block">
+      <div class="payment-title">How To Pay</div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128184;</div>
+        <div>
+          <div class="payment-text">Send via Venmo &mdash; note it <strong>&ldquo;Fat Loss Cycle&rdquo;</strong></div>
+          <div class="payment-handle">@micahp20</div>
+        </div>
+      </div>
+      <div class="payment-row">
+        <div class="payment-icon">&#128274;</div>
+        <div class="payment-text">Keep Venmo payment privacy set to <strong>Private</strong> &mdash; not Public or Friends.</div>
+      </div>
+    </div>
+
+  </div><!-- /invoice -->
+
+  <!-- ================= SCHEDULE ================= -->
+  <div class="tab-content" id="tab-schedule">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Weekly Schedule</div>
+      <div class="sec-divider-title">Eight Weeks &middot; Mon / Wed / Fri</div>
+    </div>
+
+    <div class="cal-banner">
+      <div class="cal-left">
+        <h4>&#128197; Put It On Your Calendar</h4>
+        <p>Pick your Week 1 Monday and download the .ics file. Every dosing day becomes an event with that day&apos;s shot list.</p>
+      </div>
+      <div class="cal-controls">
+        <input type="date" id="cycleStart">
+        <button class="cal-dl-btn" onclick="downloadICS()">&#11015; Download .ics</button>
+      </div>
+    </div>
+
+    <div class="sched-card">
+      <div class="sched-card-head">
+        <div class="sched-card-title">Every Week &middot; Weeks 1&ndash;8</div>
+        <div class="sched-phase-pill">7 Shots / Week</div>
+      </div>
+      <div class="sched-scroll"><table class="sched-table">
+        <thead><tr><th style="width:56px">Day</th><th>AM &middot; Fasted</th><th class="right">Shots</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sched-day">Mon</span></td><td><span class="sched-pill"><strong>6u</strong> &middot; 5-Amino-1MQ</span><span class="sched-pill"><strong>7.5u</strong> &middot; MOTS-c</span><span class="sched-pill"><strong>15u</strong> &middot; Retatrutide</span></td><td class="right"><span class="sched-count">3</span></td></tr>
+          <tr><td><span class="sched-day">Tue</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          <tr><td><span class="sched-day">Wed</span></td><td><span class="sched-pill"><strong>6u</strong> &middot; 5-Amino-1MQ</span><span class="sched-pill"><strong>7.5u</strong> &middot; MOTS-c</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+          <tr><td><span class="sched-day">Thu</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          <tr><td><span class="sched-day">Fri</span></td><td><span class="sched-pill"><strong>6u</strong> &middot; 5-Amino-1MQ</span><span class="sched-pill"><strong>7.5u</strong> &middot; MOTS-c</span></td><td class="right"><span class="sched-count">2</span></td></tr>
+          <tr><td><span class="sched-day">Sat</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+          <tr><td><span class="sched-day">Sun</span></td><td><span class="sched-pill off">Off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
+    <div class="data-card"><div class="data-scroll"><table class="data-table">
+      <thead><tr><th>Week</th><th>Monday Morning</th><th class="right">Shots</th></tr></thead>
+      <tbody>
+        <tr><td class="cmp">Week 1<span class="sub">start</span></td><td>Mix vial #1 of all three &mdash; 3 mL apiece</td><td class="num">7</td></tr>
+        <tr><td class="cmp">Weeks 2&ndash;4</td><td>Same three vials, straight through</td><td class="num">7</td></tr>
+        <tr><td class="cmp">Week 5<span class="sub">vial swap</span></td><td>Mix vial #2 of all three &mdash; the first set is at 30 days</td><td class="num">7</td></tr>
+        <tr><td class="cmp">Weeks 6&ndash;8<span class="sub">finish</span></td><td>Second set runs to the end of Week 8</td><td class="num">7</td></tr>
+      </tbody>
+    </table></div></div>
+
+  </div><!-- /schedule -->
+
+  <!-- ================= SUPPLIES ================= -->
+  <div class="tab-content" id="tab-supplies">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Supplies</div>
+      <div class="sec-divider-title">Have These Before Day 1</div>
+    </div>
+
+    <div class="supplies-wrap">
+      <div class="supply-row">
+        <div class="supply-info-name">Insulin Syringes &mdash; 29&ndash;31G, 1 mL, 100-pack</div>
+        <div class="supply-info-desc">Get the <strong>100-unit markings</strong> so 6u, 7.5u and 15u read straight off the barrel. You need <strong>56 syringes</strong> for the eight weeks &mdash; one 100-pack covers it.</div>
+        <a href="https://a.co/d/04JCzBqF" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Bacteriostatic Water &mdash; 30 mL</div>
+        <div class="supply-info-desc">Sterile preserved water for mixing the dry powder. You use <strong>3 mL per vial, 18 mL total</strong> &mdash; one 30 mL bottle covers the whole cycle.</div>
+        <a href="https://ebac-water.com/" target="_blank" class="supply-link">eBAC Water &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Alcohol Prep Pads &mdash; 70% IPA, 100-pack</div>
+        <div class="supply-info-desc">One for the vial top, one for the skin, every time. <strong>Let the skin dry fully before the needle goes in.</strong></div>
+        <a href="https://a.co/d/0fnbd8VV" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Sharps Container &mdash; 1 Quart, FDA-Cleared</div>
+        <div class="supply-info-desc">Drop it off free at any CVS or Walgreens when full. Never put a used syringe in household trash.</div>
+        <a href="https://a.co/d/0jhnMLPg" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+      <div class="supply-row">
+        <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+        <div class="supply-info-desc">Fridge organizer for your vials. <strong>Three mixed vials live in there at a time</strong> &mdash; label each one so the 6u and the 7.5u never get mixed up.</div>
+        <a href="https://www.amazon.com/dp/B0FH62NMF8" target="_blank" class="supply-link">Amazon &rarr;</a>
+      </div>
+    </div>
+
+    <div class="sec-divider mt">
+      <div class="sec-divider-eyebrow">Reconstitution &amp; Storage</div>
+      <div class="sec-divider-title">Mixing, Then Keeping It Cold</div>
+    </div>
+
+    <div class="storage-card">
+      <div class="storage-title">&#128167; Mixing &mdash; Two Sets Of Three</div>
+      <div class="storage-body"><div class="note-list">
+        <div class="nr"><div class="nr-l">Every vial</div><div class="nr-v"><strong>3 mL of BAC water</strong> &mdash; Retatrutide, 5-Amino-1MQ and MOTS-c all the same. Mix all three on the Monday of Week 1, and the second set on the Monday of Week 5.</div></div>
+        <div class="nr"><div class="nr-l">How</div><div class="nr-v">Wipe both stoppers with alcohol. Draw the water, then <strong>let it run slowly down the inside wall of the vial</strong> &mdash; do not squirt it onto the powder. Swirl gently until clear. <strong>Never shake.</strong></div></div>
+        <div class="nr"><div class="nr-l">Storage</div><div class="nr-v">Dry vials at 36&ndash;46&deg;F, out of light, never frozen. <strong>Mixed vials go straight back in the fridge</strong> and are finished inside 30 days. The second set stays dry in the box until Week 5.</div></div>
+        <div class="nr"><div class="nr-l">Label them</div><div class="nr-v">Write the compound and the dose on every vial you mix. <strong>All three are morning shots and they look identical once clear.</strong></div></div>
+      </div></div>
+    </div>
+
+  </div><!-- /supplies -->
+
+  <!-- ================= NOTES ================= -->
+  <div class="tab-content" id="tab-notes">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Notes &amp; Tips</div>
+      <div class="sec-divider-title">Running This Protocol</div>
+    </div>
+
+    <details class="tip-card featured">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Note 01</div>
+        <div class="tip-title">Monday Is The Big Morning</div>
+      </summary>
+      <div class="tip-body">
+        Monday carries all three shots &mdash; <strong>Retatrutide is Monday only</strong>. Wednesday and Friday are just the 5-Amino-1MQ and the MOTS-c. Three separate shots, three separate spots. <strong>Never combine them in one syringe.</strong>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Note 02</div>
+        <div class="tip-title">Injection Basics</div>
+      </summary>
+      <div class="tip-body">
+        <ul class="tip-list">
+          <li><strong>Subcutaneous &mdash; abdomen, love handle or outer thigh.</strong> Pinch the skin, 45&ndash;90&deg;, slow push. Fresh needle every time.</li>
+          <li><strong>Rotate sites</strong> so no spot takes a shot two sessions running.</li>
+          <li><strong>Read the small draws at eye level.</strong> 6u and 7.5u are short pulls &mdash; it is easy to overshoot.</li>
+          <li>A small bruise or a bead of blood is normal. <strong>Spreading redness, heat or a lump that grows is not</strong> &mdash; stop and call.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Note 03</div>
+        <div class="tip-title">If You Miss One</div>
+      </summary>
+      <div class="tip-body">
+        Skip it and carry on with the next scheduled dose. <strong>Never double up.</strong> If the Monday Retatrutide slips a day, take it Tuesday and put the following week&apos;s back on Monday &mdash; do not take two in one week.
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Note 04</div>
+        <div class="tip-title">What To Expect</div>
+      </summary>
+      <div class="tip-body">
+        Appetite usually drops on the first or second Retatrutide shot. <strong>Mild nausea in the 24&ndash;48 hours after the Monday shot is the known profile</strong> and normally settles by the second or third week. Eat protein, drink water, and do not chase the scale daily &mdash; the waist moves before the number does.
+      </div>
+    </details>
+
+    <details class="tip-card">
+      <summary class="tip-head">
+        <div class="tip-eyebrow">Note 05</div>
+        <div class="tip-title">Adjusting The Retatrutide</div>
+      </summary>
+      <div class="tip-body">
+        <strong>2 mg is the working dose for this cycle.</strong> If the nausea or food aversion is changing how you eat, <strong>drop to 1.5 mg (11u) or 1 mg (7.5u)</strong> and hold there &mdash; eight weeks at a tolerated dose beats four at an intolerable one. If appetite control has faded by Week 4 and the shot is easy, <strong>2.5 mg is 19u</strong>.
+      </div>
+    </details>
+
+  </div><!-- /notes -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">Research peptides. This protocol is personalized guidance, not medical advice, and does not replace evaluation by your physician. Discuss with a qualified provider before starting.</div>
+    <div class="footer-brand">BioLinked Solutions</div>
+  </div>
+
+</div><!-- /invoice-wrap -->
+
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab,btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('tab-'+tab).classList.add('active');
+  btn.classList.add('active');
+  if(btn.scrollIntoView){btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}
+}
+
+// ===== INFO-TIP TAP/CLICK TOGGLE — fixes iOS Safari tap not showing tooltips =====
+// Tap the ? once to open; tap again (or anywhere else) to close. Capture phase so we run first.
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if (t !== tip) t.classList.remove('is-open');
+  });
+  if (tip){
+    e.preventDefault();
+    e.stopPropagation();
+    tip.classList.toggle('is-open');
+  }
+}, true);
+
+function downloadICS(){
+  var v=document.getElementById('cycleStart').value;
+  if(!v){alert('Please pick your Week 1 Monday first.');return;}
+  var p=v.split('-');
+  var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
+  function pad(n){return n<10?'0'+n:String(n);}
+  function icsD(d){return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate());}
+  function addDays(d,n){var x=new Date(d);x.setDate(x.getDate()+n);return x;}
+  var stamp=icsD(new Date())+'T080000Z';
+  var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var evts=[];
+  function addE(d,title,desc,lbl){
+    var uid=icsD(d)+'-'+lbl+'-dford@biolinkedsolutions.com';
+    evts.push('BEGIN:VEVENT','UID:'+uid,'DTSTAMP:'+stamp,
+      'DTSTART;VALUE=DATE:'+icsD(d),'DTEND;VALUE=DATE:'+icsD(addDays(d,1)),
+      'SUMMARY:'+title,'DESCRIPTION:'+desc,
+      'BEGIN:VALARM','TRIGGER:-PT0M','ACTION:DISPLAY','DESCRIPTION:BioLinked injection','END:VALARM',
+      'END:VEVENT');
+  }
+  var startDay=start.getDay();
+  var diff=(startDay===0)?-6:(1-startDay);
+  var week1Mon=addDays(start,diff);
+  /* 8-week fat loss / metabolic cycle. Mon-Wed-Fri mornings only, weekends off.
+     Every vial takes 3 mL BAC water:
+       Retatrutide 40 mg / 3 mL = 13.33 mg/mL -> 2 mg  = 0.15 mL  = 15u   (Monday only)
+       5-Amino-1MQ 50 mg / 3 mL = 16.67 mg/mL -> 1 mg  = 0.06 mL  = 6u    (Mon/Wed/Fri)
+       MOTS-c      40 mg / 3 mL = 13.33 mg/mL -> 1 mg  = 0.075 mL = 7.5u  (Mon/Wed/Fri)
+     Mon = 3 shots, Wed = 2, Fri = 2 -> 7 shots per week, 56 over the cycle.
+     2 vials of each. The 30-day mixed-vial window is the binding limit, not the drug:
+     set #1 mixed Week 1 Monday, set #2 mixed Week 5 Monday. */
+  var offsets=[0,2,4]; /* Mon, Wed, Fri */
+  for(var w=1;w<=8;w++){
+    for(var i=0;i<offsets.length;i++){
+      var date=addDays(week1Mon,(w-1)*7+offsets[i]);
+      if(date<start)continue;
+      var dow=date.getDay();
+      var isMon=(offsets[i]===0);
+      var lines=[];
+      lines.push('AM, FASTED - all shots subcutaneous, separate sites, never combined in one syringe:');
+      lines.push('- 5-Amino-1MQ 6u (1 mg)');
+      lines.push('- MOTS-c 7.5u (1 mg)');
+      if(isMon)lines.push('- Retatrutide 15u (2 mg) - MONDAY ONLY');
+      if(w===1&&isMon)lines.push('VIAL DAY: mix vial #1 of all three - 3 mL BAC water each. Run the water down the inside wall, swirl until clear, never shake. Label each vial with its dose.');
+      if(w===5&&isMon)lines.push('VIAL SWAP: mix vial #2 of all three - 3 mL BAC water each. The first set is at its 30-day mixed window.');
+      if(w===1&&isMon)lines.push('PROTOCOL STARTS. 8 weeks, Mon/Wed/Fri mornings, weekends off.');
+      if(w===8&&offsets[i]===4)lines.push('LAST DAY OF THE CYCLE. 56 shots done.');
+      var n=isMon?3:2;
+      var title='BLS · Deri · W'+w+' '+dayNames[dow]+' · '+n+' shot'+(n>1?'s':'');
+      var desc='Deri - Fat Loss Cycle · Week '+w+' of 8\\n\\n'+lines.join('\\n');
+      addE(date,title,desc,'W'+w+'D'+offsets[i]);
+    }
+  }
+  var ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BioLinked//Deri Ford Protocol//EN','CALSCALE:GREGORIAN','X-WR-CALNAME:BLS — Deri Protocol','X-APPLE-CALENDAR-COLOR:#7A6530']
+    .concat(evts).concat(['END:VCALENDAR']).join('\r\n');
+  var blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download='dford-biolinked-protocol.ics';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(url);},1000);
+}
+</script>
+<style>
+.bl-pwa-banner{position:fixed;left:0;right:0;bottom:0;background:linear-gradient(135deg,#f8f5ee,#f2ede0);border-top:2px solid #7A6530;padding:14px 18px;display:none;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;font-family:'Montserrat',sans-serif;z-index:9000;box-shadow:0 -4px 20px rgba(0,0,0,0.08);}
+.bl-pwa-banner.show{display:flex;}
+.bl-pwa-banner-text{flex:1;min-width:200px;font-size:13px;color:#3d2f10;line-height:1.5;}
+.bl-pwa-banner-text strong{color:#7A6530;font-weight:700;}
+.bl-pwa-banner-actions{display:flex;gap:8px;align-items:center;}
+.bl-pwa-banner-btn{padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:0.10em;text-transform:uppercase;border-radius:4px;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;}
+.bl-pwa-install{background:#7A6530;color:#fff;}
+.bl-pwa-install:hover{background:#5f4f26;}
+.bl-pwa-dismiss{background:transparent;color:#6b6b65;}
+.bl-pwa-dismiss:hover{color:#1a1a1a;}
+@media print{.bl-pwa-banner{display:none !important;}}
+</style>
+<div class="bl-pwa-banner" id="bl-pwa-banner">
+  <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
+  <div class="bl-pwa-banner-actions">
+    <button class="bl-pwa-banner-btn bl-pwa-install" id="bl-pwa-install-btn" style="display:none">Install</button>
+    <button class="bl-pwa-banner-btn bl-pwa-dismiss" id="bl-pwa-dismiss-btn">Not now</button>
+  </div>
+</div>
+<script>
+(function(){
+  if ('serviceWorker' in navigator) {
+    let hadController_ = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController_) window.location.reload(); });
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register('/dford/sw.js').catch(()=>{});
+    });
+  }
+  var DISMISS_KEY = 'bl-pwa-dismiss-dford';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  function show(){
+    if (isIOS) {
+      textEl.innerHTML = '<strong>Deri, save this protocol as an app:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    } else if (isAndroid) {
+      textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access on your home screen.';
+    } else {
+      textEl.innerHTML = '<strong>Tip:</strong> install this protocol as an app on your phone for quick access. Open this page in mobile Safari or Chrome.';
+    }
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){
+    banner.classList.remove('show');
+    localStorage.setItem(DISMISS_KEY, '1');
+  });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') {
+      banner.classList.remove('show');
+      localStorage.setItem(DISMISS_KEY, '1');
+    }
+  });
+  if (isIOS || isAndroid) {
+    setTimeout(show, 1500);
+  }
+})();
+</script>
+</body>
+</html>
