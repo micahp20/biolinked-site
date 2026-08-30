@@ -89,8 +89,7 @@
       <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#8B7335;margin-bottom:12px;">Resources</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
         <a href="/index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Home</a>
-        <a href="/peptide-index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Peptide Index</a>
-        <a href="/cheat-sheet.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Cheat Sheet</a>
+        <a href="/peptide-index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Index</a>
         <a href="/stacks-blends.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stacks & Blends</a>
       </div>
     </div>

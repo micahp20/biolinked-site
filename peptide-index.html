@@ -235,6 +235,13 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(
   .m-stat { border-right: none; border-bottom: 1px solid var(--gold-border); }
   .m-stat:last-child { border-bottom: none; }
 }
+.dose-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 15px; margin-top: 12px; }
+.dose-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 2px 18px; margin-top: 7px; }
+.dose-row { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.dose-row:last-child { border-bottom: none; }
+.dose-k { font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text2); opacity: 0.75; font-weight: 700; white-space: nowrap; }
+.dose-v { font-size: 12.5px; font-weight: 600; color: var(--gold); text-align: right; }
+@media (max-width: 700px){ .dose-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -327,7 +334,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(
       <p class="site-footer-disclaimer">For educational purposes only. Not medical advice. Always consult a qualified healthcare professional before beginning any peptide protocol.</p>
     </div>
     <div class="site-footer-links">
-      <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index">Peptide Index</a><a href="/cheat-sheet">Cheat Sheet</a><a href="/stacks-blends">Stacks &amp; Blends</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index">Index</a><a href="/stacks-blends">Stacks &amp; Blends</a></div>
       <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/tools/peptide-tracker">Peptide Tracker</a><a href="/tools/stack-analyzer">Stack Analyzer</a><a href="/tools/biomarker-analysis">Biomarker Analysis</a></div>
       <div class="site-footer-col"><div class="site-footer-col-title">Platform</div><a href="https://biollinkedapp.netlify.app/">App</a><a href="/index.html">Home</a></div>
     </div>
@@ -335,6 +342,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(
   <div class="site-footer-bottom">© 2025 Bio Linked Peptide Solutions. All rights reserved.</div>
 </footer>
 
+<script src="/cheat-sheet-data.js"></script>
 <script>
 const COMPOUNDS = [
   {cat:"Recovery",emoji:"🩹",name:"BPC-157",sub:"Body Protection Compound-157",avail:"mixed",availLabel:"Mixed Availability",goal:"Tissue healing, gut repair, tendon & ligament recovery",mechanism:"Activates VEGFR2 signaling for angiogenesis; upregulates growth hormone receptors in injured tissue; modulates nitric oxide and FAK-paxillin pathways for accelerated cell migration and repair. Heals gut lining, tendons, ligaments, and muscle.",dose:"250–500 mcg/day SQ or IM near injury site",cycle:"6–12 weeks",frequency:"Daily or 2×/day",timing:"Morning fasted or split AM/PM",notes:"#1 most researched healing peptide. Can be taken orally for gut-specific benefits (swallowed in BAC water). Often stacked with TB-500 as 'The Wolverine Stack'. Available as premix BB10 at Bio Linked."},
@@ -441,6 +449,98 @@ const COMPOUNDS = [
   {cat:"Other",emoji:"🧪",name:"HGH Fragment 176-191",sub:"Fat-Burning HGH Fragment",avail:"research",availLabel:"Research Only",goal:"Fat loss, lipolysis, body composition",mechanism:"Fragment of HGH containing the fat-burning region (amino acids 176–191) without growth-promoting properties. Activates beta-3 adrenergic receptor in fat cells.",dose:"250–500 mcg 2× daily fasted",cycle:"12–16 weeks",frequency:"2× daily (AM fasted + pre-bed)",timing:"Morning fasted and pre-bed",notes:"Alternative to AOD-9604. Best results with fasted dosing. No effect on blood glucose or IGF-1 — safe for diabetics."}
 ];
 
+/* ===== Dosing & reconstitution, merged in from the retired cheat sheet =====
+   /cheat-sheet-data.js is the same master array the cheat-sheet page used to
+   render. It carries the vial size, BAC water volume and draw-in-units that
+   the Index cards did not have. Entries are matched to a card by name; any
+   cheat-sheet entry with no matching card (mostly blends) is appended so no
+   dosing data is lost now that the cheat sheet is gone. */
+(function mergeCheatSheet(){
+  var CS = window.CHEAT_SHEET_DATA;
+  if (!CS || !CS.length) return;               // page still works without it
+
+  var CAT_MAP = {
+    fatloss:'GLP-1 / Metabolic', healing:'Recovery', muscle:'Recovery',
+    gh:'Growth Hormone', cognition:'Cognitive', energy:'Energy / NAD+',
+    longevity:'Longevity', immunity:'Immune', sexual:'Sexual Health',
+    skin:'Skin & Cosmetic', bioregulator:'Bioregulators',
+    hormones:'Sexual Health', sleep:'Cognitive', blend:'Other'
+  };
+  var CAT_EMOJI = {
+    'Recovery':'\u{1FA79}', 'GLP-1 / Metabolic':'⚖', 'Growth Hormone':'\u{1F4C8}',
+    'Cognitive':'\u{1F9E0}', 'Longevity':'⏳', 'Immune':'\u{1F6E1}',
+    'Energy / NAD+':'⚡', 'Sexual Health':'\u{1F49B}', 'Bioregulators':'\u{1F52C}',
+    'Skin & Cosmetic':'✨', 'Other':'\u{1F9EA}'
+  };
+
+  function norm(s){
+    s = String(s).toLowerCase().replace(/[–—]/g,'-');
+    s = s.replace(/\(.*?\)/g,'');
+    s = s.split(' or ')[0];
+    s = s.replace(/\bno dac\b/g,'');
+    s = s.replace(/\siii$/,' 3').replace(/\sii$/,' 2').replace(/\si$/,' 1');
+    s = s.replace(/[^a-z0-9]+/g,'');
+    return s.replace('epitalon','epithalon');
+  }
+
+  var byName = {};
+  COMPOUNDS.forEach(function(c){
+    var k = norm(c.name);
+    if (!(k in byName)) byName[k] = c;
+  });
+  var keys = Object.keys(byName);
+
+  CS.forEach(function(d){
+    var k = norm(d.name), c = byName[k];
+    if (!c) {                                   // near-match fallback
+      for (var i = 0; i < keys.length; i++){
+        var ik = keys[i];
+        if (k && ik && (k.indexOf(ik) > -1 || ik.indexOf(k) > -1) && Math.abs(k.length - ik.length) < 6){
+          c = byName[ik]; break;
+        }
+      }
+    }
+    /* If the card already carries a variant (e.g. plain Semaglutide vs the
+       5mg Bronze vial), fall through and append this one as its own card so
+       no cheat-sheet row is silently dropped. */
+    if (c && !c.cs){ c.cs = d; return; }
+    /* Same compound, identical numbers = a duplicate row in the source data,
+       not a second vial config. Skip it rather than making a second card. */
+    if (c && c.cs && c.cs.vial === d.vial && c.cs.bac === d.bac && c.cs.dose === d.dose) return;
+
+    var cat = CAT_MAP[d.cat] || 'Other';
+    COMPOUNDS.push({
+      cat: cat, emoji: CAT_EMOJI[cat] || '\u{1F9EA}',
+      name: d.name, sub: d.purpose || '', avail: 'research',
+      availLabel: 'Research Only', goal: d.purpose || '',
+      mechanism: '', dose: d.dose || '', cycle: d.dur || '',
+      frequency: d.freq || '', timing: d.timing || '', notes: '', cs: d
+    });
+  });
+})();
+
+/* Dosing panel rendered on every card, replacing the old "View Cheat Sheet" link. */
+function dosingBlock(c){
+  var d = c.cs || {};
+  var rows = [
+    ['Dose',         d.dose   || c.dose],
+    ['Frequency',    d.freq   || c.frequency],
+    ['Timing',       d.timing || c.timing],
+    ['Duration',     d.dur    || c.cycle],
+    ['Vial Size',    d.vial],
+    ['BAC Water',    d.bac],
+    ['Draw',         d.units && d.units !== 'N/A' ? d.units + ' units' : d.units]
+  ].filter(function(r){ return r[1]; });
+  if (!rows.length) return '';
+  return '<div class="dose-box"><div class="dkey">Dosing &amp; Reconstitution</div>'
+       + '<div class="dose-grid">'
+       + rows.map(function(r){
+           return '<div class="dose-row"><span class="dose-k">' + r[0] + '</span>'
+                + '<span class="dose-v">' + r[1] + '</span></div>';
+         }).join('')
+       + '</div></div>';
+}
+
 const CAT_CHIPS = [
   {cat:'all', label:'All'},
   {cat:'Recovery', label:'🩹 Recovery', pill:'pill-recovery'},
@@ -487,7 +587,7 @@ function filtered(){
   const ql = searchQ.toLowerCase().trim();
   return COMPOUNDS.filter(c => {
     if(activeCat !== 'all' && c.cat !== activeCat) return false;
-    if(ql){ const hay=[c.name,c.sub,c.goal,c.mechanism,c.notes,c.cat].join(' ').toLowerCase(); return ql.split(' ').every(w=>hay.includes(w)); }
+    if(ql){ const d=c.cs||{}; const hay=[c.name,c.sub,c.goal,c.mechanism,c.notes,c.cat,c.dose,c.frequency,c.timing,d.dose,d.vial,d.bac,d.units,d.freq,d.timing,d.dur].join(' ').toLowerCase(); return ql.split(' ').every(w=>hay.includes(w)); }
     return true;
   });
 }
@@ -506,11 +606,11 @@ function buildDesktopCard(c, i){
     <span class="expand-icon">▾</span>
   </div>
   <div class="card-detail">
-    <div class="detail-grid">
+    ${c.mechanism ? `<div class="detail-grid">
       <div class="dblock full"><span class="dkey">Mechanism / How It Works</span><span class="dval">${c.mechanism}</span></div>
-    </div>
-    <div class="notes-box"><div class="dkey">Research Notes &amp; Clinical Context</div><div class="dval">${c.notes}</div></div>
-    <a class="cheat-link" href="/cheat-sheet.html">For dosing, reconstitution, and protocol details &rarr; View Cheat Sheet</a>
+    </div>` : ''}
+    ${dosingBlock(c)}
+    ${c.notes ? `<div class="notes-box"><div class="dkey">Research Notes &amp; Clinical Context</div><div class="dval">${c.notes}</div></div>` : ''}
   </div>
 </div>`;
 }
@@ -528,9 +628,9 @@ function buildMobileCard(c, i){
     <span class="m-toggle-icon">▾</span>
   </div>
   <div class="m-card-detail">
-    <div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${c.mechanism}</div></div>
-    <div class="m-notes"><div class="m-detail-label">Research Notes</div><div class="m-detail-text" style="font-size:11.5px">${c.notes}</div></div>
-    <a class="cheat-link" href="/cheat-sheet.html">For dosing, reconstitution, and protocol details &rarr; View Cheat Sheet</a>
+    ${c.mechanism ? `<div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${c.mechanism}</div></div>` : ''}
+    ${dosingBlock(c)}
+    ${c.notes ? `<div class="m-notes"><div class="m-detail-label">Research Notes</div><div class="m-detail-text" style="font-size:11.5px">${c.notes}</div></div>` : ''}
   </div>
 </div>`;
 }
