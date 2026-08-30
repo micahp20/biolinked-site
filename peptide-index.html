@@ -335,7 +335,7 @@ body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(
     </div>
     <div class="site-footer-links">
       <div class="site-footer-col"><div class="site-footer-col-title">Resources</div><a href="/peptide-index">Index</a><a href="/stacks-blends">Stacks &amp; Blends</a></div>
-      <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/tools/peptide-tracker">Peptide Tracker</a><a href="/tools/stack-analyzer">Stack Analyzer</a><a href="/tools/biomarker-analysis">Biomarker Analysis</a></div>
+      <div class="site-footer-col"><div class="site-footer-col-title">Tools</div><a href="/peptide-tracker.html">Peptide Tracker</a><a href="/stack-analyzer.html">Stack Analyzer</a><a href="/biomarker-landing.html">Biomarker Analysis</a></div>
       <div class="site-footer-col"><div class="site-footer-col-title">Platform</div><a href="https://biollinkedapp.netlify.app/">App</a><a href="/index.html">Home</a></div>
     </div>
   </div>
@@ -403,6 +403,7 @@ const COMPOUNDS = [
   {cat:"Immune",emoji:"🛡",name:"Gonadorelin",sub:"Synthetic GnRH",avail:"rx",availLabel:"Prescription Available",goal:"LH/FSH stimulation, testosterone support, TRT adjunct",mechanism:"Synthetic form of gonadotropin-releasing hormone (GnRH) that stimulates pituitary release of LH and FSH. Maintains the HPG axis function — prevents pituitary desensitization from TRT. Supports natural testosterone production and testicular function.",dose:"100–200 mcg 2–3×/week SQ",cycle:"Ongoing with TRT",frequency:"2–3× per week",timing:"Morning SQ",notes:"Increasingly preferred over HCG for maintaining testicular function during TRT as HCG shortages increase. Supports natural testosterone production pathway. Prevents testicular atrophy during exogenous testosterone use."},
   {cat:"Immune",emoji:"🛡",name:"VIP",sub:"Vasoactive Intestinal Peptide",avail:"research",availLabel:"Research Only",goal:"Gut function, neuroprotection, immune modulation",mechanism:"Naturally occurring neuropeptide with wide-ranging effects — relaxes smooth muscle in gut (IBS benefit), promotes anti-inflammatory immune response, supports lung function, and has neuroprotective properties.",dose:"25–50 mcg/day intranasal or SQ",cycle:"4–8 weeks",frequency:"Daily",timing:"Any time",notes:"Emerging use in MCAS, CIRS (mold illness), and long COVID protocols. Shows particular promise for post-COVID autonomic dysfunction. Also researched for pulmonary hypertension and inflammatory bowel conditions."},
   {cat:"Energy / NAD+",emoji:"⚡",name:"MOTS-c",sub:"Mitochondrial Peptide",avail:"research",availLabel:"Research Only",goal:"Energy optimization, mitochondrial biogenesis",mechanism:"See Longevity section. Listed here as it is Bio Linked's primary energy compound.",dose:"5–10 mg 2–3×/week",cycle:"8–12 weeks",frequency:"2–3× per week",timing:"Morning",notes:"See full profile in Longevity category. Core energy compound at Bio Linked."},
+  {cat:"Energy / NAD+",emoji:"⚡",name:"5-Amino-1MQ",sub:"NNMT Enzyme Inhibitor",avail:"research",availLabel:"Research Only",goal:"Energy optimization, NAD+ preservation",mechanism:"See GLP-1 / Metabolic section. Listed here because inhibiting NNMT preserves NAD+ availability for cellular energy.",dose:"50–100 mg/day oral",cycle:"8–12 weeks",frequency:"Daily oral",timing:"Morning",notes:"See full profile in GLP-1 / Metabolic category. Pairs with MOTS-c and NAD+ for cellular energy protocols."},
   {cat:"Energy / NAD+",emoji:"⚡",name:"SLU-PP-332",sub:"ERRα Agonist — Exercise Mimetic",avail:"research",availLabel:"Research Only",goal:"Exercise-mimetic effects, endurance, metabolic activation",mechanism:"Activates estrogen-related receptor alpha (ERRα) — upregulates mitochondrial gene expression mimicking exercise adaptations. Preclinical data shows increased running endurance by 70%+ in sedentary mice without training.",dose:"5–10 mg/day SQ or oral",cycle:"8–12 weeks",frequency:"Daily",timing:"Morning",notes:"Available as 33210 at Bio Linked. Cutting-edge exercise mimetic. Pairs with MOTS-c and AICAR for triple metabolic activation. Very new — mostly preclinical data but highly promising."},
   {cat:"Sexual Health",emoji:"💛",name:"PT-141",sub:"Bremelanotide — Central Desire Peptide",avail:"rx",availLabel:"Prescription Available",goal:"Sexual arousal, libido enhancement",mechanism:"Melanocortin receptor agonist activating MC3R and MC4R in the brain — stimulates desire through CNS rather than vascular mechanism. Works for both men and women. FDA-approved (Vyleesi) for premenopausal women with HSDD.",dose:"0.5–2 mg SQ 30–60 min before activity",cycle:"As needed — max 8× per month",frequency:"As needed",timing:"30–60 min before activity",notes:"Available as P41 at Bio Linked. Unlike Viagra/Cialis which work on blood flow mechanics, PT-141 works on desire. Nausea most common side effect — start at 0.5 mg. Effective for both men and women."},
   {cat:"Sexual Health",emoji:"💛",name:"Kisspeptin-10",sub:"Reproductive Hormone Axis Activator",avail:"mixed",availLabel:"Mixed Availability",goal:"Libido, hormone axis stimulation, reproductive function",mechanism:"Neuropeptide that activates GPR54 receptor — the master regulator of reproductive hormone cascade. Stimulates GnRH release, triggering LH and FSH, which then drive testosterone/estrogen production. Addresses libido at the hormonal root.",dose:"100–250 mcg SQ or IV",cycle:"As needed or protocol-based",frequency:"As needed",timing:"Evening SQ",notes:"Particularly interesting for low libido linked to low LH/testosterone. Different mechanism from PT-141 — hormonal vs. CNS. Emerging use in fertility protocols and hypogonadism research."},
@@ -483,31 +484,41 @@ const COMPOUNDS = [
     return s.replace('epitalon','epithalon');
   }
 
+  /* One name can map to several cards: the Index deliberately cross-lists a
+     compound into more than one category (GHK-Cu, MOTS-c, Thymalin, Thymagen,
+     5-Amino-1MQ). Every copy should show the same dosing, so keep a list. */
   var byName = {};
   COMPOUNDS.forEach(function(c){
     var k = norm(c.name);
-    if (!(k in byName)) byName[k] = c;
+    (byName[k] = byName[k] || []).push(c);
   });
   var keys = Object.keys(byName);
 
   CS.forEach(function(d){
-    var k = norm(d.name), c = byName[k];
-    if (!c) {                                   // near-match fallback
+    var k = norm(d.name), list = byName[k];
+    if (!list) {                                // near-match fallback
       for (var i = 0; i < keys.length; i++){
         var ik = keys[i];
         if (k && ik && (k.indexOf(ik) > -1 || ik.indexOf(k) > -1) && Math.abs(k.length - ik.length) < 6){
-          c = byName[ik]; break;
+          list = byName[ik]; break;
         }
       }
     }
-    /* If the card already carries a variant (e.g. plain Semaglutide vs the
-       5mg Bronze vial), fall through and append this one as its own card so
-       no cheat-sheet row is silently dropped. */
-    if (c && !c.cs){ c.cs = d; return; }
-    /* Same compound, identical numbers = a duplicate row in the source data,
-       not a second vial config. Skip it rather than making a second card. */
-    if (c && c.cs && c.cs.vial === d.vial && c.cs.bac === d.bac && c.cs.dose === d.dose) return;
-
+    if (list) {
+      var fresh = list.filter(function(c){ return !c.cs; });
+      if (fresh.length){                        // fill every cross-listed copy
+        fresh.forEach(function(c){ c.cs = d; });
+        return;
+      }
+      /* Every copy already carries a row. If this row has the same numbers it
+         is the cheat sheet's own cross-listing of the same compound, so there
+         is nothing new to show. A different vial/dose is a real variant and
+         falls through to be appended as its own card. */
+      var same = list.some(function(c){
+        return c.cs.vial === d.vial && c.cs.bac === d.bac && c.cs.dose === d.dose;
+      });
+      if (same) return;
+    }
     var cat = CAT_MAP[d.cat] || 'Other';
     COMPOUNDS.push({
       cat: cat, emoji: CAT_EMOJI[cat] || '\u{1F9EA}',
