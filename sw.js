@@ -1,13 +1,16 @@
 // BioLinked Peptide Solutions — main site service worker.
 // Network-first strategy: always serves fresh content when online, falls back to cache when offline.
 // Each client folder also has its own service worker scoped to that path (which will take over within its scope).
-const CACHE = 'biolinked-root-v28';
+const CACHE = 'biolinked-root-v29';
 const ASSETS = [
   '/',
   '/index.html',
   // the catalog homepage is rendered client-side — precache what it needs
   '/catalog.css',
   '/catalog.js',
+  '/bl-theme.css',
+  '/bl-theme.js',
+  '/nav.js',
   '/cheat-sheet-data.js',
   '/product-prices.js',
   '/manifest.json',
