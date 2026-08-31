@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'lmiera-v19';
+const CACHE = 'lmiera-v20';
 const ASSETS = [
   '/lmiera/',
   '/lmiera/index.html',
