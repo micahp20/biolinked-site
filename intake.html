@@ -86,6 +86,13 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .fg{margin-bottom:1.4rem}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .frow.three{grid-template-columns:1fr 1fr 1fr}
+.opt{font-size:8.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);background:rgba(0,0,0,0.05);border-radius:99px;padding:2px 8px;margin-left:8px}
+.upload-box{border:1px dashed var(--gold-border);border-radius:var(--radius);padding:16px;background:var(--gold-dim)}
+.upload-box input[type="file"]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.upload-btn{display:inline-block;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-border);border-radius:var(--radius);padding:11px 18px;background:transparent}
+.upload-btn:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+.upload-hint{font-size:11px;color:var(--muted);line-height:1.6;margin-top:10px}
+.upload-hint.picked{color:var(--gold);font-weight:600}
 .flabel{font-size:9.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;display:flex;align-items:center;gap:5px}
 .req{color:var(--red);font-size:13px}
 .fhint{font-size:11px;color:var(--muted);margin-top:5px;font-weight:300;font-style:italic}
@@ -161,14 +168,13 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
   const links = [
     {href:'/index.html', label:'Home'},
     {href:'/peptide-index.html', label:'Index'},
-    {href:'/cheat-sheet.html', label:'Cheat Sheet'},
     {href:'/stacks-blends.html', label:'Stacks & Blends'},
   ];
 
   const tools = [
     {href:'/peptide-tracker.html', label:'Peptide Tracker'},
     {href:'/stack-analyzer.html', label:'Stack Analyzer'},
-    {href:'/biomarker-analysis.html', label:'Biomarker Analysis'},
+    {href:'/biomarker-landing.html', label:'Biomarker Analysis'},
   ];
 
   const navHTML = `
@@ -321,6 +327,14 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
   <div class="fg"><div class="flabel">Known Allergies <span class="req">*</span></div><input type="text" id="allergies" placeholder='e.g. penicillin, benzyl alcohol, shellfish — or type "None"'></div>
   <div class="fg"><div class="flabel">Any relevant health conditions? <span class="req">*</span></div><div class="cg two"><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">Diabetes / Blood sugar issues</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">Cardiovascular conditions</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">Thyroid / Hormonal disorder</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">Autoimmune condition</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">GI / Gut issues</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">Kidney or liver condition</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">Mental health condition</span></label><label class="ci" onclick="ck(this)"><input type="checkbox"><span class="ci-label">No significant conditions</span></label></div><div class="fhint">Select all that apply — or "No significant conditions" if none</div></div>
   <div class="fg"><div class="flabel">Are you currently under a doctor's care? <span class="req">*</span></div><div class="cg two"><label class="ci" onclick="rd(this,'drcare')"><input type="radio" name="drcare"><span class="ci-label">Yes — I have a primary care physician</span></label><label class="ci" onclick="rd(this,'drcare')"><input type="radio" name="drcare"><span class="ci-label">No — I do not have a current physician</span></label></div></div>
+  <div class="fg">
+    <div class="flabel">Recent Blood Work <span class="opt">Optional</span></div>
+    <div class="upload-box">
+      <input type="file" id="bloodwork" data-optional="1" accept=".pdf,.jpg,.jpeg,.png,.heic,.webp" onchange="bwPicked(this)">
+      <label for="bloodwork" class="upload-btn">Choose a file</label>
+      <div class="upload-hint" id="bwHint">PDF or a photo of your lab panel &middot; up to 8 MB. Skip this if you don't have one handy &mdash; you can always send it later.</div>
+    </div>
+  </div>
   <div class="fnav"><button class="nbtn" onclick="goTo(2)">&larr; Back</button><span class="step-info">Step 3 of 7</span><button class="nbtn primary" onclick="goTo(4)">Next &rarr;</button></div>
 </div>
 
@@ -406,6 +420,20 @@ function qLabelFor(el){
   var f=el.closest('.fg')||el.closest('div');
   while(f){var l=f.querySelector('.flabel');if(l)return l.textContent.replace('*','').trim();f=f.parentElement;}
   return 'a question';
+}
+function bwPicked(input){
+  var hint=document.getElementById('bwHint');
+  var f=input.files&&input.files[0];
+  if(!f){hint.className='upload-hint';hint.textContent="PDF or a photo of your lab panel · up to 8 MB. Skip this if you don't have one handy — you can always send it later.";return;}
+  var MAX=8*1024*1024;
+  if(f.size>MAX){
+    alert('That file is '+(f.size/1048576).toFixed(1)+' MB, over the 8 MB limit.\n\nPlease attach a smaller file, or leave this blank and email it to us instead — it is optional.');
+    input.value='';
+    hint.className='upload-hint';
+    return;
+  }
+  hint.className='upload-hint picked';
+  hint.textContent='Attached: '+f.name+' ('+(f.size/1048576).toFixed(1)+' MB)';
 }
 function validateSection(sec){
   if(!sec) return [];
@@ -503,8 +531,23 @@ async function submitForm(){
   data.append('Consent Confirmed','Yes — all 6 consent statements acknowledged');
   data.append('Submission Timestamp',new Date().toISOString());
   data.append('_gotcha',document.getElementById('hpField')?.value||'');
+  const bwFile=document.getElementById('bloodwork')?.files?.[0]||null;
+  if(bwFile){data.append('Blood Work',bwFile,bwFile.name);data.append('Blood Work Attached','Yes — '+bwFile.name);}
+  else{data.append('Blood Work Attached','No');}
+  const post=b=>fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:b,headers:{'Accept':'application/json'}});
   try{
-    const res=await fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:data,headers:{'Accept':'application/json'}});
+    let res=await post(data);
+    /* The upload is optional, so it must never cost us the intake. If the
+       POST is rejected while a file is attached (size or plan limits), strip
+       the file and send the answers again, flagged so we know to ask for the
+       labs separately. */
+    if(!res.ok&&bwFile){
+      const retry=new FormData();
+      for(const [k,v] of data.entries()){ if(k!=='Blood Work') retry.append(k,v); }
+      retry.set('Blood Work Attached','Client attached '+bwFile.name+' but the upload was rejected — please request it directly.');
+      res=await post(retry);
+      if(res.ok)alert('Your intake was submitted, but the blood work file could not be uploaded. Please email it to us separately.');
+      }
     if(res.ok){document.getElementById('sec7').classList.remove('active');document.getElementById('successScreen').classList.add('active');document.getElementById('barFill').style.width='100%';document.getElementById('stepText').textContent='Complete ✓';cur=TOTAL;buildDots();window.scrollTo({top:0,behavior:'smooth'});}
     else{alert('Submission error. Please try again or email us directly.');}
   }catch(e){alert('Connection error. Please check your internet and try again.');}
