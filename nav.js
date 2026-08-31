@@ -47,7 +47,7 @@
 .bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
 .bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
 .bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:#1a1a1a;letter-spacing:0.1em}
-.bl-nav-logo-sub{font-size:8px;color:#777;letter-spacing:0.18em;text-transform:uppercase;margin-top:2px}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
 .bl-nav-links{display:flex;align-items:center;gap:2px}
 .bl-nav-link{font-size:11.5px;color:#444;text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap}
 .bl-nav-link:hover,.bl-nav-link.active{color:#7A6530;background:rgba(154,123,47,0.07)}
