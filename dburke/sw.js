@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'dburke-v7';
+const CACHE = 'dburke-v8';
 const ASSETS = [
   '/dburke/',
   '/dburke/index.html',

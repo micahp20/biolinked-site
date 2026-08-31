@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'jliuzzi-v10';
+const CACHE = 'jliuzzi-v11';
 const ASSETS = [
   '/jliuzzi/',
   '/jliuzzi/index.html',

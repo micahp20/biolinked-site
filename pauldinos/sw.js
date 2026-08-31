@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'pauldinos-v9';
+const CACHE = 'pauldinos-v10';
 const ASSETS = [
   '/pauldinos/',
   '/pauldinos/index.html',
