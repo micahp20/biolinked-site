@@ -271,9 +271,7 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
   <div class="fg">
     <div class="flabel">Recent Blood Work <span class="opt">Optional</span></div>
     <div class="upload-box">
-      <input type="file" id="bloodwork" data-optional="1" accept=".pdf,.jpg,.jpeg,.png,.heic,.webp" onchange="bwPicked(this)">
-      <label for="bloodwork" class="upload-btn">Choose a file</label>
-      <div class="upload-hint" id="bwHint">PDF or a photo of your lab panel &middot; up to 8 MB. Skip this if you don't have one handy &mdash; you can always send it later.</div>
+      <div class="upload-hint">Have a recent lab panel? Email or text it to us after you submit this form and we&rsquo;ll attach it to your file &mdash; a PDF or a clear photo both work. It&rsquo;s optional, and nothing here is held up waiting on it.</div>
     </div>
   </div>
   <div class="fnav"><button class="nbtn" onclick="goTo(2)">&larr; Back</button><span class="step-info">Step 3 of 7</span><button class="nbtn primary" onclick="goTo(4)">Next &rarr;</button></div>
@@ -361,20 +359,6 @@ function qLabelFor(el){
   var f=el.closest('.fg')||el.closest('div');
   while(f){var l=f.querySelector('.flabel');if(l)return l.textContent.replace('*','').trim();f=f.parentElement;}
   return 'a question';
-}
-function bwPicked(input){
-  var hint=document.getElementById('bwHint');
-  var f=input.files&&input.files[0];
-  if(!f){hint.className='upload-hint';hint.textContent="PDF or a photo of your lab panel · up to 8 MB. Skip this if you don't have one handy — you can always send it later.";return;}
-  var MAX=8*1024*1024;
-  if(f.size>MAX){
-    alert('That file is '+(f.size/1048576).toFixed(1)+' MB, over the 8 MB limit.\n\nPlease attach a smaller file, or leave this blank and email it to us instead — it is optional.');
-    input.value='';
-    hint.className='upload-hint';
-    return;
-  }
-  hint.className='upload-hint picked';
-  hint.textContent='Attached: '+f.name+' ('+(f.size/1048576).toFixed(1)+' MB)';
 }
 function validateSection(sec){
   if(!sec) return [];
@@ -472,23 +456,8 @@ async function submitForm(){
   data.append('Consent Confirmed','Yes — all 6 consent statements acknowledged');
   data.append('Submission Timestamp',new Date().toISOString());
   data.append('_gotcha',document.getElementById('hpField')?.value||'');
-  const bwFile=document.getElementById('bloodwork')?.files?.[0]||null;
-  if(bwFile){data.append('Blood Work',bwFile,bwFile.name);data.append('Blood Work Attached','Yes — '+bwFile.name);}
-  else{data.append('Blood Work Attached','No');}
-  const post=b=>fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:b,headers:{'Accept':'application/json'}});
   try{
-    let res=await post(data);
-    /* The upload is optional, so it must never cost us the intake. If the
-       POST is rejected while a file is attached (size or plan limits), strip
-       the file and send the answers again, flagged so we know to ask for the
-       labs separately. */
-    if(!res.ok&&bwFile){
-      const retry=new FormData();
-      for(const [k,v] of data.entries()){ if(k!=='Blood Work') retry.append(k,v); }
-      retry.set('Blood Work Attached','Client attached '+bwFile.name+' but the upload was rejected — please request it directly.');
-      res=await post(retry);
-      if(res.ok)alert('Your intake was submitted, but the blood work file could not be uploaded. Please email it to us separately.');
-      }
+    const res=await fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:data,headers:{'Accept':'application/json'}});
     if(res.ok){document.getElementById('sec7').classList.remove('active');document.getElementById('successScreen').classList.add('active');document.getElementById('barFill').style.width='100%';document.getElementById('stepText').textContent='Complete ✓';cur=TOTAL;buildDots();window.scrollTo({top:0,behavior:'smooth'});}
     else{alert('Submission error. Please try again or email us directly.');}
   }catch(e){alert('Connection error. Please check your internet and try again.');}
