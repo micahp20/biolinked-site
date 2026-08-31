@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<title>Your BioLinked Protocol</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BioLinked Solutions">
+<meta property="og:title" content="Your BioLinked Protocol">
+<meta property="og:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta property="og:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BioLinked — Peptide Solutions">
+<meta property="og:url" content="https://biolinkedsolutions.com/ogarza/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your BioLinked Protocol">
+<meta name="twitter:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta name="twitter:image" content="https://biolinkedsolutions.com/og-image.png?v=2">
+<!-- PWA — installable home-screen app -->
+<link rel="manifest" href="/ogarza/manifest.json">
+<link rel="apple-touch-icon" href="/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Oscar">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#7A6530">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-K8D30QZ2W8');
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+/* ===== Original BioLinked palette — gold accent on white / light gray ===== */
+:root{
+  --bg:#f5f5f5;
+  --bg-alt:#f5f5f5;
+  --head:#fafafa;
+  --surface:#ffffff;
+  --line:rgba(0,0,0,0.14);
+  --line-soft:#f0f0f0;
+  --zebra:#fafafa;
+  --hover:rgba(122,101,48,0.04);
+  --text:#000000;
+  --muted:#4a4a44;
+  --accent:#7A6530;
+  --accent-2:#8F7940;
+  --accent-hover:#5f4f26;
+  --accent-dim:rgba(122,101,48,0.10);
+  --accent-line:rgba(122,101,48,0.35);
+  --on-accent:#ffffff;
+  /* Tooltip tokens — the .info-tip-text rules below reference these. Without
+     them the custom properties are invalid at computed-value time, so the
+     bubble's background fell back to transparent and its text inherited the
+     open icon's white --on-accent: white-on-white, i.e. invisible. */
+  --tip-bg:#1a1a1a;
+  --tip-border:transparent;
+  --tip-text:#ffffff;
+  --tip-strong:#e9c66c;
+  --green:#3a7a5a;--green-soft:rgba(90,138,90,0.12);--green-text:#2f7a4a;--green-border:transparent;
+  --amber:#b97a1f;--amber-soft:rgba(185,122,31,0.12);--amber-border:rgba(185,122,31,0.40);
+  --red:#b85555;--red-soft:rgba(194,85,85,0.14);--red-border:transparent;--red-text:#8a3c3c;
+  --info:#3a6b8e;--info-soft:rgba(66,120,168,0.14);--info-border:transparent;--info-text:#2a5780;
+  --shadow:0 1px 2px rgba(0,0,0,0.04),0 2px 10px rgba(0,0,0,0.05);
+}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:16px;padding:34px 20px;-webkit-print-color-adjust:exact;print-color-adjust:exact;font-weight:400;-webkit-text-size-adjust:100%;}
+
+/* ===== Chart shell ===== */
+.invoice-wrap{position:relative;z-index:1;width:75%;max-width:1200px;margin:0 auto;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05),0 6px 22px rgba(0,0,0,0.06);overflow:hidden;}
+.inv-header{background:#e8e8e8;border-bottom:2px solid var(--accent-line);padding:26px 34px;display:flex;justify-content:space-between;align-items:flex-start;gap:20px;}
+.inv-brand-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:600;letter-spacing:0.04em;color:var(--text);line-height:1;}
+.inv-brand-sub{font-size:9.5px;font-weight:700;letter-spacing:0.24em;text-transform:uppercase;color:var(--accent);margin-top:5px;}
+.inv-meta{text-align:right;}
+.inv-label{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.inv-number{font-size:21px;font-weight:700;color:var(--text);margin-top:3px;letter-spacing:0.01em;}
+.inv-date{font-size:12px;color:var(--muted);font-weight:500;margin-top:5px;line-height:1.5;}
+
+.tab-bar{display:flex;background:#fafafa;border-bottom:1px solid var(--line);padding:0;position:sticky;top:0;z-index:50;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.tab-bar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:1 0 auto;white-space:nowrap;background:transparent;border:none;padding:13px 16px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all 0.18s;}
+.tab-btn:hover{color:var(--text);background:var(--hover);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface);}
+.tab-content{display:none;}
+.inv-body{background:var(--bg-alt);padding:26px 26px 34px;}
+.tab-content.active{display:block;}
+
+/* ===== Intro block ===== */
+.program-intro{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:20px 22px;margin-bottom:18px;}
+.program-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
+.program-title{font-size:27px;font-weight:700;color:var(--text);line-height:1.15;margin-top:6px;letter-spacing:-0.01em;}
+.program-title em{font-style:normal;color:var(--accent);font-weight:700;}
+.program-tag{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5;}
+.program-context{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+
+/* ===== Section rules ===== */
+.sec-divider{margin:0 0 14px;padding-bottom:9px;border-bottom:2px solid var(--accent-line);}
+.sec-divider.mt{margin-top:30px;}
+.sec-divider-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--accent);}
+.sec-divider-title{font-size:19px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:-0.01em;}
+
+/* ===== Label → value rows ===== */
+.note-list{display:flex;flex-direction:column;}
+.nr{display:grid;grid-template-columns:126px 1fr;gap:3px 18px;padding:10px 0;border-bottom:1px solid var(--line-soft);align-items:baseline;}
+.nr:first-child{padding-top:2px;}
+.nr:last-child{border-bottom:none;padding-bottom:2px;}
+.nr-l{font-size:9px;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);line-height:1.7;}
+.nr-v{font-size:13.5px;line-height:1.65;color:var(--text);min-width:0;}
+.nr-v strong{font-weight:700;}
+.nr.full{grid-template-columns:1fr;}
+.nr.fine .nr-v{font-size:12px;color:var(--muted);line-height:1.7;}
+@media(max-width:640px){.nr{grid-template-columns:1fr;gap:2px;}.nr-l{line-height:1.5;}}
+
+/* ===== Compound cards ===== */
+.cmp-group{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:12px;}
+.cmp-group::after{content:'';flex:1;height:1px;background:var(--line);}
+.cmp-group.mt{margin-top:18px;}
+.cmp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:6px;align-items:start;}
+.cmp-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;padding:0;overflow:visible;position:relative;}
+.cmp-row-name{display:flex;align-items:center;flex-wrap:wrap;gap:5px;font-size:14px;font-weight:700;color:var(--text);padding:12px 16px;border-bottom:1px solid var(--line);background:var(--head);border-radius:8px 8px 0 0;line-height:1.3;letter-spacing:0.005em;}
+.cmp-badge{display:inline-block;background:var(--accent);color:var(--on-accent);font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;vertical-align:middle;white-space:nowrap;}
+.cmp-fields{display:flex;flex-direction:column;padding:2px 16px 10px;}
+.fld{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:8px 0;border-bottom:1px solid var(--line-soft);}
+.fld:last-child{border-bottom:none;}
+.fld-l{font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);white-space:nowrap;}
+.fld-v{font-size:13px;font-weight:600;color:var(--text);text-align:right;font-variant-numeric:tabular-nums;min-width:0;}
+.fld.dose{border-top:1px solid var(--line-soft);}
+.fld.dose .fld-v{font-size:17px;font-weight:700;color:var(--accent);white-space:nowrap;}
+.cmp-note{padding:0 16px 14px;font-size:12.5px;line-height:1.7;color:var(--muted);}
+.cmp-note strong{color:var(--text);font-weight:700;}
+.cmp-note + .cmp-note{padding-top:0;}
+.cmp-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Data tables (vial math, titration) ===== */
+.data-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);margin-bottom:14px;overflow:hidden;}
+.data-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.data-table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:540px;}
+.data-table thead th{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);padding:12px 14px 9px;text-align:left;background:var(--head);border-bottom:1px solid var(--line);white-space:nowrap;}
+.data-table thead th.right{text-align:right;}
+.data-table tbody td{padding:11px 14px;border-bottom:1px solid var(--line-soft);vertical-align:middle;color:var(--text);}
+.data-table tbody tr:last-child td{border-bottom:none;}
+.data-table tbody tr:nth-child(even) td{background:var(--zebra);}
+.data-table td.cmp{font-weight:700;white-space:nowrap;}
+.data-table td.cmp .sub{color:var(--muted);font-weight:400;font-size:11px;display:block;margin-top:2px;}
+.data-table td.num{text-align:right;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14px;}
+.data-table tr.is-cap td{background:var(--accent-dim) !important;}
+
+/* ===== Chart note ===== */
+.chart-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:13px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);margin-bottom:20px;}
+.chart-note p{margin:0;}
+.chart-note strong{color:var(--text);font-weight:700;}
+.chart-note .nl{display:block;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:5px;}
+
+/* ===== Totals / payment ===== */
+.totals-block,.payment-block{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+.total-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;font-size:13.5px;padding:10px 0;border-bottom:1px solid var(--line-soft);}
+.total-row:last-child{border-bottom:none;}
+.total-row .tr-name strong{font-weight:700;}
+.total-row .tr-name .sub{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;}
+.total-row .tr-val{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums;}
+.total-row.free .tr-name,.total-row.free .tr-val{color:var(--green-text);}
+.total-row.grand{border-top:2px solid var(--accent-line);border-bottom:none;margin-top:6px;padding-top:14px;font-size:16px;font-weight:700;}
+.total-row.grand .tr-val{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;color:var(--accent);line-height:1;}
+.payment-block{border-left:3px solid var(--accent);}
+.payment-title{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px;}
+.payment-row{display:flex;align-items:center;gap:12px;padding:7px 0;}
+.payment-icon{font-size:19px;width:26px;text-align:center;flex-shrink:0;}
+.payment-text{font-size:13.5px;color:var(--text);font-weight:500;line-height:1.55;}
+.payment-handle{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:var(--accent);line-height:1.2;}
+
+/* ===== Schedule ===== */
+.sched-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:14px;overflow:hidden;}
+.sched-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 18px;background:var(--head);border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.sched-card-title{font-size:16px;font-weight:700;color:var(--text);line-height:1.2;letter-spacing:0.005em;}
+.sched-card-sub{padding:8px 18px 12px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted);line-height:1.65;}
+.sched-phase-pill{background:var(--accent);color:var(--on-accent);font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:4px 10px;border-radius:99px;white-space:nowrap;flex-shrink:0;}
+.sched-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.sched-table{width:100%;border-collapse:collapse;min-width:520px;font-size:12px;}
+.sched-table th{text-align:left;font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:11px 12px;border-bottom:1px solid var(--line);background:var(--zebra);white-space:nowrap;}
+.sched-table th.right{text-align:right;}
+.sched-table td{padding:10px 12px;vertical-align:top;border-bottom:1px solid var(--line-soft);}
+.sched-table tr:last-child td{border-bottom:none;}
+.sched-table td.right{text-align:right;}
+.sched-day{font-weight:700;white-space:nowrap;color:var(--text);font-size:12.5px;}
+.sched-pill{display:inline-block;font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;margin:1px 3px 2px 0;border:1px solid var(--accent-line);background:var(--accent-dim);color:var(--accent);white-space:nowrap;}
+.sched-pill strong{font-weight:800;font-size:11px;letter-spacing:-0.1px;margin-right:2px;}
+.sched-pill.pm{background:rgba(58,122,90,0.14);border-color:rgba(58,122,90,0.34);color:#3a7a5a;}
+.sched-pill.nad{background:rgba(58,107,142,0.14);border-color:rgba(58,107,142,0.34);color:#3a6b8e;}
+.sched-pill.off{background:rgba(0,0,0,0.03);border-color:var(--line);color:#999;font-weight:400;}
+.sched-count{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:24px;border-radius:99px;background:var(--accent-dim);border:1px solid var(--accent-line);font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;}
+.sched-count.off{color:#bbb;background:rgba(0,0,0,0.03);border-color:var(--line);}
+.cal-banner{background:linear-gradient(135deg,rgba(99,179,237,0.08),rgba(99,179,237,0.03)),#ffffff;border:1px solid rgba(99,179,237,0.35);border-left:3px solid #4278a8;border-radius:8px;box-shadow:var(--shadow);padding:15px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
+.cal-left{flex:1;min-width:240px;}
+.cal-banner h4{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#4278a8;margin-bottom:5px;}
+.cal-banner p{font-size:12px;color:#4a6b85;line-height:1.6;font-weight:400;}
+.cal-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cal-banner input[type=date]{background:#fafafa;border:1px solid rgba(99,179,237,0.35);border-radius:5px;padding:8px 10px;font-size:13px;color:var(--text);outline:none;font-family:'Montserrat',sans-serif;color-scheme:light;}
+.cal-dl-btn{background:#4278a8;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:10px 16px;border-radius:5px;border:none;cursor:pointer;white-space:nowrap;font-family:'Montserrat',sans-serif;}
+.cal-dl-btn:hover{background:#345d85;}
+
+/* ===== Note / tip cards ===== */
+.tip-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:0;margin-bottom:12px;overflow:hidden;}
+.tip-card.featured{border-left:3px solid var(--accent);}
+.tip-head{padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.tip-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
+.tip-title{font-size:16px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.25;letter-spacing:0.005em;}
+.tip-body{padding:6px 18px 14px;font-size:13.5px;line-height:1.7;color:var(--text);font-weight:400;}
+.tip-body strong{font-weight:700;}
+
+/* Collapsible tip cards — same +/- summary convention as the compound cards. */
+details.tip-card > summary.tip-head{
+  cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;
+  padding:13px 46px 13px 18px;min-height:56px;
+  display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+details.tip-card > summary.tip-head::-webkit-details-marker{display:none;}
+details.tip-card > summary.tip-head::after{
+  content:'+';position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:var(--accent);
+  font-size:16px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;
+}
+details[open].tip-card > summary.tip-head::after{content:'\2212';background:var(--accent-dim);}
+details.tip-card > summary.tip-head:hover::after{border-color:var(--accent);}
+details.tip-card:not([open]) > summary.tip-head{border-bottom-color:transparent;}
+@media print{details.tip-card > summary.tip-head::after{display:none;}}
+@media(max-width:640px){details.tip-card > summary.tip-head{padding:13px 44px 13px 15px;}}
+.tip-lead{font-size:12.5px;color:var(--muted);line-height:1.65;padding:6px 0 4px;}
+.tip-list{list-style:none;margin:0;padding:0;}
+.tip-list li{position:relative;display:block;font-size:13px;line-height:1.7;color:var(--text);padding:9px 0 9px 18px;border-bottom:1px solid var(--line-soft);overflow-wrap:break-word;margin:0;}
+.tip-list li:last-child{border-bottom:none;}
+.tip-list li::before{content:'';position:absolute;left:2px;top:16px;width:5px;height:5px;border-radius:50%;background:var(--accent);}
+
+/* ===== Supplies ===== */
+.supplies-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:20px;align-items:start;}
+.supply-row{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:stretch;padding:0;}
+.supply-info-name{display:flex;align-items:center;flex-wrap:wrap;gap:6px;font-size:13.5px;font-weight:700;color:var(--text);padding:12px 16px;background:var(--head);border-bottom:1px solid var(--line);border-radius:8px 8px 0 0;line-height:1.3;}
+.supply-free{display:inline-block;background:var(--green);color:#fff;font-size:8px;font-weight:700;letter-spacing:0.10em;padding:2px 7px;border-radius:99px;text-transform:uppercase;white-space:nowrap;}
+.supply-info-desc{font-size:12.5px;color:var(--muted);line-height:1.7;padding:12px 16px 13px;}
+.supply-info-desc strong{color:var(--text);font-weight:700;}
+.supply-link{align-self:flex-start;margin:0 16px 14px;background:var(--accent);color:var(--on-accent);font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;padding:9px 15px;border-radius:5px;text-decoration:none;white-space:nowrap;}
+.supply-link:hover{background:var(--accent-hover);}
+.storage-card{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden;}
+.storage-title{font-size:10px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);padding:13px 18px;background:var(--head);border-bottom:1px solid var(--line);}
+.storage-body{padding:6px 18px 12px;}
+
+/* ===== Footer ===== */
+.inv-footer{background:var(--head);border-top:1px solid var(--line);padding:16px 34px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;}
+.footer-disc{font-size:10px;color:var(--muted);font-weight:500;line-height:1.55;flex:1;min-width:240px;}
+.footer-brand{font-size:9.5px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);}
+.print-btn{position:relative;z-index:1;display:block;width:75%;max-width:1200px;margin:18px auto 56px;padding:15px;background:var(--accent);color:var(--on-accent);border:none;border-radius:6px;font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;cursor:pointer;box-shadow:var(--shadow);}
+.print-btn:hover{background:var(--accent-hover);}
+
+@media print{
+  body{background:#fff;padding:0;}
+  .invoice-wrap{border:none;width:100%;max-width:100%;box-shadow:none;}
+  .print-btn,.tab-bar{display:none;}
+  .tab-content{display:block !important;}
+  .inv-body{background:#fff;padding:0;}
+  .cmp-row,.sched-card,.data-card,.tip-card,.supply-row,.totals-block,.payment-block{box-shadow:none;break-inside:avoid;}
+}
+@media(max-width:1100px){.invoice-wrap,.print-btn{width:92%;}}
+@media(max-width:820px){
+  .invoice-wrap,.print-btn{width:96%;}
+  body{padding:20px 8px;}
+  .inv-header{padding:20px 20px;}
+  .inv-body{padding:22px 18px 28px;}
+  .inv-footer{padding:14px 20px;}
+}
+@media(max-width:640px){
+  .invoice-wrap,.print-btn{width:100%;border-left:none;border-right:none;border-radius:0;}
+  .print-btn{border-radius:6px;width:calc(100% - 24px);}
+  body{padding:0 0 8px;font-size:15px;}
+  .inv-header{flex-direction:column;gap:12px;padding:18px 16px;}
+  .inv-meta{text-align:left;}
+  .inv-brand-name{font-size:25px;}
+  .inv-body{padding:16px 12px 26px;}
+  .inv-footer{flex-direction:column;align-items:flex-start;padding:14px 16px;}
+  .program-title{font-size:22px;}
+  .program-intro{padding:16px 15px;}
+  .sec-divider-title{font-size:17px;}
+  .cmp-list,.supplies-wrap{grid-template-columns:1fr;}
+  .cmp-row-name,.supply-info-name{padding:12px 15px;}
+  details.cmp-row > summary.cmp-row-name{padding:12px 44px 12px 15px;}
+  .cmp-price{font-size:15px;}
+  .cmp-fields,.cmp-note,.supply-info-desc{padding-left:15px;padding-right:15px;}
+  .supply-link{margin-left:15px;margin-right:15px;}
+  .sched-card-head{padding:12px 15px;}
+  .sched-card-sub{padding-left:15px;padding-right:15px;}
+  .tip-head,.tip-body,.storage-title,.storage-body{padding-left:15px;padding-right:15px;}
+  .chart-note{padding:12px 14px;}
+  .totals-block,.payment-block{padding:14px 15px;}
+  .total-row.grand .tr-val{font-size:25px;}
+  .fld{gap:10px;}
+  .fld-v{font-size:12.5px;}
+  .fld.dose .fld-v{font-size:16px;}
+}
+
+
+
+/* ===== Info tooltip — ? icon (mpauldino base) ===== */
+.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;font-family:'Montserrat',sans-serif;letter-spacing:0;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
+.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--accent);color:var(--on-accent);border-color:var(--accent);}
+.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--tip-bg);color:var(--tip-text);border:1px solid var(--tip-border);padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;letter-spacing:0.01em;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
+.info-tip-text strong{color:var(--tip-strong);font-weight:600;}
+.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--tip-bg);}
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
+@media(max-width:640px){.info-tip-text{width:230px;font-size:11px;}}
+
+/* Viewport-safe tooltip anchoring inside the narrow compound cards — the
+   260px bubble would overflow a 290px card, so pin it to the header band with
+   left/right insets instead of centering it on the tiny icon.
+   .cmp-row-name MUST be the containing block. Anchored to .cmp-row instead,
+   top:calc(100% - 2px) resolved against the WHOLE CARD height, so the bubble
+   opened ~115px below the ? that was tapped — over the next card, or off the
+   bottom on the last one. Reads as "tapping does nothing". Same host element
+   mpauldino uses. */
+.cmp-row-name{position:relative;}
+.cmp-row-name .info-tip{position:static;}
+.cmp-row-name .info-tip-text{position:absolute;bottom:auto;top:calc(100% - 2px);left:6px;right:6px;width:auto;max-width:none;transform:none;margin:0;}
+.cmp-row-name .info-tip-text::after{top:-9px;bottom:auto;left:14px;transform:none;border:5px solid transparent;border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+/* Open bubble must paint above later sibling cards, which are position:relative. */
+.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{z-index:400;}
+
+/* ===== Archived proposal — declined compounds kept for record only =====
+   Muted and de-emphasised on purpose: these doses must never be mistaken for
+   the live protocol, which is Cycle 1 plus the as-needed cognitive block. */
+details.archive-fold{border-left:3px solid var(--muted);}
+details.archive-fold > summary.tip-head .tip-eyebrow{color:var(--muted);}
+.archive-warn{background:rgba(185,122,31,0.10);border:1px solid rgba(185,122,31,0.40);border-radius:6px;padding:11px 14px;font-size:12.5px;line-height:1.65;color:#6d4a12;margin:4px 0 14px;}
+.archive-warn strong{color:#5a3a0c;font-weight:700;}
+.archive-cards{opacity:0.72;filter:grayscale(0.35);}
+.archive-cards .cmp-badge{background:var(--muted);}
+.archive-cards .cmp-row-name::after{content:'NOT TAKEN';margin-left:auto;font-size:8px;font-weight:700;letter-spacing:0.12em;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 7px;white-space:nowrap;}
+.archive-cards .fld.dose .fld-v{color:var(--muted);}
+@media print{.archive-cards{opacity:1;filter:none;}}
+
+/* ===== Invoice order fold — collapsible, default collapsed ===== */
+details.order-fold{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+details.order-fold > summary,details.paid-archive > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;position:relative;padding-right:40px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+details.order-fold > summary::-webkit-details-marker,details.paid-archive > summary::-webkit-details-marker{display:none;}
+details.order-fold > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid var(--accent-line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:18px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;}
+details[open].order-fold > summary::after{content:'\2212';background:var(--accent-dim);}
+details.order-fold > summary:hover::after{border-color:var(--accent);}
+details[open].order-fold > summary{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--accent-line);}
+.of-head{flex:1;min-width:0;}
+.of-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.of-sub{display:block;font-size:11.5px;font-weight:500;color:var(--muted);margin-top:3px;line-height:1.5;}
+.of-status{font-size:8.5px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;padding:3px 10px;border-radius:99px;background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-border);white-space:nowrap;flex-shrink:0;}
+details.order-fold .totals-block,details.paid-archive .totals-block{border:none;box-shadow:none;padding:0;margin-bottom:0;background:transparent;}
+/* Paid fold — green variant, matching the mjirikils / ngillan paid-archive convention. */
+details.paid-archive{background:rgba(58,122,90,0.05);border:1px solid rgba(58,122,90,0.32);border-left:3px solid var(--green-text);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:16px;}
+details.paid-archive[open]{background:#fbfcfb;}
+details.paid-archive > summary::after{content:'+';position:absolute;right:0;top:50%;transform:translateY(-50%);width:26px;height:26px;border:1px solid rgba(58,122,90,0.40);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--green-text);font-size:18px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;}
+details[open].paid-archive > summary::after{content:'\2212';background:rgba(58,122,90,0.10);}
+details.paid-archive > summary:hover::after{border-color:var(--green-text);}
+details[open].paid-archive > summary{margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(58,122,90,0.32);}
+details.paid-archive .of-title{color:#0e3a1e;}
+details.paid-archive .of-sub{color:#3a6b52;}
+.pa-pill{font-size:9.5px;font-weight:800;letter-spacing:0.13em;text-transform:uppercase;color:#fff;background:var(--green-text);padding:4px 10px;border-radius:99px;flex-shrink:0;white-space:nowrap;}
+@media print{details.order-fold,details.paid-archive{box-shadow:none;break-inside:avoid;}details.order-fold > summary::after,details.paid-archive > summary::after{display:none;}}
+@media(max-width:640px){details.order-fold,details.paid-archive{padding:14px 15px;}}
+
+/* ===== Cycle tier cards — house multi-cycle layout. Compounds live inside. ===== */
+.tier-grid{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+details.tier{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);display:block;padding:0;transition:all 0.2s;}
+details.tier:hover{border-color:var(--accent-line);}
+details[open].tier{box-shadow:0 4px 18px rgba(0,0,0,0.06);}
+details.tier > summary{cursor:pointer;list-style:none;-webkit-tap-highlight-color:transparent;padding:18px 56px 18px 22px;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;position:relative;}
+details.tier > summary::-webkit-details-marker{display:none;}
+details.tier > summary::after{content:'+';position:absolute;right:18px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:1px solid var(--accent-line);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:18px;font-weight:300;line-height:1;background:var(--surface);transition:all 0.18s;}
+details[open].tier > summary::after{content:'\2212';background:var(--accent-dim);}
+details.tier > summary:hover::after{border-color:var(--accent);}
+.tier-summary-main{flex:1;min-width:220px;}
+.tier-summary-meta{flex:0 0 auto;text-align:right;min-width:90px;}
+.tier-eyebrow{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:6px;}
+.tier-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:600;color:var(--text);line-height:1.1;margin-bottom:4px;}
+.tier-tagline{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:600;line-height:1.2;margin:6px 0 4px;}
+.tier-cadence{font-size:11px;color:var(--muted);margin-top:2px;}
+.tier-body{padding:4px 22px 22px;border-top:1px solid var(--line);background:var(--head);}
+.tier-body > *:first-child{margin-top:14px;}
+.tier-includes{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.tier-compounds{list-style:none;padding:0;margin-bottom:14px;}
+.tier-compounds li{font-size:12.5px;color:var(--text);padding:3px 0;display:flex;align-items:flex-start;gap:6px;line-height:1.4;}
+.tier-compounds li::before{content:'\2022';color:var(--accent);font-weight:700;flex-shrink:0;}
+.tier-desc{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:16px;}
+.tier-desc strong{color:var(--accent);font-weight:700;}
+.tier-weeks-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;}
+.tier-weeks-amount{font-family:'Cormorant Garamond',Georgia,serif;font-size:30px;font-weight:700;line-height:1;white-space:nowrap;}
+.tier-weeks-sub{font-size:10px;color:var(--muted);margin-top:4px;font-style:italic;letter-spacing:0.04em;}
+@media print{details.tier{box-shadow:none;break-inside:avoid;}details.tier > summary::after{display:none;}}
+@media(max-width:640px){
+  details.tier > summary{padding:14px 46px 14px 16px;}
+  details.tier > summary::after{right:12px;width:24px;height:24px;font-size:16px;}
+  .tier-name{font-size:19px;}
+  .tier-tagline{font-size:15px;}
+  .tier-weeks-amount{font-size:24px;}
+  .tier-body{padding:4px 15px 18px;}
+}
+</style>
+<!-- BioLinked site theme - mpauldino palette -->
+<script>(function(){try{localStorage.removeItem('bl-theme');}catch(e){}document.documentElement.setAttribute('data-theme','light');})();</script>
+<link rel="stylesheet" href="/bl-theme.css">
+<script src="/bl-theme.js" defer></script>
+</head>
+<body>
+<style id="bl-nav-styles">
+.bl-nav{background:#fff;border-bottom:1px solid #eaeaea;position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.08em}
+.bl-nav-logo-sub{font-size:9px;color:#7A6530;letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-links{display:flex;align-items:center;gap:2px}
+.bl-nav-link{font-size:12px;color:#333;text-decoration:none;padding:8px 12px;border-radius:3px;transition:all .18s;white-space:nowrap;font-weight:500}
+.bl-nav-link:hover{color:#7A6530;background:rgba(122,101,48,0.08)}
+.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;color:#333;cursor:pointer;padding:4px 8px}
+.bl-nav-mobile-menu{display:none;background:#fff;border-bottom:1px solid #eaeaea;padding:8px 0}
+.bl-nav-mobile-menu.open{display:block}
+.bl-nav-mobile-link{display:block;padding:12px 24px;font-size:14px;color:#333;text-decoration:none;border-bottom:1px solid #f5f5f5;font-weight:500}
+.bl-nav-mobile-link:last-child{border-bottom:none}
+.bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
+@media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
+@media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+</style>
+<nav class="bl-nav">
+  <div class="bl-nav-inner">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-logo">
+      <span class="bl-nav-logo-main">BioLinked</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+    </a>
+    <div class="bl-nav-links">
+      <a href="https://biolinkedsolutions.com" class="bl-nav-link">Home</a>
+      <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-link">Index</a>
+      <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-link">Stacks &amp; Blends</a>
+      </div>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu">☰</button>
+  </div>
+  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
+    <a href="https://biolinkedsolutions.com" class="bl-nav-mobile-link">Home</a>
+    <a href="https://biolinkedsolutions.com/peptide-index" class="bl-nav-mobile-link">Index</a>
+    <a href="https://biolinkedsolutions.com/stacks-blends" class="bl-nav-mobile-link">Stacks &amp; Blends</a>
+    </div>
+</nav>
+<script>
+document.getElementById('bl-mobile-btn').addEventListener('click',function(){
+  document.getElementById('bl-mobile-menu').classList.toggle('open');
+});
+</script>
+
+<div class="invoice-wrap">
+
+  <div class="inv-header">
+    <div>
+      <div class="inv-brand-name">BioLinked</div>
+      <div class="inv-brand-sub">Peptide Solutions</div>
+    </div>
+    <div class="inv-meta">
+      <div class="inv-label">Protocol &middot; BLS-OG-0830</div>
+      <div class="inv-number">Oscar Garza</div>
+      <div class="inv-date">Recomp &middot; Bicep Repair</div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
+    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
+    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
+    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  </div>
+
+  <div class="inv-body">
+
+    <div class="tab-content active" id="tab-protocol">
+
+      <div class="program-intro">
+        <div class="program-eyebrow">Personalized Protocol</div>
+        <div class="program-title">Oscar&apos;s <em>Two-Block Protocol</em></div>
+        <div class="program-tag">The Gorilla Stack for recomposition, and a separate repair block for the bicep once surgery is behind you.</div>
+        <div class="program-context">
+          <div class="note-list">
+            <div class="nr"><div class="nr-l">Cycle 1</div><div class="nr-v">The full <strong>Gorilla Stack 2.0</strong> &mdash; a 12-week main phase with a 4-week HGH taper on the end. Five compounds working the growth hormone axis, direct muscle signalling and the fat side all at once.</div></div>
+            <div class="nr"><div class="nr-l">Cycle 2</div><div class="nr-v">A dedicated repair block for the <strong>torn bicep tendon</strong>, built to run after your operation. Four compounds pointed at tendon, inflammation, collagen and the bone the tendon anchors into.</div></div>
+            <div class="nr"><div class="nr-l">The sequencing question</div><div class="nr-v"><strong>These two are not meant to overlap, and the surgery decides the order.</strong> If your operation is soon, run cycle 2 first and start the Gorilla Stack once you are healed and back to training properly &mdash; there is no point running a 16-week recomp block through a period where you cannot load the arm.</div></div>
+            <div class="nr"><div class="nr-l">Talk to your surgeon first</div><div class="nr-v"><strong>This matters more than anything else on the page.</strong> Compounds that affect blood vessel growth and tissue healing belong in a conversation with the person operating on you &mdash; before the operation, not after. Do not start cycle 2 until they have cleared you, and follow their timing over ours.</div></div>
+            <div class="nr fine"><div class="nr-v">We do not have a full intake on file for you yet &mdash; age, weight and training history would let us tighten the dosing guidance here. Send it over and this page gets updated.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Your Protocol</div>
+        <div class="sec-divider-title">2 Blocks &middot; Tap Any Cycle to Expand</div>
+      </div>
+
+      <details class="tier" style="border-left:4px solid #7A6530;">
+        <summary>
+          <div class="tier-summary-main">
+            <div class="tier-eyebrow" style="color:#7A6530;">Cycle 1 &middot; Ordered</div>
+            <div class="tier-name">Gorilla Stack 2.0</div>
+            <div class="tier-tagline" style="color:#7A6530;">HGH + CJC/Ipamorelin + IGF-1 LR3 + 5-Amino-1MQ + L-Carnitine</div>
+            <div class="tier-cadence">12-week main phase + 4-week HGH taper &middot; 16 weeks total</div>
+          </div>
+          <div class="tier-summary-price">
+            <div class="tier-pricetag-label" style="color:#7A6530;">Cycle Price</div>
+            <div class="tier-pricetag-amount" style="color:#7A6530;">$1,595</div>
+            <div class="tier-pricetag-sub">5 compounds &middot; bundle price</div>
+          </div>
+        </summary>
+        <div class="tier-body">
+            <div class="tier-includes">Targets</div>
+            <ul class="tier-compounds">
+              <li>Recomposition &mdash; muscle up, fat down, together</li>
+              <li>Growth hormone axis worked from both ends</li>
+              <li>Fat mobilised and then actually burned</li>
+              <li>A stepped taper so nothing stops abruptly</li>
+              </ul>
+            <div class="tier-desc"><strong>The full Gorilla Stack, run as a 16-week block.</strong> Five compounds working three different levers: HGH and CJC/Ipamorelin on the growth hormone axis from outside and inside, IGF-1 LR3 directly on muscle, and 5-Amino-1MQ with L-Carnitine on the fat side &mdash; one releasing it, the other making sure it gets burned. <strong>Weeks 1&ndash;12 are the main phase; Weeks 13&ndash;16 are HGH only, stepping down.</strong></div>
+        <div class="cmp-list">
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">HGH (Somatropin) &middot; 24 IU <span class="cmp-badge">Growth Hormone</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Growth hormone itself, not a secretagogue.</strong> Where CJC/Ipamorelin asks your pituitary for more of your own, this supplies it directly. <strong>24 IU in 2.4 mL means 1 IU = 0.10 mL</strong>, so 20 units is exactly 2 IU. Refrigerate after mixing.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2.4 mL bacteriostatic water per vial &middot; 1 IU = 0.10 mL</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M&ndash;F AM fasted or pre-bed &middot; all 16 weeks</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 2 IU &mdash; Weeks 1&ndash;12</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">The taper is the point</span><strong>You do not stop HGH abruptly.</strong> Weeks 13&ndash;14 drop to <strong>15u (1.5 IU)</strong>, Weeks 15&ndash;16 to <strong>10u (1.0 IU)</strong>, then off. Stepping down lets your own production come back up rather than leaving a hole.</div>
+            <div class="cmp-note"><span class="nl">Fasted matters</span>Food, and carbohydrate especially, blunts the release. Leave about two hours after your last meal, whichever end of the day you pick &mdash; then stay consistent.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">CJC-1295 / Ipamorelin &middot; 10 mg <span class="cmp-badge">GH Axis</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Two compounds that amplify your own growth hormone pulse.</strong> CJC-1295 widens the release window, Ipamorelin triggers a clean pulse without touching cortisol or hunger. <strong>10 mg in 2 mL</strong>, so 10 units is 500 mcg of the blend.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M&ndash;F pre-bed &middot; empty stomach, 2+ hrs after food &middot; Weeks 1&ndash;12</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 500 mcg blend</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">Why it runs alongside the HGH</span>It works on a different lever &mdash; your own pituitary rather than an outside supply &mdash; and the natural pulse it produces is what keeps your own axis from going quiet while the HGH is running. It stops at Week 12, before the taper begins.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">IGF-1 LR3 &middot; 1 mg <span class="cmp-badge">Anabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A long-acting form of insulin-like growth factor 1</strong> that acts on muscle tissue directly rather than through the pituitary. The LR3 modification keeps it active far longer than natural IGF-1. <strong>1 mg in 1 mL</strong>, so 5 units is 50 mcg.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">1 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M / W / F post-workout +30 min &middot; with a carb meal &middot; Weeks 1&ndash;12</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">5u &middot; 50 mcg</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">Timing is not optional here</span><strong>Thirty minutes after training, with carbohydrate.</strong> IGF-1 works with insulin, not against it &mdash; taken fasted it does noticeably less. This is the one compound on the page where getting the timing wrong wastes the dose outright.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="cmp-badge">Metabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> It blocks the enzyme that lets fat cells hoard energy, shifting fat-cell metabolism toward burning while supporting NAD+ salvage. <strong>50 mg in 2.5 mL</strong>, so 10 units is 2 mg.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2.5 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M / W / F AM &middot; Weeks 1&ndash;10, then M&ndash;F for Weeks 11&ndash;12</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 2 mg</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">It ramps at the end</span>Weeks 1&ndash;10 run M/W/F. <strong>Weeks 11&ndash;12 step up to five mornings a week</strong> for the final metabolic push before the HGH taper starts.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">L-Carnitine &middot; 6,000 mg / 10 mL <span class="cmp-badge">Fat Transport</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Carries fatty acids into the mitochondria to be burned.</strong> Without enough carnitine, fat that has been released has nowhere to go. Pre-mixed &mdash; no reconstitution. <strong>500 mg is 0.85 mL</strong>, which is why this one needs a bigger syringe.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">Pre-mixed &middot; no reconstitution. Refrigerate after first use.</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M / W / F pre-workout 30&ndash;45 min &middot; or AM with carbs on rest days &middot; Weeks 1&ndash;12</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">0.85 mL &middot; 500 mg</span></div>
+              <div class="fld"><span class="fld-l">Route</span><span class="fld-v">IM &mdash; glute, quad or delt &middot; rotate every shot</span></div>
+              <div class="fld"><span class="fld-l">Needle</span><span class="fld-v"><strong>NOT an insulin syringe.</strong> 3 mL Luer-lock + 25G 1.5&Prime; needle</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">The one that is different</span><strong>This is an intramuscular injection, not subcutaneous</strong>, and it needs a proper 3 mL syringe with a 1.5-inch 25G needle. Rotate sites every single shot &mdash; glute, quad, delt &mdash; and push slowly. It is the only compound here that will not go through an insulin needle.</div>
+            </div>
+
+        </div>
+        <div class="tier-total-row"><span class="tier-total-label">Cycle 1 total</span><span class="tier-total-amount">$1,595</span></div>
+        </div>
+      </details>
+
+      <details class="tier" style="border-left:4px solid #b85555;">
+        <summary>
+          <div class="tier-summary-main">
+            <div class="tier-eyebrow" style="color:#b85555;">Cycle 2 &middot; After Surgery</div>
+            <div class="tier-name">The Rebuild</div>
+            <div class="tier-tagline" style="color:#b85555;">BPC-157/TB-500 + KPV + GHK-Cu + Cartalax</div>
+            <div class="tier-cadence">AM and PM blocks &middot; ~20 days per bottle set</div>
+          </div>
+          <div class="tier-summary-price">
+            <div class="tier-pricetag-label" style="color:#b85555;">Cycle Price</div>
+            <div class="tier-pricetag-amount" style="color:#b85555;">$315</div>
+            <div class="tier-pricetag-sub">4 compounds &middot; 11 vials</div>
+          </div>
+        </summary>
+        <div class="tier-body">
+            <div class="tier-includes">Targets</div>
+            <ul class="tier-compounds">
+              <li>A torn bicep tendon, repaired surgically</li>
+              <li>Tendon and connective tissue rebuild</li>
+              <li>Post-operative inflammation control</li>
+              <li>Collagen supply for the repair and the scar</li>
+              </ul>
+            <div class="tier-desc"><strong>This is the cycle for the bicep.</strong> Four compounds, each pointed at a different part of the same problem: BPC-157/TB-500 rebuilds the tendon, KPV keeps post-operative inflammation from outlasting its usefulness, GHK-Cu supplies the collagen the repair is made of, and Cartalax works on the bone the tendon anchors into.<br><br><strong>Timing is your surgeon's call, not ours.</strong> Do not start this cycle until they have cleared you. Anything affecting blood vessel growth and tissue healing belongs in that conversation before an operation, not after.</div>
+        <div class="cmp-list">
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">BPC-157 / TB-500 &middot; 10 mg <span class="cmp-badge">Tendon Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The repair pair, and the reason this cycle exists.</strong> BPC-157 drives new blood vessel growth into damaged tissue and is the most researched compound available for tendon and ligament repair specifically; TB-500 works systemically on cell migration and flexibility. <strong>10 mg in 2 mL</strong>, so 40 units is 2 mg.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Every day &middot; PM &middot; 4 vials</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">40u &middot; 2 mg combined</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">Why this is the centrepiece</span>A torn bicep tendon is exactly the tissue BPC-157 has the most research behind. <strong>Tendon is poorly vascularised, which is why it heals slowly</strong> &mdash; BPC-157's main mechanism is driving blood supply into tissue that does not have much. Running it in the PM block puts the repair signal into your overnight recovery window.</div>
+            <div class="cmp-note"><span class="nl">Around the operation</span><strong>Do not start this until your surgeon clears you.</strong> Anything that affects tissue healing and blood vessel growth is their call around an operation, not ours. Tell them you intend to use recovery peptides and follow their timing.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">KPV &middot; 10 mg <span class="cmp-badge">Anti-Inflammatory</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The active fragment of alpha-MSH.</strong> Calms inflammatory signalling without broadly suppressing the immune system &mdash; a distinction that matters when you are healing rather than fighting an infection. <strong>10 mg in 2 mL</strong>, so 40 units is 2 mg.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Every day &middot; AM &middot; 4 vials</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">40u &middot; 2 mg</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">Why inflammation control matters post-op</span>Inflammation is what turns a clean repair into a long recovery. <strong>KPV quiets the inflammatory response without shutting down the healing it is part of</strong>, which is the balance you want after surgery.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">GHK-Cu &middot; 50 mg <span class="cmp-badge">Collagen</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The copper peptide behind collagen synthesis and wound repair.</strong> Tendon is largely collagen, so this is the compound supplying the raw material for what is being rebuilt. <strong>50 mg in 3 mL</strong>, so 10 units is 1.7 mg.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Every day &middot; AM &middot; 1 vial</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1.7 mg</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">Collagen and the scar</span>Beyond the tendon itself, GHK-Cu is the compound most associated with better wound healing at the surgical site. <strong>Skin quality is usually the first visible sign it is working</strong>, which makes it a useful early signal.</div>
+            </div>
+
+          <div class="cmp-row">
+            <span class="cmp-row-name">Cartalax &middot; 20 mg <span class="cmp-badge">Joint &amp; Bone</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A Khavinson tetrapeptide targeting cartilage and bone tissue</strong> rather than soft tissue. Runs as a short defined course a few times a year, not continuously. <strong>20 mg in 2 mL</strong>, so 20 units is 2 mg.</span></span></span>
+            <div class="cmp-fields">
+              <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL bacteriostatic water per vial</span></div>
+              <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Every day &middot; PM &middot; 2 vials</span></div>
+              <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 2 mg</span></div>
+              </div>
+            <div class="cmp-note"><span class="nl">Why it belongs in a post-op cycle</span>A bicep tendon repair is an anchor into bone, not just a soft-tissue stitch. <strong>Cartalax is the one compound here aimed at the bone side of that join</strong> &mdash; the part that has to hold once the tendon has healed.</div>
+            </div>
+
+        </div>
+        <div class="tier-total-row"><span class="tier-total-label">Cycle 2 total</span><span class="tier-total-amount">$315</span></div>
+        </div>
+      </details>
+
+      <div class="chart-note">
+        <span class="nl">How to read this page</span>
+        <p><strong>Cycle 1 is the Gorilla Stack, ordered as a bundle at $1,595.</strong> Cycle 2 is the bicep repair block at $315. <strong>Together, $1,910.</strong> They run at different times rather than together &mdash; the repair block belongs around the surgery, and the recomp block belongs to a period when you can train the arm properly.</p>
+      </div>
+
+    </div><!-- /protocol tab -->
+
+    <!-- ================= INVOICE ================= -->
+    <div class="tab-content" id="tab-invoice">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Invoice</div>
+        <div class="sec-divider-title">BLS-OG-0830 &middot; Two Blocks</div>
+      </div>
+
+      <div class="totals-block">
+        <div class="total-row" style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);padding-bottom:2px;"><span class="tr-name">Cycle 1 &middot; Gorilla Stack 2.0 &middot; 16 Weeks</span><span class="tr-val"></span></div>
+        <div class="total-row"><span class="tr-name"><strong>HGH (Somatropin)</strong> 24 IU<span class="sub">Growth hormone &mdash; M&ndash;F, 20u, tapered Wks 13&ndash;16</span></span><span class="tr-val">$125 / vial</span></div>
+        <div class="total-row"><span class="tr-name"><strong>CJC-1295 / Ipamorelin</strong> 10 mg<span class="sub">GH axis &mdash; M&ndash;F pre-bed, 10u</span></span><span class="tr-val">$45 / vial</span></div>
+        <div class="total-row"><span class="tr-name"><strong>IGF-1 LR3</strong> 1 mg<span class="sub">Direct anabolic &mdash; M/W/F post-workout, 5u</span></span><span class="tr-val">$80 / vial</span></div>
+        <div class="total-row"><span class="tr-name"><strong>5-Amino-1MQ</strong> 50 mg<span class="sub">NNMT inhibitor &mdash; M/W/F AM, 10u</span></span><span class="tr-val">$100 / vial</span></div>
+        <div class="total-row"><span class="tr-name"><strong>L-Carnitine</strong> 6,000 mg / 10 mL<span class="sub">Fat transport &mdash; M/W/F pre-workout, IM</span></span><span class="tr-val">$45 / vial</span></div>
+        <div class="total-row sub"><span class="tr-name">Cycle 1 &mdash; Gorilla Stack 2.0 bundle</span><span class="tr-val">$1,595.00</span></div>
+
+        <div class="total-row" style="font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);padding:14px 0 2px;"><span class="tr-name">Cycle 2 &middot; The Rebuild &middot; Post-Surgical</span><span class="tr-val"></span></div>
+        <div class="total-row"><span class="tr-name"><strong>BPC-157 / TB-500</strong> 10 mg &times; 4 vials @ $35<span class="sub">Tendon repair &mdash; daily PM, 40u</span></span><span class="tr-val">$140.00</span></div>
+        <div class="total-row"><span class="tr-name"><strong>KPV</strong> 10 mg &times; 4 vials @ $25<span class="sub">Anti-inflammatory &mdash; daily AM, 40u</span></span><span class="tr-val">$100.00</span></div>
+        <div class="total-row"><span class="tr-name"><strong>Cartalax</strong> 20 mg &times; 2 vials @ $25<span class="sub">Joint and bone &mdash; daily PM, 20u</span></span><span class="tr-val">$50.00</span></div>
+        <div class="total-row"><span class="tr-name"><strong>GHK-Cu</strong> 50 mg &times; 1 vial @ $25<span class="sub">Collagen &mdash; daily AM, 10u</span></span><span class="tr-val">$25.00</span></div>
+        <div class="total-row sub"><span class="tr-name">Cycle 2 subtotal &middot; 11 vials</span><span class="tr-val">$315.00</span></div>
+
+        <div class="total-row" style="color:#2f7a4a;padding-top:14px;"><span class="tr-name">Bacteriostatic Water &times; 5 bottles (10 mL)</span><span class="tr-val" style="color:#2f7a4a;font-weight:700;">FREE</span></div>
+        <div class="total-row grand"><span class="tr-name">Order Total &mdash; both blocks</span><span class="tr-val">$1,910.00</span></div>
+      </div>
+
+      <div class="totals-block">
+        <div class="total-row"><span class="tr-name">Account Total</span><span class="tr-val">$1,910.00</span></div>
+        <div class="total-row"><span class="tr-name">Paid to Date</span><span class="tr-val">$0.00</span></div>
+        <div class="total-row grand"><span class="tr-name">Balance Due</span><span class="tr-val">$1,910.00</span></div>
+      </div>
+
+      <div class="chart-note">
+        <span class="nl">You can split these</span>
+        <p><strong>The two blocks run at different times, so they can be bought at different times.</strong> If surgery is close, take <strong>The Rebuild at $315</strong> now and leave the Gorilla Stack until you are back to training &mdash; a 16-week recomp block is wasted if you cannot load the arm through it.</p>
+      </div>
+
+    </div><!-- /invoice tab -->
+
+    <!-- ================= SCHEDULE ================= -->
+    <div class="tab-content" id="tab-schedule">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Weekly Schedule</div>
+        <div class="sec-divider-title">Cycle 1 &middot; Main Phase</div>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div class="sched-card-title">Gorilla Stack &mdash; Weeks 1&ndash;12</div>
+          <div class="sched-phase-pill">2&ndash;5 shots/day</div>
+        </div>
+        <div class="sched-card-sub">Mon / Wed / Fri are the heavy days with all five compounds. Tue / Thu are two shots. Weekends are off entirely.</div>
+        <div class="sched-scroll">
+          <table class="sched-table">
+            <thead><tr><th>Day</th><th>AM / Pre-workout</th><th>PM (pre-bed)</th><th class="right">Shots</th></tr></thead>
+            <tbody>
+              <tr><td class="sched-day">Mon</td>
+                <td><span class="sched-pill am">20u &middot; HGH</span><span class="sched-pill am-mwf">10u &middot; 5-Amino</span><span class="sched-pill am-mwf">0.85 mL &middot; L-Carnitine IM</span><span class="sched-pill am-mth">5u &middot; IGF-1 LR3</span></td>
+                <td><span class="sched-pill pm">10u &middot; CJC/Ipa</span></td>
+                <td class="right"><span class="sched-count">5</span></td></tr>
+              <tr><td class="sched-day">Tue</td>
+                <td><span class="sched-pill am">20u &middot; HGH</span></td>
+                <td><span class="sched-pill pm">10u &middot; CJC/Ipa</span></td>
+                <td class="right"><span class="sched-count">2</span></td></tr>
+              <tr><td class="sched-day">Wed</td>
+                <td><span class="sched-pill am">20u &middot; HGH</span><span class="sched-pill am-mwf">10u &middot; 5-Amino</span><span class="sched-pill am-mwf">0.85 mL &middot; L-Carnitine IM</span><span class="sched-pill am-mth">5u &middot; IGF-1 LR3</span></td>
+                <td><span class="sched-pill pm">10u &middot; CJC/Ipa</span></td>
+                <td class="right"><span class="sched-count">5</span></td></tr>
+              <tr><td class="sched-day">Thu</td>
+                <td><span class="sched-pill am">20u &middot; HGH</span></td>
+                <td><span class="sched-pill pm">10u &middot; CJC/Ipa</span></td>
+                <td class="right"><span class="sched-count">2</span></td></tr>
+              <tr><td class="sched-day">Fri</td>
+                <td><span class="sched-pill am">20u &middot; HGH</span><span class="sched-pill am-mwf">10u &middot; 5-Amino</span><span class="sched-pill am-mwf">0.85 mL &middot; L-Carnitine IM</span><span class="sched-pill am-mth">5u &middot; IGF-1 LR3</span></td>
+                <td><span class="sched-pill pm">10u &middot; CJC/Ipa</span></td>
+                <td class="right"><span class="sched-count">5</span></td></tr>
+              <tr><td class="sched-day">Sat</td><td><span class="sched-pill off">off</span></td><td><span class="sched-pill off">off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+              <tr><td class="sched-day">Sun</td><td><span class="sched-pill off">off</span></td><td><span class="sched-pill off">off</span></td><td class="right"><span class="sched-count off">0</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="chart-note">
+        <span class="nl">Weeks 11&ndash;12 &middot; the 5-Amino ramp</span>
+        <p>5-Amino-1MQ steps up from M/W/F to <strong>five mornings a week</strong> for the last two weeks of the main phase &mdash; the final metabolic push before the taper.</p>
+      </div>
+
+      <div class="chart-note">
+        <span class="nl">Weeks 13&ndash;16 &middot; HGH taper, nothing else</span>
+        <p>Everything except HGH stops at the end of Week 12. HGH steps down: <strong>Weeks 13&ndash;14 at 15u (1.5 IU)</strong>, then <strong>Weeks 15&ndash;16 at 10u (1.0 IU)</strong>, then off. Same M&ndash;F cadence throughout.</p>
+      </div>
+
+      <div class="sched-card">
+        <div class="sched-card-head">
+          <div class="sched-card-title">Cycle 2 &mdash; The Rebuild</div>
+          <div class="sched-phase-pill">4 shots/day</div>
+        </div>
+        <div class="sched-card-sub">All four compounds run every single day including weekends &mdash; healing does not take days off. Roughly 20 days per bottle set.</div>
+        <div class="sched-scroll">
+          <table class="sched-table">
+            <thead><tr><th>Day</th><th>AM</th><th>PM</th><th class="right">Shots</th></tr></thead>
+            <tbody>
+              <tr><td class="sched-day">Every day</td>
+                <td><span class="sched-pill am">40u &middot; KPV</span><span class="sched-pill am">10u &middot; GHK-Cu</span></td>
+                <td><span class="sched-pill pm">40u &middot; BPC/TB</span><span class="sched-pill pm">20u &middot; Cartalax</span></td>
+                <td class="right"><span class="sched-count">4</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /schedule tab -->
+
+    <!-- ================= SUPPLIES ================= -->
+    <div class="tab-content" id="tab-supplies">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Supplies</div>
+        <div class="sec-divider-title">What You Need On Hand</div>
+      </div>
+
+      <div class="data-card">
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Insulin Syringes &mdash; 31G, 1/2&quot;, 1 mL</div>
+            <div class="supply-info-desc">For everything except the L-Carnitine. The 40-unit KPV and BPC/TB draws in cycle 2 need the full 1 mL barrel. Around 19 per week on cycle 1, 28 per week on cycle 2.</div>
+          </div>
+          <a href="https://www.amazon.com/s?k=31g+insulin+syringes+1ml" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">3 mL Luer-Lock Syringes + 25G 1.5&Prime; Needles</div>
+            <div class="supply-info-desc"><strong>For the L-Carnitine only &mdash; this one is intramuscular.</strong> 0.85 mL will not draw properly through an insulin needle, and an insulin needle is far too short to reach muscle. Three per week.</div>
+          </div>
+          <a href="https://www.amazon.com/s?k=3ml+luer+lock+syringe+25g+1.5+needle" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Bacteriostatic Water &mdash; 10 mL vials</div>
+            <div class="supply-info-desc">Cycle 1 needs about 2.4 mL per HGH vial plus 2 mL, 1 mL and 2.5 mL for the others. Cycle 2 needs 21 mL across its 11 vials. Five bottles covers both with margin. L-Carnitine is pre-mixed and needs none.</div>
+          </div>
+          <span class="supply-link" style="pointer-events:none;">Included</span>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Alcohol Prep Pads</div>
+            <div class="supply-info-desc">One for the vial stopper, one for the site, every time. At up to five shots a day, buy the 200-count box.</div>
+          </div>
+          <a href="https://www.amazon.com/s?k=alcohol+prep+pads" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Peptide Organizer / Cold Storage</div>
+            <div class="supply-info-desc">Keeps reconstituted vials upright, labelled and cold. HGH in particular must stay refrigerated after mixing.</div>
+          </div>
+          <a href="https://www.amazon.com/dp/B0FH62NMF8" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+        <div class="supply-row">
+          <div class="supply-info">
+            <div class="supply-info-name">Sharps Container</div>
+            <div class="supply-info-desc">Non-negotiable, and more so here because the 25G IM needles are not something to have loose. Most pharmacies take full containers back.</div>
+          </div>
+          <a href="https://www.amazon.com/s?k=sharps+container" target="_blank" class="supply-link">Amazon &rarr;</a>
+        </div>
+      </div>
+
+    </div><!-- /supplies tab -->
+
+    <!-- ================= NOTES ================= -->
+    <div class="tab-content" id="tab-notes">
+
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Notes &amp; Tips</div>
+        <div class="sec-divider-title">Running This Well</div>
+      </div>
+
+      <div class="tip-card warn">
+        <div class="tip-head"><div class="tip-eyebrow">Before anything else</div><div class="tip-title">The Surgery Comes First</div></div>
+        <div class="tip-body">
+          <p><strong>Talk to your surgeon before you start cycle 2, and tell them you intend to use recovery peptides.</strong> Compounds that drive blood vessel growth and tissue healing are directly relevant to an operation &mdash; both to how it goes and to how they want you to recover. That is their call on timing, not ours.</p>
+          <p style="margin-top:12px;">The same applies in reverse: if the Gorilla Stack is already running when surgery is scheduled, tell them what you are on. <strong>Growth hormone and IGF-1 are not things a surgeon should find out about afterwards.</strong></p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-head"><div class="tip-eyebrow">The IM injection</div><div class="tip-title">L-Carnitine Is the Different One</div></div>
+        <div class="tip-body">
+          <p>Every other compound on this page goes subcutaneously with an insulin needle. <strong>L-Carnitine is intramuscular</strong> &mdash; 0.85 mL through a 25G 1.5-inch needle into glute, quad or delt.</p>
+          <p style="margin-top:12px;"><strong>Push slowly.</strong> A fast IM push is what makes people sore for days. Rotate sites every single shot, and with a bicep repair in the picture, keep it well away from the arm you are rehabbing.</p>
+        </div>
+      </div>
+
+      <div class="tip-card">
+        <div class="tip-head"><div class="tip-eyebrow">Reconstitution</div><div class="tip-title">Mixing Without Wrecking the Peptide</div></div>
+        <div class="tip-body">
+          <p>Aim the water at the <strong>side wall of the vial</strong>, not down onto the powder, and let it run down. Swirl gently or roll between your palms. <strong>Never shake</strong> &mdash; agitation breaks the peptide chains.</p>
+          <p style="margin-top:12px;"><strong>HGH is the fussy one.</strong> It must be refrigerated after mixing and it is the least tolerant of rough handling on this page. 2.4 mL per vial gives you the clean 1 IU = 0.10 mL maths that makes the taper easy to read.</p>
+        </div>
+      </div>
+
+      <div class="tip-card heal">
+        <div class="tip-head"><div class="tip-eyebrow">What to expect</div><div class="tip-title">Cycle 1, Realistically</div></div>
+        <div class="tip-body">
+          <p><strong>Weeks 1&ndash;4:</strong> sleep quality and recovery shift first &mdash; that is the HGH and CJC/Ipamorelin. Very little visible.</p>
+          <p style="margin-top:12px;"><strong>Weeks 4&ndash;8:</strong> body composition starts moving. Water retention in the hands or wrists early on is normal with HGH and usually settles.</p>
+          <p style="margin-top:12px;"><strong>Weeks 8&ndash;12:</strong> the recomposition becomes obvious. The 5-Amino ramp in Weeks 11&ndash;12 is timed for this stretch.</p>
+          <p style="margin-top:12px;"><strong>Weeks 13&ndash;16:</strong> HGH only, stepping down. <strong>You should not lose what you built during the taper</strong> &mdash; that is exactly why it steps rather than stops.</p>
+        </div>
+      </div>
+
+      <div class="tip-card heal">
+        <div class="tip-head"><div class="tip-eyebrow">Cycle 2</div><div class="tip-title">Healing a Tendon Takes Longer Than You Want</div></div>
+        <div class="tip-body">
+          <p>Tendon is poorly supplied with blood, which is why it heals slowly and why BPC-157 &mdash; whose main mechanism is driving blood supply into tissue &mdash; is the centrepiece here.</p>
+          <p style="margin-top:12px;"><strong>Do not let feeling better become loading it early.</strong> These compounds can make the arm feel ready before the repair is structurally ready, and a re-tear costs far more than the weeks you save. <strong>Your surgeon and physio set the loading schedule.</strong> The peptides support that timeline; they do not shorten it on their own authority.</p>
+        </div>
+      </div>
+
+    </div><!-- /notes tab -->
+
+  </div><!-- /inv-body -->
+
+  <div class="inv-footer">
+    <div class="footer-disc">For educational and research purposes only. Not medical advice. All compounds for research use. Consult a qualified healthcare provider before beginning any protocol &mdash; and your surgeon before any protocol around an operation.</div>
+    <div class="footer-brand">BioLinked Solutions &middot; BLS-OG-0830</div>
+  </div>
+
+</div><!-- /invoice-wrap -->
+
+<button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
+
+<script>
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(el){ el.classList.remove('active'); });
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('details').forEach(function(d){
+    d.addEventListener('toggle', function(){
+      if (!d.open) return;
+      var parent = d.parentElement;
+      if (!parent) return;
+      Array.prototype.forEach.call(parent.children, function(sib){
+        if (sib !== d && sib.tagName === 'DETAILS' && sib.open) sib.removeAttribute('open');
+      });
+      if (d.classList.contains('tier')){
+        requestAnimationFrame(function(){
+          var nav = document.querySelector('.bl-nav');
+          var tabs = document.querySelector('.tab-bar');
+          var offset = (nav ? nav.offsetHeight : 0) + (tabs ? tabs.offsetHeight : 0) + 10;
+          var y = d.getBoundingClientRect().top + window.pageYOffset - offset;
+          window.scrollTo({ top: y < 0 ? 0 : y, behavior: 'smooth' });
+        });
+      }
+    });
+  });
+});
+
+document.addEventListener('click', function(e){
+  var tip = e.target.closest && e.target.closest('.info-tip');
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){ if (t !== tip) t.classList.remove('is-open'); });
+  if (tip){ e.preventDefault(); e.stopPropagation(); tip.classList.toggle('is-open'); }
+}, true);
+</script>
+
+<script>
+(function(){
+  if ('serviceWorker' in navigator) {
+    let hadController_ = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadController_) window.location.reload(); });
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register('/ogarza/sw.js').catch(()=>{});
+    });
+  }
+  var DISMISS_KEY = 'bl-pwa-dismiss-ogarza';
+  if (localStorage.getItem(DISMISS_KEY)) return;
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var banner = document.getElementById('bl-pwa-banner');
+  var textEl = document.getElementById('bl-pwa-banner-text');
+  var installBtn = document.getElementById('bl-pwa-install-btn');
+  var dismissBtn = document.getElementById('bl-pwa-dismiss-btn');
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var isAndroid = /Android/i.test(ua);
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  function show(){
+    if (isIOS) {
+      textEl.innerHTML = '<strong>Dominic, save this protocol as an app:</strong> tap <span style="font-size:15px;">&#8682;</span> (Share) then "Add to Home Screen".';
+    } else if (isAndroid) {
+      textEl.innerHTML = '<strong>Install your protocol as an app</strong> &mdash; one-tap access on your home screen.';
+    } else {
+      textEl.innerHTML = '<strong>Tip:</strong> install this protocol as an app on your phone for quick access. Open this page in mobile Safari or Chrome.';
+    }
+    banner.classList.add('show');
+  }
+  dismissBtn.addEventListener('click', function(){
+    banner.classList.remove('show');
+    localStorage.setItem(DISMISS_KEY, '1');
+  });
+  installBtn.addEventListener('click', async function(){
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    var choice = await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    if (choice.outcome === 'accepted') {
+      banner.classList.remove('show');
+      localStorage.setItem(DISMISS_KEY, '1');
+    }
+  });
+  if (isIOS || isAndroid) {
+    setTimeout(show, 1500);
+  }
+})();
+</script>
+</body>
+</html>
