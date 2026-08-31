@@ -189,8 +189,35 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .nr-v{font-size:13.5px;line-height:1.65;color:var(--text);min-width:0;}
 .nr-v strong{font-weight:700;}
 
-.ask-line{text-align:center;font-size:12px;color:var(--muted);letter-spacing:0.06em;margin-top:22px;padding-top:16px;border-top:1px solid var(--border);}
-.ask-line strong{color:var(--gold);font-weight:700;letter-spacing:0.14em;text-transform:uppercase;font-size:10px;}
+/* ---- pricing ---- */
+.price-card{background:var(--surface);border:1px solid var(--gold-border);border-top:3px solid var(--gold);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,0.05),0 8px 26px rgba(0,0,0,0.07);overflow:hidden;margin-bottom:16px;}
+.price-head{padding:16px 20px 14px;background:linear-gradient(135deg,rgba(122,101,48,0.10),rgba(122,101,48,0.02)),var(--head);border-bottom:1px solid var(--border);}
+.price-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);}
+.price-title{font-size:19px;font-weight:700;color:var(--text);margin-top:4px;letter-spacing:-0.01em;line-height:1.2;}
+.price-split{display:grid;grid-template-columns:1.2fr 1fr;}
+.price-cell{padding:20px;}
+.price-cell + .price-cell{border-left:1px solid var(--border);background:var(--zebra);}
+.price-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);}
+.price-amount{font-size:42px;font-weight:700;color:var(--gold);line-height:1;margin-top:9px;letter-spacing:-0.01em;}
+.price-amount .per{font-size:15px;font-weight:600;color:var(--muted);letter-spacing:0.02em;margin-left:3px;}
+.price-note{font-size:12px;color:var(--muted);line-height:1.65;margin-top:9px;}
+.price-note strong{color:var(--text);font-weight:700;}
+.price-incl{list-style:none;padding:15px 20px 7px;border-top:1px solid var(--border);margin:0;}
+.price-incl li{font-size:13px;color:var(--text);line-height:1.55;padding:6px 0;display:flex;gap:10px;align-items:flex-start;}
+.price-incl li::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold);flex:none;margin-top:7px;}
+.price-incl strong{font-weight:700;}
+.price-foot{padding:9px 20px 16px;font-size:11.5px;color:var(--muted);line-height:1.7;}
+.price-bar{background:var(--surface);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--shadow);padding:16px 20px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+.price-bar-left{flex:1;min-width:230px;}
+.price-bar-label{font-size:9px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);}
+.price-bar-sub{font-size:12.5px;color:var(--muted);line-height:1.65;margin-top:6px;}
+.price-bar-right{text-align:right;flex-shrink:0;}
+.price-bar .price-amount{font-size:32px;margin-top:0;}
+.price-bar-alt{font-size:11.5px;color:var(--muted);margin-top:5px;letter-spacing:0.02em;}
+/* bl-theme resets the family for everything inside .invoice-wrap, so the
+   serif on the money figures needs to out-specify that universal rule. */
+html[data-theme] .price-card .price-amount,
+html[data-theme] .price-bar .price-amount{font-family:'Cormorant Garamond',Georgia,serif;}
 
 .inv-footer{padding:16px 34px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-disc{font-size:12px;color:var(--muted);line-height:1.65;max-width:460px;}
@@ -219,6 +246,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
   .cal-banner{flex-direction:column;align-items:stretch;}
   .cal-controls{flex-direction:column;align-items:stretch;}
   .cal-dl-btn,.cal-banner input[type=date]{width:100%;}
+  .price-split{grid-template-columns:1fr;}
+  .price-cell + .price-cell{border-left:none;border-top:1px solid var(--border);}
+  .price-amount{font-size:36px;}
+  .price-bar{flex-direction:column;align-items:flex-start;}
+  .price-bar-right{text-align:left;}
   .print-btn{margin-bottom:40px;}
 }
 @media print{
@@ -226,7 +258,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
   .print-btn,.tab-bar,.cal-banner,.bl-nav{display:none!important;}
   .invoice-wrap{border:none;width:100%;max-width:100%;box-shadow:none;}
   .tab-content{display:block!important;}
-  .cmp-row,.year-cell,.sched-card,.data-card,.supply-row{box-shadow:none;break-inside:avoid;}
+  .cmp-row,.year-cell,.sched-card,.data-card,.supply-row,.price-card,.price-bar{box-shadow:none;break-inside:avoid;}
 }
 </style>
 <!-- BioLinked site theme - mpauldino palette -->
@@ -396,7 +428,36 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         </tbody>
       </table></div></div>
 
-      <div class="ask-line"><strong>Pricing on request</strong><br>Vial counts and the full-year supply list are on the Supplies tab.</div>
+      <div class="sec-divider mt">
+        <div class="sec-divider-eyebrow">Investment</div>
+        <div class="sec-divider-title">One Price, Twelve Months</div>
+      </div>
+
+      <div class="price-card">
+        <div class="price-head">
+          <div class="price-eyebrow">All-Inclusive &middot; 52 Weeks</div>
+          <div class="price-title">The Full 12-Month Protocol</div>
+        </div>
+        <div class="price-split">
+          <div class="price-cell">
+            <div class="price-label">Paid in Full</div>
+            <div class="price-amount">$2,970</div>
+            <div class="price-note">One payment covers the entire year &mdash; <strong>all 63 vials</strong>, all six cycles, and the foundation for all 52 weeks.</div>
+          </div>
+          <div class="price-cell">
+            <div class="price-label">Or Monthly</div>
+            <div class="price-amount">$250<span class="per">/mo</span></div>
+            <div class="price-note">Twelve payments, <strong>$3,000</strong> in total. Paying in full is $30 less.</div>
+          </div>
+        </div>
+        <ul class="price-incl">
+          <li><strong>All 63 vials</strong> across the eight compounds &mdash; nothing further to order mid-year.</li>
+          <li><strong>The year-round foundation</strong> &mdash; Testosterone, HGH and Retatrutide, every week for 52.</li>
+          <li><strong>All six eight-week cycles</strong> plus the four-week close.</li>
+          <li><strong>The written protocol</strong> &mdash; dosing, weekly schedules and the 52-week calendar file.</li>
+        </ul>
+        <div class="price-foot">Injection supplies &mdash; syringes, bacteriostatic water, prep pads and a sharps container &mdash; are ordered directly from the links on the Supplies tab and sit outside the protocol price.</div>
+      </div>
 
     </div><!-- /overview -->
 
@@ -719,6 +780,17 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="chart-note"><span class="nl">Why these counts</span><p>Vials are billed on whichever runs out first: the <strong>drug</strong> in the vial, or the <strong>30-day clock</strong> that starts the moment a vial is reconstituted. Retatrutide and NAD+ are the two capped by the clock &mdash; both hold more doses than four weeks of use, so each is counted at roughly one vial per four weeks rather than until empty. Testosterone is pre-mixed in oil and has no reconstitution clock at all, which is why a full year takes only four vials.</p></div>
 
+      <div class="price-bar">
+        <div class="price-bar-left">
+          <div class="price-bar-label">All 63 Vials &middot; Twelve Months</div>
+          <div class="price-bar-sub">Every vial in the table above is covered by the protocol price. The injection supplies below are ordered separately from the links.</div>
+        </div>
+        <div class="price-bar-right">
+          <div class="price-amount">$2,970</div>
+          <div class="price-bar-alt">or $250/mo &times; 12</div>
+        </div>
+      </div>
+
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Supplies</div>
         <div class="sec-divider-title">Order Before Week 1</div>
@@ -768,8 +840,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
           <div class="nr"><div class="nr-l">Site rotation</div><div class="nr-v">SubQ shots rotate across the four abdominal quadrants. Never use the same 1&Prime; spot two days running &mdash; over 52 weeks this matters more than it does over eight.</div></div>
         </div></div>
       </div>
-
-      <div class="ask-line"><strong>Pricing on request</strong><br>Vial counts above are the full twelve months. Ask for a quote on the year or on a single cycle.</div>
 
     </div><!-- /supplies -->
 
