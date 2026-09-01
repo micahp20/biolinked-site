@@ -139,7 +139,7 @@ window.PRODUCT_PRICES = [
    forLine:'Strong GH pulse plus heart-protective effects. For experienced GH users.',
    desc:'Potent GHRP that strongly stimulates GH release and exhibits cardioprotective properties. One of the most powerful GH secretagogues available.',
    keywords:'hexarelin ghrp cardioprotective potent growth hormone secretagogue'},
-  {name:'Testosterone (TRT)',sec:'hormone',cat:'hormone sexual',sku:null,size:null,price:null,variants:[{sku:'TC200',size:'Cypionate 200mg/mL · 10mL',price:'$85'},{sku:'TE200',size:'Enanthate 200mg/mL · 10mL',price:'$85'},{sku:'TP100',size:'Propionate 100mg/mL · 10mL',price:'$75'}],stock:true,
+  {name:'Testosterone (TRT)',sec:'hormone',cat:'hormone sexual',sku:null,size:null,price:null,variants:[{sku:'TC200',size:'Cypionate 250mg/mL · 10mL',price:'$100'},{sku:'TE200',size:'Enanthate 200mg/mL · 10mL',price:'$85'},{sku:'TP100',size:'Propionate 100mg/mL · 10mL',price:'$75'}],stock:true,
    forLine:'Replace declining testosterone — energy, muscle, libido, drive. The foundation of TRT.',
    desc:'Bioidentical testosterone esters for replacement therapy. Restores physiological testosterone levels, muscle mass, libido, mood, and metabolic function.',
    keywords:'testosterone trt cypionate enanthate propionate replacement therapy libido muscle'},

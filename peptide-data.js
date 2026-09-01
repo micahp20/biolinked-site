@@ -135,7 +135,7 @@ window.PEPTIDE_DATA = [
   { name:'Melanotan II',               cat:'sexual', vial:'10mg', bac:'2mL', dose:'250mcg',units:'5',  schedule:'Daily loading → maint', timing:'PM',             price:45,  in_stock:true },
   { name:'Oxytocin',                   cat:'sexual', vial:'10mg', bac:'10mL', dose:'50mcg',units:'5',  schedule:'As needed',         timing:'AM',                 price:60,  in_stock:true },
   { name:'Tadalafil (Cialis)',         cat:'sexual', vial:'30 × 20mg tabs', bac:'—', dose:'10-20mg', units:'—', schedule:'As needed / daily 5mg', timing:'30-60 min before', price:35, in_stock:false }, // not on product line
-  { name:'Testosterone Cypionate',     cat:'hormones', vial:'200mg/mL 10mL', bac:'—', dose:'100mg', units:'50', schedule:'2x per week', timing:'AM',                price:85,  in_stock:true },
+  { name:'Testosterone Cypionate',     cat:'hormones', vial:'250mg/mL 10mL', bac:'—', dose:'100mg', units:'50', schedule:'2x per week', timing:'AM',                price:100,  in_stock:true },
   { name:'Testosterone Enanthate',     cat:'hormones', vial:'200mg/mL 10mL', bac:'—', dose:'100mg', units:'50', schedule:'2x per week', timing:'AM',                price:85,  in_stock:true },
   { name:'Testosterone Propionate',    cat:'hormones', vial:'100mg/mL 10mL', bac:'—', dose:'50mg', units:'50', schedule:'3x per week',  timing:'AM',                price:75,  in_stock:true },
 
