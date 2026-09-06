@@ -1438,8 +1438,14 @@ function findInventoryForProduct(product){
     const direct = state.inventory.find(i => String(i.id) === String(product.inventory_id));
     if (direct) return direct;
   }
-  // Fuzzy name match
-  const norm = s => (s||"").toLowerCase().replace(/[\s\-–—_:]+/g,"").replace(/\d+(\.\d+)?(mg|mcg|iu|ml)s?\b/g,"").trim();
+  // Fallback name match — SIZE-PRESERVING on purpose.
+  // The old version stripped "30mg"/"10ml" before comparing, so every size of a
+  // compound collapsed to one key and .find() silently returned the wrong vial
+  // size (e.g. a 60mg Reta sale decremented the 20mg row). Sizes are kept in the
+  // key now, so a genuine mismatch returns null and the caller alerts instead of
+  // quietly moving the wrong stock. Every product carries inventory_id, so this
+  // path should only ever fire for a product created outside the app.
+  const norm = s => (s||"").toLowerCase().replace(/[\s\-–—_:]+/g,"").trim();
   const pn = norm(product.name);
   if (!pn) return null;
   return state.inventory.find(i => {
