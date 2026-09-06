@@ -30,6 +30,11 @@
       inventory: "inventory"
     },
 
+    // Overhead spread per vial sold. Product costs stay pure supplier cost;
+    // overhead is applied separately here so changing it never rewrites COGS.
+    // $5.81 computed + $1.19 buffer = $7.00. Edit this one number to re-rate.
+    OVERHEAD_PER_VIAL: 7.00,
+
     // Thresholds
     LOW_STOCK_THRESHOLD: 3,         // ≤ this many vials = "Low"
     REENGAGE_DAYS: 60,              // days since last sale = re-engage candidate
@@ -396,6 +401,25 @@
       <div class="kpi"><div class="kpi-accent" style="background:var(--warn)"></div><div class="kpi-label">Outstanding Orders</div><div class="kpi-value warn" id="kpi-outstanding">—</div><div class="kpi-sub" id="kpi-outstanding-sub">vendors · in transit</div></div>
       <div class="kpi"><div class="kpi-accent" style="background:var(--success)"></div><div class="kpi-label">Revenue (MTD)</div><div class="kpi-value success" id="kpi-revenue">—</div><div class="kpi-sub" id="kpi-revenue-sub">vs last month</div></div>
       <div class="kpi"><div class="kpi-accent"></div><div class="kpi-label">Net Profit (MTD)</div><div class="kpi-value gold" id="kpi-profit">—</div><div class="kpi-sub" id="kpi-margin-sub">margin %</div></div>
+    </div>
+
+    <!-- Revenue → COGS → Gross → Overhead → Net (month to date) -->
+    <div class="section">
+      <div class="section-head">
+        <div class="section-title">Profit <em>Flow</em></div>
+        <div class="section-sub" style="font-size:11px;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;">Month to date &middot; overhead <span id="pf-rate">$7.00</span>/vial</div>
+      </div>
+      <div class="table-wrap">
+        <table class="data" id="table-profit-flow">
+          <tbody>
+            <tr><td>Revenue</td><td class="num" id="pf-revenue">—</td><td class="num" style="color:var(--text-muted);" id="pf-revenue-note"></td></tr>
+            <tr><td>&minus; COGS</td><td class="num" id="pf-cogs">—</td><td class="num" style="color:var(--text-muted);">supplier cost</td></tr>
+            <tr><td><strong>= Gross Profit</strong></td><td class="num" id="pf-gross">—</td><td class="num" style="color:var(--text-muted);" id="pf-gross-margin"></td></tr>
+            <tr><td>&minus; Overhead</td><td class="num" id="pf-overhead">—</td><td class="num" style="color:var(--text-muted);" id="pf-overhead-note"></td></tr>
+            <tr><td><strong>= Net Profit</strong></td><td class="num" id="pf-net">—</td><td class="num" id="pf-net-margin"></td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
     <div class="section">
       <div class="section-head">
@@ -886,8 +910,13 @@ function renderMoney(){
 
   const mtdRevenue = mtdSales.reduce((s,r)=>s+(r.total||0),0);
   const mtdCogs    = mtdSales.reduce((s,r)=>s+(r.cogs||0),0);
-  const mtdProfit  = mtdRevenue - mtdCogs;
+  const mtdGross   = mtdRevenue - mtdCogs;
+  // Option B overhead: product costs stay pure, overhead is spread per vial sold.
+  const mtdVials   = mtdSales.reduce((s,r)=>s+(r.qty||0),0);
+  const mtdOverhead= mtdVials * (CFG.OVERHEAD_PER_VIAL || 0);
+  const mtdProfit  = mtdGross - mtdOverhead;              // true NET
   const mtdMargin  = mtdRevenue ? (mtdProfit/mtdRevenue)*100 : 0;
+  const mtdGrossMargin = mtdRevenue ? (mtdGross/mtdRevenue)*100 : 0;
   const lastMoRevenue = lastMoSales.reduce((s,r)=>s+(r.total||0),0);
   const revDelta = lastMoRevenue ? ((mtdRevenue-lastMoRevenue)/lastMoRevenue)*100 : 0;
 
@@ -913,7 +942,22 @@ function renderMoney(){
   document.getElementById("kpi-revenue").textContent = fmt$(mtdRevenue);
   document.getElementById("kpi-revenue-sub").textContent = lastMoRevenue ? `${revDelta>=0?'+':''}${revDelta.toFixed(0)}% vs last mo` : "first month tracked";
   document.getElementById("kpi-profit").textContent = fmt$(mtdProfit);
-  document.getElementById("kpi-margin-sub").textContent = `${mtdMargin.toFixed(0)}% margin`;
+  document.getElementById("kpi-margin-sub").textContent = `${mtdMargin.toFixed(0)}% net margin`;
+
+  // Profit Flow strip — recomputes with the rest of renderMoney()
+  const setTxt = (id,v)=>{ const el=document.getElementById(id); if(el) el.textContent=v; };
+  setTxt("pf-rate",        fmt$(CFG.OVERHEAD_PER_VIAL||0));
+  setTxt("pf-revenue",     fmt$(mtdRevenue));
+  setTxt("pf-revenue-note",`${mtdSales.length} sale${mtdSales.length===1?'':'s'} · ${mtdVials} vial${mtdVials===1?'':'s'}`);
+  setTxt("pf-cogs",        "\u2212" + fmt$(mtdCogs));
+  setTxt("pf-gross",       fmt$(mtdGross));
+  setTxt("pf-gross-margin",`${mtdGrossMargin.toFixed(1)}% gross margin`);
+  setTxt("pf-overhead",    "\u2212" + fmt$(mtdOverhead));
+  setTxt("pf-overhead-note",`${mtdVials} vial${mtdVials===1?'':'s'} \u00d7 ${fmt$(CFG.OVERHEAD_PER_VIAL||0)}`);
+  setTxt("pf-net",         fmt$(mtdProfit));
+  setTxt("pf-net-margin",  `${mtdMargin.toFixed(1)}% net margin`);
+  const netEl = document.getElementById("pf-net");
+  if (netEl) netEl.className = "num " + (mtdProfit>=0 ? "profit-positive" : "");
 
   // Sortable header
   const moneyThead = document.querySelector("#table-money thead tr");
