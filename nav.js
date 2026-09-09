@@ -2,12 +2,12 @@
   const path = window.location.pathname;
   const isActive = (href) => {
     const clean = href.replace('.html','');
-    if(clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
+    if(clean === '/' || clean === '/index') return path === '/' || path === '/index.html' || path === '/index';
     return path.includes(clean.replace('/',''));
   };
 
   const links = [
-    {href:'/index.html', label:'Home'},
+    {href:'/', label:'Home'},
     {href:'/peptide-index.html', label:'Index'},
     {href:'/stacks-blends.html', label:'Stacks & Blends'},
   ];
@@ -20,7 +20,7 @@
   const navHTML = `
 <nav class="bl-nav" id="bl-nav">
   <div class="bl-nav-inner">
-    <a href="/index.html" class="bl-nav-logo">
+    <a href="/" class="bl-nav-logo">
       <span class="bl-nav-logo-main">BIO LINKED</span>
       <span class="bl-nav-logo-sub">Peptide Solutions</span>
     </a>
@@ -88,7 +88,7 @@
     <div>
       <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Resources</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Home</a>
+        <a href="/" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Home</a>
         <a href="/peptide-index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Index</a>
         <a href="/stacks-blends.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stacks & Blends</a>
       </div>
