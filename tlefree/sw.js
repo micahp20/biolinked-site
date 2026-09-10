@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'tlefree-v10';
+const CACHE = 'tlefree-v11';
 const ASSETS = [
   '/tlefree/',
   '/tlefree/index.html',

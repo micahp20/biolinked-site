@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'bcox-v15';
+const CACHE = 'bcox-v16';
 const ASSETS = [
   '/bcox/',
   '/bcox/index.html',
