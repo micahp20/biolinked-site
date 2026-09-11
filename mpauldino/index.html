@@ -492,6 +492,7 @@ details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var
       <button class="menu-item active" role="menuitem" data-label="Protocol" onclick="switchTab('protocol',this)"><span class="mi-label">Protocol</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="Schedule" onclick="switchTab('schedule',this)"><span class="mi-label">Schedule</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="Command Center" onclick="switchTab('command',this)"><span class="mi-label">Command Center</span><span class="chev" aria-hidden="true">&#9656;</span></button>
     </div>
   </nav>
@@ -1257,6 +1258,157 @@ details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var
 
   </div><!-- /schedule tab -->
 
+    <!-- ================ NUTRITION TAB ================ -->
+    <div class="tab-content" id="tab-nutrition">
+
+      <div class="nut-saved" id="nut-saved" hidden>
+        <div class="nut-saved-head">
+          <span class="nut-saved-title">My Meal Plan</span>
+          <button class="nut-link" onclick="nutClearSaved()">Clear</button>
+        </div>
+        <div class="nut-saved-meta" id="nut-saved-meta"></div>
+        <div id="nut-saved-plan"></div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Your Numbers</div>
+
+        <div class="nut-field">
+          <span class="nut-label">Sex</span>
+          <div class="nut-seg">
+            <button class="nut-seg-btn on" data-grp="sex" data-val="male" aria-pressed="true">Male</button>
+            <button class="nut-seg-btn" data-grp="sex" data-val="female" aria-pressed="false">Female</button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Units</span>
+          <div class="nut-seg">
+            <button class="nut-seg-btn on" data-grp="units" data-val="imperial" aria-pressed="true">Imperial<small>lb &middot; ft/in</small></button>
+            <button class="nut-seg-btn" data-grp="units" data-val="metric" aria-pressed="false">Metric<small>kg &middot; cm</small></button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <label class="nut-label" for="nut-age">Age</label>
+          <div class="nut-inputs"><input class="nut-input" id="nut-age" type="number" inputmode="numeric" min="14" max="99" value="30"><span class="nut-unit">yrs</span></div>
+        </div>
+
+        <div class="nut-field">
+          <label class="nut-label" for="nut-w">Weight</label>
+          <div class="nut-inputs"><input class="nut-input" id="nut-w" type="number" inputmode="decimal" value="180"><span class="nut-unit" id="nut-w-unit">lb</span></div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Height</span>
+          <div class="nut-inputs" id="nut-h-imp">
+            <input class="nut-input" id="nut-ft" type="number" inputmode="numeric" min="4" max="7" value="5"><span class="nut-unit">ft</span>
+            <input class="nut-input" id="nut-in" type="number" inputmode="numeric" min="0" max="11" value="10"><span class="nut-unit">in</span>
+          </div>
+          <div class="nut-inputs" id="nut-h-met" hidden>
+            <input class="nut-input" id="nut-cm" type="number" inputmode="numeric" min="120" max="230" value="178"><span class="nut-unit">cm</span>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Activity Level</span>
+          <div class="nut-seg">
+            <button class="nut-seg-btn" data-grp="activity" data-val="sedentary" aria-pressed="false">Sedentary<small>desk job</small></button>
+            <button class="nut-seg-btn" data-grp="activity" data-val="light" aria-pressed="false">Lightly Active<small>1&ndash;3 d/wk</small></button>
+            <button class="nut-seg-btn on" data-grp="activity" data-val="moderate" aria-pressed="true">Moderately Active<small>3&ndash;5 d/wk</small></button>
+            <button class="nut-seg-btn" data-grp="activity" data-val="very" aria-pressed="false">Very Active<small>6&ndash;7 d/wk</small></button>
+            <button class="nut-seg-btn" data-grp="activity" data-val="extra" aria-pressed="false">Extra Active<small>athlete</small></button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Goal</span>
+          <div class="nut-seg">
+            <button class="nut-seg-btn" data-grp="goal" data-val="lose" aria-pressed="false">Lose Fat<small>&minus;20%</small></button>
+            <button class="nut-seg-btn on" data-grp="goal" data-val="maintain" aria-pressed="true">Maintain<small>TDEE</small></button>
+            <button class="nut-seg-btn" data-grp="goal" data-val="gain" aria-pressed="false">Gain Muscle<small>+10%</small></button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Protein Target</span>
+          <div class="nut-seg">
+            <button class="nut-seg-btn" data-grp="protPerLb" data-val="0.8" aria-pressed="false">0.8<small>g / lb</small></button>
+            <button class="nut-seg-btn on" data-grp="protPerLb" data-val="1" aria-pressed="true">1.0<small>g / lb</small></button>
+            <button class="nut-seg-btn" data-grp="protPerLb" data-val="1.2" aria-pressed="false">1.2<small>g / lb</small></button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <label class="nut-label" for="nut-fat">Dietary Fat</label>
+          <div class="nut-range-row">
+            <input class="nut-range" id="nut-fat" type="range" min="15" max="40" step="1" value="25" aria-label="Dietary fat percentage">
+            <span class="nut-range-val" id="nut-fat-val">25%</span>
+          </div>
+        </div>
+
+        <div class="nut-field" style="margin-bottom:0;">
+          <span class="nut-label">Meals Per Day</span>
+          <div class="nut-seg">
+            <button class="nut-seg-btn" data-grp="meals" data-val="3" aria-pressed="false">3</button>
+            <button class="nut-seg-btn on" data-grp="meals" data-val="4" aria-pressed="true">4</button>
+            <button class="nut-seg-btn" data-grp="meals" data-val="5" aria-pressed="false">5</button>
+            <button class="nut-seg-btn" data-grp="meals" data-val="6" aria-pressed="false">6</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-cal-lbl">Daily Calories</div>
+        <div class="nut-cal-big" id="nut-cal">2,763</div>
+        <div class="nut-cal-sub" id="nut-cal-sub">BMR 1,783 | TDEE 2,763</div>
+        <hr style="border:none;border-top:1px solid var(--line-soft);margin:16px 0;">
+        <div class="nut-split">
+          <div class="nut-donut" id="nut-donut"></div>
+          <div class="nut-macros">
+            <div class="nut-macro p"><div class="nut-macro-top"><span class="nut-macro-name">Protein</span>
+              <span><span class="nut-macro-g" id="nut-p-g">180g</span><span class="nut-macro-pct" id="nut-p-pct">26%</span></span></div>
+              <div class="nut-macro-track"><div class="nut-macro-fill" id="nut-p-bar" style="width:26%"></div></div></div>
+            <div class="nut-macro c"><div class="nut-macro-top"><span class="nut-macro-name">Carbs</span>
+              <span><span class="nut-macro-g" id="nut-c-g">338g</span><span class="nut-macro-pct" id="nut-c-pct">49%</span></span></div>
+              <div class="nut-macro-track"><div class="nut-macro-fill" id="nut-c-bar" style="width:49%"></div></div></div>
+            <div class="nut-macro f"><div class="nut-macro-top"><span class="nut-macro-name">Fat</span>
+              <span><span class="nut-macro-g" id="nut-f-g">77g</span><span class="nut-macro-pct" id="nut-f-pct">25%</span></span></div>
+              <div class="nut-macro-track"><div class="nut-macro-fill" id="nut-f-bar" style="width:25%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Per Meal (<span id="nut-meals-n">4</span> meals/day)</div>
+        <div class="nut-pm">
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-cal">691</div><div class="nut-pm-l">Calories</div></div>
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-p">45g</div><div class="nut-pm-l">Protein</div></div>
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-c">84g</div><div class="nut-pm-l">Carbs</div></div>
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-f">19g</div><div class="nut-pm-l">Fat</div></div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <button class="nut-btn" onclick="nutCreatePlan(false)">Create Meal Plan</button>
+        <div class="nut-btn-row">
+          <button class="nut-btn ghost" onclick="nutSaveTargets()">Save as My Targets</button>
+        </div>
+      </div>
+
+      <div class="nut-card" id="nut-plan-wrap" hidden>
+        <div class="nut-card-head">Your Meal Plan</div>
+        <div id="nut-plan"></div>
+        <div class="nut-btn-row">
+          <button class="nut-btn" onclick="nutSavePlan()">Save Plan</button>
+          <button class="nut-btn ghost" onclick="nutCreatePlan(true)">Regenerate</button>
+        </div>
+      </div>
+
+      <div class="nut-toast" id="nut-toast" role="status" aria-live="polite"></div>
+
+    </div><!-- /nutrition -->
+
   <div class="tab-content" id="tab-command">
     <iframe id="cc-frame" title="Command Center" src="/mpauldino/command-center/embed.html" scrolling="no" loading="lazy"></iframe>
   </div><!-- /command tab -->
@@ -1509,6 +1661,110 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
   details.lab-section > summary.lab-section-head{gap:8px;padding-right:12px;}
   .lab-rank{min-width:54px;font-size:8px;padding:3px 7px;}
 }
+
+/* ===== Nutrition tab ===== */
+.nut-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
+  padding:16px 18px;margin-bottom:14px;}
+.nut-card-head{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:14px;}
+.nut-field{margin-bottom:15px;}
+.nut-label{display:block;font-size:10px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:7px;}
+.nut-seg{display:flex;flex-wrap:wrap;gap:6px;}
+.nut-seg-btn{flex:1 1 auto;min-width:64px;background:var(--surface);border:1px solid var(--line);
+  border-radius:6px;padding:10px 10px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;
+  font-weight:600;color:var(--text);line-height:1.3;text-align:center;-webkit-tap-highlight-color:transparent;
+  transition:background .14s,border-color .14s,color .14s;}
+.nut-seg-btn small{display:block;font-size:9px;font-weight:500;color:var(--muted);margin-top:2px;letter-spacing:0.02em;}
+.nut-seg-btn:hover{background:var(--hover);}
+.nut-seg-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.nut-seg-btn.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);}
+.nut-seg-btn.on small{color:rgba(255,255,255,0.78);}
+.nut-inputs{display:flex;gap:8px;align-items:center;}
+.nut-input{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;
+  padding:11px 12px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;color:var(--text);}
+.nut-input:focus{outline:2px solid var(--accent);outline-offset:-1px;}
+.nut-unit{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
+.nut-range{width:100%;accent-color:var(--accent);}
+.nut-range-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.nut-range-val{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-weight:700;color:var(--accent);}
+
+.nut-cal-big{font-family:'Cormorant Garamond',Georgia,serif;font-size:52px;font-weight:700;color:var(--text);line-height:1;}
+.nut-cal-lbl{font-size:10px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;}
+.nut-cal-sub{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:0.04em;}
+.nut-split{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
+.nut-donut{flex-shrink:0;}
+.nut-donut-n{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-weight:700;fill:var(--text);}
+.nut-donut-l{font-size:7px;font-weight:700;letter-spacing:0.16em;fill:var(--muted);}
+.nut-macros{flex:1;min-width:190px;}
+.nut-macro{margin-bottom:11px;}
+.nut-macro-top{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;margin-bottom:4px;}
+.nut-macro-name{font-weight:700;letter-spacing:0.08em;text-transform:uppercase;font-size:10px;}
+.nut-macro-g{font-family:'Cormorant Garamond',Georgia,serif;font-size:19px;font-weight:700;color:var(--text);}
+.nut-macro-pct{font-size:11px;color:var(--muted);margin-left:6px;}
+.nut-macro-track{height:7px;border-radius:99px;background:var(--line-soft);overflow:hidden;}
+.nut-macro-fill{height:100%;border-radius:99px;transition:width .25s;}
+.nut-macro.p .nut-macro-name{color:var(--accent);} .nut-macro.p .nut-macro-fill{background:var(--accent);}
+.nut-macro.c .nut-macro-name{color:var(--green);}  .nut-macro.c .nut-macro-fill{background:var(--green);}
+.nut-macro.f .nut-macro-name{color:var(--amber);}  .nut-macro.f .nut-macro-fill{background:var(--amber);}
+
+.nut-pm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.nut-pm-cell{background:var(--head);border:1px solid var(--line);border-radius:6px;padding:10px 8px;text-align:center;}
+.nut-pm-v{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;font-weight:700;color:var(--text);line-height:1.1;}
+.nut-pm-l{font-size:8.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+
+.nut-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);
+  color:var(--on-accent);border:1px solid var(--accent);border-radius:6px;padding:14px 20px;cursor:pointer;
+  font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  -webkit-tap-highlight-color:transparent;transition:background .16s;width:100%;}
+.nut-btn:hover{background:var(--accent-hover);}
+.nut-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.nut-btn.ghost{background:transparent;color:var(--accent);border-color:var(--accent-line);}
+.nut-btn.ghost:hover{background:var(--accent-dim);}
+.nut-btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.nut-btn-row .nut-btn{flex:1 1 130px;width:auto;}
+
+.nut-meal{border:1px solid var(--line);border-radius:8px;margin-bottom:10px;overflow:hidden;background:var(--surface);}
+.nut-meal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;
+  background:var(--head);border-bottom:1px solid var(--line);}
+.nut-meal-name{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);}
+.nut-meal-kcal{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;font-weight:700;color:var(--text);}
+.nut-meal-items{padding:4px 14px;}
+.nut-item{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;
+  border-bottom:1px solid var(--line-soft);font-size:13px;}
+.nut-item:last-child{border-bottom:none;}
+.nut-item-n{color:var(--text);}
+.nut-item-q{white-space:nowrap;font-weight:600;color:var(--text);}
+.nut-item-q em{font-style:normal;font-weight:500;color:var(--muted);font-size:11.5px;}
+.nut-meal-macros{display:flex;gap:14px;padding:9px 14px;background:var(--head);border-top:1px solid var(--line);
+  font-size:11px;font-weight:700;letter-spacing:0.06em;color:var(--muted);}
+.nut-plan-total{border:1px solid var(--accent-line);background:var(--accent-dim);border-radius:8px;padding:12px 14px;margin-top:12px;}
+.nut-plan-total-head{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
+.nut-plan-total-row{display:flex;align-items:baseline;gap:8px;font-size:12.5px;padding:3px 0;}
+.nut-plan-total-row span{flex:0 0 74px;color:var(--muted);}
+.nut-plan-total-row b{font-family:'Cormorant Garamond',Georgia,serif;font-size:17px;color:var(--text);}
+.nut-plan-total-row em{font-style:normal;font-size:11px;color:var(--muted);margin-left:auto;}
+
+.nut-saved{border:1px solid var(--accent-line);border-left:3px solid var(--accent);background:var(--surface);
+  border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+.nut-saved-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;}
+.nut-saved-title{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);}
+.nut-saved-meta{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.nut-link{background:none;border:none;padding:0;cursor:pointer;font-family:'Montserrat',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:underline;}
+.nut-link:hover{color:var(--accent);}
+
+.nut-toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(12px);background:#1a1a1a;
+  color:#fff;font-size:12px;padding:11px 18px;border-radius:99px;opacity:0;pointer-events:none;
+  transition:opacity .2s,transform .2s;z-index:200;box-shadow:0 6px 24px rgba(0,0,0,0.25);}
+.nut-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+@media(max-width:640px){
+  .nut-card{padding:14px 14px;}
+  .nut-cal-big{font-size:44px;}
+  .nut-pm{grid-template-columns:repeat(2,1fr);}
+  .nut-split{gap:12px;}
+  .nut-seg-btn{min-width:56px;font-size:10.5px;padding:9px 7px;}
+}
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
   <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
@@ -1587,6 +1843,447 @@ document.addEventListener('click', function(e){
     tip.classList.toggle('is-open');
   }
 }, true);  // useCapture: true so we run BEFORE the summary's default toggle handler
+</script>
+<script>
+/* ===================== NUTRITION TAB =====================================
+   Macro calculator + meal-plan generator. Everything client-side, no APIs.
+   Tunables live in NUT_CFG; the food library is NUT_FOODS.
+   ---------------------------------------------------------------------- */
+var NUT_CFG = {
+  /* goal adjustment applied to TDEE -> daily calorie target */
+  GOALS: { lose: -0.20, maintain: 0.00, gain: +0.10 },
+  ACTIVITY: { sedentary:1.2, light:1.375, moderate:1.55, very:1.725, extra:1.9 },
+  MIN_CAL: 1200,            /* never prescribe below this */
+  PORTION_STEP: 5,          /* round food portions to 5 g */
+  MIN_PORTION: 15,
+  MIN_PORTION_FAT: 5,      /* oils/nuts are usable in small amounts */
+  MAX_PORTION: 400,
+  MAX_PORTION_CARB: 500,   /* a 3-meal 3,000 kcal day needs big starch servings */
+  STORE_PLAN: 'mp-nutrition-plan-v1',
+  STORE_TARGETS: 'mp-nutrition-targets-v1'
+};
+
+/* Food library — per 100 g. hh = household measure for that 100 g.
+   cat: pro | carb | fat | veg | fruit                                     */
+var NUT_FOODS = [
+  /* ---- proteins ---- */
+  {n:'Chicken breast, grilled', cat:'pro', kcal:165, p:31,   c:0,   f:3.6, hh:'3.5 oz'},
+  {n:'Turkey breast',           cat:'pro', kcal:135, p:30,   c:0,   f:1,   hh:'3.5 oz'},
+  {n:'Lean sirloin steak',      cat:'pro', kcal:180, p:27,   c:0,   f:8,   hh:'3.5 oz'},
+  {n:'Ground beef 93/7',        cat:'pro', kcal:172, p:26,   c:0,   f:8,   hh:'3.5 oz'},
+  {n:'Ground turkey 93/7',      cat:'pro', kcal:176, p:27,   c:0,   f:7,   hh:'3.5 oz'},
+  {n:'Pork tenderloin',         cat:'pro', kcal:143, p:26,   c:0,   f:3.5, hh:'3.5 oz'},
+  {n:'Salmon fillet',           cat:'pro', kcal:208, p:20,   c:0,   f:13,  hh:'3.5 oz'},
+  {n:'Cod fillet',              cat:'pro', kcal:105, p:23,   c:0,   f:0.9, hh:'3.5 oz'},
+  {n:'Tilapia',                 cat:'pro', kcal:129, p:26,   c:0,   f:2.7, hh:'3.5 oz'},
+  {n:'Shrimp',                  cat:'pro', kcal:99,  p:24,   c:0.2, f:0.3, hh:'3.5 oz'},
+  {n:'Tuna, canned in water',   cat:'pro', kcal:116, p:26,   c:0,   f:0.8, hh:'1 can'},
+  {n:'Egg whites',              cat:'pro', kcal:52,  p:11,   c:0.7, f:0.2, hh:'3 whites'},
+  {n:'Whole eggs',              cat:'pro', kcal:143, p:13,   c:0.7, f:9.5, hh:'2 large'},
+  {n:'Greek yogurt, 0%',        cat:'pro', kcal:59,  p:10,   c:3.6, f:0.4, hh:'1/2 cup'},
+  {n:'Cottage cheese, 2%',      cat:'pro', kcal:84,  p:11,   c:4.3, f:2.3, hh:'1/2 cup'},
+  {n:'Whey protein powder',     cat:'pro', kcal:400, p:80,   c:8,   f:5,   hh:'3 scoops'},
+  {n:'Firm tofu',               cat:'pro', kcal:144, p:17,   c:3,   f:9,   hh:'3.5 oz'},
+  {n:'Tempeh',                  cat:'pro', kcal:192, p:20,   c:8,   f:11,  hh:'3.5 oz'},
+  /* ---- carbs ---- */
+  {n:'White rice, cooked',      cat:'carb',kcal:130, p:2.7,  c:28,  f:0.3, hh:'1/2 cup'},
+  {n:'Brown rice, cooked',      cat:'carb',kcal:123, p:2.7,  c:26,  f:1,   hh:'1/2 cup'},
+  {n:'Jasmine rice, cooked',    cat:'carb',kcal:129, p:2.7,  c:28,  f:0.3, hh:'1/2 cup'},
+  {n:'Quinoa, cooked',          cat:'carb',kcal:120, p:4.4,  c:21,  f:1.9, hh:'1/2 cup'},
+  {n:'Sweet potato, baked',     cat:'carb',kcal:90,  p:2,    c:21,  f:0.2, hh:'1 small'},
+  {n:'White potato, baked',     cat:'carb',kcal:93,  p:2.5,  c:21,  f:0.1, hh:'1 small'},
+  {n:'Oats, dry',               cat:'carb',kcal:389, p:17,   c:66,  f:7,   hh:'1 cup'},
+  {n:'Whole-wheat pasta, cooked',cat:'carb',kcal:124,p:5,    c:26,  f:0.5, hh:'1/2 cup'},
+  {n:'Pasta, cooked',           cat:'carb',kcal:131, p:5,    c:25,  f:1.1, hh:'1/2 cup'},
+  {n:'Whole-grain bread',       cat:'carb',kcal:250, p:13,   c:41,  f:3.5, hh:'2 slices'},
+  {n:'Black beans, cooked',     cat:'carb',kcal:132, p:8.9,  c:24,  f:0.5, hh:'1/2 cup'},
+  {n:'Lentils, cooked',         cat:'carb',kcal:116, p:9,    c:20,  f:0.4, hh:'1/2 cup'},
+  {n:'Chickpeas, cooked',       cat:'carb',kcal:164, p:8.9,  c:27,  f:2.6, hh:'1/2 cup'},
+  {n:'Corn tortillas',          cat:'carb',kcal:218, p:5.7,  c:45,  f:2.9, hh:'2 tortillas'},
+  {n:'Rice cakes',              cat:'carb',kcal:387, p:8,    c:81,  f:2.8, hh:'4 cakes'},
+  /* ---- fats ---- */
+  {n:'Olive oil',               cat:'fat', kcal:884, p:0,    c:0,   f:100, hh:'7 tbsp'},
+  {n:'Avocado',                 cat:'fat', kcal:160, p:2,    c:9,   f:15,  hh:'1/2 medium'},
+  {n:'Almonds',                 cat:'fat', kcal:579, p:21,   c:22,  f:50,  hh:'3/4 cup'},
+  {n:'Peanut butter',           cat:'fat', kcal:588, p:25,   c:20,  f:50,  hh:'6 tbsp'},
+  {n:'Walnuts',                 cat:'fat', kcal:654, p:15,   c:14,  f:65,  hh:'1 cup'},
+  {n:'Cashews',                 cat:'fat', kcal:553, p:18,   c:30,  f:44,  hh:'3/4 cup'},
+  {n:'Chia seeds',              cat:'fat', kcal:486, p:17,   c:42,  f:31,  hh:'1/2 cup'},
+  {n:'Cheddar cheese',          cat:'fat', kcal:403, p:25,   c:1.3, f:33,  hh:'3.5 oz'},
+  {n:'Butter',                  cat:'fat', kcal:717, p:0.9,  c:0.1, f:81,  hh:'7 tbsp'},
+  {n:'Coconut oil',             cat:'fat', kcal:862, p:0,    c:0,   f:100, hh:'7 tbsp'},
+  /* ---- vegetables ---- */
+  {n:'Broccoli',                cat:'veg', kcal:35,  p:2.4,  c:7,   f:0.4, hh:'1 cup'},
+  {n:'Spinach',                 cat:'veg', kcal:23,  p:2.9,  c:3.6, f:0.4, hh:'3 cups'},
+  {n:'Asparagus',               cat:'veg', kcal:22,  p:2.4,  c:4,   f:0.2, hh:'1 cup'},
+  {n:'Green beans',             cat:'veg', kcal:35,  p:1.8,  c:8,   f:0.1, hh:'1 cup'},
+  {n:'Bell peppers',            cat:'veg', kcal:31,  p:1,    c:6,   f:0.3, hh:'1 cup'},
+  {n:'Zucchini',                cat:'veg', kcal:17,  p:1.2,  c:3.1, f:0.3, hh:'1 cup'},
+  {n:'Mixed salad greens',      cat:'veg', kcal:17,  p:1.4,  c:2.9, f:0.2, hh:'3 cups'},
+  {n:'Brussels sprouts',        cat:'veg', kcal:43,  p:3.4,  c:9,   f:0.3, hh:'1 cup'},
+  {n:'Cauliflower',             cat:'veg', kcal:25,  p:1.9,  c:5,   f:0.3, hh:'1 cup'},
+  {n:'Mushrooms',               cat:'veg', kcal:22,  p:3.1,  c:3.3, f:0.3, hh:'1.5 cups'},
+  /* ---- fruit ---- */
+  {n:'Banana',                  cat:'fruit',kcal:89, p:1.1,  c:23,  f:0.3, hh:'1 medium'},
+  {n:'Apple',                   cat:'fruit',kcal:52, p:0.3,  c:14,  f:0.2, hh:'1 small'},
+  {n:'Blueberries',             cat:'fruit',kcal:57, p:0.7,  c:14,  f:0.3, hh:'2/3 cup'},
+  {n:'Strawberries',            cat:'fruit',kcal:32, p:0.7,  c:7.7, f:0.3, hh:'2/3 cup'},
+  {n:'Orange',                  cat:'fruit',kcal:47, p:0.9,  c:12,  f:0.1, hh:'1 medium'},
+  {n:'Pineapple',               cat:'fruit',kcal:50, p:0.5,  c:13,  f:0.1, hh:'2/3 cup'},
+  {n:'Grapes',                  cat:'fruit',kcal:69, p:0.7,  c:18,  f:0.2, hh:'2/3 cup'}
+];
+
+/* ---------- state ---------- */
+var nutState = { sex:'male', age:30, units:'imperial', weightLb:180, heightIn:70,
+                 activity:'moderate', goal:'maintain', protPerLb:1.0, fatPct:25,
+                 meals:4, seed:1 };
+var nutPlan = null;
+
+/* ---------- helpers ---------- */
+function nRound(x){ return Math.round(x); }
+function nClamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function lbToKg(lb){ return lb/2.20462262; }
+function inToCm(i){ return i*2.54; }
+function gToOz(g){ return g/28.3495; }
+function nStore(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
+function nLoad(k){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function nDrop(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+/* deterministic PRNG so a given seed always yields the same plan */
+function nutRng(seed){ var s=seed>>>0||1; return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+
+/* ---------- core math ---------- */
+function nutCompute(st){
+  var kg = lbToKg(st.weightLb), cm = inToCm(st.heightIn);
+  /* Mifflin-St Jeor */
+  var bmr = 10*kg + 6.25*cm - 5*st.age + (st.sex==='male' ? 5 : -161);
+  var tdee = bmr * (NUT_CFG.ACTIVITY[st.activity] || 1.55);
+  var cal = Math.max(NUT_CFG.MIN_CAL, tdee * (1 + (NUT_CFG.GOALS[st.goal]||0)));
+  cal = nRound(cal);
+  var pG = nRound(st.protPerLb * st.weightLb);
+  var fG = nRound(cal * (st.fatPct/100) / 9);
+  var cG = Math.max(0, nRound((cal - pG*4 - fG*9) / 4));
+  var pC=pG*4, fC=fG*9, cC=cG*4, tot=pC+fC+cC||1;
+  return { bmr:nRound(bmr), tdee:nRound(tdee), cal:cal,
+           p:pG, f:fG, c:cG, pC:pC, fC:fC, cC:cC,
+           pPct:pC/tot*100, fPct:fC/tot*100, cPct:cC/tot*100 };
+}
+
+/* ---------- meal plan generator ----------
+   For each meal we lock a vegetable (or fruit) at a fixed portion, then solve
+   the remaining three foods - protein / carb / fat source - as a 3x3 linear
+   system so their combined protein, carb and fat land on the meal's targets:
+
+       [ p_pro p_carb p_fat ] [x_pro ]   [ P_target - P_veg ]
+       [ c_pro c_carb c_fat ] [x_carb] = [ C_target - C_veg ]
+       [ f_pro f_carb f_fat ] [x_fat ]   [ F_target - F_veg ]
+
+   Solved by Cramer's rule, then portions are clamped to an edible range and
+   rounded to 5 g. Clamping/rounding breaks exactness, so a short coordinate
+   descent re-tunes the portions against a weighted error (protein weighted
+   hardest, then calories). Foods are chosen so the system is well conditioned:
+   the protein source is matched to the meal's fat-per-protein ratio, which
+   keeps the solution positive. Deterministic for a given seed, and it always
+   returns a full plan - if the solve degenerates it falls back to a
+   sequential fill.                                                          */
+function nutSolve3(m, b){
+  /* Cramer's rule on a 3x3; returns null if near-singular */
+  function det3(a){
+    return a[0][0]*(a[1][1]*a[2][2]-a[1][2]*a[2][1])
+         - a[0][1]*(a[1][0]*a[2][2]-a[1][2]*a[2][0])
+         + a[0][2]*(a[1][0]*a[2][1]-a[1][1]*a[2][0]);
+  }
+  var D=det3(m);
+  if(Math.abs(D)<1e-6) return null;
+  var out=[];
+  for(var col=0;col<3;col++){
+    var mc=[[],[],[]];
+    for(var r=0;r<3;r++) for(var c=0;c<3;c++) mc[r][c]= (c===col? b[r] : m[r][c]);
+    out.push(det3(mc)/D);
+  }
+  return out;
+}
+
+function nutBuildPlan(st, m){
+  var rnd = nutRng(st.seed*7919 + st.meals*13 + 1);
+  var byCat={};
+  ['pro','carb','fat','veg','fruit'].forEach(function(k){
+    byCat[k]=NUT_FOODS.filter(function(f){ return f.cat===k; });
+  });
+  var names = st.meals>=6 ? ['Breakfast','Mid-Morning','Lunch','Afternoon','Dinner','Evening']
+            : st.meals===5 ? ['Breakfast','Mid-Morning','Lunch','Afternoon','Dinner']
+            : st.meals===4 ? ['Breakfast','Lunch','Afternoon','Dinner']
+            : ['Breakfast','Lunch','Dinner'];
+
+  var per = { cal:m.cal/st.meals, p:m.p/st.meals, c:m.c/st.meals, f:m.f/st.meals };
+  /* how much fat the meal wants per gram of protein - used to pick a protein
+     source that does not blow the fat budget on its own */
+  var fpr = per.p>0 ? per.f/per.p : 0.5;
+
+  var MINU=NUT_CFG.MIN_PORTION/100, MAXU=NUT_CFG.MAX_PORTION/100, STEP=NUT_CFG.PORTION_STEP/100;
+  function maxFor(food){ return (food.cat==='carb'?NUT_CFG.MAX_PORTION_CARB:NUT_CFG.MAX_PORTION)/100; }
+  function snap(u,food){ return Math.round(nClamp(u,0,food?maxFor(food):MAXU)/STEP)*STEP; }
+
+  var meals=[];
+  for(var i=0;i<st.meals;i++){
+    /* --- 1. fixed vegetable / fruit anchor --- */
+    var anchorList = (st.meals>3 && i===1) ? byCat.fruit : byCat.veg;
+    var anchor = anchorList[(Math.floor(rnd()*anchorList.length)+i)%anchorList.length];
+    var anchorU = 1.2;                                   /* 120 g */
+
+    /* --- 2. choose the three solvable foods --- */
+    var pros=byCat.pro.slice().sort(function(a,b){
+      return Math.abs(a.f/Math.max(a.p,1)-fpr)-Math.abs(b.f/Math.max(b.p,1)-fpr);
+    });
+    var pf = pros[Math.floor(rnd()*Math.min(3,pros.length))];          /* near-best fit */
+    /* prefer a carb/fat source whose required portion lands in a comfortable
+       range - a 3,000 kcal day needs denser carbs than rice to stay under the
+       400 g per-item cap */
+    function fitBy(list, need, key){
+      var scored=list.map(function(f){
+        var g = f[key]>0 ? need/(f[key]/100) : 1e9;         /* grams required */
+        var pen = g>320 ? (g-320) : (g<40 ? (40-g)*1.5 : 0); /* distance from comfy */
+        return {f:f,pen:pen};
+      }).sort(function(a,b){ return a.pen-b.pen; });
+      return scored.slice(0,Math.max(3,Math.min(6,scored.length)));
+    }
+    var cCand=fitBy(byCat.carb, Math.max(per.c-anchor.c*anchorU,10), 'c');
+    var fCand=fitBy(byCat.fat,  Math.max(per.f-anchor.f*anchorU,5),  'f');
+    var cf = cCand[Math.floor(rnd()*cCand.length)].f;
+    var ff = fCand[Math.floor(rnd()*fCand.length)].f;
+
+    var foods=[pf,cf,ff];
+    var mat=[[pf.p,cf.p,ff.p],[pf.c,cf.c,ff.c],[pf.f,cf.f,ff.f]];
+    var rhs=[ per.p-anchor.p*anchorU, per.c-anchor.c*anchorU, per.f-anchor.f*anchorU ];
+
+    var x=nutSolve3(mat,rhs);
+    if(!x || x.some(function(v){ return !isFinite(v); })){
+      /* fallback: sequential fill, still always yields a plan */
+      x=[ pf.p>0?(rhs[0]/pf.p):0.8, cf.c>0?(rhs[1]/cf.c):0.8, ff.f>0?(rhs[2]/ff.f):0.2 ];
+    }
+    x=x.map(function(v,k){ return snap(v,foods[k]); });
+
+    /* --- 3. coordinate descent to recover what clamping/rounding cost --- */
+    function err(v){
+      var av=(v.length>3?v[3]:anchorU);
+      var P=anchor.p*av, C=anchor.c*av, F=anchor.f*av;
+      for(var k=0;k<3;k++){ P+=foods[k].p*v[k]; C+=foods[k].c*v[k]; F+=foods[k].f*v[k]; }
+      var kc=P*4+C*4+F*9;
+      return 5*Math.pow((P-per.p)/Math.max(per.p,1),2)
+           + 1.5*Math.pow((C-per.c)/Math.max(per.c,1),2)
+           + 1.5*Math.pow((F-per.f)/Math.max(per.f,1),2)
+           + 3*Math.pow((kc-per.cal)/Math.max(per.cal,1),2);
+    }
+    x.push(anchorU);                       /* 4th lever: the veg/fruit portion */
+    var lim=[maxFor(foods[0]),maxFor(foods[1]),maxFor(foods[2]),2.5];
+    for(var pass=0;pass<60;pass++){
+      var improved=false;
+      for(var k=0;k<4;k++){
+        for(var d=-1;d<=1;d+=2){
+          var trial=x.slice();
+          trial[k]=nClamp(+(trial[k]+d*STEP).toFixed(4), k===3?0.8:0, lim[k]);
+          if(err(trial)<err(x)-1e-9){ x=trial; improved=true; }
+        }
+      }
+      if(!improved) break;
+    }
+    anchorU=x[3];
+
+    /* --- 4. assemble, dropping any food that solved to a trivial amount --- */
+    var items=[], acc={kcal:0,p:0,c:0,f:0};
+    function push(food,u){
+      var minu=(food.cat==='fat'?NUT_CFG.MIN_PORTION_FAT:NUT_CFG.MIN_PORTION)/100;
+      if(u<minu) return;                       /* skip rather than force a token portion */
+      var g=Math.round(u*100), k=g/100;
+      items.push({ n:food.n, g:g, hh:food.hh, kcal:nRound(food.kcal*k),
+                   p:+(food.p*k).toFixed(1), c:+(food.c*k).toFixed(1), f:+(food.f*k).toFixed(1) });
+      acc.kcal+=food.kcal*k; acc.p+=food.p*k; acc.c+=food.c*k; acc.f+=food.f*k;
+    }
+    push(anchor,anchorU); push(pf,x[0]); push(cf,x[1]); push(ff,x[2]);
+
+    meals.push({ name:names[i]||('Meal '+(i+1)), items:items,
+                 kcal:nRound(acc.kcal), p:nRound(acc.p), c:nRound(acc.c), f:nRound(acc.f) });
+  }
+  var tot=meals.reduce(function(a,x2){ a.kcal+=x2.kcal; a.p+=x2.p; a.c+=x2.c; a.f+=x2.f; return a; },
+                       {kcal:0,p:0,c:0,f:0});
+  return { meals:meals, total:tot, target:{cal:m.cal,p:m.p,c:m.c,f:m.f}, per:per,
+           madeAt:new Date().toISOString(), seed:st.seed };
+}
+
+/* ===================== UI ============================================== */
+function nutEl(id){ return document.getElementById(id); }
+function nutFmt(n){ return Number(n).toLocaleString(); }
+
+/* imperial <-> metric display conversion (state is always stored imperial) */
+function nutSyncUnitFields(){
+  var st=nutState;
+  if(st.units==='imperial'){
+    nutEl('nut-w').value = Math.round(st.weightLb);
+    nutEl('nut-ft').value = Math.floor(st.heightIn/12);
+    nutEl('nut-in').value = Math.round(st.heightIn%12);
+    nutEl('nut-w-unit').textContent='lb';
+    nutEl('nut-h-imp').hidden=false; nutEl('nut-h-met').hidden=true;
+  } else {
+    nutEl('nut-w').value = Math.round(lbToKg(st.weightLb));
+    nutEl('nut-cm').value = Math.round(inToCm(st.heightIn));
+    nutEl('nut-w-unit').textContent='kg';
+    nutEl('nut-h-imp').hidden=true; nutEl('nut-h-met').hidden=false;
+  }
+}
+function nutReadFields(){
+  var st=nutState;
+  st.age = nClamp(parseInt(nutEl('nut-age').value,10)||30, 14, 99);
+  var w = parseFloat(nutEl('nut-w').value)||0;
+  if(st.units==='imperial'){
+    st.weightLb = nClamp(w, 70, 600);
+    var ft=parseInt(nutEl('nut-ft').value,10)||0, inch=parseInt(nutEl('nut-in').value,10)||0;
+    st.heightIn = nClamp(ft*12+inch, 48, 90);
+  } else {
+    st.weightLb = nClamp(w*2.20462262, 70, 600);
+    var cm=parseFloat(nutEl('nut-cm').value)||0;
+    st.heightIn = nClamp(cm/2.54, 48, 90);
+  }
+  st.fatPct = nClamp(parseInt(nutEl('nut-fat').value,10)||25, 15, 40);
+}
+
+/* segmented button groups: data-grp / data-val */
+function nutBindSegs(){
+  document.querySelectorAll('#tab-nutrition .nut-seg-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      var grp=b.getAttribute('data-grp'), val=b.getAttribute('data-val');
+      document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+grp+'"]').forEach(function(o){
+        o.classList.toggle('on', o===b); o.setAttribute('aria-pressed', o===b?'true':'false');
+      });
+      if(grp==='units'){ nutReadFields(); nutState.units=val; nutSyncUnitFields(); }
+      else if(grp==='protPerLb'){ nutState[grp]=parseFloat(val); }
+      else if(grp==='meals'){ nutState[grp]=parseInt(val,10); }
+      else { nutState[grp]=val; }
+      nutRender();
+    });
+  });
+}
+
+function nutDonut(m){
+  var segs=[{v:m.pPct,c:'var(--accent)'},{v:m.cPct,c:'var(--green)'},{v:m.fPct,c:'var(--amber)'}];
+  var R=54, C=2*Math.PI*R, off=0, out='';
+  segs.forEach(function(s){
+    var len=C*(s.v/100);
+    out+='<circle cx="70" cy="70" r="'+R+'" fill="none" stroke="'+s.c+'" stroke-width="22" '+
+         'stroke-dasharray="'+len.toFixed(2)+' '+(C-len).toFixed(2)+'" '+
+         'stroke-dashoffset="'+(-off).toFixed(2)+'" transform="rotate(-90 70 70)"></circle>';
+    off+=len;
+  });
+  return '<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Macro split">'+out+
+         '<text x="70" y="66" text-anchor="middle" class="nut-donut-n">'+nutFmt(m.cal)+'</text>'+
+         '<text x="70" y="82" text-anchor="middle" class="nut-donut-l">CALORIES</text></svg>';
+}
+
+function nutRender(){
+  nutReadFields();
+  var st=nutState, m=nutCompute(st);
+  nutEl('nut-fat-val').textContent=st.fatPct+'%';
+  nutEl('nut-cal').textContent=nutFmt(m.cal);
+  nutEl('nut-cal-sub').textContent='BMR '+nutFmt(m.bmr)+'  |  TDEE '+nutFmt(m.tdee)+
+    (st.goal==='maintain'?'':'  |  '+(NUT_CFG.GOALS[st.goal]>0?'+':'')+Math.round(NUT_CFG.GOALS[st.goal]*100)+'%');
+  [['p',m.p,m.pPct],['c',m.c,m.cPct],['f',m.f,m.fPct]].forEach(function(x){
+    nutEl('nut-'+x[0]+'-g').textContent=Math.round(x[1])+'g';
+    nutEl('nut-'+x[0]+'-pct').textContent=Math.round(x[2])+'%';
+    nutEl('nut-'+x[0]+'-bar').style.width=x[2].toFixed(1)+'%';
+  });
+  nutEl('nut-donut').innerHTML=nutDonut(m);
+  nutEl('nut-meals-n').textContent=st.meals;
+  nutEl('nut-pm-cal').textContent=nutFmt(Math.round(m.cal/st.meals));
+  nutEl('nut-pm-p').textContent=Math.round(m.p/st.meals)+'g';
+  nutEl('nut-pm-c').textContent=Math.round(m.c/st.meals)+'g';
+  nutEl('nut-pm-f').textContent=Math.round(m.f/st.meals)+'g';
+  return m;
+}
+
+function nutRenderPlan(plan, mountId){
+  if(!plan){ nutEl(mountId).innerHTML=''; return; }
+  var h='';
+  plan.meals.forEach(function(ml){
+    h+='<div class="nut-meal"><div class="nut-meal-head"><span class="nut-meal-name">'+ml.name+'</span>'+
+       '<span class="nut-meal-kcal">'+nutFmt(ml.kcal)+' cal</span></div><div class="nut-meal-items">';
+    ml.items.forEach(function(it){
+      h+='<div class="nut-item"><span class="nut-item-n">'+it.n+'</span>'+
+         '<span class="nut-item-q">'+it.g+' g <em>&middot; '+it.hh.replace(/^([\d.\/]+)/,function(x){
+             var mult=it.g/100; var num=parseFloat(x); return isFinite(num)?(+(num*mult).toFixed(2)+''):x; })+'</em></span></div>';
+    });
+    h+='</div><div class="nut-meal-macros"><span>P '+ml.p+'g</span><span>C '+ml.c+'g</span><span>F '+ml.f+'g</span></div></div>';
+  });
+  var t=plan.total, g=plan.target;
+  function dev(a,b){ return b? Math.round((a-b)/b*100) : 0; }
+  h+='<div class="nut-plan-total"><div class="nut-plan-total-head">Plan total vs target</div>'+
+     '<div class="nut-plan-total-row"><span>Calories</span><b>'+nutFmt(t.kcal)+'</b><em>target '+nutFmt(g.cal)+' ('+(dev(t.kcal,g.cal)>=0?'+':'')+dev(t.kcal,g.cal)+'%)</em></div>'+
+     '<div class="nut-plan-total-row"><span>Protein</span><b>'+t.p+'g</b><em>target '+g.p+'g ('+(dev(t.p,g.p)>=0?'+':'')+dev(t.p,g.p)+'%)</em></div>'+
+     '<div class="nut-plan-total-row"><span>Carbs</span><b>'+t.c+'g</b><em>target '+g.c+'g ('+(dev(t.c,g.c)>=0?'+':'')+dev(t.c,g.c)+'%)</em></div>'+
+     '<div class="nut-plan-total-row"><span>Fat</span><b>'+t.f+'g</b><em>target '+g.f+'g ('+(dev(t.f,g.f)>=0?'+':'')+dev(t.f,g.f)+'%)</em></div></div>';
+  nutEl(mountId).innerHTML=h;
+}
+
+function nutCreatePlan(reshuffle){
+  var m=nutRender();
+  if(reshuffle) nutState.seed=(nutState.seed%9999)+1;
+  nutPlan=nutBuildPlan(nutState,m);
+  nutRenderPlan(nutPlan,'nut-plan');
+  nutEl('nut-plan-wrap').hidden=false;
+  nutEl('nut-plan-wrap').scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function nutSavePlan(){
+  if(!nutPlan){ nutCreatePlan(false); }
+  var ok=nStore(NUT_CFG.STORE_PLAN,{state:nutState,plan:nutPlan});
+  nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:nutCompute(nutState)});
+  nutToast(ok?'Plan saved to this device':'Could not save (private mode?)');
+  nutShowSaved();
+}
+function nutSaveTargets(){
+  var ok=nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:nutCompute(nutState)});
+  nutToast(ok?'Targets saved':'Could not save (private mode?)');
+}
+function nutClearSaved(){
+  nDrop(NUT_CFG.STORE_PLAN); nDrop(NUT_CFG.STORE_TARGETS);
+  nutEl('nut-saved').hidden=true; nutToast('Saved plan cleared');
+}
+function nutToast(msg){
+  var t=nutEl('nut-toast'); if(!t) return;
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(nutToast._t); nutToast._t=setTimeout(function(){ t.classList.remove('show'); },2200);
+}
+function nutShowSaved(){
+  var saved=nLoad(NUT_CFG.STORE_PLAN);
+  if(!saved||!saved.plan){ nutEl('nut-saved').hidden=true; return; }
+  nutEl('nut-saved').hidden=false;
+  var d=new Date(saved.plan.madeAt);
+  nutEl('nut-saved-meta').textContent=
+    nutFmt(saved.plan.target.cal)+' cal  |  P '+saved.plan.target.p+'g  C '+saved.plan.target.c+
+    'g  F '+saved.plan.target.f+'g  |  saved '+(isNaN(d)?'':d.toLocaleDateString());
+  nutRenderPlan(saved.plan,'nut-saved-plan');
+}
+
+function nutInit(){
+  var saved=nLoad(NUT_CFG.STORE_TARGETS)||nLoad(NUT_CFG.STORE_PLAN);
+  if(saved&&saved.state){ Object.keys(nutState).forEach(function(k){
+      if(saved.state[k]!==undefined) nutState[k]=saved.state[k]; }); }
+  /* reflect state into the controls */
+  nutEl('nut-age').value=nutState.age;
+  nutEl('nut-fat').value=nutState.fatPct;
+  nutSyncUnitFields();
+  [['sex',nutState.sex],['units',nutState.units],['activity',nutState.activity],['goal',nutState.goal],
+   ['protPerLb',String(nutState.protPerLb)],['meals',String(nutState.meals)]].forEach(function(pair){
+    document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+pair[0]+'"]').forEach(function(b){
+      var on=b.getAttribute('data-val')===pair[1];
+      b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
+    });
+  });
+  nutBindSegs();
+  ['nut-age','nut-w','nut-ft','nut-in','nut-cm','nut-fat'].forEach(function(id){
+    var el=nutEl(id); if(el) el.addEventListener('input',nutRender);
+  });
+  nutRender(); nutShowSaved();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',nutInit);
+else nutInit();
 </script>
 </body>
 </html>
