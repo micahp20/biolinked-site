@@ -2528,6 +2528,11 @@ function nutBindSegs(){
       if(grp==='window'){
         var w=NUT_CFG.WINDOWS[val]||NUT_CFG.WINDOWS.none;
         if(val!=='custom'){ nutState.winStart=w.start; nutState.winEnd=w.end; }
+        /* Custom seeds from wherever you were, but coming off OMAD that is a
+           one-hour window - fall back to the default rather than inherit it */
+        else if(nutState.winEnd-nutState.winStart < 4){
+          nutState.winStart=w.start; nutState.winEnd=w.end;
+        }
         nutEl('nut-win-start').value=nutToHm(nutState.winStart);
         nutEl('nut-win-end').value=nutToHm(nutState.winEnd);
         if(nutState.meals>w.maxMeals) nutState.meals=w.maxMeals;
