@@ -465,6 +465,51 @@ details.paid-archive .of-sub{color:#3a6b52;}
 .bl-nav-mobile-link:hover{background:#f8f8f8;color:#7A6530}
 @media (max-width:820px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}}
 @media print{.bl-nav,.bl-nav-mobile-menu{display:none !important}}
+
+/* ===== Hamburger menu drawer (mbahl pattern) ===== */
+.menu-bar{display:flex;align-items:center;gap:12px;background:#fafafa;border-bottom:1px solid var(--line);
+  padding:9px 16px;position:sticky;top:0;z-index:60;}
+.menu-btn{display:inline-flex;align-items:center;gap:9px;background:transparent;border:1px solid var(--accent-line);
+  border-radius:6px;padding:8px 13px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:10px;
+  font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);line-height:1;
+  -webkit-tap-highlight-color:transparent;transition:background .16s,border-color .16s;}
+.menu-here{font-family:'Montserrat',sans-serif;font-size:10px;font-weight:700;letter-spacing:0.14em;
+  text-transform:uppercase;color:var(--muted);}
+.menu-scrim{position:fixed;inset:0;background:rgba(20,16,8,0.42);opacity:0;pointer-events:none;
+  transition:opacity .22s;z-index:90;}
+.menu-panel{position:fixed;top:0;left:0;bottom:0;width:min(84vw,320px);background:var(--surface);
+  border-right:1px solid var(--line);box-shadow:0 0 40px rgba(0,0,0,0.18);
+  transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);z-index:100;
+  display:flex;flex-direction:column;}
+.menu-panel.open{transform:translateX(0);}
+.menu-panel-head{padding:20px 20px 14px;border-bottom:1px solid var(--line);}
+.menu-panel-eyebrow{font-size:9px;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;color:var(--accent);}
+.menu-panel-name{font-family:'Cormorant Garamond',Georgia,serif;font-size:23px;font-weight:700;color:var(--text);line-height:1.2;margin-top:3px;}
+.menu-panel-date{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.5;}
+.menu-list{padding:10px 0;overflow-y:auto;flex:1;}
+.menu-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  background:transparent;border:none;border-left:3px solid transparent;cursor:pointer;text-align:left;
+  padding:14px 20px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.06em;
+  color:var(--text);-webkit-tap-highlight-color:transparent;transition:background .14s;}
+
+/* ===== Compound card grid — matches mjirikils / ejirikils / dholm ===== */
+html[data-theme] .line-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;margin-bottom:18px;align-items:start;}
+html[data-theme] details.li-row > summary{flex-wrap:wrap;}
+html[data-theme] .li-summary-name{font-size:16px;font-weight:700;color:#111;display:block;line-height:1.35;}
+html[data-theme] .cmp-head-key{display:block;font-size:12px;font-weight:600;color:#54544c;letter-spacing:0.02em;line-height:1.45;margin-top:3px;}
+/* readable on a phone: bigger, bolder, darker */
+html[data-theme] .cmp-quick li{font-size:15px;color:#111;line-height:1.55;}
+html[data-theme] .cmp-quick .ql{font-size:10.5px;font-weight:700;color:#54544c;letter-spacing:0.13em;}
+html[data-theme] .li-callout{font-size:14.5px;color:#2f2f2a;line-height:1.7;}
+html[data-theme] .info-tip-text{font-size:12.5px;line-height:1.62;}
+@media(max-width:640px){
+  html[data-theme] .line-items{grid-template-columns:1fr;}
+  html[data-theme] .cmp-head-key{font-size:11px;}
+  html[data-theme] .li-summary-name .info-tip{position:static;}
+  html[data-theme] .li-summary-name .info-tip-text{position:absolute;top:calc(100% + 8px);left:8px;right:8px;bottom:auto;width:auto;max-width:none;transform:none;margin:0;z-index:400;}
+  html[data-theme] .li-summary-name .info-tip-text::after{top:-9px;bottom:auto;left:18px;transform:none;border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+  html[data-theme] .invoice-wrap,html[data-theme] details.li-row,html[data-theme] .line-items{overflow:visible;}
+}
 </style>
 
 <nav class="bl-nav">
@@ -506,14 +551,29 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('overview',this)">Overview</button>
-    <button class="tab-btn" onclick="switchTab('protocol',this)">Protocol</button>
-    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
-    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
-    <button class="tab-btn" onclick="switchTab('bloodwork',this)">Bloodwork</button>
-    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
+  <div class="menu-bar">
+    <button class="menu-btn" id="mb-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mb-menu-panel" aria-haspopup="true" onclick="toggleMenu()">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu
+    </button>
+    <span class="menu-here">Viewing &middot; <b id="mb-menu-here">Overview</b></span>
   </div>
+
+  <div class="menu-scrim" id="mb-menu-scrim" onclick="closeMenu()" hidden></div>
+  <nav class="menu-panel" id="mb-menu-panel" role="menu" aria-label="Sections" aria-hidden="true">
+    <div class="menu-panel-head">
+      <div class="menu-panel-eyebrow">Personalized Protocol</div>
+      <div class="menu-panel-name">Jarod Hall</div>
+      <div class="menu-panel-date">12-Month Protocol &middot; 52 Weeks</div>
+    </div>
+    <div class="menu-list">
+      <button class="menu-item active" role="menuitem" data-label="Overview" onclick="switchTab('overview',this)"><span class="mi-label">Overview</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Protocol" onclick="switchTab('protocol',this)"><span class="mi-label">Protocol</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Invoice" onclick="switchTab('invoice',this)"><span class="mi-label">Invoice</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Schedule" onclick="switchTab('schedule',this)"><span class="mi-label">Schedule</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Supplies" onclick="switchTab('supplies',this)"><span class="mi-label">Supplies</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+    </div>
+  </nav>
 
   <div class="inv-body">
 
@@ -564,15 +624,18 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="sec-divider-title">Year-Round Foundation</div>
       </div>
 
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">Retatrutide &middot; 30 mg <span class="cmp-badge">All Year</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A triple agonist &mdash; GLP-1, GIP and glucagon.</strong> It slows gastric emptying, quiets appetite and improves blood-sugar handling, and the glucagon arm adds a direct push on energy expenditure. That third receptor is what raises the calorie burn at rest rather than only lowering intake. <strong>30 mg in 3 mL is 10 mg/mL</strong>, so every 10 units is exactly 1 mg &mdash; the ladder below reads straight off the syringe.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water &middot; gives 10 mg/mL</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Monday AM &middot; once weekly &middot; all 52 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">Ladder &middot; 10u &rarr; 60u</span></div>
-          </div>
-          <div class="cmp-note"><span class="nl">The weekly ladder</span>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Retatrutide &middot; 30 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A triple agonist &mdash; GLP-1, GIP and glucagon.</strong> It slows gastric emptying, quiets appetite and improves blood-sugar handling, and the glucagon arm adds a direct push on energy expenditure. That third receptor is what raises the calorie burn at rest rather than only lowering intake. <strong>30 mg in 3 mL is 10 mg/mL</strong>, so every 10 units is exactly 1 mg &mdash; the ladder below reads straight off the syringe.</span></span><span class="cmp-head-key">Ladder &middot; 10u &rarr; 60u &middot; Monday AM &middot; once weekly &middot; all 52 weeks &middot; All Year</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water &middot; gives 10 mg/mL</span></li>
+              <li><span class="ql">Dose</span><span class="qv">Ladder &middot; 10u &rarr; 60u</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Monday AM &middot; once weekly &middot; all 52 weeks</span></li>
+            </ul>
+            <div class="cmp-note"><span class="nl">The weekly ladder</span>
             <div class="ladder-scroll">
             <table class="ladder-table">
               <thead><tr><th>Weeks</th><th>Dose</th><th>Draw</th><th>What happens</th><th>Subtotal</th></tr></thead>
@@ -588,181 +651,250 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
             <strong>Averages 4 mg a week</strong> &mdash; peaks at 6 mg, floors at 1 mg.
           </div>
           <div class="flag-note"><strong>Ladder to confirm.</strong> The ramp, the hold length and the taper above are the proposed shape, not a fixed prescription &mdash; <strong>6 mg is the ceiling, and the hold runs as long as it is working.</strong> If appetite is handled at 4 mg there is no reason to climb past it, and the year gets cheaper in vials if you do not.</div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">Testosterone Cypionate &middot; 250 mg/mL <span class="cmp-badge">All Year</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The hormonal base layer</strong> &mdash; the background level the rest of the year is built on top of. Pre-mixed in oil, so there is no BAC water and no mixing step. Split across two injections a week to keep levels even rather than peaking once and sagging.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">Pre-mixed in oil &middot; nothing to reconstitute</span></div>
-            <div class="fld"><span class="fld-l">Route</span><span class="fld-v">Intramuscular &middot; glute, quad or delt</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon + Thu AM &middot; twice weekly &middot; 180 mg/week</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">36u &middot; 90 mg</span></div>
           </div>
-        </div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Testosterone Cypionate &middot; 250 mg/mL <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The hormonal base layer</strong> &mdash; the background level the rest of the year is built on top of. Pre-mixed in oil, so there is no BAC water and no mixing step. Split across two injections a week to keep levels even rather than peaking once and sagging.</span></span><span class="cmp-head-key">36u &middot; 90 mg &middot; Mon + Thu AM &middot; twice weekly &middot; 180 mg/week &middot; All Year</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">Pre-mixed in oil &middot; nothing to reconstitute</span></li>
+              <li><span class="ql">Dose</span><span class="qv">36u &middot; 90 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon + Thu AM &middot; twice weekly &middot; 180 mg/week</span></li>
+              <li><span class="ql">Route</span><span class="qv">Intramuscular &middot; glute, quad or delt</span></li>
+            </ul>
+          </div>
+        </details>
       </div>
 
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Cycle 1 &middot; Weeks 1&ndash;8 &middot; Metabolic Ignition + Repair</div>
         <div class="sec-divider-title">5-Amino-1MQ + CJC/Ipamorelin + GHK-Cu</div>
       </div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="cmp-badge">Metabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> Blocking that enzyme frees up NAD+ inside fat and muscle tissue and lifts the resting metabolic floor, which is the lever that keeps a deficit from stalling. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; ~1.67 mg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">5-Amino-1MQ &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> Blocking that enzyme frees up NAD+ inside fat and muscle tissue and lifts the resting metabolic floor, which is the lever that keeps a deficit from stalling. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg.</span></span><span class="cmp-head-key">10u &middot; ~1.67 mg &middot; Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks &middot; Metabolic</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; ~1.67 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">CJC-1295 / Ipamorelin &middot; 5 mg + 5 mg <span class="cmp-badge">GH Axis</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Two compounds that prompt your own growth hormone release.</strong> CJC-1295 widens the release window, Ipamorelin triggers a clean pulse without touching cortisol or hunger. <strong>5 + 5 mg in 2 mL</strong>, so a 10u draw is 250 mcg of each, 500 mcg total.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 500 mcg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">CJC-1295 / Ipamorelin &middot; 5 mg + 5 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Two compounds that prompt your own growth hormone release.</strong> CJC-1295 widens the release window, Ipamorelin triggers a clean pulse without touching cortisol or hunger. <strong>5 + 5 mg in 2 mL</strong>, so a 10u draw is 250 mcg of each, 500 mcg total.</span></span><span class="cmp-head-key">10u &middot; 500 mcg &middot; Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks &middot; GH Axis</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 500 mcg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">GHK-Cu &middot; 50 mg <span class="cmp-badge">Skin &amp; Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A copper-binding tripeptide.</strong> Drives collagen and elastin synthesis, skin tone and connective-tissue turnover, with a broad anti-inflammatory pull underneath. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg. It turns blue when mixed &mdash; that is the copper.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; ~1.67 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">GHK-Cu &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A copper-binding tripeptide.</strong> Drives collagen and elastin synthesis, skin tone and connective-tissue turnover, with a broad anti-inflammatory pull underneath. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg. It turns blue when mixed &mdash; that is the copper.</span></span><span class="cmp-head-key">10u &middot; ~1.67 mg &middot; Mon&ndash;Fri AM &middot; 8 weeks &middot; Skin &amp; Repair</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; ~1.67 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri AM &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Cycle 2 &middot; Weeks 9&ndash;16 &middot; Cellular Energy + Tissue Repair</div>
         <div class="sec-divider-title">NAD+ + CJC/Ipamorelin + Wolverine</div>
       </div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">CJC-1295 / Ipamorelin &middot; 5 mg + 5 mg <span class="cmp-badge">GH Axis</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Two compounds that prompt your own growth hormone release.</strong> CJC-1295 widens the release window, Ipamorelin triggers a clean pulse without touching cortisol or hunger. <strong>5 + 5 mg in 2 mL</strong>, so a 10u draw is 250 mcg of each, 500 mcg total.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 500 mcg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">CJC-1295 / Ipamorelin &middot; 5 mg + 5 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Two compounds that prompt your own growth hormone release.</strong> CJC-1295 widens the release window, Ipamorelin triggers a clean pulse without touching cortisol or hunger. <strong>5 + 5 mg in 2 mL</strong>, so a 10u draw is 250 mcg of each, 500 mcg total.</span></span><span class="cmp-head-key">10u &middot; 500 mcg &middot; Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks &middot; GH Axis</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 500 mcg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">NAD+ &middot; 1000 mg <span class="cmp-badge">Cellular Energy</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The cell&apos;s central redox cofactor.</strong> Every mitochondrion uses it to turn fuel into ATP, and tissue levels fall with age and metabolic load. You have run this before, so the sensation will be familiar. <strong>1000 mg in 5 mL is 200 mg/mL</strong>, so a 42u draw is about 83 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">42u &middot; ~83 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">NAD+ &middot; 1000 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The cell&apos;s central redox cofactor.</strong> Every mitochondrion uses it to turn fuel into ATP, and tissue levels fall with age and metabolic load. You have run this before, so the sensation will be familiar. <strong>1000 mg in 5 mL is 200 mg/mL</strong>, so a 42u draw is about 83 mg.</span></span><span class="cmp-head-key">42u &middot; ~83 mg &middot; Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks &middot; Cellular Energy</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">5 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">42u &middot; ~83 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">Wolverine &middot; 10 mg <span class="cmp-badge">Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one vial.</strong> Two repair peptides that speed healing of tendon, ligament, muscle and gut lining, cut inflammation and improve blood flow to injured tissue. You have run BPC-157 on its own before; this pairs it with TB-500. <strong>10 mg in 2 mL is 5 mg/mL</strong>, so a 20u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 1 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Wolverine &middot; 10 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one vial.</strong> Two repair peptides that speed healing of tendon, ligament, muscle and gut lining, cut inflammation and improve blood flow to injured tissue. You have run BPC-157 on its own before; this pairs it with TB-500. <strong>10 mg in 2 mL is 5 mg/mL</strong>, so a 20u draw is 1 mg.</span></span><span class="cmp-head-key">20u &middot; 1 mg &middot; Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks &middot; Repair</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">20u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Cycle 3 &middot; Weeks 17&ndash;24 &middot; Lean Metabolic Block</div>
         <div class="sec-divider-title">5-Amino-1MQ + GHK-Cu</div>
       </div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="cmp-badge">Metabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> Blocking that enzyme frees up NAD+ inside fat and muscle tissue and lifts the resting metabolic floor, which is the lever that keeps a deficit from stalling. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; ~1.67 mg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">5-Amino-1MQ &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> Blocking that enzyme frees up NAD+ inside fat and muscle tissue and lifts the resting metabolic floor, which is the lever that keeps a deficit from stalling. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg.</span></span><span class="cmp-head-key">10u &middot; ~1.67 mg &middot; Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks &middot; Metabolic</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; ~1.67 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">GHK-Cu &middot; 50 mg <span class="cmp-badge">Skin &amp; Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A copper-binding tripeptide.</strong> Drives collagen and elastin synthesis, skin tone and connective-tissue turnover, with a broad anti-inflammatory pull underneath. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg. It turns blue when mixed &mdash; that is the copper.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; ~1.67 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">GHK-Cu &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A copper-binding tripeptide.</strong> Drives collagen and elastin synthesis, skin tone and connective-tissue turnover, with a broad anti-inflammatory pull underneath. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg. It turns blue when mixed &mdash; that is the copper.</span></span><span class="cmp-head-key">10u &middot; ~1.67 mg &middot; Mon&ndash;Fri AM &middot; 8 weeks &middot; Skin &amp; Repair</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; ~1.67 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri AM &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Cycle 4 &middot; Weeks 25&ndash;32 &middot; Visceral Fat + Recovery</div>
         <div class="sec-divider-title">NAD+ + Tesamorelin + Wolverine</div>
       </div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">NAD+ &middot; 1000 mg <span class="cmp-badge">Cellular Energy</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The cell&apos;s central redox cofactor.</strong> Every mitochondrion uses it to turn fuel into ATP, and tissue levels fall with age and metabolic load. You have run this before, so the sensation will be familiar. <strong>1000 mg in 5 mL is 200 mg/mL</strong>, so a 42u draw is about 83 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">42u &middot; ~83 mg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">NAD+ &middot; 1000 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The cell&apos;s central redox cofactor.</strong> Every mitochondrion uses it to turn fuel into ATP, and tissue levels fall with age and metabolic load. You have run this before, so the sensation will be familiar. <strong>1000 mg in 5 mL is 200 mg/mL</strong>, so a 42u draw is about 83 mg.</span></span><span class="cmp-head-key">42u &middot; ~83 mg &middot; Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks &middot; Cellular Energy</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">5 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">42u &middot; ~83 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">Wolverine &middot; 10 mg <span class="cmp-badge">Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one vial.</strong> Two repair peptides that speed healing of tendon, ligament, muscle and gut lining, cut inflammation and improve blood flow to injured tissue. You have run BPC-157 on its own before; this pairs it with TB-500. <strong>10 mg in 2 mL is 5 mg/mL</strong>, so a 20u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 1 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Wolverine &middot; 10 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one vial.</strong> Two repair peptides that speed healing of tendon, ligament, muscle and gut lining, cut inflammation and improve blood flow to injured tissue. You have run BPC-157 on its own before; this pairs it with TB-500. <strong>10 mg in 2 mL is 5 mg/mL</strong>, so a 20u draw is 1 mg.</span></span><span class="cmp-head-key">20u &middot; 1 mg &middot; Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks &middot; Repair</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">20u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">Tesamorelin &middot; 20 mg <span class="cmp-badge">Visceral Fat</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A GHRH analog.</strong> The one peptide in this class with an approval specifically for reducing visceral and hepatic fat &mdash; it biases fat loss toward the compartment around the organs rather than the surface. <strong>20 mg in 2 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Tesamorelin &middot; 20 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A GHRH analog.</strong> The one peptide in this class with an approval specifically for reducing visceral and hepatic fat &mdash; it biases fat loss toward the compartment around the organs rather than the surface. <strong>20 mg in 2 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span><span class="cmp-head-key">10u &middot; 1 mg &middot; Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks &middot; Visceral Fat</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Cycle 5 &middot; Weeks 33&ndash;40 &middot; Body Composition Push</div>
         <div class="sec-divider-title">5-Amino-1MQ + Tesamorelin + GHK-Cu</div>
       </div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="cmp-badge">Metabolic</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> Blocking that enzyme frees up NAD+ inside fat and muscle tissue and lifts the resting metabolic floor, which is the lever that keeps a deficit from stalling. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; ~1.67 mg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">5-Amino-1MQ &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>An NNMT inhibitor.</strong> Blocking that enzyme frees up NAD+ inside fat and muscle tissue and lifts the resting metabolic floor, which is the lever that keeps a deficit from stalling. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg.</span></span><span class="cmp-head-key">10u &middot; ~1.67 mg &middot; Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks &middot; Metabolic</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; ~1.67 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">GHK-Cu &middot; 50 mg <span class="cmp-badge">Skin &amp; Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A copper-binding tripeptide.</strong> Drives collagen and elastin synthesis, skin tone and connective-tissue turnover, with a broad anti-inflammatory pull underneath. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg. It turns blue when mixed &mdash; that is the copper.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; ~1.67 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">GHK-Cu &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A copper-binding tripeptide.</strong> Drives collagen and elastin synthesis, skin tone and connective-tissue turnover, with a broad anti-inflammatory pull underneath. <strong>50 mg in 3 mL is 16.67 mg/mL</strong>, so a 10u draw is about 1.67 mg. It turns blue when mixed &mdash; that is the copper.</span></span><span class="cmp-head-key">10u &middot; ~1.67 mg &middot; Mon&ndash;Fri AM &middot; 8 weeks &middot; Skin &amp; Repair</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; ~1.67 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri AM &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">Tesamorelin &middot; 20 mg <span class="cmp-badge">Visceral Fat</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A GHRH analog.</strong> The one peptide in this class with an approval specifically for reducing visceral and hepatic fat &mdash; it biases fat loss toward the compartment around the organs rather than the surface. <strong>20 mg in 2 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Tesamorelin &middot; 20 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A GHRH analog.</strong> The one peptide in this class with an approval specifically for reducing visceral and hepatic fat &mdash; it biases fat loss toward the compartment around the organs rather than the surface. <strong>20 mg in 2 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span><span class="cmp-head-key">10u &middot; 1 mg &middot; Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks &middot; Visceral Fat</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon&ndash;Fri PM &middot; fasted, before bed &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
       <div class="sec-divider mt">
         <div class="sec-divider-eyebrow">Cycle 6 &middot; Weeks 41&ndash;48 &middot; Energy + Repair Close</div>
         <div class="sec-divider-title">NAD+ + Wolverine</div>
       </div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">NAD+ &middot; 1000 mg <span class="cmp-badge">Cellular Energy</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The cell&apos;s central redox cofactor.</strong> Every mitochondrion uses it to turn fuel into ATP, and tissue levels fall with age and metabolic load. You have run this before, so the sensation will be familiar. <strong>1000 mg in 5 mL is 200 mg/mL</strong>, so a 42u draw is about 83 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">42u &middot; ~83 mg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">NAD+ &middot; 1000 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The cell&apos;s central redox cofactor.</strong> Every mitochondrion uses it to turn fuel into ATP, and tissue levels fall with age and metabolic load. You have run this before, so the sensation will be familiar. <strong>1000 mg in 5 mL is 200 mg/mL</strong>, so a 42u draw is about 83 mg.</span></span><span class="cmp-head-key">42u &middot; ~83 mg &middot; Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks &middot; Cellular Energy</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">5 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">42u &middot; ~83 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">Wolverine &middot; 10 mg <span class="cmp-badge">Repair</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one vial.</strong> Two repair peptides that speed healing of tendon, ligament, muscle and gut lining, cut inflammation and improve blood flow to injured tissue. You have run BPC-157 on its own before; this pairs it with TB-500. <strong>10 mg in 2 mL is 5 mg/mL</strong>, so a 20u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">2 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">20u &middot; 1 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">Wolverine &middot; 10 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>BPC-157 + TB-500 in one vial.</strong> Two repair peptides that speed healing of tendon, ligament, muscle and gut lining, cut inflammation and improve blood flow to injured tissue. You have run BPC-157 on its own before; this pairs it with TB-500. <strong>10 mg in 2 mL is 5 mg/mL</strong>, so a 20u draw is 1 mg.</span></span><span class="cmp-head-key">20u &middot; 1 mg &middot; Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks &middot; Repair</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">2 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">20u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">Mon / Wed / Fri PM &middot; fasted &middot; 8 weeks</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
 
       <div class="sec-divider mt">
@@ -770,31 +902,43 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
         <div class="sec-divider-title">The Three Amidates</div>
       </div>
       <div class="chart-note"><span class="nl">How these work</span><p>One vial of each, on <strong>no schedule</strong> &mdash; use them on the days that want them. <strong>Add them one at a time</strong>, Semax first, then Selank, then Adamax, so you know which one did what.</p></div>
-      <div class="cmp-list">
-        <div class="cmp-row">
-          <span class="cmp-row-name">N-Acetyl Semax Amidate &middot; 30 mg <span class="cmp-badge">Cognitive</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A modified ACTH fragment with the hormonal activity removed.</strong> Raises BDNF, the growth factor behind learning and memory, and modulates dopamine and serotonin. <strong>30 mg in 3 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M / W / F AM &middot; or as needed</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1 mg</span></div>
+      <div class="line-items">
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">N-Acetyl Semax Amidate &middot; 30 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A modified ACTH fragment with the hormonal activity removed.</strong> Raises BDNF, the growth factor behind learning and memory, and modulates dopamine and serotonin. <strong>30 mg in 3 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span><span class="cmp-head-key">10u &middot; 1 mg &middot; M / W / F AM &middot; or as needed &middot; Cognitive</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M / W / F AM &middot; or as needed</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">N-Acetyl Selank Amidate &middot; 30 mg <span class="cmp-badge">Calm Focus</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A synthetic analogue of tuftsin.</strong> Modulates GABA and serotonin to take the edge off without sedation &mdash; calm without dulling. Often paired with Semax because it smooths the sharper edge of it. <strong>30 mg in 3 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M / W / F AM &middot; or on the days that need it</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 1 mg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">N-Acetyl Selank Amidate &middot; 30 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>A synthetic analogue of tuftsin.</strong> Modulates GABA and serotonin to take the edge off without sedation &mdash; calm without dulling. Often paired with Semax because it smooths the sharper edge of it. <strong>30 mg in 3 mL is 10 mg/mL</strong>, so a 10u draw is 1 mg.</span></span><span class="cmp-head-key">10u &middot; 1 mg &middot; M / W / F AM &middot; or on the days that need it &middot; Calm Focus</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">3 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 1 mg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M / W / F AM &middot; or on the days that need it</span></li>
+            </ul>
           </div>
-        </div>
-        <div class="cmp-row">
-          <span class="cmp-row-name">N-Acetyl Adamax Amidate &middot; 5 mg <span class="cmp-badge">Drive</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The most stimulating of the three amidates.</strong> Sits on the drive and motivation end rather than the calm end, which is why it goes in midday and last. <strong>5 mg in 1 mL is 5 mg/mL</strong>, so a 10u draw is 500 mcg.</span></span></span>
-          <div class="cmp-fields">
-            <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">1 mL BAC water</span></div>
-            <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">M / W / F midday &middot; 2+ hrs after Semax</span></div>
-            <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">10u &middot; 500 mcg</span></div>
+        </details>
+        <details class="li-row">
+          <summary>
+            <span class="li-summary-name">N-Acetyl Adamax Amidate &middot; 5 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The most stimulating of the three amidates.</strong> Sits on the drive and motivation end rather than the calm end, which is why it goes in midday and last. <strong>5 mg in 1 mL is 5 mg/mL</strong>, so a 10u draw is 500 mcg.</span></span><span class="cmp-head-key">10u &middot; 500 mcg &middot; M / W / F midday &middot; 2+ hrs after Semax &middot; Drive</span></span>
+            </summary>
+          <div class="li-body">
+            <ul class="cmp-quick">
+              <li><span class="ql">Recon</span><span class="qv">1 mL BAC water</span></li>
+              <li><span class="ql">Dose</span><span class="qv">10u &middot; 500 mcg</span></li>
+              <li><span class="ql">Schedule</span><span class="qv">M / W / F midday &middot; 2+ hrs after Semax</span></li>
+            </ul>
           </div>
-        </div>
+        </details>
       </div>
 
     </div><!-- /protocol -->
@@ -1156,9 +1300,13 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <script>
 function switchTab(tab, btn){
   document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
-  document.querySelectorAll('.tab-btn').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.menu-item').forEach(function(el){ el.classList.remove('active'); });
   document.getElementById('tab-' + tab).classList.add('active');
-  btn.classList.add('active');
+  if(btn){ btn.classList.add('active');
+    var here=document.getElementById('mb-menu-here');
+    if(here) here.textContent = btn.getAttribute('data-label') || (btn.textContent||'').trim();
+  }
+  closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -1234,6 +1382,40 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/jhall/sw.js').catch(function(){});
   });
 }
+
+function toggleMenu(){ document.body.classList.contains('menu-open') ? closeMenu() : openMenu(); }
+function openMenu(){
+  var p=document.getElementById('mb-menu-panel'), sc=document.getElementById('mb-menu-scrim'),
+      b=document.getElementById('mb-menu-btn');
+  if(!p) return;
+  sc.hidden=false;
+  requestAnimationFrame(function(){ p.classList.add('open'); sc.classList.add('open'); });
+  p.setAttribute('aria-hidden','false'); b.setAttribute('aria-expanded','true'); b.setAttribute('aria-label','Close menu');
+  document.body.classList.add('menu-open');
+  var first=p.querySelector('.menu-item.active')||p.querySelector('.menu-item');
+  if(first) setTimeout(function(){ first.focus(); },120);
+}
+function closeMenu(){
+  var p=document.getElementById('mb-menu-panel'), sc=document.getElementById('mb-menu-scrim'),
+      b=document.getElementById('mb-menu-btn');
+  if(!p) return;
+  p.classList.remove('open'); sc.classList.remove('open');
+  p.setAttribute('aria-hidden','true'); b.setAttribute('aria-expanded','false'); b.setAttribute('aria-label','Open menu');
+  document.body.classList.remove('menu-open');
+  setTimeout(function(){ if(!p.classList.contains('open')) sc.hidden=true; },240);
+}
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape' && document.body.classList.contains('menu-open')){
+    closeMenu(); var b=document.getElementById('mb-menu-btn'); if(b) b.focus();
+  }
+});
+
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape' && document.body.classList.contains('menu-open')){
+    closeMenu(); var b=document.getElementById('mb-menu-btn'); if(b) b.focus();
+  }
+});
 </script>
 </body>
 </html>
