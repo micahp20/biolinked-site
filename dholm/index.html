@@ -2298,6 +2298,43 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
   details.lab-section > summary.lab-section-head{gap:8px;padding-right:12px;}
   .lab-rank{min-width:54px;font-size:8px;padding:3px 7px;}
 }
+
+/* ===== Mobile tooltip rendering =====
+   On a phone the bubble must anchor to the full-width row, not to the 15px
+   "?" icon. bl-theme.css ships that treatment for .lab-row only
+   (html[data-theme] .lab-row .info-tip), so the compound cards fell back to
+   the desktop rule: position:relative on the icon plus translateX(-50%),
+   which put a 230px bubble 115px to the left of a 15px box and let the
+   card chrome clip it. These rules carry the same html[data-theme] prefix
+   so they outrank the theme, and the clipping ancestors are unclipped for
+   the popover. */
+@media(max-width:640px){
+  html[data-theme] .li-summary-name,
+  html[data-theme] .cmp-head-key,
+  html[data-theme] .lab-score-item{position:relative;}
+  html[data-theme] .li-summary-name .info-tip,
+  html[data-theme] .lab-score-item .info-tip{position:static;}
+  html[data-theme] .li-summary-name .info-tip-text,
+  html[data-theme] .lab-score-item .info-tip-text{
+    position:absolute;top:calc(100% + 8px);left:8px;right:8px;bottom:auto;
+    width:auto;max-width:none;transform:none;margin:0;z-index:400;}
+  html[data-theme] .li-summary-name .info-tip-text::after,
+  html[data-theme] .lab-score-item .info-tip-text::after{
+    top:-9px;bottom:auto;left:18px;transform:none;
+    border-bottom-color:var(--tip-bg);border-top-color:transparent;}
+  /* readable on a phone, and a finger-sized tap target */
+  html[data-theme] .info-tip-text{font-size:12.5px;line-height:1.62;padding:12px 14px;}
+  html[data-theme] .info-tip{width:18px;height:18px;font-size:10px;}
+  /* the popover has to be able to leave the card and the page shell */
+  html[data-theme] .invoice-wrap,
+  html[data-theme] details.li-row,
+  html[data-theme] details.lab-section,
+  html[data-theme] .line-items{overflow:visible;}
+  /* when JS flips a bubble above its icon */
+  html[data-theme] .info-tip-text.tip-above{top:auto;bottom:calc(100% + 8px);}
+  html[data-theme] .info-tip-text.tip-above::after{
+    top:auto;bottom:-9px;border-top-color:var(--tip-bg);border-bottom-color:transparent;}
+}
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
   <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
@@ -2396,9 +2433,33 @@ renderLabRanks();
 /* Tap-to-open tooltips on touch devices — hover alone never fires there. */
 document.addEventListener('click',function(e){
   var tip=e.target.closest ? e.target.closest('.info-tip') : null;
-  document.querySelectorAll('.info-tip.is-open').forEach(function(t){if(t!==tip)t.classList.remove('is-open');});
-  if(tip){e.preventDefault();e.stopPropagation();tip.classList.toggle('is-open');}
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    if(t!==tip){t.classList.remove('is-open');
+      var b=t.querySelector('.info-tip-text'); if(b) b.classList.remove('tip-above');}
+  });
+  if(!tip) return;
+  e.preventDefault(); e.stopPropagation();
+  var open=tip.classList.toggle('is-open');
+  var bub=tip.querySelector('.info-tip-text');
+  if(!bub) return;
+  bub.classList.remove('tip-above');
+  if(!open) return;
+  /* flip above the icon if the bubble would spill past the bottom of the screen */
+  requestAnimationFrame(function(){
+    var r=bub.getBoundingClientRect();
+    if(r.bottom > window.innerHeight - 8 && r.height < tip.getBoundingClientRect().top - 8){
+      bub.classList.add('tip-above');
+    }
+  });
 });
+/* tapping anywhere else, scrolling away, or Escape closes an open tip */
+function blCloseTips(){
+  document.querySelectorAll('.info-tip.is-open').forEach(function(t){
+    t.classList.remove('is-open');
+    var b=t.querySelector('.info-tip-text'); if(b) b.classList.remove('tip-above');
+  });
+}
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') blCloseTips(); });
 </script>
 </body>
 </html>
