@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'efry-v20';
+const CACHE = 'efry-v21';
 const ASSETS = [
   '/efry/',
   '/efry/index.html',

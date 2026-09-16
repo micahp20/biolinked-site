@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'mbahl-v28';
+const CACHE = 'mbahl-v29';
 const ASSETS = [
   '/mbahl/',
   '/mbahl/index.html',
