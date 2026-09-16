@@ -100,7 +100,6 @@
         <a href="/peptide-tracker.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Peptide Tracker</a>
         <a href="/stack-analyzer.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stack Analyzer</a>
         <a href="/biomarker-landing.html" style="font-size:13px;color:#7A6530;text-decoration:none;font-weight:600;padding:12px 0;display:flex;align-items:center;min-height:44px;">Biomarker Analysis →</a>
-        <a href="/intake.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Client Intake</a>
       </div>
     </div>
   </div>
