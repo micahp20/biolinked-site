@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'cmaclean-v21';
+const CACHE = 'cmaclean-v22';
 const ASSETS = [
   '/cmaclean/',
   '/cmaclean/index.html',

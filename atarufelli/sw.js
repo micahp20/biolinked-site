@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'atarufelli-v12';
+const CACHE = 'atarufelli-v13';
 const ASSETS = [
   '/atarufelli/',
   '/atarufelli/index.html',
