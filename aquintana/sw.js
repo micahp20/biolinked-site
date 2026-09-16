@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'aquintana-v31';
+const CACHE = 'aquintana-v32';
 const ASSETS = [
   '/aquintana/',
   '/aquintana/index.html',

@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'kdrieshman-v20';
+const CACHE = 'kdrieshman-v21';
 const ASSETS = [
   '/kdrieshman/',
   '/kdrieshman/index.html',
