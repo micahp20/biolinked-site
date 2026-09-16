@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'mmorehead-v16';
+const CACHE = 'mmorehead-v17';
 const ASSETS = [
   '/mmorehead/',
   '/mmorehead/index.html',
