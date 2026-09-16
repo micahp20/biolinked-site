@@ -84,28 +84,28 @@
     <div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
       <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Peptide Solutions</div>
-      <p style="font-size:11px;color:#888880;font-weight:300;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
+      <p style="font-size:12.5px;color:#777770;font-weight:400;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
     </div>
     <div>
       <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Resources</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Home</a>
-        <a href="/peptide-index.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Index</a>
-        <a href="/stacks-blends.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stacks & Blends</a>
+        <a href="/" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Home</a>
+        <a href="/peptide-index.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Index</a>
+        <a href="/stacks-blends.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Stacks & Blends</a>
       </div>
     </div>
     <div>
       <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Tools & Services</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/peptide-tracker.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Peptide Tracker</a>
-        <a href="/stack-analyzer.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Stack Analyzer</a>
-        <a href="/biomarker-landing.html" style="font-size:11px;color:#7A6530;text-decoration:none;font-weight:600;">Biomarker Analysis →</a>
-        <a href="/intake.html" style="font-size:11px;color:#444440;text-decoration:none;font-weight:300;">Client Intake</a>
+        <a href="/peptide-tracker.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Peptide Tracker</a>
+        <a href="/stack-analyzer.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Stack Analyzer</a>
+        <a href="/biomarker-landing.html" style="font-size:13px;color:#7A6530;text-decoration:none;font-weight:600;padding:9px 0;display:block;">Biomarker Analysis →</a>
+        <a href="/intake.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Client Intake</a>
       </div>
     </div>
   </div>
   <div style="max-width:1100px;margin:24px auto 0;padding-top:20px;border-top:1px solid rgba(0,0,0,0.08);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-    <div style="font-size:10px;color:#aaaaaa;">© 2025 BioLinked Peptide Solutions · Research & Educational Use Only · Not Medical Advice</div>
+    <div style="font-size:11.5px;color:#8a8a8a;">© 2025 BioLinked Peptide Solutions · Research & Educational Use Only · Not Medical Advice</div>
   </div>
 </div>`;
 
