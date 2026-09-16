@@ -65,7 +65,16 @@
 .bl-nav-mobile-link:last-child{border-bottom:none}
 .bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
 .bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#7A6530;font-family:'Montserrat',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
-@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}}
+@media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}
+/* Mobile readability: bigger type and 44px tap targets in the shared nav. */
+@media(max-width:640px){
+  .bl-nav-logo-main{font-size:19px}
+  .bl-nav-logo-sub{font-size:10.5px;letter-spacing:0.16em}
+  .bl-nav-mobile-btn{font-size:26px;padding:10px 12px;min-width:46px;min-height:46px}
+  .bl-nav-mobile-menu{padding:8px 20px 20px}
+  .bl-nav-mobile-link{font-size:16px;font-weight:500;padding:14px 0;min-height:46px;display:flex;align-items:center}
+  .bl-nav-inner{height:62px}
+}
 </style>`;
 
   const ctaBar = '';
