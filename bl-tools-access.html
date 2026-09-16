@@ -1971,6 +1971,16 @@ function showToast(msg){
 </script>
 
 <!-- mobile-floor -->
+<script>
+/* wide-table scroll wrapper — bl-theme.js carries this for themed pages */
+(function(){function w(){if(!window.matchMedia||!matchMedia('(max-width:640px)').matches)return;
+var t=document.querySelectorAll('table');for(var i=0;i<t.length;i++){var e=t[i];
+if(!e.parentNode||e.parentNode.classList.contains('bl-scroll-x'))continue;
+var a=e.parentNode.clientWidth;if(!a||e.scrollWidth<=a+1)continue;
+var b=document.createElement('div');b.className='bl-scroll-x';e.parentNode.insertBefore(b,e);b.appendChild(e);}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',w);else w();
+addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
+</script>
 <style>
 /* Universal mobile floor — nothing on this page renders under 11px and no
    control is under 44px. Selectors are pinned to max(11px, the largest size
@@ -2003,6 +2013,23 @@ function showToast(msg){
   #bl-bio-top-link,[aria-label="Open Biomarker Analyzer"]{min-height:44px !important;}
   div[style*="flex-direction:column"] > a,
   .field > label,.fld > label{min-height:44px !important;display:flex;align-items:center;}
+  /* wide tables: bl-theme.js wraps only the ones that actually overflow */
+  .bl-scroll-x{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%;}
+  /* horizontal tab strips scroll rather than pushing the document sideways */
+  .tabs-inner,.tab-row,.tabs,.tab-bar,.tab-strip{overflow-x:auto !important;max-width:100%;}
+  /* full-bleed negative margins have nothing to bleed into once body padding is 0 */
+  .bl-nav{margin-left:0 !important;margin-right:0 !important;}
+  /* controls the class list missed */
+  label.pill,.back,.qv a{min-height:44px !important;}
+  .back{display:inline-flex !important;align-items:center;}
+  /* inline prose links: vertical padding grows the touch area without
+     breaking the line, which min-height on an inline box cannot do */
+  a:not([class]):not([style]):not([id]),
+  .qv a,.attribution-text a{padding-top:14px !important;padding-bottom:14px !important;}
+  /* checkbox and radio glyphs sit inside a 44px label row (.ci); 44px on the
+     glyph itself would dwarf the form, so they get a 24px touch-sized box */
+  input[type=checkbox],input[type=radio]{width:24px !important;height:24px !important;}
+
 
   .ai-disclaimer,.ba-bar-label,.ba-bar-val,.badge,
   .bio-age-label,.bl-nav-logo-sub,.bl-nav-mobile-section,.bm-range,
