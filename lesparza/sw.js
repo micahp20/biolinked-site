@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'lesparza-v17';
+const CACHE = 'lesparza-v18';
 const ASSETS = [
   '/lesparza/',
   '/lesparza/index.html',
