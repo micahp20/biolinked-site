@@ -61,7 +61,7 @@
 .bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:#1a1a1a;padding:8px}
 .bl-nav-mobile-menu{display:none;border-top:1px solid #eaeaea;background:#fff;padding:12px 20px 20px}
 .bl-nav-mobile-menu.open{display:block}
-.bl-nav-mobile-link{display:block;padding:10px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Montserrat',sans-serif}
+.bl-nav-mobile-link{display:flex;align-items:center;min-height:44px;padding:11px 0;font-size:13px;color:#444;text-decoration:none;border-bottom:1px solid #eaeaea;font-family:'Montserrat',sans-serif}
 .bl-nav-mobile-link:last-child{border-bottom:none}
 .bl-nav-mobile-sub{padding-left:16px;font-size:12px;color:#777}
 .bl-nav-mobile-section{padding:10px 0 4px;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:#7A6530;font-family:'Montserrat',sans-serif;font-weight:600;border-bottom:1px solid #eaeaea}
@@ -69,7 +69,7 @@
 /* Mobile readability: bigger type and 44px tap targets in the shared nav. */
 @media(max-width:640px){
   .bl-nav-logo-main{font-size:19px}
-  .bl-nav-logo-sub{font-size:10.5px;letter-spacing:0.16em}
+  .bl-nav-logo-sub{font-size:11px;letter-spacing:0.16em}
   .bl-nav-mobile-btn{font-size:26px;padding:10px 12px;min-width:46px;min-height:46px}
   .bl-nav-mobile-menu{padding:8px 20px 20px}
   .bl-nav-mobile-link{font-size:16px;font-weight:500;padding:14px 0;min-height:46px;display:flex;align-items:center}
@@ -83,24 +83,24 @@
   <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex-wrap:wrap;">
     <div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
-      <div style="font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Peptide Solutions</div>
+      <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Peptide Solutions</div>
       <p style="font-size:12.5px;color:#777770;font-weight:400;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
     </div>
     <div>
-      <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Resources</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Resources</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Home</a>
-        <a href="/peptide-index.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Index</a>
-        <a href="/stacks-blends.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Stacks & Blends</a>
+        <a href="/" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Home</a>
+        <a href="/peptide-index.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Index</a>
+        <a href="/stacks-blends.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stacks & Blends</a>
       </div>
     </div>
     <div>
-      <div style="font-size:9px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Tools & Services</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Tools & Services</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/peptide-tracker.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Peptide Tracker</a>
-        <a href="/stack-analyzer.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Stack Analyzer</a>
-        <a href="/biomarker-landing.html" style="font-size:13px;color:#7A6530;text-decoration:none;font-weight:600;padding:9px 0;display:block;">Biomarker Analysis →</a>
-        <a href="/intake.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:9px 0;display:block;">Client Intake</a>
+        <a href="/peptide-tracker.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Peptide Tracker</a>
+        <a href="/stack-analyzer.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stack Analyzer</a>
+        <a href="/biomarker-landing.html" style="font-size:13px;color:#7A6530;text-decoration:none;font-weight:600;padding:12px 0;display:flex;align-items:center;min-height:44px;">Biomarker Analysis →</a>
+        <a href="/intake.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Client Intake</a>
       </div>
     </div>
   </div>
