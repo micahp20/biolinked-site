@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'dbarron-v20';
+const CACHE = 'dbarron-v21';
 const ASSETS = [
   '/dbarron/',
   '/dbarron/index.html',

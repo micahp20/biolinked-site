@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'dpacello-lcianciullo-v26';
+const CACHE = 'dpacello-lcianciullo-v27';
 const ASSETS = [
   '/dpacello-lcianciullo/',
   '/dpacello-lcianciullo/index.html',
