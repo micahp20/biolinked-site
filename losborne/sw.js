@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'losborne-v18';
+const CACHE = 'losborne-v19';
 const ASSETS = [
   '/losborne/',
   '/losborne/index.html',
