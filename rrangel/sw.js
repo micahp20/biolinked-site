@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'rrangel-v14';
+const CACHE = 'rrangel-v15';
 const ASSETS = [
   '/rrangel/',
   '/rrangel/index.html',
