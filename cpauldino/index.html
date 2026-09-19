@@ -2335,6 +2335,10 @@ var NUT_FOODS = [
   {n:'Shrimp',                  cat:'pro', kcal:99,  p:24,  c:0.2, f:0.3, hh:'3.5 oz',   d:['paleo','medit','keto'], allerg:['shellfish']},
   {n:'Tuna, canned in water',   cat:'pro', kcal:116, p:26,  c:0,   f:0.8, hh:'1 can',    d:['paleo','medit','keto']},
   {n:'Sardines, canned',        cat:'pro', kcal:208, p:25,  c:0,   f:11,  hh:'1 tin',    d:['paleo','medit','keto']},
+  {n:'Ribeye steak',            cat:'pro', kcal:291, p:24,  c:0,   f:21,  hh:'3.5 oz',   d:['paleo','keto']},
+  {n:'Ground beef 80/20',       cat:'pro', kcal:254, p:26,  c:0,   f:17,  hh:'3.5 oz',   d:['paleo','keto']},
+  {n:'Chicken thigh, skin-on',  cat:'pro', kcal:229, p:25,  c:0,   f:14,  hh:'3.5 oz',   d:['paleo','keto']},
+  {n:'Bacon',                   cat:'pro', kcal:541, p:37,  c:1.4, f:42,  hh:'4 slices', d:['paleo','keto']},
   /* ---- vegetarian proteins ---- */
   {n:'Egg whites',              cat:'pro', kcal:52,  p:11,  c:0.7, f:0.2, hh:'3 whites', d:['vegetarian','paleo','medit','keto'], allerg:['eggs']},
   {n:'Whole eggs',              cat:'pro', kcal:143, p:13,  c:0.7, f:9.5, hh:'2 large',  d:['vegetarian','paleo','medit','keto'], allerg:['eggs']},
@@ -2381,6 +2385,8 @@ var NUT_FOODS = [
   {n:'Tahini',                  cat:'fat', kcal:595, p:17,  c:21,  f:54,  hh:'6 tbsp',   d:['vegan','vegetarian','paleo','medit','keto']},
   {n:'Coconut oil',             cat:'fat', kcal:862, p:0,   c:0,   f:100, hh:'7 tbsp',   d:['vegan','vegetarian','paleo','keto']},
   {n:'Cheddar cheese',          cat:'fat', kcal:403, p:25,  c:1.3, f:33,  hh:'3.5 oz',   d:['vegetarian','medit','keto'], allerg:['dairy']},
+  {n:'Macadamia nuts',          cat:'fat', kcal:718, p:8,   c:14,  f:76,  hh:'3/4 cup',  d:['vegan','vegetarian','paleo','keto'], allerg:['nuts']},
+  {n:'Heavy cream',             cat:'fat', kcal:340, p:2.8, c:2.8, f:36,  hh:'1/3 cup',  d:['vegetarian','keto'], allerg:['dairy']},
   {n:'Butter',                  cat:'fat', kcal:717, p:0.9, c:0.1, f:81,  hh:'7 tbsp',   d:['vegetarian','keto'], allerg:['dairy']},
   /* ---- vegetables ---- */
   {n:'Broccoli',                cat:'veg', kcal:35,  p:2.4, c:7,   f:0.4, hh:'1 cup',    d:['vegan','vegetarian','paleo','medit','keto']},
@@ -2784,9 +2790,18 @@ function nutToHm(h){
 }
 
 /* segmented button groups: data-grp / data-val */
+/* Set the moment anyone touches a control. The saved profile arrives on its
+   own schedule, and on a phone that can land a second or two after the tab is
+   already usable - long enough to have picked a diet first. Without this flag
+   that late response overwrote the live selection, so choosing Keto and then
+   generating quietly produced the stored diet's plan instead. */
+var nutTouched=false;
+function nutMarkTouched(){ nutTouched=true; }
+
 function nutBindSegs(){
   document.querySelectorAll('#tab-nutrition .nut-seg-btn').forEach(function(b){
     b.addEventListener('click', function(){
+      nutMarkTouched();
       var grp=b.getAttribute('data-grp'), val=b.getAttribute('data-val');
       document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+grp+'"]').forEach(function(o){
         o.classList.toggle('on', o===b); o.setAttribute('aria-pressed', o===b?'true':'false');
@@ -2816,6 +2831,7 @@ function nutBindSegs(){
 function nutBindChips(){
   document.querySelectorAll('#tab-nutrition .nut-chip').forEach(function(b){
     b.addEventListener('click',function(){
+      nutMarkTouched();
       var k=b.getAttribute('data-excl'), i=nutState.excl.indexOf(k);
       if(i>-1) nutState.excl.splice(i,1); else nutState.excl.push(k);
       b.classList.toggle('on', i<0); b.setAttribute('aria-pressed', i<0?'true':'false');
@@ -2957,7 +2973,22 @@ function nutRenderPlan(plan, mountId){
   nutEl(mountId).innerHTML=h;
 }
 
+/* The screen is the source of truth at generate time: read the segmented
+   controls straight off the DOM so a plan can never be built for a diet other
+   than the one actually showing. */
+function nutSyncFromSegs(){
+  document.querySelectorAll('#tab-nutrition .nut-seg-btn[aria-pressed="true"]').forEach(function(b){
+    var grp=b.getAttribute('data-grp'), val=b.getAttribute('data-val');
+    if(!grp || grp==='units') return;
+    if(grp==='protPerLb')   nutState[grp]=parseFloat(val);
+    else if(grp==='meals')  nutState[grp]=parseInt(val,10);
+    else if(grp==='glp1')   nutState.glp1=(val==='on');
+    else                    nutState[grp]=val;
+  });
+}
+
 function nutCreatePlan(reshuffle){
+  nutSyncFromSegs();
   var m=nutRender();
   if(reshuffle) nutState.seed=(nutState.seed%9999)+1;
   nutPlan=nutBuildPlan(nutState,m);
@@ -3097,7 +3128,7 @@ function nutInit(){
   nutBindSegs(); nutBindChips();
   ['nut-age','nut-w','nut-ft','nut-in','nut-cm','nut-fat','nut-excl-text',
    'nut-win-start','nut-win-end'].forEach(function(id){
-    var el=nutEl(id); if(el) el.addEventListener('input',nutRender);
+    var el=nutEl(id); if(el) el.addEventListener('input',function(){ nutMarkTouched(); nutRender(); });
   });
   nutRender(); nutShowSaved();
 
@@ -3105,6 +3136,15 @@ function nutInit(){
      localStorage cache, so this quietly upgrades it when the row comes back. */
   nutSbLoad().then(function(row){
     if(!row || !row.data || !row.data.state) return;
+    /* The row came back after the user had already started choosing. Their
+       screen wins - say a saved plan exists rather than silently rewriting
+       the selections they just made. */
+    if(nutTouched){
+      var t=nutEl('nut-synced');
+      if(t){ t.hidden=false;
+             t.textContent='\u21bb You have a saved plan \u2014 reload to load it, or keep these choices and save again.'; }
+      return;
+    }
     Object.keys(nutState).forEach(function(k){
       if(row.data.state[k]!==undefined) nutState[k]=row.data.state[k];
     });
