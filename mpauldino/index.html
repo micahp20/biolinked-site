@@ -1664,7 +1664,7 @@ details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var
           </div>
         </div>
 
-        <div class="nut-field" id="nut-aggr-row" hidden>
+        <div class="nut-field is-muted" id="nut-aggr-row">
           <span class="nut-label">How Aggressive</span>
           <div class="nut-seg" data-cols="3">
             <button class="nut-seg-btn" data-grp="aggr" data-val="mild" aria-pressed="false">Mild</button>
@@ -1765,6 +1765,7 @@ details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var
             <button class="nut-seg-btn" data-grp="meals" data-val="5" aria-pressed="false">5</button>
             <button class="nut-seg-btn" data-grp="meals" data-val="6" aria-pressed="false">6</button>
           </div>
+          <div class="nut-note" id="nut-meals-cap" hidden></div>
         </div>
       </div>
 
@@ -1809,6 +1810,7 @@ details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var
       </div>
 
       <div class="nut-card" id="nut-plan-wrap" hidden>
+        <div class="nut-synced" id="nut-synced" hidden></div>
         <div class="nut-card-head">Your Meal Plan</div>
         <div id="nut-plan"></div>
         <div class="nut-btn-row">
@@ -2077,6 +2079,19 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
 }
 
 /* ===== Nutrition tab ===== */
+/* --- live-update feedback ------------------------------------------------
+   A changed figure briefly lights up so every selection visibly does
+   something, even the ones that only move macros and not calories. */
+@keyframes nutFlash{0%{background:rgba(122,101,48,0.26);}100%{background:transparent;}}
+.nut-changed{animation:nutFlash .85s ease-out 1;border-radius:4px;}
+@media (prefers-reduced-motion:reduce){.nut-changed{animation:none;}}
+/* the aggressiveness row stays in the flow so nothing below it jumps */
+.nut-field.is-muted{opacity:.38;pointer-events:none;transition:opacity .16s;}
+.nut-synced{font-size:11.5px;font-weight:600;color:var(--accent);background:var(--accent-dim,rgba(122,101,48,0.08));border:1px solid var(--accent-line,rgba(122,101,48,0.28));border-radius:5px;padding:7px 11px;margin-bottom:12px;}
+.nut-btn.is-saved{background:var(--green-text,#2f7a4a) !important;border-color:var(--green-text,#2f7a4a) !important;color:#fff !important;}
+.nut-btn.is-local{opacity:.8;}
+.nut-note{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:7px;}
+.nut-seg-btn.is-off{opacity:.34;cursor:not-allowed;}
 .nut-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
   padding:16px 18px;margin-bottom:14px;}
 .nut-card-head{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
@@ -2898,6 +2913,27 @@ function nutDonut(m){
          '<text x="70" y="82" text-anchor="middle" class="nut-donut-l">CALORIES</text></svg>';
 }
 
+/* Five of the nine controls (diet style, protein target, meals, window, GLP-1)
+   legitimately never move Daily Calories - they only move the macro split or
+   the per-meal numbers. With one giant calorie figure as the headline, that
+   reads as "nothing happened". This briefly highlights whichever figures did
+   change so every selection visibly does something. */
+var NUT_WATCH=['nut-cal','nut-p-g','nut-c-g','nut-f-g','nut-p-pct','nut-c-pct','nut-f-pct',
+               'nut-pm-cal','nut-pm-p','nut-pm-c','nut-pm-f','nut-pm-times'];
+var nutPrev={};
+function nutFlashChanged(){
+  NUT_WATCH.forEach(function(id){
+    var el=nutEl(id); if(!el) return;
+    var v=el.textContent;
+    if(nutPrev[id]!==undefined && nutPrev[id]!==v){
+      el.classList.remove('nut-changed');
+      void el.offsetWidth;            /* restart the animation */
+      el.classList.add('nut-changed');
+    }
+    nutPrev[id]=v;
+  });
+}
+
 function nutRender(){
   nutReadFields();
   var st=nutState, m=nutCompute(st);
@@ -2916,7 +2952,10 @@ function nutRender(){
   }
   /* goal aggressiveness only applies to lose / gain */
   var aggrRow=nutEl('nut-aggr-row');
-  aggrRow.hidden = (st.goal==='maintain');
+  /* Keep the row in the flow and just fade it out. Hiding it outright used to
+     reflow every control below by ~50px the instant a goal was picked, so the
+     next tap landed on a different button than the one aimed at. */
+  aggrRow.classList.toggle('is-muted', st.goal==='maintain');
   /* eating window: cap meals and grey out the ones that no longer fit */
   var mx=nutMaxMeals(st);
   document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="meals"]').forEach(function(b){
@@ -2925,7 +2964,15 @@ function nutRender(){
     b.classList.toggle('is-off', v>mx);
     b.classList.toggle('on', v===st.meals);
     b.setAttribute('aria-pressed', v===st.meals?'true':'false');
+    /* a disabled button that says nothing reads as a broken page */
+    b.title = v>mx ? (nutWindow(st).label+' leaves room for '+mx+' meal'+(mx>1?'s':'')+' a day') : '';
   });
+  var mealsCap=nutEl('nut-meals-cap');
+  if(mealsCap){
+    var capped = mx < 6;
+    mealsCap.hidden = !capped;
+    if(capped) mealsCap.textContent = nutWindow(st).label+' caps this at '+mx+' meal'+(mx>1?'s':'')+' a day \u2014 widen the eating window for more.';
+  }
   nutEl('nut-win-custom').hidden = (st.window!=='custom');
   var wn=nutWindow(st);
   nutEl('nut-win-note').textContent = st.window==='none'
@@ -2944,6 +2991,7 @@ function nutRender(){
   nutEl('nut-meals-n').textContent=st.meals;
   nutEl('nut-pm-times').textContent = nutMealTimes(st,st.meals).map(nutFmtTime).join('  \u00b7  ');
   nutEl('nut-glp1-note').hidden = !st.glp1;
+  nutFlashChanged();
   nutEl('nut-pm-cal').textContent=nutFmt(Math.round(m.cal/st.meals));
   nutEl('nut-pm-p').textContent=Math.round(m.p/st.meals)+'g';
   nutEl('nut-pm-c').textContent=Math.round(m.c/st.meals)+'g';
@@ -2991,20 +3039,92 @@ function nutCreatePlan(reshuffle){
   nutEl('nut-plan-wrap').hidden=false;
   nutEl('nut-plan-wrap').scrollIntoView({block:'nearest',behavior:'smooth'});
 }
+
+/* ============================================================================
+   CROSS-DEVICE SAVE  -  Supabase `nutrition_profiles`, keyed by page slug
+   ----------------------------------------------------------------------------
+   localStorage stays the instant cache so the tab paints immediately; Supabase
+   is the source of truth and wins whenever it answers. The slug comes from the
+   URL path, so this same block saves under 'mpauldino' here and under each
+   client's own slug wherever else it is dropped in - nothing page-specific.
+   If the table is missing or the network is down every call fails soft and the
+   tab keeps working exactly as it did on localStorage alone.
+   ========================================================================== */
+/* Supabase anon key - the same public key the other tools on this site use.
+   It is a publishable key by design; what protects the data is the RLS
+   policy on the table, not the secrecy of this string. */
+window.BL_SUPABASE_ANON = window.BL_SUPABASE_ANON || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
+var NUT_SB = {
+  url : 'https://bfjydzealeethhcpdfxl.supabase.co',
+  key : (window.BL_SUPABASE_ANON || document.documentElement.getAttribute('data-sb-anon') || ''),
+  table: 'nutrition_profiles'
+};
+function nutSlug(){
+  var m = (location.pathname||'').replace(/\/+$/,'').split('/').filter(Boolean);
+  return (m.length ? m[m.length-1] : 'default').replace(/\.html?$/,'');
+}
+function nutSbReady(){ return !!(NUT_SB.key && NUT_SB.url); }
+function nutSbHeaders(extra){
+  var h = {'apikey':NUT_SB.key,'Authorization':'Bearer '+NUT_SB.key,'Content-Type':'application/json'};
+  if(extra) Object.keys(extra).forEach(function(k){ h[k]=extra[k]; });
+  return h;
+}
+/* upsert on the unique page_slug */
+function nutSbSave(payload){
+  if(!nutSbReady()) return Promise.resolve({ok:false,reason:'no-key'});
+  return fetch(NUT_SB.url+'/rest/v1/'+NUT_SB.table+'?on_conflict=page_slug', {
+    method:'POST',
+    headers: nutSbHeaders({'Prefer':'resolution=merge-duplicates,return=representation'}),
+    body: JSON.stringify([{ page_slug: nutSlug(), data: payload, updated_at: new Date().toISOString() }])
+  }).then(function(r){ return r.ok ? {ok:true} : r.text().then(function(t){ return {ok:false,reason:r.status+' '+t.slice(0,120)}; }); })
+    .catch(function(e){ return {ok:false,reason:String(e).slice(0,120)}; });
+}
+function nutSbLoad(){
+  if(!nutSbReady()) return Promise.resolve(null);
+  return fetch(NUT_SB.url+'/rest/v1/'+NUT_SB.table+'?page_slug=eq.'+encodeURIComponent(nutSlug())+'&select=data,updated_at&limit=1',
+    { headers: nutSbHeaders() })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(rows){ return (rows && rows[0]) ? rows[0] : null; })
+    .catch(function(){ return null; });
+}
+
 function nutSavePlan(){
   if(!nutPlan){ nutCreatePlan(false); }
-  var ok=nStore(NUT_CFG.STORE_PLAN,{state:nutState,plan:nutPlan});
-  nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:nutCompute(nutState)});
-  nutToast(ok?'Plan saved to this device':'Could not save (private mode?)');
+  var payload={state:nutState,plan:nutPlan,targets:nutCompute(nutState)};
+  nStore(NUT_CFG.STORE_PLAN,{state:nutState,plan:nutPlan});
+  nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:payload.targets});
   nutShowSaved();
+  nutSaveBtnState('saving');
+  nutSbSave(payload).then(function(r){
+    if(r.ok){ nutSaveBtnState('saved'); nutToast('Saved \u2014 syncs to your other devices'); }
+    else   { nutSaveBtnState('local');  nutToast('Saved on this device only'); }
+  });
+}
+/* Save / Saved feedback on the button itself */
+function nutSaveBtnState(mode){
+  var b=document.querySelector('#tab-nutrition .nut-btn[onclick*="nutSavePlan"]');
+  if(!b) return;
+  if(!b.getAttribute('data-label')) b.setAttribute('data-label', b.textContent.trim());
+  var base=b.getAttribute('data-label');
+  b.classList.remove('is-saved','is-local');
+  if(mode==='saving'){ b.textContent='Saving\u2026'; b.disabled=true; }
+  else if(mode==='saved'){ b.textContent='Saved \u2713'; b.disabled=false; b.classList.add('is-saved');
+    setTimeout(function(){ b.textContent=base; b.classList.remove('is-saved'); },2600); }
+  else { b.textContent='Saved on device'; b.disabled=false; b.classList.add('is-local');
+    setTimeout(function(){ b.textContent=base; b.classList.remove('is-local'); },2600); }
 }
 function nutSaveTargets(){
-  var ok=nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:nutCompute(nutState)});
-  nutToast(ok?'Targets saved':'Could not save (private mode?)');
+  var payload={state:nutState,targets:nutCompute(nutState),plan:nutPlan||null};
+  nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:payload.targets});
+  nutSbSave(payload).then(function(r){
+    nutToast(r.ok?'Targets saved \u2014 syncs to your other devices':'Targets saved on this device');
+  });
 }
 function nutClearSaved(){
   nDrop(NUT_CFG.STORE_PLAN); nDrop(NUT_CFG.STORE_TARGETS);
-  nutEl('nut-saved').hidden=true; nutToast('Saved plan cleared');
+  nutEl('nut-saved').hidden=true;
+  var b=nutEl('nut-synced'); if(b) b.hidden=true;
+  nutToast('Saved plan cleared on this device');
 }
 function nutToast(msg){
   var t=nutEl('nut-toast'); if(!t) return;
@@ -3054,6 +3174,48 @@ function nutInit(){
     var el=nutEl(id); if(el) el.addEventListener('input',nutRender);
   });
   nutRender(); nutShowSaved();
+
+  /* Supabase is the source of truth: the tab has already painted from the
+     localStorage cache, so this quietly upgrades it when the row comes back. */
+  nutSbLoad().then(function(row){
+    if(!row || !row.data || !row.data.state) return;
+    Object.keys(nutState).forEach(function(k){
+      if(row.data.state[k]!==undefined) nutState[k]=row.data.state[k];
+    });
+    if(row.data.plan){ nutPlan=row.data.plan; nStore(NUT_CFG.STORE_PLAN,{state:nutState,plan:nutPlan}); }
+    nStore(NUT_CFG.STORE_TARGETS,{state:nutState,targets:row.data.targets||nutCompute(nutState)});
+    nutReflectState(); nutRender(); nutShowSaved();
+    var b=nutEl('nut-synced');
+    if(b){
+      var d=new Date(row.updated_at);
+      b.hidden=false;
+      b.textContent='\u21bb Loaded your saved plan'+(isNaN(d)?'':' from '+d.toLocaleDateString());
+    }
+  });
+}
+
+/* push nutState back into every control - used after a Supabase load */
+function nutReflectState(){
+  nutEl('nut-age').value=nutState.age;
+  nutEl('nut-fat').value=nutState.fatPct;
+  nutEl('nut-excl-text').value=nutState.exclText||'';
+  nutEl('nut-win-start').value=nutToHm(nutState.winStart);
+  nutEl('nut-win-end').value=nutToHm(nutState.winEnd);
+  if(!Array.isArray(nutState.excl)) nutState.excl=[];
+  document.querySelectorAll('#tab-nutrition .nut-chip').forEach(function(b){
+    var on=nutState.excl.indexOf(b.getAttribute('data-excl'))>-1;
+    b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
+  });
+  nutSyncUnitFields();
+  [['sex',nutState.sex],['units',nutState.units],['activity',nutState.activity],['goal',nutState.goal],
+   ['diet',nutState.diet],['window',nutState.window],['aggr',nutState.aggr],
+   ['glp1',nutState.glp1?'on':'off'],['protPerLb',String(nutState.protPerLb)],
+   ['meals',String(nutState.meals)]].forEach(function(pair){
+    document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+pair[0]+'"]').forEach(function(b){
+      var on=b.getAttribute('data-val')===pair[1];
+      b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
+    });
+  });
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',nutInit);
 else nutInit();
