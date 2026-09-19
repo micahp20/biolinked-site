@@ -2391,8 +2391,8 @@ var NUT_CFG = {
   MIN_PORTION_FAT: 5,       /* oils/nuts are usable in small amounts */
   MAX_PORTION: 400,
   MAX_PORTION_CARB: 500,    /* a 3-meal 3,000 kcal day needs big starch servings */
-  STORE_PLAN: 'mp-nutrition-plan-v1',
-  STORE_TARGETS: 'mp-nutrition-targets-v1'
+  STORE_PLAN: 'bl-nutrition-plan-v1',
+  STORE_TARGETS: 'bl-nutrition-targets-v1'
 };
 
 /* Food library - per 100 g. hh = household measure for that 100 g.
@@ -2501,9 +2501,14 @@ function nClamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function lbToKg(lb){ return lb/2.20462262; }
 function inToCm(i){ return i*2.54; }
 function gToOz(g){ return g/28.3495; }
-function nStore(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
-function nLoad(k){ try{ var r=localStorage.getItem(k); return r?JSON.parse(r):null; }catch(e){ return null; } }
-function nDrop(k){ try{ localStorage.removeItem(k); }catch(e){} }
+/* localStorage is shared by every page on this domain, so the cache key has to
+   carry the slug the way the Supabase row does. Without it, opening two
+   protocol pages on one device leaves the second showing the first one's
+   numbers until it saves. */
+function nKey(k){ return k+':'+nutSlug(); }
+function nStore(k,v){ try{ localStorage.setItem(nKey(k),JSON.stringify(v)); return true; }catch(e){ return false; } }
+function nLoad(k){ try{ var r=localStorage.getItem(nKey(k)); return r?JSON.parse(r):null; }catch(e){ return null; } }
+function nDrop(k){ try{ localStorage.removeItem(nKey(k)); }catch(e){} }
 
 /* deterministic PRNG so a given seed always yields the same plan */
 function nutRng(seed){ var s=seed>>>0||1; return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
