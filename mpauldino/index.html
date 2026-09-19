@@ -2091,6 +2091,8 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
 .nut-btn.is-saved{background:var(--green-text,#2f7a4a) !important;border-color:var(--green-text,#2f7a4a) !important;color:#fff !important;}
 .nut-btn.is-local{opacity:.8;}
 .nut-note{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:7px;}
+.nut-meal-dish{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;margin:2px 0 1px;}
+.nut-meal-note{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:7px;}
 .nut-seg-btn.is-off{opacity:.34;cursor:not-allowed;}
 .nut-card{background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
   padding:16px 18px;margin-bottom:14px;}
@@ -2492,6 +2494,282 @@ var NUT_FOODS = [
   {n:'Pineapple',               cat:'fruit',kcal:50, p:0.5, c:13,  f:0.1, hh:'2/3 cup',  d:['vegan','vegetarian','paleo']},
   {n:'Grapes',                  cat:'fruit',kcal:69, p:0.7, c:18,  f:0.2, hh:'2/3 cup',  d:['vegan','vegetarian','paleo','medit']}
 ];
+/* ===================== MEAL LIBRARY =====================================
+   Named dishes rather than loose ingredients. Each one lists its components
+   as [food name, grams for a reference serving], pointing at NUT_FOODS so
+   the macros come from the same table the calculator uses - a dish can never
+   drift from the food data. The generator scales the components to the
+   person's per-meal targets, so the reference serving is a starting shape,
+   not a fixed portion.
+     slot - when the dish reads as a meal (breakfast / lunch / dinner / snack)
+     d    - the diet styles it suits; styles that do not filter (balanced,
+            low carb, high carb) draw from the whole library
+   ---------------------------------------------------------------------- */
+var NUT_RECIPES = [
+
+  /* ---------------- keto ---------------- */
+  {n:'Steak and Eggs with Avocado', slot:['breakfast','lunch','dinner'], d:['keto','paleo'],
+   note:'Seared ribeye, eggs over easy, sliced avocado and wilted spinach',
+   c:[['Ribeye steak',140],['Whole eggs',100],['Avocado',70],['Spinach',60]]},
+
+  {n:'Butter-Basted Salmon with Asparagus', slot:['lunch','dinner'], d:['keto'],
+   note:'Salmon basted in browned butter with blistered asparagus',
+   c:[['Salmon fillet',170],['Butter',18],['Asparagus',150]]},
+
+  {n:'Bacon-Wrapped Chicken with Cauliflower Mash', slot:['dinner'], d:['keto'],
+   note:'Thigh wrapped in bacon over cauliflower whipped with cream',
+   c:[['Chicken thigh, skin-on',150],['Bacon',25],['Cauliflower',180],['Heavy cream',40]]},
+
+  {n:'Cobb Salad', slot:['lunch','dinner'], d:['keto'],
+   note:'Chicken, egg, bacon, avocado and cheddar over chopped greens',
+   c:[['Chicken breast, grilled',120],['Whole eggs',55],['Bacon',20],['Avocado',60],['Cheddar cheese',25],['Mixed salad greens',85]]},
+
+  {n:'Ribeye with Garlic Butter Greens', slot:['dinner'], d:['keto','paleo'],
+   note:'Ribeye rested in garlic butter, kale wilted in the pan drippings',
+   c:[['Ribeye steak',160],['Butter',15],['Kale',110],['Olive oil',8]]},
+
+  {n:'Cheesy Scrambled Eggs with Bacon', slot:['breakfast'], d:['keto'],
+   note:'Soft-scrambled eggs folded with cheddar, bacon and mushrooms',
+   c:[['Whole eggs',150],['Cheddar cheese',30],['Bacon',25],['Mushrooms',70],['Butter',10]]},
+
+  {n:'Ground Beef and Zucchini Skillet', slot:['lunch','dinner'], d:['keto'],
+   note:'80/20 beef browned with zucchini and melted cheddar',
+   c:[['Ground beef 80/20',150],['Zucchini',160],['Cheddar cheese',25],['Olive oil',8]]},
+
+  {n:'Tuna Avocado Boats', slot:['lunch','snack'], d:['keto'],
+   note:'Tuna folded with olive oil, piled into avocado halves',
+   c:[['Tuna, canned in water',110],['Avocado',100],['Olive oil',10],['Cucumber',80]]},
+
+  {n:'Shrimp Scampi with Zoodles', slot:['lunch','dinner'], d:['keto'],
+   note:'Garlic butter shrimp over zucchini noodles',
+   c:[['Shrimp',150],['Butter',20],['Zucchini',180],['Olive oil',8]]},
+
+  {n:'Sardine and Egg Breakfast Plate', slot:['breakfast','lunch'], d:['keto'],
+   note:'Tinned sardines, jammy eggs, avocado and leaves',
+   c:[['Sardines, canned',90],['Whole eggs',100],['Avocado',60],['Mixed salad greens',60]]},
+
+  {n:'Macadamia and Cheese Plate', slot:['snack'], d:['keto'],
+   note:'Macadamias, sharp cheddar and cucumber spears',
+   c:[['Macadamia nuts',30],['Cheddar cheese',35],['Cucumber',90]]},
+
+  {n:'Pork and Brussels Sprout Hash', slot:['breakfast','dinner'], d:['keto','paleo'],
+   note:'Pork tenderloin crisped with shredded sprouts and bacon',
+   c:[['Pork tenderloin',150],['Bacon',20],['Brussels sprouts',150],['Olive oil',10]]},
+
+  {n:'Egg Roll in a Bowl', slot:['lunch','dinner'], d:['keto'],
+   note:'Ground beef and cabbage finished with cream',
+   c:[['Ground beef 80/20',140],['Cabbage',170],['Heavy cream',35],['Olive oil',8]]},
+
+  {n:'Turkey and Avocado Roll-Ups', slot:['snack','lunch'], d:['keto','paleo'],
+   note:'Turkey slices rolled around avocado with a leafy side',
+   c:[['Turkey breast',120],['Avocado',70],['Mixed salad greens',50],['Olive oil',8]]},
+
+  {n:'Hard-Boiled Eggs with Almonds', slot:['snack'], d:['keto','paleo'],
+   note:'Jammy eggs, salted almonds and cucumber',
+   c:[['Whole eggs',110],['Almonds',25],['Cucumber',80]]},
+
+  {n:'Blackened Cod with Buttered Greens', slot:['lunch','dinner'], d:['keto'],
+   note:'Spice-crusted cod with green beans finished in butter',
+   c:[['Cod fillet',190],['Butter',22],['Green beans',150],['Olive oil',8]]},
+
+  {n:'Beef Lettuce Wraps', slot:['lunch','dinner'], d:['keto','paleo'],
+   note:'Seasoned beef spooned into lettuce cups with avocado',
+   c:[['Ground beef 93/7',160],['Mixed salad greens',90],['Avocado',60],['Olive oil',10]]},
+
+  /* ---------------- vegan ---------------- */
+  {n:'Tofu Scramble Burrito', slot:['breakfast','lunch'], d:['vegan','vegetarian'],
+   note:'Turmeric tofu scramble with peppers and avocado in corn tortillas',
+   c:[['Firm tofu',170],['Corn tortillas',60],['Bell peppers',90],['Avocado',55],['Nutritional yeast',8]]},
+
+  {n:'Lentil Curry with Rice', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Coconut lentil curry over brown rice with wilted spinach',
+   c:[['Lentils, cooked',200],['Brown rice, cooked',150],['Coconut oil',12],['Spinach',80]]},
+
+  {n:'Chickpea Buddha Bowl', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Roasted chickpeas and quinoa with kale, carrot and tahini drizzle',
+   c:[['Chickpeas, cooked',180],['Quinoa, cooked',150],['Kale',80],['Carrots',70],['Tahini',18]]},
+
+  {n:'Black Bean Tacos', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Smoky black beans in corn tortillas with cabbage slaw and avocado',
+   c:[['Black beans, cooked',180],['Corn tortillas',70],['Cabbage',80],['Avocado',60],['Bell peppers',60]]},
+
+  {n:'Peanut Tempeh Stir-Fry', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Tempeh and broccoli in peanut sauce over jasmine rice',
+   c:[['Tempeh',140],['Peanut butter',25],['Broccoli',150],['Jasmine rice, cooked',160]]},
+
+  {n:'Overnight Oats with Berries and Chia', slot:['breakfast','snack'], d:['vegan','vegetarian'],
+   note:'Oats soaked with chia, blueberries and a spoon of almond butter',
+   c:[['Oats, dry',70],['Chia seeds',15],['Blueberries',80],['Almond butter',18]]},
+
+  {n:'Edamame and Brown Rice Bowl', slot:['lunch','snack'], d:['vegan','vegetarian'],
+   note:'Sesame edamame over brown rice with carrot ribbons and hemp',
+   c:[['Edamame, shelled',150],['Brown rice, cooked',160],['Carrots',70],['Hemp seeds',15]]},
+
+  {n:'Seitan Fajita Bowl', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Charred seitan strips and peppers over rice',
+   c:[['Seitan',110],['Bell peppers',120],['Jasmine rice, cooked',160],['Olive oil',12]]},
+
+  {n:'Green Protein Smoothie', slot:['breakfast','snack'], d:['vegan','vegetarian'],
+   note:'Pea protein blended with banana, spinach and almond butter',
+   c:[['Pea protein powder',35],['Banana',110],['Spinach',50],['Almond butter',16]]},
+
+  {n:'Sweet Potato and Black Bean Hash', slot:['breakfast','lunch'], d:['vegan','vegetarian'],
+   note:'Crisped sweet potato with black beans and kale',
+   c:[['Sweet potato, baked',200],['Black beans, cooked',150],['Kale',80],['Olive oil',12]]},
+
+  {n:'Tofu Poke Bowl', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Marinated tofu over rice with cucumber, edamame and avocado',
+   c:[['Firm tofu',160],['Jasmine rice, cooked',150],['Cucumber',80],['Edamame, shelled',70],['Avocado',50]]},
+
+  {n:'Apple with Almond Butter', slot:['snack'], d:['vegan','vegetarian','paleo'],
+   note:'Sliced apple with a spoon of almond butter',
+   c:[['Apple',150],['Almond butter',24]]},
+
+  /* ---------------- vegetarian (dairy / eggs) ---------------- */
+  {n:'Greek Yogurt Parfait with Berries and Granola', slot:['breakfast','snack'], d:['vegetarian','medit'],
+   note:'Layered yogurt, toasted oats, almonds and berries',
+   c:[['Greek yogurt, 0%',220],['Oats, dry',35],['Almonds',20],['Blueberries',80]]},
+
+  {n:'Three-Egg Veggie Omelette', slot:['breakfast','lunch'], d:['vegetarian','medit'],
+   note:'Folded omelette with mushrooms, spinach and cheddar',
+   c:[['Whole eggs',165],['Cheddar cheese',25],['Mushrooms',70],['Spinach',60],['Butter',8]]},
+
+  {n:'Cottage Cheese and Pineapple Bowl', slot:['snack','breakfast'], d:['vegetarian','medit'],
+   note:'Cottage cheese with pineapple and toasted almonds',
+   c:[['Cottage cheese, 2%',200],['Pineapple',120],['Almonds',18]]},
+
+  {n:'Egg and Avocado Toast', slot:['breakfast','lunch'], d:['vegetarian'],
+   note:'Smashed avocado on grain toast with soft eggs and greens',
+   c:[['Whole eggs',110],['Whole-grain bread',70],['Avocado',70],['Mixed salad greens',50]]},
+
+  {n:'Seared Cheese and Chickpea Salad', slot:['lunch'], d:['vegetarian','medit'],
+   note:'Pan-seared cheddar, chickpeas, cucumber and olive oil over leaves',
+   c:[['Cheddar cheese',55],['Chickpeas, cooked',150],['Cucumber',90],['Mixed salad greens',70],['Olive oil',12]]},
+
+  /* ---------------- mediterranean ---------------- */
+  {n:'Grilled Chicken Gyro Bowl', slot:['lunch','dinner'], d:['medit'],
+   note:'Oregano chicken over quinoa with cucumber and yogurt sauce',
+   c:[['Chicken breast, grilled',160],['Quinoa, cooked',160],['Cucumber',90],['Greek yogurt, 0%',70],['Olive oil',12]]},
+
+  {n:'Salmon Poke Bowl', slot:['lunch','dinner'], d:['medit'],
+   note:'Salmon over brown rice with cucumber, edamame and avocado',
+   c:[['Salmon fillet',150],['Brown rice, cooked',160],['Cucumber',70],['Edamame, shelled',60],['Avocado',50]]},
+
+  {n:'Shrimp and Quinoa Tabbouleh', slot:['lunch','dinner'], d:['medit'],
+   note:'Lemon shrimp tossed through herby quinoa and chopped salad',
+   c:[['Shrimp',160],['Quinoa, cooked',160],['Cucumber',80],['Bell peppers',70],['Olive oil',14]]},
+
+  {n:'Lemon Cod with Roasted Vegetables', slot:['dinner'], d:['medit'],
+   note:'Baked cod with roasted squash and broccoli',
+   c:[['Cod fillet',180],['Butternut squash',180],['Broccoli',120],['Olive oil',14]]},
+
+  {n:'Tuna and Chickpea Salad', slot:['lunch'], d:['medit'],
+   note:'Tuna, chickpeas and leaves dressed in lemon and olive oil',
+   c:[['Tuna, canned in water',120],['Chickpeas, cooked',160],['Mixed salad greens',80],['Olive oil',14]]},
+
+  {n:'Hummus Plate with Warm Bread', slot:['snack','lunch'], d:['medit','vegetarian'],
+   note:'Chickpeas whipped with tahini, cucumber and grain bread',
+   c:[['Chickpeas, cooked',170],['Tahini',22],['Cucumber',90],['Whole-grain bread',55]]},
+
+  /* ---------------- paleo ---------------- */
+  {n:'Sweet Potato Hash with Eggs', slot:['breakfast'], d:['paleo'],
+   note:'Crisped sweet potato and peppers under fried eggs',
+   c:[['Sweet potato, baked',190],['Whole eggs',120],['Bell peppers',80],['Olive oil',12]]},
+
+  {n:'Grilled Chicken with Roasted Vegetables', slot:['lunch','dinner'], d:['paleo','medit'],
+   note:'Chicken breast with roasted squash and broccoli',
+   c:[['Chicken breast, grilled',170],['Butternut squash',180],['Broccoli',130],['Olive oil',14]]},
+
+  {n:'Beef and Broccoli', slot:['lunch','dinner'], d:['paleo'],
+   note:'Sirloin and broccoli seared in coconut oil with carrot',
+   c:[['Lean sirloin steak',160],['Broccoli',160],['Coconut oil',12],['Carrots',70]]},
+
+  {n:'Salmon with Sweet Potato and Greens', slot:['dinner'], d:['paleo','medit'],
+   note:'Roast salmon, sweet potato wedges and garlicky kale',
+   c:[['Salmon fillet',160],['Sweet potato, baked',180],['Kale',90],['Olive oil',12]]},
+
+  {n:'Chicken Salad Plate with Walnuts', slot:['lunch','snack'], d:['paleo'],
+   note:'Shredded chicken, avocado and walnuts over leaves',
+   c:[['Chicken breast, grilled',150],['Avocado',70],['Walnuts',20],['Mixed salad greens',80]]},
+
+  {n:'Eggs and Avocado Breakfast Plate', slot:['breakfast'], d:['paleo','keto'],
+   note:'Fried eggs, avocado and sauteed spinach',
+   c:[['Whole eggs',150],['Avocado',80],['Spinach',80],['Olive oil',10]]},
+
+  {n:'Plantain and Beef Bowl', slot:['lunch','dinner'], d:['paleo'],
+   note:'Caramelised plantain with seasoned beef and peppers',
+   c:[['Ground beef 93/7',160],['Plantain, cooked',200],['Bell peppers',90],['Coconut oil',14]]},
+
+  {n:'Banana Nut Breakfast Bowl', slot:['breakfast','snack'], d:['paleo'],
+   note:'Banana, walnuts, almond butter and blueberries',
+   c:[['Banana',140],['Walnuts',25],['Almond butter',20],['Blueberries',90]]},
+
+  {n:'Chicken with Plantain and Greens', slot:['lunch','dinner'], d:['paleo'],
+   note:'Grilled chicken, fried plantain and garlicky kale',
+   c:[['Chicken breast, grilled',170],['Plantain, cooked',190],['Kale',90],['Olive oil',14]]},
+
+  {n:'Steak with Roasted Roots', slot:['dinner'], d:['paleo'],
+   note:'Sirloin with sweet potato, beets and carrots',
+   c:[['Lean sirloin steak',165],['Sweet potato, baked',180],['Beets, cooked',110],['Carrots',90],['Olive oil',16]]},
+
+  /* ---------------- balanced / everyday ---------------- */
+  {n:'Turkey Chili', slot:['lunch','dinner'], d:[],
+   note:'Ground turkey simmered with black beans and peppers over rice',
+   c:[['Ground turkey 93/7',150],['Black beans, cooked',150],['Bell peppers',90],['Brown rice, cooked',140]]},
+
+  {n:'Chicken Burrito Bowl', slot:['lunch','dinner'], d:[],
+   note:'Grilled chicken, rice, black beans, peppers and avocado',
+   c:[['Chicken breast, grilled',160],['Jasmine rice, cooked',170],['Black beans, cooked',120],['Avocado',55],['Bell peppers',70]]},
+
+  {n:'Beef and Broccoli with Rice', slot:['dinner'], d:[],
+   note:'Sirloin and broccoli stir-fried, served over jasmine rice',
+   c:[['Lean sirloin steak',150],['Broccoli',150],['Jasmine rice, cooked',170],['Olive oil',12]]},
+
+  {n:'Protein Oats with Banana and Peanut Butter', slot:['breakfast'], d:[],
+   note:'Oats cooked with whey, topped with banana and peanut butter',
+   c:[['Oats, dry',70],['Whey protein powder',30],['Banana',110],['Peanut butter',18]]},
+
+  {n:'Chicken Caesar Quinoa Salad', slot:['lunch'], d:[],
+   note:'Sliced chicken over quinoa, greens and shaved cheese',
+   c:[['Chicken breast, grilled',150],['Quinoa, cooked',150],['Mixed salad greens',80],['Cheddar cheese',20],['Olive oil',12]]},
+
+  {n:'Turkey and Sweet Potato Bowl', slot:['dinner'], d:[],
+   note:'Ground turkey with roasted sweet potato and green beans',
+   c:[['Ground turkey 93/7',160],['Sweet potato, baked',190],['Green beans',140],['Olive oil',12]]},
+
+  {n:'Tuna Pasta Salad', slot:['lunch'], d:[],
+   note:'Tuna tossed through pasta with leaves and olive oil',
+   c:[['Tuna, canned in water',120],['Pasta, cooked',180],['Mixed salad greens',70],['Olive oil',14]]},
+
+  {n:'Steak Fajita Bowl', slot:['dinner'], d:[],
+   note:'Seared sirloin and charred peppers over rice with avocado',
+   c:[['Lean sirloin steak',150],['Bell peppers',120],['Jasmine rice, cooked',160],['Avocado',55]]},
+
+  {n:'Greek Yogurt Protein Bowl', slot:['snack','breakfast'], d:[],
+   note:'Greek yogurt whipped with whey, strawberries and almonds',
+   c:[['Greek yogurt, 0%',200],['Whey protein powder',20],['Strawberries',110],['Almonds',18]]},
+
+  {n:'Cottage Cheese and Rice Cakes', slot:['snack'], d:[],
+   note:'Rice cakes topped with cottage cheese and raspberries',
+   c:[['Cottage cheese, 2%',180],['Rice cakes',30],['Raspberries',80]]},
+
+  {n:'Shrimp Fried Rice', slot:['lunch','dinner'], d:[],
+   note:'Shrimp and egg through fried rice with peppers',
+   c:[['Shrimp',150],['White rice, cooked',170],['Whole eggs',55],['Bell peppers',80],['Olive oil',10]]},
+
+  {n:'Turkey and Avocado Sandwich', slot:['lunch','snack'], d:[],
+   note:'Turkey breast and smashed avocado on grain bread',
+   c:[['Turkey breast',130],['Whole-grain bread',80],['Avocado',60],['Mixed salad greens',50]]},
+
+  {n:'Chicken Thigh Traybake with Potatoes', slot:['dinner'], d:[],
+   note:'Roast thighs with potato and green beans',
+   c:[['Chicken thigh, skin-on',160],['White potato, baked',190],['Green beans',140],['Olive oil',10]]},
+
+  {n:'Whey and Berry Shake', slot:['snack'], d:[],
+   note:'Whey blended with raspberries and a spoon of almond butter',
+   c:[['Whey protein powder',35],['Raspberries',100],['Almond butter',16]]}
+];
+
 
 
 /* ---------- state ---------- */
@@ -2623,6 +2901,204 @@ function nutSolve2(m, b){
   var D=m[0][0]*m[1][1]-m[0][1]*m[1][0];
   if(Math.abs(D)<1e-6) return null;
   return [ (b[0]*m[1][1]-m[0][1]*b[1])/D, (m[0][0]*b[1]-b[0]*m[1][0])/D ];
+}
+
+/* ===================== MENU BUILDER ====================================
+   Builds a day from NUT_RECIPES - named dishes - and scales each one to that
+   meal's targets. The older ingredient builder below stays as the safety net:
+   heavy exclusions can empty the recipe pool, and a plan of loose foods is
+   better than no plan.
+   ---------------------------------------------------------------------- */
+var nutFoodMap=null;
+function nutFood(n){
+  if(!nutFoodMap){ nutFoodMap={}; NUT_FOODS.forEach(function(f){ nutFoodMap[f.n]=f; }); }
+  return nutFoodMap[n];
+}
+
+/* dish names from the last few plans, so Regenerate rotates the menu instead
+   of re-rolling the same handful of dishes */
+var nutMenuHistory=[];
+
+/* A day is not four identical meals: dinner carries more than a mid-morning
+   snack. Weights are normalised across however many meals there are, which is
+   also what makes a snack-sized dish a sane choice for a snack slot. */
+var NUT_SLOT_W = { breakfast:1.00, lunch:1.15, dinner:1.25, snack:0.60 };
+var NUT_SLOT_OF = { 'Breakfast':'breakfast', 'Mid-Morning':'snack', 'Lunch':'lunch',
+                    'Afternoon':'snack', 'Dinner':'dinner', 'Evening':'snack', 'Meal':'dinner' };
+
+function nutRecipePool(st){
+  var filt = NUT_CFG.DIET_FILTERS.indexOf(st.diet)>-1 ? st.diet : null;
+  var excl = (st.excl||[]);
+  var banned = String(st.exclText||'').toLowerCase().split(',')
+                 .map(function(x){ return x.trim(); }).filter(Boolean);
+  return NUT_RECIPES.filter(function(r){
+    if(filt && r.d.indexOf(filt)<0) return false;
+    return r.c.every(function(ci){
+      var f=nutFood(ci[0]);
+      if(!f) return false;
+      if(f.allerg && excl.some(function(a){ return f.allerg.indexOf(a)>-1; })) return false;
+      var ln=f.n.toLowerCase();
+      return !banned.some(function(b){ return ln.indexOf(b)>-1; });
+    });
+  });
+}
+
+function nutFitErr(a, per, glp1){
+  return (glp1?NUT_CFG.GLP1.PROTEIN_W:9)*Math.pow((a.p-per.p)/Math.max(per.p,1),2)
+       + 1.5*Math.pow((a.c-per.c)/Math.max(per.c,1),2)
+       + 2.5*Math.pow((a.f-per.f)/Math.max(per.f,1),2)
+       + 4*Math.pow((a.kcal-per.cal)/Math.max(per.cal,1),2);
+}
+
+/* Scale a dish to one meal's targets. Components are grouped by what they are
+   for - protein, carb, fat, vegetable - and each group gets one multiplier, so
+   the dish keeps its shape: more steak and more butter, not a fourth food
+   appearing from nowhere. */
+function nutScaleRecipe(r, per, glp1){
+  var groups={}, order=[];
+  r.c.forEach(function(ci){
+    var f=nutFood(ci[0]); if(!f) return;
+    var role=(f.cat==='veg'||f.cat==='fruit') ? 'veg' : f.cat;
+    if(!groups[role]){ groups[role]={items:[],p:0,c:0,f:0,kcal:0}; order.push(role); }
+    var g=groups[role], k=ci[1]/100;
+    g.items.push({f:f,g:ci[1]});
+    g.p+=f.p*k; g.c+=f.c*k; g.f+=f.f*k; g.kcal+=f.kcal*k;
+  });
+  if(!order.length) return null;
+  /* Headroom scales with how big the meal is. A reference serving is written
+     for a normal plate, so a 900-calorie dinner needs to stretch further than
+     a 400-calorie one - without letting a snack inflate to a dinner. */
+  var room=nClamp(per.cal/550, 1, 2.2);
+  var LIM={ pro:[0.4,4.0*room], carb:[0.15,3.5*room], fat:[0.15,3.2*room], veg:[0.6,2.4] };
+  /* and a hard ceiling on what any one component can grow to, so a dish never
+     solves its way to a kilo of squash - a dish that cannot reach the target
+     inside these portions simply scores badly and another one gets picked */
+  var MAXG={ pro:400, carb:550, fat:150, veg:600 };
+  order.forEach(function(role){
+    var big=groups[role].items.reduce(function(a,it){ return Math.max(a,it.g); },1);
+    var cap=(MAXG[role]||500)/big;
+    LIM[role]=[Math.min(LIM[role][0],cap), Math.max(LIM[role][0], Math.min(LIM[role][1], cap))];
+  });
+  function tot(x){
+    var a={p:0,c:0,f:0,kcal:0};
+    order.forEach(function(role,i){
+      var g=groups[role];
+      a.p+=g.p*x[i]; a.c+=g.c*x[i]; a.f+=g.f*x[i]; a.kcal+=g.kcal*x[i];
+    });
+    return a;
+  }
+  function err(x){ return nutFitErr(tot(x), per, glp1); }
+  var x=order.map(function(){ return 1; });
+  for(var pass=0; pass<120; pass++){
+    var improved=false;
+    for(var k=0;k<x.length;k++){
+      for(var d=-1;d<=1;d+=2){
+        var lim=LIM[order[k]]||[0.3,3], t=x.slice();
+        t[k]=nClamp(+(t[k]+d*0.04).toFixed(4), lim[0], lim[1]);
+        if(err(t)<err(x)-1e-9){ x=t; improved=true; }
+      }
+    }
+    if(!improved) break;
+  }
+  var items=[], acc={kcal:0,p:0,c:0,f:0};
+  order.forEach(function(role,i){
+    groups[role].items.forEach(function(it){
+      var g=Math.max(5, Math.round(it.g*x[i]/5)*5), k=g/100;
+      items.push({ n:it.f.n, g:g, hh:it.f.hh, kcal:nRound(it.f.kcal*k),
+                   p:+(it.f.p*k).toFixed(1), c:+(it.f.c*k).toFixed(1), f:+(it.f.f*k).toFixed(1) });
+      acc.kcal+=it.f.kcal*k; acc.p+=it.f.p*k; acc.c+=it.f.c*k; acc.f+=it.f.f*k;
+    });
+  });
+  return { items:items, acc:acc, err:nutFitErr(acc, per, glp1) };
+}
+
+function nutShuffled(list, rnd){
+  var a=list.slice();
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1))%(i+1); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+/* Pick a dish for this slot. Candidates are scored on how close they land to
+   the meal's targets once scaled, and the choice is random among the best few
+   - accurate, but not the same optimum every single time. */
+function nutChooseDish(pool, slot, rnd, usedToday, per, glp1){
+  var chain=[slot].concat(['lunch','dinner','breakfast','snack'].filter(function(s){ return s!==slot; }));
+  var lastResort=null;
+  for(var i=0;i<chain.length;i++){
+    var cand=pool.filter(function(r){ return r.slot.indexOf(chain[i])>-1; });
+    if(!cand.length) continue;
+    var open=cand.filter(function(r){ return !usedToday[r.n]; });
+    if(!open.length){ lastResort=lastResort||cand; continue; }
+    /* Recently served dishes are pushed down rather than excluded. On a short
+       pool - vegan at a high protein target, say - the two or three dishes
+       that can actually carry the meal have to stay reachable, or the day
+       drifts far under target purely to look varied. */
+    var scored=nutShuffled(open,rnd).slice(0,18).map(function(r){
+      var s=nutScaleRecipe(r,per,glp1);
+      if(!s) return null;
+      var rank=nutMenuHistory.indexOf(r.n)<0 ? s.err : s.err*2.5+0.15;
+      return {r:r,s:s,rank:rank};
+    }).filter(Boolean).sort(function(a,b){ return a.rank-b.rank; });
+    if(!scored.length) continue;
+    var top=scored.slice(0, Math.min(3, scored.length));
+    return top[Math.floor(rnd()*top.length)%top.length];
+  }
+  /* every dish is already on today's menu - repeat the best fit rather than fail */
+  if(lastResort && lastResort.length){
+    var again=lastResort.map(function(r){
+      var s=nutScaleRecipe(r,per,glp1); return s?{r:r,s:s}:null;
+    }).filter(Boolean).sort(function(a,b){ return a.s.err-b.s.err; });
+    if(again.length) return again[0];
+  }
+  return null;
+}
+
+function nutBuildMenu(st, m){
+  var pool=nutRecipePool(st);
+  if(pool.length<2) return null;                 /* fall back to loose foods */
+  var rnd=nutRng(st.seed*7919 + st.meals*13 + 1);
+  var times=nutMealTimes(st, st.meals);
+  var names = st.meals===1 ? ['Meal']
+            : st.meals>=6 ? ['Breakfast','Mid-Morning','Lunch','Afternoon','Dinner','Evening']
+            : st.meals===5 ? ['Breakfast','Mid-Morning','Lunch','Afternoon','Dinner']
+            : st.meals===4 ? ['Breakfast','Lunch','Afternoon','Dinner']
+            : ['Breakfast','Lunch','Dinner'];
+  var slots=[], wsum=0;
+  for(var i=0;i<st.meals;i++){
+    var nm=names[i]||('Meal '+(i+1)), sl=NUT_SLOT_OF[nm]||'lunch';
+    slots.push({name:nm, slot:sl, w:NUT_SLOT_W[sl]||1});
+    wsum+=NUT_SLOT_W[sl]||1;
+  }
+  var usedToday={}, meals=[], served=[];
+  /* Each meal is targeted at what is LEFT of the day, not at a fixed share of
+     it. A breakfast that lands light on protein raises the bar for lunch, so
+     the day still totals out instead of drifting four meals in a row. */
+  var rem={ cal:m.cal, p:m.p, c:m.c, f:m.f }, wleft=wsum;
+  for(var j=0;j<slots.length;j++){
+    var sh=slots[j].w/wleft;
+    var per={ cal:Math.max(80,rem.cal*sh), p:Math.max(5,rem.p*sh),
+              c:Math.max(2,rem.c*sh),      f:Math.max(3,rem.f*sh) };
+    var pick=nutChooseDish(pool, slots[j].slot, rnd, usedToday, per, !!st.glp1);
+    if(!pick) return null;
+    usedToday[pick.r.n]=1; served.push(pick.r.n);
+    meals.push({ name:slots[j].name, at:nutFmtTime(times[j]), dish:pick.r.n, note:pick.r.note||'',
+                 items:pick.s.items, kcal:nRound(pick.s.acc.kcal), p:nRound(pick.s.acc.p),
+                 c:nRound(pick.s.acc.c), f:nRound(pick.s.acc.f) });
+    rem.cal-=pick.s.acc.kcal; rem.p-=pick.s.acc.p; rem.c-=pick.s.acc.c; rem.f-=pick.s.acc.f;
+    wleft-=slots[j].w;
+  }
+  /* remember what was just served, but never so much that the pool starves */
+  nutMenuHistory = served.concat(nutMenuHistory).slice(0, Math.max(0, Math.min(3*st.meals, pool.length-1)));
+
+  var tot=meals.reduce(function(a,x){ a.kcal+=x.kcal; a.p+=x.p; a.c+=x.c; a.f+=x.f; return a; },
+                       {kcal:0,p:0,c:0,f:0});
+  return { meals:meals, total:tot, target:{cal:m.cal,p:m.p,c:m.c,f:m.f},
+           per:{cal:m.cal/st.meals,p:m.p/st.meals,c:m.c/st.meals,f:m.f/st.meals},
+           window:nutWindow(st).label, glp1:!!st.glp1, thin:[], menu:true, poolSize:pool.length,
+           poolNote: pool.length < st.meals
+             ? 'Only '+pool.length+' dish'+(pool.length>1?'es':'')+' clear these exclusions, so the day repeats one.'
+             : '',
+           madeAt:new Date().toISOString(), seed:st.seed };
 }
 
 function nutBuildPlan(st, m){
@@ -2890,6 +3366,7 @@ function nutBindSegs(){
       else if(grp==='meals'){ nutState[grp]=parseInt(val,10); }
       else if(grp==='glp1'){ nutState.glp1=(val==='on'); }
       else { nutState[grp]=val; }
+      if(grp==='diet') nutMenuHistory=[];
       if(grp==='window'){
         var w=NUT_CFG.WINDOWS[val]||NUT_CFG.WINDOWS.none;
         if(val!=='custom'){ nutState.winStart=w.start; nutState.winEnd=w.end; }
@@ -3026,7 +3503,10 @@ function nutRenderPlan(plan, mountId){
   plan.meals.forEach(function(ml){
     h+='<div class="nut-meal"><div class="nut-meal-head">'+
        '<span class="nut-meal-name">'+ml.name+(ml.at?'<em class="nut-meal-at">'+ml.at+'</em>':'')+'</span>'+
-       '<span class="nut-meal-kcal">'+nutFmt(ml.kcal)+' cal</span></div><div class="nut-meal-items">';
+       '<span class="nut-meal-kcal">'+nutFmt(ml.kcal)+' cal</span></div>';
+    if(ml.dish) h+='<div class="nut-meal-dish">'+ml.dish+'</div>';
+    if(ml.note) h+='<div class="nut-meal-note">'+ml.note+'</div>';
+    h+='<div class="nut-meal-items">';
     ml.items.forEach(function(it){
       h+='<div class="nut-item"><span class="nut-item-n">'+it.n+'</span>'+
          '<span class="nut-item-q">'+it.g+' g <em>&middot; '+it.hh.replace(/^([\d.\/]+)/,function(x){
@@ -3070,7 +3550,7 @@ function nutCreatePlan(reshuffle){
   nutSyncFromSegs();
   var m=nutRender();
   if(reshuffle) nutState.seed=(nutState.seed%9999)+1;
-  nutPlan=nutBuildPlan(nutState,m);
+  nutPlan=nutBuildMenu(nutState,m) || nutBuildPlan(nutState,m);
   nutRenderPlan(nutPlan,'nut-plan');
   nutEl('nut-plan-wrap').hidden=false;
   nutEl('nut-plan-wrap').scrollIntoView({block:'nearest',behavior:'smooth'});
