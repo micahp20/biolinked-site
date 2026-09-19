@@ -2546,6 +2546,30 @@ var NUT_RECIPES = [
    note:'Sliced apple with a spoon of almond butter',
    c:[['Apple',150],['Almond butter',24]]},
 
+  {n:'Tempeh Taco Bowl', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Crumbled tempeh and black beans with cabbage slaw and avocado',
+   c:[['Tempeh',140],['Black beans, cooked',140],['Cabbage',90],['Avocado',55],['Corn tortillas',50]]},
+
+  {n:'Seitan and Broccoli Stir-Fry', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Seitan and broccoli in ginger soy over brown rice',
+   c:[['Seitan',110],['Broccoli',160],['Brown rice, cooked',160],['Olive oil',12]]},
+
+  {n:'Tofu Curry with Quinoa', slot:['lunch','dinner'], d:['vegan','vegetarian'],
+   note:'Coconut tofu curry with spinach over quinoa',
+   c:[['Firm tofu',170],['Quinoa, cooked',160],['Spinach',90],['Coconut oil',12]]},
+
+  {n:'Protein Oats with Berries', slot:['breakfast','snack'], d:['vegan','vegetarian'],
+   note:'Oats stirred with pea protein, raspberries and almond butter',
+   c:[['Oats, dry',65],['Pea protein powder',30],['Raspberries',100],['Almond butter',18]]},
+
+  {n:'Edamame and Tofu Salad Bowl', slot:['lunch','snack'], d:['vegan','vegetarian'],
+   note:'Chilled tofu and edamame over greens with hemp and sesame oil',
+   c:[['Firm tofu',150],['Edamame, shelled',120],['Mixed salad greens',80],['Hemp seeds',18],['Olive oil',10]]},
+
+  {n:'Tempeh Breakfast Hash', slot:['breakfast'], d:['vegan','vegetarian'],
+   note:'Tempeh crumbles crisped with sweet potato and peppers',
+   c:[['Tempeh',140],['Sweet potato, baked',170],['Bell peppers',90],['Olive oil',12]]},
+
   /* ---------------- vegetarian (dairy / eggs) ---------------- */
   {n:'Greek Yogurt Parfait with Berries and Granola', slot:['breakfast','snack'], d:['vegetarian','medit'],
    note:'Layered yogurt, toasted oats, almonds and berries',
@@ -2685,6 +2709,26 @@ var NUT_RECIPES = [
   {n:'Chicken Thigh Traybake with Potatoes', slot:['dinner'], d:[],
    note:'Roast thighs with potato and green beans',
    c:[['Chicken thigh, skin-on',160],['White potato, baked',190],['Green beans',140],['Olive oil',10]]},
+
+  {n:'Chicken and Rice Bowl', slot:['lunch','dinner'], d:[],
+   note:'Grilled chicken over jasmine rice with steamed broccoli',
+   c:[['Chicken breast, grilled',180],['Jasmine rice, cooked',220],['Broccoli',140]]},
+
+  {n:'Shrimp and Rice Plate', slot:['lunch','dinner'], d:[],
+   note:'Lemon shrimp with rice and green beans',
+   c:[['Shrimp',170],['White rice, cooked',220],['Green beans',140]]},
+
+  {n:'Oatmeal with Banana and Egg Whites', slot:['breakfast'], d:[],
+   note:'Oats cooked through with egg whites, topped with banana',
+   c:[['Oats, dry',80],['Egg whites',200],['Banana',120]]},
+
+  {n:'Turkey and Potato Plate', slot:['lunch','dinner'], d:[],
+   note:'Sliced turkey with roasted potato and carrots',
+   c:[['Turkey breast',170],['White potato, baked',250],['Carrots',100]]},
+
+  {n:'Chicken with Sweet Potato and Plantain', slot:['lunch','dinner'], d:['paleo'],
+   note:'Grilled chicken with roasted sweet potato and plantain',
+   c:[['Chicken breast, grilled',170],['Sweet potato, baked',200],['Plantain, cooked',150],['Bell peppers',80]]},
 
   {n:'Whey and Berry Shake', slot:['snack'], d:[],
    note:'Whey blended with raspberries and a spoon of almond butter',
@@ -2837,8 +2881,12 @@ function nutFood(n){
 }
 
 /* dish names from the last few plans, so Regenerate rotates the menu instead
-   of re-rolling the same handful of dishes */
+   of re-rolling the same handful of dishes. nutMenuLast is the plan just
+   served: those dishes are held back outright whenever the slot has real
+   alternatives, which is what makes two regenerates read differently even on
+   a diet where only a few dishes can carry the protein target. */
 var nutMenuHistory=[];
+var nutMenuLast=[];
 
 /* A day is not four identical meals: dinner carries more than a mid-morning
    snack. Weights are normalised across however many meals there are, which is
@@ -2863,6 +2911,10 @@ function nutRecipePool(st){
     });
   });
 }
+
+/* A meal scoring under this is close enough to its targets that swapping in a
+   fresher dish is free. Above it, accuracy wins and a recent dish can return. */
+var NUT_FIT_OK = 0.25;
 
 function nutFitErr(a, per, glp1){
   return (glp1?NUT_CFG.GLP1.PROTEIN_W:9)*Math.pow((a.p-per.p)/Math.max(per.p,1),2)
@@ -2890,7 +2942,9 @@ function nutScaleRecipe(r, per, glp1){
      for a normal plate, so a 900-calorie dinner needs to stretch further than
      a 400-calorie one - without letting a snack inflate to a dinner. */
   var room=nClamp(per.cal/550, 1, 2.2);
-  var LIM={ pro:[0.4,4.0*room], carb:[0.15,3.5*room], fat:[0.15,3.2*room], veg:[0.6,2.4] };
+  /* Floors matter as much as ceilings: a dish that solves avocado down to 10g
+     is not the dish it is named after. Every component stays recognisable. */
+  var LIM={ pro:[0.5,4.0*room], carb:[0.3,3.5*room], fat:[0.45,3.2*room], veg:[0.6,2.4] };
   /* and a hard ceiling on what any one component can grow to, so a dish never
      solves its way to a kilo of squash - a dish that cannot reach the target
      inside these portions simply scores badly and another one gets picked */
@@ -2950,16 +3004,28 @@ function nutChooseDish(pool, slot, rnd, usedToday, per, glp1){
     if(!cand.length) continue;
     var open=cand.filter(function(r){ return !usedToday[r.n]; });
     if(!open.length){ lastResort=lastResort||cand; continue; }
-    /* Recently served dishes are pushed down rather than excluded. On a short
-       pool - vegan at a high protein target, say - the two or three dishes
-       that can actually carry the meal have to stay reachable, or the day
-       drifts far under target purely to look varied. */
-    var scored=nutShuffled(open,rnd).slice(0,18).map(function(r){
-      var s=nutScaleRecipe(r,per,glp1);
-      if(!s) return null;
-      var rank=nutMenuHistory.indexOf(r.n)<0 ? s.err : s.err*2.5+0.15;
-      return {r:r,s:s,rank:rank};
-    }).filter(Boolean).sort(function(a,b){ return a.rank-b.rank; });
+    /* When the slot has real alternatives, dishes from the plan just served
+       are held back outright so a regenerate actually reads differently.
+       When it does not - vegan at a high protein target, where only two or
+       three dishes can carry the meal - they come back in, merely pushed
+       down, because a repeated dish beats a day that misses its target. */
+    function rank(list){
+      return nutShuffled(list,rnd).slice(0,18).map(function(r){
+        var s=nutScaleRecipe(r,per,glp1);
+        if(!s) return null;
+        return {r:r,s:s,rank:(nutMenuHistory.indexOf(r.n)<0 ? s.err : s.err*2.5+0.15)};
+      }).filter(Boolean).sort(function(a,b){ return a.rank-b.rank; });
+    }
+    var novel=open.filter(function(r){ return nutMenuLast.indexOf(r.n)<0 && nutMenuHistory.indexOf(r.n)<0; });
+    var scored=[];
+    /* Try the dishes not served recently first, and keep them only if one of
+       them actually lands near the meal's targets. Variety is the goal right
+       up to the point where it would cost the day its numbers. */
+    if(novel.length>=2){
+      scored=rank(novel);
+      if(scored.length && scored[0].s.err>NUT_FIT_OK) scored=[];
+    }
+    if(!scored.length) scored=rank(open);
     if(!scored.length) continue;
     var top=scored.slice(0, Math.min(3, scored.length));
     return top[Math.floor(rnd()*top.length)%top.length];
@@ -3009,6 +3075,7 @@ function nutBuildMenu(st, m){
     wleft-=slots[j].w;
   }
   /* remember what was just served, but never so much that the pool starves */
+  nutMenuLast = served.slice();
   nutMenuHistory = served.concat(nutMenuHistory).slice(0, Math.max(0, Math.min(3*st.meals, pool.length-1)));
 
   var tot=meals.reduce(function(a,x){ a.kcal+=x.kcal; a.p+=x.p; a.c+=x.c; a.f+=x.f; return a; },
@@ -3287,7 +3354,7 @@ function nutBindSegs(){
       else if(grp==='meals'){ nutState[grp]=parseInt(val,10); }
       else if(grp==='glp1'){ nutState.glp1=(val==='on'); }
       else { nutState[grp]=val; }
-      if(grp==='diet') nutMenuHistory=[];
+      if(grp==='diet'){ nutMenuHistory=[]; nutMenuLast=[]; }
       if(grp==='window'){
         var w=NUT_CFG.WINDOWS[val]||NUT_CFG.WINDOWS.none;
         if(val!=='custom'){ nutState.winStart=w.start; nutState.winEnd=w.end; }
