@@ -4257,14 +4257,17 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   }
 
   function fmt(n){
-    if(n === null || isNaN(n)) return '';
-    return (Math.abs(n) >= 100 || n === Math.round(n)) ? String(Math.round(n*100)/100) : String(n);
+    if(n === null || n === undefined || isNaN(n)) return '';
+    /* Round to two places before printing. Subtracting two floats gives
+       things like 0.5999999999999979, and that was reaching the change
+       column and the chart axis verbatim. */
+    return String(Math.round(n * 100) / 100);
   }
 
   /* ---------- trend chart ---------- */
   function chartHTML(pts, ref, d){
     if(pts.length < 2) return '';
-    var W = 560, H = 190, P = {t:14, r:14, b:30, l:44};
+    var W = 560, H = 190, P = {t:14, r:14, b:30, l:52};
     var xs = pts.map(function(p,i){ return i; });
     var vals = pts.map(function(p){ return p.v; });
     var vMin = Math.min.apply(null, vals), vMax = Math.max.apply(null, vals);
