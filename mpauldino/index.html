@@ -4275,7 +4275,10 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     else if(ref.kind === 'max'){ vMax = Math.max(vMax, ref.hi); vMin = Math.min(vMin, 0); }
     else if(ref.kind === 'min'){ vMin = Math.min(vMin, ref.lo); }
     var span = (vMax - vMin) || 1;
-    vMin -= span*0.12; vMax += span*0.12; span = vMax - vMin;
+    var floorAtZero = vMin >= 0;          /* no marker here goes negative */
+    vMin -= span*0.12; vMax += span*0.12;
+    if(floorAtZero && vMin < 0) vMin = 0;
+    span = vMax - vMin;
     var X = function(i){ return P.l + (pts.length===1 ? 0 : i/(pts.length-1))*(W-P.l-P.r); };
     var Y = function(v){ return P.t + (1 - (v - vMin)/span)*(H-P.t-P.b); };
     var hue = HUE[d.stCls] || HUE.normal;
