@@ -4649,9 +4649,13 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     {id:'undated', t:'Stopped', s:'dates not recorded'}
   ];
 
-  function weeks(s,e){
+  function dur(s,e){
     var a = new Date(s[0], s[1]-1, s[2]||1), b = new Date(e[0], e[1]-1, e[2]||1);
-    return Math.max(1, Math.round((b-a)/86400000/7));
+    var d = Math.max(1, Math.round((b-a)/86400000) + 1);
+    /* a 10-day course rounded down to "1 week", so short runs stay in days */
+    if(d < 21) return d + ' day' + (d===1?'':'s');
+    var w = Math.round(d/7);
+    return w + ' week' + (w===1?'':'s');
   }
   function dstr(d){ return MONTHS[d[1]-1] + ' ' + (d[2]||1) + ', ' + d[0]; }
 
@@ -4706,7 +4710,7 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     var html = '<div class="tlm-range">' + range + '</div><div class="tlm-meta">'
       + '<span class="tlm-tag">' + (r.kind==='run' ? 'Running now' : (r.kind==='cyc' ? 'Defined course' : 'Stopped')) + '</span>'
       + '<span class="tlm-tag">' + r.sub + '</span>'
-      + (r.dated ? '<span class="tlm-tag">About <b>' + weeks(r.s, r.e) + '</b> week' + (weeks(r.s,r.e)===1?'':'s') + '</span>' : '')
+      + (r.dated ? '<span class="tlm-tag">About <b>' + dur(r.s, r.e) + '</b></span>' : '')
       + '</div><div class="tlm-what">' + r.w + '</div>'
       + '<div class="tlm-src">' + (r.src || 'No start date is recorded for this compound on the page, so the timeline does not place one.') + '</div>';
     if(window.BLPanel && window.BLPanel.show) window.BLPanel.show('Notes on', r.n, html);
@@ -4719,11 +4723,21 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     });
   });
 
-  /* start the phone view scrolled to the live end of the axis */
-  var wrap = grid.parentNode;
-  setTimeout(function(){
-    if(wrap.scrollWidth > wrap.clientWidth) wrap.scrollLeft = wrap.scrollWidth;
-  }, 60);
+  /* Start the phone view at the live end of the axis. The tab is display:none
+     when this runs, so the chart has no measurable width yet - park it until
+     the tab is actually shown. */
+  var wrap = grid.parentNode, parked = true;
+  function toEnd(){
+    if(!parked || !wrap.clientWidth) return;
+    if(wrap.scrollWidth > wrap.clientWidth){ wrap.scrollLeft = wrap.scrollWidth; parked = false; }
+  }
+  window.__tlToEnd = toEnd;
+  if(window.MutationObserver){
+    new MutationObserver(function(){
+      if(document.getElementById('tab-timeline').classList.contains('active')) setTimeout(toEnd, 40);
+    }).observe(document.getElementById('tab-timeline'), {attributes:true, attributeFilter:['class']});
+  }
+  setTimeout(toEnd, 60);
 })();
 </script>
 
