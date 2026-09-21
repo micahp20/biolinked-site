@@ -605,8 +605,10 @@ body.mk-open{overflow:hidden;}
   color:var(--muted);text-align:center;padding:11px 2px;border-left:1px solid var(--line-soft);}
 
 .tl-group{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
-  color:var(--accent);background:var(--accent-dim);padding:9px 14px;
-  border-bottom:1px solid var(--line);position:sticky;left:0;}
+  color:var(--accent);background:var(--accent-dim);border-bottom:1px solid var(--line);}
+/* the heading sits in a pinned span so it stays readable once the chart is
+   scrolled sideways */
+.tl-group i{font-style:normal;position:sticky;left:0;display:inline-block;padding:9px 14px;}
 .tl-group em{font-style:normal;color:var(--muted);letter-spacing:0.04em;text-transform:none;font-weight:600;}
 
 .tl-row{display:flex;min-height:52px;align-items:stretch;border-bottom:1px solid var(--line-soft);
@@ -636,9 +638,11 @@ body.mk-open{overflow:hidden;}
 .tl-bar span{font-size:11.5px;font-weight:700;color:#fff;padding:0 8px;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;}
 .tl-now{position:absolute;top:0;bottom:0;width:2px;background:#b85555;z-index:1;opacity:.75;}
-.tl-now::after{content:'NOW';position:absolute;top:2px;left:50%;transform:translateX(-50%);
-  font-size:9px;font-weight:700;letter-spacing:0.1em;color:#fff;background:#b85555;
-  padding:2px 5px;border-radius:3px;}
+/* the flag belongs on the first row only - on every row it stacked into a
+   column of red badges down the chart */
+.tl-now.flag::after{content:'NOW';position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  font-size:11px;font-weight:700;letter-spacing:0.1em;color:#fff;background:#b85555;
+  padding:2px 6px;border-radius:3px;}
 
 .tl-note{font-size:13px;line-height:1.6;color:var(--muted);background:var(--surface);
   border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;
@@ -4666,16 +4670,21 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   var h = '<div class="tl-head"><div class="tl-label"></div><div class="tl-months">'
         + months.map(function(m){ return '<b>' + m + '</b>'; }).join('') + '</div></div>';
 
+  var rowN = 0;
   GROUPS.forEach(function(g){
     var items = ROWS.filter(function(r){ return r.g === g.id; });
     if(!items.length) return;
-    h += '<div class="tl-group">' + g.t + ' <em>&middot; ' + items.length + ' &middot; ' + g.s + '</em></div>';
+    h += '<div class="tl-group"><i>' + g.t + ' <em>&middot; ' + items.length
+       + ' &middot; ' + g.s + '</em></i></div>';
     items.forEach(function(r, i){
-      var bar;
+      var bar, flag = (rowN === 0) ? ' flag' : '';
+      rowN++;
       if(r.dated){
         var L = pos(r.s[0], r.s[1], r.s[2]), R = pos(r.e[0], r.e[1], r.e[2]);
-        bar = '<div class="tl-bar ' + r.kind + '" style="left:' + L + '%;width:' + Math.max(0.6, R-L) + '%">'
-            + '<span>' + r.label + '</span></div>';
+        var W = Math.max(0.6, R-L);
+        /* a 10-day bar is ~3% wide - the label would render as "A..." */
+        bar = '<div class="tl-bar ' + r.kind + '" style="left:' + L + '%;width:' + W + '%">'
+            + (W >= 13 ? '<span>' + r.label + '</span>' : '') + '</div>';
       } else if(r.kind === 'run'){
         bar = '<div class="tl-bar run open-left" style="left:0%;width:' + nowPct + '%">'
             + '<span>start not recorded &rarr; now</span></div>';
@@ -4686,9 +4695,9 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
       h += '<div class="tl-row' + (r.kind==='arch' ? ' arch' : '') + '" role="button" tabindex="0"'
          + ' data-i="' + ROWS.indexOf(r) + '" aria-label="' + r.n + ' — open notes">'
          + '<div class="tl-label"><span class="tl-nm">' + r.n + '</span>'
-         + '<span class="tl-sub">' + r.sub + '</span></div>'
+         + '<span class="tl-sub">' + (r.dated ? r.label + ' \u00b7 ' : '') + r.sub + '</span></div>'
          + '<div class="tl-track">' + bar
-         + (g.id !== 'undated' ? '<div class="tl-now" style="left:' + nowPct + '%"></div>' : '')
+         + (g.id !== 'undated' ? '<div class="tl-now' + flag + '" style="left:' + nowPct + '%"></div>' : '')
          + '</div></div>';
     });
   });
