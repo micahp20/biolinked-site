@@ -468,6 +468,113 @@ details[open].bodycomp-card .bc-card-chev{transform:rotate(45deg);background:var
   .tip-head,.tip-body{padding-left:15px;padding-right:15px;}
   .chart-note{padding:12px 14px;}
 }
+
+/* ===================== MARKER DETAIL PANEL ==============================
+   Every lab row opens a full panel. The panel reads its content out of the
+   row's own markup at open time - value, units, reference, status and the
+   tooltip text including its Trend line - so there is one copy of the data
+   and the panel can never drift from the table.
+   ====================================================================== */
+#tab-bloodwork .lab-row{cursor:pointer;-webkit-tap-highlight-color:transparent;
+  min-height:52px;transition:background .12s;}
+#tab-bloodwork .lab-row:hover{background:var(--accent-dim);}
+#tab-bloodwork .lab-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+#tab-bloodwork .lab-row .info-tip{display:none !important;}
+#tab-bloodwork .lab-row::after{content:'\203A';position:absolute;right:6px;top:50%;
+  transform:translateY(-50%);color:var(--muted);font-size:17px;line-height:1;opacity:.5;}
+#tab-bloodwork .lab-row{padding-right:24px;}
+
+.mk-scrim{position:fixed;inset:0;background:rgba(20,18,12,0.55);z-index:9400;
+  opacity:0;transition:opacity .18s ease;-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);}
+.mk-scrim.open{opacity:1;}
+.mk-panel{position:fixed;z-index:9500;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);
+  width:min(640px,calc(100vw - 32px));max-height:min(88vh,860px);display:flex;flex-direction:column;
+  background:var(--surface);border:1px solid var(--accent-line);border-radius:16px;
+  box-shadow:0 24px 70px -18px rgba(0,0,0,.45);opacity:0;
+  transition:opacity .18s ease,transform .18s ease;overflow:hidden;}
+.mk-panel.open{opacity:1;transform:translate(-50%,-50%) scale(1);}
+@media (prefers-reduced-motion:reduce){.mk-scrim,.mk-panel{transition:none;}}
+
+.mk-head{display:flex;align-items:flex-start;gap:12px;padding:18px 18px 14px;
+  border-bottom:1px solid var(--line);background:var(--head);}
+.mk-head-l{flex:1;min-width:0;}
+.mk-panel-eyebrow{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:4px;}
+.mk-title{font-size:21px;font-weight:700;line-height:1.25;color:var(--text);letter-spacing:-0.01em;}
+.mk-x{flex:none;width:44px;height:44px;border:1px solid var(--line);background:var(--surface);
+  border-radius:10px;color:var(--muted);font-size:21px;line-height:1;cursor:pointer;}
+.mk-x:hover{background:var(--accent-dim);color:var(--text);}
+
+.mk-body{padding:18px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+.mk-value-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px;}
+.mk-big{font-size:46px;font-weight:700;line-height:1;letter-spacing:-0.02em;color:var(--text);
+  font-variant-numeric:tabular-nums;}
+.mk-unit{font-size:17px;font-weight:600;color:var(--muted);}
+.mk-pill{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  padding:4px 10px;border-radius:99px;margin-left:auto;white-space:nowrap;color:#fff;}
+.mk-pill.ok{background:#2f7a4a;} .mk-pill.normal{background:#3a6b8e;}
+.mk-pill.hi{background:#b97a1f;} .mk-pill.lo{background:#b85555;}
+.mk-where{font-size:17px;line-height:1.5;color:var(--muted);margin-bottom:18px;}
+.mk-where b{color:var(--text);font-weight:700;}
+
+.mk-bar-wrap{margin-bottom:20px;}
+.mk-bar{position:relative;height:16px;border-radius:99px;background:rgba(0,0,0,.055);
+  border:1px solid var(--line);overflow:visible;}
+.mk-band{position:absolute;top:0;bottom:0;background:var(--_b,rgba(122,101,48,.20));}
+.mk-band.mid{background:var(--_b2,rgba(122,101,48,.42));}
+.mk-thresh{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--muted);opacity:.6;}
+.mk-dot{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;
+  background:var(--_d,#2f7a4a);border:3px solid var(--surface);
+  box-shadow:0 2px 7px rgba(0,0,0,.3);transform:translate(-50%,-50%);}
+.mk-bar-ends{display:flex;justify-content:space-between;margin-top:8px;font-size:13px;
+  color:var(--muted);font-weight:600;font-variant-numeric:tabular-nums;}
+.mk-legend{font-size:13px;color:var(--muted);margin-top:8px;line-height:1.5;}
+
+.mk-sec{margin-top:22px;}
+.mk-sec-h{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--accent);padding-bottom:7px;border-bottom:1px solid var(--line);margin-bottom:13px;
+  display:flex;align-items:center;gap:10px;}
+.mk-sec-h span{margin-left:auto;font-size:12px;letter-spacing:0.04em;text-transform:none;
+  color:var(--muted);font-weight:600;}
+
+.mk-rng{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.mk-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:13px;}
+.mk-seg button{min-height:44px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);background:var(--surface);
+  border:1px solid var(--line);border-radius:9px;cursor:pointer;padding:8px 4px;}
+.mk-seg button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.mk-chart{width:100%;height:auto;display:block;overflow:visible;}
+.mk-chart-note{font-size:13px;color:var(--muted);margin-top:9px;line-height:1.5;}
+
+.mk-tbl{width:100%;border-collapse:collapse;font-size:15px;}
+.mk-tbl th{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--muted);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);}
+.mk-tbl th.r,.mk-tbl td.r{text-align:right;}
+.mk-tbl td{padding:10px 8px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums;}
+.mk-tbl tr:last-child td{border-bottom:none;}
+.mk-tbl tr.now td{font-weight:700;background:var(--accent-dim);}
+.mk-up{color:#2f7a4a;font-weight:700;} .mk-dn{color:#b85555;font-weight:700;}
+.mk-flat{color:var(--muted);font-weight:600;}
+
+.mk-what{font-size:17px;line-height:1.68;color:var(--text);}
+.mk-what strong{font-weight:700;}
+.mk-foot{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);
+  font-size:13px;color:var(--muted);line-height:1.6;}
+.mk-foot b{color:var(--text);font-weight:700;}
+
+body.mk-open{overflow:hidden;}
+
+@media(max-width:640px){
+  .mk-panel{left:0;right:0;bottom:0;top:auto;width:100%;max-height:92vh;
+    transform:translateY(14px);border-radius:18px 18px 0 0;border-bottom:none;}
+  .mk-panel.open{transform:translateY(0);}
+  .mk-big{font-size:40px;}
+  .mk-head{padding:16px 15px 13px;}
+  .mk-body{padding:15px 15px 26px;}
+  .mk-title{font-size:19px;}
+}
 </style>
 </head>
 <body>
@@ -3980,5 +4087,341 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   .tb-card-pill,.tb-card-sub,.tip-eyebrow{font-size:11px !important;}
 }
 </style>
+
+<div class="mk-scrim" id="mkScrim" hidden></div>
+<div class="mk-panel" id="mkPanel" role="dialog" aria-modal="true" aria-labelledby="mkTitle" hidden>
+  <div class="mk-head">
+    <div class="mk-head-l">
+      <div class="mk-panel-eyebrow" id="mkPanelEyebrow">Marker</div>
+      <div class="mk-title" id="mkTitle"></div>
+    </div>
+    <button class="mk-x" id="mkX" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="mk-body" id="mkBody"></div>
+</div>
+
+<script>
+/* ===================== MARKER DETAIL PANEL ==============================
+   Reads each lab row's own markup when it is opened, so the table stays the
+   single source of truth for every value, range and explanation.
+   ====================================================================== */
+(function(){
+  var tab = document.getElementById('tab-bloodwork');
+  if(!tab) return;
+  var scrim = document.getElementById('mkScrim'),
+      panel = document.getElementById('mkPanel'),
+      titleEl = document.getElementById('mkTitle'),
+      eyebrowEl = document.getElementById('mkPanelEyebrow'),
+      bodyEl = document.getElementById('mkBody'),
+      xBtn  = document.getElementById('mkX');
+  if(!scrim || !panel) return;
+
+  var lastFocus = null, current = null, range = 'all';
+
+  function num(t){ var m = String(t).match(/-?[\d.]+/); return m ? parseFloat(m[0]) : null; }
+  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+  /* ---------- pull one row apart ---------- */
+  function read(row){
+    var nameEl = row.querySelector('.lab-name'),
+        valEl  = row.querySelector('.lab-val'),
+        refEl  = row.querySelector('.lab-ref'),
+        stEl   = row.querySelector('.lab-status'),
+        tipEl  = row.querySelector('.info-tip-text');
+
+    var name = '';
+    if(nameEl){
+      var c = nameEl.cloneNode(true);
+      var t = c.querySelector('.info-tip'); if(t) t.remove();
+      name = c.textContent.trim();
+    }
+    var unit = '', valTxt = '';
+    if(valEl){
+      var v = valEl.cloneNode(true);
+      var em = v.querySelector('em');
+      if(em){ unit = em.textContent.trim(); em.remove(); }
+      valTxt = v.textContent.trim();
+    }
+    var tipHTML = tipEl ? tipEl.innerHTML : '';
+    var trendRaw = '', whatHTML = tipHTML;
+    var ti = tipHTML.search(/<strong>\s*Trend:\s*<\/strong>/i);
+    if(ti > -1){
+      trendRaw = tipHTML.slice(ti).replace(/<strong>\s*Trend:\s*<\/strong>/i,'');
+      whatHTML = tipHTML.slice(0, ti).replace(/(<br\s*\/?>\s*)+$/i,'');
+    }
+    var sec = row.closest('.lab-section');
+    var secName = sec ? (sec.querySelector('.lab-section-title')||{}).textContent : '';
+
+    return { name:name, valTxt:valTxt, val:num(valTxt), unit:unit,
+             refTxt:(refEl?refEl.textContent.trim():''),
+             stCls:(stEl?(stEl.className.match(/lab-status\s+(\w+)/)||[])[1]||'normal':'normal'),
+             stTxt:(stEl?stEl.textContent.trim():''),
+             whatHTML:whatHTML, trend:parseTrend(trendRaw),
+             section:(secName||'').trim() };
+  }
+
+  /* ---------- "01/25 328 -> 06/25 345 -> ..." ---------- */
+  function parseTrend(raw){
+    if(!raw) return [];
+    var txt = raw.replace(/<[^>]*>/g,' ').replace(/&rarr;|&gt;|→/g,'|').replace(/&nbsp;/g,' ');
+    var out = [];
+    txt.split('|').forEach(function(chunk){
+      var m = chunk.trim().match(/^(\d{1,2})\/(\d{2})\s+(-?[\d.]+)/);
+      if(!m) return;
+      var mo = parseInt(m[1],10), yr = 2000 + parseInt(m[2],10);
+      out.push({ mo:mo, yr:yr, t:yr*12+mo, label:m[1]+'/'+m[2], v:parseFloat(m[3]) });
+    });
+    return out;
+  }
+
+  /* ---------- "ref 250-1100" / "ref <200" / "ref >40" ---------- */
+  function parseRef(raw){
+    var t = String(raw).replace(/^ref\s*/i,'').trim();
+    var m = t.match(/(-?[\d.]+)\s*(?:[–—-])\s*(-?[\d.]+)/);
+    if(m) return {kind:'range', lo:parseFloat(m[1]), hi:parseFloat(m[2])};
+    m = t.match(/^[≤<]\s*(-?[\d.]+)/);
+    if(m) return {kind:'max', hi:parseFloat(m[1])};
+    m = t.match(/^[≥>]\s*(-?[\d.]+)/);
+    if(m) return {kind:'min', lo:parseFloat(m[1])};
+    return {kind:'none'};
+  }
+
+  /* ---------- where the value sits, computed - never asserted ---------- */
+  function placement(v, ref){
+    if(v === null || ref.kind === 'none') return '';
+    if(ref.kind === 'range'){
+      var span = ref.hi - ref.lo;
+      if(v > ref.hi) return 'above the reference range';
+      if(v < ref.lo) return 'below the reference range';
+      var p = span > 0 ? (v - ref.lo)/span : 0.5;
+      if(p >= 0.85) return 'at the top of the range';
+      if(p >= 0.65) return 'in the upper third';
+      if(p >= 0.35) return 'mid-range';
+      if(p >= 0.15) return 'in the lower third';
+      return 'at the bottom of the range';
+    }
+    if(ref.kind === 'max'){
+      if(v > ref.hi) return 'over the limit';
+      var p = ref.hi ? v/ref.hi : 0;
+      if(p >= 0.85) return 'close to the limit';
+      if(p >= 0.5)  return 'comfortably under the limit';
+      return 'well under the limit';
+    }
+    if(v < ref.lo) return 'under the minimum';
+    var q = ref.lo ? v/ref.lo : 0;
+    if(q >= 1.5) return 'well above the minimum';
+    if(q >= 1.15) return 'comfortably above the minimum';
+    return 'just above the minimum';
+  }
+
+  var HUE = {ok:'#2f7a4a', normal:'#3a6b8e', hi:'#b97a1f', lo:'#b85555'};
+
+  /* ---------- range bar ---------- */
+  function barHTML(d, ref){
+    if(ref.kind === 'none' || d.val === null) return '';
+    var lo, hi, bandA, bandB, mid = null, thresh = null, pad;
+    if(ref.kind === 'range'){
+      pad = (ref.hi - ref.lo) * 0.14 || 1;
+      lo = Math.min(ref.lo - pad, d.val - pad*0.6);
+      hi = Math.max(ref.hi + pad, d.val + pad*0.6);
+      bandA = ref.lo; bandB = ref.hi;
+      mid = [ref.lo + (ref.hi-ref.lo)*0.25, ref.lo + (ref.hi-ref.lo)*0.75];
+    } else if(ref.kind === 'max'){
+      hi = Math.max(ref.hi * 1.55, d.val * 1.2); lo = 0;
+      bandA = 0; bandB = ref.hi; thresh = ref.hi;
+    } else {
+      hi = Math.max(ref.lo * 2.1, d.val * 1.25); lo = 0;
+      bandA = ref.lo; bandB = hi; thresh = ref.lo;
+    }
+    var w = hi - lo || 1;
+    var pc = function(x){ return Math.max(0, Math.min(100, (x - lo)/w*100)); };
+    var hue = HUE[d.stCls] || HUE.normal;
+    var h = '<div class="mk-bar-wrap"><div class="mk-bar">'
+      + '<div class="mk-band" style="left:' + pc(bandA) + '%;width:' + (pc(bandB)-pc(bandA)) + '%;'
+      + '--_b:' + hue + '2e"></div>';
+    if(mid) h += '<div class="mk-band mid" style="left:' + pc(mid[0]) + '%;width:'
+      + (pc(mid[1])-pc(mid[0])) + '%;--_b2:' + hue + '55"></div>';
+    if(thresh !== null) h += '<div class="mk-thresh" style="left:' + pc(thresh) + '%"></div>';
+    h += '<div class="mk-dot" style="left:' + pc(d.val) + '%;--_d:' + hue + '"></div></div>'
+      + '<div class="mk-bar-ends"><span>' + (ref.kind==='range' ? fmt(ref.lo) : fmt(lo))
+      + '</span><span>' + (ref.kind==='range' ? fmt(ref.hi) : fmt(hi)) + '</span></div>'
+      + '<div class="mk-legend">'
+      + (ref.kind === 'range'
+          ? 'Shaded is the reference range; the brighter middle marks the central half of it.'
+          : 'Shaded is the acceptable side of the ' + d.refTxt.replace(/^ref\s*/i,'') + ' threshold, marked by the line.')
+      + '</div></div>';
+    return h;
+  }
+
+  function fmt(n){
+    if(n === null || isNaN(n)) return '';
+    return (Math.abs(n) >= 100 || n === Math.round(n)) ? String(Math.round(n*100)/100) : String(n);
+  }
+
+  /* ---------- trend chart ---------- */
+  function chartHTML(pts, ref, d){
+    if(pts.length < 2) return '';
+    var W = 560, H = 190, P = {t:14, r:14, b:30, l:44};
+    var xs = pts.map(function(p,i){ return i; });
+    var vals = pts.map(function(p){ return p.v; });
+    var vMin = Math.min.apply(null, vals), vMax = Math.max.apply(null, vals);
+    if(ref.kind === 'range'){ vMin = Math.min(vMin, ref.lo); vMax = Math.max(vMax, ref.hi); }
+    else if(ref.kind === 'max'){ vMax = Math.max(vMax, ref.hi); vMin = Math.min(vMin, 0); }
+    else if(ref.kind === 'min'){ vMin = Math.min(vMin, ref.lo); }
+    var span = (vMax - vMin) || 1;
+    vMin -= span*0.12; vMax += span*0.12; span = vMax - vMin;
+    var X = function(i){ return P.l + (pts.length===1 ? 0 : i/(pts.length-1))*(W-P.l-P.r); };
+    var Y = function(v){ return P.t + (1 - (v - vMin)/span)*(H-P.t-P.b); };
+    var hue = HUE[d.stCls] || HUE.normal;
+
+    var s = '<svg class="mk-chart" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Trend chart">';
+    if(ref.kind === 'range'){
+      s += '<rect x="' + P.l + '" y="' + Y(ref.hi) + '" width="' + (W-P.l-P.r)
+        + '" height="' + Math.max(1, Y(ref.lo)-Y(ref.hi)) + '" fill="' + hue + '18"></rect>';
+    } else if(ref.kind !== 'none'){
+      var ty = Y(ref.kind==='max' ? ref.hi : ref.lo);
+      s += '<line x1="' + P.l + '" y1="' + ty + '" x2="' + (W-P.r) + '" y2="' + ty
+        + '" stroke="' + hue + '" stroke-width="1.5" stroke-dasharray="5 4" opacity=".65"></line>';
+    }
+    s += '<line x1="' + P.l + '" y1="' + (H-P.b) + '" x2="' + (W-P.r) + '" y2="' + (H-P.b)
+      + '" stroke="rgba(0,0,0,.16)" stroke-width="1"></line>';
+    var d2 = pts.map(function(p,i){ return (i?'L':'M') + X(i).toFixed(1) + ' ' + Y(p.v).toFixed(1); }).join(' ');
+    s += '<path d="' + d2 + '" fill="none" stroke="' + hue + '" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"></path>';
+    pts.forEach(function(p,i){
+      var last = (i === pts.length-1);
+      s += '<circle cx="' + X(i).toFixed(1) + '" cy="' + Y(p.v).toFixed(1) + '" r="' + (last?6:4)
+        + '" fill="' + (last?hue:'#fff') + '" stroke="' + hue + '" stroke-width="2.5"></circle>';
+    });
+    s += '<text x="' + (P.l-8) + '" y="' + (Y(vMax)+12) + '" text-anchor="end" font-size="12" fill="#6a6a62">' + fmt(vMax) + '</text>';
+    s += '<text x="' + (P.l-8) + '" y="' + (Y(vMin)-3) + '" text-anchor="end" font-size="12" fill="#6a6a62">' + fmt(vMin) + '</text>';
+    var every = pts.length > 5 ? 2 : 1;
+    pts.forEach(function(p,i){
+      if(i % every && i !== pts.length-1) return;
+      s += '<text x="' + X(i).toFixed(1) + '" y="' + (H-P.b+18) + '" text-anchor="middle" font-size="12" fill="#6a6a62">' + p.label + '</text>';
+    });
+    s += '</svg>';
+
+    var first = pts[0], last = pts[pts.length-1];
+    var delta = last.v - first.v;
+    var pctS = first.v ? (delta/Math.abs(first.v)*100) : 0;
+    s += '<div class="mk-chart-note">' + pts.length + ' draws, ' + first.label + ' to ' + last.label
+      + ' &middot; ' + (delta>=0?'up ':'down ') + fmt(Math.abs(delta)) + ' ' + esc(d.unit)
+      + (first.v ? ' (' + (pctS>=0?'+':'') + Math.round(pctS) + '%)' : '') + ' across the window.</div>';
+    return s;
+  }
+
+  /* ---------- per-draw table ---------- */
+  function tableHTML(pts, d){
+    if(!pts.length) return '';
+    var h = '<table class="mk-tbl"><thead><tr><th>Draw</th><th class="r">Value</th>'
+          + '<th class="r">Change</th></tr></thead><tbody>';
+    pts.forEach(function(p,i){
+      var prev = i ? pts[i-1].v : null, cell = '&mdash;';
+      if(prev !== null){
+        var dv = p.v - prev;
+        var cls = Math.abs(dv) < 1e-9 ? 'mk-flat' : (dv > 0 ? 'mk-up' : 'mk-dn');
+        cell = '<span class="' + cls + '">' + (dv>0?'+':'') + fmt(dv) + '</span>';
+      }
+      h += '<tr' + (i===pts.length-1?' class="now"':'') + '><td>' + p.label + '</td><td class="r">'
+        + fmt(p.v) + '</td><td class="r">' + cell + '</td></tr>';
+    });
+    return h + '</tbody></table>';
+  }
+
+  function filterPts(pts, r){
+    if(r === 'all' || !pts.length) return pts;
+    var months = (r === '6m') ? 6 : 12;
+    var cut = pts[pts.length-1].t - months;
+    var out = pts.filter(function(p){ return p.t >= cut; });
+    return out.length >= 2 ? out : pts;
+  }
+
+  /* ---------- build ---------- */
+  function paint(){
+    var d = current; if(!d) return;
+    var ref = parseRef(d.refTxt);
+    var pts = filterPts(d.trend, range);
+    var where = placement(d.val, ref);
+
+    var h = '<div class="mk-value-row"><span class="mk-big">' + esc(d.valTxt) + '</span>'
+      + (d.unit ? '<span class="mk-unit">' + esc(d.unit) + '</span>' : '')
+      + '<span class="mk-pill ' + d.stCls + '">' + esc(d.stTxt) + '</span></div>';
+    if(where) h += '<div class="mk-where">Sitting <b>' + where + '</b> &middot; ' + esc(d.refTxt) + '</div>';
+    h += barHTML(d, ref);
+
+    if(d.trend.length > 1){
+      h += '<div class="mk-sec"><div class="mk-sec-h">Trend<span>' + d.trend.length + ' draws on record</span></div>'
+        + '<div class="mk-seg" role="group" aria-label="Time range">'
+        + ['all','12m','6m'].map(function(r){
+            return '<button type="button" data-r="' + r + '" aria-pressed="' + (r===range) + '">'
+              + (r==='all'?'All':(r==='12m'?'12 Months':'6 Months')) + '</button>'; }).join('')
+        + '</div>' + chartHTML(pts, ref, d) + '</div>'
+        + '<div class="mk-sec"><div class="mk-sec-h">Every Draw</div>' + tableHTML(pts, d) + '</div>';
+    } else if(d.trend.length === 1){
+      h += '<div class="mk-sec"><div class="mk-sec-h">Trend</div>'
+        + '<div class="mk-chart-note">Only one draw on record for this marker, so there is nothing to chart yet. '
+        + 'The next panel will give it a line.</div></div>';
+    }
+
+    if(d.whatHTML) h += '<div class="mk-sec"><div class="mk-sec-h">What It Means</div>'
+      + '<div class="mk-what">' + d.whatHTML + '</div></div>';
+
+    h += '<div class="mk-foot">Reference <b>' + esc(d.refTxt.replace(/^ref\s*/i,'')) + '</b>'
+      + (d.unit ? ' ' + esc(d.unit) : '')
+      + (d.section ? ' &middot; ' + esc(d.section) + ' panel' : '')
+      + ' &middot; latest draw <b>05/06/2026</b>. Values and ranges come straight from the table on this tab.</div>';
+
+    bodyEl.innerHTML = h;
+    [].forEach.call(bodyEl.querySelectorAll('.mk-seg button'), function(b){
+      b.addEventListener('click', function(){
+        range = b.getAttribute('data-r');
+        paint();
+        var sec = bodyEl.querySelector('.mk-sec'); if(sec) sec.scrollIntoView({block:'nearest'});
+      });
+    });
+  }
+
+  function open(row){
+    current = read(row); range = 'all';
+    titleEl.textContent = current.name;
+    eyebrowEl.textContent = current.section || 'Marker';
+    paint();
+    lastFocus = document.activeElement;
+    scrim.hidden = false; panel.hidden = false;
+    document.body.classList.add('mk-open');
+    void panel.offsetWidth;
+    scrim.classList.add('open'); panel.classList.add('open');
+    bodyEl.scrollTop = 0;
+    xBtn.focus();
+  }
+
+  function close(){
+    scrim.classList.remove('open'); panel.classList.remove('open');
+    document.body.classList.remove('mk-open');
+    setTimeout(function(){
+      scrim.hidden = true; panel.hidden = true; bodyEl.innerHTML = ''; current = null;
+    }, 190);
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  [].forEach.call(tab.querySelectorAll('.lab-row'), function(row){
+    row.setAttribute('role','button');
+    row.setAttribute('tabindex','0');
+    var nm = row.querySelector('.lab-name');
+    row.setAttribute('aria-label', (nm ? nm.textContent.trim() : 'Marker') + ' — open details');
+    row.addEventListener('click', function(){ open(row); });
+    row.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(row); }
+    });
+  });
+
+  xBtn.addEventListener('click', close);
+  scrim.addEventListener('click', close);
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !panel.hidden) close();
+  });
+})();
+</script>
+
 </body>
 </html>
