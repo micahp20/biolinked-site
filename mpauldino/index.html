@@ -578,6 +578,89 @@ body.mk-open{overflow:hidden;}
   .mk-body{padding:15px 15px 26px;}
   .mk-title{font-size:19px;}
 }
+
+/* ===================== PROTOCOL TIMELINE ================================
+   A Gantt of every compound on the stack against a shared month axis. The
+   label column stays put while the chart scrolls sideways on a phone.
+   ====================================================================== */
+.tl-intro{font-size:17px;line-height:1.65;color:var(--text);max-width:70ch;margin-bottom:6px;}
+.tl-key{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0 18px;}
+.tl-key span{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;
+  color:var(--muted);background:var(--surface);border:1px solid var(--line);
+  border-radius:99px;padding:6px 12px;}
+.tl-key i{width:16px;height:9px;border-radius:3px;display:block;font-style:normal;}
+.tl-key i.run{background:var(--accent);}
+.tl-key i.cyc{background:#3a6b8e;}
+.tl-key i.arch{background:#9a9a90;}
+
+.tl-wrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;
+  box-shadow:var(--shadow);overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;}
+.tl-grid{min-width:740px;position:relative;}
+
+.tl-head{display:flex;position:sticky;top:0;z-index:3;background:var(--head);
+  border-bottom:1px solid var(--line);}
+.tl-head .tl-label{background:var(--head);}
+.tl-months{flex:1;display:flex;position:relative;}
+.tl-months b{flex:1;font-size:12px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;
+  color:var(--muted);text-align:center;padding:11px 2px;border-left:1px solid var(--line-soft);}
+
+.tl-group{font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--accent);background:var(--accent-dim);padding:9px 14px;
+  border-bottom:1px solid var(--line);position:sticky;left:0;}
+.tl-group em{font-style:normal;color:var(--muted);letter-spacing:0.04em;text-transform:none;font-weight:600;}
+
+.tl-row{display:flex;min-height:52px;align-items:stretch;border-bottom:1px solid var(--line-soft);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.tl-row:last-child{border-bottom:none;}
+.tl-row:hover{background:var(--accent-dim);}
+.tl-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;}
+.tl-label{width:150px;flex:none;position:sticky;left:0;z-index:2;background:var(--surface);
+  border-right:1px solid var(--line);padding:9px 11px;display:flex;flex-direction:column;
+  justify-content:center;gap:2px;}
+.tl-row:hover .tl-label{background:#faf8f3;}
+.tl-nm{font-size:14px;font-weight:700;line-height:1.25;color:var(--text);}
+.tl-sub{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.35;}
+.tl-row.arch .tl-nm{color:#6a6a62;}
+
+.tl-track{flex:1;position:relative;padding:12px 0;}
+.tl-track::before{content:'';position:absolute;inset:0;
+  background-image:repeating-linear-gradient(to right,transparent 0,transparent calc(11.111% - 1px),var(--line-soft) calc(11.111% - 1px),var(--line-soft) 11.111%);}
+.tl-bar{position:absolute;top:50%;transform:translateY(-50%);height:24px;border-radius:6px;
+  background:var(--accent);min-width:26px;display:flex;align-items:center;
+  box-shadow:0 1px 3px rgba(0,0,0,.14);}
+.tl-bar.cyc{background:#3a6b8e;}
+.tl-bar.arch{background:#9a9a90;}
+.tl-bar.open-left{border-top-left-radius:0;border-bottom-left-radius:0;
+  -webkit-mask-image:linear-gradient(to right,transparent 0,#000 34px);
+  mask-image:linear-gradient(to right,transparent 0,#000 34px);}
+.tl-bar span{font-size:11.5px;font-weight:700;color:#fff;padding:0 8px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;}
+.tl-now{position:absolute;top:0;bottom:0;width:2px;background:#b85555;z-index:1;opacity:.75;}
+.tl-now::after{content:'NOW';position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  font-size:9px;font-weight:700;letter-spacing:0.1em;color:#fff;background:#b85555;
+  padding:2px 5px;border-radius:3px;}
+
+.tl-note{font-size:13px;line-height:1.6;color:var(--muted);background:var(--surface);
+  border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:8px;
+  padding:13px 15px;margin-bottom:16px;}
+.tl-note b{color:var(--text);font-weight:700;}
+.tl-scrollhint{font-size:12.5px;color:var(--muted);margin:-8px 0 14px;font-weight:600;}
+
+.tlm-range{font-size:19px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.tlm-meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;}
+.tlm-tag{font-size:13px;font-weight:600;color:var(--muted);background:#f3f2ef;
+  border:1px solid var(--line-soft);border-radius:7px;padding:5px 10px;}
+.tlm-tag b{color:var(--text);font-weight:700;}
+.tlm-what{font-size:17px;line-height:1.68;color:var(--text);}
+.tlm-src{margin-top:18px;padding-top:13px;border-top:1px solid var(--line);
+  font-size:13px;line-height:1.6;color:var(--muted);}
+
+@media(max-width:640px){
+  .tl-grid{min-width:700px;}
+  .tl-label{width:126px;padding:9px;}
+  .tl-nm{font-size:13px;}
+  .tl-intro{font-size:17px;}
+}
 </style>
 </head>
 <body>
@@ -616,6 +699,7 @@ body.mk-open{overflow:hidden;}
       <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="DNA &amp; Traits" onclick="switchTab('dna',this)"><span class="mi-label">DNA &amp; Traits</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Timeline" onclick="switchTab('timeline',this)"><span class="mi-label">Timeline</span><span class="chev">&rsaquo;</span></button>
       <button class="menu-item" role="menuitem" data-label="Command Center" onclick="switchTab('command',this)"><span class="mi-label">Command Center</span><span class="chev" aria-hidden="true">&#9656;</span></button>
     </div>
   </nav>
@@ -2033,6 +2117,30 @@ body.mk-open{overflow:hidden;}
 
       </div><!-- /nut-wrap -->
     </div><!-- /nutrition -->
+
+  
+  <!-- ================ TIMELINE TAB ================ -->
+  <div class="tab-content" id="tab-timeline">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Protocol Timeline</div>
+      <div class="sec-divider-title">What Ran, and When</div>
+    </div>
+
+    <div class="tl-intro">Every compound on the stack against one month axis &mdash; how long each ran, what overlapped what, and what is still going. Tap any row for the dates and the note.</div>
+
+    <div class="tl-key">
+      <span><i class="run"></i>Running now</span>
+      <span><i class="cyc"></i>Defined course</span>
+      <span><i class="arch"></i>Stopped</span>
+    </div>
+
+    <div class="tl-scrollhint" id="tlHint">Scroll the chart sideways to move through the year &mdash; the names stay put.</div>
+    <div class="tl-wrap"><div class="tl-grid" id="tlGrid"></div></div>
+
+    <div class="tl-note" id="tlDateNote"></div>
+
+  </div><!-- /timeline tab -->
 
   <div class="tab-content" id="tab-command">
     <iframe id="cc-frame" title="Command Center" src="/mpauldino/command-center/embed.html" scrolling="no" loading="lazy"></iframe>
@@ -4390,6 +4498,24 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     });
   }
 
+  /* show the panel with whatever content is handed to it - the marker rows
+     use it through open(), and the timeline reuses it for compound notes so
+     there is one modal and one set of close mechanics on the page */
+  function show(eyebrow, title, html){
+    current = null;
+    eyebrowEl.textContent = eyebrow;
+    titleEl.textContent = title;
+    bodyEl.innerHTML = html;
+    lastFocus = document.activeElement;
+    scrim.hidden = false; panel.hidden = false;
+    document.body.classList.add('mk-open');
+    void panel.offsetWidth;
+    scrim.classList.add('open'); panel.classList.add('open');
+    bodyEl.scrollTop = 0;
+    xBtn.focus();
+  }
+  window.BLPanel = { show: show };
+
   function open(row){
     current = read(row); range = 'all';
     titleEl.textContent = current.name;
@@ -4429,6 +4555,175 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape' && !panel.hidden) close();
   });
+})();
+</script>
+
+
+<script>
+/* ===================== PROTOCOL TIMELINE ================================
+   Dates come from what the page actually records. Where a compound has no
+   recorded start, the bar says so rather than inventing one - it is drawn
+   anchored to today and faded off to the left.
+   ====================================================================== */
+(function(){
+  var grid = document.getElementById('tlGrid');
+  if(!grid) return;
+
+  var AXIS_START = {y:2026, m:1};              /* Jan 2026 - earliest recorded run */
+  var NOW = new Date();
+  var AXIS_END = {y:NOW.getFullYear(), m:NOW.getMonth()+1};
+  var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function mi(y,m){ return y*12 + (m-1); }                    /* month index */
+  var A0 = mi(AXIS_START.y, AXIS_START.m), A1 = mi(AXIS_END.y, AXIS_END.m) + 1;
+  var SPAN = A1 - A0;                                          /* months on the axis */
+  function pos(y,m,d){                                         /* -> 0..100 */
+    var dim = new Date(y, m, 0).getDate();
+    var v = (mi(y,m) - A0) + ((d||1) - 1)/dim;
+    return Math.max(0, Math.min(100, v/SPAN*100));
+  }
+  var nowPct = pos(NOW.getFullYear(), NOW.getMonth()+1, NOW.getDate());
+
+  /* kind: run = still going, cyc = defined course, arch = stopped
+     dated: true when the page records real dates for it            */
+  var ROWS = [
+    {g:'dated', n:'Epithalon', kind:'arch', dated:true,
+     s:[2026,8,17], e:[2026,8,26], sub:'10-day course', label:'Aug 17–26',
+     src:'Dated on the protocol tab as a 10-day course, Aug 17 to Aug 26.',
+     w:'Four-amino-acid pineal peptide studied for its effect on melatonin rhythm and on telomerase. 10 mg (40u) PM before bed.'},
+    {g:'dated', n:'Pinealon', kind:'arch', dated:true,
+     s:[2026,8,17], e:[2026,8,26], sub:'10-day course', label:'Aug 17–26',
+     src:'Dated on the protocol tab as a 10-day course, Aug 17 to Aug 26.',
+     w:'Short Khavinson bioregulator aimed at CNS and sleep-cycle regulation. 4 mg (20u) PM before bed, paired with Epithalon on the same course.'},
+    {g:'dated', n:'Retatrutide', kind:'arch', dated:true,
+     s:[2026,1,1], e:[2026,2,28], sub:'Cycle 1 · metabolic', label:'Jan–Feb',
+     src:'Window taken from the 2026 rotation plan, where Cycle 1 (Jan–Feb) is listed as Reta, MOTS-c, Tesamorelin and 5-Amino-1MQ.',
+     w:'Triple agonist across GLP-1, GIP and glucagon receptors. The glucagon arm drove fat oxidation and energy expenditure on top of appetite control. Its slot is now filled by Tirzepatide at the same 1 mg M/Th dose.'},
+    {g:'dated', n:'MOTS-c', kind:'arch', dated:true,
+     s:[2026,1,1], e:[2026,2,28], sub:'Cycle 1 · metabolic', label:'Jan–Feb',
+     src:'Window taken from the 2026 rotation plan, Cycle 1 (Jan–Feb).',
+     w:'Mitochondrial-derived peptide that activates AMPK, the cell’s metabolic master switch, driving fat oxidation and exercise-like adaptation. 2 mg M–F AM.'},
+    {g:'dated', n:'5-Amino-1MQ', kind:'arch', dated:true,
+     s:[2026,1,1], e:[2026,2,28], sub:'Cycle 1 · metabolic', label:'Jan–Feb',
+     src:'Window taken from the 2026 rotation plan, Cycle 1 (Jan–Feb).',
+     w:'NNMT inhibitor — blocks the enzyme that lets fat cells hoard energy, shifting fat-cell metabolism toward burning and supporting NAD+ salvage. 500 mcg M–F AM.'},
+    {g:'dated', n:'Melanotan', kind:'arch', dated:true,
+     s:[2026,5,1], e:[2026,6,30], sub:'Cycle 3 · repair + skin', label:'May–Jun',
+     src:'Window taken from the 2026 rotation plan, Cycle 3 (May–Jun).',
+     w:'Melanocortin analogue — stimulates melanin for skin tanning and acts on the central receptors behind sexual desire. 0.5 mg M/Th AM.'},
+
+    {g:'now', n:'HGH (Somatropin)', kind:'run', dated:false, sub:'2 iu · daily AM fasted',
+     w:'Growth hormone itself rather than a secretagogue. Recovery, body composition, sleep depth and connective tissue. A 36 iu kit in 3 mL gives 12 iu/mL, so 2 iu is about 17 units.'},
+    {g:'now', n:'TRT', kind:'run', dated:false, sub:'0.25 mL · M/W/F AM',
+     w:'Testosterone cypionate, restoring testosterone to a physiological range — energy, libido, muscle protein synthesis, mood and recovery. Long ester, so time of day is immaterial.'},
+    {g:'now', n:'HCG', kind:'run', dated:false, sub:'500 iu · M/W/F PM',
+     w:'Mimics LH, which keeps the testes producing their own intratesticular testosterone and preserves size and fertility while on TRT.'},
+    {g:'now', n:'Tirzepatide', kind:'run', dated:false, sub:'1 mg · M/Th AM',
+     w:'Dual GLP-1 / GIP agonist. The GIP arm adds insulin-sensitising and appetite signalling on top of the GLP-1 effect. Took over the Retatrutide slot at the same dose and cadence.'},
+    {g:'now', n:'BPC-157 (oral)', kind:'run', dated:false, sub:'500 mcg tablet · daily AM',
+     w:'Body Protection Compound by the oral route, aimed at the gut lining rather than the bloodstream. Running both routes covers systemic and gut-local exposure separately.'},
+    {g:'now', n:'Dihexa', kind:'run', dated:false, sub:'10 mg · M/W/F AM',
+     w:'Angiotensin IV analogue that potentiates hepatocyte growth factor at its c-Met receptor — a pathway tied to synaptogenesis. Two 5 mg tablets per dose.'},
+    {g:'now', n:'BPC-157 (injectable)', kind:'run', dated:false, sub:'1 mg · nightly PM',
+     w:'The injectable route of the same peptide — systemic rather than gut-local. Drives angiogenesis and fibroblast migration, the mechanism behind its soft-tissue repair reputation.'},
+    {g:'now', n:'KPV', kind:'run', dated:false, sub:'1 mg · nightly PM',
+     w:'The C-terminal tripeptide of alpha-MSH. Carries the anti-inflammatory end of that hormone’s activity without the pigmentation signalling.'},
+    {g:'now', n:'DSIP', kind:'run', dated:false, sub:'1 mg · nightly pre-bed',
+     w:'Delta Sleep-Inducing Peptide — named for the delta-wave activity it was first associated with in slow-wave sleep. Taken close to lights-out.'},
+    {g:'now', n:'Ipamorelin', kind:'run', dated:false, sub:'1 mg · nightly PM fasted',
+     w:'Selective GH secretagogue — triggers a pulse from your own pituitary without dragging cortisol or prolactin up with it. Works the GH axis from the opposite end to the morning HGH.'},
+
+    {g:'undated', n:'Vesugen', kind:'arch', dated:false, sub:'2 mg · was M–F PM',
+     w:'Khavinson short-peptide bioregulator aimed at the vascular wall and endothelial tissue health. Ran as a defined course on the prior protocol.'},
+    {g:'undated', n:'Finasteride', kind:'arch', dated:false, sub:'1 mg · was daily AM',
+     w:'5-alpha reductase inhibitor — blocks the conversion of testosterone to DHT. The standard hair-loss dose.'},
+    {g:'undated', n:'Spermidine', kind:'arch', dated:false, sub:'10 mg · was daily',
+     w:'Polyamine that supports autophagy — the cell’s own cleanup process — alongside cell-membrane and telomere health.'},
+    {g:'undated', n:'Apigenin', kind:'arch', dated:false, sub:'100 mg · was nightly',
+     w:'Bioflavonoid with a GABAergic sedative effect for sleep onset. Also a mild aromatase inhibitor.'}
+  ];
+
+  var GROUPS = [
+    {id:'dated', t:'Dated Runs', s:'start and end recorded'},
+    {id:'now',   t:'Running Now', s:'start not recorded — drawn open to the left'},
+    {id:'undated', t:'Stopped', s:'dates not recorded'}
+  ];
+
+  function weeks(s,e){
+    var a = new Date(s[0], s[1]-1, s[2]||1), b = new Date(e[0], e[1]-1, e[2]||1);
+    return Math.max(1, Math.round((b-a)/86400000/7));
+  }
+  function dstr(d){ return MONTHS[d[1]-1] + ' ' + (d[2]||1) + ', ' + d[0]; }
+
+  /* ---------- build ---------- */
+  var months = [];
+  for(var k=A0;k<A1;k++) months.push(MONTHS[k%12] + (k%12===0 ? ' ' + Math.floor(k/12) : ''));
+
+  var h = '<div class="tl-head"><div class="tl-label"></div><div class="tl-months">'
+        + months.map(function(m){ return '<b>' + m + '</b>'; }).join('') + '</div></div>';
+
+  GROUPS.forEach(function(g){
+    var items = ROWS.filter(function(r){ return r.g === g.id; });
+    if(!items.length) return;
+    h += '<div class="tl-group">' + g.t + ' <em>&middot; ' + items.length + ' &middot; ' + g.s + '</em></div>';
+    items.forEach(function(r, i){
+      var bar;
+      if(r.dated){
+        var L = pos(r.s[0], r.s[1], r.s[2]), R = pos(r.e[0], r.e[1], r.e[2]);
+        bar = '<div class="tl-bar ' + r.kind + '" style="left:' + L + '%;width:' + Math.max(0.6, R-L) + '%">'
+            + '<span>' + r.label + '</span></div>';
+      } else if(r.kind === 'run'){
+        bar = '<div class="tl-bar run open-left" style="left:0%;width:' + nowPct + '%">'
+            + '<span>start not recorded &rarr; now</span></div>';
+      } else {
+        bar = '<div class="tl-bar arch open-left" style="left:0%;width:' + (nowPct*0.42) + '%">'
+            + '<span>dates not recorded</span></div>';
+      }
+      h += '<div class="tl-row' + (r.kind==='arch' ? ' arch' : '') + '" role="button" tabindex="0"'
+         + ' data-i="' + ROWS.indexOf(r) + '" aria-label="' + r.n + ' — open notes">'
+         + '<div class="tl-label"><span class="tl-nm">' + r.n + '</span>'
+         + '<span class="tl-sub">' + r.sub + '</span></div>'
+         + '<div class="tl-track">' + bar
+         + (g.id !== 'undated' ? '<div class="tl-now" style="left:' + nowPct + '%"></div>' : '')
+         + '</div></div>';
+    });
+  });
+  grid.innerHTML = h;
+
+  var nDated = ROWS.filter(function(r){ return r.dated; }).length;
+  var undated = ROWS.filter(function(r){ return !r.dated; });
+  document.getElementById('tlDateNote').innerHTML =
+      '<b>Where the dates come from.</b> ' + nDated + ' of ' + ROWS.length
+    + ' compounds have real dates on this page &mdash; the Aug 17–26 sleep course, and the Cycle 1 and Cycle 3 windows from the 2026 rotation plan. '
+    + 'The other ' + undated.length + ' have no start date recorded anywhere, so nothing is invented for them: '
+    + 'the ones still running are drawn open to the left and anchored to today, and the stopped ones say so. '
+    + 'Give me a start date for any of them and it becomes a real bar.';
+
+  /* ---------- tap a row for its notes ---------- */
+  function openNotes(r){
+    var range = r.dated ? (dstr(r.s) + ' &rarr; ' + dstr(r.e)) :
+                (r.kind === 'run' ? 'Running now — start not recorded' : 'Stopped — dates not recorded');
+    var html = '<div class="tlm-range">' + range + '</div><div class="tlm-meta">'
+      + '<span class="tlm-tag">' + (r.kind==='run' ? 'Running now' : (r.kind==='cyc' ? 'Defined course' : 'Stopped')) + '</span>'
+      + '<span class="tlm-tag">' + r.sub + '</span>'
+      + (r.dated ? '<span class="tlm-tag">About <b>' + weeks(r.s, r.e) + '</b> week' + (weeks(r.s,r.e)===1?'':'s') + '</span>' : '')
+      + '</div><div class="tlm-what">' + r.w + '</div>'
+      + '<div class="tlm-src">' + (r.src || 'No start date is recorded for this compound on the page, so the timeline does not place one.') + '</div>';
+    if(window.BLPanel && window.BLPanel.show) window.BLPanel.show('Notes on', r.n, html);
+  }
+
+  [].forEach.call(grid.querySelectorAll('.tl-row'), function(row){
+    row.addEventListener('click', function(){ openNotes(ROWS[+row.getAttribute('data-i')]); });
+    row.addEventListener('keydown', function(e){
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openNotes(ROWS[+row.getAttribute('data-i')]); }
+    });
+  });
+
+  /* start the phone view scrolled to the live end of the axis */
+  var wrap = grid.parentNode;
+  setTimeout(function(){
+    if(wrap.scrollWidth > wrap.clientWidth) wrap.scrollLeft = wrap.scrollWidth;
+  }, 60);
 })();
 </script>
 
