@@ -5111,8 +5111,17 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
       var v = parseAmt(d.vial), b = parseAmt(d.bac), o = parseAmt(d.dose);
       var unit = (o && o.u) || (v && v.u) || 'mg';
       if(unit === 'ml') unit = 'mg';
+      /* vial and dose are often stored in different units (10 mg vial, 500 mcg
+         dose). Normalise the vial into the dose's unit or the concentration,
+         and every draw off it, comes out wrong by 1000x. */
+      var vialN = v ? v.n : null;
+      if(v && v.u && v.u !== unit && v.u !== 'ml'){
+        if(v.u === 'mg'  && unit === 'mcg') vialN = v.n * 1000;
+        else if(v.u === 'mcg' && unit === 'mg') vialN = v.n / 1000;
+        else if(v.u !== unit) unit = v.u;        /* IU vs mass — trust the vial */
+      }
       return {name:d.name, cat:d.cat||'', purpose:d.purpose||'',
-              vial:(v?v.n:null), vialU:(v?v.u:''), bac:(b?b.n:null),
+              vial:vialN, vialU:(v?v.u:''), bac:(b?b.n:null),
               dose:(o?o.n:null), unit:unit,
               rawVial:d.vial, rawBac:d.bac, rawDose:d.dose, rawUnits:d.units};
     });
