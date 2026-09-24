@@ -2147,11 +2147,23 @@ body.mk-open{overflow:hidden;}
 
       <div class="pc-card accent">
         <div class="pc-field">
-          <div class="pc-label">Compound <span class="info-tip" tabindex="0">?<span class="info-tip-text">Optional label &mdash; it only names the result, it does not change the maths.</span></span></div>
+          <div class="pc-label">Compound <span class="info-tip" tabindex="0">?<span class="info-tip-text">Pulled from the Index. Picking one fills in whatever dosing is on file for it; anything missing you can type over.</span></span></div>
+          <select class="pc-select" id="pc-compound"><option value="__custom__">Custom &mdash; enter my own</option></select>
+        </div>
+        <div class="pc-field" id="pc-name-field">
+          <div class="pc-label">Name <span class="info-tip" tabindex="0">?<span class="info-tip-text">What to call this one in your saved list.</span></span></div>
           <input class="pc-input" id="pc-name" type="text" placeholder="e.g. BPC-157" autocomplete="off">
         </div>
         <div class="pc-field">
-          <div class="pc-label">Vial Size <span class="info-tip" tabindex="0">?<span class="info-tip-text">Total peptide in the vial as supplied, before any water is added.</span></span><span class="pc-unit">mg</span></div>
+          <div class="pc-label">Units <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial strength and dose always share this unit. mcg to mg is a factor of 1000; IU stays IU, since the IU-to-mg conversion is compound-specific.</span></span></div>
+          <div class="pc-seg" id="pc-unitseg" role="group" aria-label="Dose unit">
+            <button type="button" data-u="mg" class="on">mg</button>
+            <button type="button" data-u="mcg">mcg</button>
+            <button type="button" data-u="iu">IU</button>
+          </div>
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Vial Size <span class="info-tip" tabindex="0">?<span class="info-tip-text">Total peptide in the vial as supplied, before any water is added.</span></span><span class="pc-unit" data-unitslot>mg</span></div>
           <input class="pc-input" id="pc-vial" type="number" inputmode="decimal" step="any" min="0" value="10">
         </div>
         <div class="pc-field">
@@ -2159,7 +2171,7 @@ body.mk-open{overflow:hidden;}
           <input class="pc-input" id="pc-bac" type="number" inputmode="decimal" step="any" min="0" value="1">
         </div>
         <div class="pc-field">
-          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection. Type here, or drag the syringe below &mdash; they stay in sync.</span></span><span class="pc-unit">mg</span></div>
+          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection. Type here, or drag the syringe below &mdash; they stay in sync.</span></span><span class="pc-unit" data-unitslot>mg</span></div>
           <input class="pc-input" id="pc-dose" type="number" inputmode="decimal" step="any" min="0" value="1.4">
         </div>
         <div class="pc-field">
@@ -2216,6 +2228,18 @@ body.mk-open{overflow:hidden;}
       </div>
 
       <div class="pc-warn" id="pc-warn" hidden></div>
+
+      <button class="pc-add" id="pc-addbtn" type="button">+ Add to My List</button>
+      <div class="pc-note" id="pc-srcnote" hidden></div>
+
+      <div class="pc-saved-head" id="pc-saved-head" hidden>
+        <span class="pc-saved-title">My Compounds</span>
+        <span class="pc-saved-count" id="pc-saved-count"></span>
+      </div>
+      <input class="pc-search" id="pc-search" type="search" placeholder="Search my compounds..." autocomplete="off" hidden>
+      <div id="pc-list"></div>
+      <div class="pc-empty" id="pc-empty" hidden>Nothing matches that search.</div>
+
 
     </div>
 
@@ -2711,6 +2735,48 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
 .pc-warn{background:var(--amber-soft);border:1px solid var(--amber-border);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--amber);margin-top:13px;line-height:1.5;}
 .pc-warn[hidden]{display:none !important;}
 @media(max-width:420px){ .pc-hl-main{font-size:26px;} .pc-grid{grid-template-columns:1fr;} }
+
+
+/* ===== calculator round 2 ===== */
+.pc-seg{display:flex;gap:0;border:1px solid var(--line);border-radius:7px;overflow:hidden;}
+.pc-seg button{flex:1;min-height:44px;padding:10px 4px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:0.10em;text-transform:uppercase;color:var(--muted);background:var(--surface);border:none;border-right:1px solid var(--line);cursor:pointer;transition:all .15s;}
+.pc-seg button:last-child{border-right:none;}
+.pc-seg button.on{background:var(--accent);color:var(--on-accent);}
+.pc-seg button:not(.on):hover{background:var(--hover);color:var(--accent);}
+.pc-note{font-size:11.5px;color:var(--amber);background:var(--amber-soft);border:1px solid var(--amber-border);
+  border-radius:6px;padding:8px 11px;margin-top:8px;line-height:1.45;}
+.pc-note[hidden]{display:none !important;}
+.pc-field[hidden]{display:none !important;}
+.pc-add{width:100%;min-height:48px;margin-top:4px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--on-accent);background:var(--accent);border:none;border-radius:8px;cursor:pointer;transition:background .15s;}
+.pc-add:hover{background:var(--accent-hover);}
+.pc-add:disabled{opacity:.45;cursor:not-allowed;}
+
+/* saved list */
+.pc-saved-head{display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px;}
+.pc-saved-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
+.pc-saved-count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
+.pc-search{width:100%;box-sizing:border-box;min-height:44px;padding:10px 13px;font-family:'Montserrat',sans-serif;font-size:15px;
+  color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:7px;margin-bottom:11px;-webkit-appearance:none;}
+.pc-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.pc-search[hidden],.pc-saved-head[hidden]{display:none !important;}
+.pc-item{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:13px 14px;margin-bottom:10px;}
+.pc-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.pc-item-name{font-size:14.5px;font-weight:700;color:var(--text);line-height:1.25;}
+.pc-item-sub{font-size:11.5px;color:var(--muted);margin-top:3px;}
+.pc-item-acts{display:flex;gap:6px;flex-shrink:0;}
+.pc-ico{width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;
+  background:var(--surface);border:1px solid var(--line);border-radius:7px;color:var(--muted);cursor:pointer;padding:0;}
+.pc-ico:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim);}
+.pc-ico.del:hover{border-color:var(--red);color:var(--red-text);background:var(--red-soft);}
+.pc-mini{position:relative;height:13px;background:#2a2a28;border-radius:4px;margin:10px 0 8px;overflow:hidden;}
+.pc-mini-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#C9A84C,#7A6530);border-radius:4px;}
+.pc-item-stats{display:flex;flex-wrap:wrap;gap:6px;}
+.pc-chip{font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;padding:4px 9px;border-radius:99px;
+  background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-line);white-space:nowrap;}
+.pc-empty{text-align:center;font-size:12.5px;color:var(--muted);padding:18px 10px;border:1px dashed var(--line);border-radius:9px;}
+.pc-empty[hidden]{display:none !important;}
 
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
@@ -4901,6 +4967,8 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
 </script>
 
 
+<!-- shared dosing array — same source the /index/ page renders from -->
+<script src="/cheat-sheet-data.js"></script>
 <script>
 /* ===================== PEPTIDE CALCULATOR =================================
    concentration = vial_mg / bac_mL
@@ -4913,6 +4981,8 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
 (function(){
   var el = function(id){ return document.getElementById(id); };
   var nameEl, vialEl, bacEl, doseEl, syrEl, bar, svg, fill, plunger, ticksG;
+  var cmpEl, nameField, unitSeg, srcNote, addBtn, searchEl, listEl, savedHead, countEl, emptyEl;
+  var LIB = [], curUnit = 'mg';
   var X0 = 6, X1 = 294, TOP = 16, H = 34;     // barrel geometry in viewBox units
   var maxU = 100, curU = 14, dragging = false;
 
@@ -4952,16 +5022,17 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     var mL = curU / 100, mg = mL * c;
     var label = (nameEl.value || '').trim();
     el('pc-syr-read').textContent = fmt(curU, 1) + ' u';
-    el('pc-conc').innerHTML  = (c > 0 ? fmt(c, 2) : '—') + '<em>mg/mL</em>';
+    var uu = (curUnit === 'iu') ? 'IU' : curUnit;
+    el('pc-conc').innerHTML  = (c > 0 ? fmt(c, 2) : '—') + '<em>' + uu + '/mL</em>';
     el('pc-vol').innerHTML   = fmt(mL, 3) + '<em>mL</em>';
     el('pc-units').innerHTML = fmt(curU, 1) + '<em>u</em>';
 
     var vial = num(vialEl.value, 0), dose = num(doseEl.value, 0);
     el('pc-doses').textContent = (vial > 0 && dose > 0) ? String(Math.floor(vial / dose)) : '—';
 
-    el('pc-headline').innerHTML = 'Draw <b>' + fmt(curU, 1) + ' units</b> for <b>' + fmt(mg, 3) + ' mg</b>' +
+    el('pc-headline').innerHTML = 'Draw <b>' + fmt(curU, 1) + ' units</b> for <b>' + fmt(mg, 3) + ' ' + uu + '</b>' +
       (label ? ' <span style="font-size:.62em;color:var(--muted);">of ' + label.replace(/[<>&]/g, '') + '</span>' : '');
-    el('pc-headline-sub').textContent = fmt(mL, 3) + ' mL at ' + (c > 0 ? fmt(c, 2) : '—') + ' mg/mL';
+    el('pc-headline-sub').textContent = fmt(mL, 3) + ' mL at ' + (c > 0 ? fmt(c, 2) : '—') + ' ' + uu + '/mL';
 
     var msgs = [];
     if(!(num(bacEl.value, 0) > 0)) msgs.push('Enter a BAC water volume to get a concentration.');
@@ -5016,12 +5087,191 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     else if(e.key === 'End'){ curU = maxU; fromUnits(); e.preventDefault(); }
   }
 
+
+  /* ---------- compound library, parsed out of CHEAT_SHEET_DATA ---------- */
+  var CATS = {fatloss:'Fat Loss',gh:'Growth Hormone',healing:'Healing & Repair',muscle:'Muscle',
+              longevity:'Longevity',energy:'Energy',cognition:'Cognition',sleep:'Sleep',
+              immunity:'Immunity',sexual:'Sexual Health',hormones:'Hormones',skin:'Skin & Hair',
+              blend:'Blends',bioregulator:'Bioregulators'};
+
+  /* "10 mg" -> {n:10,u:'mg'} | "0.5–1 mg" -> low end | "5,000 IU" -> 5000 | junk -> null */
+  function parseAmt(str){
+    if(!str) return null;
+    var s = String(str).replace(/,/g,'').replace(/[–—]/g,'-');
+    var m = s.match(/(\d*\.?\d+)\s*(mcg|mg|iu|ml)?/i);
+    if(!m) return null;
+    var n = parseFloat(m[1]);
+    if(!isFinite(n)) return null;
+    var u = (m[2]||'').toLowerCase();
+    return {n:n, u:(u==='ml') ? '' : u};
+  }
+  function buildLib(){
+    var raw = (window.CHEAT_SHEET_DATA||[]);
+    return raw.map(function(d){
+      var v = parseAmt(d.vial), b = parseAmt(d.bac), o = parseAmt(d.dose);
+      var unit = (o && o.u) || (v && v.u) || 'mg';
+      if(unit === 'ml') unit = 'mg';
+      return {name:d.name, cat:d.cat||'', purpose:d.purpose||'',
+              vial:(v?v.n:null), vialU:(v?v.u:''), bac:(b?b.n:null),
+              dose:(o?o.n:null), unit:unit,
+              rawVial:d.vial, rawBac:d.bac, rawDose:d.dose, rawUnits:d.units};
+    });
+  }
+
+  function fillCompoundSelect(){
+    var lib = LIB, byCat = {};
+    lib.forEach(function(c,i){ (byCat[c.cat] = byCat[c.cat] || []).push(i); });
+    var html = '<option value="__custom__">Custom &mdash; enter my own</option>';
+    Object.keys(CATS).forEach(function(k){
+      if(!byCat[k]) return;
+      html += '<optgroup label="' + CATS[k] + '">';
+      byCat[k].sort(function(a,b){ return lib[a].name.localeCompare(lib[b].name); })
+        .forEach(function(i){ html += '<option value="' + i + '">' + lib[i].name.replace(/[<>&]/g,'') + '</option>'; });
+      html += '</optgroup>';
+    });
+    Object.keys(byCat).forEach(function(k){
+      if(CATS[k]) return;
+      html += '<optgroup label="Other">';
+      byCat[k].forEach(function(i){ html += '<option value="' + i + '">' + lib[i].name.replace(/[<>&]/g,'') + '</option>'; });
+      html += '</optgroup>';
+    });
+    cmpEl.innerHTML = html;
+  }
+
+  /* ---------- unit handling: vial + dose always share a unit ---------- */
+  var FACT = {mg:1, mcg:0.001, iu:1};           // iu has no mg equivalence — it rides as its own scale
+  function setUnit(u, convert){
+    if(u === curUnit) return;
+    if(convert && (curUnit !== 'iu' && u !== 'iu')){
+      var k = FACT[curUnit] / FACT[u];          // mg->mcg = 1000, mcg->mg = 0.001
+      [vialEl, doseEl].forEach(function(el){
+        var n = parseFloat(el.value);
+        if(isFinite(n)) el.value = String(Math.round(n * k * 1e6) / 1e6);
+      });
+    }
+    curUnit = u;
+    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
+      b.classList.toggle('on', b.getAttribute('data-u') === u);
+    });
+    [].forEach.call(document.querySelectorAll('#tab-calculator .pc-unit'), function(s){
+      if(s.getAttribute('data-unitslot') !== null) s.textContent = (u === 'iu' ? 'IU' : u);
+    });
+    fromDose();
+  }
+
+  function applyCompound(){
+    var v = cmpEl.value;
+    if(v === '__custom__'){
+      nameField.hidden = false; srcNote.hidden = true;
+      return paint();
+    }
+    var c = LIB[+v]; if(!c) return;
+    nameField.hidden = true;
+    nameEl.value = c.name;
+    if(c.vial != null) vialEl.value = String(c.vial);
+    if(c.bac  != null) bacEl.value  = String(c.bac);
+    if(c.dose != null) doseEl.value = String(c.dose);
+    setUnit(c.unit === 'iu' ? 'iu' : (c.unit || 'mg'), false);
+    var gaps = [];
+    if(c.vial == null) gaps.push('vial size');
+    if(c.bac  == null) gaps.push('BAC water');
+    if(c.dose == null) gaps.push('dose');
+    if(gaps.length){
+      srcNote.innerHTML = 'No ' + gaps.join(' or ') + ' on file for ' + c.name.replace(/[<>&]/g,'') +
+        ' &mdash; enter it manually.' + (c.rawDose ? ' Index lists: ' + String(c.rawDose).replace(/[<>&]/g,'') + '.' : '');
+      srcNote.hidden = false;
+    } else if(/[-–]/.test(String(c.rawDose||''))){
+      srcNote.innerHTML = 'Index lists a range (' + String(c.rawDose).replace(/[<>&]/g,'') + ') &mdash; filled at the low end.';
+      srcNote.hidden = false;
+    } else { srcNote.hidden = true; }
+    fromDose();
+  }
+
+  /* ---------- saved list, localStorage keyed by page slug ---------- */
+  function pcSlug(){
+    var m = (location.pathname||'').replace(/\/+$/,'').split('/').filter(Boolean);
+    return (m.length ? m[m.length-1] : 'default').replace(/\.html?$/,'');
+  }
+  var LSKEY = 'bl-calc-list-v1:' + pcSlug();
+  var saved = [];
+  function load(){ try{ saved = JSON.parse(localStorage.getItem(LSKEY)||'[]')||[]; }catch(_){ saved = []; } }
+  function store(){ try{ localStorage.setItem(LSKEY, JSON.stringify(saved)); }catch(_){} }
+
+  function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g, function(c){
+    return ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]; }); }
+
+  function renderList(){
+    var q = (searchEl.value||'').trim().toLowerCase();
+    var rows = saved.map(function(it,i){ return {it:it,i:i}; })
+                    .filter(function(r){ return !q || (r.it.name||'').toLowerCase().indexOf(q) !== -1; });
+    savedHead.hidden = saved.length === 0;
+    searchEl.hidden  = saved.length === 0;
+    countEl.textContent = saved.length + (saved.length === 1 ? ' saved' : ' saved');
+    emptyEl.hidden = !(saved.length > 0 && rows.length === 0);
+    listEl.innerHTML = rows.map(function(r){
+      var it = r.it, pct = Math.max(0, Math.min(100, (it.units / it.max) * 100));
+      var uu = it.unit === 'iu' ? 'IU' : it.unit;
+      return '<div class="pc-item">' +
+        '<div class="pc-item-top"><div><div class="pc-item-name">' + esc(it.name) + '</div>' +
+        '<div class="pc-item-sub">' + esc(it.vial) + ' ' + esc(uu) + ' in ' + esc(it.bac) + ' mL &middot; ' + esc(it.max) + 'u syringe</div></div>' +
+        '<div class="pc-item-acts">' +
+        '<button class="pc-ico" type="button" data-edit="' + r.i + '" aria-label="Edit ' + esc(it.name) + '">&#9998;</button>' +
+        '<button class="pc-ico del" type="button" data-del="' + r.i + '" aria-label="Remove ' + esc(it.name) + '">&times;</button>' +
+        '</div></div>' +
+        '<div class="pc-mini"><div class="pc-mini-fill" style="width:' + pct.toFixed(1) + '%"></div></div>' +
+        '<div class="pc-item-stats">' +
+        '<span class="pc-chip">' + esc(it.units) + ' u</span>' +
+        '<span class="pc-chip">' + esc(it.dose) + ' ' + esc(uu) + '</span>' +
+        '<span class="pc-chip">' + esc(it.volume) + ' mL</span>' +
+        '<span class="pc-chip">' + esc(it.doses) + ' doses/vial</span>' +
+        '</div></div>';
+    }).join('');
+  }
+
+  function addCurrent(){
+    var c = conc(), vial = num(vialEl.value,0), bac = num(bacEl.value,0), dose = num(doseEl.value,0);
+    if(!(vial > 0 && bac > 0 && dose > 0)) return;
+    var nm = (nameEl.value||'').trim() || 'Untitled';
+    saved.unshift({name:nm, vial:vial, bac:bac, dose:dose, unit:curUnit, max:maxU,
+                   units:Math.round(curU*10)/10, volume:Math.round((curU/100)*1000)/1000,
+                   doses:Math.floor(vial/dose), conc:Math.round(c*100)/100});
+    store(); renderList();
+  }
+
+  function editItem(i){
+    var it = saved[i]; if(!it) return;
+    cmpEl.value = '__custom__'; nameField.hidden = false; srcNote.hidden = true;
+    nameEl.value = it.name; vialEl.value = it.vial; bacEl.value = it.bac; doseEl.value = it.dose;
+    curUnit = it.unit;
+    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
+      b.classList.toggle('on', b.getAttribute('data-u') === it.unit); });
+    syrEl.value = String(it.max); maxU = it.max; drawTicks();
+    saved.splice(i,1); store(); renderList(); fromDose();
+    document.getElementById('pc-compound').scrollIntoView({block:'center', behavior:'smooth'});
+  }
+
   function init(){
     nameEl = el('pc-name'); vialEl = el('pc-vial'); bacEl = el('pc-bac');
     doseEl = el('pc-dose'); syrEl = el('pc-syringe');
     bar = el('pc-syr'); svg = el('pc-svg'); fill = el('pc-fill');
     plunger = el('pc-plunger'); ticksG = el('pc-ticks');
     if(!bar) return;
+    cmpEl = el('pc-compound'); nameField = el('pc-name-field'); unitSeg = el('pc-unitseg');
+    srcNote = el('pc-srcnote'); addBtn = el('pc-addbtn'); searchEl = el('pc-search');
+    listEl = el('pc-list'); savedHead = el('pc-saved-head'); countEl = el('pc-saved-count'); emptyEl = el('pc-empty');
+    LIB = buildLib(); fillCompoundSelect();
+    cmpEl.addEventListener('change', applyCompound);
+    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){ setUnit(b.getAttribute('data-u'), true); });
+    });
+    addBtn.addEventListener('click', addCurrent);
+    searchEl.addEventListener('input', renderList);
+    listEl.addEventListener('click', function(e){
+      var d = e.target.closest('[data-del]'), ed = e.target.closest('[data-edit]');
+      if(d){ saved.splice(+d.getAttribute('data-del'),1); store(); renderList(); }
+      else if(ed){ editItem(+ed.getAttribute('data-edit')); }
+    });
+    load(); renderList();
 
     maxU = parseFloat(syrEl.value) || 100;
     drawTicks();
