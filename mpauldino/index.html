@@ -709,6 +709,7 @@ body.mk-open{overflow:hidden;}
       <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="DNA &amp; Traits" onclick="switchTab('dna',this)"><span class="mi-label">DNA &amp; Traits</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Calculator" onclick="switchTab('calculator',this)"><span class="mi-label">Calculator</span><span class="chev" aria-hidden="true">&#9656;</span></button>
       <button class="menu-item" role="menuitem" data-label="Timeline" onclick="switchTab('timeline',this)"><span class="mi-label">Timeline</span><span class="chev">&rsaquo;</span></button>
       <button class="menu-item" role="menuitem" data-label="Command Center" onclick="switchTab('command',this)"><span class="mi-label">Command Center</span><span class="chev" aria-hidden="true">&#9656;</span></button>
     </div>
@@ -2128,6 +2129,99 @@ body.mk-open{overflow:hidden;}
       </div><!-- /nut-wrap -->
     </div><!-- /nutrition -->
 
+  <!-- ================ CALCULATOR TAB ================ -->
+  <div class="tab-content" id="tab-calculator">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Tools</div>
+      <div class="sec-divider-title">Peptide Calculator</div>
+    </div>
+
+    <div class="pc-wrap">
+
+      <div class="pc-headline">
+        <div class="pc-hl-eyebrow">Your Draw</div>
+        <div class="pc-hl-main" id="pc-headline">Draw <b>14 units</b> for <b>1.4 mg</b></div>
+        <div class="pc-hl-sub" id="pc-headline-sub">0.14 mL at 10 mg/mL</div>
+      </div>
+
+      <div class="pc-card accent">
+        <div class="pc-field">
+          <div class="pc-label">Compound <span class="info-tip" tabindex="0">?<span class="info-tip-text">Optional label &mdash; it only names the result, it does not change the maths.</span></span></div>
+          <input class="pc-input" id="pc-name" type="text" placeholder="e.g. BPC-157" autocomplete="off">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Vial Size <span class="info-tip" tabindex="0">?<span class="info-tip-text">Total peptide in the vial as supplied, before any water is added.</span></span><span class="pc-unit">mg</span></div>
+          <input class="pc-input" id="pc-vial" type="number" inputmode="decimal" step="any" min="0" value="10">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">BAC Water <span class="info-tip" tabindex="0">?<span class="info-tip-text">How much bacteriostatic water you add. More water means a bigger, easier-to-read draw for the same dose.</span></span><span class="pc-unit">mL</span></div>
+          <input class="pc-input" id="pc-bac" type="number" inputmode="decimal" step="any" min="0" value="1">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection. Type here, or drag the syringe below &mdash; they stay in sync.</span></span><span class="pc-unit">mg</span></div>
+          <input class="pc-input" id="pc-dose" type="number" inputmode="decimal" step="any" min="0" value="1.4">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Syringe <span class="info-tip" tabindex="0">?<span class="info-tip-text">All three are U-100 scale, so 100 units = 1 mL regardless of barrel size.</span></span></div>
+          <select class="pc-select" id="pc-syringe">
+            <option value="30">0.3 mL &middot; 30 units</option>
+            <option value="50">0.5 mL &middot; 50 units</option>
+            <option value="100" selected>1 mL &middot; 100 units</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pc-card">
+        <div class="pc-syr-head">
+          <span class="pc-syr-title">Drag to set units</span>
+          <span class="pc-syr-read" id="pc-syr-read">14 u</span>
+        </div>
+        <div class="pc-syr" id="pc-syr" role="slider" tabindex="0"
+             aria-label="Draw volume in units" aria-valuemin="0" aria-valuemax="100" aria-valuenow="14">
+          <svg id="pc-svg" viewBox="0 0 300 76" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="pcGold" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#C9A84C"/><stop offset="55%" stop-color="#A8873A"/><stop offset="100%" stop-color="#7A6530"/>
+              </linearGradient>
+            </defs>
+            <rect class="pc-barrel-bg" x="6" y="16" width="288" height="34" rx="5"/>
+            <rect class="pc-barrel-fill" id="pc-fill" x="6" y="16" width="40" height="34" rx="5"/>
+            <g id="pc-ticks"></g>
+            <g id="pc-plunger-g">
+              <rect class="pc-plunger" id="pc-plunger" x="42" y="8" width="8" height="50" rx="4"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pc-hint">Drag the bar, or type a dose above &mdash; <b>they stay in sync</b>.</div>
+      </div>
+
+      <div class="pc-grid">
+        <div class="pc-stat">
+          <div class="pc-stat-l">Concentration <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial size divided by BAC water. How many mg sit in each millilitre once mixed.</span></span></div>
+          <div class="pc-stat-v" id="pc-conc">10<em>mg/mL</em></div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-l">Draw Volume <span class="info-tip" tabindex="0">?<span class="info-tip-text">The liquid you actually pull into the barrel for one dose.</span></span></div>
+          <div class="pc-stat-v" id="pc-vol">0.14<em>mL</em></div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-l">Units <span class="info-tip" tabindex="0">?<span class="info-tip-text">The mark on a U-100 insulin syringe. Units are millilitres times 100.</span></span></div>
+          <div class="pc-stat-v" id="pc-units">14<em>u</em></div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-l">Doses Per Vial <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial size divided by your dose, rounded down. Drug-limited only &mdash; it does not account for the shelf clock once mixed.</span></span></div>
+          <div class="pc-stat-v" id="pc-doses">7</div>
+        </div>
+      </div>
+
+      <div class="pc-warn" id="pc-warn" hidden></div>
+
+    </div>
+
+  </div><!-- /calculator -->
+
+
   
   <!-- ================ TIMELINE TAB ================ -->
   <div class="tab-content" id="tab-timeline">
@@ -2568,6 +2662,56 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
 .nut-seg-btn:disabled{pointer-events:none;}
 #tab-nutrition input[type=time]{font-family:'Montserrat',sans-serif;}
 @media(max-width:400px){ .nut-chips{grid-template-columns:repeat(2,minmax(0,1fr));} }
+
+
+/* ===== Peptide calculator ===== */
+.pc-wrap{max-width:560px;margin:0 auto;}
+.pc-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:18px 18px 20px;margin-bottom:16px;}
+.pc-card.accent{border-top:3px solid var(--accent);}
+.pc-label{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.pc-field{margin-bottom:15px;}
+.pc-field:last-child{margin-bottom:0;}
+.pc-input,.pc-select{width:100%;box-sizing:border-box;min-height:46px;padding:11px 13px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600;color:var(--text);
+  background:var(--surface);border:1px solid var(--line);border-radius:7px;-webkit-appearance:none;appearance:none;}
+.pc-input:focus,.pc-select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
+.pc-select{background-image:linear-gradient(45deg,transparent 50%,var(--accent) 50%),linear-gradient(135deg,var(--accent) 50%,transparent 50%);
+  background-position:calc(100% - 19px) calc(50% + 2px),calc(100% - 14px) calc(50% + 2px);background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:38px;}
+.pc-unit{font-size:11px;font-weight:600;color:var(--muted);margin-left:auto;letter-spacing:0.04em;}
+
+/* headline */
+.pc-headline{background:linear-gradient(135deg,var(--accent-dim),rgba(122,101,48,0.03)),var(--surface);
+  border:1px solid var(--accent-line);border-radius:10px;padding:18px 20px;margin-bottom:16px;text-align:center;}
+.pc-hl-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:7px;}
+.pc-hl-main{font-family:'Cormorant Garamond',serif;font-size:31px;font-weight:600;color:var(--text);line-height:1.15;}
+.pc-hl-main b{color:var(--accent);font-weight:600;}
+.pc-hl-sub{font-size:12px;color:var(--muted);margin-top:6px;}
+
+/* syringe */
+.pc-syr-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px;}
+.pc-syr-title{font-size:10px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:var(--muted);}
+.pc-syr-read{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;}
+.pc-syr{position:relative;width:100%;height:76px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none;}
+.pc-syr.dragging{cursor:grabbing;}
+.pc-syr svg{display:block;width:100%;height:100%;overflow:visible;}
+.pc-barrel-bg{fill:#2a2a28;}
+.pc-barrel-fill{fill:url(#pcGold);}
+.pc-tick{stroke:rgba(255,255,255,0.40);stroke-width:1;}
+.pc-tick.major{stroke:rgba(255,255,255,0.78);stroke-width:1.5;}
+.pc-ticknum{fill:rgba(255,255,255,0.72);font-family:'Montserrat',sans-serif;font-size:7.5px;font-weight:600;text-anchor:middle;}
+.pc-plunger{fill:var(--accent);stroke:#fff;stroke-width:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35));}
+.pc-hint{font-size:11px;color:var(--muted);text-align:center;margin-top:9px;}
+.pc-hint b{color:var(--accent);font-weight:700;}
+
+/* results */
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.pc-stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 13px;}
+.pc-stat-l{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.pc-stat-v{font-size:19px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums;line-height:1.15;}
+.pc-stat-v em{font-style:normal;font-size:11px;font-weight:600;color:var(--muted);margin-left:3px;}
+.pc-warn{background:var(--amber-soft);border:1px solid var(--amber-border);border-radius:7px;padding:10px 13px;font-size:12px;color:var(--amber);margin-top:13px;line-height:1.5;}
+.pc-warn[hidden]{display:none !important;}
+@media(max-width:420px){ .pc-hl-main{font-size:26px;} .pc-grid{grid-template-columns:1fr;} }
+
 </style>
 <div class="bl-pwa-banner" id="bl-pwa-banner">
   <div class="bl-pwa-banner-text" id="bl-pwa-banner-text"></div>
@@ -4753,6 +4897,162 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     }).observe(document.getElementById('tab-timeline'), {attributes:true, attributeFilter:['class']});
   }
   setTimeout(toEnd, 60);
+})();
+</script>
+
+
+<script>
+/* ===================== PEPTIDE CALCULATOR =================================
+   concentration = vial_mg / bac_mL
+   draw_mL       = dose_mg / concentration
+   units         = draw_mL * 100          (U-100 scale)
+   doses/vial    = floor(vial_mg / dose_mg)
+   The syringe bar and the dose field are two-way bound; dragging sets units
+   and back-solves mg, typing a dose fills the bar.
+   ------------------------------------------------------------------------ */
+(function(){
+  var el = function(id){ return document.getElementById(id); };
+  var nameEl, vialEl, bacEl, doseEl, syrEl, bar, svg, fill, plunger, ticksG;
+  var X0 = 6, X1 = 294, TOP = 16, H = 34;     // barrel geometry in viewBox units
+  var maxU = 100, curU = 14, dragging = false;
+
+  function num(v, dflt){ var n = parseFloat(v); return (isFinite(n) && n >= 0) ? n : dflt; }
+  function conc(){ var v = num(vialEl.value, 0), b = num(bacEl.value, 0); return b > 0 ? v / b : 0; }
+  function fmt(n, dp){
+    if(!isFinite(n)) return '—';
+    var s = n.toFixed(dp);
+    return s.replace(/\.?0+$/, '') || '0';
+  }
+
+  function drawTicks(){
+    var step = maxU <= 30 ? 5 : (maxU <= 50 ? 5 : 10);
+    var minor = maxU <= 30 ? 1 : (maxU <= 50 ? 1 : 2);
+    var out = '';
+    for(var u = 0; u <= maxU; u += minor){
+      var x = X0 + (X1 - X0) * (u / maxU);
+      var major = (u % step === 0);
+      var len = major ? 11 : 6;
+      out += '<line class="pc-tick' + (major ? ' major' : '') + '" x1="' + x.toFixed(2) + '" y1="' + TOP +
+             '" x2="' + x.toFixed(2) + '" y2="' + (TOP + len) + '"/>';
+      if(major) out += '<text class="pc-ticknum" x="' + x.toFixed(2) + '" y="' + (TOP + H + 12) + '">' + u + '</text>';
+    }
+    ticksG.innerHTML = out;
+  }
+
+  function paint(){
+    var c = conc();
+    var frac = maxU > 0 ? Math.min(curU / maxU, 1) : 0;
+    var w = (X1 - X0) * frac;
+    fill.setAttribute('width', Math.max(0, w).toFixed(2));
+    var px = X0 + w;
+    plunger.setAttribute('x', (px - 4).toFixed(2));
+    bar.setAttribute('aria-valuenow', String(Math.round(curU * 10) / 10));
+    bar.setAttribute('aria-valuemax', String(maxU));
+
+    var mL = curU / 100, mg = mL * c;
+    var label = (nameEl.value || '').trim();
+    el('pc-syr-read').textContent = fmt(curU, 1) + ' u';
+    el('pc-conc').innerHTML  = (c > 0 ? fmt(c, 2) : '—') + '<em>mg/mL</em>';
+    el('pc-vol').innerHTML   = fmt(mL, 3) + '<em>mL</em>';
+    el('pc-units').innerHTML = fmt(curU, 1) + '<em>u</em>';
+
+    var vial = num(vialEl.value, 0), dose = num(doseEl.value, 0);
+    el('pc-doses').textContent = (vial > 0 && dose > 0) ? String(Math.floor(vial / dose)) : '—';
+
+    el('pc-headline').innerHTML = 'Draw <b>' + fmt(curU, 1) + ' units</b> for <b>' + fmt(mg, 3) + ' mg</b>' +
+      (label ? ' <span style="font-size:.62em;color:var(--muted);">of ' + label.replace(/[<>&]/g, '') + '</span>' : '');
+    el('pc-headline-sub').textContent = fmt(mL, 3) + ' mL at ' + (c > 0 ? fmt(c, 2) : '—') + ' mg/mL';
+
+    var msgs = [];
+    if(!(num(bacEl.value, 0) > 0)) msgs.push('Enter a BAC water volume to get a concentration.');
+    if(curU >= maxU - 0.01 && dose > 0 && c > 0 && (dose / c) * 100 > maxU)
+      msgs.push('That dose needs ' + fmt((dose / c) * 100, 1) + ' units &mdash; more than this syringe holds. Use a larger syringe or more BAC water.');
+    var wEl = el('pc-warn');
+    if(msgs.length){ wEl.innerHTML = msgs.join('<br>'); wEl.hidden = false; } else { wEl.hidden = true; }
+  }
+
+  /* dose typed -> fill the bar */
+  function fromDose(){
+    var c = conc(), dose = num(doseEl.value, 0);
+    curU = (c > 0) ? Math.min((dose / c) * 100, maxU) : 0;
+    paint();
+  }
+  /* bar dragged -> back-solve mg */
+  function fromUnits(){
+    var c = conc(), mg = (curU / 100) * c;
+    doseEl.value = (c > 0) ? (Math.round(mg * 1000) / 1000) : '';
+    paint();
+  }
+
+  function unitsAtClientX(clientX){
+    var r = bar.getBoundingClientRect();
+    if(r.width <= 0) return curU;
+    var pad0 = r.width * (X0 / 300), pad1 = r.width * (X1 / 300);
+    var t = (clientX - r.left - pad0) / (pad1 - pad0);
+    t = Math.max(0, Math.min(1, t));
+    var u = t * maxU;
+    var snap = maxU <= 50 ? 0.5 : 1;          // half-unit on small barrels
+    return Math.round(u / snap) * snap;
+  }
+
+  function onDown(e){
+    dragging = true; bar.classList.add('dragging');
+    if(bar.setPointerCapture && e.pointerId !== undefined){ try{ bar.setPointerCapture(e.pointerId); }catch(_){} }
+    curU = unitsAtClientX(e.clientX); fromUnits();
+    e.preventDefault();
+  }
+  function onMove(e){
+    if(!dragging) return;
+    curU = unitsAtClientX(e.clientX); fromUnits();
+    e.preventDefault();
+  }
+  function onUp(){ dragging = false; bar.classList.remove('dragging'); }
+
+  function onKey(e){
+    var step = (e.shiftKey ? 5 : 1) * (maxU <= 50 ? 0.5 : 1);
+    if(e.key === 'ArrowRight' || e.key === 'ArrowUp'){ curU = Math.min(curU + step, maxU); fromUnits(); e.preventDefault(); }
+    else if(e.key === 'ArrowLeft' || e.key === 'ArrowDown'){ curU = Math.max(curU - step, 0); fromUnits(); e.preventDefault(); }
+    else if(e.key === 'Home'){ curU = 0; fromUnits(); e.preventDefault(); }
+    else if(e.key === 'End'){ curU = maxU; fromUnits(); e.preventDefault(); }
+  }
+
+  function init(){
+    nameEl = el('pc-name'); vialEl = el('pc-vial'); bacEl = el('pc-bac');
+    doseEl = el('pc-dose'); syrEl = el('pc-syringe');
+    bar = el('pc-syr'); svg = el('pc-svg'); fill = el('pc-fill');
+    plunger = el('pc-plunger'); ticksG = el('pc-ticks');
+    if(!bar) return;
+
+    maxU = parseFloat(syrEl.value) || 100;
+    drawTicks();
+
+    [vialEl, bacEl].forEach(function(x){ x.addEventListener('input', fromDose); });
+    doseEl.addEventListener('input', fromDose);
+    nameEl.addEventListener('input', paint);
+    syrEl.addEventListener('change', function(){
+      maxU = parseFloat(syrEl.value) || 100;
+      drawTicks(); fromDose();
+    });
+
+    if(window.PointerEvent){
+      bar.addEventListener('pointerdown', onDown);
+      bar.addEventListener('pointermove', onMove);
+      bar.addEventListener('pointerup', onUp);
+      bar.addEventListener('pointercancel', onUp);
+    } else {
+      bar.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      bar.addEventListener('touchstart', function(e){ onDown(e.touches[0]); }, {passive:false});
+      bar.addEventListener('touchmove',  function(e){ onMove(e.touches[0]); }, {passive:false});
+      bar.addEventListener('touchend', onUp);
+    }
+    bar.addEventListener('keydown', onKey);
+
+    fromDose();
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
 </script>
 
