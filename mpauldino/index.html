@@ -5105,6 +5105,21 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     var u = (m[2]||'').toLowerCase();
     return {n:n, u:(u==='ml') ? '' : u};
   }
+
+  /* vial figure for the dropdown label — the number we actually fill from,
+     shown in the unit the Index states it in (not the normalised one) */
+  function vialLabel(raw){
+    if(!raw) return '';
+    var t = String(raw).trim();
+    if(/\/\s*m[lL]/.test(t)) return '';                 /* "600 mg/ml" is a concentration, not a vial mass */
+    var bl = t.match(/^\s*(\d*\.?\d+)\s*(mg|mcg|iu)?\s*\/\s*(\d*\.?\d+)\s*(mg|mcg|iu)/i);
+    if(bl) return (bl[1] + (bl[2]||bl[4]) + '/' + bl[3] + bl[4]).toLowerCase().replace(/iu/g,' IU');
+    var m = t.replace(/,/g,'').match(/^\s*(\d*\.?\d+)\s*(mg|mcg|iu)\b/i);
+    if(!m) return '';
+    var u = m[2].toLowerCase();
+    return m[1] + (u === 'iu' ? ' IU' : u);
+  }
+
   function buildLib(){
     var raw = (window.CHEAT_SHEET_DATA||[]);
     return raw.map(function(d){
@@ -5120,13 +5135,17 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
         else if(v.u === 'mcg' && unit === 'mg') vialN = v.n / 1000;
         else if(v.u !== unit) unit = v.u;        /* IU vs mass — trust the vial */
       }
-      return {name:d.name, cat:d.cat||'', purpose:d.purpose||'',
+      return {name:d.name, cat:d.cat||'', purpose:d.purpose||'', label:vialLabel(d.vial),
               vial:vialN, vialU:(v?v.u:''), bac:(b?b.n:null),
               dose:(o?o.n:null), unit:unit,
               rawVial:d.vial, rawBac:d.bac, rawDose:d.dose, rawUnits:d.units};
     });
   }
 
+  function optText(c){
+    var n = c.name.replace(/[<>&]/g,'');
+    return c.label ? (n + ' \u2014 ' + c.label) : n;
+  }
   function fillCompoundSelect(){
     var lib = LIB, byCat = {};
     lib.forEach(function(c,i){ (byCat[c.cat] = byCat[c.cat] || []).push(i); });
@@ -5135,13 +5154,13 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
       if(!byCat[k]) return;
       html += '<optgroup label="' + CATS[k] + '">';
       byCat[k].sort(function(a,b){ return lib[a].name.localeCompare(lib[b].name); })
-        .forEach(function(i){ html += '<option value="' + i + '">' + lib[i].name.replace(/[<>&]/g,'') + '</option>'; });
+        .forEach(function(i){ html += '<option value="' + i + '">' + optText(lib[i]) + '</option>'; });
       html += '</optgroup>';
     });
     Object.keys(byCat).forEach(function(k){
       if(CATS[k]) return;
       html += '<optgroup label="Other">';
-      byCat[k].forEach(function(i){ html += '<option value="' + i + '">' + lib[i].name.replace(/[<>&]/g,'') + '</option>'; });
+      byCat[k].forEach(function(i){ html += '<option value="' + i + '">' + optText(lib[i]) + '</option>'; });
       html += '</optgroup>';
     });
     cmpEl.innerHTML = html;
