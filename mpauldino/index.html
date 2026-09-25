@@ -2235,6 +2235,7 @@ body.mk-open{overflow:hidden;}
       <div class="pc-saved-head" id="pc-saved-head" hidden>
         <span class="pc-saved-title">My Compounds</span>
         <span class="pc-saved-count" id="pc-saved-count"></span>
+        <span class="pc-sync" id="pc-sync" hidden></span>
       </div>
       <input class="pc-search" id="pc-search" type="search" placeholder="Search my compounds..." autocomplete="off" hidden>
       <div id="pc-list"></div>
@@ -2754,9 +2755,11 @@ details.lab-section[open] > summary.lab-section-head .lab-chev{transform:rotate(
 .pc-add:disabled{opacity:.45;cursor:not-allowed;}
 
 /* saved list */
-.pc-saved-head{display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px;}
+.pc-saved-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:22px 0 10px;}
 .pc-saved-title{font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);}
 .pc-saved-count{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;}
+.pc-sync{font-size:9.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-line);border-radius:99px;padding:3px 9px;margin-left:8px;white-space:nowrap;}
+.pc-sync[hidden]{display:none !important;}
 .pc-search{width:100%;box-sizing:border-box;min-height:44px;padding:10px 13px;font-family:'Montserrat',sans-serif;font-size:15px;
   color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:7px;margin-bottom:11px;-webkit-appearance:none;}
 .pc-search:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-dim);}
@@ -5225,6 +5228,80 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   function load(){ try{ saved = JSON.parse(localStorage.getItem(LSKEY)||'[]')||[]; }catch(_){ saved = []; } }
   function store(){ try{ localStorage.setItem(LSKEY, JSON.stringify(saved)); }catch(_){} }
 
+
+  /* ===================== CROSS-DEVICE SAVE ==================================
+     Supabase `calc_lists`, keyed by page slug, mirroring the nutrition tab.
+     localStorage stays the instant cache so the list paints before the network
+     answers; Supabase is the source of truth and wins when it replies. Every
+     call fails soft - if the table does not exist yet, or the device is
+     offline, the tab keeps working on localStorage exactly as before.
+     ------------------------------------------------------------------------ */
+  var CALC_SB = {
+    url  : 'https://bfjydzealeethhcpdfxl.supabase.co',
+    key  : (window.BL_SUPABASE_ANON || document.documentElement.getAttribute('data-sb-anon') || ''),
+    table: 'calc_lists'
+  };
+  var calcTouched = false;      /* user edited before the remote answered - do not clobber */
+  var syncEl = null;
+
+  function sbHeaders(extra){
+    var h = {'apikey':CALC_SB.key,'Authorization':'Bearer '+CALC_SB.key,'Content-Type':'application/json'};
+    if(extra) Object.keys(extra).forEach(function(k){ h[k]=extra[k]; });
+    return h;
+  }
+  function sbReady(){ return !!(CALC_SB.key && CALC_SB.url); }
+
+  function sbLoad(){
+    if(!sbReady()) return Promise.resolve(null);
+    return fetch(CALC_SB.url+'/rest/v1/'+CALC_SB.table+'?page_slug=eq.'+encodeURIComponent(pcSlug())+'&select=data,updated_at&limit=1',
+      { headers: sbHeaders() })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(rows){ return (rows && rows[0]) ? rows[0] : null; })
+      .catch(function(){ return null; });
+  }
+  function sbSave(list){
+    if(!sbReady()) return Promise.resolve({ok:false,reason:'no-key'});
+    return fetch(CALC_SB.url+'/rest/v1/'+CALC_SB.table+'?on_conflict=page_slug', {
+      method:'POST',
+      headers: sbHeaders({'Prefer':'resolution=merge-duplicates,return=representation'}),
+      body: JSON.stringify([{ page_slug: pcSlug(), data: {items:list}, updated_at: new Date().toISOString() }])
+    }).then(function(r){ return r.ok ? {ok:true} : r.text().then(function(t){ return {ok:false,reason:r.status+' '+t.slice(0,90)}; }); })
+      .catch(function(e){ return {ok:false,reason:String(e).slice(0,90)}; });
+  }
+
+  function setSync(state, detail){
+    if(!syncEl) return;
+    var map = {saving:'Saving…', saved:'Synced', local:'Saved on this device only', off:''};
+    syncEl.textContent = map[state] || '';
+    syncEl.title = detail || '';
+    syncEl.hidden = !syncEl.textContent;
+  }
+
+  /* every mutation: localStorage first (instant, offline-safe), then push up */
+  function persist(){
+    calcTouched = true;
+    store();
+    renderList();
+    if(!sbReady()) return;
+    setSync('saving');
+    sbSave(saved).then(function(res){
+      setSync(res.ok ? 'saved' : 'local', res.ok ? '' : ('Cross-device sync unavailable: ' + (res.reason||'')));
+    });
+  }
+
+  /* first paint from cache, then let the remote win if the user has not typed */
+  function hydrate(){
+    syncEl = el('pc-sync'); hydrate();
+    if(!sbReady()) return;
+    sbLoad().then(function(row){
+      if(!row || calcTouched) return;                 /* never clobber a live edit */
+      var items = (row.data && row.data.items) || [];
+      if(!Array.isArray(items)) return;
+      saved = items; store(); renderList();
+      setSync('saved','Loaded from your account');
+    });
+  }
+
   function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g, function(c){
     return ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]; }); }
 
@@ -5263,7 +5340,7 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     saved.unshift({name:nm, vial:vial, bac:bac, dose:dose, unit:curUnit, max:maxU,
                    units:Math.round(curU*10)/10, volume:Math.round((curU/100)*1000)/1000,
                    doses:Math.floor(vial/dose), conc:Math.round(c*100)/100});
-    store(); renderList();
+    persist();
   }
 
   function editItem(i){
@@ -5274,7 +5351,7 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
       b.classList.toggle('on', b.getAttribute('data-u') === it.unit); });
     syrEl.value = String(it.max); maxU = it.max; drawTicks();
-    saved.splice(i,1); store(); renderList(); fromDose();
+    saved.splice(i,1); persist(); fromDose();
     document.getElementById('pc-compound').scrollIntoView({block:'center', behavior:'smooth'});
   }
 
@@ -5296,7 +5373,7 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     searchEl.addEventListener('input', renderList);
     listEl.addEventListener('click', function(e){
       var d = e.target.closest('[data-del]'), ed = e.target.closest('[data-edit]');
-      if(d){ saved.splice(+d.getAttribute('data-del'),1); store(); renderList(); }
+      if(d){ saved.splice(+d.getAttribute('data-del'),1); persist(); }
       else if(ed){ editItem(+ed.getAttribute('data-edit')); }
     });
     load(); renderList();
