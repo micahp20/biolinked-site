@@ -4419,6 +4419,25 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   .sched-pill,.sched-table th,.sec-divider-eyebrow,.tab-btn,
   .tb-card-pill,.tb-card-sub,.tip-eyebrow{font-size:11px !important;}
 }
+
+/* --- the marker detail panel must not sit over the page while closed -------
+   .mk-panel sets display:flex, which outranks the UA [hidden]{display:none}.
+   The panel then stayed in the layer at z-index 9500 with opacity 0 and
+   pointer-events auto: invisible, but eating every click. At <=640px it is a
+   bottom sheet so it missed the form; at desktop width it is centred right on
+   top of it, which is why the calculator was dead on a PC and fine on a phone. */
+.mk-panel[hidden], .mk-scrim[hidden]{display:none !important}
+.mk-panel:not(.open), .mk-scrim:not(.open){pointer-events:none}
+.mk-panel.open, .mk-scrim.open{pointer-events:auto}
+
+/* --- inline dose-unit picker ---------------------------------------------- */
+.pc-dose-row{display:flex;gap:8px;align-items:stretch}
+.pc-dose-row .pc-input{flex:1 1 auto;min-width:0}
+.pc-unit-sel{flex:0 0 auto;width:86px;padding:0 10px;border:1px solid var(--line);
+  border-radius:8px;background:var(--head);color:var(--text);font-family:inherit;font-size:14px;
+  font-weight:700;cursor:pointer;-webkit-appearance:menulist;appearance:menulist}
+.pc-unit-sel:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+@media(max-width:640px){ .pc-unit-sel{width:78px;font-size:13px} }
 </style>
 
 <div class="mk-scrim" id="mkScrim" hidden></div>
