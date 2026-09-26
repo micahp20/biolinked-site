@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'rgreen-v53';
+const CACHE = 'rgreen-v54';
 const ASSETS = [
   '/rgreen/',
   '/rgreen/index.html',
