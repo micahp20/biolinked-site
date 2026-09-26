@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'gpadilla-v28';
+const CACHE = 'gpadilla-v29';
 const ASSETS = [
   '/gpadilla/',
   '/gpadilla/index.html',
