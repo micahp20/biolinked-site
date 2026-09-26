@@ -4444,6 +4444,29 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
    content column; same failure class as the marker panel above. */
 .menu-panel:not(.open){pointer-events:none}
 .menu-panel.open{pointer-events:auto}
+
+/* ===================== [hidden] MUST ALWAYS WIN ============================
+   A class rule that sets display (.mk-panel{display:flex}, .menu-panel,
+   .nut-inputs, ...) outranks the UA's [hidden]{display:none}. The element then
+   stays in the layer while "closed": opacity 0, pointer-events auto, high
+   z-index - invisible, and swallowing every click underneath it. That is what
+   made the calculator controls dead on desktop while fine on a phone: the
+   bloodwork marker modal is centred at desktop width and a bottom sheet at
+   <=640px, so on mobile it simply missed the form. elementFromPoint over each
+   control returned .mk-head.
+
+   The JS was never at fault - close() does set the hidden attribute. This makes
+   the attribute authoritative for every element, so the whole class of bug is
+   gone rather than patched overlay by overlay. Deliberately unprefixed: an
+   html[data-theme] prefix only applies once the theme script has run, which
+   leaves a live gap on first paint and never matches on pages that do not set
+   the attribute at all.
+   ========================================================================= */
+[hidden]{display:none !important}
+.mk-panel[hidden],.mk-scrim[hidden],.menu-panel[hidden],.menu-scrim[hidden]{display:none !important;pointer-events:none !important}
+/* belt and braces for the opacity-0-but-not-[hidden] moment mid-transition */
+.mk-panel:not(.open),.mk-scrim:not(.open),.menu-panel:not(.open),.menu-scrim:not(.open){pointer-events:none}
+.mk-panel.open,.mk-scrim.open,.menu-panel.open,.menu-scrim.open{pointer-events:auto}
 </style>
 
 <div class="mk-scrim" id="mkScrim" hidden></div>
