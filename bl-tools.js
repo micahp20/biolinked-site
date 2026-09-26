@@ -1902,15 +1902,17 @@ else nutInit();
   function vialLabelUnit(){ return vialUnit === 'iu' ? 'IU' : vialUnit; }
   function doseLabelUnit(){ return curUnit === 'iu' ? 'IU' : curUnit; }
   /* IU is only meaningful when the vial itself is IU-based. */
+  /* One control, one place. IU is only listed when the vial is IU-based, so the
+     client cannot pick a unit that has no conversion. */
   function syncUnitButtons(){
-    if(!unitSeg) return;
-    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
-      var u = b.getAttribute('data-u');
-      var allowed = (vialUnit === 'iu') ? (u === 'iu') : (u !== 'iu');
-      b.disabled = !allowed;
-      b.hidden = !allowed;
-      b.classList.toggle('on', u === curUnit);
+    var sel = el('pc-doseunit');
+    if(!sel) return;
+    [].forEach.call(sel.options, function(o){
+      var allowed = (vialUnit === 'iu') ? (o.value === 'iu') : (o.value !== 'iu');
+      o.hidden = !allowed;
+      o.disabled = !allowed;
     });
+    sel.value = curUnit;
   }
   function setVialUnit(u){
     vialUnit = (u === 'iu') ? 'iu' : 'mg';
@@ -1919,9 +1921,6 @@ else nutInit();
     });
     if(vialUnit === 'iu' && curUnit !== 'iu') curUnit = 'iu';
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
-    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
-      s.textContent = doseLabelUnit();
-    });
     syncUnitButtons();
   }
   function fmt(n, dp){
@@ -2117,9 +2116,6 @@ else nutInit();
       if(isFinite(n)) doseEl.value = String(Math.round(n * k * 1e6) / 1e6);
     }
     curUnit = u;
-    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
-      s.textContent = doseLabelUnit();
-    });
     syncUnitButtons();
     fromDose();
   }
@@ -2139,9 +2135,6 @@ else nutInit();
     setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
     curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
-    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
-      s.textContent = doseLabelUnit();
-    });
     syncUnitButtons();
     var gaps = [];
     if(c.vial == null) gaps.push('vial size');
@@ -2301,14 +2294,13 @@ else nutInit();
     bar = el('pc-syr'); svg = el('pc-svg'); fill = el('pc-fill');
     plunger = el('pc-plunger'); ticksG = el('pc-ticks');
     if(!bar) return;
-    cmpEl = el('pc-compound'); nameField = el('pc-name-field'); unitSeg = el('pc-unitseg');
+    cmpEl = el('pc-compound'); nameField = el('pc-name-field'); unitSeg = el('pc-doseunit');
     srcNote = el('pc-srcnote'); addBtn = el('pc-addbtn'); searchEl = el('pc-search');
     listEl = el('pc-list'); savedHead = el('pc-saved-head'); countEl = el('pc-saved-count'); emptyEl = el('pc-empty');
     LIB = buildLib(); fillCompoundSelect();
     cmpEl.addEventListener('change', applyCompound);
-    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
-      b.addEventListener('click', function(){ setUnit(b.getAttribute('data-u'), true); });
-    });
+    var duSel = el('pc-doseunit');
+    if(duSel) duSel.addEventListener('change', function(){ setUnit(duSel.value, true); });
     addBtn.addEventListener('click', addCurrent);
     searchEl.addEventListener('input', renderList);
     listEl.addEventListener('click', function(e){

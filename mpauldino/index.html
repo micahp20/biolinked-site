@@ -2155,14 +2155,6 @@ body.mk-open{overflow:hidden;}
           <input class="pc-input" id="pc-name" type="text" placeholder="e.g. BPC-157" autocomplete="off">
         </div>
         <div class="pc-field">
-          <div class="pc-label">Dose Unit <span class="info-tip" tabindex="0">?<span class="info-tip-text">Sets the unit for Desired Dose only &mdash; Vial Size keeps its own. mcg to mg is a factor of 1000. IU appears only on IU-based vials such as HGH, since there is no universal IU-to-mg conversion.</span></span></div>
-          <div class="pc-seg" id="pc-unitseg" role="group" aria-label="Dose unit">
-            <button type="button" data-u="mg" class="on">mg</button>
-            <button type="button" data-u="mcg">mcg</button>
-            <button type="button" data-u="iu">IU</button>
-          </div>
-        </div>
-        <div class="pc-field">
           <div class="pc-label">Vial Size <span class="info-tip" tabindex="0">?<span class="info-tip-text">Total peptide in the vial as supplied, before any water is added. This stays in the vial&rsquo;s own unit and does not change when you switch the dose unit.</span></span><span class="pc-unit" data-unitslot="vial">mg</span></div>
           <input class="pc-input" id="pc-vial" type="number" inputmode="decimal" step="any" min="0" value="10">
         </div>
@@ -2171,8 +2163,15 @@ body.mk-open{overflow:hidden;}
           <input class="pc-input" id="pc-bac" type="number" inputmode="decimal" step="any" min="0" value="1">
         </div>
         <div class="pc-field">
-          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection. Type here, or drag the syringe below &mdash; they stay in sync. The MG / MCG toggle above changes this field only.</span></span><span class="pc-unit" data-unitslot="dose">mg</span></div>
-          <input class="pc-input" id="pc-dose" type="number" inputmode="decimal" step="any" min="0" value="1.4">
+          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection, in whichever unit you pick beside it. Type here, or drag the syringe below &mdash; they stay in sync. Vial Size keeps its own unit and never changes.</span></span></div>
+          <div class="pc-dose-row">
+            <input class="pc-input" id="pc-dose" type="number" inputmode="decimal" step="any" min="0" value="1.4">
+            <select class="pc-unit-sel" id="pc-doseunit" aria-label="Dose unit">
+              <option value="mg">mg</option>
+              <option value="mcg">mcg</option>
+              <option value="iu">IU</option>
+            </select>
+          </div>
         </div>
         <div class="pc-field">
           <div class="pc-label">Syringe <span class="info-tip" tabindex="0">?<span class="info-tip-text">All three are U-100 scale, so 100 units = 1 mL regardless of barrel size.</span></span></div>
@@ -5010,15 +5009,17 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
   function vialLabelUnit(){ return vialUnit === 'iu' ? 'IU' : vialUnit; }
   function doseLabelUnit(){ return curUnit === 'iu' ? 'IU' : curUnit; }
   /* IU is only meaningful when the vial itself is IU-based. */
+  /* One control, one place. IU is only listed when the vial is IU-based, so the
+     client cannot pick a unit that has no conversion. */
   function syncUnitButtons(){
-    if(!unitSeg) return;
-    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
-      var u = b.getAttribute('data-u');
-      var allowed = (vialUnit === 'iu') ? (u === 'iu') : (u !== 'iu');
-      b.disabled = !allowed;
-      b.hidden = !allowed;
-      b.classList.toggle('on', u === curUnit);
+    var sel = el('pc-doseunit');
+    if(!sel) return;
+    [].forEach.call(sel.options, function(o){
+      var allowed = (vialUnit === 'iu') ? (o.value === 'iu') : (o.value !== 'iu');
+      o.hidden = !allowed;
+      o.disabled = !allowed;
     });
+    sel.value = curUnit;
   }
   function setVialUnit(u){
     vialUnit = (u === 'iu') ? 'iu' : 'mg';
@@ -5027,9 +5028,6 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     });
     if(vialUnit === 'iu' && curUnit !== 'iu') curUnit = 'iu';
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
-    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
-      s.textContent = doseLabelUnit();
-    });
     syncUnitButtons();
   }
   function fmt(n, dp){
@@ -5225,9 +5223,6 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
       if(isFinite(n)) doseEl.value = String(Math.round(n * k * 1e6) / 1e6);
     }
     curUnit = u;
-    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
-      s.textContent = doseLabelUnit();
-    });
     syncUnitButtons();
     fromDose();
   }
@@ -5247,9 +5242,6 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
     curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
-    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
-      s.textContent = doseLabelUnit();
-    });
     syncUnitButtons();
     var gaps = [];
     if(c.vial == null) gaps.push('vial size');
@@ -5409,14 +5401,13 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     bar = el('pc-syr'); svg = el('pc-svg'); fill = el('pc-fill');
     plunger = el('pc-plunger'); ticksG = el('pc-ticks');
     if(!bar) return;
-    cmpEl = el('pc-compound'); nameField = el('pc-name-field'); unitSeg = el('pc-unitseg');
+    cmpEl = el('pc-compound'); nameField = el('pc-name-field'); unitSeg = el('pc-doseunit');
     srcNote = el('pc-srcnote'); addBtn = el('pc-addbtn'); searchEl = el('pc-search');
     listEl = el('pc-list'); savedHead = el('pc-saved-head'); countEl = el('pc-saved-count'); emptyEl = el('pc-empty');
     LIB = buildLib(); fillCompoundSelect();
     cmpEl.addEventListener('change', applyCompound);
-    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
-      b.addEventListener('click', function(){ setUnit(b.getAttribute('data-u'), true); });
-    });
+    var duSel = el('pc-doseunit');
+    if(duSel) duSel.addEventListener('change', function(){ setUnit(duSel.value, true); });
     addBtn.addEventListener('click', addCurrent);
     searchEl.addEventListener('input', renderList);
     listEl.addEventListener('click', function(e){
