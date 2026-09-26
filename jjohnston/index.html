@@ -352,6 +352,7 @@ details.paid-archive .of-sub{color:#3a6b52;}
 <!-- BioLinked site theme - mpauldino palette -->
 <script>(function(){try{localStorage.removeItem('bl-theme');}catch(e){}document.documentElement.setAttribute('data-theme','light');})();</script>
 <link rel="stylesheet" href="/bl-theme.css?v=21">
+<link rel="stylesheet" href="/bl-tools.css?v=1">
 <script src="/bl-theme.js?v=2" defer></script>
 </head>
 <body>
@@ -412,14 +413,31 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
-    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
-    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
-    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
-    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  <div class="menu-bar">
+    <button class="menu-btn" id="mp-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mp-menu-panel" aria-haspopup="true" onclick="toggleMenu()">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu
+    </button>
+    <span class="menu-here">Viewing &middot; <b id="mp-menu-here">Protocol</b></span>
   </div>
 
+  <div class="menu-scrim" id="mp-menu-scrim" onclick="closeMenu()" hidden></div>
+  <nav class="menu-panel" id="mp-menu-panel" role="menu" aria-label="Sections" aria-hidden="true">
+    <div class="menu-panel-head">
+      <div class="menu-panel-eyebrow">Protocol</div>
+      <div class="menu-panel-name">Jeremy Johnston</div>
+      <div class="menu-panel-date">Muscle &amp; Energy Stack</div>
+    </div>
+    <div class="menu-list">
+      <button class="menu-item active" role="menuitem" data-label="Protocol" onclick="switchTab('protocol',this)"><span class="mi-label">Protocol</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Invoice" onclick="switchTab('invoice',this)"><span class="mi-label">Invoice</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Schedule" onclick="switchTab('schedule',this)"><span class="mi-label">Schedule</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Calculator" onclick="switchTab('calculator',this)"><span class="mi-label">Calculator</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Supplies" onclick="switchTab('supplies',this)"><span class="mi-label">Supplies</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Notes &amp; Tips" onclick="switchTab('notes',this)"><span class="mi-label">Notes &amp; Tips</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+    </div>
+  </nav>
   <div class="inv-body">
 
   <!-- ================= PROTOCOL ================= -->
@@ -524,6 +542,381 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </div>
 
   </div><!-- /protocol -->
+
+  <!-- ================= BLOODWORK ================= -->
+  <div class="tab-content" id="tab-bloodwork">
+      <div class="sec-divider">
+        <div class="sec-divider-eyebrow">Bloodwork</div>
+        <div class="sec-divider-title">Results Pending</div>
+      </div>
+
+      <div class="note-block">
+        <span class="nl">Nothing here yet</span>
+        <p><strong>No labs are on file for you.</strong> When you have a panel done, this tab is where it goes &mdash; every marker laid out with its range, a plain-English note on what it is, and a score so you can see movement between draws.</p>
+        <p>There is a note on the <strong>Notes &amp; Tips</strong> tab about which baseline markers are worth asking your provider for. Once you have those results, send them over and this tab fills in.</p>
+      </div>
+</div><!-- /bloodwork tab -->
+
+  <!-- ================= NUTRITION ================= -->
+    <div class="tab-content" id="tab-nutrition">
+      <div class="nut-wrap">
+
+      <div class="nut-saved" id="nut-saved" hidden>
+        <div class="nut-saved-head">
+          <span class="nut-saved-title">My Meal Plan</span>
+          <button class="nut-link" onclick="nutClearSaved()">Clear</button>
+        </div>
+        <div class="nut-saved-meta" id="nut-saved-meta"></div>
+        <div id="nut-saved-plan"></div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Your Numbers</div>
+
+        <div class="nut-field">
+          <span class="nut-label">Sex</span>
+          <div class="nut-seg" data-cols="2">
+            <button class="nut-seg-btn on" data-grp="sex" data-val="male" aria-pressed="true">Male</button>
+            <button class="nut-seg-btn" data-grp="sex" data-val="female" aria-pressed="false">Female</button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Units</span>
+          <div class="nut-seg" data-cols="2">
+            <button class="nut-seg-btn on" data-grp="units" data-val="imperial" aria-pressed="true">Imperial<small>lb &middot; ft/in</small></button>
+            <button class="nut-seg-btn" data-grp="units" data-val="metric" aria-pressed="false">Metric<small>kg &middot; cm</small></button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <label class="nut-label" for="nut-age">Age</label>
+          <div class="nut-inputs"><input class="nut-input" id="nut-age" type="number" inputmode="numeric" min="14" max="99" value="30"><span class="nut-unit">yrs</span></div>
+        </div>
+
+        <div class="nut-field">
+          <label class="nut-label" for="nut-w">Weight</label>
+          <div class="nut-inputs"><input class="nut-input" id="nut-w" type="number" inputmode="decimal" value="180"><span class="nut-unit" id="nut-w-unit">lb</span></div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Height</span>
+          <div class="nut-inputs" id="nut-h-imp">
+            <input class="nut-input" id="nut-ft" type="number" inputmode="numeric" min="4" max="7" value="5"><span class="nut-unit">ft</span>
+            <input class="nut-input" id="nut-in" type="number" inputmode="numeric" min="0" max="11" value="10"><span class="nut-unit">in</span>
+          </div>
+          <div class="nut-inputs" id="nut-h-met" hidden>
+            <input class="nut-input" id="nut-cm" type="number" inputmode="numeric" min="120" max="230" value="178"><span class="nut-unit">cm</span>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Activity Level</span>
+          <div class="nut-seg" data-cols="act">
+            <button class="nut-seg-btn" data-grp="activity" data-val="sedentary" aria-pressed="false">Sedentary<small>desk job</small></button>
+            <button class="nut-seg-btn" data-grp="activity" data-val="light" aria-pressed="false">Lightly Active<small>1&ndash;3 d/wk</small></button>
+            <button class="nut-seg-btn on" data-grp="activity" data-val="moderate" aria-pressed="true">Moderately Active<small>3&ndash;5 d/wk</small></button>
+            <button class="nut-seg-btn" data-grp="activity" data-val="very" aria-pressed="false">Very Active<small>6&ndash;7 d/wk</small></button>
+            <button class="nut-seg-btn" data-grp="activity" data-val="extra" aria-pressed="false">Extra Active<small>athlete</small></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Goal</div>
+
+        <div class="nut-field">
+          <span class="nut-label">Goal</span>
+          <div class="nut-seg" data-cols="3">
+            <button class="nut-seg-btn" data-grp="goal" data-val="lose" aria-pressed="false">Lose Fat</button>
+            <button class="nut-seg-btn on" data-grp="goal" data-val="maintain" aria-pressed="true">Maintain</button>
+            <button class="nut-seg-btn" data-grp="goal" data-val="gain" aria-pressed="false">Gain Muscle</button>
+          </div>
+        </div>
+
+        <div class="nut-field is-muted" id="nut-aggr-row">
+          <span class="nut-label">How Aggressive</span>
+          <div class="nut-seg" data-cols="3">
+            <button class="nut-seg-btn" data-grp="aggr" data-val="mild" aria-pressed="false">Mild</button>
+            <button class="nut-seg-btn on" data-grp="aggr" data-val="moderate" aria-pressed="true">Moderate</button>
+            <button class="nut-seg-btn" data-grp="aggr" data-val="aggressive" aria-pressed="false">Aggressive</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Diet &amp; Timing</div>
+        <div class="nut-field">
+          <span class="nut-label">Diet Style</span>
+          <div class="nut-seg" data-cols="2">
+            <button class="nut-seg-btn on" data-grp="diet" data-val="balanced" aria-pressed="true">Balanced</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="keto" aria-pressed="false">Keto</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="lowcarb" aria-pressed="false">Low Carb</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="highcarb" aria-pressed="false">High Carb</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="paleo" aria-pressed="false">Paleo</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="medit" aria-pressed="false">Mediterranean</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="vegetarian" aria-pressed="false">Vegetarian</button>
+            <button class="nut-seg-btn" data-grp="diet" data-val="vegan" aria-pressed="false">Vegan</button>
+          </div>
+        </div>
+
+        <div class="nut-field">
+          <span class="nut-label">Eating Window</span>
+          <div class="nut-seg" data-cols="3">
+            <button class="nut-seg-btn on" data-grp="window" data-val="none" aria-pressed="true">None</button>
+            <button class="nut-seg-btn" data-grp="window" data-val="16:8" aria-pressed="false">16:8</button>
+            <button class="nut-seg-btn" data-grp="window" data-val="18:6" aria-pressed="false">18:6</button>
+            <button class="nut-seg-btn" data-grp="window" data-val="20:4" aria-pressed="false">20:4</button>
+            <button class="nut-seg-btn" data-grp="window" data-val="omad" aria-pressed="false">OMAD</button>
+            <button class="nut-seg-btn" data-grp="window" data-val="custom" aria-pressed="false">Custom</button>
+          </div>
+          <div class="nut-inputs nut-win-times" id="nut-win-custom" hidden>
+            <input class="nut-input" id="nut-win-start" type="time" value="12:00" aria-label="Window start">
+            <span class="nut-unit">to</span>
+            <input class="nut-input" id="nut-win-end" type="time" value="20:00" aria-label="Window end">
+          </div>
+          <div class="nut-note" id="nut-win-note"></div>
+        </div>
+
+        <div class="nut-field" style="margin-bottom:0;">
+          <span class="nut-label">Appetite</span>
+          <div class="nut-seg" data-cols="2">
+            <button class="nut-seg-btn on" data-grp="glp1" data-val="off" aria-pressed="true">Normal</button>
+            <button class="nut-seg-btn" data-grp="glp1" data-val="on" aria-pressed="false">On GLP-1<small>reduced appetite</small></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Allergies &amp; Exclusions</div>
+        <div class="nut-field">
+          <span class="nut-label">Avoid</span>
+          <div class="nut-chips">
+            <button class="nut-chip" data-excl="gluten" aria-pressed="false">Gluten</button>
+            <button class="nut-chip" data-excl="dairy" aria-pressed="false">Dairy</button>
+            <button class="nut-chip" data-excl="nuts" aria-pressed="false">Nuts</button>
+            <button class="nut-chip" data-excl="shellfish" aria-pressed="false">Shellfish</button>
+            <button class="nut-chip" data-excl="soy" aria-pressed="false">Soy</button>
+            <button class="nut-chip" data-excl="eggs" aria-pressed="false">Eggs</button>
+          </div>
+        </div>
+        <div class="nut-field" style="margin-bottom:0;">
+          <label class="nut-label" for="nut-excl-text">Foods I won&apos;t eat</label>
+          <input class="nut-input" id="nut-excl-text" type="text" placeholder="e.g. salmon, mushrooms, tofu" autocomplete="off">
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Macros</div>
+
+        <div class="nut-field">
+          <span class="nut-label">Protein Target</span>
+          <div class="nut-seg" data-cols="3">
+            <button class="nut-seg-btn" data-grp="protPerLb" data-val="0.8" aria-pressed="false">0.8<small>g / lb</small></button>
+            <button class="nut-seg-btn on" data-grp="protPerLb" data-val="1" aria-pressed="true">1.0<small>g / lb</small></button>
+            <button class="nut-seg-btn" data-grp="protPerLb" data-val="1.2" aria-pressed="false">1.2<small>g / lb</small></button>
+          </div>
+        </div>
+
+        <div class="nut-field" id="nut-fat-row">
+          <label class="nut-label" for="nut-fat">Dietary Fat</label>
+          <div class="nut-range-row">
+            <input class="nut-range" id="nut-fat" type="range" min="15" max="40" step="1" value="25" aria-label="Dietary fat percentage">
+            <span class="nut-range-val" id="nut-fat-val">25%</span>
+          </div>
+          <div class="nut-note" id="nut-diet-note" hidden></div>
+        </div>
+
+        <div class="nut-field" style="margin-bottom:0;">
+          <span class="nut-label">Meals Per Day</span>
+          <div class="nut-seg" data-cols="4">
+            <button class="nut-seg-btn" data-grp="meals" data-val="3" aria-pressed="false">3</button>
+            <button class="nut-seg-btn on" data-grp="meals" data-val="4" aria-pressed="true">4</button>
+            <button class="nut-seg-btn" data-grp="meals" data-val="5" aria-pressed="false">5</button>
+            <button class="nut-seg-btn" data-grp="meals" data-val="6" aria-pressed="false">6</button>
+          </div>
+          <div class="nut-note" id="nut-meals-cap" hidden></div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-cal-lbl">Daily Calories</div>
+        <div class="nut-cal-big" id="nut-cal">2,763</div>
+        <div class="nut-cal-sub" id="nut-cal-sub">BMR 1,783 | TDEE 2,763</div>
+        <hr style="border:none;border-top:1px solid var(--line-soft);margin:16px 0;">
+        <div class="nut-split">
+          <div class="nut-donut" id="nut-donut"></div>
+          <div class="nut-macros">
+            <div class="nut-macro p"><div class="nut-macro-top"><span class="nut-macro-name">Protein</span>
+              <span><span class="nut-macro-g" id="nut-p-g">180g</span><span class="nut-macro-pct" id="nut-p-pct">26%</span></span></div>
+              <div class="nut-macro-track"><div class="nut-macro-fill" id="nut-p-bar" style="width:26%"></div></div></div>
+            <div class="nut-macro c"><div class="nut-macro-top"><span class="nut-macro-name">Carbs</span>
+              <span><span class="nut-macro-g" id="nut-c-g">338g</span><span class="nut-macro-pct" id="nut-c-pct">49%</span></span></div>
+              <div class="nut-macro-track"><div class="nut-macro-fill" id="nut-c-bar" style="width:49%"></div></div></div>
+            <div class="nut-macro f"><div class="nut-macro-top"><span class="nut-macro-name">Fat</span>
+              <span><span class="nut-macro-g" id="nut-f-g">77g</span><span class="nut-macro-pct" id="nut-f-pct">25%</span></span></div>
+              <div class="nut-macro-track"><div class="nut-macro-fill" id="nut-f-bar" style="width:25%"></div></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nut-card">
+        <div class="nut-card-head">Per Meal (<span id="nut-meals-n">4</span> meals/day)</div>
+        <div class="nut-times" id="nut-pm-times"></div>
+        <div class="nut-pm">
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-cal">691</div><div class="nut-pm-l">Calories</div></div>
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-p">45g</div><div class="nut-pm-l">Protein</div></div>
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-c">84g</div><div class="nut-pm-l">Carbs</div></div>
+          <div class="nut-pm-cell"><div class="nut-pm-v" id="nut-pm-f">19g</div><div class="nut-pm-l">Fat</div></div>
+        </div>
+        <div class="nut-note" id="nut-glp1-note" hidden>Protein-forward, smaller portions for reduced appetite.</div>
+      </div>
+
+      <div class="nut-card">
+        <button class="nut-btn" onclick="nutCreatePlan(false)">Create Meal Plan</button>
+        <div class="nut-btn-row">
+          <button class="nut-btn ghost" onclick="nutSaveTargets()">Save as My Targets</button>
+        </div>
+      </div>
+
+      <div class="nut-card" id="nut-plan-wrap" hidden>
+        <div class="nut-synced" id="nut-synced" hidden></div>
+        <div class="nut-card-head">Your Meal Plan</div>
+        <div id="nut-plan"></div>
+        <div class="nut-btn-row">
+          <button class="nut-btn" onclick="nutSavePlan()">Save Plan</button>
+          <button class="nut-btn ghost" onclick="nutCreatePlan(true)">Regenerate</button>
+        </div>
+      </div>
+
+      <div class="nut-toast" id="nut-toast" role="status" aria-live="polite"></div>
+
+      </div><!-- /nut-wrap -->
+    </div><!-- /nutrition -->
+
+  <!-- ================ CALCULATOR TAB ================ -->
+
+  <!-- ================= CALCULATOR ================= -->
+  <div class="tab-content" id="tab-calculator">
+
+    <div class="sec-divider">
+      <div class="sec-divider-eyebrow">Tools</div>
+      <div class="sec-divider-title">Peptide Calculator</div>
+    </div>
+
+    <div class="pc-wrap">
+
+      <div class="pc-headline">
+        <div class="pc-hl-eyebrow">Your Draw</div>
+        <div class="pc-hl-main" id="pc-headline">Draw <b>14 units</b> for <b>1.4 mg</b></div>
+        <div class="pc-hl-sub" id="pc-headline-sub">0.14 mL at 10 mg/mL</div>
+      </div>
+
+      <div class="pc-card accent">
+        <div class="pc-field">
+          <div class="pc-label">Compound <span class="info-tip" tabindex="0">?<span class="info-tip-text">Pulled from the Index. Picking one fills in whatever dosing is on file for it; anything missing you can type over.</span></span></div>
+          <select class="pc-select" id="pc-compound"><option value="__custom__">Custom &mdash; enter my own</option></select>
+        </div>
+        <div class="pc-field" id="pc-name-field">
+          <div class="pc-label">Name <span class="info-tip" tabindex="0">?<span class="info-tip-text">What to call this one in your saved list.</span></span></div>
+          <input class="pc-input" id="pc-name" type="text" placeholder="e.g. BPC-157" autocomplete="off">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Units <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial strength and dose always share this unit. mcg to mg is a factor of 1000; IU stays IU, since the IU-to-mg conversion is compound-specific.</span></span></div>
+          <div class="pc-seg" id="pc-unitseg" role="group" aria-label="Dose unit">
+            <button type="button" data-u="mg" class="on">mg</button>
+            <button type="button" data-u="mcg">mcg</button>
+            <button type="button" data-u="iu">IU</button>
+          </div>
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Vial Size <span class="info-tip" tabindex="0">?<span class="info-tip-text">Total peptide in the vial as supplied, before any water is added.</span></span><span class="pc-unit" data-unitslot>mg</span></div>
+          <input class="pc-input" id="pc-vial" type="number" inputmode="decimal" step="any" min="0" value="10">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">BAC Water <span class="info-tip" tabindex="0">?<span class="info-tip-text">How much bacteriostatic water you add. More water means a bigger, easier-to-read draw for the same dose.</span></span><span class="pc-unit">mL</span></div>
+          <input class="pc-input" id="pc-bac" type="number" inputmode="decimal" step="any" min="0" value="1">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection. Type here, or drag the syringe below &mdash; they stay in sync.</span></span><span class="pc-unit" data-unitslot>mg</span></div>
+          <input class="pc-input" id="pc-dose" type="number" inputmode="decimal" step="any" min="0" value="1.4">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Syringe <span class="info-tip" tabindex="0">?<span class="info-tip-text">All three are U-100 scale, so 100 units = 1 mL regardless of barrel size.</span></span></div>
+          <select class="pc-select" id="pc-syringe">
+            <option value="30">0.3 mL &middot; 30 units</option>
+            <option value="50">0.5 mL &middot; 50 units</option>
+            <option value="100" selected>1 mL &middot; 100 units</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pc-card">
+        <div class="pc-syr-head">
+          <span class="pc-syr-title">Drag to set units</span>
+          <span class="pc-syr-read" id="pc-syr-read">14 u</span>
+        </div>
+        <div class="pc-syr" id="pc-syr" role="slider" tabindex="0"
+             aria-label="Draw volume in units" aria-valuemin="0" aria-valuemax="100" aria-valuenow="14">
+          <svg id="pc-svg" viewBox="0 0 300 76" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <linearGradient id="pcGold" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#C9A84C"/><stop offset="55%" stop-color="#A8873A"/><stop offset="100%" stop-color="#7A6530"/>
+              </linearGradient>
+            </defs>
+            <rect class="pc-barrel-bg" x="6" y="16" width="288" height="34" rx="5"/>
+            <rect class="pc-barrel-fill" id="pc-fill" x="6" y="16" width="40" height="34" rx="5"/>
+            <g id="pc-ticks"></g>
+            <g id="pc-plunger-g">
+              <rect class="pc-plunger" id="pc-plunger" x="42" y="8" width="8" height="50" rx="4"/>
+            </g>
+          </svg>
+        </div>
+        <div class="pc-hint">Drag the bar, or type a dose above &mdash; <b>they stay in sync</b>.</div>
+      </div>
+
+      <div class="pc-grid">
+        <div class="pc-stat">
+          <div class="pc-stat-l">Concentration <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial size divided by BAC water. How many mg sit in each millilitre once mixed.</span></span></div>
+          <div class="pc-stat-v" id="pc-conc">10<em>mg/mL</em></div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-l">Draw Volume <span class="info-tip" tabindex="0">?<span class="info-tip-text">The liquid you actually pull into the barrel for one dose.</span></span></div>
+          <div class="pc-stat-v" id="pc-vol">0.14<em>mL</em></div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-l">Units <span class="info-tip" tabindex="0">?<span class="info-tip-text">The mark on a U-100 insulin syringe. Units are millilitres times 100.</span></span></div>
+          <div class="pc-stat-v" id="pc-units">14<em>u</em></div>
+        </div>
+        <div class="pc-stat">
+          <div class="pc-stat-l">Doses Per Vial <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial size divided by your dose, rounded down. Drug-limited only &mdash; it does not account for the shelf clock once mixed.</span></span></div>
+          <div class="pc-stat-v" id="pc-doses">7</div>
+        </div>
+      </div>
+
+      <div class="pc-warn" id="pc-warn" hidden></div>
+
+      <button class="pc-add" id="pc-addbtn" type="button">+ Add to My List</button>
+      <div class="pc-note" id="pc-srcnote" hidden></div>
+
+      <div class="pc-saved-head" id="pc-saved-head" hidden>
+        <span class="pc-saved-title">My Compounds</span>
+        <span class="pc-saved-count" id="pc-saved-count"></span>
+        <span class="pc-sync" id="pc-sync" hidden></span>
+      </div>
+      <input class="pc-search" id="pc-search" type="search" placeholder="Search my compounds..." autocomplete="off" hidden>
+      <div id="pc-list"></div>
+      <div class="pc-empty" id="pc-empty" hidden>Nothing matches that search.</div>
+
+
+    </div>
+
+  </div><!-- /calculator -->
+
+
+  
+  <!-- ================ TIMELINE TAB ================ -->
+
 
   <!-- ================= INVOICE ================= -->
   <div class="tab-content" id="tab-invoice">
@@ -797,10 +1190,16 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 // ===== TAB SWITCHING =====
 function switchTab(tab,btn){
   document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('tab-'+tab).classList.add('active');
-  btn.classList.add('active');
-  if(btn.scrollIntoView){btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}
+  document.querySelectorAll('.menu-item').forEach(function(el){el.classList.remove('active');});
+  var panel=document.getElementById('tab-'+tab);
+  if(panel) panel.classList.add('active');
+  if(btn){
+    btn.classList.add('active');
+    var here=document.getElementById('mp-menu-here');
+    if(here) here.textContent = btn.getAttribute('data-label') || (btn.textContent||'').trim();
+  }
+  if(typeof closeMenu==='function') closeMenu();
+  window.scrollTo({top:0,behavior:'instant'});
 }
 
 // ===== INFO-TIP TAP/CLICK TOGGLE — fixes iOS Safari tap not showing tooltips =====
@@ -949,5 +1348,19 @@ function downloadICS(){
   .payment-title,.storage-title{font-size:11px !important;}
 }
 </style>
+<div class="mk-scrim" id="mkScrim" hidden></div>
+<div class="mk-panel" id="mkPanel" role="dialog" aria-modal="true" aria-labelledby="mkTitle" hidden>
+  <div class="mk-head">
+    <div class="mk-head-l">
+      <div class="mk-panel-eyebrow" id="mkPanelEyebrow">Marker</div>
+      <div class="mk-title" id="mkTitle"></div>
+    </div>
+    <button class="mk-x" id="mkX" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div class="mk-body" id="mkBody"></div>
+</div>
+
+<script src="/cheat-sheet-data.js?v=1"></script>
+<script src="/bl-tools.js?v=1"></script>
 </body>
 </html>
