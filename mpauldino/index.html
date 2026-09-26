@@ -5402,7 +5402,7 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     var c = conc(), vial = num(vialEl.value,0), bac = num(bacEl.value,0), dose = num(doseEl.value,0);
     if(!(vial > 0 && bac > 0 && dose > 0)) return;
     var nm = (nameEl.value||'').trim() || 'Untitled';
-    saved.unshift({name:nm, vial:vial, bac:bac, dose:dose, unit:curUnit, max:maxU,
+    saved.unshift({name:nm, vial:vial, bac:bac, dose:dose, unit:curUnit, vialUnit:vialUnit, max:maxU,
                    units:Math.round(curU*10)/10, volume:Math.round((curU/100)*1000)/1000,
                    doses:Math.floor(vial/dose), conc:Math.round(c*100)/100});
     persist();
@@ -5412,9 +5412,10 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     var it = saved[i]; if(!it) return;
     cmpEl.value = '__custom__'; nameField.hidden = false; srcNote.hidden = true;
     nameEl.value = it.name; vialEl.value = it.vial; bacEl.value = it.bac; doseEl.value = it.dose;
+    setVialUnit(it.vialUnit || (it.unit === 'iu' ? 'iu' : 'mg'));
     curUnit = it.unit;
-    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
-      b.classList.toggle('on', b.getAttribute('data-u') === it.unit); });
+    if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
+    syncUnitButtons();
     syrEl.value = String(it.max); maxU = it.max; drawTicks();
     saved.splice(i,1); persist(); fromDose();
     document.getElementById('pc-compound').scrollIntoView({block:'center', behavior:'smooth'});
