@@ -1877,12 +1877,53 @@ else nutInit();
   var el = function(id){ return document.getElementById(id); };
   var nameEl, vialEl, bacEl, doseEl, syrEl, bar, svg, fill, plunger, ticksG;
   var cmpEl, nameField, unitSeg, srcNote, addBtn, searchEl, listEl, savedHead, countEl, emptyEl;
-  var LIB = [], curUnit = 'mg';
+  var LIB = [], curUnit = 'mg';      /* dose unit - what the MG/MCG/IU toggle sets */
+  var vialUnit = 'mg';               /* vial's own unit - fixed, never follows the toggle */
   var X0 = 6, X1 = 294, TOP = 16, H = 34;     // barrel geometry in viewBox units
   var maxU = 100, curU = 14, dragging = false;
 
   function num(v, dflt){ var n = parseFloat(v); return (isFinite(n) && n >= 0) ? n : dflt; }
   function conc(){ var v = num(vialEl.value, 0), b = num(bacEl.value, 0); return b > 0 ? v / b : 0; }
+  /* concentration is always vialUnit per mL, so the dose has to be expressed in
+     vialUnit before it can be divided by it. mcg->mg is the only real conversion;
+     IU never crosses over, which is why the toggle only offers IU on IU vials. */
+  function toVial(d){
+    if(curUnit === vialUnit) return d;
+    if(vialUnit === 'mg'  && curUnit === 'mcg') return d / 1000;
+    if(vialUnit === 'mcg' && curUnit === 'mg')  return d * 1000;
+    return d;                         /* iu<->mass: not convertible, leave alone */
+  }
+  function fromVial(d){
+    if(curUnit === vialUnit) return d;
+    if(vialUnit === 'mg'  && curUnit === 'mcg') return d * 1000;
+    if(vialUnit === 'mcg' && curUnit === 'mg')  return d / 1000;
+    return d;
+  }
+  function vialLabelUnit(){ return vialUnit === 'iu' ? 'IU' : vialUnit; }
+  function doseLabelUnit(){ return curUnit === 'iu' ? 'IU' : curUnit; }
+  /* IU is only meaningful when the vial itself is IU-based. */
+  function syncUnitButtons(){
+    if(!unitSeg) return;
+    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
+      var u = b.getAttribute('data-u');
+      var allowed = (vialUnit === 'iu') ? (u === 'iu') : (u !== 'iu');
+      b.disabled = !allowed;
+      b.hidden = !allowed;
+      b.classList.toggle('on', u === curUnit);
+    });
+  }
+  function setVialUnit(u){
+    vialUnit = (u === 'iu') ? 'iu' : 'mg';
+    [].forEach.call(document.querySelectorAll('[data-unitslot="vial"]'), function(s){
+      s.textContent = vialLabelUnit();
+    });
+    if(vialUnit === 'iu' && curUnit !== 'iu') curUnit = 'iu';
+    if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
+    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
+      s.textContent = doseLabelUnit();
+    });
+    syncUnitButtons();
+  }
   function fmt(n, dp){
     if(!isFinite(n)) return '—';
     var s = n.toFixed(dp);
@@ -1914,39 +1955,40 @@ else nutInit();
     bar.setAttribute('aria-valuenow', String(Math.round(curU * 10) / 10));
     bar.setAttribute('aria-valuemax', String(maxU));
 
-    var mL = curU / 100, mg = mL * c;
+    var mL = curU / 100, inVial = mL * c, shownDose = fromVial(inVial);
     var label = (nameEl.value || '').trim();
     el('pc-syr-read').textContent = fmt(curU, 1) + ' u';
-    var uu = (curUnit === 'iu') ? 'IU' : curUnit;
-    el('pc-conc').innerHTML  = (c > 0 ? fmt(c, 2) : '—') + '<em>' + uu + '/mL</em>';
+    var vu = vialLabelUnit(), du = doseLabelUnit();
+    el('pc-conc').innerHTML  = (c > 0 ? fmt(c, 2) : '—') + '<em>' + vu + '/mL</em>';
     el('pc-vol').innerHTML   = fmt(mL, 3) + '<em>mL</em>';
     el('pc-units').innerHTML = fmt(curU, 1) + '<em>u</em>';
 
-    var vial = num(vialEl.value, 0), dose = num(doseEl.value, 0);
-    el('pc-doses').textContent = (vial > 0 && dose > 0) ? String(Math.floor(vial / dose)) : '—';
+    var vial = num(vialEl.value, 0), doseV = toVial(num(doseEl.value, 0));
+    el('pc-doses').textContent = (vial > 0 && doseV > 0) ? String(Math.floor(vial / doseV)) : '—';
 
-    el('pc-headline').innerHTML = 'Draw <b>' + fmt(curU, 1) + ' units</b> for <b>' + fmt(mg, 3) + ' ' + uu + '</b>' +
+    el('pc-headline').innerHTML = 'Draw <b>' + fmt(curU, 1) + ' units</b> for <b>' + fmt(shownDose, 3) + ' ' + du + '</b>' +
       (label ? ' <span style="font-size:.62em;color:var(--muted);">of ' + label.replace(/[<>&]/g, '') + '</span>' : '');
-    el('pc-headline-sub').textContent = fmt(mL, 3) + ' mL at ' + (c > 0 ? fmt(c, 2) : '—') + ' ' + uu + '/mL';
+    el('pc-headline-sub').textContent = fmt(mL, 3) + ' mL at ' + (c > 0 ? fmt(c, 2) : '—') + ' ' + vu + '/mL';
 
     var msgs = [];
     if(!(num(bacEl.value, 0) > 0)) msgs.push('Enter a BAC water volume to get a concentration.');
-    if(curU >= maxU - 0.01 && dose > 0 && c > 0 && (dose / c) * 100 > maxU)
-      msgs.push('That dose needs ' + fmt((dose / c) * 100, 1) + ' units &mdash; more than this syringe holds. Use a larger syringe or more BAC water.');
+    if(curU >= maxU - 0.01 && doseV > 0 && c > 0 && (doseV / c) * 100 > maxU)
+      msgs.push('That dose needs ' + fmt((doseV / c) * 100, 1) + ' units &mdash; more than this syringe holds. Use a larger syringe or more BAC water.');
     var wEl = el('pc-warn');
     if(msgs.length){ wEl.innerHTML = msgs.join('<br>'); wEl.hidden = false; } else { wEl.hidden = true; }
   }
 
   /* dose typed -> fill the bar */
   function fromDose(){
-    var c = conc(), dose = num(doseEl.value, 0);
+    var c = conc(), dose = toVial(num(doseEl.value, 0));
     curU = (c > 0) ? Math.min((dose / c) * 100, maxU) : 0;
     paint();
   }
   /* bar dragged -> back-solve mg */
   function fromUnits(){
-    var c = conc(), mg = (curU / 100) * c;
-    doseEl.value = (c > 0) ? (Math.round(mg * 1000) / 1000) : '';
+    var c = conc(), inVial = (curU / 100) * c;
+    var shown = fromVial(inVial);
+    doseEl.value = (c > 0) ? (Math.round(shown * 1000) / 1000) : '';
     paint();
   }
 
@@ -2063,22 +2105,22 @@ else nutInit();
 
   /* ---------- unit handling: vial + dose always share a unit ---------- */
   var FACT = {mg:1, mcg:0.001, iu:1};           // iu has no mg equivalence — it rides as its own scale
+  /* The toggle sets the DOSE unit only. Vial Size keeps its own unit and its own
+     label, so picking mcg no longer relabels a 10 mg vial as 10000 mcg. */
   function setUnit(u, convert){
     if(u === curUnit) return;
+    if(vialUnit === 'iu' && u !== 'iu') return;      /* IU vial: dose stays IU */
+    if(vialUnit !== 'iu' && u === 'iu') return;      /* mass vial: IU is not offered */
     if(convert && (curUnit !== 'iu' && u !== 'iu')){
-      var k = FACT[curUnit] / FACT[u];          // mg->mcg = 1000, mcg->mg = 0.001
-      [vialEl, doseEl].forEach(function(el){
-        var n = parseFloat(el.value);
-        if(isFinite(n)) el.value = String(Math.round(n * k * 1e6) / 1e6);
-      });
+      var k = FACT[curUnit] / FACT[u];               // mg->mcg = 1000, mcg->mg = 0.001
+      var n = parseFloat(doseEl.value);              // dose only - the vial does not move
+      if(isFinite(n)) doseEl.value = String(Math.round(n * k * 1e6) / 1e6);
     }
     curUnit = u;
-    [].forEach.call(unitSeg.querySelectorAll('button'), function(b){
-      b.classList.toggle('on', b.getAttribute('data-u') === u);
+    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
+      s.textContent = doseLabelUnit();
     });
-    [].forEach.call(document.querySelectorAll('#tab-calculator .pc-unit'), function(s){
-      if(s.getAttribute('data-unitslot') !== null) s.textContent = (u === 'iu' ? 'IU' : u);
-    });
+    syncUnitButtons();
     fromDose();
   }
 
@@ -2094,7 +2136,13 @@ else nutInit();
     if(c.vial != null) vialEl.value = String(c.vial);
     if(c.bac  != null) bacEl.value  = String(c.bac);
     if(c.dose != null) doseEl.value = String(c.dose);
-    setUnit(c.unit === 'iu' ? 'iu' : (c.unit || 'mg'), false);
+    setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
+    curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
+    if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
+    [].forEach.call(document.querySelectorAll('[data-unitslot="dose"]'), function(s){
+      s.textContent = doseLabelUnit();
+    });
+    syncUnitButtons();
     var gaps = [];
     if(c.vial == null) gaps.push('vial size');
     if(c.bac  == null) gaps.push('BAC water');
