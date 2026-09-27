@@ -39,31 +39,49 @@
 })();
 
 /* ============================ HAMBURGER NAV ========================== */
+/* Resolve the nav by CLASS, not by a hardcoded id prefix.
+   These three functions are plain globals, so on a page that also ships its own
+   inline copy the file that loads LAST wins -- and that is always this one,
+   because bl-tools.js sits at the end of body. The old version looked up
+   'mp-menu-panel' and returned silently on `if(!p)`, so on any page whose nav
+   used a different id prefix (scs-, mbj-, cfy-, cp-, mb-, ...) it overrode a
+   working inline copy with one that did nothing: the hamburger went dead and,
+   since the menu is the only way to reach the other tabs, so did navigation.
+   Querying by class means any prefix works and no page needs editing. */
+function menuParts(){
+  return {p:  document.querySelector('.menu-panel'),
+          sc: document.querySelector('.menu-scrim'),
+          b:  document.querySelector('.menu-btn')};
+}
 function toggleMenu(){ document.body.classList.contains('menu-open') ? closeMenu() : openMenu(); }
 function openMenu(){
-  var p=document.getElementById('mp-menu-panel'), sc=document.getElementById('mp-menu-scrim'),
-      b=document.getElementById('mp-menu-btn');
+  var m=menuParts(), p=m.p, sc=m.sc, b=m.b;
   if(!p) return;
-  sc.hidden=false;
-  void sc.offsetWidth;                 // force a reflow so the slide has a start frame
-  p.classList.add('open'); sc.classList.add('open');
-  p.setAttribute('aria-hidden','false'); b.setAttribute('aria-expanded','true'); b.setAttribute('aria-label','Close menu');
+  if(sc){
+    sc.hidden=false;
+    void sc.offsetWidth;               // force a reflow so the slide has a start frame
+    sc.classList.add('open');
+  }
+  p.classList.add('open');
+  p.setAttribute('aria-hidden','false');
+  if(b){ b.setAttribute('aria-expanded','true'); b.setAttribute('aria-label','Close menu'); }
   document.body.classList.add('menu-open');
   var first=p.querySelector('.menu-item.active')||p.querySelector('.menu-item');
   if(first) setTimeout(function(){ first.focus(); },120);
 }
 function closeMenu(){
-  var p=document.getElementById('mp-menu-panel'), sc=document.getElementById('mp-menu-scrim'),
-      b=document.getElementById('mp-menu-btn');
+  var m=menuParts(), p=m.p, sc=m.sc, b=m.b;
   if(!p) return;
-  p.classList.remove('open'); sc.classList.remove('open');
-  p.setAttribute('aria-hidden','true'); b.setAttribute('aria-expanded','false'); b.setAttribute('aria-label','Open menu');
+  p.classList.remove('open');
+  if(sc) sc.classList.remove('open');
+  p.setAttribute('aria-hidden','true');
+  if(b){ b.setAttribute('aria-expanded','false'); b.setAttribute('aria-label','Open menu'); }
   document.body.classList.remove('menu-open');
-  setTimeout(function(){ if(!p.classList.contains('open')) sc.hidden=true; },240);
+  setTimeout(function(){ if(sc && !p.classList.contains('open')) sc.hidden=true; },240);
 }
 document.addEventListener('keydown',function(e){
   if(e.key==='Escape' && document.body.classList.contains('menu-open')){
-    closeMenu(); var b=document.getElementById('mp-menu-btn'); if(b) b.focus();
+    closeMenu(); var b=menuParts().b; if(b) b.focus();
   }
 });
 
