@@ -563,17 +563,30 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
-    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
-    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
-    <button class="tab-btn" onclick="switchTab('bloodwork',this)">Bloodwork</button>
-    <button class="tab-btn" onclick="switchTab('nutrition',this)">Nutrition</button>
-    <button class="tab-btn" onclick="switchTab('calculator',this)">Calculator</button>
-    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
-    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  <div class="menu-bar">
+    <button class="menu-btn" id="mp-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mp-menu-panel" aria-haspopup="true" onclick="toggleMenu()">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu
+    </button>
+    <span class="menu-here">Viewing &middot; <b id="mp-menu-here">Protocol</b></span>
   </div>
 
+  <div class="menu-scrim" id="mp-menu-scrim" onclick="closeMenu()" hidden></div>
+  <nav class="menu-panel" id="mp-menu-panel" role="menu" aria-label="Sections" aria-hidden="true">
+    <div class="menu-panel-head">
+      <div class="menu-panel-eyebrow">Protocol</div>
+      <div class="menu-panel-name">Tatiana's Lean & Ageless Stack</div>
+    </div>
+    <div class="menu-list">
+      <button class="menu-item active" role="menuitem" data-label="Protocol" onclick="switchTab('protocol',this)"><span class="mi-label">Protocol</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Invoice" onclick="switchTab('invoice',this)"><span class="mi-label">Invoice</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Schedule" onclick="switchTab('schedule',this)"><span class="mi-label">Schedule</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Calculator" onclick="switchTab('calculator',this)"><span class="mi-label">Calculator</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Supplies" onclick="switchTab('supplies',this)"><span class="mi-label">Supplies</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Notes &amp; Tips" onclick="switchTab('notes',this)"><span class="mi-label">Notes &amp; Tips</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+    </div>
+  </nav>
   <div class="inv-body">
 
     <div class="tab-content active" id="tab-protocol">
@@ -608,9 +621,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
               <li><span class="ql">Dose</span><span class="qv">2 mg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
               <li><span class="ql">Schedule</span><span class="qv"><strong>Once weekly &middot; Monday AM fasted</strong></span></li>
             </ul>
-            <div class="li-callout why"><strong>Why it&apos;s in your protocol &mdash; the fat-loss anchor:</strong> Retatrutide is a triple agonist (GLP-1 + GIP + glucagon). The glucagon arm sets it apart from Semaglutide/Tirzepatide &mdash; it preferentially burns <strong>visceral fat and raises energy expenditure</strong>, so you get real fat loss plus a metabolic lift, not just appetite suppression.</div>
-            <div class="li-callout"><strong>2 mg once weekly:</strong> a solid working dose. Take it Monday AM; eat lighter, lower-fat meals Monday/Tuesday and hydrate well (Reta blunts thirst). If nausea shows up early it usually settles &mdash; message us and we can ease off or push higher as tolerated.</div>
-            <div class="li-callout"><strong>Supply:</strong> 2 vials &times; 40 mg = 80 mg. At 2 mg once weekly that&apos;s ~40 weeks &mdash; a long runway with room to titrate.</div>
           </div>
         </details>
         <details class="li-row">
@@ -624,8 +634,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
               <li><span class="ql">Dose</span><span class="qv">~1.7 mg &rarr; pull syringe to <span class="units">10 units (0.10 mL)</span></span></li>
               <li><span class="ql">Schedule</span><span class="qv">M&ndash;F (5 on / 2 off) &middot; AM</span></li>
             </ul>
-            <div class="li-callout why"><strong>Why it&apos;s in your protocol &mdash; skin, collagen &amp; anti-aging:</strong> GHK-Cu (copper tripeptide) ramps up <strong>collagen and elastin production</strong>, supports skin firmness and tone, aids tissue repair, and carries antioxidant + anti-inflammatory effects. It&apos;s the aesthetic/longevity piece &mdash; and specifically the reason fat loss here doesn&apos;t have to mean loose or crepey skin.</div>
-            <div class="li-callout"><strong>Turns clear blue once mixed</strong> &mdash; that&apos;s the copper, totally normal. <strong>Supply:</strong> 2 vials &times; 50 mg &divide; 1.7 mg = ~58 doses &rarr; ~11 weeks at 5&times;/wk.</div>
           </div>
         </details>
 
@@ -826,10 +834,17 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <script>
 // ===== TAB SWITCHING =====
 function switchTab(tab, btn){
-  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('tab-' + tab).classList.add('active');
-  btn.classList.add('active');
+  document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.menu-item').forEach(function(el){ el.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + tab);
+  if(panel) panel.classList.add('active');
+  if(btn){
+    btn.classList.add('active');
+    var here = document.getElementById('mp-menu-here');
+    if(here) here.textContent = btn.getAttribute('data-label') || (btn.textContent||'').trim();
+  }
+  if(typeof closeMenu === 'function') closeMenu();
+  window.scrollTo({top:0,behavior:'instant'});
 }
 
 // ===== ICS CALENDAR EXPORT =====
