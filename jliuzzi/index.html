@@ -768,17 +768,30 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('protocol',this)">Protocol</button>
-    <button class="tab-btn" onclick="switchTab('invoice',this)">Invoice</button>
-    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
-    <button class="tab-btn" onclick="switchTab('bloodwork',this)">Bloodwork</button>
-    <button class="tab-btn" onclick="switchTab('nutrition',this)">Nutrition</button>
-    <button class="tab-btn" onclick="switchTab('calculator',this)">Calculator</button>
-    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
-    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  <div class="menu-bar">
+    <button class="menu-btn" id="mp-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mp-menu-panel" aria-haspopup="true" onclick="toggleMenu()">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu
+    </button>
+    <span class="menu-here">Viewing &middot; <b id="mp-menu-here">Protocol</b></span>
   </div>
 
+  <div class="menu-scrim" id="mp-menu-scrim" onclick="closeMenu()" hidden></div>
+  <nav class="menu-panel" id="mp-menu-panel" role="menu" aria-label="Sections" aria-hidden="true">
+    <div class="menu-panel-head">
+      <div class="menu-panel-eyebrow">Protocol</div>
+      <div class="menu-panel-name">Justin's Repair & Rebuild</div>
+    </div>
+    <div class="menu-list">
+      <button class="menu-item active" role="menuitem" data-label="Protocol" onclick="switchTab('protocol',this)"><span class="mi-label">Protocol</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Invoice" onclick="switchTab('invoice',this)"><span class="mi-label">Invoice</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Schedule" onclick="switchTab('schedule',this)"><span class="mi-label">Schedule</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Calculator" onclick="switchTab('calculator',this)"><span class="mi-label">Calculator</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Supplies" onclick="switchTab('supplies',this)"><span class="mi-label">Supplies</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Notes &amp; Tips" onclick="switchTab('notes',this)"><span class="mi-label">Notes &amp; Tips</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+    </div>
+  </nav>
   <div class="inv-body">
 
     <div class="tab-content active" id="tab-protocol">
@@ -1597,9 +1610,15 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <script>
 function switchTab(tab, btn){
   document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
-  document.querySelectorAll('.tab-btn').forEach(function(el){ el.classList.remove('active'); });
-  document.getElementById('tab-' + tab).classList.add('active');
-  btn.classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(function(el){ el.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + tab);
+  if(panel) panel.classList.add('active');
+  if(btn){
+    btn.classList.add('active');
+    var here = document.getElementById('mp-menu-here');
+    if(here) here.textContent = btn.getAttribute('data-label') || (btn.textContent||'').trim();
+  }
+  if(typeof closeMenu === 'function') closeMenu();
   window.scrollTo({top:0,behavior:'instant'});
 }
 
