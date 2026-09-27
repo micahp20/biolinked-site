@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'aluna-v29';
+const CACHE = 'aluna-v30';
 const ASSETS = [
   '/aluna/',
   '/aluna/index.html',

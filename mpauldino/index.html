@@ -5180,11 +5180,6 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
 
 
   /* ---------- compound library, parsed out of CHEAT_SHEET_DATA ---------- */
-  var CATS = {fatloss:'Fat Loss',gh:'Growth Hormone',healing:'Healing & Repair',muscle:'Muscle',
-              longevity:'Longevity',energy:'Energy',cognition:'Cognition',sleep:'Sleep',
-              immunity:'Immunity',sexual:'Sexual Health',hormones:'Hormones',skin:'Skin & Hair',
-              blend:'Blends',bioregulator:'Bioregulators'};
-
   /* "10 mg" -> {n:10,u:'mg'} | "0.5–1 mg" -> low end | "5,000 IU" -> 5000 | junk -> null */
   function parseAmt(str){
     if(!str) return null;
@@ -5237,22 +5232,21 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
     var n = c.name.replace(/[<>&]/g,'');
     return c.label ? (n + ' \u2014 ' + c.label) : n;
   }
+  /* One flat A-Z list, with the category groupings removed. People come here
+     looking for a compound by name, so the group headers were only something to
+     scroll past -- and a compound whose category was blank or unrecognised used
+     to land under a repeated "Other" heading. Sorting is numeric and
+     case-insensitive so "5-Amino-1MQ" leads and "AICAR" follows "AOD-9604"
+     correctly. The option value stays the LIB index, so which entry fills the
+     form is unaffected by the display order. */
   function fillCompoundSelect(){
-    var lib = LIB, byCat = {};
-    lib.forEach(function(c,i){ (byCat[c.cat] = byCat[c.cat] || []).push(i); });
-    var html = '<option value="__custom__">Custom &mdash; enter my own</option>';
-    Object.keys(CATS).forEach(function(k){
-      if(!byCat[k]) return;
-      html += '<optgroup label="' + CATS[k] + '">';
-      byCat[k].sort(function(a,b){ return lib[a].name.localeCompare(lib[b].name); })
-        .forEach(function(i){ html += '<option value="' + i + '">' + optText(lib[i]) + '</option>'; });
-      html += '</optgroup>';
+    var lib = LIB;
+    var order = lib.map(function(c,i){ return i; }).sort(function(a,b){
+      return lib[a].name.localeCompare(lib[b].name, undefined, {numeric:true, sensitivity:'base'});
     });
-    Object.keys(byCat).forEach(function(k){
-      if(CATS[k]) return;
-      html += '<optgroup label="Other">';
-      byCat[k].forEach(function(i){ html += '<option value="' + i + '">' + optText(lib[i]) + '</option>'; });
-      html += '</optgroup>';
+    var html = '<option value="__custom__">Custom &mdash; enter my own</option>';
+    order.forEach(function(i){
+      html += '<option value="' + i + '">' + optText(lib[i]) + '</option>';
     });
     cmpEl.innerHTML = html;
   }
