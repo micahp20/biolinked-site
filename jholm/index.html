@@ -552,16 +552,29 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
     </div>
   </div>
 
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('pricing',this)">Protocol</button>
-    <button class="tab-btn" onclick="switchTab('schedule',this)">Schedule</button>
-    <button class="tab-btn" onclick="switchTab('bloodwork',this)">Bloodwork</button>
-    <button class="tab-btn" onclick="switchTab('nutrition',this)">Nutrition</button>
-    <button class="tab-btn" onclick="switchTab('calculator',this)">Calculator</button>
-    <button class="tab-btn" onclick="switchTab('supplies',this)">Supplies</button>
-    <button class="tab-btn" onclick="switchTab('notes',this)">Notes &amp; Tips</button>
+  <div class="menu-bar">
+    <button class="menu-btn" id="mp-menu-btn" aria-label="Open menu" aria-expanded="false" aria-controls="mp-menu-panel" aria-haspopup="true" onclick="toggleMenu()">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>Menu
+    </button>
+    <span class="menu-here">Viewing &middot; <b id="mp-menu-here">Pricing</b></span>
   </div>
 
+  <div class="menu-scrim" id="mp-menu-scrim" onclick="closeMenu()" hidden></div>
+  <nav class="menu-panel" id="mp-menu-panel" role="menu" aria-label="Sections" aria-hidden="true">
+    <div class="menu-panel-head">
+      <div class="menu-panel-eyebrow">Protocol</div>
+      <div class="menu-panel-name">Julie's 8-Week Recomp & Recovery Stack</div>
+    </div>
+    <div class="menu-list">
+      <button class="menu-item active" role="menuitem" data-label="Pricing" onclick="switchTab('pricing',this)"><span class="mi-label">Pricing</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Schedule" onclick="switchTab('schedule',this)"><span class="mi-label">Schedule</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Bloodwork" onclick="switchTab('bloodwork',this)"><span class="mi-label">Bloodwork</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Nutrition" onclick="switchTab('nutrition',this)"><span class="mi-label">Nutrition</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Calculator" onclick="switchTab('calculator',this)"><span class="mi-label">Calculator</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Supplies" onclick="switchTab('supplies',this)"><span class="mi-label">Supplies</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+      <button class="menu-item" role="menuitem" data-label="Notes &amp; Tips" onclick="switchTab('notes',this)"><span class="mi-label">Notes &amp; Tips</span><span class="chev" aria-hidden="true">&#9656;</span></button>
+    </div>
+  </nav>
   <div class="inv-body">
 
     <!-- ================ PRICING / HERO TAB ================ -->
@@ -605,7 +618,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
               <li><span class="ql">Maintenance</span><span class="qv">1 mg &rarr; pull syringe to <span class="units">10 units</span> (once tolerated)</span></li>
               <li><span class="ql">Schedule</span><span class="qv">M / W / F, AM</span></li>
             </ul>
-            <div class="li-callout"><strong>Why the titration:</strong> Reta is potent. Starting at 0.5 mg for ~2 weeks lets your GI tract adapt before stepping up to the working 1 mg dose. Skipping titration is the #1 cause of nausea, vomiting, and protocol abandonment. Stay at the starter dose longer if you still feel rough.</div>
           </div>
         </details>
         <details class="li-row">
@@ -645,7 +657,6 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
               <li><span class="ql">Dose</span><span class="qv">0.5 mg &rarr; pull syringe to <span class="units">10 units</span></span></li>
               <li><span class="ql">Schedule</span><span class="qv">M&ndash;F, <strong>pre-bed on an empty stomach</strong> (2+ hrs after last meal)</span></li>
             </ul>
-            <div class="li-callout"><strong>Fasting window is non-negotiable:</strong> Food &mdash; especially carbs and fats &mdash; spikes blood glucose and blunts the natural GH pulse this peptide is designed to amplify. Eating within 2 hours of injection wastes the dose.</div>
           </div>
         </details>
       </div>
@@ -1028,11 +1039,18 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 <button class="print-btn" onclick="window.print()">&#128424; Print / Save as PDF</button>
 
 <script>
-function switchTab(tab,btn){
-  document.querySelectorAll('.tab-content').forEach(function(el){el.classList.remove('active');});
-  document.querySelectorAll('.tab-btn').forEach(function(el){el.classList.remove('active');});
-  document.getElementById('tab-'+tab).classList.add('active');
-  btn.classList.add('active');
+function switchTab(tab, btn){
+  document.querySelectorAll('.tab-content').forEach(function(el){ el.classList.remove('active'); });
+  document.querySelectorAll('.menu-item').forEach(function(el){ el.classList.remove('active'); });
+  var panel = document.getElementById('tab-' + tab);
+  if(panel) panel.classList.add('active');
+  if(btn){
+    btn.classList.add('active');
+    var here = document.getElementById('mp-menu-here');
+    if(here) here.textContent = btn.getAttribute('data-label') || (btn.textContent||'').trim();
+  }
+  if(typeof closeMenu === 'function') closeMenu();
+  window.scrollTo({top:0,behavior:'instant'});
 }
 
 function downloadICS(){
