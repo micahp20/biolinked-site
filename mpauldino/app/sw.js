@@ -1,7 +1,7 @@
 // BioLinked app pilot service worker — network-first so the protocol is never stale.
 // Falls back to cache only when offline. Scoped to /mpauldino/app/ so it cannot
 // touch or shadow the live /mpauldino/ page.
-const CACHE = 'mpauldino-app-v1';
+const CACHE = 'mpauldino-app-v2';
 const ASSETS = [
   '/mpauldino/app/',
   '/mpauldino/app/index.html',
