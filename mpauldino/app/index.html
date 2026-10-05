@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbfaf6">
+<title>BioLinked</title>
+<meta name="description" content="Your BioLinked protocol, as an app.">
+
+<!-- PWA -->
+<link rel="manifest" href="/mpauldino/app/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="BioLinked">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="/icon-192.png?v=5">
+<link rel="icon" type="image/png" href="/icon-192.png?v=5">
+
+<style>
+  :root{
+    --ink:#211d16; --ink2:#4a4538; --muted:#8c8578; --faint:#b3ad9f;
+    --line:#ece7db; --line2:#f4f0e7; --bg:#f7f4ec; --card:#ffffff;
+    --gold:#8a7338; --gold2:#a68c4a; --gold-soft:#f2ebd7; --cream:#faf7ef;
+    --warn:#b5473a; --ok:#4e7a52;
+    --serif:'Hoefler Text',Georgia,'Times New Roman',serif;
+    --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+    --shadow:0 1px 2px rgba(40,34,20,.05),0 6px 16px rgba(40,34,20,.05);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{background:#d8d4ca;font-family:var(--sans);color:var(--ink);-webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .device{width:400px;max-width:100vw;height:860px;max-height:100vh;background:var(--bg);
+    position:relative;overflow:hidden;box-shadow:0 24px 70px rgba(30,26,16,.3);border-radius:34px}
+  @media(max-width:430px){.device{width:100vw;height:100vh;border-radius:0}}
+  @media(display-mode:standalone){.device{width:100vw;height:100vh;border-radius:0}}
+
+  .top{position:absolute;top:0;left:0;right:0;z-index:20;background:rgba(251,250,246,.92);
+    backdrop-filter:saturate(1.3) blur(12px);border-bottom:1px solid var(--line);
+    padding:calc(14px + env(safe-area-inset-top)) 18px 11px;display:flex;align-items:center;justify-content:space-between}
+  .brand{font-family:var(--serif);letter-spacing:2.5px;font-size:14px;color:var(--ink)}
+  .brand small{display:block;font-family:var(--sans);letter-spacing:2px;font-size:8px;color:var(--muted);font-weight:700;margin-top:1px}
+  .top .bell{width:30px;height:30px;border-radius:50%;background:var(--cream);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold)}
+
+  .scroll{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;
+    padding:calc(62px + env(safe-area-inset-top)) 0 96px;-webkit-overflow-scrolling:touch}
+  .scroll::-webkit-scrollbar{width:0}
+  .pad{padding:0 18px}
+  .view{display:none;animation:fade .22s ease}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .tabs{position:absolute;bottom:0;left:0;right:0;z-index:20;background:rgba(251,250,246,.94);
+    backdrop-filter:saturate(1.3) blur(12px);border-top:1px solid var(--line);
+    display:flex;padding:8px 2px calc(8px + env(safe-area-inset-bottom))}
+  .tab{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:6px 0;color:var(--faint);font-family:var(--sans);font-size:9.5px;font-weight:600;letter-spacing:.2px;cursor:pointer}
+  .tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7}
+  .tab.on{color:var(--gold)}
+
+  h1.scrn{font-family:var(--serif);font-size:25px;margin:6px 0 2px;letter-spacing:-.2px}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}
+
+  .hero{background:linear-gradient(145deg,#2d2615 0%,#4a3c1d 60%,#6b5527 100%);
+    color:#fff;border-radius:18px;padding:17px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+  .hero::after{content:"";position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;
+    background:radial-gradient(circle,rgba(212,180,110,.35),transparent 70%)}
+  .hero .lab{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#e3d2a6;font-weight:700}
+  .hero h2{font-family:var(--serif);font-size:19px;margin:5px 0 2px}
+  .hero .meta{font-size:12px;color:#d8cdb4;margin-top:2px}
+  .hero .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.18);margin-top:12px;overflow:hidden}
+  .hero .bar i{display:block;height:100%;background:linear-gradient(90deg,#d8bd79,#efe0b2)}
+  .hero .barl{display:flex;justify-content:space-between;font-size:10.5px;color:#e3d2a6;margin-top:6px}
+
+  .qgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+  .q{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px;box-shadow:var(--shadow);cursor:pointer}
+  .q .ic{width:30px;height:30px;border-radius:9px;background:var(--gold-soft);color:var(--gold);
+    display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+  .q .ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .q .t{font-size:13px;font-weight:700;color:var(--ink)}
+  .q .d{font-size:11px;color:var(--muted);margin-top:1px}
+
+  .seclbl{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);font-weight:800;margin:18px 2px 9px}
+  .today{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
+  .drow{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line2);cursor:pointer}
+  .drow:last-child{border-bottom:none}
+  .chk{width:21px;height:21px;border-radius:7px;border:1.8px solid var(--line);flex:none}
+  .chk.done{background:var(--gold);border-color:var(--gold);position:relative}
+  .chk.done::after{content:"\2713";color:#fff;font-size:12px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+  .drow .nm{font-size:13.5px;font-weight:650}
+  .drow .mt{font-size:11px;color:var(--muted);margin-top:1px}
+  .drow .u{margin-left:auto;text-align:right;flex:none}
+  .drow .u b{font-size:13px;color:var(--gold);font-weight:700}
+  .drow .u span{display:block;font-size:10px;color:var(--faint)}
+  .drow.done .nm{color:var(--muted);text-decoration:line-through}
+
+  .ghd{display:flex;justify-content:space-between;align-items:baseline;margin:18px 2px 2px}
+  .ghd .g{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--faint);font-weight:800}
+  .ghd .n{font-size:11px;color:var(--faint)}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-top:7px}
+  .li{display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line2);cursor:pointer}
+  .li:last-child{border-bottom:none}
+  .li:active{background:var(--cream)}
+  .li .nm{font-family:var(--serif);font-size:15.5px;line-height:1.15}
+  .li .pp{font-size:11px;color:var(--muted);margin-top:2px}
+  .li .rt{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+  .li .pr{font-size:12px;font-weight:700;color:var(--gold)}
+  .li .chev{color:var(--faint);font-size:17px;line-height:1}
+
+  .detail{position:absolute;inset:0;z-index:30;background:var(--bg);transform:translateX(100%);
+    transition:transform .26s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:calc(62px + env(safe-area-inset-top)) 0 40px}
+  .detail.on{transform:none}
+  .dtop{position:absolute;top:0;left:0;right:0;z-index:5;background:rgba(251,250,246,.92);backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);padding:calc(14px + env(safe-area-inset-top)) 16px 14px;display:flex;align-items:center;justify-content:space-between}
+  .dtop .bk{font-size:13px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:3px;cursor:pointer}
+  .dtop .dis{font-size:11px;color:var(--muted)}
+  .dname{font-family:var(--serif);font-size:26px;padding:4px 18px 0}
+  .dpur{padding:3px 18px 0;color:var(--muted);font-size:12.5px}
+  .dl{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:var(--faint);font-weight:800;
+    padding:20px 18px 0;margin-top:14px;border-top:1px solid var(--line2)}
+  .dl.first{border-top:none;margin-top:6px}
+  .dbody{padding:9px 18px 0;font-size:13.5px;line-height:1.55;color:var(--ink2)}
+  .facts{margin:12px 18px 0;background:var(--cream);border:1px solid var(--line);border-radius:15px;padding:15px}
+  .frow{margin-bottom:14px}.frow:last-child{margin-bottom:0}
+  .frow .fl{font-size:11px;color:var(--muted);margin-bottom:6px}
+  .fchips{display:flex;gap:7px;flex-wrap:wrap}
+  .fchips b{font-weight:600;font-size:12px;background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--ink)}
+
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:11px;letter-spacing:.4px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:5px}
+  .field select,.field input{width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;
+    padding:12px 13px;font-size:14px;color:var(--ink);outline:none;box-shadow:var(--shadow);font-family:var(--sans);-webkit-appearance:none;appearance:none}
+  .field select{background-image:linear-gradient(45deg,transparent 50%,var(--faint) 50%),linear-gradient(135deg,var(--faint) 50%,transparent 50%);
+    background-position:calc(100% - 18px) 19px,calc(100% - 13px) 19px;background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+  .frow2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .seg{display:flex;gap:6px}
+  .seg button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 0;font-size:12.5px;font-weight:700;color:var(--ink2);cursor:pointer}
+  .seg button.on{background:var(--gold);border-color:var(--gold);color:#fff}
+  .calcout{background:linear-gradient(145deg,#2d2615,#5a491f);color:#fff;border-radius:18px;padding:20px;text-align:center;margin-top:16px}
+  .calcout .lab{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:#e3d2a6;font-weight:700}
+  .calcout .big{font-family:var(--serif);font-size:46px;margin:4px 0 0;line-height:1}
+  .calcout .big small{font-size:18px;color:#e3d2a6}
+  .calcout .note{font-size:12px;color:#d8cdb4;margin-top:8px;line-height:1.5}
+  .banner{display:flex;align-items:flex-start;gap:8px;background:#fbeeec;color:var(--warn);
+    border:1px solid #f0d8d3;border-radius:11px;padding:9px 12px;font-size:11px;font-weight:700;margin:4px 0 14px;letter-spacing:.2px;line-height:1.45}
+  .banner .d{width:6px;height:6px;border-radius:50%;background:var(--warn);flex:none;margin-top:4px}
+
+  /* bloodwork */
+  .score{background:linear-gradient(145deg,#2d2615,#5a491f);color:#fff;border-radius:18px;padding:18px;margin-bottom:14px}
+  .score .lab{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#e3d2a6;font-weight:700}
+  .score .num{font-family:var(--serif);font-size:44px;line-height:1;margin:6px 0 0}
+  .score .num small{font-size:16px;color:#e3d2a6}
+  .score .gr{font-size:13px;font-weight:700;color:#efe0b2;margin-top:4px}
+  .score .ctx{font-size:11.5px;color:#d8cdb4;margin-top:7px;line-height:1.5}
+  .dgrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:13px}
+  .dchip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:9px;padding:6px 9px;font-size:10.5px;color:#efe0b2;font-weight:600}
+  .dchip b{font-family:var(--serif);font-size:13px;margin-right:4px}
+  .lrow{border-bottom:1px solid var(--line2);padding:11px 15px;cursor:pointer}
+  .lrow:last-child{border-bottom:none}
+  .lrow .lt{display:flex;align-items:center;gap:8px}
+  .lrow .ln{font-size:13px;font-weight:650;flex:1}
+  .lrow .qm{width:17px;height:17px;border-radius:50%;background:var(--gold-soft);color:var(--gold);
+    font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:none}
+  .lrow .lv{font-size:13px;font-weight:700;flex:none}
+  .lrow .lmeta{display:flex;gap:8px;align-items:center;margin-top:3px}
+  .lrow .lref{font-size:10.5px;color:var(--faint)}
+  .lrow .pill{font-size:9px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;border-radius:5px;padding:2px 6px;margin-left:auto;flex:none}
+  .pill.ok{background:#e8f0e8;color:var(--ok)} .pill.normal{background:var(--line2);color:var(--muted)}
+  .pill.hi{background:#fbeeec;color:var(--warn)} .pill.lo{background:#eef0f7;color:#5566a0}
+  .lv.ok{color:var(--ok)} .lv.hi{color:var(--warn)} .lv.lo{color:#5566a0} .lv.normal{color:var(--ink)}
+  .ltip{display:none;font-size:12px;line-height:1.55;color:var(--ink2);background:var(--cream);
+    border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:9px}
+  .ltip.on{display:block}
+  .ltip strong{color:var(--gold)}
+  .newtag{font-size:8.5px;font-weight:800;letter-spacing:.4px;color:#fff;background:var(--gold);border-radius:4px;padding:2px 5px;flex:none}
+
+  /* nutrition */
+  .macro{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:12px}
+  .mc{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 10px;text-align:center;box-shadow:var(--shadow)}
+  .mc .v{font-family:var(--serif);font-size:21px;color:var(--gold)}
+  .mc .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-top:2px}
+  .kcal{background:linear-gradient(145deg,#2d2615,#5a491f);color:#fff;border-radius:16px;padding:17px;text-align:center;margin-top:14px}
+  .kcal .v{font-family:var(--serif);font-size:38px;line-height:1}
+  .kcal .l{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:#e3d2a6;font-weight:700}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.55;margin-top:10px}
+
+  /* A2HS hint */
+  .a2hs{position:absolute;left:12px;right:12px;bottom:calc(80px + env(safe-area-inset-bottom));z-index:40;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(40,34,20,.16);
+    padding:13px 14px;display:none;align-items:flex-start;gap:11px}
+  .a2hs.on{display:flex}
+  .a2hs .tx{font-size:12px;line-height:1.5;color:var(--ink2);flex:1}
+  .a2hs .tx b{color:var(--ink)}
+  .a2hs .x{background:none;border:none;color:var(--faint);font-size:19px;line-height:1;cursor:pointer;padding:0 2px;flex:none}
+</style>
+</head>
+<body>
+<div class="device">
+  <div class="top">
+    <div class="brand">BIO LINKED<small>PEPTIDE SOLUTIONS</small></div>
+    <div class="bell">&#9830;</div>
+  </div>
+
+  <div class="scroll" id="scroll">
+
+    <!-- ===== HOME ===== -->
+    <section class="view on" id="v-home"><div class="pad">
+      <h1 class="scrn" id="greet">Welcome back</h1>
+      <p class="sub" id="subline">Year-round foundation</p>
+
+      <div class="hero">
+        <div class="lab">Current Protocol</div>
+        <h2>Year-Round Foundation</h2>
+        <div class="meta">TRT &middot; HGH &middot; Tirzepatide &middot; 10 active compounds</div>
+        <div class="bar"><i id="bloodbar" style="width:0%"></i></div>
+        <div class="barl"><span id="bloodl">Since last panel</span><span id="bloodr"></span></div>
+      </div>
+
+      <div class="qgrid">
+        <div class="q" onclick="go('calc')"><div class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h3"/></svg></div><div class="t">Dose Calculator</div><div class="d">Units in one tap</div></div>
+        <div class="q" onclick="go('proto')"><div class="ic"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h6"/></svg></div><div class="t">My Protocol</div><div class="d">10 compounds</div></div>
+        <div class="q" onclick="go('blood')"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div><div class="t">Bloodwork</div><div class="d">Last: 09/25/26</div></div>
+        <div class="q" onclick="go('nutr')"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8c0 4 3 5 7 5M19 8c0 4-3 5-7 5"/></svg></div><div class="t">Nutrition</div><div class="d">Macro targets</div></div>
+      </div>
+
+      <div class="seclbl" id="todaylbl">Today</div>
+      <div class="today" id="todaylist"></div>
+      <p class="note" id="todaynote"></p>
+    </div></section>
+
+    <!-- ===== PROTOCOL ===== -->
+    <section class="view" id="v-proto"><div class="pad">
+      <h1 class="scrn">My Protocol</h1>
+      <p class="sub">Year-round foundation &middot; AM and PM blocks</p>
+
+      <div class="seclbl">Weekly Rhythm</div>
+      <div class="list" id="rhythm"></div>
+
+      <div class="seclbl">Compounds</div>
+      <div class="list" id="cmplist"></div>
+
+      <div class="seclbl">No Longer Running</div>
+      <div class="list"><div class="li"><div><div class="nm" style="font-family:var(--sans);font-size:13px;font-weight:700">7 archived</div><div class="pp">MOTS-c · 5-Amino-1MQ · Melanotan · Retatrutide · Vesugen · Epithalon · Pinealon</div></div></div></div>
+      <p class="note">Tap any compound for its recon, draw and timing.</p>
+    </div></section>
+
+    <!-- ===== BLOODWORK ===== -->
+    <section class="view" id="v-blood"><div class="pad">
+      <h1 class="scrn">Bloodwork</h1>
+      <p class="sub">Latest draw 09/25/2026 &middot; 46 markers on file</p>
+
+      <div class="score">
+        <div class="lab">Overall Panel Score</div>
+        <div class="num">77<small>/100</small></div>
+        <div class="gr">C+ &middot; Therapy-Driven Highs, Clean Metabolics</div>
+        <div class="ctx">Lipids and metabolic markers are flawless. The score is held back by three hormone markers reading above range &mdash; total testosterone, free testosterone and IGF-1 &mdash; which are <strong>expected on TRT plus daily HGH</strong> rather than signs of disease. They are worth reviewing against dose, not treated as pathology.</div>
+        <div class="dgrid"><div class="dchip"><b>68</b>Hormone Panel</div><div class="dchip"><b>100</b>Metabolic + Lipids</div><div class="dchip"><b>64</b>Hematology</div><div class="dchip"><b>73</b>Liver / Kidney / Thyroid</div><div class="dchip"><b>88</b>Other Markers</div></div>
+      </div>
+
+      <div class="banner"><span class="d"></span>Scored from the status of each marker. Three highs are therapy-driven by design; MCH, eosinophils and alkaline phosphatase are the ones worth a second look.</div>
+      <div class="ghd"><div class="g">Hormone Panel</div><div class="n">68 / 100 &middot; D+</div></div>
+      <div class="list">
+        <div class="lrow" onclick="tt('thormon0')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Total Testosterone</span><span class="newtag">09/26</span><span class="lv hi">1364 <small style="font-size:10px;color:var(--faint)">ng/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 300–890</span><span class="pill hi">High</span></div>
+          <div class="ltip" id="thormon0"><strong>Total Testosterone.</strong> Sum of bound + free + bioavailable T. The headline T number — drives energy, libido, muscle, mood. Low (&lt;300) = clinically hypogonadal.<br><br><strong>Trend:</strong> 01/25 328 &rarr; 06/25 345 &rarr; 11/25 613 &rarr; 01/26 440 &rarr; 02/26 622 &rarr; 03/26 517 &rarr; 05/26 1073 &rarr; 09/26 1364 <strong>H</strong><br><em>09/26 is an ARUP mass-spec assay (Testosterone, Total, MS; ref 300–890), a tighter range than the 250–1100 used through 05/26 &mdash; so the status change is partly the range. 1364 sits above either one.</em></div>
+        </div>
+        <div class="lrow" onclick="tt('thormon1')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Free Testosterone</span><span class="newtag">09/26</span><span class="lv hi">329.2 <small style="font-size:10px;color:var(--faint)">pg/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 47.0–244.0</span><span class="pill hi">High</span></div>
+          <div class="ltip" id="thormon1"><strong>Free Testosterone.</strong> T not bound to SHBG/albumin — directly active at tissue receptors. The bioactive T number.<br><br><strong>Trend:</strong> 01/25 46.9 &rarr; 06/25 49.2 &rarr; 11/25 120 &rarr; 01/26 79.3 &rarr; 02/26 107.2 &rarr; 03/26 79.1 &rarr; 05/26 186.9 &rarr; 09/26 329.2 <strong>H</strong><br><em>09/26 is an ARUP assay (Testosterone, Free, S; ref 47.0–244.0). It tracks the total &mdash; both are high on the same draw, and SHBG held flat at 29, so more of the total is circulating unbound rather than the binding protein having moved.</em></div>
+        </div>
+        <div class="lrow" onclick="tt('thormon2')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Bioavailable Testosterone</span><span class="lv ok">392.5 <small style="font-size:10px;color:var(--faint)">ng/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 110–575</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="thormon2"><strong>Bioavailable Testosterone.</strong> Free T + albumin-bound T = the T pool actually available to tissues.<br><br><strong>Trend:</strong> 01/25 108.6 &rarr; 06/25 101.2 &rarr; 11/25 257.1 &rarr; 01/26 166.4 &rarr; 02/26 215.7 &rarr; 03/26 169.5 &rarr; 05/26 392.5</div>
+        </div>
+        <div class="lrow" onclick="tt('thormon3')">
+          <div class="lt"><span class="qm">?</span><span class="ln">SHBG</span><span class="newtag">09/26</span><span class="lv normal">29 <small style="font-size:10px;color:var(--faint)">nmol/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 17–56</span><span class="pill normal">In Range</span></div>
+          <div class="ltip" id="thormon3"><strong>SHBG.</strong> Sex Hormone Binding Globulin. Protein that binds T in blood. High SHBG = less bioavailable T.<br><br><strong>Trend:</strong> 01/25 27.2 &rarr; 06/25 29 &rarr; 11/25 21 &rarr; 01/26 22 &rarr; 02/26 26 &rarr; 03/26 28 &rarr; 05/26 30 &rarr; 09/26 29<br><em>09/26 is an ARUP assay (Sex Hormone Binding Globulin, S; ref 17–56). Essentially unchanged from 05/26 &mdash; steady binding capacity, which is what makes the free testosterone rise a real rise rather than a binding artefact.</em></div>
+        </div>
+        <div class="lrow" onclick="tt('thormon4')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Estradiol</span><span class="newtag">09/26</span><span class="lv normal">60.26 <small style="font-size:10px;color:var(--faint)">pg/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 5.37–65.90</span><span class="pill normal">In Range</span></div>
+          <div class="ltip" id="thormon4"><strong>Estradiol.</strong> Primary estrogen in men. TRT increases T → E2 aromatization. Symptomatic high E2 (water retention, soft skin tone, low libido despite high T) is the action point. Asymptomatic high E2 in TRT men is often clinically fine — bone, cardiovascular, cognitive benefits.<br><br><strong>Trend:</strong> 01/25 23 &rarr; 11/25 30 &rarr; 01/26 <30 &rarr; 05/26 51 &rarr; 09/26 60.26<br><em>09/26 is an ARUP assay (ref 5.37–65.90); prior draws used a ≤39 reference, so the status change is partly the range, not only the value.</em></div>
+        </div>
+        <div class="lrow" onclick="tt('thormon5')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Cortisol AM</span><span class="lv ok">11.8 <small style="font-size:10px;color:var(--faint)">mcg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 4–22</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="thormon5"><strong>Cortisol AM.</strong> Primary stress hormone. Morning peak normal. Came down from 23.2 H (chronic stress signal) at baseline.<br><br><strong>Trend:</strong> 01/25 23.2 &rarr; 05/26 11.8</div>
+        </div>
+        <div class="lrow" onclick="tt('thormon6')">
+          <div class="lt"><span class="qm">?</span><span class="ln">DHEA-S</span><span class="lv normal">253 <small style="font-size:10px;color:var(--faint)">mcg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 61–442</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="thormon6"><strong>DHEA-S.</strong> Adrenal androgen precursor. The "longevity hormone." Pairs with TRT for energy + libido + cognition.<br><br><strong>Trend:</strong> 01/25 253</div>
+        </div>
+        <div class="lrow" onclick="tt('thormon7')">
+          <div class="lt"><span class="qm">?</span><span class="ln">IGF-1 (LC/MS)</span><span class="newtag">09/26</span><span class="lv hi">289 <small style="font-size:10px;color:var(--faint)">ng/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 74–227</span><span class="pill hi">High · Z 2.7</span></div>
+          <div class="ltip" id="thormon7"><strong>IGF-1 (LC/MS).</strong> Downstream effect of GH on the liver — the actually-diagnostic readout of the GH axis (random GH is pulsatile + unreliable). Mid-range for males. This 03/26 draw was on the CJC-1295/Ipamorelin secretagogue; the GH lever is now exogenous HGH (2 iu daily, year-round — Protocol tab), which typically drives IGF-1 higher — worth re-checking at the next panel.<br><br><strong>Trend:</strong> 03/26 141 &rarr; 09/26 289 <strong>H</strong><br><em>09/26 Z-score 2.7 (ref &minus;2.0 to +2.0), ARUP assay ref 74–227. The 03/26 draw was on CJC-1295/Ipamorelin; the GH lever is now exogenous HGH.</em></div>
+        </div>
+        <div class="lrow" onclick="tt('thormon8')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Growth Hormone (random)</span><span class="lv normal"><0.1 <small style="font-size:10px;color:var(--faint)">ng/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref ≤7.1</span><span class="pill normal">Expected</span></div>
+          <div class="ltip" id="thormon8"><strong>Growth Hormone (random).</strong> GH releases in pulses (sleep + post-exercise spikes, near-zero between). Random sample catches the "off" portion — not diagnostic alone. IGF-1 is the meaningful readout.<br><br><strong>Trend:</strong> 01/25 <0.1</div>
+        </div>
+        <div class="lrow" onclick="tt('thormon9')">
+          <div class="lt"><span class="qm">?</span><span class="ln">PSA Total</span><span class="lv ok">1.69 <small style="font-size:10px;color:var(--faint)">ng/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref ≤4.00</span><span class="pill ok">Normal</span></div>
+          <div class="ltip" id="thormon9"><strong>PSA Total.</strong> Prostate Specific Antigen. Screens prostate enlargement / inflammation / cancer risk. Watch closely on TRT — should stay &lt;4.0.<br><br><strong>Trend:</strong> 01/26 1.69</div>
+        </div>
+      </div>
+      <div class="ghd"><div class="g">Metabolic + Lipids</div><div class="n">100 / 100 &middot; A+</div></div>
+      <div class="list">
+        <div class="lrow" onclick="tt('tmetabo0')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Glucose (fasting)</span><span class="lv ok">86 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 65–99</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo0"><strong>Glucose (fasting).</strong> Blood sugar after fasting. Pre-diabetic edge starts at 100. Was 100 H pre-TRT.<br><br><strong>Trend:</strong> 01/25 100 &rarr; 03/26 86</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo1')">
+          <div class="lt"><span class="qm">?</span><span class="ln">HbA1c</span><span class="lv ok">4.6%</span></div>
+          <div class="lmeta"><span class="lref">ref <5.7</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo1"><strong>HbA1c.</strong> 90-day average blood sugar. The lifestyle-level glucose readout.<br><br><strong>Trend:</strong> 03/26 4.5 &rarr; 05/26 4.6</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo2')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Total Cholesterol</span><span class="lv ok">178 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref <200</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo2"><strong>Total Cholesterol.</strong> Sum of HDL + LDL + VLDL. The ratios + ApoB tell the actual story.<br><br><strong>Trend:</strong> 03/26 178</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo3')">
+          <div class="lt"><span class="qm">?</span><span class="ln">HDL Cholesterol</span><span class="lv ok">78 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref >40</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo3"><strong>HDL Cholesterol.</strong> Protective cholesterol — carries away from arteries. &gt;60 = protective.<br><br><strong>Trend:</strong> 03/26 78</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo4')">
+          <div class="lt"><span class="qm">?</span><span class="ln">LDL (Martin-Hopkins)</span><span class="lv ok">83 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref <100</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo4"><strong>LDL (Martin-Hopkins).</strong> Atherogenic particle — drives plaque. Martin-Hopkins is more accurate than older Friedewald calc.<br><br><strong>Trend:</strong> 03/26 83</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo5')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Triglycerides</span><span class="lv ok">79 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref <150</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo5"><strong>Triglycerides.</strong> Blood fat from carbs + alcohol + excess calories. Sensitive to insulin resistance.<br><br><strong>Trend:</strong> 03/26 79</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo6')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Non-HDL</span><span class="lv ok">100 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref <130</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo6"><strong>Non-HDL.</strong> Total Chol minus HDL = all atherogenic particles combined. More predictive than LDL alone.<br><br><strong>Trend:</strong> 03/26 100</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo7')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Chol / HDL Ratio</span><span class="lv ok">2.3</span></div>
+          <div class="lmeta"><span class="lref">ref <5.0</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo7"><strong>Chol / HDL Ratio.</strong> Cardiovascular risk ratio. &lt;3.5 = optimal.<br><br><strong>Trend:</strong> 03/26 2.3</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo8')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Trig / HDL Ratio</span><span class="lv ok">1.0</span></div>
+          <div class="lmeta"><span class="lref">ref <2 elite</span><span class="pill ok">Elite</span></div>
+          <div class="ltip" id="tmetabo8"><strong>Trig / HDL Ratio.</strong> Insulin sensitivity + cardiovascular risk marker. &lt;2 = elite. Cardiologists watch this over absolute LDL.<br><br><strong>Trend:</strong> 03/26 1.0</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo9')">
+          <div class="lt"><span class="qm">?</span><span class="ln">ApoB</span><span class="lv ok">67 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref <90 opt</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo9"><strong>ApoB.</strong> Counts every atherogenic particle (each LDL/VLDL has one). Most accurate single CV risk marker.<br><br><strong>Trend:</strong> 03/26 67</div>
+        </div>
+        <div class="lrow" onclick="tt('tmetabo10')">
+          <div class="lt"><span class="qm">?</span><span class="ln">hs-CRP</span><span class="lv ok">0.4 <small style="font-size:10px;color:var(--faint)">mg/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref <1.0 opt</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tmetabo10"><strong>hs-CRP.</strong> High-sensitivity C-Reactive Protein. Low-grade systemic inflammation marker. &lt;1.0 = low CV risk.<br><br><strong>Trend:</strong> 03/26 0.4</div>
+        </div>
+      </div>
+      <div class="ghd"><div class="g">Hematology</div><div class="n">64 / 100 &middot; D</div></div>
+      <div class="list">
+        <div class="lrow" onclick="tt('themato0')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Hemoglobin</span><span class="lv normal">17.3 <small style="font-size:10px;color:var(--faint)">g/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 13.7–17.7</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato0"><strong>Hemoglobin.</strong> Oxygen-carrying protein in red cells. TRT increases production — watch upper range.<br><br><strong>Trend:</strong> 01/25 17.1 &rarr; 11/25 17.7 &rarr; 01/26 16.6 &rarr; 03/26 16.6 &rarr; 05/26 17.3</div>
+        </div>
+        <div class="lrow" onclick="tt('themato1')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Hematocrit</span><span class="lv normal">50.2 <small style="font-size:10px;color:var(--faint)">%</small></span></div>
+          <div class="lmeta"><span class="lref">ref 42.5–55.0</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato1"><strong>Hematocrit.</strong> Percentage of blood that is red cells. TRT elevates — &gt;54% is action point (donate blood). Was 53.3 in Nov 2025.<br><br><strong>Trend:</strong> 01/25 49.8 &rarr; 11/25 53.3 &rarr; 01/26 49.6 &rarr; 03/26 51.5 &rarr; 05/26 50.2</div>
+        </div>
+        <div class="lrow" onclick="tt('themato2')">
+          <div class="lt"><span class="qm">?</span><span class="ln">RBC</span><span class="lv normal">5.08 <small style="font-size:10px;color:var(--faint)">M/uL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 4.33–5.82</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato2"><strong>RBC.</strong> Red Blood Cell count. Slightly elevated on TRT — expected.<br><br><strong>Trend:</strong> 01/25 5.18 &rarr; 11/25 5.42 &rarr; 01/26 5.14 &rarr; 03/26 5.21 &rarr; 05/26 5.08</div>
+        </div>
+        <div class="lrow" onclick="tt('themato3')">
+          <div class="lt"><span class="qm">?</span><span class="ln">WBC</span><span class="lv normal">6.6 <small style="font-size:10px;color:var(--faint)">K/uL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 3.8–10.8</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato3"><strong>WBC.</strong> White Blood Cell count. Immune soldiers.<br><br><strong>Trend:</strong> 01/25 5.1 &rarr; 11/25 5.9 &rarr; 01/26 4.8 &rarr; 03/26 5.7 &rarr; 05/26 6.6</div>
+        </div>
+        <div class="lrow" onclick="tt('themato4')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Platelets</span><span class="lv normal">218 <small style="font-size:10px;color:var(--faint)">K/uL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 140–400</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato4"><strong>Platelets.</strong> Cells that form clots.<br><br><strong>Trend:</strong> 01/25 214 &rarr; 11/25 232 &rarr; 01/26 232 &rarr; 03/26 226 &rarr; 05/26 218</div>
+        </div>
+        <div class="lrow" onclick="tt('themato5')">
+          <div class="lt"><span class="qm">?</span><span class="ln">MCV</span><span class="lv normal">98.8 <small style="font-size:10px;color:var(--faint)">fL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 81.4–101.7</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato5"><strong>MCV.</strong> Mean Corpuscular Volume — average red cell size.<br><br><strong>Trend:</strong> 01/25 96.1 &rarr; 11/25 98.3 &rarr; 01/26 96.5 &rarr; 03/26 98.8 &rarr; 05/26 98.8</div>
+        </div>
+        <div class="lrow" onclick="tt('themato6')">
+          <div class="lt"><span class="qm">?</span><span class="ln">MCH</span><span class="lv hi">34.1 <small style="font-size:10px;color:var(--faint)">pg</small></span></div>
+          <div class="lmeta"><span class="lref">ref 27.0–33.0</span><span class="pill hi">High</span></div>
+          <div class="ltip" id="themato6"><strong>MCH.</strong> Average Hgb per red cell. High suggests macrocytic-leaning cells. Not actionable on its own at this level. Worth a single B12+folate check at next draw.<br><br><strong>Trend:</strong> 01/25 33.0 &rarr; 11/25 32.7 &rarr; 01/26 32.3 &rarr; 03/26 31.9 &rarr; 05/26 34.1</div>
+        </div>
+        <div class="lrow" onclick="tt('themato7')">
+          <div class="lt"><span class="qm">?</span><span class="ln">RDW</span><span class="lv normal">14.1 <small style="font-size:10px;color:var(--faint)">%</small></span></div>
+          <div class="lmeta"><span class="lref">ref 11.0–15.0</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="themato7"><strong>RDW.</strong> Red cell Distribution Width — variability in red cell size.<br><br><strong>Trend:</strong> 01/25 13.0 &rarr; 11/25 12.5 &rarr; 01/26 13.1 &rarr; 03/26 13.1 &rarr; 05/26 14.1</div>
+        </div>
+        <div class="lrow" onclick="tt('themato8')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Eosinophils (abs)</span><span class="lv hi">673 <small style="font-size:10px;color:var(--faint)">cells/uL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 15–500</span><span class="pill hi">High</span></div>
+          <div class="ltip" id="themato8"><strong>Eosinophils (abs).</strong> White cell elevated in allergies / parasites / atopic conditions. Trending up across draws (112 → 71 → 149 → 268 → 673). May be Colorado spring pollen if symptomatic. Recheck after pollen season.<br><br><strong>Trend:</strong> 01/25 112 &rarr; 11/25 71 &rarr; 01/26 149 &rarr; 03/26 268 &rarr; 05/26 673</div>
+        </div>
+      </div>
+      <div class="ghd"><div class="g">Liver · Kidney · Thyroid</div><div class="n">73 / 100 &middot; C</div></div>
+      <div class="list">
+        <div class="lrow" onclick="tt('tliverk0')">
+          <div class="lt"><span class="qm">?</span><span class="ln">ALT</span><span class="lv normal">24 <small style="font-size:10px;color:var(--faint)">U/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 9–46</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk0"><strong>ALT.</strong> Alanine Aminotransferase — liver enzyme. Best single liver marker.<br><br><strong>Trend:</strong> 01/25 23 &rarr; 03/26 24</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk1')">
+          <div class="lt"><span class="qm">?</span><span class="ln">AST</span><span class="lv normal">26 <small style="font-size:10px;color:var(--faint)">U/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 10–40</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk1"><strong>AST.</strong> Aspartate Aminotransferase — liver + muscle enzyme.<br><br><strong>Trend:</strong> 01/25 24 &rarr; 03/26 26</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk2')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Alkaline Phosphatase</span><span class="lv lo">32 <small style="font-size:10px;color:var(--faint)">U/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 36–130</span><span class="pill lo">Low</span></div>
+          <div class="ltip" id="tliverk2"><strong>Alkaline Phosphatase.</strong> Enzyme from liver / bone / intestine. Slightly low — often diet-related or low normal.<br><br><strong>Trend:</strong> 01/25 36 &rarr; 03/26 32</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk3')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Total Bilirubin</span><span class="lv normal">0.7 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 0.2–1.2</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk3"><strong>Total Bilirubin.</strong> Byproduct of red cell breakdown — liver processes it. Was 1.4 H at baseline, normalized.<br><br><strong>Trend:</strong> 01/25 1.4 &rarr; 03/26 0.7</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk4')">
+          <div class="lt"><span class="qm">?</span><span class="ln">BUN</span><span class="lv normal">12 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 7–25</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk4"><strong>BUN.</strong> Blood Urea Nitrogen. Kidney waste clearance + protein intake reflector.<br><br><strong>Trend:</strong> 01/25 18 &rarr; 03/26 12</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk5')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Creatinine</span><span class="lv normal">1.07 <small style="font-size:10px;color:var(--faint)">mg/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 0.60–1.29</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk5"><strong>Creatinine.</strong> Muscle waste cleared by kidney. Stable = stable kidney function.<br><br><strong>Trend:</strong> 01/25 1.05 &rarr; 03/26 1.07</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk6')">
+          <div class="lt"><span class="qm">?</span><span class="ln">eGFR</span><span class="lv ok">88 <small style="font-size:10px;color:var(--faint)">mL/min</small></span></div>
+          <div class="lmeta"><span class="lref">ref >60</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="tliverk6"><strong>eGFR.</strong> Kidney filtering capacity. &gt;60 = healthy; &gt;90 = excellent.<br><br><strong>Trend:</strong> 01/25 90 &rarr; 03/26 88</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk7')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Sodium</span><span class="lv normal">138 <small style="font-size:10px;color:var(--faint)">mmol/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 135–146</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk7"><strong>Sodium.</strong> Primary electrolyte. Tight body regulation.<br><br><strong>Trend:</strong> 01/25 139 &rarr; 03/26 138</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk8')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Potassium</span><span class="lv normal">4.2 <small style="font-size:10px;color:var(--faint)">mmol/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 3.5–5.3</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk8"><strong>Potassium.</strong> Critical for nerve + muscle function.<br><br><strong>Trend:</strong> 01/25 4.1 &rarr; 03/26 4.2</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk9')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Albumin</span><span class="lv normal">4.6 <small style="font-size:10px;color:var(--faint)">g/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 3.6–5.1</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk9"><strong>Albumin.</strong> Major blood protein. Reflects nutrition + liver + hydration.<br><br><strong>Trend:</strong> 01/25 5.1 &rarr; 03/26 4.7 &rarr; 05/26 4.6</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk10')">
+          <div class="lt"><span class="qm">?</span><span class="ln">TSH</span><span class="lv normal">3.78 <small style="font-size:10px;color:var(--faint)">mIU/L</small></span></div>
+          <div class="lmeta"><span class="lref">ref 0.40–4.50</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk10"><strong>TSH.</strong> Thyroid Stimulating Hormone. Spiked to 5.48 H in March 2026 (transient sub-clinical hypothyroid signal) — fully resolved by May.<br><br><strong>Trend:</strong> 01/25 3.57 &rarr; 03/26 5.48 &rarr; 05/26 3.78</div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk11')">
+          <div class="lt"><span class="qm">?</span><span class="ln">T4 Free</span><span class="newtag">09/26</span><span class="lv normal">0.77 <small style="font-size:10px;color:var(--faint)">ng/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 0.59–2.19</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk11"><strong>T4 Free.</strong> Unbound thyroxine — active thyroid hormone available to tissues.<br><br><strong>Trend:</strong> 03/26 1.1 &rarr; 05/26 1.2 &rarr; 09/26 0.77<br><em>09/26 is an ARUP assay (ref 0.59–2.19); low-normal on that range.</em></div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk12')">
+          <div class="lt"><span class="qm">?</span><span class="ln">T3 Free</span><span class="newtag">09/26</span><span class="lv normal">4.42 <small style="font-size:10px;color:var(--faint)">pg/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 2.77–5.27</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk12"><strong>T3 Free.</strong> Active thyroid hormone — directly drives metabolism, energy, body temp.<br><br><strong>Trend:</strong> 05/26 3.1 &rarr; 09/26 4.42<br><em>09/26 is an ARUP assay (ref 2.77–5.27).</em></div>
+        </div>
+        <div class="lrow" onclick="tt('tliverk13')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Reverse T3</span><span class="newtag">09/26</span><span class="lv normal">13.7 <small style="font-size:10px;color:var(--faint)">ng/dL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 9.0–27.0</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="tliverk13"><strong>Reverse T3.</strong> The inactive mirror of free T3. The body converts T4 into either active T3 or inactive reverse T3, and shunts more toward rT3 under stress, illness, dieting or low calories. A high rT3 alongside a normal free T3 is the classic sign that thyroid hormone is being produced but not used.<br><br><strong>Trend:</strong> 09/26 13.7<br><em>First reverse T3 on file – 09/26 ARUP assay (ref 9.0–27.0).</em></div>
+        </div>
+      </div>
+      <div class="ghd"><div class="g">Other Markers</div><div class="n">88 / 100 &middot; B+</div></div>
+      <div class="list">
+        <div class="lrow" onclick="tt('totherm0')">
+          <div class="lt"><span class="qm">?</span><span class="ln">Vitamin D, 25-OH</span><span class="lv ok">69 <small style="font-size:10px;color:var(--faint)">ng/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 30–100</span><span class="pill ok">Optimal</span></div>
+          <div class="ltip" id="totherm0"><strong>Vitamin D, 25-OH.</strong> 25-hydroxy Vitamin D — storage form. &gt;50 = functional optimum for metabolic + immune + bone.<br><br><strong>Trend:</strong> 05/26 69</div>
+        </div>
+        <div class="lrow" onclick="tt('totherm1')">
+          <div class="lt"><span class="qm">?</span><span class="ln">ACTH, Plasma</span><span class="lv normal">36 <small style="font-size:10px;color:var(--faint)">pg/mL</small></span></div>
+          <div class="lmeta"><span class="lref">ref 6–50</span><span class="pill normal">Normal</span></div>
+          <div class="ltip" id="totherm1"><strong>ACTH, Plasma.</strong> Pituitary hormone signaling adrenals to make cortisol. Pairs with cortisol for HPA axis.<br><br><strong>Trend:</strong> 01/25 36</div>
+        </div>
+      </div>
+      <p class="note">Tap any marker for what it measures. Values marked <span class="newtag">09/26</span> are from the 09/25/2026 ARUP draw; the rest are the most recent on file.</p>
+    </div></section>
+
+    <!-- ===== CALC ===== -->
+    <section class="view" id="v-calc"><div class="pad">
+      <h1 class="scrn">Dose Calculator</h1>
+      <p class="sub">Three numbers in, units out</p>
+
+      <div class="field">
+        <label>Start from a preset</label>
+        <select id="c-cmp"><option data-mg="" data-ml="" data-dose="">Custom &mdash; enter my own</option><option data-mg="250" data-ml="1" data-dose="50">Testosterone Cypionate · 250 mg/mL</option><option data-mg="36" data-ml="3" data-dose="2">HGH · 36 iu kit</option><option data-mg="10" data-ml="2" data-dose="1">Generic 10 mg vial · 2 mL</option><option data-mg="10" data-ml="3" data-dose="1">Generic 10 mg vial · 3 mL</option><option data-mg="5" data-ml="2" data-dose="0.5">Generic 5 mg vial · 2 mL</option><option data-mg="30" data-ml="3" data-dose="1">Generic 30 mg vial · 3 mL</option><option data-mg="60" data-ml="3" data-dose="1">Generic 60 mg vial · 3 mL</option></select>
+      </div>
+      <div class="frow2">
+        <div class="field"><label>Vial size (mg or iu)</label><input id="c-mg" type="number" inputmode="decimal" step="any" min="0" value="250"></div>
+        <div class="field"><label>BAC water (mL)</label><input id="c-ml" type="number" inputmode="decimal" step="any" min="0" value="1"></div>
+      </div>
+      <div class="field">
+        <label>Dose you want</label>
+        <div class="frow2">
+          <input id="c-dose" type="number" inputmode="decimal" step="any" min="0" value="50">
+          <select id="c-unit"><option value="mg">mg</option><option value="mcg">mcg</option><option value="iu">iu</option></select>
+        </div>
+      </div>
+      <div class="calcout">
+        <div class="lab">Draw to</div>
+        <div class="big" id="c-units">20<small> units</small></div>
+        <div class="note" id="c-note"></div>
+      </div>
+      <p class="note">Units are marks on a U-100 insulin syringe &mdash; 100 units is 1 mL. Pre-mixed vials take a BAC water value of the vial&rsquo;s own volume.</p>
+    </div></section>
+
+    <!-- ===== NUTRITION ===== -->
+    <section class="view" id="v-nutr"><div class="pad">
+      <h1 class="scrn">Nutrition</h1>
+      <p class="sub">Macro targets from your bodyweight and goal</p>
+      <div class="frow2">
+        <div class="field"><label>Weight (lb)</label><input id="n-w" type="number" inputmode="decimal" value="180"></div>
+        <div class="field"><label>Protein g per lb</label><input id="n-p" type="number" inputmode="decimal" step="0.05" value="1"></div>
+      </div>
+      <div class="field"><label>Goal</label>
+        <div class="seg">
+          <button data-g="cut" onclick="ngoal('cut')">Cut</button>
+          <button data-g="maintain" class="on" onclick="ngoal('maintain')">Maintain</button>
+          <button data-g="gain" onclick="ngoal('gain')">Gain</button>
+        </div>
+      </div>
+      <div class="field"><label>Activity</label>
+        <select id="n-a"><option value="1.3">Light &mdash; desk, little training</option><option value="1.5" selected>Moderate &mdash; lifting 3&ndash;4x</option><option value="1.7">High &mdash; daily training</option></select>
+      </div>
+      <div class="field"><label>Meals per day</label>
+        <select id="n-m"><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+      </div>
+      <div class="kcal"><div class="l">Daily Target</div><div class="v" id="n-kcal">2700</div></div>
+      <div class="macro">
+        <div class="mc"><div class="v" id="n-pro">180</div><div class="l">Protein g</div></div>
+        <div class="mc"><div class="v" id="n-carb">270</div><div class="l">Carbs g</div></div>
+        <div class="mc"><div class="v" id="n-fat">75</div><div class="l">Fat g</div></div>
+      </div>
+      <p class="note" id="n-note"></p>
+      <p class="note">Protein is set first off bodyweight, fat at 25&#37; of calories, and carbohydrate fills the remainder. On a GLP-1 appetite is the limiter, so hitting protein matters more than hitting calories exactly.</p>
+    </div></section>
+
+  </div>
+
+  <div class="detail" id="detail">
+    <div class="dtop"><div class="bk" onclick="closeDetail()">&lsaquo; Protocol</div><div class="dis" id="d-tag"></div></div>
+    <div class="dname" id="d-name"></div>
+    <div class="dpur" id="d-pur"></div>
+    <div class="dl first">About</div>
+    <div class="dbody" id="d-about"></div>
+    <div class="dl">Quick Facts</div>
+    <div class="facts"><div class="frow"><div class="fl">Draw</div><div class="fchips" id="d-draw"></div></div>
+      <div class="frow"><div class="fl">Schedule</div><div class="fchips" id="d-sched"></div></div>
+      <div class="frow"><div class="fl">Vial / Recon</div><div class="fchips" id="d-rec"></div></div></div>
+    <div style="height:40px"></div>
+  </div>
+
+  <div class="a2hs" id="a2hs">
+    <div class="tx"><b>Add BioLinked to your home screen.</b> Tap <span style="font-size:14px">&#8682;</span> Share, then &ldquo;Add to Home Screen&rdquo; &mdash; it opens full screen like an app.</div>
+    <button class="x" onclick="hideA2(1)">&times;</button>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab on" data-v="home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+    <button class="tab" data-v="proto" onclick="go('proto')"><svg viewBox="0 0 24 24"><path d="M5 3h10l4 4v14H5z"/><path d="M9 12h6M9 16h6"/></svg>Protocol</button>
+    <button class="tab" data-v="blood" onclick="go('blood')"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Bloodwork</button>
+    <button class="tab" data-v="calc" onclick="go('calc')"><svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h3"/></svg>Calc</button>
+    <button class="tab" data-v="nutr" onclick="go('nutr')"><svg viewBox="0 0 24 24"><path d="M12 3v18M5 8c0 4 3 5 7 5M19 8c0 4-3 5-7 5"/></svg>Nutrition</button>
+  </nav>
+</div>
+<script>
+var CMP=[{"n": "TRT (Testosterone Cypionate)", "b": "AM", "c": "Mon / Wed / Fri", "d": "50 mg", "u": "20u", "rec": "250 mg/mL \u00b7 10 mL pre-mixed", "about": "Hormone replacement \u2014 the background level everything else is built on. 150 mg a week split across three AM shots at 50 mg each. At 250 mg/mL that is 0.20 mL, a 20-unit draw. Long ester, so time of day is immaterial, but it sits in the AM block with the rest.", "tag": "Year-round"}, {"n": "HGH (Somatropin)", "b": "AM", "c": "Every day", "d": "2 iu", "u": "~17u", "rec": "36 iu kit \u00b7 3 mL \u2192 12 iu/mL", "about": "Exogenous growth hormone. 2 iu every day, year-round \u2014 recovery, body composition, sleep depth, connective tissue. A 36 iu kit in 3 mL gives 12 iu/mL, so 2 iu is about 17 units. Dosed fasted on waking: insulin and carbs blunt GH, so hold off eating 30\u201360 minutes.", "tag": "Year-round"}, {"n": "Tirzepatide", "b": "AM", "c": "Mon + Thu", "d": "1 mg", "u": "", "rec": "As supplied \u2014 1 mg per draw", "about": "Dual GLP-1 / GIP agonist. The GIP arm adds insulin-sensitising and appetite signalling on top of the GLP-1 effect. Ongoing foundation, long half-life, so clock time does not affect it. Draw whatever 1 mg is at your vial's concentration.", "tag": "Ongoing"}, {"n": "BPC-157 (oral)", "b": "AM", "c": "Every day", "d": "500 mcg", "u": "1 tablet", "rec": "None \u2014 tablet", "about": "Body-protection compound, taken orally here rather than injected. Gut lining repair and systemic soft-tissue recovery. One tablet daily in the morning block.", "tag": "Oral"}, {"n": "Dihexa (oral)", "b": "AM", "c": "Mon / Wed / Fri", "d": "10 mg", "u": "2 tablets", "rec": "None \u2014 tablets", "about": "An angiotensin-derived compound studied for synaptogenesis \u2014 cognition and neural connection density. Two tablets, three mornings a week.", "tag": "Oral"}, {"n": "HCG", "b": "PM", "c": "Mon / Wed / Fri", "d": "500 iu", "u": "", "rec": "As supplied", "about": "Mimics LH, which keeps the testes producing their own intratesticular testosterone and preserves size and fertility while on TRT. Three evenings a week.", "tag": "Supportive"}, {"n": "DSIP", "b": "PM", "c": "Every night", "d": "1 mg", "u": "", "rec": "As supplied \u2014 confirm vial size for the unit draw", "about": "Delta sleep-inducing peptide. Deepens slow-wave sleep rather than sedating you into it \u2014 architecture rather than duration. Pre-bed, nightly.", "tag": "Pre-bed"}, {"n": "BPC-157 (injectable)", "b": "PM", "c": "Every night", "d": "1 mg", "u": "", "rec": "As supplied \u2014 confirm vial size for the unit draw", "about": "The injectable form alongside the oral, run in the evening block for systemic repair \u2014 tendon, ligament and soft tissue.", "tag": "Injectable"}, {"n": "KPV", "b": "PM", "c": "Every night", "d": "1 mg", "u": "", "rec": "As supplied \u2014 confirm vial size for the unit draw", "about": "A tripeptide fragment of alpha-MSH with anti-inflammatory action, particularly in the gut. Pairs with the BPC-157 on the repair side.", "tag": "Pre-bed"}, {"n": "Ipamorelin", "b": "PM", "c": "Every night", "d": "1 mg", "u": "", "rec": "As supplied \u2014 confirm vial size for the unit draw", "about": "A selective growth-hormone secretagogue working the ghrelin receptor without touching cortisol or appetite. Pre-bed and fasted, so it rides the natural overnight GH pulse.", "tag": "Pre-bed fasted"}];
+
+var DAY=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+function due(c,d){ // d = 0..6
+  if(c==='Every day'||c==='Every night') return true;
+  if(c==='Mon / Wed / Fri') return d===1||d===3||d===5;
+  if(c==='Mon + Thu') return d===1||d===4;
+  return false;
+}
+function go(v){
+  document.querySelectorAll('.view').forEach(function(e){e.classList.remove('on')});
+  document.getElementById('v-'+v).classList.add('on');
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.v===v)});
+  document.getElementById('scroll').scrollTop=0;
+}
+function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
+function openDetail(i){
+  var c=CMP[i];
+  document.getElementById('d-name').textContent=c.n;
+  document.getElementById('d-pur').textContent=c.b+' block · '+c.c;
+  document.getElementById('d-about').textContent=c.about;
+  document.getElementById('d-tag').textContent=c.tag;
+  document.getElementById('d-draw').innerHTML='<b>'+c.d+'</b>'+(c.u?'<b>'+c.u+'</b>':'');
+  document.getElementById('d-sched').innerHTML='<b>'+c.c+'</b><b>'+c.b+'</b>';
+  document.getElementById('d-rec').innerHTML='<b>'+c.rec+'</b>';
+  document.getElementById('detail').classList.add('on');
+}
+function closeDetail(){document.getElementById('detail').classList.remove('on');}
+
+/* ---- greeting, no personal name ---- */
+(function(){
+  var h=new Date().getHours();
+  document.getElementById('greet').textContent = h<12?'Good morning':(h<18?'Good afternoon':'Good evening');
+})();
+
+/* ---- days since the 09/25/2026 panel, against a 90-day recheck ---- */
+(function(){
+  var last=new Date(2026,8,25), now=new Date();
+  var days=Math.max(0,Math.round((now-last)/864e5));
+  var pct=Math.min(100,Math.round(days/90*100));
+  document.getElementById('bloodbar').style.width=pct+'%';
+  document.getElementById('bloodl').textContent=days+' days since last panel';
+  document.getElementById('bloodr').textContent=(days>=90?'recheck due':(90-days)+' to recheck');
+  document.getElementById('subline').textContent='10 active compounds · AM and PM blocks';
+})();
+
+/* ---- today list, from the real cadences ---- */
+(function(){
+  var d=new Date().getDay(), key='bl-app-'+new Date().toISOString().slice(0,10);
+  var done={}; try{done=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+  document.getElementById('todaylbl').textContent='Today · '+FULL[d];
+  var rows=CMP.map(function(c,i){return {c:c,i:i}}).filter(function(x){return due(x.c.c,d)});
+  var host=document.getElementById('todaylist');
+  if(!rows.length){host.innerHTML='<div class="drow"><div><div class="nm">Nothing scheduled</div><div class="mt">Weekend — the M/W/F and M/Th compounds are off</div></div></div>';}
+  else host.innerHTML=rows.map(function(x){
+    var on=done[x.c.n]?' done':'';
+    return '<div class="drow'+on+'" data-n="'+x.c.n+'" onclick="toggle(this)">'+
+      '<div class="chk'+(on?' done':'')+'"></div>'+
+      '<div><div class="nm">'+x.c.n+'</div><div class="mt">'+x.c.b+' · '+x.c.c+'</div></div>'+
+      '<div class="u"><b>'+(x.c.u||x.c.d)+'</b><span>'+(x.c.u?x.c.d:'as supplied')+'</span></div></div>';
+  }).join('');
+  var am=rows.filter(function(x){return x.c.b==='AM'}).length, pm=rows.length-am;
+  document.getElementById('todaynote').textContent=rows.length?(rows.length+' doses today — '+am+' in the AM block, '+pm+' in the PM.'):'';
+  window.toggle=function(el){
+    var n=el.dataset.n; done[n]=!done[n];
+    el.classList.toggle('done'); el.querySelector('.chk').classList.toggle('done');
+    try{localStorage.setItem(key,JSON.stringify(done))}catch(e){}
+  };
+})();
+
+/* ---- protocol tab ---- */
+(function(){
+  var groups={};
+  CMP.forEach(function(c){ (groups[c.c]=groups[c.c]||[]).push(c); });
+  var order=['Every day','Every night','Mon / Wed / Fri','Mon + Thu'];
+  document.getElementById('rhythm').innerHTML=order.filter(function(k){return groups[k]}).map(function(k){
+    return '<div class="li"><div><div class="nm" style="font-family:var(--sans);font-size:13px;font-weight:700">'+k+'</div>'+
+      '<div class="pp">'+groups[k].map(function(c){return c.n.replace(/ \(.*\)/,'')+' '+c.d}).join(' · ')+'</div></div>'+
+      '<div class="rt"><div class="pr">'+groups[k].length+'</div></div></div>';
+  }).join('');
+  document.getElementById('cmplist').innerHTML=CMP.map(function(c,i){
+    return '<div class="li" onclick="openDetail('+i+')"><div><div class="nm">'+c.n+'</div>'+
+      '<div class="pp">'+c.rec+'</div></div><div class="rt"><div class="pr">'+(c.u||c.d)+'</div><div class="chev">›</div></div></div>';
+  }).join('');
+})();
+
+/* ---- calculator ---- */
+function calc(){
+  var mg=parseFloat(document.getElementById('c-mg').value)||0;
+  var ml=parseFloat(document.getElementById('c-ml').value)||0;
+  var dose=parseFloat(document.getElementById('c-dose').value)||0;
+  var u=document.getElementById('c-unit').value;
+  var dmg=(u==='mcg')?dose/1000:dose;              // iu treated on the vial's own scale
+  var conc=ml?mg/ml:0;
+  var units=conc?(dmg/conc)*100:0;
+  var show=units?(Math.round(units*10)/10):0;
+  document.getElementById('c-units').innerHTML=show+'<small> units</small>';
+  var vol=conc?(dmg/conc):0;
+  document.getElementById('c-note').textContent=
+    conc? (dose+' '+u+' · '+(Math.round(conc*100)/100)+(u==='iu'?' iu/mL':' mg/mL')+' · '+(Math.round(vol*1000)/1000)+' mL')
+        : 'Enter a vial size and a BAC water volume.';
+}
+['c-mg','c-ml','c-dose','c-unit'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',calc);
+  document.getElementById(id).addEventListener('change',calc);
+});
+document.getElementById('c-cmp').addEventListener('change',function(){
+  var o=this.selectedOptions[0];
+  if(!o.dataset.mg) return;
+  document.getElementById('c-mg').value=o.dataset.mg;
+  document.getElementById('c-ml').value=o.dataset.ml;
+  document.getElementById('c-dose').value=o.dataset.dose;
+  document.getElementById('c-unit').value=(o.textContent.indexOf('iu')>-1)?'iu':'mg';
+  calc();
+});
+calc();
+
+/* ---- nutrition ---- */
+var NG='maintain';
+function ngoal(g){NG=g;document.querySelectorAll('.seg button').forEach(function(b){b.classList.toggle('on',b.dataset.g===g)});nutr();}
+function nutr(){
+  var w=parseFloat(document.getElementById('n-w').value)||0;
+  var ppl=parseFloat(document.getElementById('n-p').value)||1;
+  var act=parseFloat(document.getElementById('n-a').value)||1.5;
+  var meals=parseInt(document.getElementById('n-m').value,10)||3;
+  var kg=w/2.2046;
+  var bmr=10*kg+6.25*178-5*30+5;                   /* Mifflin-St Jeor, height/age from the planner defaults */
+  var tdee=bmr*act;
+  var kcal=Math.round((NG==='cut'?tdee*0.8:(NG==='gain'?tdee*1.1:tdee))/10)*10;
+  var pro=Math.round(w*ppl);
+  var fat=Math.round(kcal*0.25/9);
+  var carb=Math.max(0,Math.round((kcal-pro*4-fat*9)/4));
+  document.getElementById('n-kcal').textContent=kcal.toLocaleString();
+  document.getElementById('n-pro').textContent=pro;
+  document.getElementById('n-carb').textContent=carb;
+  document.getElementById('n-fat').textContent=fat;
+  document.getElementById('n-note').textContent='Across '+meals+' meals that is about '+Math.round(pro/meals)+
+    ' g protein, '+Math.round(carb/meals)+' g carbs and '+Math.round(fat/meals)+' g fat per meal.';
+}
+['n-w','n-p','n-a','n-m'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',nutr);
+  document.getElementById(id).addEventListener('change',nutr);
+});
+nutr();
+
+/* ---- add to home screen hint, once ---- */
+function hideA2(save){document.getElementById('a2hs').classList.remove('on'); if(save){try{localStorage.setItem('bl-app-a2hs','1')}catch(e){}}}
+(function(){
+  var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  var seen=false; try{seen=localStorage.getItem('bl-app-a2hs')==='1'}catch(e){}
+  var ios=/iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+  if(!standalone && !seen && ios) setTimeout(function(){document.getElementById('a2hs').classList.add('on')},1600);
+})();
+
+/* ---- service worker ---- */
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){navigator.serviceWorker.register('/mpauldino/app/sw.js').catch(function(){})});
+}
+</script>
+</body>
+</html>
