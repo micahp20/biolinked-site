@@ -1433,8 +1433,11 @@ function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.
    Brand colours only, no logos or wordmarks. */
 var PAY={venmo:'Micahp20', cashapp:'micahpauldino', zelle:'720-938-0698'};
 function attr(v){ return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
-function venmoApp(a,q){ return 'venmo://paycharge?txn=pay&recipients='+PAY.venmo+'&amount='+a+'&note='+q; }
-function venmoWeb(a,q){ return 'https://account.venmo.com/payment-link?audience=private&txn=pay&recipients='+PAY.venmo+'&amount='+a+'&note='+q; }
+/* No amount on the Venmo side -- the client types it. Only the recipient and
+   the note go across, so the payment is still identifiable. The web fallback is
+   the universal profile link, which hands off to the app most reliably. */
+function venmoApp(q){ return 'venmo://paycharge?txn=pay&recipients='+PAY.venmo+'&note='+q; }
+function venmoWeb(){ return 'https://venmo.com/u/'+PAY.venmo; }
 /* Cash App's https link is a universal link, so the OS hands it to the app on
    its own. Venmo's is not, so the button tries the app scheme first and only
    falls back to the web page if the app did not take over. The fallback is
@@ -1442,7 +1445,7 @@ function venmoWeb(a,q){ return 'https://account.venmo.com/payment-link?audience=
    that Venmo opened -- so it can never fire on top of the app. */
 function payVenmo(el,ev){
   if(ev && ev.preventDefault) ev.preventDefault();
-  var a=el.getAttribute('data-amt')||'', q=encodeURIComponent(el.getAttribute('data-note')||'');
+  var q=encodeURIComponent(el.getAttribute('data-note')||'');
   var done=false,t=null;
   function cleanup(){
     document.removeEventListener('visibilitychange',onHide);
@@ -1457,9 +1460,9 @@ function payVenmo(el,ev){
   t=setTimeout(function(){
     if(done) return;              /* the app took over */
     done=true; cleanup();
-    window.location.href=venmoWeb(a,q);
+    window.location.href=venmoWeb();
   },1200);
-  window.location.href=venmoApp(a,q);
+  window.location.href=venmoApp(q);
   return false;
 }
 function payAmt(n){ return (Math.round(n*100)%100===0) ? String(Math.round(n)) : n.toFixed(2); }
@@ -1467,10 +1470,10 @@ function payButtons(amount,note){
   if(!(amount>0)) return '';
   var a=payAmt(amount), q=encodeURIComponent(note);
   return '<div class="payrow">'+
-    '<a class="paybtn vm" target="_blank" rel="noopener" data-amt="'+a+'" data-note="'+attr(note)+'"'+
-      ' onclick="return payVenmo(this,event)" href="'+venmoWeb(a,q)+'">'+
+    '<a class="paybtn vm" target="_blank" rel="noopener" data-note="'+attr(note)+'"'+
+      ' onclick="return payVenmo(this,event)" href="'+venmoWeb()+'">'+
       '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'+
-      'Pay with Venmo <span class="amt">$'+a+'</span></a>'+
+      'Pay with Venmo</a>'+
     '<a class="paybtn ca" target="_blank" rel="noopener" href="https://cash.app/$'+PAY.cashapp+'/'+a+'">'+
       '<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M16 6.5A3.5 3.5 0 0012.5 4h-1a3.5 3.5 0 000 7h1a3.5 3.5 0 010 7h-1A3.5 3.5 0 018 17.5"/></svg>'+
       'Pay with Cash App <span class="amt">$'+a+'</span></a>'+
