@@ -1130,3 +1130,59 @@ a.bls-card:hover{transform:translateY(-3px);box-shadow:var(--bls-shadow-lg);bord
 .bls-foot-disc{font-size:11.5px;line-height:1.65;color:#bdb49c;max-width:66ch}
 
 @media print{.bls-hero,.bls-foot{background:#fff;color:#000}}
+
+/* ======================================================================
+   PUBLIC NAV — one canonical appearance across every .bls page
+   ----------------------------------------------------------------------
+   /nav.js is the single source of the nav markup and link set. Its own
+   injected <style> is plain-class specificity (0,1,0), while the client
+   layer above carries html[data-theme] .bl-nav-* (0,1,1). So whether a
+   page happened to set data-theme decided which won: pages without it
+   got nav.js (Tools indented 16px, 13px type), pages with it got the
+   client layer (flush 24px, 14-16px type). That is the inconsistency
+   between the homepage and the Biomarker page.
+
+   These rules are scoped to body.bls (0,2,1+), which beats both, so every
+   public page lands on the same nav regardless of data-theme. Client
+   protocol pages carry no .bls class and are untouched.
+   ====================================================================== */
+body.bls .bl-nav{background:var(--bls-card);border-bottom:1px solid var(--bls-line);
+  position:sticky;top:0;z-index:600;font-family:var(--bls-sans)}
+body.bls .bl-nav-inner{max-width:var(--bls-maxw);margin:0 auto;
+  padding:0 var(--bls-gutter);display:flex;align-items:center;justify-content:space-between;height:58px}
+body.bls .bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+body.bls .bl-nav-logo-main{font-family:var(--bls-serif);font-size:18px;font-weight:600;
+  color:var(--bls-ink);letter-spacing:.1em}
+body.bls .bl-nav-logo-sub{font-size:9px;color:var(--bls-gold);letter-spacing:.2em;
+  text-transform:uppercase;margin-top:3px;font-weight:700}
+
+/* desktop links + Tools dropdown */
+body.bls .bl-nav-links{display:flex;align-items:center;gap:2px}
+body.bls .bl-nav-link{font-size:11.5px;color:var(--bls-ink2);text-decoration:none;padding:8px 12px;
+  border-radius:6px;background:none;border:none;cursor:pointer;font-family:var(--bls-sans);white-space:nowrap}
+body.bls .bl-nav-link:hover,body.bls .bl-nav-link.active{color:var(--bls-gold);background:var(--bls-gold-soft)}
+body.bls .bl-nav-dropdown-menu{background:var(--bls-card);border:1px solid var(--bls-line);
+  border-radius:0 0 10px 10px;box-shadow:var(--bls-shadow-lg);min-width:200px;padding:4px 0}
+body.bls .bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:var(--bls-ink2);
+  text-decoration:none;font-family:var(--bls-sans);white-space:nowrap}
+body.bls .bl-nav-dropdown-item:hover,body.bls .bl-nav-dropdown-item.active{
+  background:var(--bls-gold-soft);color:var(--bls-gold);padding-left:20px}
+body.bls .bl-nav-mobile-btn{display:none;background:none;border:none;font-size:22px;cursor:pointer;
+  color:var(--bls-ink);padding:8px}
+
+/* mobile menu — identical spacing, dividers, type and Tools indent everywhere */
+body.bls .bl-nav-mobile-menu{display:none;border-top:1px solid var(--bls-line);
+  background:var(--bls-card);padding:10px var(--bls-gutter) 18px}
+body.bls .bl-nav-mobile-menu.open{display:block}
+body.bls .bl-nav-mobile-link{display:flex;align-items:center;min-height:46px;padding:12px 0;
+  font-size:15px;color:var(--bls-ink);text-decoration:none;
+  border-bottom:1px solid var(--bls-line2);font-family:var(--bls-sans)}
+body.bls .bl-nav-mobile-link:last-child{border-bottom:none}
+body.bls .bl-nav-mobile-sub{padding-left:18px;font-size:14px;color:var(--bls-ink2)}
+body.bls .bl-nav-mobile-section{padding:14px 0 6px;font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--bls-gold);font-family:var(--bls-sans);font-weight:700;
+  border-bottom:1px solid var(--bls-line)}
+@media(max-width:767px){
+  body.bls .bl-nav-links{display:none}
+  body.bls .bl-nav-mobile-btn{display:block}
+}
