@@ -466,6 +466,27 @@
   .a2hs .tx{font-size:12px;line-height:1.5;color:var(--ink2);flex:1}
   .a2hs .tx b{color:var(--ink)}
   .a2hs .x{background:none;border:none;color:var(--faint);font-size:19px;line-height:1;cursor:pointer;padding:0 2px;flex:none}
+  /* ===== PAYMENT BUTTONS =====
+     Brand colours only -- no official logos or wordmarks, just the service name
+     and a generic icon. The colours are fixed rather than tokenised because a
+     brand colour is the same in both themes; the text colour on each is picked
+     for contrast against its own fill, so they read in light and dark alike. */
+  .payrow{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .paybtn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+    min-height:48px;padding:13px 14px;border:none;border-radius:13px;cursor:pointer;
+    font-family:var(--sans);font-size:13.5px;font-weight:800;letter-spacing:.2px;
+    text-decoration:none;text-align:center;
+    box-shadow:0 1px 2px rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.10);
+    transition:transform .14s,filter .18s}
+  .paybtn:active{transform:scale(.985);filter:brightness(.94)}
+  .paybtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2;flex:none}
+  .paybtn .amt{font-weight:800;opacity:.92}
+  .paybtn.vm{background:#3D95CE;color:#ffffff}
+  .paybtn.ca{background:#00D632;color:#06240f}
+  .paybtn.zl{background:#6D1ED4;color:#ffffff}
+  .paybtn.copied{background:var(--ok);color:var(--card)}
+  .paynote{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px}
+
   /* ===== NUTRITION =====
      Ported from the nutrition tool on mpauldino's protocol page; only the
      colour tokens and fonts are remapped onto this app's own. */
@@ -1051,9 +1072,8 @@
     <div class="dname" id="i-name"></div><div class="dpur" id="i-sum"></div>
     <div class="dl first">Line Items</div>
     <div style="padding:6px 16px 0" id="i-items"></div>
-    <div style="padding:4px 16px 0"><button class="btn" id="i-pay" onclick="payStub()"></button>
-    <button class="btn ghost" onclick="docStub()">View invoice document</button></div>
-    <p class="note" style="padding:0 16px">Preview only &mdash; payment is not wired up in this pilot.</p>
+    <div style="padding:4px 16px 0" id="i-pay"></div>
+    <p class="note" style="padding:0 16px">Tapping opens your payment app &mdash; nothing is charged inside this app.</p>
   </div>
 
   <div class="sheet" id="s-calc">
@@ -1254,8 +1274,52 @@ function go(v){
 function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
 function sheet(n){var e=document.getElementById('s-'+n);e.scrollTop=0;e.classList.add('on');}
 function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});}
-function payStub(){alert('Payment is not wired up in this pilot — this is a preview of the layout.');}
-function docStub(){alert('The invoice document link is a placeholder in this pilot.');}
+/* ---------- PAYMENT HAND-OFF ----------
+   These only hand the client to their own payment app with the amount and a
+   note pre-filled; nothing is charged in here. Venmo cannot lock the amount,
+   so the client can still edit it before sending -- that is expected.
+   Brand colours only, no logos or wordmarks. */
+var PAY={venmo:'Micahp20', cashapp:'micahpauldino', zelle:'720-938-0698'};
+function payAmt(n){ return (Math.round(n*100)%100===0) ? String(Math.round(n)) : n.toFixed(2); }
+function payButtons(amount,note){
+  if(!(amount>0)) return '';
+  var a=payAmt(amount), q=encodeURIComponent(note);
+  return '<div class="payrow">'+
+    '<a class="paybtn vm" target="_blank" rel="noopener" href="https://venmo.com/'+PAY.venmo+
+      '?txn=pay&amount='+a+'&note='+q+'">'+
+      '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'+
+      'Pay with Venmo <span class="amt">$'+a+'</span></a>'+
+    '<a class="paybtn ca" target="_blank" rel="noopener" href="https://cash.app/$'+PAY.cashapp+'/'+a+'">'+
+      '<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M16 6.5A3.5 3.5 0 0012.5 4h-1a3.5 3.5 0 000 7h1a3.5 3.5 0 010 7h-1A3.5 3.5 0 018 17.5"/></svg>'+
+      'Pay with Cash App <span class="amt">$'+a+'</span></a>'+
+    '<button class="paybtn zl" type="button" onclick="payZelle(this)">'+
+      '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 11h18M7 15h4"/></svg>'+
+      'Send via Zelle to '+PAY.zelle+'</button>'+
+    '</div>';
+}
+/* copy the Zelle number -- Zelle has no deep link to hand off to */
+function payZelle(btn){
+  var n=PAY.zelle, done=function(){
+    var old=btn.innerHTML;
+    btn.classList.add('copied');
+    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied '+n;
+    setTimeout(function(){ btn.classList.remove('copied'); btn.innerHTML=old; },2200);
+  };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(n).then(done,function(){ payCopyFallback(n,done); });
+    } else payCopyFallback(n,done);
+  }catch(e){ payCopyFallback(n,done); }
+}
+function payCopyFallback(text,done){
+  try{
+    var t=document.createElement('textarea');
+    t.value=text; t.setAttribute('readonly','');
+    t.style.position='absolute'; t.style.left='-9999px';
+    document.body.appendChild(t); t.select();
+    document.execCommand('copy'); document.body.removeChild(t); done();
+  }catch(e){ alert('Zelle: '+text); }
+}
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
 (function(){var h=new Date().getHours();
@@ -1418,7 +1482,8 @@ function renderPay(){
     '</div><div class="o">'+dueO.map(function(o){return o.label}).join(', ')+
     '</div><div class="np">'+dueO.length+' unpaid invoice'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
-    '<button class="btn" onclick="openInv('+INV.indexOf(dueO[0])+')">Review &amp; pay</button></div>')
+    '<button class="btn" onclick="openInv('+INV.indexOf(dueO[0])+')">Review &amp; pay</button>'+
+    payButtons(dueT,'BioLinked \u2014 balance due')+'</div>')
     : ('<div class="bal"><div class="l">Balance due</div><div class="n">'+money(0)+
        '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>');
   list.innerHTML=INV.map(function(o,i){
@@ -1443,8 +1508,9 @@ function openInv(i){
       '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>';
   }).join('')+'<div class="irow tot"><span class="in">Order total</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o);
   var pay=document.getElementById('i-pay');
-  pay.textContent=o.status==='due'?('Pay '+money(o.total)):(o.status==='free'?'No charge':'Paid in full');
-  pay.style.display=o.status==='due'?'block':'none';
+  pay.innerHTML = o.status==='due'
+    ? payButtons(o.total,'BioLinked \u2014 '+o.label.split(' \u00b7 ')[0])
+    : '';
   sheet('inv');
 }
 
