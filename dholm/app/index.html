@@ -58,11 +58,13 @@
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   /* html carries the app background, not the desktop surround: Safari paints
      the html background into the rubber-band overscroll area, so anything else
-     here flashes a mismatched strip at the top when you pull down. */
+     here flashes a mismatched strip at the top when you pull down.
+     No overscroll-behavior lock -- combined with an inner absolute scroller it
+     is what wedges touch handling on iOS. */
   html{margin:0;height:100%;background:var(--bg)}
   body{margin:0;height:100%;background:var(--surround);font-family:var(--sans);color:var(--ink);
     -webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;
-    min-height:100vh;overscroll-behavior:none;transition:background .25s}
+    min-height:100vh;transition:background .25s}
 
   /* The device frame. On a phone it is full-bleed and sized with dvh, NOT vh:
      iOS reports 100vh as the URL-bar-hidden height, so a vh-sized frame hangs
@@ -71,21 +73,45 @@
   .device{width:400px;max-width:100vw;height:860px;max-height:100vh;background:var(--bg);
     position:relative;overflow:hidden;box-shadow:0 24px 70px rgba(30,26,16,.3);border-radius:34px;
     transition:background .25s}
-  /* On a phone the frame IS the viewport, so stop centring it. body was a
-     flex container with align-items:center and min-height:100vh while the
-     frame is 100dvh -- and on iOS 100vh is the URL-bar-hidden height, so the
-     frame got centred inside a taller body and left a band of
-     (100vh - 100dvh)/2 at the top showing --surround through. That was the
-     tan strip in light and the black strip in dark. display:block pins the
-     frame to top:0 with nothing above it, and the body background matches the
-     app so there is no second colour anywhere near the top edge. */
+  /* ===== PHONE LAYOUT: the DOCUMENT scrolls =====
+     Above 430px the framed desktop preview above stays exactly as it is. On a
+     phone we switch models entirely.
+
+     What was here before clamped body to 100dvh with overflow:hidden and let an
+     absolutely-positioned inner .scroll do the scrolling. That is the pattern
+     that wedges iOS Safari: momentum scrolling inside an inner scroller whose
+     height is resolved against a viewport unit that changes as the URL bar
+     moves, so the scroller ends up the wrong height -- content below the fold
+     unreachable, a block of dead space, and touch handling stuck.
+
+     Now: body scrolls naturally with no height clamp, the header is sticky so
+     it keeps its own space in normal flow (no magic offset to get wrong), the
+     tab bar is fixed, and the content wrapper simply pads past the tab bar.
+     Nothing is absolutely positioned against a dynamic viewport height. */
   @media(max-width:430px){
-    body{display:block;min-height:0;height:100dvh;overflow:hidden;background:var(--bg)}
-    .device{width:100vw;border-radius:0;height:100vh;height:100dvh;max-height:none;box-shadow:none}
+    html,body{height:auto}
+    body{display:block;min-height:100vh;background:var(--bg)}
+    .device{position:static;width:100%;max-width:none;height:auto;min-height:100vh;max-height:none;
+      border-radius:0;overflow:visible;box-shadow:none}
+    /* sticky, so it occupies flow space and the content below needs no offset */
+    .top{position:sticky;left:auto;right:auto}
+    /* a plain static wrapper now -- it only has to clear the fixed tab bar */
+    .scroll{position:static;overflow:visible;height:auto;
+      padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
+    /* overlays stay viewport-anchored, with their own internal scroll */
+    .sheet{position:fixed}
+    .navscrim,.navmenu{position:fixed}
   }
   @media(display-mode:standalone){
-    body{display:block;min-height:0;height:100dvh;overflow:hidden;background:var(--bg)}
-    .device{width:100vw;border-radius:0;height:100vh;height:100dvh;max-height:none;box-shadow:none}
+    html,body{height:auto}
+    body{display:block;min-height:100vh;background:var(--bg)}
+    .device{position:static;width:100%;max-width:none;height:auto;min-height:100vh;max-height:none;
+      border-radius:0;overflow:visible;box-shadow:none}
+    .top{position:sticky;left:auto;right:auto}
+    .scroll{position:static;overflow:visible;height:auto;
+      padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
+    .sheet{position:fixed}
+    .navscrim,.navmenu{position:fixed}
   }
 
   /* top:0 of the frame, and its padding-top carries env(safe-area-inset-top)
@@ -870,10 +896,13 @@ function go(v){
   document.querySelectorAll('.view').forEach(function(e){e.classList.remove('on')});
   document.getElementById('v-'+v).classList.add('on');
   document.querySelectorAll('.tab').forEach(function(t){t.classList.toggle('on',t.dataset.v===v)});
-  document.getElementById('scroll').scrollTop=0;
+  /* On a phone the document scrolls; on the desktop frame the inner container
+     does. Reset both -- whichever is not scrolling is a harmless no-op. */
+  var sc=document.getElementById('scroll'); if(sc) sc.scrollTop=0;
+  if(window.scrollTo) window.scrollTo(0,0);
 }
 function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
-function sheet(n){document.getElementById('s-'+n).classList.add('on');}
+function sheet(n){var e=document.getElementById('s-'+n);e.scrollTop=0;e.classList.add('on');}
 function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});}
 function payStub(){alert('Payment is not wired up in this pilot — this is a preview of the layout.');}
 function docStub(){alert('The invoice document link is a placeholder in this pilot.');}
