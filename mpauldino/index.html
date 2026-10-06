@@ -819,6 +819,33 @@
     .days{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
     .cats{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   }
+
+  /* ===== HAMBURGER-ONLY NAV (phone) =================================
+     .tabs stays a flex child of the shell. Collapsing it to zero height
+     keeps the flex column intact, so .scroll keeps flex:1 1 auto with
+     min-height:0 and still sizes to the viewport. display:none would
+     pull it out of flow, which is what previously cost .scroll its flex
+     sizing and froze the page. --tabh drops to 0 so any bottom padding
+     that reserved room for the bar collapses with it.
+     Desktop (>=768px) already hides .tabs and uses the sidebar. ======= */
+  @media(max-width:767px){
+    .tabs{height:0 !important;min-height:0 !important;padding:0 !important;
+      margin:0 !important;border:0 !important;overflow:hidden !important;
+      visibility:hidden !important;flex:0 0 auto !important}
+    :root{--tabh:0px}
+    /* belt and braces: restate the scroller's flex sizing at the same
+       specificity, so it cannot be lost again by a later rule. */
+    .scroll{flex:1 1 auto !important;min-height:0 !important;overflow-y:auto !important}
+    .navmenu{width:min(84vw,268px);max-height:calc(100vh - 92px - env(safe-area-inset-top));
+      overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+    .navmenu .nav-item{display:flex;align-items:center;gap:10px;width:100%;
+      padding:11px 14px;border:none;border-top:1px solid var(--line2);
+      background:transparent;text-align:left;font-family:inherit;cursor:pointer;
+      -webkit-tap-highlight-color:transparent}
+    .navmenu .nav-item:active{background:var(--cream)}
+    .navmenu .nh:first-child{padding-top:11px}
+    .navmenu .nh + .nav-item,.navmenu .nh + a{border-top:none}
+  }
 </style>
 </head>
 <body>
@@ -860,7 +887,29 @@
     </button>
   </div>
   <div class="navscrim" id="navscrim" onclick="closeNav()"></div>
-  <div class="navmenu" id="navmenu">
+  <div class="navmenu" id="navmenu" role="menu" aria-label="Navigation">
+    <div class="nh">Your Protocol</div>
+    <button type="button" class="nav-item" onclick="go('proto')">
+      <div><div class="nl">Protocol</div><div class="nd">Your welcome screen and overview</div></div></button>
+    <button type="button" class="nav-item" onclick="go('sched')">
+      <div><div class="nl">Schedule</div><div class="nd">Today's doses, timing and the week</div></div></button>
+    <button type="button" class="nav-item" onclick="go('nutr')">
+      <div><div class="nl">Nutrition</div><div class="nd">Meal builder and macro targets</div></div></button>
+    <button type="button" class="nav-item" onclick="go('labs')">
+      <div><div class="nl">Labs</div><div class="nd">Every marker, explained</div></div></button>
+    <button type="button" class="nav-item" onclick="go('pay')">
+      <div><div class="nl">Pay</div><div class="nd">Invoices and balance</div></div></button>
+    <div class="nh">Tools &amp; Info</div>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('indexlist')">
+      <div><div class="nl">Index</div><div class="nd">Look up any compound</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
+      <div><div class="nl">Dose Calculator</div><div class="nd">Vial, water and dose in, units out</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('notes')">
+      <div><div class="nl">Notes &amp; Tips</div><div class="nd">Storage, technique, week by week</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('dna')">
+      <div><div class="nl">DNA &amp; Traits</div><div class="nd">Genetics, methylation and detox</div></div></button>
+    <a href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" onclick="closeNav()">
+      <div><div class="nl">BL Tools Access</div><div class="nd">Biomarker analyzer and the rest</div></div><div class="ext">&#8599;</div></a>
     <div class="nh">BioLinked Website</div>
     <a href="https://biolinkedsolutions.com" target="_blank" rel="noopener" onclick="closeNav()">
       <div><div class="nl">Home</div><div class="nd">biolinkedsolutions.com</div></div><div class="ext">&#8599;</div></a>
