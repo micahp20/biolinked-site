@@ -1,7 +1,7 @@
 // BioLinked app pilot service worker — network-first so the protocol is never stale.
 // Falls back to cache only when offline. Scoped to /dholm/app/ so it cannot touch
 // or shadow the live /dholm/ page, which has its own worker at /dholm/sw.js.
-const CACHE = 'dholm-app-v20';
+const CACHE = 'dholm-app-v21';
 const ASSETS = [
   '/dholm/app/',
   '/dholm/app/index.html',

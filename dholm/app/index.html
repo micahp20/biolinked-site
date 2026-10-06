@@ -1432,13 +1432,43 @@ function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.
    so the client can still edit it before sending -- that is expected.
    Brand colours only, no logos or wordmarks. */
 var PAY={venmo:'Micahp20', cashapp:'micahpauldino', zelle:'720-938-0698'};
+function attr(v){ return String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function venmoApp(a,q){ return 'venmo://paycharge?txn=pay&recipients='+PAY.venmo+'&amount='+a+'&note='+q; }
+function venmoWeb(a,q){ return 'https://account.venmo.com/payment-link?audience=private&txn=pay&recipients='+PAY.venmo+'&amount='+a+'&note='+q; }
+/* Cash App's https link is a universal link, so the OS hands it to the app on
+   its own. Venmo's is not, so the button tries the app scheme first and only
+   falls back to the web page if the app did not take over. The fallback is
+   cancelled the moment the page is hidden or backgrounded -- that is the signal
+   that Venmo opened -- so it can never fire on top of the app. */
+function payVenmo(el,ev){
+  if(ev && ev.preventDefault) ev.preventDefault();
+  var a=el.getAttribute('data-amt')||'', q=encodeURIComponent(el.getAttribute('data-note')||'');
+  var done=false,t=null;
+  function cleanup(){
+    document.removeEventListener('visibilitychange',onHide);
+    window.removeEventListener('pagehide',cancel);
+    window.removeEventListener('blur',cancel);
+  }
+  function cancel(){ if(done) return; done=true; clearTimeout(t); cleanup(); }
+  function onHide(){ if(document.hidden) cancel(); }
+  document.addEventListener('visibilitychange',onHide);
+  window.addEventListener('pagehide',cancel);
+  window.addEventListener('blur',cancel);
+  t=setTimeout(function(){
+    if(done) return;              /* the app took over */
+    done=true; cleanup();
+    window.location.href=venmoWeb(a,q);
+  },1200);
+  window.location.href=venmoApp(a,q);
+  return false;
+}
 function payAmt(n){ return (Math.round(n*100)%100===0) ? String(Math.round(n)) : n.toFixed(2); }
 function payButtons(amount,note){
   if(!(amount>0)) return '';
   var a=payAmt(amount), q=encodeURIComponent(note);
   return '<div class="payrow">'+
-    '<a class="paybtn vm" target="_blank" rel="noopener" href="https://account.venmo.com/payment-link'+
-      '?audience=private&txn=pay&recipients='+PAY.venmo+'&amount='+a+'&note='+q+'">'+
+    '<a class="paybtn vm" target="_blank" rel="noopener" data-amt="'+a+'" data-note="'+attr(note)+'"'+
+      ' onclick="return payVenmo(this,event)" href="'+venmoWeb(a,q)+'">'+
       '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'+
       'Pay with Venmo <span class="amt">$'+a+'</span></a>'+
     '<a class="paybtn ca" target="_blank" rel="noopener" href="https://cash.app/$'+PAY.cashapp+'/'+a+'">'+
