@@ -1,23 +1,26 @@
-// BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'ahellyer-v8';
+// BioLinked client protocol service worker — network-first so the protocol is
+// never stale. Scoped to /ahellyer/, which is now the real page: the app layout
+// was promoted here from the /ahellyer/app/ pilot.
+const CACHE = 'ahellyer-v9';
 const ASSETS = [
   '/ahellyer/',
   '/ahellyer/index.html',
   '/ahellyer/manifest.json',
-  '/icon-180.png',
   '/icon-192.png',
-  '/icon-512.png',
-  '/favicon.png'
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
   self.skipWaiting();
 });
 
+// Prune only this page's own caches, including the retired pilot's, so an
+// installed copy of /ahellyer/app/ does not keep serving from its old store.
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => (k.startsWith('ahellyer-') || k.startsWith('ahellyer-app-')) && k !== CACHE)
+        .map(k => caches.delete(k))
   )));
   self.clients.claim();
 });
@@ -26,6 +29,7 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
+  if (!url.pathname.startsWith('/ahellyer/') && !url.pathname.startsWith('/icon-')) return;
   e.respondWith(
     fetch(e.request).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
