@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dholm/, which is now the real page: the app layout
 // was promoted here from the /dholm/app/ pilot.
-const CACHE = 'dholm-v52';
+const CACHE = 'dholm-v53';
 const ASSETS = [
   '/dholm/',
   '/dholm/index.html',

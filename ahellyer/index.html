@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fbfaf6" id="tc">
+<meta name="theme-color" content="#f2f3f5" id="tc">
 <title>BioLinked &middot; Amelia Hellyer</title>
 <meta name="description" content="Your BioLinked protocol, compound index, labs and invoices in one place.">
 <link rel="manifest" href="/ahellyer/manifest.json">
@@ -20,8 +20,8 @@
      in both. Toggled by setting data-theme on <html>; persisted on-device. */
   :root{
     --ink:#211d16; --ink2:#4a4538; --muted:#8c8578; --faint:#b3ad9f;
-    --line:#ece7db; --line2:#f4f0e7; --bg:#fbfaf6; --card:#ffffff;
-    --gold:#8a7338; --gold2:#a68c4a; --gold-soft:#f2ebd7; --cream:#faf7ef;
+    --line:#e3e5e9; --line2:#eef0f3; --bg:#f2f3f5; --card:#ffffff;
+    --gold:#8a7338; --gold2:#a68c4a; --gold-soft:#f2ebd7; --cream:#f7f8fa;
     --on-gold:#ffffff;
     --pm:#5b7686; --pm-soft:#e8eef1;
     --warn:#b5473a; --warn-soft:#fbeeec; --warn-line:#f0d8d3;
@@ -29,8 +29,8 @@
     --ok:#4e7a52; --ok-soft:#e8f0e8;
     --lo:#5566a0; --lo-soft:#eef0f7;
     --deep1:#2d2615; --deep2:#5a491f; --deep-tx:#ffffff; --deep-ac:#e3d2a6; --deep-sb:#d8cdb4;
-    --topbg:#fbfaf6; --tabbg:rgba(251,250,246,.98);
-    --surround:#d8d4ca;
+    --topbg:#f2f3f5; --tabbg:rgba(242,243,245,.98);
+    --surround:#dfe1e5;
     --barrel:#2a2a28; --syr-stroke:#ffffff;
     --tip-bg:#211d16; --tip-tx:#f3eee2; --tip-line:#3a3328; --tip-strong:#dcc68c;
     --serif:'Hoefler Text',Georgia,'Times New Roman',serif;
@@ -820,6 +820,31 @@
     .days{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
     .cats{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   }
+
+  /* ===== HAMBURGER-ONLY NAV (phone) — mpauldino is the reference =======
+     .tabs stays a flex child and collapses to zero height. display:none
+     would pull it out of flow, which is what cost .scroll its flex sizing
+     and froze the page on the first attempt. --tabh drops to 0 so bottom
+     padding that reserved room for the bar collapses with it, and the
+     scroller's flex sizing is restated so it cannot be lost again.
+     Desktop (>=768px) already hides .tabs and uses the sidebar. ========= */
+  @media(max-width:767px){
+    .tabs{height:0 !important;min-height:0 !important;padding:0 !important;
+      margin:0 !important;border:0 !important;overflow:hidden !important;
+      visibility:hidden !important;flex:0 0 auto !important}
+    :root{--tabh:0px}
+    .scroll{flex:1 1 auto !important;min-height:0 !important;overflow-y:auto !important}
+    body{background:var(--bg)}
+    .navmenu{width:min(84vw,268px);max-height:calc(100vh - 92px - env(safe-area-inset-top));
+      overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+    .navmenu .nav-item{display:flex;align-items:center;gap:10px;width:100%;
+      padding:11px 14px;border:none;border-top:1px solid var(--line2);
+      background:transparent;text-align:left;font-family:inherit;cursor:pointer;
+      -webkit-tap-highlight-color:transparent}
+    .navmenu .nav-item:active{background:var(--cream)}
+    .navmenu .nh:first-child{padding-top:11px}
+    .navmenu .nh + .nav-item,.navmenu .nh + a{border-top:none}
+  }
 </style>
 </head>
 <body>
@@ -861,7 +886,27 @@
     </button>
   </div>
   <div class="navscrim" id="navscrim" onclick="closeNav()"></div>
-  <div class="navmenu" id="navmenu">
+    <div class="navmenu" id="navmenu" role="menu" aria-label="Navigation">
+    <div class="nh">Your Protocol</div>
+    <button type="button" class="nav-item" onclick="go('proto')">
+      <div><div class="nl">Protocol</div><div class="nd">Your welcome screen and overview</div></div></button>
+    <button type="button" class="nav-item" onclick="go('sched')">
+      <div><div class="nl">Schedule</div><div class="nd">Today's doses, timing and the week</div></div></button>
+    <button type="button" class="nav-item" onclick="go('nutr')">
+      <div><div class="nl">Nutrition</div><div class="nd">Meal builder and macro targets</div></div></button>
+    <button type="button" class="nav-item" onclick="go('labs')">
+      <div><div class="nl">Labs</div><div class="nd">Your bloodwork, explained</div></div></button>
+    <button type="button" class="nav-item" onclick="go('pay')">
+      <div><div class="nl">Pay</div><div class="nd">Invoices and balance</div></div></button>
+    <div class="nh">Tools &amp; Info</div>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('indexlist')">
+      <div><div class="nl">Index</div><div class="nd">Look up any compound</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
+      <div><div class="nl">Dose Calculator</div><div class="nd">Vial, water and dose in, units out</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('notes')">
+      <div><div class="nl">Notes &amp; Tips</div><div class="nd">Storage, technique, week by week</div></div></button>
+    <a href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" onclick="closeNav()">
+      <div><div class="nl">BL Tools Access</div><div class="nd">Biomarker analyzer and the rest</div></div><div class="ext">&#8599;</div></a>
     <div class="nh">BioLinked Website</div>
     <a href="https://biolinkedsolutions.com" target="_blank" rel="noopener" onclick="closeNav()">
       <div><div class="nl">Home</div><div class="nd">biolinkedsolutions.com</div></div><div class="ext">&#8599;</div></a>
@@ -869,6 +914,8 @@
       <div><div class="nl">Peptide Index</div><div class="nd">Dosing cheat sheet &amp; full catalog</div></div><div class="ext">&#8599;</div></a>
     <a href="https://biolinkedsolutions.com/stacks-blends" target="_blank" rel="noopener" onclick="closeNav()">
       <div><div class="nl">Stacks &amp; Blends</div><div class="nd">Pre-built protocol combinations</div></div><div class="ext">&#8599;</div></a>
+  </div>
+</div><div class="ext">&#8599;</div></a>
   </div>
   <div class="scroll" id="scroll">
     <section class="view on" id="v-proto"><div class="pad">
@@ -1316,7 +1363,7 @@ var sel=new Date().getDay();
 var KP='ah-app-';
 
 /* ---------- THEME ---------- */
-var TCOL={light:'#fbfaf6',dark:'#15130f'};
+var TCOL={light:'#f2f3f5',dark:'#15130f'};
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   var m=document.getElementById('tc'); if(m) m.setAttribute('content',TCOL[t]||TCOL.light);
