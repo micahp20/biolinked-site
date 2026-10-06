@@ -1,34 +1,35 @@
-// BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-// Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'cpauldino-v49';
+// BioLinked client protocol service worker — network-first so the protocol is
+// never stale. Scoped to /cpauldino/, which is now the real page: the app layout
+// was promoted here from the /cpauldino/app/ pilot.
+const CACHE = 'cpauldino-v50';
 const ASSETS = [
   '/cpauldino/',
   '/cpauldino/index.html',
   '/cpauldino/manifest.json',
-  '/icon-180.png',
   '/icon-192.png',
-  '/icon-512.png',
-  '/favicon.png'
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
   self.skipWaiting();
 });
 
+// Prune only this page's own caches, including the retired pilot's, so an
+// installed copy of /cpauldino/app/ does not keep serving from its old store.
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => (k.startsWith('cpauldino-') || k.startsWith('cpauldino-app-')) && k !== CACHE)
+        .map(k => caches.delete(k))
   )));
   self.clients.claim();
 });
 
-// Network-first: always try fresh content first so clients see the latest protocol updates.
-// Falls back to cache only if the network is unavailable (offline support preserved).
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
+  if (!url.pathname.startsWith('/cpauldino/') && !url.pathname.startsWith('/icon-')) return;
   e.respondWith(
     fetch(e.request).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
