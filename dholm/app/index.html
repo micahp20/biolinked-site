@@ -61,10 +61,10 @@
      here flashes a mismatched strip at the top when you pull down.
      No overscroll-behavior lock -- combined with an inner absolute scroller it
      is what wedges touch handling on iOS. */
-  html{margin:0;height:100%;background:var(--bg)}
+  html{margin:0;height:100%;background:var(--bg);overflow-x:hidden}
   body{margin:0;height:100%;background:var(--surround);font-family:var(--sans);color:var(--ink);
     -webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;
-    min-height:100vh;transition:background .25s}
+    min-height:100vh;overflow-x:hidden;transition:background .25s}
 
   /* The device frame. On a phone it is full-bleed and sized with dvh, NOT vh:
      iOS reports 100vh as the URL-bar-hidden height, so a vh-sized frame hangs
@@ -73,50 +73,6 @@
   .device{width:400px;max-width:100vw;height:860px;max-height:100vh;background:var(--bg);
     position:relative;overflow:hidden;box-shadow:0 24px 70px rgba(30,26,16,.3);border-radius:34px;
     transition:background .25s}
-  /* ===== PHONE LAYOUT: the DOCUMENT scrolls =====
-     Above 430px the framed desktop preview above stays exactly as it is. On a
-     phone we switch models entirely.
-
-     What was here before clamped body to 100dvh with overflow:hidden and let an
-     absolutely-positioned inner .scroll do the scrolling. That is the pattern
-     that wedges iOS Safari: momentum scrolling inside an inner scroller whose
-     height is resolved against a viewport unit that changes as the URL bar
-     moves, so the scroller ends up the wrong height -- content below the fold
-     unreachable, a block of dead space, and touch handling stuck.
-
-     Now: body scrolls naturally with no height clamp, the header is sticky so
-     it keeps its own space in normal flow (no magic offset to get wrong), the
-     tab bar is fixed, and the content wrapper simply pads past the tab bar.
-     Nothing is absolutely positioned against a dynamic viewport height. */
-  @media(max-width:430px){
-    html,body{height:auto}
-    body{display:block;min-height:100vh;background:var(--bg)}
-    .device{position:static;width:100%;max-width:none;height:auto;min-height:100vh;max-height:none;
-      border-radius:0;overflow:visible;box-shadow:none}
-    /* sticky, so it occupies flow space and the content below needs no offset */
-    .top{position:sticky;left:auto;right:auto}
-    /* a plain static wrapper now -- it only has to clear the fixed tab bar */
-    .scroll{position:static;overflow:visible;height:auto;
-      padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
-    /* overlays stay viewport-anchored, with their own internal scroll */
-    .sheet{position:fixed}
-    .navscrim,.navmenu{position:fixed}
-  }
-  @media(display-mode:standalone){
-    html,body{height:auto}
-    body{display:block;min-height:100vh;background:var(--bg)}
-    .device{position:static;width:100%;max-width:none;height:auto;min-height:100vh;max-height:none;
-      border-radius:0;overflow:visible;box-shadow:none}
-    .top{position:sticky;left:auto;right:auto}
-    .scroll{position:static;overflow:visible;height:auto;
-      padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
-    .sheet{position:fixed}
-    .navscrim,.navmenu{position:fixed}
-  }
-
-  /* top:0 of the frame, and its padding-top carries env(safe-area-inset-top)
-     with the header's own opaque background filling that inset -- so the status
-     bar strip is always header colour, in both themes. */
   .top{position:absolute;top:0;left:0;right:0;z-index:20;background:var(--topbg);
     backdrop-filter:saturate(1.3) blur(12px);border-bottom:1px solid var(--line);
     padding:calc(13px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
@@ -303,7 +259,7 @@
   /* Overlay sheets sit under the bar (z-40 vs z-90) and pad past it. */
   .sheet{position:absolute;inset:0;z-index:40;background:var(--bg);
     transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
-    overflow-y:auto;-webkit-overflow-scrolling:touch;
+    overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
     padding:calc(56px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 30px)}
   .sheet::-webkit-scrollbar{width:0}
   .sheet.on{transform:none;box-shadow:-10px 0 30px rgba(40,34,20,.1)}
@@ -513,6 +469,34 @@
   .a2hs .tx{font-size:12px;line-height:1.5;color:var(--ink2);flex:1}
   .a2hs .tx b{color:var(--ink)}
   .a2hs .x{background:none;border:none;color:var(--faint);font-size:19px;line-height:1;cursor:pointer;padding:0 2px;flex:none}
+  /* =======================================================================
+     PHONE LAYOUT -- DELIBERATELY LAST IN THE STYLESHEET.
+     A media query adds no specificity, so these overrides only beat the base
+     rules above by source order. When this block sat higher up, every base
+     rule that followed it won instead: .sheet stayed position:absolute, and an
+     absolute sheet translated one full viewport to the right extended the
+     document to 2x the viewport width -- the sideways scroll into a hidden
+     panel. .top, .scroll, .navscrim and .navmenu were losing the same way.
+     Keep this block at the bottom.
+     ======================================================================= */
+  @media(max-width:430px),(display-mode:standalone){
+    html,body{height:auto;overflow-x:hidden}
+    body{display:block;min-height:100vh;background:var(--bg)}
+    .device{position:static;width:100%;max-width:none;height:auto;min-height:100vh;max-height:none;
+      border-radius:0;overflow:visible;box-shadow:none}
+    /* sticky: keeps its own space in flow, so content below needs no offset */
+    .top{position:sticky;top:0;left:auto;right:auto}
+    /* a plain static wrapper -- it only has to clear the fixed tab bar */
+    .scroll{position:static;inset:auto;overflow:visible;height:auto;
+      padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
+    .tabs{position:fixed}
+    /* FIXED, not absolute: a closed sheet is translated one viewport right, and
+       only a fixed element is out of flow enough that it cannot widen the
+       document. width:100vw so it covers the screen edge to edge when open. */
+    .sheet{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;max-width:100vw;height:auto}
+    .navscrim{position:fixed}
+    .navmenu{position:fixed}
+  }
 </style>
 </head>
 <body>
