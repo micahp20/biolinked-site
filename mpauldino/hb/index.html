@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#fbfaf6" id="tc">
 <title>BioLinked</title>
 <meta name="description" content="Your BioLinked protocol, compound index, labs and invoices in one place.">
-<link rel="manifest" href="/mpauldino/manifest.json">
+<meta name="robots" content="noindex">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="BioLinked">
@@ -819,6 +819,27 @@
     .days{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
     .cats{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   }
+
+  /* ===== HAMBURGER-ONLY NAV (mobile) ==================================
+     The bottom tab bar is removed below 768px and every destination now
+     lives in the top-right menu. .tabs was the last flex child of the
+     shell, so display:none hands its height back to .scroll automatically
+     and --tabh drops to 0 so sheets and the A2HS banner stop reserving
+     space for a bar that is no longer there. Desktop (>=768px) is
+     untouched - it already hid .tabs and used the sidebar. ============== */
+  @media(max-width:767px){
+    .tabs{display:none !important}
+    :root{--tabh:0px}
+    .navmenu{width:min(84vw,268px);max-height:calc(100vh - 92px - env(safe-area-inset-top));
+      overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+    .navmenu .nav-item{display:flex;align-items:center;gap:10px;width:100%;
+      padding:11px 14px;border:none;border-top:1px solid var(--line2);
+      background:transparent;text-align:left;font-family:inherit;cursor:pointer;
+      -webkit-tap-highlight-color:transparent}
+    .navmenu .nav-item:active{background:var(--cream)}
+    .navmenu .nh:first-child{padding-top:11px}
+    .navmenu .nh + .nav-item,.navmenu .nh + a{border-top:none}
+  }
 </style>
 </head>
 <body>
@@ -860,7 +881,29 @@
     </button>
   </div>
   <div class="navscrim" id="navscrim" onclick="closeNav()"></div>
-  <div class="navmenu" id="navmenu">
+  <div class="navmenu" id="navmenu" role="menu" aria-label="Navigation">
+    <div class="nh">Your Protocol</div>
+    <button type="button" class="nav-item" onclick="go('proto')">
+      <div><div class="nl">Protocol</div><div class="nd">Your welcome screen and overview</div></div></button>
+    <button type="button" class="nav-item" onclick="go('sched')">
+      <div><div class="nl">Schedule</div><div class="nd">Today's doses, timing and the week</div></div></button>
+    <button type="button" class="nav-item" onclick="go('nutr')">
+      <div><div class="nl">Nutrition</div><div class="nd">Meal builder and macro targets</div></div></button>
+    <button type="button" class="nav-item" onclick="go('labs')">
+      <div><div class="nl">Labs</div><div class="nd">Every marker, explained</div></div></button>
+    <button type="button" class="nav-item" onclick="go('pay')">
+      <div><div class="nl">Pay</div><div class="nd">Invoices and balance</div></div></button>
+    <div class="nh">Tools &amp; Info</div>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('indexlist')">
+      <div><div class="nl">Index</div><div class="nd">Look up any compound</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
+      <div><div class="nl">Dose Calculator</div><div class="nd">Vial, water and dose in, units out</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('notes')">
+      <div><div class="nl">Notes &amp; Tips</div><div class="nd">Storage, technique, week by week</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('dna')">
+      <div><div class="nl">DNA &amp; Traits</div><div class="nd">Genetics, methylation and detox</div></div></button>
+    <a href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" onclick="closeNav()">
+      <div><div class="nl">BL Tools Access</div><div class="nd">Biomarker analyzer and the rest</div></div><div class="ext">&#8599;</div></a>
     <div class="nh">BioLinked Website</div>
     <a href="https://biolinkedsolutions.com" target="_blank" rel="noopener" onclick="closeNav()">
       <div><div class="nl">Home</div><div class="nd">biolinkedsolutions.com</div></div><div class="ext">&#8599;</div></a>
@@ -868,6 +911,7 @@
       <div><div class="nl">Peptide Index</div><div class="nd">Dosing cheat sheet &amp; full catalog</div></div><div class="ext">&#8599;</div></a>
     <a href="https://biolinkedsolutions.com/stacks-blends" target="_blank" rel="noopener" onclick="closeNav()">
       <div><div class="nl">Stacks &amp; Blends</div><div class="nd">Pre-built protocol combinations</div></div><div class="ext">&#8599;</div></a>
+  </div>
   </div>
   <div class="scroll" id="scroll">
     <section class="view on" id="v-proto"><div class="pad">
@@ -3955,7 +3999,7 @@ function hideA2(save){document.getElementById('a2hs').classList.remove('on');if(
 if('serviceWorker' in navigator){
   window.addEventListener('load',function(){
     var hadController = !!navigator.serviceWorker.controller, reloaded = false;
-    navigator.serviceWorker.register('/mpauldino/sw.js').then(function(reg){
+    navigator.serviceWorker.register('/mpauldino/hb/sw.js').then(function(reg){
       if(reg && reg.update){ try{ reg.update(); }catch(e){} }
     }).catch(function(){});
     navigator.serviceWorker.addEventListener('controllerchange',function(){
