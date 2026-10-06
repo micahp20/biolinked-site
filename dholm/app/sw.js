@@ -1,42 +1,19 @@
-// BioLinked app pilot service worker — network-first so the protocol is never stale.
-// Falls back to cache only when offline. Scoped to /dholm/app/ so it cannot touch
-// or shadow the live /dholm/ page, which has its own worker at /dholm/sw.js.
-const CACHE = 'dholm-app-v22';
-const ASSETS = [
-  '/dholm/app/',
-  '/dholm/app/index.html',
-  '/dholm/app/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+// Retired. The pilot moved to /dholm/. This worker exists only to get out of
+// the way: it caches nothing, serves everything straight from the network, and
+// removes its own caches and registration on activation so an installed copy
+// of the pilot cannot keep serving the old build.
+self.addEventListener('install', () => self.skipWaiting());
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
-  self.skipWaiting();
-});
-
-// Only ever prune this app's own caches — never dholm-v50, which belongs to the
-// live protocol page and shares this origin's cache storage.
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith('dholm-app-') && k !== CACHE).map(k => caches.delete(k))
-  )));
-  self.clients.claim();
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k.startsWith('dholm-app-')).map(k => caches.delete(k)));
+    await self.clients.claim();
+    try { await self.registration.unregister(); } catch (_) {}
+    const cs = await self.clients.matchAll({ type: 'window' });
+    cs.forEach(c => { try { c.navigate('/dholm/'); } catch (_) {} });
+  })());
 });
 
-// Network-first, and only for requests inside this app's own scope.
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  const url = new URL(e.request.url);
-  if (url.origin !== location.origin) return;
-  if (!url.pathname.startsWith('/dholm/app/') && !url.pathname.startsWith('/icon-')) return;
-  e.respondWith(
-    fetch(e.request).then(res => {
-      if (res && res.status === 200 && res.type === 'basic') {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-      }
-      return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/dholm/app/index.html')))
-  );
-});
+// No caching at all — always the network, so nothing stale survives here.
+self.addEventListener('fetch', () => {});
