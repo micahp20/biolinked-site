@@ -61,10 +61,10 @@
      here flashes a mismatched strip at the top when you pull down.
      No overscroll-behavior lock -- combined with an inner absolute scroller it
      is what wedges touch handling on iOS. */
-  html{margin:0;height:100%;background:var(--bg);overflow-x:hidden}
+  html{margin:0;height:100%;background:var(--bg);overflow-x:clip}
   body{margin:0;height:100%;background:var(--surround);font-family:var(--sans);color:var(--ink);
     -webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;
-    min-height:100vh;overflow-x:hidden;transition:background .25s}
+    min-height:100vh;overflow-x:clip;transition:background .25s}
 
   /* The device frame. On a phone it is full-bleed and sized with dvh, NOT vh:
      iOS reports 100vh as the URL-bar-hidden height, so a vh-sized frame hangs
@@ -202,7 +202,6 @@
   .pill.free{background:var(--gold-soft);color:var(--gold)}
 
   /* ALL COMPOUNDS -- expand in place. Everything starts collapsed. */
-  .sortseg{margin:0 0 11px}
   .cxwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;
     box-shadow:var(--shadow);overflow:hidden}
   .cx{border-bottom:1px solid var(--line2)}
@@ -480,20 +479,35 @@
      Keep this block at the bottom.
      ======================================================================= */
   @media(max-width:430px),(display-mode:standalone){
-    html,body{height:auto;overflow-x:hidden}
+    /* clip, never hidden: hidden makes these a scroll container and on iOS a
+       fixed child can then anchor to the document rather than the viewport,
+       which strands the tab bar mid-screen. */
+    html,body{height:auto;overflow-x:clip}
     body{display:block;min-height:100vh;background:var(--bg)}
-    .device{position:static;width:100%;max-width:none;height:auto;min-height:100vh;max-height:none;
-      border-radius:0;overflow:visible;box-shadow:none}
+    /* A flex column whose minimum is the visible viewport, so the content
+       wrapper below the sticky header always stretches to the bottom even when
+       a view is short. Without this a short view (the Index reference sheet,
+       say) ended where its text ended and left bare body background under the
+       bar. dvh is the live viewport height; vh is the fallback. */
+    .device{position:static;width:100%;max-width:none;height:auto;max-height:none;
+      min-height:100vh;min-height:100dvh;border-radius:0;overflow:visible;box-shadow:none;
+      display:flex;flex-direction:column;background:var(--bg)}
     /* sticky: keeps its own space in flow, so content below needs no offset */
-    .top{position:sticky;top:0;left:auto;right:auto}
-    /* a plain static wrapper -- it only has to clear the fixed tab bar */
-    .scroll{position:static;inset:auto;overflow:visible;height:auto;
+    .top{position:sticky;top:0;left:auto;right:auto;flex:none}
+    /* flex:1 makes it take all the height the header leaves, short content or
+       not; the padding keeps the last row clear of the fixed bar. */
+    .scroll{position:static;inset:auto;overflow:visible;height:auto;flex:1 0 auto;
+      display:flex;flex-direction:column;
       padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
+    .view.on{flex:1 0 auto}
     .tabs{position:fixed}
     /* FIXED, not absolute: a closed sheet is translated one viewport right, and
        only a fixed element is out of flow enough that it cannot widen the
        document. width:100vw so it covers the screen edge to edge when open. */
-    .sheet{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;max-width:100vw;height:auto}
+    /* already viewport-height via top/bottom; min-height is belt and braces
+       so a short detail view still paints its background to the bottom. */
+    .sheet{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;max-width:100vw;height:auto;
+      min-height:100vh;min-height:100dvh;background:var(--bg)}
     .navscrim{position:fixed}
     .navmenu{position:fixed}
   }
@@ -547,10 +561,6 @@
       <div class="seclbl">Weekly Rhythm</div>
       <div class="list" id="rhythm"></div>
       <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
-      <div class="seg sortseg">
-        <button id="sort-grp" class="on" onclick="setSort('grp')">Grouped</button>
-        <button id="sort-az" onclick="setSort('az')">A &ndash; Z</button>
-      </div>
       <div id="cmplist"></div>
       <p class="note">Everything Drew has taken or ordered &mdash; the active protocol, the gifts, and the prior Gorilla Stack. Tap a compound to open its recon, draw, site and timing in place.</p>
     </div></section>
@@ -955,25 +965,12 @@ function renderDoses(){
   }).join('');
 })();
 
-/* ---------- ALL COMPOUNDS -- full history, expand in place, A-Z toggle ----------
-   Rows expand inline instead of pushing a separate overlay. Everything starts
-   collapsed. 'Grouped' keeps the active / gift / prior-cycle split; 'A - Z'
-   flattens the whole 18 into one alphabetical list. */
-var sortMode='grp';
-function setSort(m){
-  sortMode=m;
-  document.getElementById('sort-grp').classList.toggle('on',m==='grp');
-  document.getElementById('sort-az').classList.toggle('on',m==='az');
-  renderAll();
-}
-function cmpBucket(c){
-  if(c.hist) return 'Prior Cycle \u00b7 Gorilla Stack';
-  if(c.tag==='Free Gift') return 'Gifts \u00b7 Included Free';
-  return 'Active Protocol';
-}
+/* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
+   Every compound Drew has taken or ordered, alphabetical, expanding in place.
+   Everything starts collapsed. No grouping and no sort toggle: one list. */
 function cmpRow(c,i){
   var sub=(c.hist?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
-  return '<div class="cx" id="cx'+i+'">'+
+  return '<div class="cx'+(c.hist?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog('+i+')">'+
       '<div class="cx-t"><div class="cx-n">'+c.n+'</div><div class="cx-s">'+sub+'</div></div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
@@ -990,21 +987,10 @@ function cmpRow(c,i){
 }
 function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
 function renderAll(){
-  var host=document.getElementById('cmplist');
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
-  var html='';
-  if(sortMode==='az'){
-    idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
-    html='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
-  } else {
-    var order=['Active Protocol','Gifts \u00b7 Included Free','Prior Cycle \u00b7 Gorilla Stack'];
-    var g={}; idx.forEach(function(x){(g[cmpBucket(x.c)]=g[cmpBucket(x.c)]||[]).push(x)});
-    html=order.filter(function(k){return g[k]}).map(function(k){
-      return '<div class="seclbl" style="margin-top:14px">'+k+'<span class="cnt">'+g[k].length+'</span></div>'+
-        '<div class="cxwrap">'+g[k].map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
-    }).join('');
-  }
-  host.innerHTML=html;
+  idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
+  document.getElementById('cmplist').innerHTML=
+    '<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+
     ALL.filter(function(c){return !c.hist}).length+' ACTIVE';
 }
