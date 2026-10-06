@@ -2334,8 +2334,6 @@ var NUT_RECIPES = [
    c:[['Whey protein powder',35],['Raspberries',100],['Almond butter',16]]}
 ];
 
-
-
 /* ---------- state ---------- */
 var nutState = { sex:'male', age:30, units:'imperial', weightLb:180, heightIn:70,
                  activity:'moderate', goal:'maintain', aggr:'moderate', diet:'balanced',
@@ -2349,10 +2347,8 @@ function nClamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
 function lbToKg(lb){ return lb/2.20462262; }
 function inToCm(i){ return i*2.54; }
 function gToOz(g){ return g/28.3495; }
-/* localStorage is shared by every page on this domain, so the cache key has to
-   carry the slug the way the Supabase row does. Without it, opening two
-   protocol pages on one device leaves the second showing the first one's
-   numbers until it saves. */
+/* One app, one set of keys -- namespaced to this app rather than derived
+     from the URL slug, since nothing here is shared with another page. */
 function nKey(k){ return 'dh-app-'+k; }
 function nStore(k,v){ try{ localStorage.setItem(nKey(k),JSON.stringify(v)); return true; }catch(e){ return false; } }
 function nLoad(k){ try{ var r=localStorage.getItem(nKey(k)); return r?JSON.parse(r):null; }catch(e){ return null; } }
@@ -3143,27 +3139,6 @@ function nutCreatePlan(reshuffle){
   nutEl('nut-plan-wrap').scrollIntoView({block:'nearest',behavior:'smooth'});
 }
 
-/* ============================================================================
-   CROSS-DEVICE SAVE  -  Supabase `nutrition_profiles`, keyed by page slug
-   ----------------------------------------------------------------------------
-   localStorage stays the instant cache so the tab paints immediately; Supabase
-   is the source of truth and wins whenever it answers. The slug comes from the
-   URL path, so this same block saves under whichever slug it is served from -
-   every page keeps its own row and nothing here is page-specific.
-   If the table is missing or the network is down every call fails soft and the
-   tab keeps working exactly as it did on localStorage alone.
-   ========================================================================== */
-/* Supabase anon key - the same public key the other tools on this site use.
-   It is a publishable key by design; what protects the data is the RLS
-   policy on the table, not the secrecy of this string. */
-window.BL_SUPABASE_ANON = window.BL_SUPABASE_ANON || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
-
-
-
-/* upsert on the unique page_slug */
-
-
-
 function nutSavePlan(){
   if(!nutPlan){ nutCreatePlan(false); }
   nStore(NUT_CFG.STORE_PLAN,{state:nutState,plan:nutPlan});
@@ -3246,7 +3221,7 @@ function nutInit(){
 
 }
 
-/* push nutState back into every control - used after a Supabase load */
+/* push nutState back into every control - used after a saved load */
 function nutReflectState(){
   nutEl('nut-age').value=nutState.age;
   nutEl('nut-fat').value=nutState.fatPct;
