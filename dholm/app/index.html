@@ -255,12 +255,16 @@
   .irow.freeln .iv{color:var(--gold)}
 
   /* Overlay sheets sit under the bar (z-40 vs z-90) and pad past it. */
-  .sheet{position:absolute;inset:0;z-index:40;background:var(--bg);
+  /* pointer-events:none while closed. A closed sheet is only translated out of
+     the way, and a transformed overlay that still accepts input can swallow
+     taps meant for the view underneath -- which is what froze the nutrition
+     buttons. Only .sheet.on takes input. */
+  .sheet{position:absolute;inset:0;z-index:40;background:var(--bg);pointer-events:none;
     transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
     overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
     padding:calc(56px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 30px)}
   .sheet::-webkit-scrollbar{width:0}
-  .sheet.on{transform:none;box-shadow:-10px 0 30px rgba(40,34,20,.1)}
+  .sheet.on{transform:none;pointer-events:auto;box-shadow:-10px 0 30px rgba(40,34,20,.1)}
   .stop{position:absolute;top:0;left:0;right:0;z-index:5;background:var(--topbg);backdrop-filter:blur(12px);
     border-bottom:1px solid var(--line);padding:calc(13px + env(safe-area-inset-top)) 14px 12px;display:flex;align-items:center;justify-content:space-between}
   .stop .bk{font-size:13px;font-weight:800;color:var(--gold);display:flex;align-items:center;gap:4px;cursor:pointer;
@@ -1475,8 +1479,8 @@ function payButtons(amount,note){
   if(!(amount>0)) return '';
   var a=payAmt(amount), q=encodeURIComponent(note);
   return '<div class="payrow">'+
-    '<a class="paybtn vm" target="_blank" rel="noopener" href="https://venmo.com/'+PAY.venmo+
-      '?txn=pay&amount='+a+'&note='+q+'">'+
+    '<a class="paybtn vm" target="_blank" rel="noopener" href="https://account.venmo.com/payment-link'+
+      '?audience=private&txn=pay&recipients='+PAY.venmo+'&amount='+a+'&note='+q+'">'+
       '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'+
       'Pay with Venmo <span class="amt">$'+a+'</span></a>'+
     '<a class="paybtn ca" target="_blank" rel="noopener" href="https://cash.app/$'+PAY.cashapp+'/'+a+'">'+
@@ -1672,7 +1676,6 @@ function renderPay(){
     '</div><div class="o">'+dueO.map(function(o){return o.label}).join(', ')+
     '</div><div class="np">'+dueO.length+' unpaid invoice'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
-    '<button class="btn" onclick="openInv('+INV.indexOf(dueO[0])+')">Review &amp; pay</button>'+
     payButtons(dueT,'BioLinked \u2014 balance due')+'</div>')
     : ('<div class="bal"><div class="l">Balance due</div><div class="n">'+money(0)+
        '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>');
@@ -3392,7 +3395,7 @@ function nutCreatePlan(reshuffle){
   nutPlan=nutBuildMenu(nutState,m) || nutBuildPlan(nutState,m);
   nutRenderPlan(nutPlan,'nut-plan');
   nutEl('nut-plan-wrap').hidden=false;
-  nutEl('nut-plan-wrap').scrollIntoView({block:'nearest',behavior:'smooth'});
+  nutEl('nut-plan-wrap').scrollIntoView({block:'start',behavior:'smooth'});
 }
 
 function nutSavePlan(){
