@@ -56,7 +56,26 @@
     --tip-bg:#302a20; --tip-tx:#f6f1e5; --tip-line:#4a4234; --tip-strong:#e2cd96;
     --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 16px rgba(0,0,0,.3);
   }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  *{box-sizing:border-box}
+  /* ===== iOS TAP RELIABILITY =====
+     Inside a -webkit-overflow-scrolling:touch container iOS can read a tap on a
+     button as the beginning of a scroll and never synthesise the click, so an
+     inline onclick never runs. touch-action:manipulation tells it to treat a tap
+     as an immediate click, which is the documented cure. Applied to every
+     interactive control, early enough that .pc-syr's touch-action:none below
+     still wins for the syringe drag.
+     The tap highlight is a faint gold rather than transparent: a fully
+     transparent highlight reads as "not tappable" to the engine. */
+  button,a,select,input,label,summary,[role="button"],
+  .tab,.snav,.li,.cx-hd,.lx-cta,.paybtn,.seg button,
+  .nut-btn,.nut-seg-btn,.nut-chip,.pc-add,.pc-ico,.day,.cat,.lrow,.ocard,.nt-hd{
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:rgba(138,115,56,.14)}
+  /* non-interactive surfaces keep no highlight */
+  div,span,p,h1,h2,h3,li,section,nav{-webkit-tap-highlight-color:transparent}
+  .tab,.snav,.li,.cx-hd,.lx-cta,.paybtn,.seg button,.nut-btn,.nut-seg-btn,
+  .nut-chip,.pc-add,.pc-ico,.day,.cat,.lrow,.ocard,.nt-hd{
+    -webkit-tap-highlight-color:rgba(138,115,56,.14)}
   /* html carries the app background, not the desktop surround: Safari paints
      the html background into the rubber-band overscroll area, so anything else
      here flashes a mismatched strip at the top when you pull down.
@@ -3867,6 +3886,50 @@ function hideA2(save){document.getElementById('a2hs').classList.remove('on');if(
   var seen=false; try{seen=localStorage.getItem(KP+'a2hs')==='1'}catch(e){}
   if(!standalone && !seen && /iPhone|iPad|iPod/i.test(navigator.userAgent||'')) setTimeout(function(){document.getElementById('a2hs').classList.add('on')},1600);
 })();
+/* ---------- iOS TAP BACKSTOP ----------
+   touch-action:manipulation in the CSS is the real fix; this covers the case
+   where iOS still swallows the tap inside the momentum scroller. A tap that
+   does not move is remembered, and if no click lands within 350ms we dispatch
+   one. The element is stamped so a late real click is dropped instead of
+   running the action a second time. Scoped to buttons only -- never anchors,
+   so a payment link can never open twice. */
+(function(){
+  var SEL='.nut-btn,.nut-seg-btn,.nut-chip,.pc-add,.pc-ico';
+  var armed=null,sx=0,sy=0;
+  function hit(t){ return (t && t.closest) ? t.closest(SEL) : null; }
+  document.addEventListener('touchstart',function(e){
+    var b=hit(e.target);
+    if(!b){ armed=null; return; }
+    var t=e.touches[0]; sx=t.clientX; sy=t.clientY; armed=b;
+  },{passive:true});
+  document.addEventListener('touchmove',function(e){
+    if(!armed) return;
+    var t=e.touches[0];
+    if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10) armed=null;   /* it was a scroll */
+  },{passive:true});
+  document.addEventListener('touchend',function(){
+    var b=armed; armed=null;
+    if(!b) return;
+    var landed=false;
+    function mark(){ landed=true; }
+    b.addEventListener('click',mark,true);
+    setTimeout(function(){
+      b.removeEventListener('click',mark,true);
+      if(landed) return;                      /* the browser did its job */
+      b.setAttribute('data-tapshim',String(Date.now()));
+      b.click();
+    },350);
+  },{passive:true});
+  document.addEventListener('click',function(e){
+    var b=hit(e.target); if(!b) return;
+    var t=+(b.getAttribute('data-tapshim')||0), d=Date.now()-t;
+    if(t && d>30 && d<900){                   /* a late duplicate of one we fired */
+      e.stopImmediatePropagation(); e.preventDefault();
+      b.removeAttribute('data-tapshim');
+    }
+  },true);
+})();
+
 if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('/dholm/app/sw.js').catch(function(){})});}
 
 renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay();
