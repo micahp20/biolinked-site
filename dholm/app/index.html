@@ -676,7 +676,7 @@
   .nut-field:last-child{margin-bottom:0;}
   .nut-label{margin-bottom:9px;}
   .nut-inputs{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;}
-  .nut-inputs[hidden],.nut-note[hidden],#tab-nutrition [hidden]{display:none !important;}
+  .nut-inputs[hidden],.nut-note[hidden],#v-nutr [hidden]{display:none !important;}
   .nut-input{width:100%;padding:12px 13px;}
   .nut-unit{min-width:26px;text-align:left;}
   .nut-range-row{gap:14px;}
@@ -1436,7 +1436,6 @@ var TCOL={light:'#fbfaf6',dark:'#15130f'};
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   var m=document.getElementById('tc'); if(m) m.setAttribute('content',TCOL[t]||TCOL.light);
-  var lbl=document.getElementById('thlabel'); if(lbl) lbl.textContent=(t==='dark'?'Dark':'Light');
 }
 function toggleTheme(){
   var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
@@ -3215,11 +3214,11 @@ var nutTouched=false;
 function nutMarkTouched(){ nutTouched=true; }
 
 function nutBindSegs(){
-  document.querySelectorAll('#tab-nutrition .nut-seg-btn').forEach(function(b){
+  document.querySelectorAll('#v-nutr .nut-seg-btn').forEach(function(b){
     b.addEventListener('click', function(){
       nutMarkTouched();
       var grp=b.getAttribute('data-grp'), val=b.getAttribute('data-val');
-      document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+grp+'"]').forEach(function(o){
+      document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="'+grp+'"]').forEach(function(o){
         o.classList.toggle('on', o===b); o.setAttribute('aria-pressed', o===b?'true':'false');
       });
       if(grp==='units'){ nutReadFields(); nutState.units=val; nutSyncUnitFields(); }
@@ -3246,7 +3245,7 @@ function nutBindSegs(){
 }
 
 function nutBindChips(){
-  document.querySelectorAll('#tab-nutrition .nut-chip').forEach(function(b){
+  document.querySelectorAll('#v-nutr .nut-chip').forEach(function(b){
     b.addEventListener('click',function(){
       nutMarkTouched();
       var k=b.getAttribute('data-excl'), i=nutState.excl.indexOf(k);
@@ -3317,7 +3316,7 @@ function nutRender(){
   aggrRow.classList.toggle('is-muted', st.goal==='maintain');
   /* eating window: cap meals and grey out the ones that no longer fit */
   var mx=nutMaxMeals(st);
-  document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="meals"]').forEach(function(b){
+  document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="meals"]').forEach(function(b){
     var v=parseInt(b.getAttribute('data-val'),10);
     b.disabled = v>mx;
     b.classList.toggle('is-off', v>mx);
@@ -3397,7 +3396,7 @@ function nutRenderPlan(plan, mountId){
    controls straight off the DOM so a plan can never be built for a diet other
    than the one actually showing. */
 function nutSyncFromSegs(){
-  document.querySelectorAll('#tab-nutrition .nut-seg-btn[aria-pressed="true"]').forEach(function(b){
+  document.querySelectorAll('#v-nutr .nut-seg-btn[aria-pressed="true"]').forEach(function(b){
     var grp=b.getAttribute('data-grp'), val=b.getAttribute('data-val');
     if(!grp || grp==='units') return;
     if(grp==='protPerLb')   nutState[grp]=parseFloat(val);
@@ -3427,7 +3426,7 @@ function nutSavePlan(){
 }
 /* Save / Saved feedback on the button itself */
 function nutSaveBtnState(mode){
-  var b=document.querySelector('#tab-nutrition .nut-btn[onclick*="nutSavePlan"]');
+  var b=document.querySelector('#v-nutr .nut-btn[onclick*="nutSavePlan"]');
   if(!b) return;
   if(!b.getAttribute('data-label')) b.setAttribute('data-label', b.textContent.trim());
   var base=b.getAttribute('data-label');
@@ -3476,7 +3475,7 @@ function nutInit(){
   nutEl('nut-win-start').value=nutToHm(nutState.winStart);
   nutEl('nut-win-end').value=nutToHm(nutState.winEnd);
   if(!Array.isArray(nutState.excl)) nutState.excl=[];
-  document.querySelectorAll('#tab-nutrition .nut-chip').forEach(function(b){
+  document.querySelectorAll('#v-nutr .nut-chip').forEach(function(b){
     var on=nutState.excl.indexOf(b.getAttribute('data-excl'))>-1;
     b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
   });
@@ -3485,7 +3484,7 @@ function nutInit(){
    ['diet',nutState.diet],['window',nutState.window],['aggr',nutState.aggr],
    ['glp1',nutState.glp1?'on':'off'],['protPerLb',String(nutState.protPerLb)],
    ['meals',String(nutState.meals)]].forEach(function(pair){
-    document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+pair[0]+'"]').forEach(function(b){
+    document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="'+pair[0]+'"]').forEach(function(b){
       var on=b.getAttribute('data-val')===pair[1];
       b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
     });
@@ -3507,7 +3506,7 @@ function nutReflectState(){
   nutEl('nut-win-start').value=nutToHm(nutState.winStart);
   nutEl('nut-win-end').value=nutToHm(nutState.winEnd);
   if(!Array.isArray(nutState.excl)) nutState.excl=[];
-  document.querySelectorAll('#tab-nutrition .nut-chip').forEach(function(b){
+  document.querySelectorAll('#v-nutr .nut-chip').forEach(function(b){
     var on=nutState.excl.indexOf(b.getAttribute('data-excl'))>-1;
     b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
   });
@@ -3516,7 +3515,7 @@ function nutReflectState(){
    ['diet',nutState.diet],['window',nutState.window],['aggr',nutState.aggr],
    ['glp1',nutState.glp1?'on':'off'],['protPerLb',String(nutState.protPerLb)],
    ['meals',String(nutState.meals)]].forEach(function(pair){
-    document.querySelectorAll('#tab-nutrition .nut-seg-btn[data-grp="'+pair[0]+'"]').forEach(function(b){
+    document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="'+pair[0]+'"]').forEach(function(b){
       var on=b.getAttribute('data-val')===pair[1];
       b.classList.toggle('on',on); b.setAttribute('aria-pressed',on?'true':'false');
     });
