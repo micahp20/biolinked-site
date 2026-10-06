@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="BioLinked">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="/icon-192.png?v=6">
-<link rel="icon" type="image/png" href="/icon-192.png?v=6">
+<link rel="apple-touch-icon" href="/icon-192.png?v=5">
+<link rel="icon" type="image/png" href="/icon-192.png?v=5">
 <style>
   /* ===== THEME TOKENS =====
      Light is the default. Dark is a full re-skin driven only by these tokens,
@@ -61,10 +61,10 @@
      here flashes a mismatched strip at the top when you pull down.
      No overscroll-behavior lock -- combined with an inner absolute scroller it
      is what wedges touch handling on iOS. */
-  html{margin:0;height:100%;background:var(--bg);overflow-x:clip}
+  html{margin:0;height:100%;background:var(--bg)}
   body{margin:0;height:100%;background:var(--surround);font-family:var(--sans);color:var(--ink);
     -webkit-font-smoothing:antialiased;display:flex;align-items:center;justify-content:center;
-    min-height:100vh;overflow-x:clip;transition:background .25s}
+    min-height:100vh;transition:background .25s}
 
   /* The device frame. On a phone it is full-bleed and sized with dvh, NOT vh:
      iOS reports 100vh as the URL-bar-hidden height, so a vh-sized frame hangs
@@ -139,8 +139,6 @@
     box-shadow:0 -6px 20px rgba(40,34,20,.07);
     display:flex;gap:5px;padding:8px 7px calc(8px + env(safe-area-inset-bottom));
     height:calc(var(--tabh) + env(safe-area-inset-bottom))}
-  @media(max-width:430px){.tabs{position:fixed}}
-  @media(display-mode:standalone){.tabs{position:fixed}}
   .tab{flex:1;min-width:0;background:var(--cream);border:1px solid var(--line);display:flex;flex-direction:column;
     align-items:center;justify-content:center;gap:3px;padding:7px 0 6px;border-radius:14px;
     color:var(--ink2);font-family:var(--sans);font-size:9.5px;font-weight:750;letter-spacing:.2px;
@@ -478,38 +476,49 @@
      panel. .top, .scroll, .navscrim and .navmenu were losing the same way.
      Keep this block at the bottom.
      ======================================================================= */
+  /* =======================================================================
+     PHONE APP SHELL -- DELIBERATELY LAST IN THE STYLESHEET.
+     A media query adds no specificity, so these only beat the base rules above
+     by source order. Keep this block at the bottom.
+
+     Fixed-height flex shell, not a naturally-scrolling document. The document
+     does not scroll at all; the content column does. That is the whole point:
+     position:fixed;bottom:0 resolves against the URL-bar-shown viewport, so
+     when iOS collapses the bar at the end of a scroll the element floats above
+     the true visual bottom and the page background shows beneath it. A flex
+     child of a full-height fixed shell cannot do that -- it is the last box in
+     a column that is exactly the viewport, so it is always on the bottom edge.
+
+     No overscroll-behavior anywhere, and no overflow-x on html or body: both
+     were implicated in the earlier freeze and the floating bar. The only
+     horizontal clip is .device's own overflow:hidden, which also clips the
+     closed sheets so they can never create page-level overflow.
+     ======================================================================= */
   @media(max-width:430px),(display-mode:standalone){
-    /* clip, never hidden: hidden makes these a scroll container and on iOS a
-       fixed child can then anchor to the document rather than the viewport,
-       which strands the tab bar mid-screen. */
-    html,body{height:auto;overflow-x:clip}
-    body{display:block;min-height:100vh;background:var(--bg)}
-    /* A flex column whose minimum is the visible viewport, so the content
-       wrapper below the sticky header always stretches to the bottom even when
-       a view is short. Without this a short view (the Index reference sheet,
-       say) ended where its text ended and left bare body background under the
-       bar. dvh is the live viewport height; vh is the fallback. */
-    .device{position:static;width:100%;max-width:none;height:auto;max-height:none;
-      min-height:100vh;min-height:100dvh;border-radius:0;overflow:visible;box-shadow:none;
-      display:flex;flex-direction:column;background:var(--bg)}
-    /* sticky: keeps its own space in flow, so content below needs no offset */
-    .top{position:sticky;top:0;left:auto;right:auto;flex:none}
-    /* flex:1 makes it take all the height the header leaves, short content or
-       not; the padding keeps the last row clear of the fixed bar. */
-    .scroll{position:static;inset:auto;overflow:visible;height:auto;flex:1 0 auto;
-      display:flex;flex-direction:column;
-      padding:0 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 28px)}
-    .view.on{flex:1 0 auto}
-    .tabs{position:fixed}
-    /* FIXED, not absolute: a closed sheet is translated one viewport right, and
-       only a fixed element is out of flow enough that it cannot widen the
-       document. width:100vw so it covers the screen edge to edge when open. */
-    /* already viewport-height via top/bottom; min-height is belt and braces
-       so a short detail view still paints its background to the bottom. */
-    .sheet{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;max-width:100vw;height:auto;
-      min-height:100vh;min-height:100dvh;background:var(--bg)}
-    .navscrim{position:fixed}
-    .navmenu{position:fixed}
+    html,body{height:100%;margin:0;overflow:hidden}
+    body{display:block;min-height:0;background:var(--bg)}
+    .device{position:fixed;inset:0;width:100%;max-width:none;
+      height:100vh;height:100dvh;max-height:none;
+      display:flex;flex-direction:column;overflow:hidden;
+      border-radius:0;box-shadow:none;background:var(--bg)}
+    .top{position:static;left:auto;right:auto;flex:0 0 auto}
+    /* min-height:0 is what lets a flex child actually scroll instead of
+       growing to fit its content. Without it the column overflows the shell. */
+    .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
+      display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+      padding:0 0 26px}
+    .view.on{flex:none}
+    /* last flex child -> always on the true visual bottom edge */
+    .tabs{position:static;flex:0 0 auto;height:auto;
+      padding:8px 7px calc(8px + env(safe-area-inset-bottom))}
+    /* absolute INSIDE the fixed shell, which is overflow:hidden, so a closed
+       sheet translated off to the right is clipped rather than widening
+       anything. Bottom padding keeps its content clear of the tab bar. */
+    .sheet{position:absolute;inset:0;width:auto;max-width:none;height:auto;min-height:0;
+      padding:calc(56px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 24px)}
+    .navscrim{position:absolute}
+    .navmenu{position:absolute}
+    .a2hs{position:absolute}
   }
 </style>
 </head>
@@ -558,8 +567,6 @@
       <div class="days" id="daystrip"></div>
       <div id="doses"></div>
       <p class="note" id="dosenote"></p>
-      <div class="seclbl">Weekly Rhythm</div>
-      <div class="list" id="rhythm"></div>
       <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
       <div id="cmplist"></div>
       <p class="note">Everything Drew has taken or ordered &mdash; the active protocol, the gifts, and the prior Gorilla Stack. Tap a compound to open its recon, draw, site and timing in place.</p>
@@ -901,7 +908,7 @@ function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.
 function payStub(){alert('Payment is not wired up in this pilot — this is a preview of the layout.');}
 function docStub(){alert('The invoice document link is a placeholder in this pilot.');}
 
-/* ---------- SCHEDULE (merged day view + rhythm + compounds) ---------- */
+/* ---------- SCHEDULE (day view + compounds) ---------- */
 (function(){var h=new Date().getHours();
   document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Drew';
   document.getElementById('subline').textContent=CMP.length+' active compounds · AM and PM blocks';})();
@@ -954,16 +961,6 @@ function renderDoses(){
   document.getElementById('dosenote').textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
     '. This is a read-only view of your schedule.';
 }
-
-(function(){
-  var g={}; CMP.forEach(function(c){(g[c.c]=g[c.c]||[]).push(c)});
-  var order=['Every day','Mon–Fri','Mon / Wed / Fri','Mon + Thu','Monday only'];
-  document.getElementById('rhythm').innerHTML=order.filter(function(k){return g[k]}).map(function(k){
-    return '<div class="li"><div><div class="nm sans">'+k+'</div><div class="pp">'+
-      g[k].map(function(c){return c.n.split(' · ')[0]}).join(' · ')+
-      '</div></div><div class="rt"><div class="pr">'+g[k].length+'</div></div></div>';
-  }).join('');
-})();
 
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
    Every compound Drew has taken or ordered, alphabetical, expanding in place.
