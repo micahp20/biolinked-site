@@ -867,8 +867,80 @@
   .xp{padding:0 16px;margin:0 0 6px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
   .xp:empty{display:none}
   #x-edu[hidden]{display:none}
+
+/* ====== GRONK SCHEDULE (prototype, mpauldino only) ==========================
+   Every selector is scoped under .gk so the ivory/champagne palette and the
+   Cormorant/Outfit faces stay inside the Schedule view and never reach the
+   gray chrome, Labs, Pay, Nutrition or Notes.
+   BACKEND HOOK: dose min/max is enforced here client-side only. A real
+   backend would validate the range server-side on write - the values below
+   are a convenience, not a control. ----------------------------------------- */
+.gk{
+  --ivory:#f6f3ee; --paper:#fffcf8; --gk-ink:#1c1915; --ink-soft:#5c564c;
+  --gk-line:#e7e1d6; --gk-gold:#8d7344; --gold-deep:#6e5832; --gold-soft:#f3ead8;
+  --gold-line:#e4d3b4; --gk-shadow:0 8px 24px rgba(40,32,18,.05); --gk-radius:18px;
+  font-family:"Outfit",system-ui,sans-serif; color:var(--gk-ink);
+  background:radial-gradient(1200px 500px at 50% -10%,#fff 0%,transparent 60%),var(--ivory);
+  margin:-16px; padding:22px 16px 28px;
+}
+.gk *{box-sizing:border-box}
+.gk button,.gk input{font-family:inherit}
+.gk h1.gk-h{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;line-height:1;margin:0 0 6px;color:var(--gk-ink)}
+.gk .gk-sub{color:var(--ink-soft);font-size:13px;font-weight:300;margin:0 0 16px}
+.gk .cycle{background:var(--gk-ink);color:#f6f1e7;border-radius:22px;padding:16px 16px 14px;margin-bottom:16px}
+.gk .cycle-kicker{letter-spacing:.22em;font-size:10px;color:#d7c39a;font-weight:500}
+.gk .cycle h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;margin:4px 0 2px;color:#f6f1e7}
+.gk .cycle p{margin:0;color:#cfc6b8;font-size:12.5px;font-weight:300}
+.gk .bar{height:4px;background:#3a342c;border-radius:99px;margin:14px 0 8px;overflow:hidden}
+.gk .bar>i{display:block;height:100%;background:linear-gradient(90deg,#c6a56a,#f0ddb4)}
+.gk .cycle-meta{display:flex;justify-content:space-between;font-size:11px;color:#b7ad9f}
+.gk .gk-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:4px 0 18px}
+.gk .day{border:1px solid var(--gk-line);background:var(--paper);border-radius:14px;padding:8px 0 7px;text-align:center;cursor:pointer;color:var(--ink-soft)}
+.gk .day b{display:block;font-size:10px;letter-spacing:.12em;font-weight:500}
+.gk .day span{display:block;margin-top:3px;font-size:14px;color:var(--gk-ink);font-weight:500}
+.gk .day.on{background:var(--gold-deep);border-color:var(--gold-deep);color:#f6efe2}
+.gk .day.on span{color:#fff}
+.gk .block-head{display:flex;justify-content:space-between;align-items:baseline;margin:8px 2px 8px}
+.gk .block-head h3{margin:0;letter-spacing:.2em;font-size:11px;font-weight:500;color:var(--ink-soft)}
+.gk .block-head em{font-style:normal;font-size:11px;color:var(--gk-gold);letter-spacing:.08em}
+.gk .gk-card{background:var(--paper);border:1px solid #efeae2;border-radius:var(--gk-radius);box-shadow:var(--gk-shadow);padding:14px;margin-bottom:10px}
+.gk .gk-row{display:flex;gap:12px;align-items:center}
+.gk .dose-mark{min-width:54px;font-family:"Cormorant Garamond",Georgia,serif;font-size:22px;color:var(--gold-deep);line-height:1}
+.gk .dose-mark small{display:block;font-family:"Outfit",sans-serif;font-size:10px;letter-spacing:.08em;color:var(--ink-soft);margin-top:3px}
+.gk .gk-name{font-size:15.5px;font-weight:500}
+.gk .gk-meta{margin-top:3px;color:var(--ink-soft);font-size:12px;font-weight:300}
+.gk .edit{margin-left:auto;border:1px solid var(--gk-line);background:#fff;color:var(--ink-soft);border-radius:999px;padding:7px 11px;font-size:12px;cursor:pointer}
+.gk .edit.on{background:var(--gk-ink);color:#f6efe2;border-color:var(--gk-ink)}
+.gk .panel{margin-top:14px;padding-top:12px;border-top:1px solid var(--gk-line)}
+.gk .gk-label{letter-spacing:.16em;font-size:10px;color:var(--ink-soft);margin-bottom:8px}
+.gk .stepper{display:flex;align-items:center;gap:8px}
+.gk .stepper button{width:32px;height:32px;border-radius:10px;border:1px solid var(--gk-line);background:#fff;font-size:18px;cursor:pointer;color:var(--gk-ink)}
+.gk .stepper button[disabled]{opacity:.35;cursor:default}
+.gk .dose{min-width:88px;text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep)}
+.gk .dose small{display:block;font-family:"Outfit",sans-serif;font-size:10px;letter-spacing:.12em;color:var(--ink-soft)}
+.gk .range{margin-left:auto;font-size:11px;color:var(--ink-soft);text-align:right;font-weight:300}
+.gk .days-edit{display:flex;gap:5px;margin:12px 0}
+.gk .chip{flex:1;border:1px solid var(--gk-line);background:#fff;border-radius:9px;font-size:10px;padding:7px 0;cursor:pointer;color:var(--ink-soft)}
+.gk .chip.on{background:var(--gk-ink);color:#f6efe2;border-color:var(--gk-ink)}
+.gk .actions{display:flex;gap:8px;align-items:center}
+.gk .remind{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--gk-line);border-radius:12px;padding:7px 10px;background:#fff}
+.gk .remind input{border:0;background:transparent;width:92px;font-size:13px;color:var(--gk-ink)}
+.gk .switch{margin-left:auto;width:36px;height:22px;border-radius:99px;border:0;background:#ddd4c6;position:relative;cursor:pointer}
+.gk .switch.on{background:var(--gk-gold)}
+.gk .switch i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.gk .switch.on i{left:17px}
+.gk .ghost{border:1px solid var(--gk-line);background:transparent;color:var(--ink-soft);border-radius:12px;padding:8px 10px;font-size:12px;cursor:pointer}
+.gk .gk-empty{border:1px dashed var(--gold-line);border-radius:16px;padding:16px;color:var(--ink-soft);font-size:13px;font-weight:300}
+.gk .viewbar{display:flex;gap:8px;margin:0 0 14px}
+.gk .viewbar button{border:1px solid var(--gk-line);background:transparent;border-radius:999px;padding:7px 12px;font-size:12px;color:var(--ink-soft);cursor:pointer}
+.gk .viewbar button.on{background:var(--gk-ink);color:#f6efe2;border-color:var(--gk-ink)}
+.gk-toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#1c1915;color:#f6efe2;border-radius:999px;padding:10px 14px;font-size:12.5px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:80;font-family:"Outfit",system-ui,sans-serif}
+.gk-toast.show{opacity:1}
 </style>
 <script src="/compound-library.js?v=2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="device">
@@ -976,19 +1048,7 @@
         <li><b>Questions about your protocol?</b> Just reach out anytime.</li>
       </ul>
     </div></section>
-    <section class="view" id="v-sched"><div class="pad">
-      <h1 class="scrn" id="greet">Schedule</h1>
-      <p class="sub" id="subline"></p>
-      <div id="duebar"></div>
-      <div id="cycbar"></div>
-      <div class="days" id="daystrip"></div>
-      <div id="doses"></div>
-      <p class="note" id="dosenote"></p>
-      <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
-      <div id="cmplist"></div>
-      <p class="note">Everything You have taken or ordered &mdash; the active protocol, the gifts, and the prior Gorilla Stack. Tap a compound to open its recon, draw, site and timing in place.</p>
-    </div></section>
-    <section class="view" id="v-nutr"><div class="pad">
+    <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p><section class="cycle" id="gkCycle"></section><div class="viewbar"><button id="gkTabSchedule" class="on">Schedule</button><button id="gkTabArchive">Archive</button></div><div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Your numbers, your targets, and a meal plan built from them</p>
       <div class="nut-wrap">
@@ -1197,7 +1257,8 @@
       <div id="paylist"></div>
       <p class="note" id="paynote"></p>
     </div></section>
-    <section class="view" id="v-more"><div class="pad">
+    <div class="gk-toast" id="gkToast"></div>
+<section class="view" id="v-more"><div class="pad">
       <h1 class="scrn">More</h1>
       <p class="sub">Tools, your notes, and the full site</p>
       <div class="list">
@@ -1626,7 +1687,7 @@ function payCopyFallback(text,done){
   renderSubline();})();
 
 function renderDue(){
-  var host=document.getElementById('duebar');
+  var host=document.getElementById('duebar'); if(!host) return;
   var unpaid=INV.filter(function(o){return o.status==='due'});
   if(!unpaid.length){host.innerHTML='';return;}
   var t=unpaid.reduce(function(a,x){return a+x.total},0);
@@ -1634,6 +1695,7 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
+  if(!document.getElementById('daystrip')) return;
   var now=new Date(), start=new Date(now); start.setDate(now.getDate()-now.getDay());
   var h='';
   for(var i=0;i<7;i++){
@@ -1649,7 +1711,7 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
 function inBlock(c,g){return c.b===g||c.b==='BOTH';}
 function renderDoses(){
   var rows=cycRows().filter(function(c){return due(c,sel)});
-  var host=document.getElementById('doses');
+  var host=document.getElementById('doses'); if(!host) return;
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
       ' is clear — the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
@@ -1783,6 +1845,7 @@ function renderSubline(){
     (cycOn()&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
 }
 function renderAll(){
+  if(!document.getElementById('cmplist')) return;
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
   var past=idx.filter(function(x){return cmpArch(x.c)});
@@ -4160,4 +4223,172 @@ if('serviceWorker' in navigator){
 CYCS=cycList(); cycSel=cycCurrent();
 renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
 if(typeof nutInit==='function') nutInit();
+
+/* ====== GRONK SCHEDULE ENGINE (prototype - mpauldino only) =================
+   State is per-device localStorage, namespaced by slug so it can never
+   collide with another client's page on the same browser.
+
+   WHERE A REAL BACKEND HOOKS IN:
+   1. DOSE RANGE   - min/max is enforced below in the browser only. Server
+                     must re-validate on write; this is a convenience rail.
+   2. WEEK-8 ARCHIVE - archiveIfDue() runs on page open, so a client who does
+                     not open the page is not archived. Belongs in a cron /
+                     scheduled job against the real cycle start.
+   3. STATE        - localStorage is per-device and per-browser. Authenticated
+                     per-member state on the server replaces load()/save().
+   4. REMINDERS    - the time + switch are stored only. Real delivery needs
+                     push subscriptions and server-side scheduling.
+   ========================================================================= */
+var GK_STORAGE = "biolinked-sched-mpauldino";
+var GK_DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+var GK_SHORT = ["S","M","T","W","T","F","S"];
+/* CYCLE ASSUMPTION - his page defines no cycle clock, so this start date is
+   assumed, not read from his protocol. Change this one constant when Micah
+   gives the real start; the week-8 auto-archive counts from it. */
+var GK_CYCLE_START = "2026-09-19";
+var GK_CYCLE_WEEKS = 8;
+var gkSeed = {
+  member: "Papi Peptide",
+  cycleStart: GK_CYCLE_START,
+  cycleWeeks: GK_CYCLE_WEEKS,
+  selected: new Date().getDay(),
+  view: "schedule",
+  open: null,
+  compounds: [
+    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL", dose:50, step:10,   min:30,   max:70,  unit:"mg",  draw:"20u",     block:"AM", days:[1,3,5],         reminder:"08:00", remindOn:true,  foundation:true,  active:true},
+    {id:"tirz",  name:"Tirzepatide",                  vial:"As supplied", dose:1, step:0.5, min:0.5,  max:2.5, unit:"mg",  draw:"1 mg",    block:"AM", days:[1,4],           reminder:"08:00", remindOn:true,  foundation:false, active:true},
+    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted",    dose:2,  step:0.5,  min:1,    max:3,   unit:"iu",  draw:"~17u",    block:"AM", days:[0,1,2,3,4,5,6], reminder:"07:30", remindOn:true,  foundation:true,  active:true},
+    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet",    dose:500,step:250,  min:250,  max:1000,unit:"mcg", draw:"1 tab",   block:"AM", days:[0,1,2,3,4,5,6], reminder:"08:15", remindOn:false, foundation:false, active:true},
+    {id:"dihexa",name:"Dihexa · Oral",                vial:"Tablet",    dose:10, step:5,    min:5,    max:20,  unit:"mg",  draw:"2 tabs",  block:"AM", days:[1,3,5],         reminder:"08:15", remindOn:false, foundation:false, active:true},
+    {id:"hcg",   name:"HCG",                          vial:"500 iu",    dose:500,step:100,  min:250,  max:750, unit:"iu",  draw:"—",       block:"PM", days:[1,3,5],         reminder:"21:00", remindOn:true,  foundation:true,  active:true},
+    {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:true},
+    {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    /* already off his stack - these seed the Archive */
+    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5, min:0.5, max:4,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250, min:250, max:1000,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,min:0.25,max:1,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5, min:0.5, max:4,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5, min:0.5, max:4,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5],     reminder:"21:30", remindOn:false, foundation:false, active:false},
+    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, min:2.5, max:15, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false},
+    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,   min:1,   max:8,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false}
+  ]
+};
+function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }catch(e){ return JSON.parse(JSON.stringify(gkSeed)); } }
+function gkSave(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gkState)); }catch(e){} }
+var gkState = gkLoad();
+gkState.view = gkState.view || "schedule";
+function gkWeek(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Date(); n.setHours(0,0,0,0);
+  return Math.min(gkState.cycleWeeks, Math.max(1, Math.floor((n-st)/86400000/7)+1)); }
+function gkDaysInto(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Date(); n.setHours(0,0,0,0);
+  return Math.max(0, Math.floor((n-st)/86400000)); }
+function gkCycleDone(){ return gkDaysInto() >= gkState.cycleWeeks*7; }
+/* BACKEND HOOK 2: this fires on page open only. A cron would do it properly. */
+function gkArchiveIfDue(){
+  if(!gkCycleDone()) return;
+  var moved=0;
+  gkState.compounds.forEach(function(c){
+    if(c.active && !c.foundation){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); moved++; }
+  });
+  if(moved){ gkSave(); gkToast("Week "+gkState.cycleWeeks+" complete. Cycled compounds moved to archive."); }
+}
+function gkToast(msg){ var el=document.getElementById("gkToast"); if(!el) return;
+  el.textContent=msg; el.classList.add("show"); clearTimeout(gkToast._t);
+  gkToast._t=setTimeout(function(){ el.classList.remove("show"); },2400); }
+function gkFmt(n){ n=Number(n); return Number.isInteger(n)?String(n):String(Math.round(n*100)/100); }
+function gkDayText(days){ if(days.length===7) return "Daily";
+  return [1,2,3,4,5,6,0].filter(function(d){return days.indexOf(d)>=0;}).map(function(d){return GK_DAY[d];}).join(" / "); }
+function gkRound(n){ return Math.round(n*100)/100; }
+function gkRender(){
+  if(!document.getElementById("gkList")) return;
+  gkArchiveIfDue();
+  var h=new Date().getHours();
+  document.getElementById("gkGreet").textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", "+gkState.member.split(" ")[0];
+  var week=gkWeek(), pct=Math.min(100,Math.round(gkDaysInto()/(gkState.cycleWeeks*7)*100));
+  var end=new Date(gkState.cycleStart+"T00:00:00"); end.setDate(end.getDate()+gkState.cycleWeeks*7);
+  document.getElementById("gkCycle").innerHTML='<div class="cycle-kicker">PROTOCOL CLOCK</div><h2>Week '+week+' of '+gkState.cycleWeeks+'</h2><p>'+
+    (gkCycleDone()?"Cycle complete. Cycled compounds are in the archive.":"Cycled compounds move to archive on "+end.toLocaleDateString(undefined,{month:"short",day:"numeric"})+".")+
+    '</p><div class="bar"><i style="width:'+pct+'%"></i></div><div class="cycle-meta"><span>'+pct+'% through</span><span>Foundation stays on</span></div>';
+  document.getElementById("gkTabSchedule").className=gkState.view==="schedule"?"on":"";
+  document.getElementById("gkTabArchive").className=gkState.view==="archive"?"on":"";
+  var strip=document.getElementById("gkDayStrip");
+  strip.style.display=gkState.view==="schedule"?"grid":"none";
+  strip.innerHTML=GK_DAY.map(function(label,i){
+    var d=new Date(); d.setDate(d.getDate()-d.getDay()+i);
+    return '<button class="day'+(gkState.selected===i?" on":"")+'" data-gkday="'+i+'"><b>'+label.toUpperCase()+'</b><span>'+d.getDate()+'</span></button>';
+  }).join("");
+  var active=gkState.compounds.filter(function(c){return c.active;});
+  var dueNow=active.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
+  var arch=gkState.compounds.filter(function(c){return !c.active;});
+  document.getElementById("gkTabArchive").textContent="Archive"+(arch.length?" · "+arch.length:"");
+  document.getElementById("gkSummary").textContent=gkState.view==="archive"
+    ? "Removed from the schedule. Add back to return it. New compounds cannot be added."
+    : dueNow.length+" due "+GK_DAY[gkState.selected]+" · off-days are hidden";
+  document.getElementById("gkList").innerHTML=gkState.view==="archive"?gkArchiveView(arch):gkDayView(dueNow);
+}
+function gkDayView(dueNow){
+  return ["AM","PM"].map(function(block){
+    var items=dueNow.filter(function(c){return c.block===block;});
+    return '<div class="block-head"><h3>'+(block==="AM"?"MORNING":"NIGHT")+'</h3><em>'+items.length+' DUE</em></div>'+
+      (items.map(gkCard).join("")||'<div class="gk-empty">Nothing scheduled '+(block==="AM"?"this morning":"tonight")+'.</div>');
+  }).join("");
+}
+function gkCard(c){
+  var open=gkState.open===c.id;
+  return '<article class="gk-card"><div class="gk-row">'+
+    '<div class="dose-mark">'+gkFmt(c.dose)+'<small>'+c.unit+'</small></div>'+
+    '<div><div class="gk-name">'+c.name+'</div><div class="gk-meta">'+c.vial+' · '+gkDayText(c.days)+(c.foundation?" · year-round":"")+'</div></div>'+
+    '<button class="edit'+(open?" on":"")+'" data-gkedit="'+c.id+'">'+(open?"Done":"Edit")+'</button>'+
+    '</div>'+(open?gkPanel(c):"")+'</article>';
+}
+function gkPanel(c){
+  /* BACKEND HOOK 1: min/max disables the buttons here; the server must also refuse out-of-range writes. */
+  return '<div class="panel"><div class="gk-label">DOSE</div>'+
+    '<div class="gk-row"><div class="stepper">'+
+      '<button data-gkdec="'+c.id+'"'+(c.dose<=c.min?" disabled":"")+'>–</button>'+
+      '<div class="dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div>'+
+      '<button data-gkinc="'+c.id+'"'+(c.dose>=c.max?" disabled":"")+'>+</button></div>'+
+    '<div class="range">Allowed '+gkFmt(c.min)+'–'+gkFmt(c.max)+' '+c.unit+'<br>'+c.draw+' draw</div></div>'+
+    '<div class="gk-label" style="margin-top:14px">DAYS</div>'+
+    '<div class="days-edit">'+GK_SHORT.map(function(l,i){
+      return '<button class="chip'+(c.days.indexOf(i)>=0?" on":"")+'" data-gktoggle="'+c.id+'" data-gkd="'+i+'">'+l+'</button>';}).join("")+'</div>'+
+    '<div class="actions"><div class="remind"><input type="time" value="'+c.reminder+'" data-gktime="'+c.id+'">'+
+      '<button class="switch'+(c.remindOn?" on":"")+'" data-gkremind="'+c.id+'"><i></i></button></div>'+
+    '<button class="ghost" data-gkremove="'+c.id+'">Archive</button></div></div>';
+}
+function gkArchiveView(items){
+  if(!items.length) return '<div class="gk-empty">Archive is empty. Archiving a compound removes it from every day. Add back returns it with the same dose and days.</div>';
+  return items.map(function(c){
+    return '<article class="gk-card"><div class="gk-row"><div><div class="gk-name">'+c.name+'</div>'+
+      '<div class="gk-meta">'+gkFmt(c.dose)+' '+c.unit+' · '+gkDayText(c.days)+(c.archivedOn?" · archived "+c.archivedOn:"")+'</div></div>'+
+      '<button class="edit" data-gkrestore="'+c.id+'">Add back</button></div></article>';}).join("");
+}
+document.addEventListener("click",function(e){
+  var t=e.target.closest&&e.target.closest("button"); if(!t) return;
+  if(t.id==="gkTabSchedule"){ gkState.view="schedule"; gkSave(); gkRender(); return; }
+  if(t.id==="gkTabArchive"){ gkState.view="archive"; gkState.open=null; gkSave(); gkRender(); return; }
+  if(t.dataset.gkday!=null){ gkState.selected=Number(t.dataset.gkday); gkState.open=null; gkSave(); gkRender(); return; }
+  var id=t.dataset.gkedit||t.dataset.gkinc||t.dataset.gkdec||t.dataset.gktoggle||t.dataset.gkremind||t.dataset.gkremove||t.dataset.gkrestore;
+  if(!id) return;
+  var c=gkState.compounds.filter(function(x){return x.id===id;})[0]; if(!c) return;
+  if(t.dataset.gkedit) gkState.open = gkState.open===id ? null : id;
+  if(t.dataset.gkinc) c.dose=Math.min(c.max,gkRound(c.dose+c.step));
+  if(t.dataset.gkdec) c.dose=Math.max(c.min,gkRound(c.dose-c.step));
+  if(t.dataset.gktoggle){ var d=Number(t.dataset.gkd);
+    c.days = c.days.indexOf(d)>=0 ? c.days.filter(function(x){return x!==d;}) : c.days.concat([d]);
+    if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or archive it."); } }
+  if(t.dataset.gkremind) c.remindOn=!c.remindOn;
+  if(t.dataset.gkremove){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); gkState.open=null; gkToast("Removed from the schedule. It is in Archive."); }
+  if(t.dataset.gkrestore){ c.active=true; c.archivedOn=null; gkToast("Added back to the schedule."); }
+  gkSave(); gkRender();
+});
+document.addEventListener("change",function(e){
+  if(!e.target.dataset||!e.target.dataset.gktime) return;
+  var c=gkState.compounds.filter(function(x){return x.id===e.target.dataset.gktime;})[0]; if(!c) return;
+  /* BACKEND HOOK 4: stored only - real delivery needs push + server scheduling. */
+  c.reminder=e.target.value; c.remindOn=true; gkSave();
+});
+gkRender();
+
 </script>
