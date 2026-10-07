@@ -121,12 +121,18 @@ def compounds(s):
         c['_pos']=m.start(); out.append(c)
 
     # --- family A: details.li-row / .cmp-quick ---
-    for m in re.finditer(r'<details class="li-row"[^>]*>(.*?)</details>', s, re.S):
-        seg = m.group(1)
-        nm = re.search(r'class="li-summary-name"[^>]*>(.*?)</span>\s*(?:</summary>|<span class="li-)', seg, re.S) \
-             or re.search(r'class="li-summary-name"[^>]*>(.*?)</span>', seg, re.S)
-        if not nm: continue
-        raw = nm.group(1)
+    # the row is a <details> on most pages and a plain <div> on a few
+    for m in re.finditer(r'<(details|div) class="li-row"[^>]*>', s):
+        tag = m.group(1)
+        seg, _end = (_balanced_details(s, m.start()) if tag == 'details'
+                     else _balanced_div(s, m.start()))
+        about_tip = _tip(seg)
+        # take the tooltip out before reading the name: without a </summary>
+        # to stop at, the name capture otherwise runs into the tip text
+        seg = re.sub(r'<span class="info-tip".*?</span></span>', '', seg, flags=re.S)
+        nmm = re.search(r'<span class="li-summary-name"[^>]*>', seg)
+        if not nmm: continue
+        raw, _ = _balanced_span(seg, nmm.start())
         head = re.search(r'class="cmp-head-key">(.*?)</span>', raw, re.S)
         headtxt = _txt(head.group(1)) if head else ''
         name = _split_name(re.sub(r'<span class="cmp-head-key">.*?</span>', '', raw, flags=re.S))
@@ -135,8 +141,26 @@ def compounds(s):
         for qm in re.finditer(r'<li><span class="ql">(.*?)</span><span class="qv">(.*?)</span></li>', seg, re.S):
             f[_txt(qm.group(1)).lower()] = _txt(qm.group(2))
         c=_mk(name, f.get('recon'), f.get('dose'), f.get('schedule') or headtxt,
-                   f.get('site'), _tip(seg), seg, headtxt)
+                   f.get('site'), about_tip, seg, headtxt)
         c['_pos']=m.start(); out.append(c)
+
+    # --- family C: .li-card (name/key in their own divs, fields in .cmp-quick) ---
+    for m in re.finditer(r'<div class="li-card"[^>]*>', s):
+        seg, _e = _balanced_div(s, m.start())
+        about_tip = _tip(seg)
+        seg2 = re.sub(r'<span class="info-tip".*?</span></span>', '', seg, flags=re.S)
+        nm = re.search(r'class="li-card-name"[^>]*>(.*?)</span>', seg2, re.S)
+        if not nm: continue
+        name = _split_name(nm.group(1))
+        if not name or _is_record(name, seg2): continue
+        key = re.search(r'class="li-card-key"[^>]*>(.*?)</span>', seg2, re.S)
+        headtxt = _txt(key.group(1)) if key else ''
+        f = {}
+        for qm in re.finditer(r'<li><span class="ql">(.*?)</span><span class="qv">(.*?)</span></li>', seg2, re.S):
+            f[_txt(qm.group(1)).lower()] = _txt(qm.group(2))
+        c = _mk(name, f.get('recon'), f.get('dose'), f.get('schedule') or headtxt,
+                f.get('site'), about_tip, seg2, headtxt)
+        c['_pos'] = m.start(); out.append(c)
 
     # de-dupe pages that carry a compound in both families
     ded = []
@@ -408,9 +432,12 @@ def _units(dose, headtxt):
             return m.group(1) + 'u', [float(m.group(1))]
     return '', []
 
+WEEKPREFIX = re.compile(r'^\s*(?:week|wk|day|phase|cycle)s?\s*\d+\s*(?:[\u2014\u2013:\u00b7-]|to)\s*', re.I)
+
 def _amount(dose):
     """-> ('1 \u2192 4 mg' | '2 mg' | '', [values], unit)"""
-    d = dose or ''
+    # "Week 1 - 1.33 mg" is one dose, not a range from 1 to 1.33
+    d = WEEKPREFIX.sub('', dose or '')
     m = re.search(r'(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu)?\s*%s\s*(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu)\b' % ARROW, d, re.I)
     if m:
         u2 = m.group(4).lower()
@@ -529,3 +556,21 @@ def fill_days_from_table(s, cmps):
             c['cad'] = 'DAYS'
             c['_from_table'] = True
     return cmps
+
+
+def _balanced_div(h, start):
+    i = h.index('>', start) + 1
+    depth = 1
+    for m in re.finditer(r'<(/?)div\b[^>]*>', h[i:]):
+        depth += 1 if not m.group(1) else -1
+        if depth == 0: return h[i:i + m.start()], i + m.end()
+    return h[i:], len(h)
+
+
+def _balanced_span(h, start):
+    i = h.index('>', start) + 1
+    depth = 1
+    for m in re.finditer(r'<(/?)span\b[^>]*>', h[i:]):
+        depth += 1 if not m.group(1) else -1
+        if depth == 0: return h[i:i + m.start()], i + m.end()
+    return h[i:], len(h)
