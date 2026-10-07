@@ -135,7 +135,11 @@ def build(slug, old, full_name, first_name, template=None):
     out = out.replace(T_FULL, full_name)
     out = re.sub(r"\b%s\b" % re.escape(T_FIRST), first_name, out)
 
-    leftovers = re.findall(r'\b%s\b|%s' % (re.escape(T_FIRST), re.escape(T_SLUG)), out)
+    # Only meaningful for tokens that are not also this client's own.
+    probes = []
+    if first_name != T_FIRST and full_name != T_FULL: probes.append(r'\b%s\b' % re.escape(T_FIRST))
+    if slug != T_SLUG: probes.append(re.escape(T_SLUG))
+    leftovers = re.findall('|'.join(probes), out) if probes else []
     if leftovers: raise AssertionError('%s: template identity left behind: %s' % (slug, set(leftovers)))
     return out, {'compounds': len(ALL), 'active': len(CMP), 'invoices': len(inv),
                  'notes': len(nts), 'labmarkers': sum(len(x['rows']) for x in lab['secs']) if lab else 0,

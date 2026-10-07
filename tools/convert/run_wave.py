@@ -11,7 +11,10 @@ def convert(e):
     g = gate.assess(slug, old)
     if not g['ok']:
         return None, 'gate: ' + '; '.join(g['problems'])[:140]
-    page, st = A.build(slug, old, e['full'], e['first'])
+    try:
+        page, st = A.build(slug, old, e['full'], e['first'])
+    except AssertionError as err:
+        return None, 'build refused: %s' % err
 
     blocks = re.findall(r'<script(?![^>]*src=)[^>]*>(.*?)</script>', page, re.S)
     with tempfile.NamedTemporaryFile('w', suffix='.js', delete=False, encoding='utf-8') as f:
