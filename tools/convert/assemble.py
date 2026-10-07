@@ -8,6 +8,7 @@ sharing card and PWA name are unchanged.
 import re, json, html, sys
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
 import extract as X, billing as B
+from billing import _txt
 
 TEMPLATE = 'dcoone/index.html'
 T_SLUG, T_FULL, T_FIRST = 'dcoone', 'David Coone', 'David'
@@ -141,6 +142,26 @@ def build(slug, old, full_name, first_name, template=None):
     probes = []
     if first_name != T_FIRST and full_name != T_FULL: probes.append(r'\b%s\b' % re.escape(T_FIRST))
     if slug != T_SLUG: probes.append(re.escape(T_SLUG))
+    # A client with an earlier protocol kept in its own file must still be able
+    # to reach it, so it gets a row on the More screen.
+    import os, glob as _g
+    sibs = [f for f in sorted(_g.glob(slug + '/*.html')) if not f.endswith('/index.html')]
+    if sibs:
+        rows = ''
+        for f in sibs:
+            try:
+                t = open(f, encoding='utf-8', errors='replace').read()
+            except OSError:
+                continue
+            m = re.search(r'<option value="[^"]*%s"[^>]*>(.*?)</option>' % re.escape(os.path.basename(f)), out + t, re.S)
+            label = _txt(m.group(1)) if m else 'Earlier protocol'
+            rows += ('<div class="li" onclick="location.href=\'/%s\'"><div><div class="nm sans">%s</div>'
+                     '<div class="pp">An earlier protocol, kept on its own page</div></div>'
+                     '<div class="rt"><div class="chev">&rsaquo;</div></div></div>' % (f, label[:70]))
+        anchor = '<div class="li" onclick="sheet(\'indexlist\')">'
+        if rows and anchor in out:
+            out = out.replace(anchor, rows + anchor, 1)
+
     leftovers = re.findall('|'.join(probes), out) if probes else []
     if leftovers: raise AssertionError('%s: template identity left behind: %s' % (slug, set(leftovers)))
     return out, {'compounds': len(ALL), 'active': len(CMP), 'invoices': len(inv),
