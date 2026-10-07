@@ -1644,6 +1644,7 @@ function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
    fewer than two Cycle N tags has no selector and behaves exactly as before. */
 function cycName(c){return String(c.tag||'').split('\u00b7')[0].trim();}
 function cycIsFuture(c){return /future|upcoming|planned/i.test(c.tag||'');}
+function cycIsPast(c){return /\u00b7\s*past\b|\bprior\b|\bcompleted?\b/i.test(c.tag||'');}
 function cycList(){
   var seen={}, out=[];
   ALL.forEach(function(c){
@@ -1651,7 +1652,7 @@ function cycList(){
     if(!/^Cycle\s*\d+/i.test(n)) return;
     if(seen[n]) return;
     seen[n]=1;
-    out.push({n:n, future:cycIsFuture(c), arch:cmpArch(c)});
+    out.push({n:n, future:cycIsFuture(c), arch:cycIsPast(c)||cmpArch(c)});
   });
   out.sort(function(a,b){
     return parseInt(a.n.replace(/\D+/g,''),10)-parseInt(b.n.replace(/\D+/g,''),10);
