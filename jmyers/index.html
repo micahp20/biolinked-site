@@ -1667,7 +1667,13 @@ function cycIsFoundation(c){return !!(c&&c.found);}
    the rotation - it runs alongside every cycle. */
 function cycTagged(c){
   var ns=cycNames(c);
-  for(var i=0;i<ns.length;i++){ if(/^(Cycle\s*\d+|Close)$/i.test(ns[i])) return true; }
+  for(var i=0;i<ns.length;i++){
+    if(/^(Cycle\s*\d+|Close)$/i.test(ns[i])) return true;
+    /* a protocol may name its cycles anything it likes ("Energy + GH Axis") */
+    if(typeof CYC!=='undefined'&&CYC){
+      for(var k=0;k<CYC.length;k++){ if(CYC[k].n===ns[i]) return true; }
+    }
+  }
   return false;
 }
 function cycIsBase(c){return cycIsFoundation(c)||(!cycTagged(c)&&!cmpArch(c));}

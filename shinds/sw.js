@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'shinds-v44';
+const CACHE = 'shinds-v45';
 const ASSETS = [
   '/shinds/',
   '/shinds/index.html',
