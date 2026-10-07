@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'aarchuleta-v38';
+const CACHE = 'aarchuleta-v39';
 const ASSETS = [
   '/aarchuleta/',
   '/aarchuleta/index.html',

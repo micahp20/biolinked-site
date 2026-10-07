@@ -1628,13 +1628,13 @@ function renderDoses(){
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
    Every compound Erik has taken or ordered, alphabetical, expanding in place.
    Everything starts collapsed. No grouping and no sort toggle: one list. */
-function cmpArch(c){return !!(c.hist||/^\s*(archived|prior)\b/i.test(c.tag||''));}
+function cmpArch(c){return !!(c.hist||/^\s*(archived|prior|past)\b/i.test(c.tag||''));}
 function cmpRow(c,i){
   var arch=cmpArch(c);
   var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog('+i+')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Archived</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
@@ -1754,10 +1754,12 @@ function renderAll(){
       : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
         '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
   } else {
+    /* One list, A-Z. A compound that is finished stays in place with a quiet
+       "Past" tag rather than being moved into a section of its own. */
     live=idx.filter(function(x){return !cmpArch(x.c)});
-    if(live.length) h+='<div class="cxwrap">'+live.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
-  if(past.length) h+='<div class="cxsub">Archived \u00b7 not currently running</div>'+
+  if(cycOn()&&past.length) h+='<div class="cxsub">Past \u00b7 no longer running</div>'+
     '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;
   document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+live.length+' ACTIVE';
