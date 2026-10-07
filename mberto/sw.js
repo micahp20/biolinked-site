@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mberto/, which is now the real page: the app layout
 // was promoted here from the /mberto/app/ pilot.
-const CACHE = 'mberto-v9';
+const CACHE = 'mberto-v10';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mberto/',
