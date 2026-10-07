@@ -77,13 +77,16 @@ VIEW_OF_ANOTHER = re.compile(r'itemi[sz]ed|per compound|breakdown|line items?\b'
 def invoices(s):
     body = s[s.find('</style>'):]
     out = []
+    spans = []
     for cls in ORDER_CLASSES:
         pos = 0
         while True:
             m = re.search(r'<details class="[^"]*\b%s\b[^"]*"[^>]*>' % cls, body[pos:])
             if not m: break
-            inner, end = _balanced(body, pos + m.start(), 'details')
-            pos = pos + m.start() + (end - (pos + m.start()))
+            start = pos + m.start()
+            inner, end = _balanced(body, start, 'details')
+            spans.append((start, end))
+            pos = end
             # title / status
             t = (re.search(r'class="of-title"[^>]*>(.*?)</span>', inner, re.S)
                  or re.search(r'class="tier-name"[^>]*>(.*?)</span>', inner, re.S)
@@ -119,6 +122,32 @@ def invoices(s):
                         'summary': _txt(sub.group(1)) if sub else stat_t,
                         'status': 'quote' if quoted else ('paid' if paid else 'due'),
                         'total': total, 'items': items})
+
+    # Some pages state their whole invoice as bare totals blocks with no
+    # container at all. Only used when nothing else was found, so a page that
+    # does use containers cannot have its orders counted twice.
+    if out:
+        return out
+    for m in re.finditer(r'<div class="totals-block"[^>]*>', body):
+        if any(a <= m.start() <= b for a, b in spans):
+            continue
+        inner, _ = _balanced(body, m.start(), 'div')
+        items, total = _rows(inner)
+        if total is None or not items:
+            continue
+        label = _txt(re.search(r'<div class="sec-divider-title"[^>]*>(.*?)</div>',
+                               body[max(0, m.start() - 700):m.start()], re.S).group(1)) \
+            if re.search(r'<div class="sec-divider-title"[^>]*>(.*?)</div>',
+                         body[max(0, m.start() - 700):m.start()], re.S) else 'Order'
+        # the status is often stated in a summary block just after the items
+        flat = _txt(inner) + ' ' + _txt(body[m.start():m.start() + 900])
+        paid = re.search(r'paid in full|\u2713\s*paid|\u2714\s*paid|\bsettled\b', flat, re.I)
+        due = re.search(r'balance due\s*\$\s*(?!0(?:\.00)?\b)[\d,]', flat, re.I)
+        if not (paid or due):
+            continue
+        out.append({'label': label[:90], 'summary': '',
+                    'status': 'paid' if paid and not due else 'due',
+                    'total': total, 'items': items})
     return out
 
 STATED = {

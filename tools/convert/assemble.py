@@ -44,10 +44,12 @@ def labs(s):
             if not m2: break
             r, pos = _bal(seg, pos + m2.start())
             ri += 1
-            nm  = re.search(r'class="lab-name"[^>]*>(.*?)</span>\s*<span class="lab-val', r + '<span class="lab-val', re.S)
-            val = re.search(r'class="lab-val([^"]*)"[^>]*>(.*?)</span>', r, re.S)
-            ref = re.search(r'class="lab-ref"[^>]*>(.*?)</span>', r, re.S)
-            st  = re.search(r'class="lab-status ([^"]*)"[^>]*>(.*?)</span>', r, re.S)
+            # fields are spans on some pages and divs on others
+            nm  = re.search(r'class="lab-name"[^>]*>(.*?)</(?:span|div)>\s*<(?:span|div) class="lab-val',
+                            r + '<span class="lab-val', re.S)
+            val = re.search(r'class="lab-val([^"]*)"[^>]*>(.*?)</(?:span|div)>', r, re.S)
+            ref = re.search(r'class="lab-ref"[^>]*>(.*?)</(?:span|div)>', r, re.S)
+            st  = re.search(r'class="lab-status ([^"]*)"[^>]*>(.*?)</(?:span|div)>', r, re.S)
             tip = re.search(r'class="info-tip-text">(.*?)</span></span>', r, re.S)
             if not nm or not val: continue
             raw = (st.group(1).strip().split() or [''])[0].lower() if st else 'normal'
