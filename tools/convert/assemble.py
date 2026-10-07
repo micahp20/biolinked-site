@@ -154,7 +154,12 @@ def build(slug, old, full_name, first_name, template=None):
             except OSError:
                 continue
             m = re.search(r'<option value="[^"]*%s"[^>]*>(.*?)</option>' % re.escape(os.path.basename(f)), out + t, re.S)
-            label = _txt(m.group(1)) if m else 'Earlier protocol'
+            if m:
+                label = _txt(m.group(1))
+            else:
+                # fall back to how that page names itself
+                own = re.search(r'class="inv-date"[^>]*>(.*?)</div>', t, re.S)
+                label = _txt(own.group(1)) if own else 'Earlier protocol'
             rows += ('<div class="li" onclick="location.href=\'/%s\'"><div><div class="nm sans">%s</div>'
                      '<div class="pp">An earlier protocol, kept on its own page</div></div>'
                      '<div class="rt"><div class="chev">&rsaquo;</div></div></div>' % (f, label[:70]))
