@@ -123,12 +123,20 @@ def notes(s):
             pos = end
             eb = re.search(r'class="tip-eyebrow"[^>]*>(.*?)</div>', inner, re.S)
             tt = re.search(r'class="tip-title"[^>]*>(.*?)</div>', inner, re.S)
-            bd = (re.search(r'<div class="tip-body"[^>]*>(.*)$', inner, re.S)
-                  or re.search(r'(<div class="tip-lead".*)$', inner, re.S))
             if not tt: continue
+            bm = re.search(r'<div class="tip-body"[^>]*>', inner)
+            if bm:
+                body_html, _ = _balanced(inner, bm.start(), 'div')
+            else:
+                lm = re.search(r'<div class="tip-lead"[^>]*>', inner)
+                body_html = inner[lm.start():] if lm else ''
+            body_html = body_html.strip()
+            # never emit a fragment that does not close itself
+            if body_html.count('<div') != body_html.count('</div>'):
+                body_html = ''
             out.append({'eb': _txt(eb.group(1)) if eb else '',
                         'tt': _txt(tt.group(1)),
-                        'bd': (bd.group(1).strip() if bd else '')})
+                        'bd': body_html})
         if out: break   # a page uses one shape or the other, not both
     return out
 

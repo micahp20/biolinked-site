@@ -1,7 +1,7 @@
 """Per-page eligibility. A page converts only if everything it contains survives."""
 import sys, re
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
-import extract as X, billing as B, labs as L
+import extract as X, billing as B, assemble as A
 
 MULTI_PROTOCOL = {'jmaynes', 'kdrieshman', 'knelson', 'dmaynes'}
 
@@ -11,11 +11,18 @@ def assess(slug, s):
     nts  = B.notes(s)
     src  = B.count_sources(s)
     rec  = B.reconcile(s, inv)
-    labsec = X.labs(s)
+    try:
+        labdata = A.labs(s)
+        labn = sum(len(x['rows']) for x in labdata['secs']) if labdata else 0
+        laberr = None
+    except AssertionError as e:
+        labdata, labn, laberr = None, 0, str(e)
     problems = []
     if slug in MULTI_PROTOCOL:
         problems.append('multi-protocol: needs the dropdown pattern')
-    if not cmps and not labsec and not inv:
+    if laberr:
+        problems.append(laberr)
+    if not cmps and not labn and not inv:
         problems.append('no compounds, labs or invoices found')
     if rec['problems']:
         problems += ['money: ' + p for p in rec['problems']]
@@ -27,7 +34,7 @@ def assess(slug, s):
     if nocad:
         problems.append('schedule days unresolved: ' + ', '.join(nocad[:3]))
     return {'slug': slug, 'compounds': len(cmps), 'invoices': len(inv), 'notes': len(nts),
-            'labmarkers': sum(len(x['rows']) for x in labsec), 'cycles': len({c.get('cycle') for c in cmps if c.get('cycle')}),
+            'labmarkers': labn, 'cycles': len({c.get('cycle') for c in cmps if c.get('cycle')}),
             'trt': bool(re.search(r'testosterone|cypionate|\bTRT\b', ' '.join(c['n'] for c in cmps), re.I)),
             'ok': not problems, 'problems': problems}
 
