@@ -849,9 +849,10 @@
 
   /* Index detail - explainer sections above the Typical Reference card. */
   .xp{padding:0 16px;margin:0 0 6px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
+  .xp:empty{display:none}
   #x-edu[hidden]{display:none}
 </style>
-<script src="/compound-library.js?v=1"></script>
+<script src="/compound-library.js?v=2"></script>
 </head>
 <body>
 <div class="device">
@@ -1335,6 +1336,7 @@
       <p class="xp" id="x-how"></p>
       <div class="dl">Why people use it</div>
       <p class="xp" id="x-why"></p>
+      <p class="xp" id="x-why2"></p>
     </div>
     <div class="dl first" id="x-reflbl">Typical Reference</div>
     <div class="facts">
@@ -1754,15 +1756,17 @@ function openIx(i){
   document.getElementById('x-dose').innerHTML='<b>'+esc(e.dose)+'</b>'+(e.units&&e.units!=='N/A'?'<b>'+esc(e.units)+' units</b>':'');
   document.getElementById('x-when').innerHTML='<b>'+esc(e.timing)+'</b><b>'+esc(e.freq)+'</b>';
   document.getElementById('x-dur').innerHTML='<b>'+esc(e.dur)+'</b>';
-  /* Education sections come from the shared compound library - one file feeds
-     every surface. No entry (blends, the five with no prose yet) -> the block
-     hides and the reference card still stands on its own. */
+  /* Education sections come from /compound-library.js - one shared file feeds
+     the public Index and every protocol page. goal and notes render as two
+     separate lines rather than one run-on. No entry -> block hides and the
+     reference card stands alone. */
   var lib=(typeof blLib==='function')?blLib(e.name):null;
   var edu=document.getElementById('x-edu');
   if(lib&&(lib.sub||lib.mech||lib.goal)){
     document.getElementById('x-what').textContent=lib.sub||'';
     document.getElementById('x-how').textContent=lib.mech||'';
-    document.getElementById('x-why').textContent=[lib.goal,lib.notes].filter(Boolean).join(' ');
+    document.getElementById('x-why').textContent=lib.goal||'';
+    document.getElementById('x-why2').textContent=lib.notes||'';
     edu.hidden=false;
   } else { edu.hidden=true; }
   sheet('ix');

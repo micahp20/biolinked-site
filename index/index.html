@@ -241,6 +241,7 @@ html[data-theme] body{padding:0}
     </div>
   </div>
 </section>
+<script src="/compound-library.js?v=2"></script>
 <script src="/cheat-sheet-data.js"></script>
 <script>
 const COMPOUNDS = [
@@ -573,6 +574,25 @@ function render(){
   }
 }
 
+/* ---------- SHARED LIBRARY IS AUTHORITATIVE ----------
+   The prose below originated here, but /compound-library.js is now the one
+   place it is maintained - the protocol pages read the same file. Applying it
+   over COMPOUNDS at load means editing the library updates the public Index
+   too, and the inlined values act only as a fallback if the file fails to
+   load. Reference figures (dose/cycle/frequency/timing) stay page-owned. */
+(function(){
+  if(typeof blLib!=='function') return;
+  var n=0;
+  COMPOUNDS.forEach(function(c){
+    var L=blLib(c.name); if(!L) return;
+    if(L.sub)   c.sub=L.sub;
+    if(L.mech)  c.mechanism=L.mech;
+    if(L.goal)  c.goal=L.goal;
+    if(L.notes) c.notes=L.notes;
+    n++;
+  });
+  if(window.console&&console.debug) console.debug('[BL] library prose applied to '+n+'/'+COMPOUNDS.length+' compounds');
+})();
 buildMobileFilters();
 document.getElementById('searchInput').addEventListener('input', e => { searchQ=e.target.value; render(); });
 document.querySelectorAll('.filter-row .fchip[data-cat]').forEach(b => b.addEventListener('click', () => {

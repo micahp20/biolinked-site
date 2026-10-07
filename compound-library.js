@@ -201,6 +201,12 @@ var BL_LIB = {
   "notes": "Primarily useful when appetite stimulation is desired (underweight, muscle-building, post-illness). Not ideal for weight loss clients due to hunger effect. Very affordable. Stack with CJC-1295.",
   "sub": "Growth Hormone Releasing Peptide-6"
  },
+ "GLOW Blend (GHK-Cu, BPC-157, TB-500)": {
+  "goal": "Covered in one shot \u2014 Skin rejuvenation, collagen production, wound healing; Tissue healing, gut repair, tendon & ligament recovery; Systemic tissue repair, inflammation reduction, flexibility.",
+  "mech": "Each component works on its own pathway, which is why they are combined. GHK-Cu: Copper-binding tripeptide upregulates collagen I/III synthesis, glycosaminoglycans, and antioxidant enzymes. BPC-157: Activates VEGFR2 signaling for angiogenesis. TB-500: Thymosin Beta-4 fragment promotes actin polymerization, cell migration, and anti-inflammatory responses.",
+  "notes": "One draw instead of 3, which is the practical appeal of a blend. The tradeoff is that the ratio is fixed \u2014 the components cannot be dosed independently.",
+  "sub": "A pre-mixed blend of GHK-Cu, BPC-157 and TB-500 in one vial."
+ },
  "Glutathione": {
   "goal": "Detoxification, antioxidant protection, skin brightening",
   "mech": "The body's primary antioxidant \u2014 tripeptide (Glu-Cys-Gly) neutralizing free radicals, supporting liver detoxification pathways, and protecting cells from oxidative damage. Injectable GSH bypasses oral degradation for superior systemic delivery.",
@@ -224,6 +230,12 @@ var BL_LIB = {
   "mech": "Fragment of HGH containing the fat-burning region (amino acids 176\u2013191) without growth-promoting properties. Activates beta-3 adrenergic receptor in fat cells.",
   "notes": "Alternative to AOD-9604. Best results with fasted dosing. No effect on blood glucose or IGF-1 \u2014 safe for diabetics.",
   "sub": "Fat-Burning HGH Fragment"
+ },
+ "HMG": {
+  "goal": "Used in fertility contexts and, in hormone-protocol discussion, where the FSH arm is wanted alongside or instead of hCG.",
+  "mech": "Supplies FSH and LH signal directly to the gonads, acting downstream of the pituitary rather than stimulating it. The FSH component is what distinguishes it from hCG, which is LH-like only.",
+  "notes": "This is prescriber territory \u2014 it is a hormone with direct endocrine effects and warrants medical supervision and bloodwork.",
+  "sub": "A gonadotropin preparation containing both FSH and LH activity. A prescription hormone, not a research peptide."
  },
  "Hexarelin": {
   "goal": "Maximum GH output, muscle, cardioprotection",
@@ -255,6 +267,12 @@ var BL_LIB = {
   "notes": "Available as IP10 and as premix CP10 (with CJC-1295) at Bio Linked. The gold standard pairing: CJC-1295 extends pulse duration, Ipamorelin amplifies pulse amplitude. No hunger or cortisol side effects.",
   "sub": "Selective GHRP"
  },
+ "KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)": {
+  "goal": "Covered in one shot \u2014 Skin rejuvenation, collagen production, wound healing; Tissue healing, gut repair, tendon & ligament recovery; Systemic tissue repair, inflammation reduction, flexibility; Anti-inflammatory, gut healing, IBS/IBD support.",
+  "mech": "Each component works on its own pathway, which is why they are combined. GHK-Cu: Copper-binding tripeptide upregulates collagen I/III synthesis, glycosaminoglycans, and antioxidant enzymes. BPC-157: Activates VEGFR2 signaling for angiogenesis. TB-500: Thymosin Beta-4 fragment promotes actin polymerization, cell migration, and anti-inflammatory responses. KPV: Tripeptide fragment of alpha-MSH that directly inhibits NF-\u03baB signaling and pro-inflammatory cytokine cascade.",
+  "notes": "One draw instead of 4, which is the practical appeal of a blend. The tradeoff is that the ratio is fixed \u2014 the components cannot be dosed independently.",
+  "sub": "A pre-mixed blend of GHK-Cu, BPC-157, TB-500 and KPV in one vial."
+ },
  "KPV": {
   "goal": "Anti-inflammatory, gut healing, IBS/IBD support",
   "mech": "Tripeptide fragment of alpha-MSH that directly inhibits NF-\u03baB signaling and pro-inflammatory cytokine cascade. Reduces intestinal inflammation at the mucosal level. Calms immune overactivation in gut and skin tissue.",
@@ -266,6 +284,12 @@ var BL_LIB = {
   "mech": "Neuropeptide that activates GPR54 receptor \u2014 the master regulator of reproductive hormone cascade. Stimulates GnRH release, triggering LH and FSH, which then drive testosterone/estrogen production. Addresses libido at the hormonal root.",
   "notes": "Particularly interesting for low libido linked to low LH/testosterone. Different mechanism from PT-141 \u2014 hormonal vs. CNS. Emerging use in fertility protocols and hypogonadism research.",
   "sub": "Reproductive Hormone Axis Activator"
+ },
+ "L-Carnitine": {
+  "goal": "Fat oxidation and perceived recovery alongside training.",
+  "mech": "Carries long-chain fatty acids across the inner mitochondrial membrane, the rate-limiting step before they can be oxidised for fuel. Injectable forms bypass the low oral bioavailability (~15%) that limits the tablet form.",
+  "notes": "Commonly timed before cardio on the reasoning that released fatty acids need movement to be burned. Injections are reported to sting; warming the vial and pushing slowly is the usual advice.",
+  "sub": "An amino-acid derivative that shuttles fatty acids into the mitochondria; sold as an injectable solution rather than a reconstituted peptide."
  },
  "LL-37": {
   "goal": "Wound healing, antimicrobial defense, immune modulation",
@@ -314,6 +338,18 @@ var BL_LIB = {
   "mech": "Dual GLP-1 and glucagon receptor co-agonist developed in China with strong Phase 2 weight loss data. Glucagon component increases energy expenditure and liver fat oxidation on top of GLP-1-mediated appetite suppression.",
   "notes": "Emerging compound with impressive Phase 2 trial results. Represents next generation of dual-mechanism metabolic peptides. Less widely studied than Tirzepatide in Western research but gaining attention rapidly.",
   "sub": "GLP-1/Glucagon Dual Agonist"
+ },
+ "Melanotan 1": {
+  "goal": "Skin pigmentation and reduced sun sensitivity.",
+  "mech": "Selective agonist at the MC1 receptor on melanocytes, increasing eumelanin synthesis. More receptor-selective than Melanotan 2, which is why it is associated with fewer off-target effects.",
+  "notes": "Chosen over Melanotan 2 when the goal is tanning alone, without the libido and appetite effects the less selective analog carries.",
+  "sub": "A synthetic analog of alpha-MSH, the hormone that drives pigment production."
+ },
+ "Melanotan 2": {
+  "goal": "Pigmentation plus the central effects \u2014 appetite suppression and libido.",
+  "mech": "Agonist across several melanocortin receptors \u2014 MC1 for pigmentation, and MC3/MC4 centrally, which is where its appetite and arousal effects come from. That broad activity is the tradeoff against Melanotan 1.",
+  "notes": "Nausea and facial flushing on early doses are commonly reported. The non-selectivity is the reason some people choose Melanotan 1 instead.",
+  "sub": "A shortened, non-selective analog of alpha-MSH."
  },
  "Melanotan I": {
   "goal": "Tanning, melanin production, skin protection research",
@@ -519,6 +555,12 @@ var BL_LIB = {
   "notes": "Pairs perfectly with BPC-157 for the Wolverine Stack (premix BB10). TB-500 handles systemic healing while BPC-157 addresses local tissue. Reduces inflammation and speeds recovery from injuries, surgery, and overtraining.",
   "sub": "Thymosin Beta-4 Fragment"
  },
+ "Tadalafil (Cialis)": {
+  "goal": "Vascular and erectile function, and sometimes low daily doses for blood-flow and pump effects during training.",
+  "mech": "Blocks phosphodiesterase type 5, so cGMP persists and smooth muscle stays relaxed, increasing blood flow. Its ~17.5-hour half-life is far longer than others in the class, which is why it is described as daily rather than on-demand.",
+  "notes": "Because it is a prescription medication with real cardiovascular interactions \u2014 nitrates in particular \u2014 this one belongs in a conversation with a prescriber, not a protocol page.",
+  "sub": "A long-acting PDE5 inhibitor. A prescription medication in most jurisdictions, not a research peptide."
+ },
  "Tesamorelin": {
   "goal": "Visceral fat reduction, GH optimization",
   "mech": "FDA-studied GHRH analog with the strongest clinical data for visceral fat reduction (15\u201320% reduction in trials). Specifically researched for HIV-associated lipodystrophy but widely applied for general visceral fat and body recomposition.",
@@ -566,6 +608,12 @@ var BL_LIB = {
   "mech": "Gly-Pro-Hyp sequence identical to the most common repeating unit in type I collagen. Signals fibroblasts to produce collagen.",
   "notes": "Works synergistically with Matrixyl and Syn-Coll for multi-pathway collagen stimulation.",
   "sub": "Collagen Tripeptide Signal"
+ },
+ "Triple Threat Blend (NAD+, MOTS-C, 5-Amino-1MQ)": {
+  "goal": "Covered in one shot \u2014 Cellular energy, DNA repair, recovery, longevity; Mitochondrial restoration, metabolic reset, exercise mimetic; Metabolic enhancement, fat storage reduction, NAD+ optimization.",
+  "mech": "Each component works on its own pathway, which is why they are combined. NAD+: Essential coenzyme for every energy-producing reaction in the body. MOTS-c: Mitochondria-derived peptide that activates AMPK pathway, improving insulin sensitivity, mitochondrial biogenesis, and metabolic flexibility. 5-Amino-1MQ: Inhibits NNMT (nicotinamide N-methyltransferase), an enzyme that converts NAD+ to a methylated form, reducing fat cell formation and boosting cellular energy metabolism.",
+  "notes": "One draw instead of 3, which is the practical appeal of a blend. The tradeoff is that the ratio is fixed \u2014 the components cannot be dosed independently.",
+  "sub": "A pre-mixed blend of NAD+, MOTS-c and 5-Amino-1MQ in one vial."
  },
  "Triptorelin": {
   "goal": "Hormonal reset, GnRH axis stimulation",
