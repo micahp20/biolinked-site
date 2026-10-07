@@ -30,6 +30,9 @@ def assess(slug, s):
         problems.append('notes: %d tip-cards in source, %d extracted' % (src['tipcards'], len(nts)))
     if any(c.get('cycle_ambiguous') for c in cmps):
         problems.append('cycle state ambiguous: cannot tell which cycle is current')
+    for c in cmps:
+        d = X.dose_check(c)
+        if d: problems.append('dose/draw: ' + d)
     nocad = [c['n'] for c in cmps if c.get('days') is None and c['cad'] not in ('PRN','EOD','WK')]
     if nocad:
         problems.append('schedule days unresolved: ' + ', '.join(nocad[:3]))

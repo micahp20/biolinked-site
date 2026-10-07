@@ -155,12 +155,11 @@ def _mk(name, recon, dose, sched, site, about, seg, headtxt=''):
     sched = sched or ''
     code, label, days = cadence(sched + ' ' + headtxt)
     blk = block(sched + ' ' + headtxt)
-    units = ''
-    um = re.search(r'(\d+(?:\.\d+)?)\s*(?:u\b|units)', (dose or '') + ' ' + headtxt, re.I)
-    if um: units = um.group(1) + 'u'
-    mg = ''
-    dm = re.search(r'(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu|ml)\b', dose or '', re.I)
-    if dm: mg = dm.group(1) + ' ' + dm.group(2).lower()
+    # A dose is often a titration ("1 mg -> 4 mg", "10 -> 40 units"). Taking one
+    # endpoint from each field independently produces a draw volume that does not
+    # match the dose, so ranges are carried whole.
+    units, unit_vals = _units(dose, headtxt)
+    mg, mg_vals, mg_unit = _amount(dose)
     return {
         'n': name,
         'b': blk, 'cad': code, 'c': label, 'days': days,
@@ -170,6 +169,7 @@ def _mk(name, recon, dose, sched, site, about, seg, headtxt=''):
         'about': about or '',
         'tag': 'Archived' if ARCH_RE.search(seg[:400]) else 'Active',
         '_raw_sched': sched,
+        '_u_vals': unit_vals, '_d_vals': mg_vals, '_d_unit': mg_unit,
     }
 
 
@@ -352,3 +352,58 @@ def assign_cycles(s, cmps):
     if ambiguous:
         for c in cmps: c['cycle_ambiguous'] = True
     return cmps
+
+
+ARROW = r'(?:\u2192|->|&rarr;|to|\u2013|\u2014|-)'
+
+def _units(dose, headtxt):
+    """-> ('10 \u2192 40u' | '10u' | '', [values])"""
+    for src in ((dose or ''), headtxt or ''):
+        m = re.search(r'(\d+(?:\.\d+)?)\s*%s\s*(\d+(?:\.\d+)?)\s*(?:u\b|units)' % ARROW, src, re.I)
+        if m:
+            a, b = m.group(1), m.group(2)
+            return '%s \u2192 %su' % (a, b), [float(a), float(b)]
+        m = re.search(r'(\d+(?:\.\d+)?)\s*(?:u\b|units)', src, re.I)
+        if m:
+            return m.group(1) + 'u', [float(m.group(1))]
+    return '', []
+
+def _amount(dose):
+    """-> ('1 \u2192 4 mg' | '2 mg' | '', [values], unit)"""
+    d = dose or ''
+    m = re.search(r'(~?\d+(?:\.\d+)?)\s*(?:mg|mcg|iu)?\s*%s\s*(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu)\b' % ARROW, d, re.I)
+    if m:
+        u = m.group(3).lower()
+        return '%s \u2192 %s %s' % (m.group(1), m.group(2), u), [_f(m.group(1)), _f(m.group(2))], u
+    m = re.search(r'(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu|ml)\b', d, re.I)
+    if m:
+        u = m.group(2).lower()
+        return m.group(1) + ' ' + u, [_f(m.group(1))], u
+    return '', [], None
+
+def _f(x):
+    return float(str(x).lstrip('~'))
+
+
+VIAL_RE  = re.compile(r'(\d+(?:[.,]\d+)?)\s*(mg|mcg|iu)\b', re.I)
+RECON_RE = re.compile(r'(\d+(?:\.\d+)?)\s*m[lL]\b')
+
+def dose_check(c):
+    """Draw volume must follow from the vial, the recon volume and the dose.
+    Returns None when the page did not state enough to check."""
+    vm = VIAL_RE.search(c['n'].split('\u00b7', 1)[-1] if '\u00b7' in c['n'] else '')
+    rm = RECON_RE.search(c.get('rec') or '')
+    if not vm or not rm: return None
+    if not c.get('_u_vals') or not c.get('_d_vals'): return None
+    if c.get('_d_unit') not in (None, vm.group(2).lower()): return None
+    vial = float(vm.group(1).replace(',', '')); mls = float(rm.group(1))
+    if not vial or not mls: return None
+    conc = vial / mls                       # mg per mL
+    if len(c['_u_vals']) != len(c['_d_vals']): 
+        return 'dose and draw do not pair: %s vs %s' % (c['d'], c['u'])
+    for dose_v, unit_v in zip(c['_d_vals'], c['_u_vals']):
+        want = dose_v / conc * 100.0        # U-100: 100 units = 1 mL
+        if abs(want - unit_v) > max(1.0, want * 0.12):
+            return ('%s: %s of %s in %s mL should draw ~%.1fu, page says %.1fu'
+                    % (c['n'], c['d'], vm.group(0), mls, want, unit_v))
+    return None
