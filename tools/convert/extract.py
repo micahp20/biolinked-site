@@ -40,7 +40,10 @@ CAD = [
     (r'tue\w*\s*(?:&|\+|and|/)\s*sat', 'TS', 'Tue + Sat', [2,6]),
     (r'tue\w*\s*(?:&|\+|and|/)\s*fri', 'TF', 'Tue + Fri', [2,5]),
     (r'\bas needed\b|\bprn\b|self-directed|your own cadence'
-     r'|days you train|training days?|on train\w* days|pre-?workout', 'PRN', 'As needed', []),
+     r'|days you train|training days?|on train\w* days|pre-?workout'
+     r'|when used|if needed|only when', 'PRN', 'As needed', []),
+    # an insulin or oral dosed "40u/day · before meals" runs every day
+    (r'\d+\s*u?\s*/\s*day|per day\b|before meals|with meals|with food daily', 'DAILY', 'Daily', [0,1,2,3,4,5,6]),
     (r'days?\s*1\s*[,/&]\s*3\s*(?:[,/&]|and)\s*5', 'MWF', 'Mon / Wed / Fri', [1,3,5]),
     (r'\d+\s*consecutive\s*(?:days?|nights?)', 'DAILY', 'Daily', [0,1,2,3,4,5,6]),
     (r'nightly|every night|\d+\s*-?\s*night\s*(?:block|pulse|run)|\d+\s*nights?\s*straight'
@@ -162,6 +165,10 @@ ARCH_RE = re.compile(r'completed|archived|prior cycle|no longer|finished|paid in
 def _mk(name, recon, dose, sched, site, about, seg, headtxt=''):
     sched = sched or ''
     code, label, days = cadence(sched + ' ' + headtxt)
+    if days is None and code is None and not (sched or '').strip() and not (headtxt or '').strip():
+        # last resort: some rows state the cadence inside the compound name
+        # ("Humulin R · 25u AM + 15u PM (40u/day) · before meals")
+        code, label, days = cadence(name)
     blk = block(sched + ' ' + headtxt)
     # A dose is often a titration ("1 mg -> 4 mg", "10 -> 40 units"). Taking one
     # endpoint from each field independently produces a draw volume that does not
