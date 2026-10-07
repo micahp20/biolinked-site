@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'bhartman-v33';
+const CACHE = 'bhartman-v34';
 const ASSETS = [
   '/bhartman/',
   '/bhartman/index.html',

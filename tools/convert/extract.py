@@ -39,7 +39,9 @@ CAD = [
     (r'mon\w*\s*(?:&|\+|and)\s*wed', 'MW',  'Mon + Wed', [1,3]),
     (r'tue\w*\s*(?:&|\+|and|/)\s*sat', 'TS', 'Tue + Sat', [2,6]),
     (r'tue\w*\s*(?:&|\+|and|/)\s*fri', 'TF', 'Tue + Fri', [2,5]),
-    (r'\bas needed\b|\bprn\b', 'PRN', 'As needed', []),
+    (r'\bas needed\b|\bprn\b|self-directed|your own cadence', 'PRN', 'As needed', []),
+    (r'days?\s*1\s*[,/&]\s*3\s*(?:[,/&]|and)\s*5', 'MWF', 'Mon / Wed / Fri', [1,3,5]),
+    (r'\d+\s*consecutive\s*(?:days?|nights?)', 'DAILY', 'Daily', [0,1,2,3,4,5,6]),
     (r'nightly|every night|\d+\s*-?\s*night\s*(?:block|pulse|run)|\d+\s*nights?\s*straight'
      r'|\d+\s*days?\s*straight|\d+\s*days?\s*on,?\s*then\s*off|\d+\s*(?:nights?|days?)\s*in a row',
      'DAILY', 'Daily', [0,1,2,3,4,5,6]),
@@ -138,14 +140,19 @@ def compounds(s):
         k = c['n'].lower()
         if k in seen: continue
         seen.add(k); ded.append(c)
-    return assign_cycles(s, ded)
+    return assign_cycles(s, fill_days_from_table(s, ded))
 
 # A details.li-row is also used for closed-order records and section folds.
 # Those carry a "Compound" or "Order" quick-label and a tick/"Completed" heading;
 # they are not compounds and must never become schedule rows.
+# Supplies are listed alongside compounds but are not dosed, so they must not
+# become schedule rows.
+SUPPLY_RE = re.compile(r'^(?:bacteriostatic|bac)\s*water|^sterile water|^insulin syringes?|'
+                       r'^alcohol (?:prep )?pads?|^sharps|^vial stoppers?|^organizer', re.I)
+
 RECORD_RE = re.compile(r'^[\u2714\u2713\s]*(cycle\s*\d+|order\s*\d+|paid|completed|archive|invoice|summary|total)', re.I)
 def _is_record(name, seg):
-    if RECORD_RE.search(name): return True
+    if RECORD_RE.search(name) or SUPPLY_RE.search(name.strip()): return True
     labels = {m.lower() for m in re.findall(r'<span class="ql">(.*?)</span>', seg)}
     return bool(labels & {'compound', 'order', 'titration', 'paid', 'total'}) and 'dose' not in labels
 
@@ -434,3 +441,58 @@ def dose_check(c):
             return ('%s: %s at %.1f %s/mL should draw ~%.1fu, page says %.1fu'
                     % (c['n'], c['d'], conc, unit, want, unit_v))
     return None
+
+
+# ---------- weekly schedule table ----------
+# Many pages state cadence only in a Day -> AM/PM grid rather than on the
+# compound row. That grid is authoritative, so it fills in what the row omits.
+DAYCELL = re.compile(r'<span class="sched-day">(.*?)</span>', re.S)
+
+def schedule_table(s):
+    """-> {day index: [compound text dosed that day]} read from the grid."""
+    body = s[s.find('</style>'):]
+    out = {}
+    for rm in re.finditer(r'<tr>(.*?)</tr>', body, re.S):
+        row = rm.group(1)
+        dm = DAYCELL.search(row)
+        if not dm: continue
+        d = DAYNAME.get(_txt(dm.group(1)).strip().lower()[:3])
+        if d is None: continue
+        pills = [_txt(p) for p in re.findall(r'<span class="sched-pill[^"]*">(.*?)</span>', row, re.S)]
+        pills = [p for p in pills if p and not re.fullmatch(r'[—–\-\s]*', p)]
+        if pills:
+            out.setdefault(d, []).extend(pills)
+    return out
+
+def _token(name):
+    """The compound's leading word, which is what a schedule pill names it by."""
+    n = re.split(r'\u00b7|\(|,|\u2014|\u2013', name)[0].strip()
+    w = re.split(r'\s+', n)[0]
+    return re.sub(r'[^a-z0-9]+', '', w.lower())
+
+def _flat(t):
+    return re.sub(r'[^a-z0-9]+', '', t.lower())
+
+def fill_days_from_table(s, cmps):
+    """Give a compound its days when only the weekly grid states them."""
+    table = schedule_table(s)
+    if not table:
+        return cmps
+    for c in cmps:
+        if c.get('days') is not None or c['cad'] in ('PRN', 'EOD', 'WK'):
+            continue
+        k = _token(c['n'])
+        if len(k) < 3:
+            continue
+        # a pill reads "15u \u00b7 KLOW (4 mg blend)", so look for the name inside it
+        days = sorted(d for d, pills in table.items() if any(k in _flat(p) for p in pills))
+        if not days and len(k) >= 6:
+            # grids often abbreviate ("Reta" for Retatrutide)
+            short = k[:4]
+            days = sorted(d for d, pills in table.items() if any(short in _flat(p) for p in pills))
+        if days and len(days) < 7 or (days and len(days) == 7):
+            c['days'] = days
+            c['c'] = _daylabel(days)
+            c['cad'] = 'DAYS'
+            c['_from_table'] = True
+    return cmps

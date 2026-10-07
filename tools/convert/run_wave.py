@@ -33,6 +33,15 @@ def convert(e):
     if st['compounds'] == 0 and st['labmarkers'] == 0: return None, 'nothing extracted'
 
     open(slug + '/index.html', 'w', encoding='utf-8').write(page)
+    if not os.path.exists(slug + '/sw.js'):
+        # the shell registers a worker, so a page that never had one gets the
+        # template's, renamed to its own cache
+        tpl = open('dcoone/sw.js', encoding='utf-8').read()
+        open(slug + '/sw.js', 'w', encoding='utf-8').write(
+            re.sub(r"CACHE *= *'dcoone-v\d+'", "CACHE = '%s-v1'" % slug, tpl).replace('/dcoone/', '/%s/' % slug))
+    if not os.path.exists(slug + '/manifest.json') and os.path.exists('dcoone/manifest.json'):
+        mf = open('dcoone/manifest.json', encoding='utf-8').read()
+        open(slug + '/manifest.json', 'w', encoding='utf-8').write(mf.replace('/dcoone/', '/%s/' % slug))
     sw = open(slug + '/sw.js', encoding='utf-8').read()
     m = re.search(r"CACHE *= *'%s-v(\d+)'" % re.escape(slug), sw)
     if m:
