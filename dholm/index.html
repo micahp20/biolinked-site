@@ -1411,7 +1411,12 @@ function closeNav(){var p=navParts();p.m.classList.remove('on');p.s.classList.re
 function toggleNav(){navParts().m.classList.contains('on')?closeNav():openNav();}
 document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeNav();closeSheet();}});
 
-function due(cad,d){
+/* A compound may carry an explicit day set (0=Sun..6=Sat), which is exact and
+   wins. The older cadence codes stay for compounds that have none. */
+function due(c,d){
+  if(typeof c==='string') c={cad:c};
+  if(c && c.days && c.days.length) return c.days.indexOf(d)>=0;
+  var cad=c?c.cad:null;
   if(cad==='DAILY') return true;
   if(cad==='MF')    return d>=1&&d<=5;
   if(cad==='MWF')   return d===1||d===3||d===5;
@@ -1584,7 +1589,7 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
    Morning block and again in the Night block. */
 function inBlock(c,g){return c.b===g||c.b==='BOTH';}
 function renderDoses(){
-  var rows=cycRows().filter(function(c){return due(c.cad,sel)});
+  var rows=cycRows().filter(function(c){return due(c,sel)});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+

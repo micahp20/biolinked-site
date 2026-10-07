@@ -1,0 +1,158 @@
+"""Invoices and notes, with a reconciliation gate.
+
+The corpus uses several markup shapes for the same thing. Everything here is
+tolerant of that, and nothing is emitted on trust: reconcile() re-reads the
+figures the page states in its own words (Balance Due, Account Total, Paid to
+Date) and compares them to what was extracted. A page that does not reconcile
+is refused rather than converted.
+"""
+import re, html
+
+def _txt(s):
+    s = re.sub(r'<span class="info-tip".*?</span></span>', '', s or '', flags=re.S)
+    s = re.sub(r'<[^>]+>', ' ', s)
+    return re.sub(r'\s+', ' ', html.unescape(s)).strip()
+
+MONEY = re.compile(r'\$\s*(-?[\d,]+(?:\.\d{1,2})?)')
+def money(t):
+    m = MONEY.search(t or '')
+    return float(m.group(1).replace(',', '')) if m else None
+
+def _balanced(h, start, tag):
+    """(inner, end) for the <tag> opening at start, matched by depth."""
+    i = h.index('>', start) + 1
+    depth = 1
+    for m in re.finditer(r'<(/?)%s\b[^>]*>' % tag, h[i:]):
+        depth += 1 if not m.group(1) else -1
+        if depth == 0:
+            return h[i:i + m.start()], i + m.end()
+    return h[i:], len(h)
+
+TOTAL_WORDS = re.compile(r'\b(total|balance|due|subtotal|paid in full|grand)\b', re.I)
+
+def _rows(seg):
+    """Both .total-row shapes -> (items, total)."""
+    items, total = [], None
+    for m in re.finditer(r'<div class="total-row([^"]*)"[^>]*>(.*?)</div>\s*(?=<div class="total-row|</div>|$)', seg, re.S):
+        cls, inner = m.group(1), m.group(2)
+        # shape A: .tr-name / .tr-val   shape B: <span>label</span><span class="val">
+        nm = re.search(r'<span class="tr-name">(.*?)</span>\s*<span class="tr-val"[^>]*>(.*?)</span>', inner, re.S)
+        if nm:
+            label_html, val = nm.group(1), nm.group(2)
+        else:
+            # shape B has <span class="val">, shape C has a bare second span
+            nb = (re.search(r'<span[^>]*>(.*?)</span>\s*<span class="val"[^>]*>(.*?)</span>', inner, re.S)
+                  or re.fullmatch(r'\s*<span[^>]*>(.*?)</span>\s*<span[^>]*>([^<]*\$[^<]*)</span>\s*', inner, re.S))
+            if not nb: continue
+            label_html, val = nb.group(1), nb.group(2)
+        amt = money(_txt(val))
+        if amt is None: continue
+        sub = re.search(r'<span class="sub">(.*?)</span>', label_html, re.S)
+        label = _txt(re.sub(r'<span class="sub">.*?</span>', '', label_html, flags=re.S))
+        if 'grand' in cls or TOTAL_WORDS.search(label):
+            if total is None: total = amt
+            continue
+        items.append({'n': label, 'sub': _txt(sub.group(1)) if sub else '', 'amt': amt})
+    return items, total
+
+ORDER_CLASSES = ('order-fold', 'paid-archive', 'tier')
+
+def invoices(s):
+    body = s[s.find('</style>'):]
+    out = []
+    for cls in ORDER_CLASSES:
+        pos = 0
+        while True:
+            m = re.search(r'<details class="[^"]*\b%s\b[^"]*"[^>]*>' % cls, body[pos:])
+            if not m: break
+            inner, end = _balanced(body, pos + m.start(), 'details')
+            pos = pos + m.start() + (end - (pos + m.start()))
+            # title / status
+            t = (re.search(r'class="of-title"[^>]*>(.*?)</span>', inner, re.S)
+                 or re.search(r'class="tier-name"[^>]*>(.*?)</span>', inner, re.S)
+                 or re.search(r'<summary[^>]*>(.*?)</summary>', inner, re.S))
+            sub = re.search(r'class="of-sub"[^>]*>(.*?)</span>', inner, re.S)
+            st = re.search(r'class="of-status"[^>]*>(.*?)</span>', inner, re.S)
+            items, total = _rows(inner)
+            if total is None and not items:
+                continue
+            stat_t = _txt(st.group(1)) if st else ''
+            head = _txt(t.group(1)) if t else ''
+            # A quoted / not-yet-ordered cycle is shown for planning and is
+            # deliberately outside the account total.
+            quoted = re.search(r'not ordered|not yet ordered|quoted|quote only|planned', head + ' ' + stat_t, re.I)
+            paid = (cls == 'paid-archive'
+                    or re.search(r'paid|settled|✓|✔|complete', stat_t, re.I)
+                    or re.search(r'paid in full|✔\s*cycle', _txt(t.group(1) if t else ''), re.I))
+            if not total:
+                pa = re.search(r'class="pa-sub"[^>]*>(.*?)</span>', inner, re.S)
+                total = money(_txt(pa.group(1))) if pa else None
+            if not total:
+                total = round(sum(i['amt'] for i in items), 2)
+            out.append({'label': _txt(t.group(1))[:90] if t else 'Order',
+                        'summary': _txt(sub.group(1)) if sub else stat_t,
+                        'status': 'quote' if quoted else ('paid' if paid else 'due'),
+                        'total': total, 'items': items})
+    return out
+
+STATED = {
+    'balance': re.compile(r'Balance Due.{0,160}?\$\s*(-?[\d,]+(?:\.\d{1,2})?)', re.S | re.I),
+    'account': re.compile(r'Account Total.{0,160}?\$\s*(-?[\d,]+(?:\.\d{1,2})?)', re.S | re.I),
+    'paid':    re.compile(r'Paid to Date.{0,160}?\$\s*(-?[\d,]+(?:\.\d{1,2})?)', re.S | re.I),
+}
+def stated_figures(s):
+    body = s[s.find('</style>'):]
+    out = {}
+    for k, rx in STATED.items():
+        m = rx.search(body)
+        out[k] = float(m.group(1).replace(',', '')) if m else None
+    return out
+
+
+def notes(s):
+    """details.tip-card and the older div.tip-card, body carried over verbatim."""
+    body = s[s.find('</style>'):]
+    out = []
+    for tag, cls in (('details', 'tip-card'), ('div', 'tip-card')):
+        pos = 0
+        while True:
+            m = re.search(r'<%s class="[^"]*\b%s\b[^"]*"[^>]*>' % (tag, cls), body[pos:])
+            if not m: break
+            start = pos + m.start()
+            inner, end = _balanced(body, start, tag)
+            pos = end
+            eb = re.search(r'class="tip-eyebrow"[^>]*>(.*?)</div>', inner, re.S)
+            tt = re.search(r'class="tip-title"[^>]*>(.*?)</div>', inner, re.S)
+            bd = (re.search(r'<div class="tip-body"[^>]*>(.*)$', inner, re.S)
+                  or re.search(r'(<div class="tip-lead".*)$', inner, re.S))
+            if not tt: continue
+            out.append({'eb': _txt(eb.group(1)) if eb else '',
+                        'tt': _txt(tt.group(1)),
+                        'bd': (bd.group(1).strip() if bd else '')})
+        if out: break   # a page uses one shape or the other, not both
+    return out
+
+def count_sources(s):
+    """What the page actually contains, for the drop-nothing assertion."""
+    body = s[s.find('</style>'):]
+    return {'tipcards': len(re.findall(r'<details class="[^"]*tip-card|<div class="tip-card', body)),
+            'orders': sum(len(re.findall(r'<details class="[^"]*\b%s\b' % c, body)) for c in ORDER_CLASSES)}
+
+
+def reconcile(s, inv):
+    """Compare extracted money against the figures the page states itself."""
+    f = stated_figures(s)
+    got_due = round(sum(o['total'] for o in inv if o['status'] == 'due'), 2)
+    got_paid = round(sum(o['total'] for o in inv if o['status'] == 'paid'), 2)
+    got_quote = round(sum(o['total'] for o in inv if o['status'] == 'quote'), 2)
+    got_all = round(got_due + got_paid, 2)
+    problems = []
+    def near(a, b): return a is not None and b is not None and abs(a - b) < 0.01
+    if f['balance'] is not None and not near(f['balance'], got_due):
+        problems.append('balance due: page says $%.2f, extracted $%.2f' % (f['balance'], got_due))
+    if f['account'] is not None and not near(f['account'], got_all):
+        problems.append('account total: page says $%.2f, extracted $%.2f' % (f['account'], got_all))
+    if f['paid'] is not None and not near(f['paid'], got_paid):
+        problems.append('paid to date: page says $%.2f, extracted $%.2f' % (f['paid'], got_paid))
+    return {'stated': f, 'got': {'due': got_due, 'paid': got_paid, 'all': got_all, 'quoted': got_quote},
+            'problems': problems, 'ok': not problems}
