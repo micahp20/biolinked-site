@@ -1655,12 +1655,14 @@ function cycList(){
 }
 var CYCS=[], cycSel=null;
 function cycCurrent(){
-  for(var i=0;i<CYCS.length;i++){ if(!CYCS[i].future && !CYCS[i].arch) return CYCS[i].n; }
-  return CYCS.length?CYCS[0].n:null;
+  var L=cycOn(); if(!L) return null;
+  for(var i=0;i<L.length;i++){ if(!L[i].future && !L[i].arch) return L[i].n; }
+  return L[0].n;
 }
 /* Compounds driving the day strip. With no cycles this is CMP, untouched. */
+function cycOn(){return (typeof CYCS!=='undefined'&&CYCS&&CYCS.length)?CYCS:null;}
 function cycRows(){
-  if(!CYCS.length) return CMP;
+  if(!cycOn()) return CMP;
   if(cycSel===cycCurrent()) return CMP;
   return ALL.filter(function(c){return cycName(c)===cycSel && !cmpArch(c)});
 }
@@ -1668,7 +1670,7 @@ function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSu
 function renderCyc(){
   var host=document.getElementById('cycbar');
   if(!host) return;
-  if(!CYCS.length){ host.innerHTML=''; return; }
+  if(!cycOn()){ host.innerHTML=''; return; }
   host.innerHTML='<div class="cycrow">'+CYCS.map(function(c){
     var lbl=c.n+(c.n===cycCurrent()?' \u00b7 Current':(c.future?' \u00b7 Upcoming':(c.arch?' \u00b7 Past':'')));
     return '<button type="button" class="cyc'+(c.n===cycSel?' on':'')+
@@ -1683,12 +1685,12 @@ function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
   var n=cycRows().length;
   e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks'+
-    (CYCS.length&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
+    (cycOn()&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
 }
 function renderAll(){
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
-  if(CYCS.length) idx=idx.filter(function(x){return cycName(x.c)===cycSel});
+  if(cycOn()) idx=idx.filter(function(x){return cycName(x.c)===cycSel});
   var live=idx.filter(function(x){return !cmpArch(x.c)}),
       past=idx.filter(function(x){return cmpArch(x.c)});
   var h='';
