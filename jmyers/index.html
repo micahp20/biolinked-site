@@ -1387,6 +1387,7 @@ var NOTES=[{"eb":"Tip 01 — Reta Dose-Down Trigger","tt":"If You Hit Goal Weigh
 var MINE=[{"name":"Retatrutide","cat":"mine","purpose":"Active","vial":"30 mg","bac":"3 mL BAC water per 30 mg vial → 10 mg/mL","dose":"1 mg","units":"10"},{"name":"Tesamorelin","cat":"mine","purpose":"Active","vial":"20 mg","bac":"2 mL BAC water per vial","dose":"1 mg","units":"10"},{"name":"SLU-PP-332","cat":"mine","purpose":"Active","vial":"5 mg","bac":"1 mL BAC water per vial","dose":"0.5 mg","units":"10"},{"name":"KLOW Blend","cat":"mine","purpose":"Active","vial":"80 mg","bac":"3 mL BAC water per vial","dose":"4 mg","units":"15"},{"name":"AOD-9604","cat":"mine","purpose":"Active","vial":"5 mg","bac":"2 mL BAC water per vial","dose":"250 mcg","units":"10"}];
 var ALL=[{"n":"Retatrutide · 30 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"1 mg","u":"10u","rec":"3 mL BAC water per 30 mg vial → 10 mg/mL","site":"SubQ","about":"Retatrutide · 30 mg vial. Triple agonist across the GLP-1, GIP and glucagon receptors — appetite down, glucose handling up, fat mobilised. Reconstituted with 3 mL of bacteriostatic water the vial reads 10 mg/mL, so your 1 mg dose is 10 units (0.10 mL). One vial holds 30 doses, about 10 weeks at 3×/wk.","tag":"Carryover · continues from Cycle 1","days":[1,3,5],"found":true},{"n":"Tesamorelin · 20 mg","b":"PM","cad":"MF","c":"Mon-Fri","d":"1 mg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"","tag":"Cycle 2","days":[1,2,3,4,5],"cy":["Cycle 2"]},{"n":"SLU-PP-332 · 5 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"0.5 mg","u":"10u","rec":"1 mL BAC water per vial","site":"SubQ","about":"","tag":"Cycle 2","days":[1,2,3,4,5],"cy":["Cycle 2"]},{"n":"KLOW Blend · 80 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"4 mg","u":"15u","rec":"3 mL BAC water per vial","site":"SubQ","about":"","tag":"Cycle 2","days":[1,2,3,4,5],"cy":["Cycle 2"]},{"n":"AOD-9604 · 5 mg","b":"AM","cad":"PRN","c":"As needed","d":"250 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"","tag":"Cycle 2","days":[],"cy":["Cycle 2"]},{"n":"CJC-1295 / Ipamorelin","b":"PM","cad":null,"c":null,"site":"SubQ","about":"Ran during Cycle 1. Finished — not part of the current rotation.","tag":"Prior cycle · Cycle 1"},{"n":"5-Amino-1MQ","b":"AM","cad":null,"c":null,"site":"SubQ","about":"Ran during Cycle 1. Finished — not part of the current rotation.","tag":"Prior cycle · Cycle 1"}];
 var LABS=null;
+var CYCBASE='Carryover \u00b7 continues from Cycle 1';
 var CYC=[{"n":"Cycle 1","wk":"completed","st":"past"},{"n":"Cycle 2","wk":"Weeks 1–12","st":"current"}];
 var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1743,9 +1744,10 @@ function renderAll(){
     var sel=null;
     for(var i=0;i<CYCS.length;i++){ if(CYCS[i].n===cycSel) sel=CYCS[i]; }
     var isNow=cycSel===cycCurrent();
-    if(found.length) h+='<div class="cxsub found">'+(declared
-        ?'Foundation \u00b7 every week, all year'
-        :'Ongoing \u00b7 runs through every cycle')+'</div>'+
+    var baseLbl=(typeof CYCBASE!=='undefined'&&CYCBASE)?CYCBASE
+        :(declared?'Foundation \u00b7 every week, all year'
+                  :'Ongoing \u00b7 runs through every cycle');
+    if(found.length) h+='<div class="cxsub found">'+baseLbl+'</div>'+
       '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
     h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
        (sel&&sel.wk?' \u00b7 '+sel.wk:'')+(isNow?'':' \u00b7 not running yet')+'</div>';
