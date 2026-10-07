@@ -39,7 +39,8 @@ CAD = [
     (r'mon\w*\s*(?:&|\+|and)\s*wed', 'MW',  'Mon + Wed', [1,3]),
     (r'tue\w*\s*(?:&|\+|and|/)\s*sat', 'TS', 'Tue + Sat', [2,6]),
     (r'tue\w*\s*(?:&|\+|and|/)\s*fri', 'TF', 'Tue + Fri', [2,5]),
-    (r'\bas needed\b|\bprn\b|self-directed|your own cadence', 'PRN', 'As needed', []),
+    (r'\bas needed\b|\bprn\b|self-directed|your own cadence'
+     r'|days you train|training days?|on train\w* days|pre-?workout', 'PRN', 'As needed', []),
     (r'days?\s*1\s*[,/&]\s*3\s*(?:[,/&]|and)\s*5', 'MWF', 'Mon / Wed / Fri', [1,3,5]),
     (r'\d+\s*consecutive\s*(?:days?|nights?)', 'DAILY', 'Daily', [0,1,2,3,4,5,6]),
     (r'nightly|every night|\d+\s*-?\s*night\s*(?:block|pulse|run)|\d+\s*nights?\s*straight'
