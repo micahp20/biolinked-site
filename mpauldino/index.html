@@ -1572,19 +1572,6 @@ var TCOL={light:'#f6f3ee',dark:'#1c1915'};
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   var m=document.getElementById('tc'); if(m) m.setAttribute('content',TCOL[t]||TCOL.light);
-  /* body and .device take their background from var(--bg), and the engine does
-     not re-resolve those when --bg changes on :root via this attribute -- every
-     other element updates, so toggling left the old ground sitting under a
-     freshly themed header. Writing the resolved value straight onto the two
-     offenders sidesteps the stale invalidation. Verified stale on a page this
-     change never touched, so it is the engine, not this page.
-     TCOL, not a read-back of --bg: that read is stale at this exact moment for
-     the same reason and pins the OUTGOING colour, which is worse than the bug.
-     So TCOL's two values must stay equal to --bg in each theme -- they are the
-     same thing by definition, since it is also the theme-color meta. */
-  var g=TCOL[t]||TCOL.light;
-  document.body.style.background=g;
-  var d=document.querySelector('.device'); if(d) d.style.background=g;
 }
 function toggleTheme(){
   var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
