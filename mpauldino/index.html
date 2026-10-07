@@ -1572,6 +1572,15 @@ var TCOL={light:'#f6f3ee',dark:'#1c1915'};
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   var m=document.getElementById('tc'); if(m) m.setAttribute('content',TCOL[t]||TCOL.light);
+  /* body and .device take their background from var(--bg), and the engine does
+     not re-resolve those when --bg changes on :root via this attribute -- every
+     other element updates, so toggling left the old ground sitting under a
+     freshly themed header. Writing the resolved value straight onto the two
+     offenders sidesteps the stale invalidation. Verified stale on a page this
+     change never touched, so it is the engine, not this page. */
+  var g=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
+  if(g){ document.body.style.background=g;
+         var d=document.querySelector('.device'); if(d) d.style.background=g; }
 }
 function toggleTheme(){
   var t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
