@@ -359,7 +359,7 @@ ARROW = r'(?:\u2192|->|&rarr;|to|\u2013|\u2014|-)'
 def _units(dose, headtxt):
     """-> ('10 \u2192 40u' | '10u' | '', [values])"""
     for src in ((dose or ''), headtxt or ''):
-        m = re.search(r'(\d+(?:\.\d+)?)\s*%s\s*(\d+(?:\.\d+)?)\s*(?:u\b|units)' % ARROW, src, re.I)
+        m = re.search(r'(\d+(?:\.\d+)?)\s*(?:u\b|units)?\s*%s\s*(\d+(?:\.\d+)?)\s*(?:u\b|units)' % ARROW, src, re.I)
         if m:
             a, b = m.group(1), m.group(2)
             return '%s \u2192 %su' % (a, b), [float(a), float(b)]
