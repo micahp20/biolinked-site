@@ -51,21 +51,34 @@
     --sw:264px;
   }
   :root[data-theme="dark"]{
-    --ink:#f2ece0; --ink2:#cdc4b2; --muted:#9c9484; --faint:#7a7466;
-    --line:#332e26; --line2:#262219; --bg:#15130f; --card:#1e1b16;
-    --gold:#d4b56a; --gold2:#b89a52; --gold-soft:#2e2718; --cream:#211d17;
-    --on-gold:#1a1710;
-    --pm:#8aa8bb; --pm-soft:#1d262c;
+    /* ---- Warm dark, same champagne gold -------------------------------
+       The inverse of the light palette, not a separate scheme: the ground is
+       the Protocol Clock card's warm near-black, the text is the ivory the
+       light theme uses as its ground, and the gold lifts to a champagne that
+       carries on a dark surface (#8d7344 is too dark to read here, so it is
+       kept for FILLS -- selected chips, buttons -- with light text on top).
+       Surfaces step up in lightness exactly as light does: bg < cream < card.
+       color-scheme tells the browser to render the native time picker and
+       scrollbars dark too. */
+    color-scheme:dark;
+    --ivory:#1c1915; --paper:#26221b; --p-ink:#f4efe4; --p-ink-soft:#b5ac9c;
+    --p-line:#38322a; --p-gold:#cdae72; --gold-deep:#d8bb80; --p-gold-soft:#302819;
+
+    --ink:var(--p-ink); --ink2:var(--p-ink-soft); --muted:#948b7c; --faint:#6f685c;
+    --line:var(--p-line); --line2:#2a251f; --bg:var(--ivory); --card:var(--paper);
+    --gold:var(--p-gold); --gold2:#b2945c; --gold-soft:var(--p-gold-soft); --cream:#221e18;
+    --on-gold:#1c1915;
+    --pm:#d8bb80; --pm-soft:#302819;
     --warn:#e58d7c; --warn-soft:#2e1d19; --warn-line:#4a2c26;
     --amber:#e0b86a; --amber-soft:#2d2415; --amber-line:#4a3c1f;
-    --ok:#85b68a; --ok-soft:#1b2a1d;
-    --lo:#93a3dd; --lo-soft:#1d2033;
-    --deep1:#241f14; --deep2:#3a3120; --deep-tx:#f8f2e4; --deep-ac:#dcc68c; --deep-sb:#bdb196;
-    --topbg:#15130f; --tabbg:rgba(21,19,15,.985);
-    --surround:#0c0b09;
+    --ok:#85b68a; --ok-soft:#1f2a1b;
+    --lo:#93a3dd; --lo-soft:#23212c;
+    --deep1:#2b2417; --deep2:#4a3d22; --deep-tx:#f8f2e4; --deep-ac:#dcc68c; --deep-sb:#bdb196;
+    --topbg:var(--ivory); --tabbg:rgba(28,25,21,.985);
+    --surround:#100e0b;
     --barrel:#100f0d; --syr-stroke:#e9e1cd;
-    --tip-bg:#302a20; --tip-tx:#f6f1e5; --tip-line:#4a4234; --tip-strong:#e2cd96;
-    --shadow:0 1px 2px rgba(0,0,0,.35),0 6px 16px rgba(0,0,0,.3);
+    --tip-bg:#332c22; --tip-tx:#f6f1e5; --tip-line:#4a4234; --tip-strong:#e2cd96;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.34);
   }
   *{box-sizing:border-box}
   /* ===== iOS TAP RELIABILITY =====
@@ -949,6 +962,45 @@
 .gk .viewbar button.on{background:var(--gk-ink);color:#f6efe2;border-color:var(--gk-ink)}
 .gk-toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#1c1915;color:#f6efe2;border-radius:999px;padding:10px 14px;font-size:12.5px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:80;font-family:"Outfit",system-ui,sans-serif}
 .gk-toast.show{opacity:1}
+
+/* ===== GRONK SCHEDULE -- DARK ==========================================
+   The Schedule view carries its own palette, so without this it would stay
+   ivory while the rest of the page went dark -- the same seam, inverted.
+   Two things cannot just be re-tinted and are overridden below:
+     - selected states fill with var(--gk-ink), which is near-black in light
+       and near-WHITE in dark; left alone they would be cream text on cream.
+       They fill with the deep gold #8d7344 instead, which reads in both.
+     - the white literals (.edit, .chip, .stepper, .remind, .switch, the
+       card hairline, the toast, the radial bloom) have no token to follow.
+   ====================================================================== */
+:root[data-theme="dark"] .gk{
+  --ivory:#1c1915; --paper:#26221b; --gk-ink:#f4efe4; --ink-soft:#b5ac9c;
+  --gk-line:#38322a; --gk-gold:#cdae72; --gold-deep:#d8bb80; --gold-soft:#302819;
+  --gold-line:#4a3f2a; --gk-shadow:0 8px 24px rgba(0,0,0,.45);
+  background:radial-gradient(1200px 500px at 50% -10%,rgba(255,242,214,.05) 0%,transparent 60%),var(--ivory);
+}
+:root[data-theme="dark"] .gk .cycle{background:#2a2419;border:1px solid #403524}
+:root[data-theme="dark"] .gk .bar{background:#443c30}
+:root[data-theme="dark"] .gk .gk-card{border-color:#332e26}
+:root[data-theme="dark"] .gk .edit,
+:root[data-theme="dark"] .gk .stepper button,
+:root[data-theme="dark"] .gk .chip,
+:root[data-theme="dark"] .gk .remind{background:#2f2a22}
+:root[data-theme="dark"] .gk .stepper button:disabled{opacity:.4}
+:root[data-theme="dark"] .gk .switch{background:#433b2f}
+:root[data-theme="dark"] .gk .switch.on{background:var(--gk-gold)}
+:root[data-theme="dark"] .gk .switch i{background:#1c1915}
+/* fills: deep gold reads against cream text on dark and on light alike */
+:root[data-theme="dark"] .gk .day.on,
+:root[data-theme="dark"] .gk .edit.on,
+:root[data-theme="dark"] .gk .chip.on,
+:root[data-theme="dark"] .gk .viewbar button.on{background:#8d7344;border-color:#a3864f;color:#fbf6ea}
+:root[data-theme="dark"] .gk .day.on span{color:#fff}
+:root[data-theme="dark"] .gk-toast{background:#3a3328;color:#f6efe2;border:1px solid #4e4536}
+/* Latent: the cycle chip fills with var(--ink), which inverts in dark and
+   would leave #fff text on a near-white chip. He has no cycles today
+   (CYCS is empty) so it never draws -- this keeps it right if he gains one. */
+:root[data-theme="dark"] .cyc.on{background:#8d7344;border-color:#a3864f;color:#fbf6ea}
 </style>
 <script src="/compound-library.js?v=2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1516,7 +1568,7 @@ var sel=new Date().getDay();
 var KP='mp-app-';
 
 /* ---------- THEME ---------- */
-var TCOL={light:'#f6f3ee',dark:'#15130f'};
+var TCOL={light:'#f6f3ee',dark:'#1c1915'};
 function applyTheme(t){
   document.documentElement.setAttribute('data-theme',t);
   var m=document.getElementById('tc'); if(m) m.setAttribute('content',TCOL[t]||TCOL.light);
