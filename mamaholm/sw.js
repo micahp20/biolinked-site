@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mamaholm/, which is now the real page: the app layout
 // was promoted here from the /mamaholm/app/ pilot.
-const CACHE = 'mamaholm-v1';
+const CACHE = 'mamaholm-v2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mamaholm/',
