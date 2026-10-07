@@ -340,6 +340,31 @@ def assign_cycles(s, cmps):
         # a cycle with no order of its own has not been bought yet
         for c in cards:
             c['state'] = states.get(c['n'], 'future')
+    # Several cycles can be open at once: a client is quoted a whole plan and
+    # pays for it a cycle at a time. The one they are on is the first unpaid
+    # cycle in order; the ones after it have not started. Work on cycle NAMES,
+    # since a page can carry two cards for one cycle (a plan and a resupply).
+    # only cycles that actually hold compounds can be the current schedule
+    occupied = set()
+    for c in cmps:
+        pos = c.get('_pos', -1)
+        k = next((x for x in cards if x['a'] <= pos <= x['b']), None)
+        if k: occupied.add(k['n'])
+    names = sorted({c['n'] for c in cards if not occupied or c['n'] in occupied},
+                   key=lambda n: int(re.match(r'Cycle\s*(\d+)', n).group(1)))
+    state_of = {}
+    for n in names:
+        sts = {c['state'] for c in cards if c['n'] == n}
+        state_of[n] = 'current' if 'current' in sts else ('past' if 'past' in sts else 'future')
+    open_names = [n for n in names if state_of[n] == 'current']
+    for n in open_names[1:]:
+        state_of[n] = 'future'
+    if not open_names:
+        past_names = [n for n in names if state_of[n] == 'past']
+        if past_names:
+            state_of[past_names[-1]] = 'current'
+    for c in cards:
+        c['state'] = state_of.get(c['n'], c['state'])
     # the running cycle is the last one already paid for, when none is open
     if not any(c['state'] == 'current' for c in cards):
         past = [c for c in cards if c['state'] == 'past']
