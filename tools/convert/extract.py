@@ -371,10 +371,16 @@ def _units(dose, headtxt):
 def _amount(dose):
     """-> ('1 \u2192 4 mg' | '2 mg' | '', [values], unit)"""
     d = dose or ''
-    m = re.search(r'(~?\d+(?:\.\d+)?)\s*(?:mg|mcg|iu)?\s*%s\s*(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu)\b' % ARROW, d, re.I)
+    m = re.search(r'(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu)?\s*%s\s*(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu)\b' % ARROW, d, re.I)
     if m:
-        u = m.group(3).lower()
-        return '%s \u2192 %s %s' % (m.group(1), m.group(2), u), [_f(m.group(1)), _f(m.group(2))], u
+        u2 = m.group(4).lower()
+        u1 = (m.group(2) or u2).lower()
+        lo, hi = _f(m.group(1)), _f(m.group(3))
+        # normalise to the second endpoint's unit so the pair is comparable
+        lo_n = lo / 1000.0 if (u1 == 'mcg' and u2 == 'mg') else lo
+        label = ('%s %s \u2192 %s %s' % (m.group(1), u1, m.group(3), u2)
+                 if u1 != u2 else '%s \u2192 %s %s' % (m.group(1), m.group(3), u2))
+        return label, [lo_n, hi], u2
     m = re.search(r'(~?\d+(?:\.\d+)?)\s*(mg|mcg|iu|ml)\b', d, re.I)
     if m:
         u = m.group(2).lower()
@@ -388,22 +394,43 @@ def _f(x):
 VIAL_RE  = re.compile(r'(\d+(?:[.,]\d+)?)\s*(mg|mcg|iu)\b', re.I)
 RECON_RE = re.compile(r'(\d+(?:\.\d+)?)\s*m[lL]\b')
 
+CONC_RE = re.compile(r'(\d+(?:[.,]\d+)?)\s*(mg|mcg|iu)\s*/\s*m[lL]', re.I)
+
 def dose_check(c):
     """Draw volume must follow from the vial, the recon volume and the dose.
     Returns None when the page did not state enough to check."""
-    vm = VIAL_RE.search(c['n'].split('\u00b7', 1)[-1] if '\u00b7' in c['n'] else '')
+    name = c['n']
+    # A blend states a combined vial weight while the dose refers to the blend
+    # as a whole; the per-mg arithmetic does not apply.
+    if re.search(r'\bblend\b|\bstack\b|\+', name, re.I): return None
+    # "5/5 mg" is two compounds in one vial, so the stated weight is not the
+    # vial's single-compound strength.
+    tailspec = name.split('\u00b7')[-1] if '\u00b7' in name else name
+    if re.search(r'\d\s*/\s*\d', tailspec): return None
+    tail = name.split('\u00b7', 1)[-1] if '\u00b7' in name else ''
+    cm = CONC_RE.search(name)
     rm = RECON_RE.search(c.get('rec') or '')
-    if not vm or not rm: return None
+    if cm:
+        conc = float(cm.group(1).replace(',', ''))   # already mg per mL
+        unit = cm.group(2).lower()
+    else:
+        vm = VIAL_RE.search(tail)
+        if not vm or not rm: return None
+        vial = float(vm.group(1).replace(',', '')); mls = float(rm.group(1))
+        if not vial or not mls: return None
+        conc = vial / mls
+        unit = vm.group(2).lower()
     if not c.get('_u_vals') or not c.get('_d_vals'): return None
-    if c.get('_d_unit') not in (None, vm.group(2).lower()): return None
-    vial = float(vm.group(1).replace(',', '')); mls = float(rm.group(1))
-    if not vial or not mls: return None
-    conc = vial / mls                       # mg per mL
-    if len(c['_u_vals']) != len(c['_d_vals']): 
+    if c.get('_d_unit') not in (None, unit): return None
+    d_vals, u_vals = c['_d_vals'], c['_u_vals']
+    # A titration states the full dose range but only the starting draw.
+    if len(u_vals) == 1 and len(d_vals) > 1:
+        d_vals = d_vals[:1]
+    elif len(u_vals) != len(d_vals):
         return 'dose and draw do not pair: %s vs %s' % (c['d'], c['u'])
-    for dose_v, unit_v in zip(c['_d_vals'], c['_u_vals']):
+    for dose_v, unit_v in zip(d_vals, u_vals):
         want = dose_v / conc * 100.0        # U-100: 100 units = 1 mL
         if abs(want - unit_v) > max(1.0, want * 0.12):
-            return ('%s: %s of %s in %s mL should draw ~%.1fu, page says %.1fu'
-                    % (c['n'], c['d'], vm.group(0), mls, want, unit_v))
+            return ('%s: %s at %.1f %s/mL should draw ~%.1fu, page says %.1fu'
+                    % (c['n'], c['d'], conc, unit, want, unit_v))
     return None
