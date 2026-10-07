@@ -238,6 +238,13 @@
   .cx-ab{font-size:12.5px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
   .cx.hist .cx-n{color:var(--ink2)}
+  .cx-arch{display:inline-block;margin-left:7px;font-family:var(--sans);font-size:9px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    border:1px solid var(--line2);border-radius:5px;padding:1px 5px;vertical-align:middle}
+  .cxsub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    margin:15px 0 7px;padding:0 2px}
+  .cxwrap.past{opacity:.72}
+  .cxwrap.past .cx-u{color:var(--muted)}
 
   /* INDEX -- client-facing compound library */
   .srch{position:relative;margin-bottom:4px}
@@ -1638,11 +1645,13 @@ function renderDoses(){
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
    Every compound MamaP has taken or ordered, alphabetical, expanding in place.
    Everything starts collapsed. No grouping and no sort toggle: one list. */
+function cmpArch(c){return !!(c.hist||/^\s*(archived|prior)\b/i.test(c.tag||''));}
 function cmpRow(c,i){
-  var sub=(c.hist?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
-  return '<div class="cx'+(c.hist?' hist':'')+'" id="cx'+i+'">'+
+  var arch=cmpArch(c);
+  var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
+  return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog('+i+')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+'</div><div class="cx-s">'+sub+'</div></div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Archived</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
@@ -1659,10 +1668,14 @@ function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
 function renderAll(){
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
-  document.getElementById('cmplist').innerHTML=
-    '<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
-  document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+
-    ALL.filter(function(c){return !c.hist}).length+' ACTIVE';
+  var live=idx.filter(function(x){return !cmpArch(x.c)}),
+      past=idx.filter(function(x){return cmpArch(x.c)});
+  var h='';
+  if(live.length) h+='<div class="cxwrap">'+live.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+  if(past.length) h+='<div class="cxsub">Archived \u00b7 not currently running</div>'+
+    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+  document.getElementById('cmplist').innerHTML=h;
+  document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+live.length+' ACTIVE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
 var ixCat='all', ixQ='';
