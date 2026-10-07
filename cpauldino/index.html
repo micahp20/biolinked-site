@@ -248,6 +248,8 @@
   .cx-arch{display:inline-block;margin-left:7px;font-family:var(--sans);font-size:9px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     border:1px solid var(--line2);border-radius:5px;padding:1px 5px;vertical-align:middle}
+  .cxsub.found{color:var(--gold);}
+  .cxsub.now{color:var(--ink);}
   .cxsub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
     margin:15px 0 7px;padding:0 2px}
   .cxwrap.past{opacity:.72}
@@ -1711,11 +1713,29 @@ function renderSubline(){
 function renderAll(){
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
-  if(cycOn()) idx=idx.filter(function(x){return cycHas(x.c,cycSel)});
-  var live=idx.filter(function(x){return !cmpArch(x.c)}),
-      past=idx.filter(function(x){return cmpArch(x.c)});
-  var h='';
-  if(live.length) h+='<div class="cxwrap">'+live.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+  var past=idx.filter(function(x){return cmpArch(x.c)});
+  var h='', live;
+  if(cycOn()){
+    /* The foundation never pauses, so it is shown as its own group above
+       whichever cycle is being viewed rather than mixed in with it. */
+    var found=idx.filter(function(x){return cycIsFoundation(x.c)&&!cmpArch(x.c)});
+    var cyc=idx.filter(function(x){return !cycIsFoundation(x.c)&&cycHas(x.c,cycSel)&&!cmpArch(x.c)});
+    live=found.concat(cyc);
+    var sel=null;
+    for(var i=0;i<CYCS.length;i++){ if(CYCS[i].n===cycSel) sel=CYCS[i]; }
+    var isNow=cycSel===cycCurrent();
+    if(found.length) h+='<div class="cxsub found">Foundation \u00b7 every week, all year</div>'+
+      '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+    h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
+       (sel&&sel.wk?' \u00b7 '+sel.wk:'')+(isNow?'':' \u00b7 not running yet')+'</div>';
+    h+=cyc.length
+      ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>'
+      : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
+        '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
+  } else {
+    live=idx.filter(function(x){return !cmpArch(x.c)});
+    if(live.length) h+='<div class="cxwrap">'+live.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+  }
   if(past.length) h+='<div class="cxsub">Archived \u00b7 not currently running</div>'+
     '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;

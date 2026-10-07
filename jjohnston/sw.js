@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'jjohnston-v51';
+const CACHE = 'jjohnston-v52';
 const ASSETS = [
   '/jjohnston/',
   '/jjohnston/index.html',
