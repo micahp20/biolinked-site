@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'ngillan-v50';
+const CACHE = 'ngillan-v51';
 const ASSETS = [
   '/ngillan/',
   '/ngillan/index.html',

@@ -1653,9 +1653,22 @@ function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
    carries ("Cycle 2 · future"), so no page needs new data: a page with
    fewer than two Cycle N tags has no selector and behaves exactly as before. */
 function cycName(c){return String(c.tag||'').split('\u00b7')[0].trim();}
+/* A compound can run in several cycles (SS-31 in 1, 3 and 5), and a foundation
+   compound runs in all of them. Pages that declare neither behave as before. */
+function cycNames(c){
+  if(c && Object.prototype.toString.call(c.cy)==='[object Array]') return c.cy;
+  var n=cycName(c); return n?[n]:[];
+}
+function cycIsFoundation(c){return !!(c&&c.found);}
+function cycHas(c,n){return cycIsFoundation(c)||cycNames(c).indexOf(n)>=0;}
 function cycIsFuture(c){return /future|upcoming|planned/i.test(c.tag||'');}
 function cycIsPast(c){return /\u00b7\s*past\b|\bprior\b|\bcompleted?\b/i.test(c.tag||'');}
 function cycList(){
+  /* An explicit plan wins: a protocol can name cycles that have no compound
+     carrying their tag yet. */
+  if(typeof CYC!=='undefined' && CYC && CYC.length){
+    return CYC.map(function(x){return {n:x.n, future:x.st==='future', arch:x.st==='past', wk:x.wk||''};});
+  }
   var seen={}, out=[];
   ALL.forEach(function(c){
     var n=cycName(c);
@@ -1680,7 +1693,7 @@ function cycOn(){return (typeof CYCS!=='undefined'&&CYCS&&CYCS.length)?CYCS:null
 function cycRows(){
   if(!cycOn()) return CMP;
   if(cycSel===cycCurrent()) return CMP;
-  return ALL.filter(function(c){return cycName(c)===cycSel && !cmpArch(c)});
+  return ALL.filter(function(c){return cycHas(c,cycSel) && !cmpArch(c)});
 }
 function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); }
 function renderCyc(){
@@ -1688,7 +1701,8 @@ function renderCyc(){
   if(!host) return;
   if(!cycOn()){ host.innerHTML=''; return; }
   host.innerHTML='<div class="cycrow">'+CYCS.map(function(c){
-    var lbl=c.n+(c.n===cycCurrent()?' \u00b7 Current':(c.future?' \u00b7 Upcoming':(c.arch?' \u00b7 Past':'')));
+    var lbl=c.n+(c.n===cycCurrent()?' \u00b7 Current':(c.future?' \u00b7 Upcoming':(c.arch?' \u00b7 Past':'')))
+            +(c.wk?' \u00b7 '+c.wk:'');
     return '<button type="button" class="cyc'+(c.n===cycSel?' on':'')+
       '" onclick="pickCyc(\''+c.n.replace(/'/g,"\\'")+'\')">'+lbl+'</button>';
   }).join('')+'</div>'+
@@ -1706,7 +1720,7 @@ function renderSubline(){
 function renderAll(){
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
-  if(cycOn()) idx=idx.filter(function(x){return cycName(x.c)===cycSel});
+  if(cycOn()) idx=idx.filter(function(x){return cycHas(x.c,cycSel)});
   var live=idx.filter(function(x){return !cmpArch(x.c)}),
       past=idx.filter(function(x){return cmpArch(x.c)});
   var h='';
