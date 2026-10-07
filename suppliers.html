@@ -1533,15 +1533,7 @@
       return `
         <div class="pv-card ${isOpen ? "open" : ""}">
           <button type="button" class="pv-head" data-pv-row="${rowId}" aria-expanded="${isOpen}">
-            <span class="pv-title">
-              <span class="pv-name">${row.peptide} <span class="pv-dose">${row.dose}${row.unit}</span></span>
-              <span class="pv-sub">${quotes.length} supplier${quotes.length === 1 ? "" : "s"}${perMg ? ` &middot; from ${fmtPerMg(perMg)}` : ""}</span>
-            </span>
-            <span class="pv-from">
-              <span class="lbl">From</span>
-              <span class="amt">${fmtPrice(cheapest.price)}</span>
-            </span>
-            <span class="pv-chev">&#9660;</span>
+            <span class="pv-title"><span class="pv-name">${row.peptide} <span class="pv-dose">${row.dose}${row.unit}</span></span><span class="pv-sub">${perMg ? `from ${fmtPerMg(perMg)}` : ""}</span></span><span class="pv-from"><span class="amt">${fmtPrice(cheapest.price)}</span></span><span class="pv-cnt" title="${quotes.length} supplier${quotes.length === 1 ? "" : "s"}">${quotes.length}</span><span class="pv-chev">&#9656;</span>
           </button>
           ${body}
         </div>`;
@@ -1659,7 +1651,7 @@
   setMode(pvMode);
 </script>
 
-<script src="/nav.js?v=4" defer></script>
+<!-- public site nav deliberately NOT loaded: internal cost page, reachable from the Admin Hub only -->
 
 <!-- mobile-floor -->
 <script>
@@ -1789,6 +1781,73 @@ body{font-size:15px;line-height:1.6}
 }
 /* 44px tap targets throughout */
 .pv-toggle,.mode-btn,.tabs-bar a,.tabs-bar button{min-height:44px;display:inline-flex;align-items:center}
+
+/* ======================================================================
+   MOBILE DENSITY — condensed product list
+   The collapsed row was a 107px floating card showing one line of real
+   information, so only 6 products fit a phone screen out of 308. This
+   turns it into a tight single-line list with dividers. The expanded
+   supplier breakdown is unchanged apart from tighter padding.
+   ====================================================================== */
+.pv-list{display:block;gap:0}
+.pv-card{background:var(--surface);border:0;border-bottom:1px solid var(--border);
+  border-left:0;border-radius:0;box-shadow:none;margin:0}
+.pv-card:first-child{border-top:1px solid var(--border)}
+.pv-card.open{border-left:0;background:var(--surface-alt)}
+.pv-list{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--surface)}
+.pv-list .pv-card:first-child{border-top:0}
+.pv-list .pv-card:last-child{border-bottom:0}
+
+/* one tight tappable line */
+.pv-head{display:flex;align-items:center;gap:10px;width:100%;
+  padding:7px 13px;min-height:50px;cursor:pointer}
+.pv-title{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;justify-content:center}
+.pv-name{font-size:15px;line-height:1.25;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-dose{color:var(--gold);font-style:italic;font-weight:600}
+.pv-sub{font-size:10px;line-height:1.3;margin-top:1px;color:var(--text-soft);
+  letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-sub:empty{display:none}
+
+/* right side: price, count, chevron - all on the one line */
+.pv-from{flex:none;text-align:right}
+.pv-from .lbl{display:none}
+.pv-from .amt{font-size:15px;font-weight:700;color:var(--grey-dark);font-variant-numeric:tabular-nums}
+.pv-cnt{flex:none;min-width:22px;height:20px;padding:0 6px;border-radius:999px;
+  background:var(--surface-alt);border:1px solid var(--border);
+  font-size:10.5px;font-weight:700;color:var(--text-muted);
+  display:inline-flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.pv-chev{flex:none;color:var(--text-soft);font-size:11px;transition:transform .15s}
+.pv-card.open .pv-chev{transform:rotate(90deg)}
+
+/* expanded breakdown - same content, tighter */
+.pv-body{padding:2px 13px 10px}
+.pv-quote{padding:7px 0;border-bottom:1px solid var(--border)}
+.pv-quote:last-child{border-bottom:0}
+.pv-sup{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.pv-sup-name{font-size:13px}
+.pv-prices{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:2px}
+.pv-prices .kit{font-size:14px;font-weight:700}
+.pv-prices .per{font-size:11px;color:var(--text-muted)}
+.pv-badge{font-size:9px;padding:2px 6px}
+.pv-line.note{font-size:11px;line-height:1.5;margin-top:3px}
+
+@media(min-width:768px){
+  .pv-head{padding:9px 16px;min-height:54px}
+  .pv-name{font-size:16px}
+  .pv-from .amt{font-size:16px}
+  .pv-body{padding:2px 16px 12px}
+}
+
+/* same density thinking on the other tabs */
+.orals-name{font-size:15px;line-height:1.25}
+.orals-spec,.orals-code,.orals-note{font-size:11px;line-height:1.45}
+.orals-price{font-size:15px}
+.compare td,.compare th{padding:7px 10px}
+@media(min-width:768px){.compare td,.compare th{padding:9px 12px}}
+.empty-state{padding:28px 18px}
+.controls,.pv-controls{padding:12px 13px}
+.pv-meta{font-size:11px;margin:0 0 8px;line-height:1.5}
 </style>
 </body>
 </html>
