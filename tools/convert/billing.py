@@ -149,7 +149,15 @@ def notes(s):
             pos = end
             eb = re.search(r'class="tip-eyebrow"[^>]*>(.*?)</div>', inner, re.S)
             tt = re.search(r'class="tip-title"[^>]*>(.*?)</div>', inner, re.S)
-            if not tt: continue
+            if not tt:
+                # Some cards carry no title of their own; the page titles them
+                # with the section divider immediately above.
+                pre = body[max(0, start - 600):start]
+                dv = list(re.finditer(r'class="(?:sec-divider-title|cmp-group[^"]*)"[^>]*>(.*?)</div>', pre, re.S))
+                de = list(re.finditer(r'class="sec-divider-eyebrow"[^>]*>(.*?)</div>', pre, re.S))
+                if not dv: continue
+                tt = dv[-1]
+                if de and not eb: eb = de[-1]
             bm = re.search(r'<div class="tip-body"[^>]*>', inner)
             if bm:
                 body_html, _ = _balanced(inner, bm.start(), 'div')
@@ -163,7 +171,14 @@ def notes(s):
             out.append({'eb': _txt(eb.group(1)) if eb else '',
                         'tt': _txt(tt.group(1)),
                         'bd': body_html})
-        if out: break   # a page uses one shape or the other, not both
+    # de-dupe: a <div class="tip-card"> nested inside a <details class="tip-card">
+    # would otherwise be collected twice
+    seen, uniq = set(), []
+    for n in out:
+        k = (n['tt'], n['eb'])
+        if k in seen: continue
+        seen.add(k); uniq.append(n)
+    out = uniq
     return out
 
 def count_sources(s):
