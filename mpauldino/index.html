@@ -524,13 +524,16 @@
     border:1px solid var(--warn-line);border-radius:11px;padding:9px 12px;font-size:11px;font-weight:700;margin:4px 0 13px;line-height:1.45}
   .banner .d{width:6px;height:6px;border-radius:50%;background:var(--warn);flex:none;margin-top:4px}
 
-  .a2hs{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh) + 14px + env(safe-area-inset-bottom));z-index:95;
-    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(40,34,20,.16);
-    padding:13px 14px;display:none;align-items:flex-start;gap:11px;max-width:376px;margin:0 auto}
+  .a2hs{margin:14px 16px 0;background:var(--gold-soft);border:1px solid var(--amber-line);
+    border-radius:14px;padding:12px 13px;display:none;align-items:flex-start;gap:10px}
   .a2hs.on{display:flex}
-  .a2hs .tx{font-size:12px;line-height:1.5;color:var(--ink2);flex:1}
-  .a2hs .tx b{color:var(--ink)}
-  .a2hs .x{background:none;border:none;color:var(--faint);font-size:19px;line-height:1;cursor:pointer;padding:0 2px;flex:none}
+  .a2hs .tx{font-size:12.5px;line-height:1.5;color:var(--ink2);flex:1}
+  .a2hs .tx b{color:var(--ink);font-weight:600}
+  .a2hs .a2hs-ios,.a2hs .a2hs-keep{display:block;margin-top:6px}
+  .a2hs .a2hs-keep{color:var(--muted);font-size:11.5px}
+  .a2hs .a2hs-shr{font-size:14px}
+  .a2hs .x{background:none;border:none;color:var(--faint);font-size:20px;line-height:1;cursor:pointer;
+    padding:0 2px;flex:none;min-width:28px;min-height:28px}
   /* ===== DESKTOP SIDEBAR =====
      Hidden by default; only the >=768px block turns it on, so the phone path
      never sees it. */
@@ -790,7 +793,6 @@
       padding:calc(56px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 24px)}
     .navscrim{position:absolute}
     .navmenu{position:absolute}
-    .a2hs{position:absolute}
     .nut-toast{position:absolute}
   }
   /* =======================================================================
@@ -1082,6 +1084,18 @@
       <div><div class="nl">Stacks &amp; Blends</div><div class="nd">Pre-built protocol combinations</div></div><div class="ext">&#8599;</div></a>
   </div>
   <div class="scroll" id="scroll">
+    <!-- Sits in the flow at the top of the scroller rather than floating over
+         the content: it is a nudge, not an interruption, and it scrolls away.
+         Shown only outside an installed app -- see the block near hideA2(). -->
+    <div class="a2hs" id="a2hs">
+      <div class="tx">
+        <b>Keep BioLinked one tap away.</b>
+        Add it to your Home Screen and your protocol opens full screen, like an app.
+        <span class="a2hs-ios" id="a2hsIos" hidden>Tap <span class="a2hs-shr">&#8682;</span> Share, then &ldquo;Add to Home Screen.&rdquo;</span>
+        <span class="a2hs-keep">Hang on to the link we texted you &mdash; it is how your edits follow you to a new phone.</span>
+      </div>
+      <button class="x" id="a2hsX" aria-label="Dismiss">&times;</button>
+    </div>
     <section class="view on" id="v-proto"><div class="pad">
       <div class="lx-hero">
         <svg class="lx-mark" viewBox="0 0 512 512" aria-hidden="true">
@@ -1543,10 +1557,6 @@
       <div id="notelist"></div>
       <p class="note">Tap a card to open it. Research compounds &mdash; not FDA evaluated, not medical advice, and no substitute for your physician. Keep your prescriber informed about everything you run.</p>
     </div>
-  </div>
-  <div class="a2hs" id="a2hs">
-    <div class="tx"><b>Add BioLinked to your home screen.</b> Tap <span style="font-size:14px">&#8682;</span> Share, then &ldquo;Add to Home Screen&rdquo; &mdash; it opens full screen like an app.</div>
-    <button class="x" onclick="hideA2(1)">&times;</button>
   </div>
   <nav class="tabs">
     <button class="tab" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Schedule</button>
@@ -4326,11 +4336,30 @@ document.getElementById('notelist').innerHTML=NOTES.map(function(n,i){
 function ntTog(i){document.getElementById('nt'+i).classList.toggle('on');}
 
 /* ---------- A2HS + SW ---------- */
-function hideA2(save){document.getElementById('a2hs').classList.remove('on');if(save){try{localStorage.setItem(KP+'a2hs','1')}catch(e){}}}
+function hideA2(save){
+  var el=document.getElementById('a2hs'); if(el) el.classList.remove('on');
+  if(save){ try{ localStorage.setItem(KP+'a2hs','1'); }catch(e){} }
+}
+/* Shown only in a browser tab. Once it is installed the display-mode check
+   fails and it never appears again, so the dismissal flag is really only for
+   people who would rather not install. Was iOS-only before; the nudge applies
+   on Android too, and only the Share-sheet wording is iOS-specific. */
 (function(){
-  var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
-  var seen=false; try{seen=localStorage.getItem(KP+'a2hs')==='1'}catch(e){}
-  if(!standalone && !seen && /iPhone|iPad|iPod/i.test(navigator.userAgent||'')) setTimeout(function(){document.getElementById('a2hs').classList.add('on')},1600);
+  var el=document.getElementById('a2hs'); if(!el) return;
+  var installed = window.navigator.standalone===true ||
+    ['standalone','fullscreen','minimal-ui'].some(function(m){
+      try{ return window.matchMedia('(display-mode: '+m+')').matches; }catch(e){ return false; }
+    });
+  if(installed) return;
+  var seen=false; try{ seen=localStorage.getItem(KP+'a2hs')==='1'; }catch(e){}
+  if(seen) return;
+  /* iPadOS 13+ reports itself as a Mac, hence the touch-point check. */
+  var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent||'') ||
+            (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  if(ios){ var l=document.getElementById('a2hsIos'); if(l) l.hidden=false; }
+  var x=document.getElementById('a2hsX');
+  if(x) x.addEventListener('click', function(){ hideA2(1); });
+  setTimeout(function(){ el.classList.add('on'); }, 1200);
 })();
 /* ---------- iOS TAP BACKSTOP ----------
    touch-action:manipulation in the CSS is the real fix; this covers the case
