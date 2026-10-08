@@ -1623,9 +1623,6 @@ function blRpc(fn,body){
 function blMessage(r){
   var m=(r && r.err && r.err.message) || '';
   if(r && r.status===401) return 'That link is no longer valid. Open your personal link again.';
-  var range=m.match(/dose_out_of_range: (\S+) = (\S+) \(allowed (\S+) to (\S+)\)/);
-  if(range) return 'That dose is outside the allowed range ('+range[3]+'\u2013'+range[4]+'). Not saved.';
-  if(/unknown_compound/.test(m)) return 'That is not a compound on your protocol. Not saved.';
   if(/bad_day_index|days_must_be/.test(m)) return 'Those days could not be saved.';
   if(/payload_too_large/.test(m)) return 'That is too large to save.';
   return 'Could not save that change.';
@@ -4423,24 +4420,24 @@ var gkSeed = {
   view: "schedule",
   open: null,
   compounds: [
-    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL", dose:50, step:10,   min:30,   max:70,  unit:"mg",  draw:"20u",     block:"AM", days:[1,3,5],         reminder:"08:00", remindOn:true,  foundation:true,  active:true},
-    {id:"tirz",  name:"Tirzepatide",                  vial:"As supplied", dose:1, step:0.5, min:0.5,  max:2.5, unit:"mg",  draw:"1 mg",    block:"AM", days:[1,4],           reminder:"08:00", remindOn:true,  foundation:true, active:true},
-    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted",    dose:2,  step:0.5,  min:1,    max:3,   unit:"iu",  draw:"~17u",    block:"AM", days:[0,1,2,3,4,5,6], reminder:"07:30", remindOn:true,  foundation:true,  active:true},
-    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet",    dose:500,step:250,  min:250,  max:1000,unit:"mcg", draw:"1 tab",   block:"AM", days:[0,1,2,3,4,5,6], reminder:"08:15", remindOn:false, foundation:false, active:true},
-    {id:"dihexa",name:"Dihexa · Oral",                vial:"Tablet",    dose:10, step:5,    min:5,    max:20,  unit:"mg",  draw:"2 tabs",  block:"AM", days:[1,3,5],         reminder:"08:15", remindOn:false, foundation:false, active:true},
-    {id:"hcg",   name:"HCG",                          vial:"500 iu",    dose:500,step:100,  min:250,  max:750, unit:"iu",  draw:"—",       block:"PM", days:[1,3,5],         reminder:"21:00", remindOn:true,  foundation:true,  active:true},
-    {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
-    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:true},
-    {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
-    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, min:0.25, max:1.5, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL", dose:50, step:10,  unit:"mg",  draw:"20u",     block:"AM", days:[1,3,5],         reminder:"08:00", remindOn:true,  foundation:true,  active:true},
+    {id:"tirz",  name:"Tirzepatide",                  vial:"As supplied", dose:1, step:0.5, unit:"mg",  draw:"1 mg",    block:"AM", days:[1,4],           reminder:"08:00", remindOn:true,  foundation:true, active:true},
+    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted",    dose:2,  step:0.5,   unit:"iu",  draw:"~17u",    block:"AM", days:[0,1,2,3,4,5,6], reminder:"07:30", remindOn:true,  foundation:true,  active:true},
+    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet",    dose:500,step:250,unit:"mcg", draw:"1 tab",   block:"AM", days:[0,1,2,3,4,5,6], reminder:"08:15", remindOn:false, foundation:false, active:true},
+    {id:"dihexa",name:"Dihexa · Oral",                vial:"Tablet",    dose:10, step:5,  unit:"mg",  draw:"2 tabs",  block:"AM", days:[1,3,5],         reminder:"08:15", remindOn:false, foundation:false, active:true},
+    {id:"hcg",   name:"HCG",                          vial:"500 iu",    dose:500,step:100, unit:"iu",  draw:"—",       block:"PM", days:[1,3,5],         reminder:"21:00", remindOn:true,  foundation:true,  active:true},
+    {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:true},
+    {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
     /* already off his stack - these seed the Archive */
-    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5, min:0.5, max:4,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250, min:250, max:1000,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,min:0.25,max:1,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5, min:0.5, max:4,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5, min:0.5, max:4,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5],     reminder:"21:30", remindOn:false, foundation:false, active:false},
-    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, min:2.5, max:15, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false},
-    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,   min:1,   max:8,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false}
+    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
+    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5],     reminder:"21:30", remindOn:false, foundation:false, active:false},
+    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false},
+    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false}
   ]
 };
 function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }catch(e){ return JSON.parse(JSON.stringify(gkSeed)); } }
@@ -4570,13 +4567,14 @@ function gkCard(c){
     '</div>'+(open?gkPanel(c):"")+'</article>';
 }
 function gkPanel(c){
-  /* BACKEND HOOK 1: min/max disables the buttons here; the server must also refuse out-of-range writes. */
+  /* There is no dose cap, here or on the server. The stepper moves freely in
+     step increments; only the draw is shown next to it. */
   return '<div class="panel"><div class="gk-label">DOSE</div>'+
     '<div class="gk-row"><div class="stepper">'+
-      '<button data-gkdec="'+c.id+'"'+(c.dose<=c.min?" disabled":"")+'>–</button>'+
+      '<button data-gkdec="'+c.id+'"'+(c.dose<=c.step?" disabled":"")+'>–</button>'+
       '<div class="dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div>'+
-      '<button data-gkinc="'+c.id+'"'+(c.dose>=c.max?" disabled":"")+'>+</button></div>'+
-    '<div class="range">Allowed '+gkFmt(c.min)+'–'+gkFmt(c.max)+' '+c.unit+'<br>'+c.draw+' draw</div></div>'+
+      '<button data-gkinc="'+c.id+'">+</button></div>'+
+    '<div class="range">'+c.draw+' draw</div></div>'+
     '<div class="gk-label" style="margin-top:14px">DAYS</div>'+
     '<div class="days-edit">'+GK_SHORT.map(function(l,i){
       return '<button class="chip'+(c.days.indexOf(i)>=0?" on":"")+'" data-gktoggle="'+c.id+'" data-gkd="'+i+'">'+l+'</button>';}).join("")+'</div>'+
@@ -4600,8 +4598,11 @@ document.addEventListener("click",function(e){
   if(!id) return;
   var c=gkState.compounds.filter(function(x){return x.id===id;})[0]; if(!c) return;
   if(t.dataset.gkedit) gkState.open = gkState.open===id ? null : id;
-  if(t.dataset.gkinc) c.dose=Math.min(c.max,gkRound(c.dose+c.step));
-  if(t.dataset.gkdec) c.dose=Math.max(c.min,gkRound(c.dose-c.step));
+  /* No ceiling: the dose is whatever he sets, and the server no longer range
+     checks it either. The floor is one step rather than zero -- a zero dose is
+     not a dose, and Archive is how a compound comes off the list. */
+  if(t.dataset.gkinc) c.dose=gkRound(c.dose+c.step);
+  if(t.dataset.gkdec) c.dose=Math.max(c.step,gkRound(c.dose-c.step));
   if(t.dataset.gktoggle){ var d=Number(t.dataset.gkd);
     c.days = c.days.indexOf(d)>=0 ? c.days.filter(function(x){return x!==d;}) : c.days.concat([d]);
     if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or archive it."); } }
