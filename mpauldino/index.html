@@ -526,7 +526,8 @@
   .a2hs.on{display:flex}
   .a2hs .tx{font-size:12.5px;line-height:1.5;color:var(--ink2);flex:1}
   .a2hs .tx b{color:var(--ink);font-weight:600}
-  .a2hs .a2hs-ios{display:block;margin-top:6px}
+  .a2hs .a2hs-ios,.a2hs .a2hs-keep{display:block;margin-top:6px}
+  .a2hs .a2hs-keep{color:var(--muted);font-size:11.5px}
   /* display:block on a class outranks the UA stylesheet's [hidden]{display:none},
      so without this the iOS Share-sheet line showed on Android too. Same
      specificity as the rule above and placed after it, so it wins outright. */
@@ -947,19 +948,16 @@
 /* Read-only dose: same weight as the old stepper readout, without controls. */
 .gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}
 .gk .fixed-dose small{display:block;font-family:"Outfit",sans-serif;font-size:10px;letter-spacing:.12em;color:var(--ink-soft)}
-/* Read-only days: a dot per day, filled on the days it is due. Deliberately
-   not a button -- there is nothing to press. */
-.gk .days-read{display:flex;gap:6px}
-.gk .day-dot{flex:1;text-align:center;font-size:10px;padding:7px 0;border-radius:9px;
-  border:1px solid var(--gk-line);color:var(--ink-soft);background:transparent}
-.gk .day-dot.on{background:var(--gk-ink);border-color:var(--gk-ink);color:#ffffff}
+/* Shown only when there is no key, or the key was refused. */
+.gk .gk-note{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:14px;
+  padding:11px 13px;font-size:12.5px;line-height:1.45;color:var(--ink-soft);margin:0 0 14px}
+.gk .gk-note b{color:var(--gk-ink);font-weight:500}
+/* Editable days: the one thing on this panel the client actually sets. */
+.gk .days-edit{display:flex;gap:5px;margin:12px 0}
+.gk .chip{flex:1;border:1px solid var(--gk-line);background:var(--paper);border-radius:9px;
+  font-size:10px;padding:7px 0;cursor:pointer;color:var(--ink-soft)}
+.gk .chip.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
 .gk .actions{display:flex;gap:8px;align-items:center}
-.gk .remind{flex:1;display:flex;align-items:center;gap:8px;border:1px solid var(--gk-line);border-radius:12px;padding:7px 10px;background:#fff}
-.gk .remind input{border:0;background:transparent;width:92px;font-size:13px;color:var(--gk-ink)}
-.gk .switch{margin-left:auto;width:36px;height:22px;border-radius:99px;border:0;background:#d6d6d3;position:relative;cursor:pointer}
-.gk .switch.on{background:var(--gk-gold)}
-.gk .switch i{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
-.gk .switch.on i{left:17px}
 .gk .ghost{border:1px solid var(--gk-line);background:transparent;color:var(--ink-soft);border-radius:12px;padding:8px 10px;font-size:12px;cursor:pointer}
 .gk .gk-empty{border:1px dashed var(--gold-line);border-radius:16px;padding:16px;color:var(--ink-soft);font-size:13px;font-weight:300}
 .gk .viewbar{display:flex;gap:8px;margin:0 0 14px}
@@ -987,13 +985,10 @@
 :root[data-theme="dark"] .gk .bar{background:#35332c}
 :root[data-theme="dark"] .gk .gk-card{border-color:#2e2f31}
 :root[data-theme="dark"] .gk .edit,
-:root[data-theme="dark"] .gk .remind{background:#25262a}
-:root[data-theme="dark"] .gk .switch{background:#3c3b36}
-:root[data-theme="dark"] .gk .switch.on{background:var(--cu-gold)}
-:root[data-theme="dark"] .gk .switch i{background:#ffffff}
+:root[data-theme="dark"] .gk .chip{background:#25262a}
 /* Gold fill, black type -- reads on either variant */
 :root[data-theme="dark"] .gk .day.on,
-:root[data-theme="dark"] .gk .day-dot.on,
+:root[data-theme="dark"] .gk .chip.on,
 :root[data-theme="dark"] .gk .edit.on,
 :root[data-theme="dark"] .gk .viewbar button.on{background:var(--cu-gold);border-color:var(--cu-gold-lt);color:#0b0b0c}
 :root[data-theme="dark"] .gk .day.on span{color:#0b0b0c}
@@ -1085,6 +1080,7 @@
         <b>Keep BioLinked one tap away.</b>
         Add it to your Home Screen and your protocol opens full screen, like an app.
         <span class="a2hs-ios" id="a2hsIos" hidden>Tap <span class="a2hs-shr">&#8682;</span> Share, then &ldquo;Add to Home Screen.&rdquo;</span>
+        <span class="a2hs-keep">Keep the link we texted you &mdash; it is your key, and it is how your schedule follows you to a new phone.</span>
       </div>
       <button class="x" id="a2hsX" aria-label="Dismiss">&times;</button>
     </div>
@@ -1123,7 +1119,7 @@
         <li><b>Questions about your protocol?</b> Just reach out anytime.</li>
       </ul>
     </div></section>
-    <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p>
+    <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p><div class="gk-note" id="gkNote" hidden></div>
 <section class="cycle" id="gkCycle"></section><div class="viewbar"><button id="gkTabSchedule" class="on">Schedule</button><button id="gkTabArchive">Archive</button></div><div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Your numbers, your targets, and a meal plan built from them</p>
@@ -1573,6 +1569,75 @@ var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var sel=new Date().getDay();
 var KP='mp-app-';
+
+/* ====== MEMBER SYNC ======================================================
+   Server is the source of truth for everything the member can edit; the
+   localStorage copy is only an offline cache. Access is the per-member key
+   carried on the link -- there is no login.
+
+   The anon key below is public by design and grants nothing on its own: the
+   state tables live in a schema PostgREST does not expose, so they cannot be
+   addressed at all, and the only way in is the two SECURITY DEFINER functions,
+   which refuse to do anything without the member key. The dose range is
+   enforced in the database, not here -- the stepper rails are a convenience
+   and a crafted request cannot get past the server check.
+   ===================================================================== */
+var BL_SLUG='mpauldino';
+var BL_URL='https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/rpc/';
+var BL_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
+var BL_ONLINE=false, BL_KEYBAD=false;
+/* Ordering rules, learned the hard way -- an earlier build of this could wipe a
+   member's saved schedule by pushing page defaults over it on a slow load:
+     BL_READY  the initial read has settled; nothing renders as final before it
+     BL_SEEN   we have SUCCESSFULLY read server state at least once this session.
+               Never write without it -- writing over state we have not read is
+               how edits get destroyed.
+     BL_DIRTY  the member has made a genuine edit. Navigation alone (opening a
+               panel, switching tab, picking which day to look at) must never
+               create or overwrite a saved row. */
+var BL_READY=false, BL_SEEN=false, BL_DIRTY=false, BL_PENDING=false;
+
+/* The key arrives as ?k=... once. It is copied to this device and wiped from
+   the address bar straight away, so it is not left sitting in history, in a
+   screenshot or in a shared screen. */
+var BL_KEY=(function(){
+  var k=null;
+  try{ var m=location.search.match(/[?&]k=([^&#]+)/); if(m) k=decodeURIComponent(m[1]); }catch(e){}
+  if(k){
+    try{ localStorage.setItem(KP+'mkey',k); }catch(e){}
+    try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}
+    return k;
+  }
+  try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
+})();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; }
+
+function blRpc(fn,body,signal){
+  var opt={
+    method:'POST',
+    headers:{'apikey':BL_ANON,'Authorization':'Bearer '+BL_ANON,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  };
+  if(signal) opt.signal=signal;
+  return fetch(BL_URL+fn,opt).then(function(r){
+    return r.text().then(function(t){
+      var j=null; try{ j=t?JSON.parse(t):null; }catch(e){}
+      return r.ok ? {ok:true,data:j} : {ok:false,status:r.status,err:j};
+    });
+  });
+}
+
+/* Turns the server's refusal into something a person can act on. The message
+   is deliberately specific for a range rejection -- that is the one a member
+   can actually do something about. */
+function blMessage(r){
+  var m=(r && r.err && r.err.message) || '';
+  if(r && r.status===401) return 'That link is no longer valid. Open your personal link again.';
+  if(/bad_day_index|days_must_be/.test(m)) return 'Those days could not be saved.';
+  if(/payload_too_large/.test(m)) return 'That is too large to save.';
+  return 'Could not save that change.';
+}
+
 
 
 
@@ -2998,6 +3063,29 @@ function nStore(k,v){ try{ localStorage.setItem(nKey(k),JSON.stringify(v)); retu
 function nLoad(k){ try{ var r=localStorage.getItem(nKey(k)); return r?JSON.parse(r):null; }catch(e){ return null; } }
 function nDrop(k){ try{ localStorage.removeItem(nKey(k)); }catch(e){} }
 
+/* Nutrition rides the same channel. nStore stays the single local write point;
+   wrapping it means every existing caller syncs without being touched. */
+var blNutT=null;
+function blNutPayload(){
+  return { targets:nLoad(NUT_CFG.STORE_TARGETS), plan:nLoad(NUT_CFG.STORE_PLAN) };
+}
+(function(){
+  var local=nStore;
+  nStore=function(k,v){
+    var ok=local(k,v);
+    BL_DIRTY=true;                      /* nStore is only reached from Save */
+    if(BL_KEY && !BL_KEYBAD && BL_READY && BL_SEEN){
+      clearTimeout(blNutT);
+      blNutT=setTimeout(function(){
+        blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'nutrition',p_payload:blNutPayload()})
+          .then(function(r){ if(!r.ok && typeof gkToast==='function') gkToast(blMessage(r)); })
+          .catch(function(){});
+      },500);
+    }
+    return ok;
+  };
+})();
+
 
 /* deterministic PRNG so a given seed always yields the same plan */
 function nutRng(seed){ var s=seed>>>0||1; return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
@@ -4338,20 +4426,18 @@ renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats()
    them doing nothing at all. */
 
 /* ====== GRONK SCHEDULE ENGINE (prototype - mpauldino only) =================
-   Entirely local. State is per-device localStorage, namespaced by slug so it
-   can never collide with another client's page on the same browser. There is
-   no account, no key and no network call: a cloud-synced version existed
-   briefly and was removed deliberately.
+   Server-backed. State lives in Supabase against the member's own key, with
+   localStorage as an offline cache, so a change made on a phone shows up on a
+   laptop. The key arrives once on the link and is cached per device.
 
-   The dose and the days are the protocol, not preferences. They are rendered
-   read-only and no handler here will change them -- the client's controls are
-   Archive / Add back and the reminder.
+   The DOSE is the protocol: rendered read-only, no stepper, no handler that
+   would change it. The DAYS are the client's -- which days they take a
+   compound is theirs to set, and it syncs. Archive takes a compound off every
+   day; Add back restores it.
 
-   Two honest limits of being local-only, neither of which is a bug:
-   - State does not follow a client to a new phone, and clearing site data
-     resets them to the protocol defaults.
-   - The reminder time and switch are stored, not delivered. Real reminders
-     would need push subscriptions and something server-side to fire them.
+   There is no reminder. A stored time that never fires is worse than nothing,
+   so the control and its data are both gone rather than sitting there
+   implying a notification that will not arrive.
    ========================================================================= */
 var GK_STORAGE = "biolinked-sched-mpauldino";
 var GK_DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -4369,30 +4455,104 @@ var gkSeed = {
   view: "schedule",
   open: null,
   compounds: [
-    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL", dose:50, step:10,  unit:"mg",  draw:"20u",     block:"AM", days:[1,3,5],         reminder:"08:00", remindOn:true,  foundation:true,  active:true},
-    {id:"tirz",  name:"Tirzepatide",                  vial:"As supplied", dose:1, step:0.5, unit:"mg",  draw:"1 mg",    block:"AM", days:[1,4],           reminder:"08:00", remindOn:true,  foundation:true, active:true},
-    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted",    dose:2,  step:0.5,   unit:"iu",  draw:"~17u",    block:"AM", days:[0,1,2,3,4,5,6], reminder:"07:30", remindOn:true,  foundation:true,  active:true},
-    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet",    dose:500,step:250,unit:"mcg", draw:"1 tab",   block:"AM", days:[0,1,2,3,4,5,6], reminder:"08:15", remindOn:false, foundation:false, active:true},
-    {id:"dihexa",name:"Dihexa · Oral",                vial:"Tablet",    dose:10, step:5,  unit:"mg",  draw:"2 tabs",  block:"AM", days:[1,3,5],         reminder:"08:15", remindOn:false, foundation:false, active:true},
-    {id:"hcg",   name:"HCG",                          vial:"500 iu",    dose:500,step:100, unit:"iu",  draw:"—",       block:"PM", days:[1,3,5],         reminder:"21:00", remindOn:true,  foundation:true,  active:true},
-    {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
-    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:true},
-    {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
-    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:true,  foundation:false, active:true},
+    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL", dose:50, step:10,  unit:"mg",  draw:"20u",     block:"AM", days:[1,3,5],  foundation:true,  active:true},
+    {id:"tirz",  name:"Tirzepatide",                  vial:"As supplied", dose:1, step:0.5, unit:"mg",  draw:"1 mg",    block:"AM", days:[1,4],  foundation:true, active:true},
+    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted",    dose:2,  step:0.5,   unit:"iu",  draw:"~17u",    block:"AM", days:[0,1,2,3,4,5,6],  foundation:true,  active:true},
+    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet",    dose:500,step:250,unit:"mcg", draw:"1 tab",   block:"AM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
+    {id:"dihexa",name:"Dihexa · Oral",                vial:"Tablet",    dose:10, step:5,  unit:"mg",  draw:"2 tabs",  block:"AM", days:[1,3,5], foundation:false, active:true},
+    {id:"hcg",   name:"HCG",                          vial:"500 iu",    dose:500,step:100, unit:"iu",  draw:"—",       block:"PM", days:[1,3,5],  foundation:true,  active:true},
+    {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
+    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
+    {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
+    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
     /* already off his stack - these seed the Archive */
-    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5],     reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,4],           reminder:"08:00", remindOn:false, foundation:false, active:false},
-    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5],     reminder:"21:30", remindOn:false, foundation:false, active:false},
-    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false},
-    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], reminder:"21:30", remindOn:false, foundation:false, active:false}
+    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:false},
+    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:false},
+    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:false},
+    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:false},
+    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5], foundation:false, active:false},
+    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:false},
+    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:false}
   ]
 };
 function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }catch(e){ return JSON.parse(JSON.stringify(gkSeed)); } }
-/* Local only. No account, no server: the schedule lives in this browser,
-   namespaced per client slug so two people sharing a device never collide. */
-function gkSave(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gkState)); }catch(e){} }
+/* Local write is the offline cache and happens immediately so the UI never
+   waits. The server write is debounced and authoritative: if it refuses, we
+   roll the page back to the last state the server accepted rather than leaving
+   the screen showing an edit that was never stored. */
+var gkPushT=null, gkLastGood=null;
+function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gkState)); }catch(e){} }
+/* edit=true means the member actually changed something. Everything else is
+   navigation and must not reach the server: a brand-new member who opens their
+   link and taps around has written nothing, and an existing member on a slow
+   connection cannot clobber their own saved row before it has even arrived. */
+function gkSave(edit){
+  if(edit) BL_DIRTY=true;
+  gkCacheLocal();
+  if(!BL_KEY || BL_KEYBAD) return;
+  if(!BL_DIRTY) return;
+  if(!BL_READY || !BL_SEEN){ BL_PENDING=true; return; }
+  clearTimeout(gkPushT);
+  gkPushT=setTimeout(gkPush, 350);
+}
+function gkPayload(){
+  return {
+    compounds: gkState.compounds.map(function(c){
+      return { id:c.id, dose:c.dose, days:c.days,
+               active:!!c.active, archivedOn:c.archivedOn||null };
+    }),
+    selected: gkState.selected,
+    view: gkState.view
+  };
+}
+function gkPush(){
+  /* If the boot read failed we still do not know what is on the server, so read
+     before writing rather than overwriting blind. The member's edit wins once
+     the read succeeds -- it is an explicit action on their own device. */
+  if(!BL_SEEN){
+    blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}).then(function(r){
+      if(r.ok){ BL_SEEN=true; BL_ONLINE=true; gkPushNow(); }
+      else if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); blNote(); }
+    }).catch(function(){ BL_ONLINE=false; });
+    return;
+  }
+  gkPushNow();
+}
+function gkPushNow(){
+  var attempt=JSON.stringify(gkState);
+  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',p_payload:gkPayload()})
+    .then(function(r){
+      if(r.ok){ BL_ONLINE=true; gkLastGood=attempt; return; }
+      if(r.status===401){ BL_KEYBAD=true; blForgetKey(); }
+      gkToast(blMessage(r));
+      gkRollback();
+    })
+    .catch(function(){ BL_ONLINE=false; });   /* offline: cache holds, retry on next edit */
+}
+function gkRollback(){
+  if(!gkLastGood) return;
+  try{ gkState=JSON.parse(gkLastGood); }catch(e){ return; }
+  gkCacheLocal();
+  gkRender();
+}
+/* Server state is an overlay on the page's own compound list, not a
+   replacement for it: names, units and the stepper rails always come from the
+   page, so editing the protocol here never gets erased by an older saved row,
+   and a compound the member no longer has simply does not match. */
+function gkHydrate(p){
+  if(!p || !p.compounds) return;
+  var byId={};
+  p.compounds.forEach(function(x){ if(x && x.id) byId[x.id]=x; });
+  gkState.compounds.forEach(function(c){
+    var v=byId[c.id]; if(!v) return;
+    if(typeof v.dose==='number')     c.dose=v.dose;
+    if(Array.isArray(v.days) && v.days.length) c.days=v.days.slice();
+    if(typeof v.active==='boolean')  c.active=v.active;
+    c.archivedOn = v.archivedOn || null;
+  });
+  if(typeof p.selected==='number') gkState.selected=p.selected;
+  if(p.view) gkState.view=p.view;
+}
 var gkState = gkLoad();
 gkState.view = gkState.view || "schedule";
 function gkWeek(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Date(); n.setHours(0,0,0,0);
@@ -4408,7 +4568,7 @@ function gkArchiveIfDue(){
   gkState.compounds.forEach(function(c){
     if(c.active && !c.foundation){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); moved++; }
   });
-  if(moved){ gkSave(); gkToast("Week "+gkState.cycleWeeks+" complete. Cycled compounds moved to archive."); }
+  if(moved){ gkSave(true); gkToast("Week "+gkState.cycleWeeks+" complete. Cycled compounds moved to archive."); }
 }
 function gkToast(msg){ var el=document.getElementById("gkToast"); if(!el) return;
   el.textContent=msg; el.classList.add("show"); clearTimeout(gkToast._t);
@@ -4460,18 +4620,16 @@ function gkCard(c){
     '</div>'+(open?gkPanel(c):"")+'</article>';
 }
 function gkPanel(c){
-  /* Dose and days are the protocol. They are shown, not offered: no stepper,
-     no day chips, nothing here writes to either. The only things a client
-     controls are the reminder and whether the compound is on their list. */
+  /* Dose is the protocol and is shown, not offered -- there is no stepper and
+     nothing here writes to it. Days ARE the client's: they pick which days
+     they take it, and that choice syncs. Archive takes it off every day. */
   return '<div class="panel"><div class="gk-label">DOSE</div>'+
     '<div class="gk-row"><div class="fixed-dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div>'+
     '<div class="range">'+c.draw+' draw</div></div>'+
     '<div class="gk-label" style="margin-top:14px">DAYS</div>'+
-    '<div class="days-read">'+GK_SHORT.map(function(l,i){
-      return '<span class="day-dot'+(c.days.indexOf(i)>=0?" on":"")+'">'+l+'</span>';}).join("")+'</div>'+
-    '<div class="actions"><div class="remind"><input type="time" value="'+c.reminder+'" data-gktime="'+c.id+'">'+
-      '<button class="switch'+(c.remindOn?" on":"")+'" data-gkremind="'+c.id+'"><i></i></button></div>'+
-    '<button class="ghost" data-gkremove="'+c.id+'">Archive</button></div></div>';
+    '<div class="days-edit">'+GK_SHORT.map(function(l,i){
+      return '<button class="chip'+(c.days.indexOf(i)>=0?" on":"")+'" data-gktoggle="'+c.id+'" data-gkd="'+i+'">'+l+'</button>';}).join("")+'</div>'+
+    '<div class="actions"><button class="ghost" data-gkremove="'+c.id+'">Archive</button></div></div>';
 }
 function gkArchiveView(items){
   if(!items.length) return '<div class="gk-empty">Archive is empty. Archiving a compound removes it from every day. Add back returns it with the same dose and days.</div>';
@@ -4485,26 +4643,84 @@ document.addEventListener("click",function(e){
   if(t.id==="gkTabSchedule"){ gkState.view="schedule"; gkSave(); gkRender(); return; }
   if(t.id==="gkTabArchive"){ gkState.view="archive"; gkState.open=null; gkSave(); gkRender(); return; }
   if(t.dataset.gkday!=null){ gkState.selected=Number(t.dataset.gkday); gkState.open=null; gkSave(); gkRender(); return; }
-  var id=t.dataset.gkedit||t.dataset.gkremind||t.dataset.gkremove||t.dataset.gkrestore;
+  var id=t.dataset.gkedit||t.dataset.gktoggle||t.dataset.gkremove||t.dataset.gkrestore;
   if(!id) return;
+  /* gkedit only opens or closes the panel -- navigation, not an edit. */
+  var mutates = !!(t.dataset.gktoggle||t.dataset.gkremove||t.dataset.gkrestore);
   var c=gkState.compounds.filter(function(x){return x.id===id;})[0]; if(!c) return;
   if(t.dataset.gkedit) gkState.open = gkState.open===id ? null : id;
-  if(t.dataset.gkremind) c.remindOn=!c.remindOn;
+  if(t.dataset.gktoggle){ var d=Number(t.dataset.gkd);
+    c.days = c.days.indexOf(d)>=0 ? c.days.filter(function(x){return x!==d;}) : c.days.concat([d]);
+    if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or archive it."); } }
   if(t.dataset.gkremove){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); gkState.open=null; gkToast("Removed from the schedule. It is in Archive."); }
   if(t.dataset.gkrestore){ c.active=true; c.archivedOn=null; gkToast("Added back to the schedule."); }
-  gkSave(); gkRender();
-});
-document.addEventListener("change",function(e){
-  if(!e.target.dataset||!e.target.dataset.gktime) return;
-  var c=gkState.compounds.filter(function(x){return x.id===e.target.dataset.gktime;})[0]; if(!c) return;
-  /* Stored, not delivered -- see the note at the top of this engine. */
-  c.reminder=e.target.value; c.remindOn=true; gkSave();
+  gkSave(mutates); gkRender();
 });
 
-/* ---- boot ---------------------------------------------------------------
-   nutInit runs here and only here. It used to run from a DOMContentLoaded hook
-   as well, which bound every diet chip twice and left them doing nothing. */
-if(typeof nutInit==='function') nutInit();
-gkRender();
+function blNote(){
+  var el=document.getElementById('gkNote'); if(!el) return;
+  if(BL_KEYBAD){
+    el.innerHTML='<b>This link is no longer valid.</b> Open your personal link again to pick your schedule back up. Changes made here stay on this device.';
+    el.hidden=false; return;
+  }
+  if(!BL_KEY){
+    el.innerHTML='<b>Changes save on this device only.</b> Open your personal link to keep your schedule in step across your phone and laptop.';
+    el.hidden=false; return;
+  }
+  el.hidden=true;
+}
+var blInited=false;
+function blInitOnce(){
+  if(blInited) return; blInited=true;
+  try{ if(typeof nutInit==='function') nutInit(); }catch(e){}
+}
+/* Called exactly once, when the initial read has settled one way or the other.
+   Nothing before this point is treated as final and nothing before this point
+   may write. */
+function blReady(){
+  BL_READY=true;
+  blInitOnce();
+  gkLastGood=JSON.stringify(gkState);
+  try{ gkRender(); }catch(e){}
+  blNote();
+  if(BL_PENDING && BL_DIRTY){ BL_PENDING=false; gkPush(); }
+}
+(function blBoot(){
+  if(!BL_KEY){ blReady(); return; }      /* local-only: nothing to read, nothing to push */
+
+  /* A provisional paint so a slow link does not stare at an empty tab. It is
+     explicitly NOT "ready": it does not run nutInit, does not enable writes,
+     and is replaced the moment the real state lands. The previous version
+     treated this as settled and then THREW AWAY the server's response, which
+     is what let page defaults overwrite a saved schedule. */
+  var paint=setTimeout(function(){ if(!BL_READY){ try{ gkRender(); }catch(e){} } }, 2000);
+
+  var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  var hard = setTimeout(function(){ if(ctl){ try{ ctl.abort(); }catch(e){} } }, 12000);
+
+  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}, ctl && ctl.signal)
+    .then(function(r){
+      clearTimeout(paint); clearTimeout(hard);
+      if(r.ok){
+        BL_ONLINE=true;
+        BL_SEEN=true;                    /* we have read the server: writing is now safe */
+        if(r.data){
+          gkHydrate(r.data.schedule);
+          if(r.data.nutrition){ try{
+            if(r.data.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(r.data.nutrition.targets));
+            if(r.data.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(r.data.nutrition.plan));
+          }catch(e){} }
+        }
+      } else if(r.status===401){
+        BL_KEYBAD=true; blForgetKey(); BL_SEEN=true;
+      }
+      blReady();
+    })
+    .catch(function(){
+      clearTimeout(paint); clearTimeout(hard);
+      BL_SEEN=false;                     /* read failed: stay local until one succeeds */
+      blReady();
+    });
+})();
 
 </script>
