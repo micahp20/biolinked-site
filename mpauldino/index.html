@@ -1596,6 +1596,18 @@ var BL_ONLINE=false, BL_KEYBAD=false;
                panel, switching tab, picking which day to look at) must never
                create or overwrite a saved row. */
 var BL_READY=false, BL_SEEN=false, BL_DIRTY=false, BL_PENDING=false;
+/* What version of each kind this page last SAW. Sent back on write so the
+   server can refuse a save built on a stale read -- two tabs, or a phone
+   resuming from background, used to silently overwrite each other. */
+var BL_VER={};
+/* get_member_state returns {state,versions} after the concurrency migration
+   and a flat {schedule,nutrition} before it. Tolerating both means the client
+   and the SQL can be deployed in either order without a broken window. */
+function blUnwrap(d){
+  if(d && d.state && typeof d.state==='object')
+    return {state:d.state, versions:(d.versions||{})};
+  return {state:(d||{}), versions:{}};
+}
 
 /* The key arrives as ?k=... once. It is copied to this device and wiped from
    the address bar straight away, so it is not left sitting in history, in a
@@ -1634,6 +1646,7 @@ function blMessage(r){
   var m=(r && r.err && r.err.message) || '';
   if(r && r.status===401) return 'That link is no longer valid. Open your personal link again.';
   if(/bad_day_index|days_must_be/.test(m)) return 'Those days could not be saved.';
+  if(/version_conflict/.test(m)) return 'Updated from your other device.';
   if(/payload_too_large/.test(m)) return 'That is too large to save.';
   return 'Could not save that change.';
 }
@@ -3077,8 +3090,13 @@ function blNutPayload(){
     if(BL_KEY && !BL_KEYBAD && BL_READY && BL_SEEN){
       clearTimeout(blNutT);
       blNutT=setTimeout(function(){
-        blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'nutrition',p_payload:blNutPayload()})
-          .then(function(r){ if(!r.ok && typeof gkToast==='function') gkToast(blMessage(r)); })
+        blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'nutrition',
+                                   p_payload:blNutPayload(), p_expected_version:BL_VER.nutrition})
+          .then(function(r){
+            if(r.ok){ if(r.data && typeof r.data.version==='number') BL_VER.nutrition=r.data.version; return; }
+            if(blIsConflict(r)){ blResync(); return; }
+            if(typeof gkToast==='function') gkToast(blMessage(r));
+          })
           .catch(function(){});
       },500);
     }
@@ -4511,7 +4529,7 @@ function gkPush(){
      the read succeeds -- it is an explicit action on their own device. */
   if(!BL_SEEN){
     blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}).then(function(r){
-      if(r.ok){ BL_SEEN=true; BL_ONLINE=true; gkPushNow(); }
+      if(r.ok){ BL_SEEN=true; BL_ONLINE=true; BL_VER=blUnwrap(r.data).versions||{}; gkPushNow(); }
       else if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); blNote(); }
     }).catch(function(){ BL_ONLINE=false; });
     return;
@@ -4520,14 +4538,48 @@ function gkPush(){
 }
 function gkPushNow(){
   var attempt=JSON.stringify(gkState);
-  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',p_payload:gkPayload()})
+  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',
+                             p_payload:gkPayload(), p_expected_version:BL_VER.schedule})
     .then(function(r){
-      if(r.ok){ BL_ONLINE=true; gkLastGood=attempt; return; }
-      if(r.status===401){ BL_KEYBAD=true; blForgetKey(); }
+      if(r.ok){
+        BL_ONLINE=true; gkLastGood=attempt;
+        if(r.data && typeof r.data.version==='number') BL_VER.schedule=r.data.version;
+        return;
+      }
+      if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); gkRollback(); return; }
+      if(blIsConflict(r)){ blResync(); return; }
       gkToast(blMessage(r));
       gkRollback();
     })
     .catch(function(){ BL_ONLINE=false; });   /* offline: cache holds, retry on next edit */
+}
+/* The server refused because someone else wrote since we last read. The other
+   side's change is the newer one, so we take it rather than insisting -- this
+   edit is lost, which is the honest outcome and better than reverting a change
+   the member made somewhere else. */
+function blIsConflict(r){
+  return !!(r && r.err && /version_conflict/.test(r.err.message||''));
+}
+var blResyncing=false;
+function blResync(){
+  if(blResyncing) return; blResyncing=true;
+  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY})
+    .then(function(r){
+      blResyncing=false;
+      if(!r.ok) return;
+      var u=blUnwrap(r.data);
+      BL_VER=u.versions||{};
+      gkHydrate(u.state.schedule);
+      if(u.state.nutrition){ try{
+        if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
+        if(u.state.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(u.state.nutrition.plan));
+      }catch(e){} }
+      gkCacheLocal();
+      gkLastGood=JSON.stringify(gkState);
+      gkRender();
+      gkToast("Updated from your other device.");
+    })
+    .catch(function(){ blResyncing=false; });
 }
 function gkRollback(){
   if(!gkLastGood) return;
@@ -4705,10 +4757,12 @@ function blReady(){
         BL_ONLINE=true;
         BL_SEEN=true;                    /* we have read the server: writing is now safe */
         if(r.data){
-          gkHydrate(r.data.schedule);
-          if(r.data.nutrition){ try{
-            if(r.data.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(r.data.nutrition.targets));
-            if(r.data.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(r.data.nutrition.plan));
+          var u=blUnwrap(r.data);
+          BL_VER=u.versions||{};         /* remember what we saw, for the write check */
+          gkHydrate(u.state.schedule);
+          if(u.state.nutrition){ try{
+            if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
+            if(u.state.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(u.state.nutrition.plan));
           }catch(e){} }
         }
       } else if(r.status===401){
