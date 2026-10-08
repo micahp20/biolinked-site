@@ -4558,7 +4558,9 @@ function gkPushNow(){
    edit is lost, which is the honest outcome and better than reverting a change
    the member made somewhere else. */
 function blIsConflict(r){
-  return !!(r && r.err && /version_conflict/.test(r.err.message||''));
+  if(!r) return false;
+  if(r.status===409) return true;                       /* PT409 from the server */
+  return !!(r.err && /version_conflict/.test(r.err.message||''));
 }
 var blResyncing=false;
 function blResync(){
