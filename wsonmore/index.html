@@ -248,6 +248,31 @@
   .cx-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
   .cx.on .cx-cv{transform:rotate(90deg)}
   .cx-bd{display:none;padding:0 14px 14px}
+  /* Collapsible groups: the per-cycle blocks in All Compounds and the
+     explainer on the Protocol tab. Both reuse the .cx idiom -- a header row
+     with a chevron that quarter-turns when open -- so there is nothing new
+     to learn visually and nothing new to theme. */
+  .cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+  .cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+  .cgrp-m{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+  .cgrp-n{font-size:11px;font-weight:800;color:var(--gold)}
+  .cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+  .cgrp.on .cgrp-cv{transform:rotate(90deg)}
+  .cgrp-bd{display:none;border-top:1px solid var(--line2)}
+  .cgrp.on .cgrp-bd{display:block}
+  .cgrp-bd .cx:last-child{border-bottom:none}
+  .cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+  .cgrp.pastgrp .cgrp-bd{opacity:.72}
+  .abt{padding:11px 13px 13px}
+  .abt-l{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+  .abt-l+.abt-p{margin-bottom:11px}
+  .abt-p{font-size:12.5px;line-height:1.55;color:var(--ink2)}
+  .abt-p:last-child{margin-bottom:0}
   .cx.on .cx-bd{display:block}
   .cx-ab{font-size:12.5px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
@@ -976,6 +1001,7 @@
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
       </div>
+      <div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
@@ -1736,7 +1762,47 @@ function cycRows(){
   if(cycSel===cycCurrent()) return CMP;
   return ALL.filter(function(c){return cycHas(c,cycSel) && !cmpArch(c)});
 }
-function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); }
+var CYCABOUT={"Cycle 1 · Fat Loss": {"t": "Bodyfat, without giving up the muscle underneath it.", "s": "Retatrutide does the appetite and mobilisation work; 5-Amino-1MQ blocks NNMT to restore NAD+ inside fat and muscle so the fatty acids it frees actually get burned instead of recirculating. One releases, the other oxidises.", "w": "Both AM, fasted — GLP-1 nausea is lowest on an empty stomach and the appetite effect then carries the whole day. Retatrutide splits Mon and Thu to keep levels flat rather than peaking once. 5-Amino runs M/W/F because its effect builds over weeks and does not need daily dosing."}, "Cycle 2 · Cognitive Enhancement": {"t": "Focus and mental clarity, without the edge that usually comes with it.", "s": "Semax raises BDNF and drives the attention side; Selank is anxiolytic without sedation. Run together, one lifts output and the other keeps it from tipping into agitation — which is why neither is given alone here.", "w": "AM for both: they are alerting, and an evening dose costs you sleep. M/W/F rather than daily keeps receptor sensitivity from blunting, so week eight works as well as week one."}, "Cycle 3 · Longevity & Anti-Aging": {"t": "Cellular repair — energy, nightly rhythm, and connective tissue.", "s": "NAD+ restores the substrate your mitochondria actually run on. Epitalon rebuilds the melatonin rhythm so the repair window opens properly. GHK-Cu supplies the collagen signal. Energy, the time to use it, and the material to rebuild with.", "w": "NAD+ in the AM — it is stimulating, and a PM dose will cost you the sleep the rest of this cycle is trying to buy. Epitalon and GHK-Cu in the PM, because repair is nocturnal. Epitalon runs as a defined 20-day course rather than continuously, which is how the research uses it."}, "Cycle 4 · Muscle Building": {"t": "Lean tissue — run once you are lean enough for it to show.", "s": "CJC-1295 lifts the growth-hormone baseline, Ipamorelin adds a clean pulse on top without touching cortisol or hunger, and IGF-1 LR3 is the downstream mediator that does the actual anabolic work. Signal, pulse, effect.", "w": "CJC/Ipamorelin pre-bed on an empty stomach: insulin blunts the GH pulse, and your own largest pulse comes in early deep sleep — so you are amplifying it rather than fighting it. IGF-1 about thirty minutes after training, when muscle is primed to take up."}, "Cycle 5 · Sleep, Stress & Hormonal Balance": {"t": "Sleep depth, stress resilience, and the hormonal axis.", "s": "DSIP targets how deep you sleep rather than how fast you fall asleep; Pinealon supports the architecture around it. Kisspeptin-10 sits upstream and prompts your own LH and FSH rather than replacing anything — the conservative first move.", "w": "DSIP and Pinealon one to three hours before bed. Kisspeptin in the AM, because the axis follows a morning rhythm and a morning dose is what reads cleanly if you pull a panel."}};
+/* The explainer lives on the Protocol tab but follows the cycle context the
+   Schedule tab already owns, so there is no second selector to keep in sync.
+   Collapsed on arrival; an open card stays open when the cycle changes. */
+function aboutTog(){var e=document.getElementById('cg-about'); if(e) e.classList.toggle('on');}
+function renderAbout(){
+  var host=document.getElementById('protoabout'); if(!host) return;
+  var key=(typeof cycSel!=='undefined'&&cycSel)?cycSel:(cycOn()?cycCurrent():null);
+  var a=(key&&typeof CYCABOUT!=='undefined')?CYCABOUT[key]:null;
+  if(!a){host.innerHTML=''; return;}
+  var prev=document.getElementById('cg-about');
+  var open=!!(prev&&prev.classList.contains('on'));
+  host.innerHTML='<div class="cgrp'+(open?' on':'')+'" id="cg-about">'+
+    '<div class="cgrp-hd" onclick="aboutTog()">'+
+      '<div><div class="cgrp-t">About this protocol</div>'+
+      '<div class="cgrp-m">'+key+'</div></div>'+
+      '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
+    '</div>'+
+    '<div class="cgrp-bd"><div class="abt">'+
+      '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
+      '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
+      '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
+    '</div></div></div>';
+}
+function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
+/* A group re-renders whenever the cycle toggle moves, so remember which ones
+   the reader had open and put them back. */
+function cgOpenSet(){
+  var o={}; var n=document.querySelectorAll('#cmplist .cgrp.on');
+  for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
+}
+function cgrpHTML(key,title,meta,rows,open,extra){
+  if(!rows.length) return '';
+  return '<div class="cgrp'+(open?' on':'')+(extra?' '+extra:'')+'" id="cg-'+key+'">'+
+    '<div class="cgrp-hd" onclick="cgTog(\''+key+'\')">'+
+      '<div><div class="cgrp-t">'+title+'</div>'+(meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
+      '<div class="cgrp-r"><span class="cgrp-n">'+rows.length+'</span><span class="cgrp-cv">\u203a</span></div>'+
+    '</div>'+
+    '<div class="cgrp-bd">'+rows.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div></div>';
+}
+function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); renderAbout(); }
 function renderCyc(){
   var host=document.getElementById('cycbar');
   if(!host) return;
@@ -1764,36 +1830,40 @@ function renderAll(){
   var past=idx.filter(function(x){return cmpArch(x.c)});
   var h='', live;
   if(cycOn()){
-    /* The foundation never pauses, so it is shown as its own group above
-       whichever cycle is being viewed rather than mixed in with it. */
+    /* Every cycle is listed, not just the selected one, so the whole plan
+       reads top to bottom in one pass. Each cycle is its own collapsible
+       group with the current one open and the rest shut, so five cycles do
+       not turn into a mile of scroll. Membership is tested against the
+       compound's OWN cycle names rather than cycHas(), because cycHas() is
+       true for a foundation compound in every cycle and that would emit the
+       same DOM id several times over. */
     var found=idx.filter(function(x){return cycIsBase(x.c)&&!cmpArch(x.c)});
-    var cyc=idx.filter(function(x){return !cycIsBase(x.c)&&cycHas(x.c,cycSel)&&!cmpArch(x.c)});
     var declared=false;
     for(var q=0;q<ALL.length;q++){ if(ALL[q].found) declared=true; }
-    live=found.concat(cyc);
-    var sel=null;
-    for(var i=0;i<CYCS.length;i++){ if(CYCS[i].n===cycSel) sel=CYCS[i]; }
-    var isNow=cycSel===cycCurrent();
     var baseLbl=(typeof CYCBASE!=='undefined'&&CYCBASE)?CYCBASE
         :(declared?'Foundation \u00b7 every week, all year'
                   :'Ongoing \u00b7 runs through every cycle');
-    if(found.length) h+='<div class="cxsub found">'+baseLbl+'</div>'+
-      '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
-    h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
-       (sel&&sel.wk?' \u00b7 '+sel.wk:'')+
-       (isNow?'':(sel&&sel.arch?' \u00b7 already run':' \u00b7 not running yet'))+'</div>';
-    h+=cyc.length
-      ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>'
-      : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
-        '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
+    var was=cgOpenSet(), first=!document.querySelector('#cmplist .cgrp');
+    function inCyc(x,n){return !cycIsBase(x.c)&&!cmpArch(x.c)&&cycNames(x.c).indexOf(n)>=0;}
+    function openFor(id,def){ return first?def:!!was[id]; }
+    if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',true),'');
+    for(var k=0;k<CYCS.length;k++){
+      var cy=CYCS[k];
+      var rows=idx.filter(function(x){return inCyc(x,cy.n)});
+      var isNow=cy.n===cycCurrent();
+      var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
+      var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,isNow),'');
+    }
+    if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
+    var cur=idx.filter(function(x){return inCyc(x,cycCurrent())});
+    live=found.concat(cur);
   } else {
     /* One list, A-Z. A compound that is finished stays in place with a quiet
        "Past" tag rather than being moved into a section of its own. */
     live=idx.filter(function(x){return !cmpArch(x.c)});
     if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
-  if(cycOn()&&past.length) h+='<div class="cxsub">Past \u00b7 no longer running</div>'+
-    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;
   document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+live.length+' ACTIVE';
 }
@@ -4141,6 +4211,6 @@ if('serviceWorker' in navigator){
 }
 
 CYCS=cycList(); cycSel=cycCurrent();
-renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
+renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
 if(typeof nutInit==='function') nutInit();
 </script>
