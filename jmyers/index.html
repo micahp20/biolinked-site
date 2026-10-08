@@ -850,8 +850,19 @@
     :root{--tabh:0px}
     .scroll{flex:1 1 auto !important;min-height:0 !important;overflow-y:auto !important}
     body{background:var(--bg)}
+    /* The cap has to be the SMALL viewport. 100vh on iOS Safari is the
+       toolbar-hidden height, so a panel sized against it hangs below the
+       visible area whenever the toolbars are showing -- and because the
+       content still fits inside that too-generous cap, overflow-y never
+       engages and the bottom rows cannot be reached at all. 100svh is the
+       toolbar-SHOWN height, so the panel always fits on screen and anything
+       longer becomes internal scroll. svh is held to a second declaration so
+       browsers without it keep the vh fallback. padding-bottom sits inside
+       the scroller, adding room past the last row rather than height. */
     .navmenu{width:min(84vw,268px);max-height:calc(100vh - 92px - env(safe-area-inset-top));
-      overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+      max-height:calc(100svh - 76px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+      padding-bottom:calc(10px + env(safe-area-inset-bottom))}
     .navmenu .nav-item{display:flex;align-items:center;gap:10px;width:100%;
       padding:11px 14px;border:none;border-top:1px solid var(--line2);
       background:transparent;text-align:left;font-family:inherit;cursor:pointer;
