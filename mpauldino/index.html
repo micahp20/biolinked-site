@@ -1588,6 +1588,16 @@ var BL_SLUG='mpauldino';
 var BL_URL='https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/rpc/';
 var BL_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
 var BL_ONLINE=false, BL_KEYBAD=false;
+/* Ordering rules, learned the hard way -- an earlier build of this could wipe a
+   member's saved schedule by pushing page defaults over it on a slow load:
+     BL_READY  the initial read has settled; nothing renders as final before it
+     BL_SEEN   we have SUCCESSFULLY read server state at least once this session.
+               Never write without it -- writing over state we have not read is
+               how edits get destroyed.
+     BL_DIRTY  the member has made a genuine edit. Navigation alone (opening a
+               panel, switching tab, picking which day to look at) must never
+               create or overwrite a saved row. */
+var BL_READY=false, BL_SEEN=false, BL_DIRTY=false, BL_PENDING=false;
 
 /* The key arrives as ?k=... once. It is copied to this device and wiped from
    the address bar straight away, so it is not left sitting in history, in a
@@ -1604,12 +1614,14 @@ var BL_KEY=(function(){
 })();
 function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; }
 
-function blRpc(fn,body){
-  return fetch(BL_URL+fn,{
+function blRpc(fn,body,signal){
+  var opt={
     method:'POST',
     headers:{'apikey':BL_ANON,'Authorization':'Bearer '+BL_ANON,'Content-Type':'application/json'},
     body:JSON.stringify(body)
-  }).then(function(r){
+  };
+  if(signal) opt.signal=signal;
+  return fetch(BL_URL+fn,opt).then(function(r){
     return r.text().then(function(t){
       var j=null; try{ j=t?JSON.parse(t):null; }catch(e){}
       return r.ok ? {ok:true,data:j} : {ok:false,status:r.status,err:j};
@@ -3062,7 +3074,8 @@ function blNutPayload(){
   var local=nStore;
   nStore=function(k,v){
     var ok=local(k,v);
-    if(BL_KEY && !BL_KEYBAD){
+    BL_DIRTY=true;                      /* nStore is only reached from Save */
+    if(BL_KEY && !BL_KEYBAD && BL_READY && BL_SEEN){
       clearTimeout(blNutT);
       blNutT=setTimeout(function(){
         blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'nutrition',p_payload:blNutPayload()})
@@ -4447,9 +4460,16 @@ function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || J
    the screen showing an edit that was never stored. */
 var gkPushT=null, gkLastGood=null;
 function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gkState)); }catch(e){} }
-function gkSave(){
+/* edit=true means the member actually changed something. Everything else is
+   navigation and must not reach the server: a brand-new member who opens their
+   link and taps around has written nothing, and an existing member on a slow
+   connection cannot clobber their own saved row before it has even arrived. */
+function gkSave(edit){
+  if(edit) BL_DIRTY=true;
   gkCacheLocal();
   if(!BL_KEY || BL_KEYBAD) return;
+  if(!BL_DIRTY) return;
+  if(!BL_READY || !BL_SEEN){ BL_PENDING=true; return; }
   clearTimeout(gkPushT);
   gkPushT=setTimeout(gkPush, 350);
 }
@@ -4465,6 +4485,19 @@ function gkPayload(){
   };
 }
 function gkPush(){
+  /* If the boot read failed we still do not know what is on the server, so read
+     before writing rather than overwriting blind. The member's edit wins once
+     the read succeeds -- it is an explicit action on their own device. */
+  if(!BL_SEEN){
+    blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}).then(function(r){
+      if(r.ok){ BL_SEEN=true; BL_ONLINE=true; gkPushNow(); }
+      else if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); blNote(); }
+    }).catch(function(){ BL_ONLINE=false; });
+    return;
+  }
+  gkPushNow();
+}
+function gkPushNow(){
   var attempt=JSON.stringify(gkState);
   blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',p_payload:gkPayload()})
     .then(function(r){
@@ -4510,12 +4543,13 @@ function gkDaysInto(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Da
 function gkCycleDone(){ return gkDaysInto() >= gkState.cycleWeeks*7; }
 /* BACKEND HOOK 2: this fires on page open only. A cron would do it properly. */
 function gkArchiveIfDue(){
+  if(!BL_READY) return;        /* never act on defaults that the server may be about to replace */
   if(!gkCycleDone()) return;
   var moved=0;
   gkState.compounds.forEach(function(c){
     if(c.active && !c.foundation){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); moved++; }
   });
-  if(moved){ gkSave(); gkToast("Week "+gkState.cycleWeeks+" complete. Cycled compounds moved to archive."); }
+  if(moved){ gkSave(true); gkToast("Week "+gkState.cycleWeeks+" complete. Cycled compounds moved to archive."); }
 }
 function gkToast(msg){ var el=document.getElementById("gkToast"); if(!el) return;
   el.textContent=msg; el.classList.add("show"); clearTimeout(gkToast._t);
@@ -4596,6 +4630,9 @@ document.addEventListener("click",function(e){
   if(t.dataset.gkday!=null){ gkState.selected=Number(t.dataset.gkday); gkState.open=null; gkSave(); gkRender(); return; }
   var id=t.dataset.gkedit||t.dataset.gkinc||t.dataset.gkdec||t.dataset.gktoggle||t.dataset.gkremind||t.dataset.gkremove||t.dataset.gkrestore;
   if(!id) return;
+  /* gkedit only opens or closes the panel -- that is navigation, not an edit. */
+  var mutates = !!(t.dataset.gkinc||t.dataset.gkdec||t.dataset.gktoggle||
+                   t.dataset.gkremind||t.dataset.gkremove||t.dataset.gkrestore);
   var c=gkState.compounds.filter(function(x){return x.id===id;})[0]; if(!c) return;
   if(t.dataset.gkedit) gkState.open = gkState.open===id ? null : id;
   /* No ceiling: the dose is whatever he sets, and the server no longer range
@@ -4609,13 +4646,13 @@ document.addEventListener("click",function(e){
   if(t.dataset.gkremind) c.remindOn=!c.remindOn;
   if(t.dataset.gkremove){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); gkState.open=null; gkToast("Removed from the schedule. It is in Archive."); }
   if(t.dataset.gkrestore){ c.active=true; c.archivedOn=null; gkToast("Added back to the schedule."); }
-  gkSave(); gkRender();
+  gkSave(mutates); gkRender();
 });
 document.addEventListener("change",function(e){
   if(!e.target.dataset||!e.target.dataset.gktime) return;
   var c=gkState.compounds.filter(function(x){return x.id===e.target.dataset.gktime;})[0]; if(!c) return;
   /* BACKEND HOOK 4: stored only - real delivery needs push + server scheduling. */
-  c.reminder=e.target.value; c.remindOn=true; gkSave();
+  c.reminder=e.target.value; c.remindOn=true; gkSave(true);
 });
 
 /* ---- boot ---------------------------------------------------------------
@@ -4636,23 +4673,41 @@ function blNote(){
   }
   el.hidden=true;
 }
-var blStarted=false;
-function blStart(){
-  if(blStarted) return; blStarted=true;
+var blInited=false;
+function blInitOnce(){
+  if(blInited) return; blInited=true;
   try{ if(typeof nutInit==='function') nutInit(); }catch(e){}
+}
+/* Called exactly once, when the initial read has settled one way or the other.
+   Nothing before this point is treated as final and nothing before this point
+   may write. */
+function blReady(){
+  BL_READY=true;
+  blInitOnce();
   gkLastGood=JSON.stringify(gkState);
   try{ gkRender(); }catch(e){}
   blNote();
+  if(BL_PENDING && BL_DIRTY){ BL_PENDING=false; gkPush(); }
 }
 (function blBoot(){
-  if(!BL_KEY){ blStart(); return; }
-  var settled=false;
-  var timer=setTimeout(function(){ if(!settled){ settled=true; blStart(); } }, 2500);
-  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY})
+  if(!BL_KEY){ blReady(); return; }      /* local-only: nothing to read, nothing to push */
+
+  /* A provisional paint so a slow link does not stare at an empty tab. It is
+     explicitly NOT "ready": it does not run nutInit, does not enable writes,
+     and is replaced the moment the real state lands. The previous version
+     treated this as settled and then THREW AWAY the server's response, which
+     is what let page defaults overwrite a saved schedule. */
+  var paint=setTimeout(function(){ if(!BL_READY){ try{ gkRender(); }catch(e){} } }, 2000);
+
+  var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
+  var hard = setTimeout(function(){ if(ctl){ try{ ctl.abort(); }catch(e){} } }, 12000);
+
+  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}, ctl && ctl.signal)
     .then(function(r){
-      if(settled) return; settled=true; clearTimeout(timer);
+      clearTimeout(paint); clearTimeout(hard);
       if(r.ok){
         BL_ONLINE=true;
+        BL_SEEN=true;                    /* we have read the server: writing is now safe */
         if(r.data){
           gkHydrate(r.data.schedule);
           if(r.data.nutrition){ try{
@@ -4661,11 +4716,15 @@ function blStart(){
           }catch(e){} }
         }
       } else if(r.status===401){
-        BL_KEYBAD=true; blForgetKey();
+        BL_KEYBAD=true; blForgetKey(); BL_SEEN=true;
       }
-      blStart();
+      blReady();
     })
-    .catch(function(){ if(settled) return; settled=true; clearTimeout(timer); blStart(); });
+    .catch(function(){
+      clearTimeout(paint); clearTimeout(hard);
+      BL_SEEN=false;                     /* read failed: stay local until one succeeds */
+      blReady();
+    });
 })();
 
 </script>
