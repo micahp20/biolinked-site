@@ -1763,28 +1763,34 @@ function cycRows(){
   return ALL.filter(function(c){return cycHas(c,cycSel) && !cmpArch(c)});
 }
 var CYCABOUT={"Cycle 1 · Fat Loss": {"t": "Bodyfat, without giving up the muscle underneath it.", "s": "Retatrutide does the appetite and mobilisation work; 5-Amino-1MQ blocks NNMT to restore NAD+ inside fat and muscle so the fatty acids it frees actually get burned instead of recirculating. One releases, the other oxidises.", "w": "Both AM, fasted — GLP-1 nausea is lowest on an empty stomach and the appetite effect then carries the whole day. Retatrutide splits Mon and Thu to keep levels flat rather than peaking once. 5-Amino runs M/W/F because its effect builds over weeks and does not need daily dosing."}, "Cycle 2 · Cognitive Enhancement": {"t": "Focus and mental clarity, without the edge that usually comes with it.", "s": "Semax raises BDNF and drives the attention side; Selank is anxiolytic without sedation. Run together, one lifts output and the other keeps it from tipping into agitation — which is why neither is given alone here.", "w": "AM for both: they are alerting, and an evening dose costs you sleep. M/W/F rather than daily keeps receptor sensitivity from blunting, so week eight works as well as week one."}, "Cycle 3 · Longevity & Anti-Aging": {"t": "Cellular repair — energy, nightly rhythm, and connective tissue.", "s": "NAD+ restores the substrate your mitochondria actually run on. Epitalon rebuilds the melatonin rhythm so the repair window opens properly. GHK-Cu supplies the collagen signal. Energy, the time to use it, and the material to rebuild with.", "w": "NAD+ in the AM — it is stimulating, and a PM dose will cost you the sleep the rest of this cycle is trying to buy. Epitalon and GHK-Cu in the PM, because repair is nocturnal. Epitalon runs as a defined 20-day course rather than continuously, which is how the research uses it."}, "Cycle 4 · Muscle Building": {"t": "Lean tissue — run once you are lean enough for it to show.", "s": "CJC-1295 lifts the growth-hormone baseline, Ipamorelin adds a clean pulse on top without touching cortisol or hunger, and IGF-1 LR3 is the downstream mediator that does the actual anabolic work. Signal, pulse, effect.", "w": "CJC/Ipamorelin pre-bed on an empty stomach: insulin blunts the GH pulse, and your own largest pulse comes in early deep sleep — so you are amplifying it rather than fighting it. IGF-1 about thirty minutes after training, when muscle is primed to take up."}, "Cycle 5 · Sleep, Stress & Hormonal Balance": {"t": "Sleep depth, stress resilience, and the hormonal axis.", "s": "DSIP targets how deep you sleep rather than how fast you fall asleep; Pinealon supports the architecture around it. Kisspeptin-10 sits upstream and prompts your own LH and FSH rather than replacing anything — the conservative first move.", "w": "DSIP and Pinealon one to three hours before bed. Kisspeptin in the AM, because the axis follows a morning rhythm and a morning dose is what reads cleanly if you pull a panel."}};
-/* The explainer lives on the Protocol tab but follows the cycle context the
-   Schedule tab already owns, so there is no second selector to keep in sync.
-   Collapsed on arrival; an open card stays open when the cycle changes. */
-function aboutTog(){var e=document.getElementById('cg-about'); if(e) e.classList.toggle('on');}
+/* Every cycle is listed on the Protocol tab, each its own collapsible card,
+   so the whole plan can be read from the homepage without going hunting.
+   This no longer tracks the Schedule tab's selector -- there is nothing to
+   follow when all five are on screen -- so a cycle switch over there leaves
+   whatever the reader has open here alone. */
 function renderAbout(){
   var host=document.getElementById('protoabout'); if(!host) return;
-  var key=(typeof cycSel!=='undefined'&&cycSel)?cycSel:(cycOn()?cycCurrent():null);
-  var a=(key&&typeof CYCABOUT!=='undefined')?CYCABOUT[key]:null;
-  if(!a){host.innerHTML=''; return;}
-  var prev=document.getElementById('cg-about');
-  var open=!!(prev&&prev.classList.contains('on'));
-  host.innerHTML='<div class="cgrp'+(open?' on':'')+'" id="cg-about">'+
-    '<div class="cgrp-hd" onclick="aboutTog()">'+
-      '<div><div class="cgrp-t">About this protocol</div>'+
-      '<div class="cgrp-m">'+key+'</div></div>'+
-      '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
-    '</div>'+
-    '<div class="cgrp-bd"><div class="abt">'+
-      '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
-      '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
-      '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
-    '</div></div></div>';
+  if(typeof CYCABOUT==='undefined'||!CYCABOUT||!cycOn()){ host.innerHTML=''; return; }
+  var h='';
+  for(var k=0;k<CYCS.length;k++){
+    var cy=CYCS[k], a=CYCABOUT[cy.n];
+    if(!a) continue;
+    var isNow=cy.n===cycCurrent();
+    var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
+    var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+    h+='<div class="cgrp'+(isNow?' on':'')+'" id="cg-ab'+k+'">'+
+       '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
+         '<div><div class="cgrp-t">'+cy.n+'</div>'+
+         (meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
+         '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
+       '</div>'+
+       '<div class="cgrp-bd"><div class="abt">'+
+         '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
+         '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
+         '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
+       '</div></div></div>';
+  }
+  host.innerHTML=h?('<div class="seclbl">About This Protocol</div>'+h):'';
 }
 function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
 /* A group re-renders whenever the cycle toggle moves, so remember which ones
@@ -1802,7 +1808,7 @@ function cgrpHTML(key,title,meta,rows,open,extra){
     '</div>'+
     '<div class="cgrp-bd">'+rows.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div></div>';
 }
-function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); renderAbout(); }
+function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); }
 function renderCyc(){
   var host=document.getElementById('cycbar');
   if(!host) return;
