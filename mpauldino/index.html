@@ -4357,9 +4357,13 @@ function hideA2(save){
   if(installed) return;
   var seen=false; try{ seen=localStorage.getItem(KP+'a2hs')==='1'; }catch(e){}
   if(seen) return;
-  /* iPadOS 13+ reports itself as a Mac, hence the touch-point check. */
-  var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent||'') ||
-            (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+  /* iPadOS 13+ reports itself as a Mac, hence the touch-point check. The
+     Android exclusion matters: a touch-emulating Chrome on a Mac host also
+     reports MacIntel with touch points, and would otherwise be told to use an
+     iOS Share sheet it does not have. */
+  var ua = navigator.userAgent||'';
+  var ios = /iPhone|iPad|iPod/i.test(ua) ||
+            (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1 && !/Android/i.test(ua));
   if(ios){ var l=document.getElementById('a2hsIos'); if(l) l.hidden=false; }
   var x=document.getElementById('a2hsX');
   if(x) x.addEventListener('click', function(){ hideA2(1); });
