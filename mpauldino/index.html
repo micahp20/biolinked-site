@@ -904,9 +904,8 @@
    or Notes. The ivory/champagne COLOURS are no longer confined here - the
    same seven values now sit on :root and tint the whole page, which is what
    closed the gray seam under the header. Edit them there, not here.
-   BACKEND HOOK: dose min/max is enforced here client-side only. A real
-   backend would validate the range server-side on write - the values below
-   are a convenience, not a control. ----------------------------------------- */
+   The dose and the days are fixed by the protocol and render read-only, so
+   there are no stepper or day-chip styles here to find. ------------------- */
 .gk{
   --ivory:#f6f3ee; --paper:#fffcf8; --gk-ink:#1c1915; --ink-soft:#5c564c;
   --gk-line:#e7e1d6; --gk-gold:#8d7344; --gold-deep:#6e5832; --gold-soft:#f3ead8;
@@ -2097,8 +2096,7 @@ function openInv(i){
    and back-solves the dose, typing a dose fills the bar.
 
    The one deliberate omission is "+ Add to My List" and the saved-compound
-   list: on the protocol page those persist through Supabase, and this app is
-   front-end only. Nothing a client uses to work out a draw is missing.
+   list. Nothing a client uses to work out a draw is missing.
    ------------------------------------------------------------------------ */
 (function(){
   /* The picker is your OWN compounds -- his active protocol, his gifts and
@@ -2373,8 +2371,7 @@ function openInv(i){
   var saved = [];
   function load(){ try{ saved = JSON.parse(localStorage.getItem(LSKEY)||'[]')||[]; }catch(_){ saved = []; } }
   function store(){ try{ localStorage.setItem(LSKEY, JSON.stringify(saved)); }catch(_){} }
-  /* localStorage only -- the protocol page also pushes this to Supabase, which
-     is deliberately not carried over here. */
+  /* localStorage only, per device. Nothing on this page talks to a server. */
   function persist(){ store(); renderList(); }
 
   function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g, function(c){
@@ -2487,9 +2484,8 @@ function openInv(i){
    Ported from the nutrition tool on mpauldino's protocol page: the same
    inputs, the same targets maths, the same 105-food / 75-dish library and
    plan generator, the same Save Plan / Save as My Targets / Regenerate.
-   Device-local only -- the protocol page also pushes this to Supabase and
-   that is deliberately not carried over. Storage keys are namespaced
-   dh-app-nut-plan / dh-app-nut-targets. */
+   Device-local only. Storage keys are namespaced per client slug, so two
+   people opening their pages in the same browser never share state. */
 /* ===================== NUTRITION TAB =====================================
    Macro calculator + meal-plan generator. Everything client-side, no APIs.
    Tunables live in NUT_CFG; the food library is NUT_FOODS.
@@ -3883,11 +3879,9 @@ function nutReflectState(){
     });
   });
 }
-/* nutInit is called once, from the boot continuation at the end of this
-   script, after member state has been pulled. It used to run here AND
-   there: every chip got two click handlers, so a tap added an exclusion
-   and the second handler immediately removed it -- the diet chips did
-   nothing at all. */
+/* nutInit is called once, at the end of this script. It used to run here AND
+   there: every chip got two click handlers, so a tap added an exclusion and
+   the second handler immediately removed it -- the diet chips did nothing. */
 
 /* ============================ BLOODWORK ============================= */
 /* ===================== MARKER DETAIL PANEL ==============================
@@ -4341,22 +4335,25 @@ if('serviceWorker' in navigator){
 
 CYCS=cycList(); cycSel=cycCurrent();
 renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
-/* nutInit now runs from blBoot(), once member state has been pulled. */
+/* nutInit runs once, from the end of this script. It used to run from a
+   DOMContentLoaded hook as well, which bound every diet chip twice and left
+   them doing nothing at all. */
 
 /* ====== GRONK SCHEDULE ENGINE (prototype - mpauldino only) =================
-   State is per-device localStorage, namespaced by slug so it can never
-   collide with another client's page on the same browser.
+   Entirely local. State is per-device localStorage, namespaced by slug so it
+   can never collide with another client's page on the same browser. There is
+   no account, no key and no network call: a cloud-synced version existed
+   briefly and was removed deliberately.
 
-   WHERE A REAL BACKEND HOOKS IN:
-   1. DOSE RANGE   - min/max is enforced below in the browser only. Server
-                     must re-validate on write; this is a convenience rail.
-   2. WEEK-8 ARCHIVE - archiveIfDue() runs on page open, so a client who does
-                     not open the page is not archived. Belongs in a cron /
-                     scheduled job against the real cycle start.
-   3. STATE        - localStorage is per-device and per-browser. Authenticated
-                     per-member state on the server replaces load()/save().
-   4. REMINDERS    - the time + switch are stored only. Real delivery needs
-                     push subscriptions and server-side scheduling.
+   The dose and the days are the protocol, not preferences. They are rendered
+   read-only and no handler here will change them -- the client's controls are
+   Archive / Add back and the reminder.
+
+   Two honest limits of being local-only, neither of which is a bug:
+   - State does not follow a client to a new phone, and clearing site data
+     resets them to the protocol defaults.
+   - The reminder time and switch are stored, not delivered. Real reminders
+     would need push subscriptions and something server-side to fire them.
    ========================================================================= */
 var GK_STORAGE = "biolinked-sched-mpauldino";
 var GK_DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -4405,7 +4402,8 @@ function gkWeek(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Date()
 function gkDaysInto(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Date(); n.setHours(0,0,0,0);
   return Math.max(0, Math.floor((n-st)/86400000)); }
 function gkCycleDone(){ return gkDaysInto() >= gkState.cycleWeeks*7; }
-/* BACKEND HOOK 2: this fires on page open only. A cron would do it properly. */
+/* Fires on page open, so a client who does not open the page is not swept.
+   Good enough while this is local-only; a scheduled job would do it properly. */
 function gkArchiveIfDue(){
   if(!gkCycleDone()) return;
   var moved=0;
@@ -4501,7 +4499,7 @@ document.addEventListener("click",function(e){
 document.addEventListener("change",function(e){
   if(!e.target.dataset||!e.target.dataset.gktime) return;
   var c=gkState.compounds.filter(function(x){return x.id===e.target.dataset.gktime;})[0]; if(!c) return;
-  /* BACKEND HOOK 4: stored only - real delivery needs push + server scheduling. */
+  /* Stored, not delivered -- see the note at the top of this engine. */
   c.reminder=e.target.value; c.remindOn=true; gkSave();
 });
 
