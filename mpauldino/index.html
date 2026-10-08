@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#f6f3ee" id="tc">
 <title>BioLinked</title>
 <meta name="description" content="Your BioLinked protocol, compound index, labs and invoices in one place.">
@@ -960,6 +961,9 @@
 .gk .viewbar{display:flex;gap:8px;margin:0 0 14px}
 .gk .viewbar button{border:1px solid var(--gk-line);background:transparent;border-radius:999px;padding:7px 12px;font-size:12px;color:var(--ink-soft);cursor:pointer}
 .gk .viewbar button.on{background:var(--gk-ink);color:#f6efe2;border-color:var(--gk-ink)}
+.gk .gk-note{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:14px;
+  padding:11px 13px;font-size:12.5px;line-height:1.45;color:var(--ink-soft);margin:0 0 14px}
+.gk .gk-note b{color:var(--gk-ink);font-weight:500}
 .gk-toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#1c1915;color:#f6efe2;border-radius:999px;padding:10px 14px;font-size:12.5px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:80;font-family:"Outfit",system-ui,sans-serif}
 .gk-toast.show{opacity:1}
 
@@ -1113,7 +1117,8 @@
         <li><b>Questions about your protocol?</b> Just reach out anytime.</li>
       </ul>
     </div></section>
-    <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p><section class="cycle" id="gkCycle"></section><div class="viewbar"><button id="gkTabSchedule" class="on">Schedule</button><button id="gkTabArchive">Archive</button></div><div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
+    <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p>
+<div class="gk-note" id="gkNote" hidden></div><section class="cycle" id="gkCycle"></section><div class="viewbar"><button id="gkTabSchedule" class="on">Schedule</button><button id="gkTabArchive">Archive</button></div><div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Your numbers, your targets, and a meal plan built from them</p>
       <div class="nut-wrap">
@@ -1566,6 +1571,66 @@ var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var sel=new Date().getDay();
 var KP='mp-app-';
+
+/* ====== MEMBER SYNC ======================================================
+   Server is the source of truth for everything the member can edit; the
+   localStorage copy is only an offline cache. Access is the per-member key
+   carried on the link -- there is no login.
+
+   The anon key below is public by design and grants nothing on its own: the
+   state tables live in a schema PostgREST does not expose, so they cannot be
+   addressed at all, and the only way in is the two SECURITY DEFINER functions,
+   which refuse to do anything without the member key. The dose range is
+   enforced in the database, not here -- the stepper rails are a convenience
+   and a crafted request cannot get past the server check.
+   ===================================================================== */
+var BL_SLUG='mpauldino';
+var BL_URL='https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/rpc/';
+var BL_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
+var BL_ONLINE=false, BL_KEYBAD=false;
+
+/* The key arrives as ?k=... once. It is copied to this device and wiped from
+   the address bar straight away, so it is not left sitting in history, in a
+   screenshot or in a shared screen. */
+var BL_KEY=(function(){
+  var k=null;
+  try{ var m=location.search.match(/[?&]k=([^&#]+)/); if(m) k=decodeURIComponent(m[1]); }catch(e){}
+  if(k){
+    try{ localStorage.setItem(KP+'mkey',k); }catch(e){}
+    try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}
+    return k;
+  }
+  try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
+})();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; }
+
+function blRpc(fn,body){
+  return fetch(BL_URL+fn,{
+    method:'POST',
+    headers:{'apikey':BL_ANON,'Authorization':'Bearer '+BL_ANON,'Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  }).then(function(r){
+    return r.text().then(function(t){
+      var j=null; try{ j=t?JSON.parse(t):null; }catch(e){}
+      return r.ok ? {ok:true,data:j} : {ok:false,status:r.status,err:j};
+    });
+  });
+}
+
+/* Turns the server's refusal into something a person can act on. The message
+   is deliberately specific for a range rejection -- that is the one a member
+   can actually do something about. */
+function blMessage(r){
+  var m=(r && r.err && r.err.message) || '';
+  if(r && r.status===401) return 'That link is no longer valid. Open your personal link again.';
+  var range=m.match(/dose_out_of_range: (\S+) = (\S+) \(allowed (\S+) to (\S+)\)/);
+  if(range) return 'That dose is outside the allowed range ('+range[3]+'\u2013'+range[4]+'). Not saved.';
+  if(/unknown_compound/.test(m)) return 'That is not a compound on your protocol. Not saved.';
+  if(/bad_day_index|days_must_be/.test(m)) return 'Those days could not be saved.';
+  if(/payload_too_large/.test(m)) return 'That is too large to save.';
+  return 'Could not save that change.';
+}
+
 
 /* ---------- THEME ---------- */
 var TCOL={light:'#f6f3ee',dark:'#1c1915'};
@@ -2355,7 +2420,7 @@ function openInv(i){
      Same flow as the protocol page: pick or type a compound, tap Add to
      put it in My Compounds, search filters that list, the pencil loads one
      back into the calculator and the cross removes it. Device-local. */
-  var LSKEY = 'dh-app-calc-list-v1';
+  var LSKEY = KP+'calc-list-v1';
   var saved = [];
   function load(){ try{ saved = JSON.parse(localStorage.getItem(LSKEY)||'[]')||[]; }catch(_){ saved = []; } }
   function store(){ try{ localStorage.setItem(LSKEY, JSON.stringify(saved)); }catch(_){} }
@@ -2973,10 +3038,44 @@ function inToCm(i){ return i*2.54; }
 function gToOz(g){ return g/28.3495; }
 /* One app, one set of keys -- namespaced to this app rather than derived
      from the URL slug, since nothing here is shared with another page. */
-function nKey(k){ return 'dh-app-'+k; }
+function nKey(k){ return KP+k; }
+/* Was hard-coded 'dh-app-' -- Drew Holm's prefix -- on Micah's page, so his
+   nutrition state shared a namespace with another client's on any browser that
+   had opened both. One-time copy of anything already saved under the old
+   prefix, then it is never read again. */
+(function(){ try{
+  ['nut-plan','nut-targets','calc-list-v1'].forEach(function(k){
+    if(localStorage.getItem(KP+k)===null){
+      var old=localStorage.getItem('dh-app-'+k);
+      if(old!==null) localStorage.setItem(KP+k, old);
+    }
+  });
+}catch(e){} })();
 function nStore(k,v){ try{ localStorage.setItem(nKey(k),JSON.stringify(v)); return true; }catch(e){ return false; } }
 function nLoad(k){ try{ var r=localStorage.getItem(nKey(k)); return r?JSON.parse(r):null; }catch(e){ return null; } }
 function nDrop(k){ try{ localStorage.removeItem(nKey(k)); }catch(e){} }
+
+/* Nutrition rides the same channel. nStore stays the single local write point;
+   wrapping it means every existing caller syncs without being touched. */
+var blNutT=null;
+function blNutPayload(){
+  return { targets:nLoad(NUT_CFG.STORE_TARGETS), plan:nLoad(NUT_CFG.STORE_PLAN) };
+}
+(function(){
+  var local=nStore;
+  nStore=function(k,v){
+    var ok=local(k,v);
+    if(BL_KEY && !BL_KEYBAD){
+      clearTimeout(blNutT);
+      blNutT=setTimeout(function(){
+        blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'nutrition',p_payload:blNutPayload()})
+          .then(function(r){ if(!r.ok && typeof gkToast==='function') gkToast(blMessage(r)); })
+          .catch(function(){});
+      },500);
+    }
+    return ok;
+  };
+})();
 
 /* deterministic PRNG so a given seed always yields the same plan */
 function nutRng(seed){ var s=seed>>>0||1; return function(){ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
@@ -3856,8 +3955,11 @@ function nutReflectState(){
     });
   });
 }
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',nutInit);
-else nutInit();
+/* nutInit is called once, from the boot continuation at the end of this
+   script, after member state has been pulled. It used to run here AND
+   there: every chip got two click handlers, so a tap added an exclusion
+   and the second handler immediately removed it -- the diet chips did
+   nothing at all. */
 
 /* ============================ BLOODWORK ============================= */
 /* ===================== MARKER DETAIL PANEL ==============================
@@ -4288,7 +4390,7 @@ if('serviceWorker' in navigator){
 
 CYCS=cycList(); cycSel=cycCurrent();
 renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
-if(typeof nutInit==='function') nutInit();
+/* nutInit now runs from blBoot(), once member state has been pulled. */
 
 /* ====== GRONK SCHEDULE ENGINE (prototype - mpauldino only) =================
    State is per-device localStorage, namespaced by slug so it can never
@@ -4342,7 +4444,66 @@ var gkSeed = {
   ]
 };
 function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }catch(e){ return JSON.parse(JSON.stringify(gkSeed)); } }
-function gkSave(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gkState)); }catch(e){} }
+/* Local write is the offline cache and happens immediately so the UI never
+   waits. The server write is debounced and authoritative: if it refuses, we
+   roll the page back to the last state the server accepted rather than leaving
+   the screen showing an edit that was never stored. */
+var gkPushT=null, gkLastGood=null;
+function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gkState)); }catch(e){} }
+function gkSave(){
+  gkCacheLocal();
+  if(!BL_KEY || BL_KEYBAD) return;
+  clearTimeout(gkPushT);
+  gkPushT=setTimeout(gkPush, 350);
+}
+function gkPayload(){
+  return {
+    compounds: gkState.compounds.map(function(c){
+      return { id:c.id, dose:c.dose, days:c.days,
+               reminder:c.reminder, remindOn:!!c.remindOn,
+               active:!!c.active, archivedOn:c.archivedOn||null };
+    }),
+    selected: gkState.selected,
+    view: gkState.view
+  };
+}
+function gkPush(){
+  var attempt=JSON.stringify(gkState);
+  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',p_payload:gkPayload()})
+    .then(function(r){
+      if(r.ok){ BL_ONLINE=true; gkLastGood=attempt; return; }
+      if(r.status===401){ BL_KEYBAD=true; blForgetKey(); }
+      gkToast(blMessage(r));
+      gkRollback();
+    })
+    .catch(function(){ BL_ONLINE=false; });   /* offline: cache holds, retry on next edit */
+}
+function gkRollback(){
+  if(!gkLastGood) return;
+  try{ gkState=JSON.parse(gkLastGood); }catch(e){ return; }
+  gkCacheLocal();
+  gkRender();
+}
+/* Server state is an overlay on the page's own compound list, not a
+   replacement for it: names, units and the stepper rails always come from the
+   page, so editing the protocol here never gets erased by an older saved row,
+   and a compound the member no longer has simply does not match. */
+function gkHydrate(p){
+  if(!p || !p.compounds) return;
+  var byId={};
+  p.compounds.forEach(function(x){ if(x && x.id) byId[x.id]=x; });
+  gkState.compounds.forEach(function(c){
+    var v=byId[c.id]; if(!v) return;
+    if(typeof v.dose==='number')     c.dose=v.dose;
+    if(Array.isArray(v.days) && v.days.length) c.days=v.days.slice();
+    if(typeof v.reminder==='string') c.reminder=v.reminder;
+    if(typeof v.remindOn==='boolean')c.remindOn=v.remindOn;
+    if(typeof v.active==='boolean')  c.active=v.active;
+    c.archivedOn = v.archivedOn || null;
+  });
+  if(typeof p.selected==='number') gkState.selected=p.selected;
+  if(p.view) gkState.view=p.view;
+}
 var gkState = gkLoad();
 gkState.view = gkState.view || "schedule";
 function gkWeek(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Date(); n.setHours(0,0,0,0);
@@ -4455,6 +4616,55 @@ document.addEventListener("change",function(e){
   /* BACKEND HOOK 4: stored only - real delivery needs push + server scheduling. */
   c.reminder=e.target.value; c.remindOn=true; gkSave();
 });
-gkRender();
+
+/* ---- boot ---------------------------------------------------------------
+   Pull member state first, THEN initialise, so nutInit reads the server's copy
+   rather than this device's stale one and never has to be run twice. If the
+   network is slow or absent we start anyway on the cached copy -- an offline
+   member still gets a working page, they just do not get the other device's
+   edits until they reconnect. */
+function blNote(){
+  var el=document.getElementById('gkNote'); if(!el) return;
+  if(BL_KEYBAD){
+    el.innerHTML='<b>This link is no longer valid.</b> Open your personal link again to pick your schedule back up. Changes made here stay on this device.';
+    el.hidden=false; return;
+  }
+  if(!BL_KEY){
+    el.innerHTML='<b>Changes save on this device only.</b> Open your personal link to keep your schedule in step across your phone and laptop.';
+    el.hidden=false; return;
+  }
+  el.hidden=true;
+}
+var blStarted=false;
+function blStart(){
+  if(blStarted) return; blStarted=true;
+  try{ if(typeof nutInit==='function') nutInit(); }catch(e){}
+  gkLastGood=JSON.stringify(gkState);
+  try{ gkRender(); }catch(e){}
+  blNote();
+}
+(function blBoot(){
+  if(!BL_KEY){ blStart(); return; }
+  var settled=false;
+  var timer=setTimeout(function(){ if(!settled){ settled=true; blStart(); } }, 2500);
+  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY})
+    .then(function(r){
+      if(settled) return; settled=true; clearTimeout(timer);
+      if(r.ok){
+        BL_ONLINE=true;
+        if(r.data){
+          gkHydrate(r.data.schedule);
+          if(r.data.nutrition){ try{
+            if(r.data.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(r.data.nutrition.targets));
+            if(r.data.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(r.data.nutrition.plan));
+          }catch(e){} }
+        }
+      } else if(r.status===401){
+        BL_KEYBAD=true; blForgetKey();
+      }
+      blStart();
+    })
+    .catch(function(){ if(settled) return; settled=true; clearTimeout(timer); blStart(); });
+})();
 
 </script>
