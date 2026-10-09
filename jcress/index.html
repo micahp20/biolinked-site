@@ -199,12 +199,12 @@
   .days{display:flex;gap:6px;margin:2px -16px 14px;padding:0 16px;overflow-x:auto}
   .days::-webkit-scrollbar{height:0}
   .day{flex:1 0 auto;min-width:44px;background:var(--card);border:1px solid var(--line);border-radius:13px;
-    padding:9px 0 8px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
-  .day .dw{font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}
-  .day .dn{font-family:var(--serif);font-size:17px;color:var(--ink);margin-top:2px;line-height:1}
+    padding:13px 0 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
+  .day .dw{font-family:var(--serif);font-size:15px;font-weight:400;letter-spacing:.2px;
+    text-transform:none;color:var(--ink);line-height:1}
   .day.on{background:var(--gold);border-color:var(--gold)}
-  .day.on .dw,.day.on .dn{color:var(--on-gold)}
-  .day.today:not(.on) .dn{color:var(--gold)}
+  .day.on .dw{color:var(--on-gold)}
+  .day.today:not(.on) .dw{color:var(--gold)}
 
   /* Dose rows are READ-ONLY -- no check-off control, no stored state. */
   .dgrp{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
@@ -1655,12 +1655,14 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
-  var now=new Date(), start=new Date(now); start.setDate(now.getDate()-now.getDay());
+  /* Days only, no calendar dates: a client rarely starts on the date shown,
+     so a real date reads as a promise the schedule is not making. What matters
+     is which weekdays carry a draw. "Today" is still marked, by weekday. */
+  var now=new Date();
   var h='';
   for(var i=0;i<7;i++){
-    var d=new Date(start); d.setDate(start.getDate()+i);
     h+='<div class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+'" onclick="pickDay('+i+')">'+
-       '<div class="dw">'+DW[i]+'</div><div class="dn">'+d.getDate()+'</div></div>';
+       '<div class="dw">'+DW[i]+'</div></div>';
   }
   document.getElementById('daystrip').innerHTML=h;
 }
@@ -1903,14 +1905,14 @@ function renderAll(){
     var was=cgOpenSet(), first=!document.querySelector('#cmplist .cgrp');
     function inCyc(x,n){return !cycIsBase(x.c)&&!cmpArch(x.c)&&cycNames(x.c).indexOf(n)>=0;}
     function openFor(id,def){ return first?def:!!was[id]; }
-    if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',true),'');
+    if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',false),'');
     for(var k=0;k<CYCS.length;k++){
       var cy=CYCS[k];
       var rows=idx.filter(function(x){return inCyc(x,cy.n)});
       var isNow=cy.n===cycCurrent();
       var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
       var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
-      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,isNow),'');
+      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,false),'');
     }
     if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
     var cur=idx.filter(function(x){return inCyc(x,cycCurrent())});
