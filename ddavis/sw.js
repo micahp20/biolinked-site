@@ -1,5 +1,5 @@
 // BioLinked protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'ddavis-v43';
+const CACHE = 'ddavis-v44';
 const ASSETS = [
   '/ddavis/',
   '/ddavis/index.html',

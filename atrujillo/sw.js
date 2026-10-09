@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /atrujillo/, which is now the real page: the app layout
 // was promoted here from the /atrujillo/app/ pilot.
-const CACHE = 'atrujillo-v3';
+const CACHE = 'atrujillo-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/atrujillo/',
