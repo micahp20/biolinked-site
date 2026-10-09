@@ -907,6 +907,37 @@
   .xp{padding:0 16px;margin:0 0 6px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
   .xp:empty{display:none}
   #x-edu[hidden]{display:none}
+
+  /* About card + cycle-grouped list, same rules as the reference page. */
+.cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+.cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+.cgrp-m{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+.cgrp-n{font-size:11px;font-weight:800;color:var(--gold)}
+.cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+.cgrp.on .cgrp-cv{transform:rotate(90deg)}
+.cgrp-bd{display:none;border-top:1px solid var(--line2)}
+.cgrp.on .cgrp-bd{display:block}
+.cgrp-bd .cx:last-child{border-bottom:none}
+.cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+.cgrp.pastgrp .cgrp-bd{opacity:.72}
+.abt{padding:11px 13px 13px}
+.abt-l{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+.abt-l+.abt-p{margin-bottom:11px}
+.abt-p{font-size:12.5px;line-height:1.55;color:var(--ink2)}
+.abt-p:last-child{margin-bottom:0}
+.stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+.stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.stk-a:last-child{border-bottom:none}
+.stk-a:active{background:var(--gold-soft)}
+.stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
 </style>
 <script src="/compound-library.js?v=2"></script>
 </head>
@@ -993,6 +1024,7 @@
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
       </div>
+      <div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
@@ -1799,6 +1831,104 @@ function cycRows(){
   return ALL.filter(function(c){return cycHas(c,cycSel) && !cmpArch(c)});
 }
 function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); }
+var CYCABOUT={"Cycle 1": {"t": "Metabolic support with repair alongside it.", "s": "5-Amino-1MQ blocked NNMT so NAD+ was not spent needlessly. KLOW carried the repair half — GHK-Cu, BPC-157, TB-500 and KPV in one vial rather than four draws.", "w": "Both on weekday mornings."}, "Energy + GH Axis": {"t": "Energy, the growth-hormone axis, and fat loss running through both.", "s": "NAD+ and MOTS-c work the cellular energy side — one supplies the cofactor, the other signals through AMPK. CJC-1295 with Ipamorelin prompts your own GH pulse, which protects lean mass while Retatrutide and AOD-9604 handle appetite and lipolysis from two different directions. Semax is there for the days focus needs help, used as needed rather than scheduled.", "w": "The morning block carries Retatrutide on Mon and Thu, MOTS-c and AOD-9604 on weekdays, NAD+ M/W/F, and Semax when wanted. CJC/Ipamorelin runs on weeknights, away from food."}, "Cycle 2": {"t": "Cellular ageing, if you decide to run it.", "s": "Epitalon rebuilds your own nightly rhythm and Pinealon supports the neural architecture around it. FOXO4-DRI is the direct one — a senolytic that clears senescent cells rather than supporting them.", "w": "Epitalon at night, Pinealon and FOXO4-DRI in the morning. Quoted rather than ordered — nothing here is running yet."}, "Cycle 3": {"t": "Libido and the hormonal signalling behind it.", "s": "Kisspeptin-10 sits upstream and prompts your own LH and FSH rather than replacing anything. PT-141 works centrally on desire. Oxytocin covers how the experience lands rather than whether it starts.", "w": "Kisspeptin Mon and Thu in the evening; PT-141 and Oxytocin as needed. Quoted rather than ordered."}, "Cycle 4": {"t": "Sleep depth, on demand.", "s": "DSIP targets how deep you sleep rather than how fast you fall asleep. A single compound — there is nothing here that needs a partner.", "w": "Evening, as needed, one to three hours before bed. Quoted rather than ordered."}};
+/* ----------------------------------------------------------------------
+   About this protocol, and the cycle-grouped compound list.
+
+   Both read off ALL at render time rather than a second hand-kept list, so
+   neither can drift from the schedule. Doses, recon and days stay in the
+   Schedule tab; these cards are the why, not the how much.
+   ---------------------------------------------------------------------- */
+var STK_IX_ALIAS={
+  "N-Acetyl Semax Amidate":"Semax or NA Semax Amidate",
+  "N-Acetyl Selank Amidate":"Selank or NA Selank Amidate",
+  "N-Acetyl Adamax Amidate":"Adamax",
+  "Semax":"Semax or NA Semax Amidate",
+  "Selank":"Selank or NA Selank Amidate",
+  "MOTS-c":"MOTS-C",
+  "Kisspeptin-10":"Kisspeptin",
+  "PT-141 (Bremelanotide)":"PT-141",
+  "HGH":"Somatropin (HGH)",
+  "HGH (Somatropin)":"Somatropin (HGH)",
+  "KLOW Blend":"KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)",
+  "BPC-157 / TB-500":"BPC-157 / TB-500 5mg/5mg Blend",
+  "CJC-1295 / Ipamorelin":"Ipamorelin / CJC-1295 No DAC",
+  /* Two spellings of the same peptide are in use across the protocols, and
+     one page carries a zero for the letter O. Both point at the real entry
+     rather than dropping the reader on the full list. */
+  "Epithalon":"Epitalon",
+  "FOX04-DRI":"FOXO4-DRI"
+};
+/* Jump straight to the compound's Index entry where the catalog has one.
+   Anything unmatched - a blend with no single entry, or testosterone, which
+   the catalog does not carry - opens the Index list rather than failing
+   silently. */
+function stkIxFind(name){
+  if(typeof IX==='undefined'||!IX) return -1;
+  var want=((typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS[name])||name).toLowerCase();
+  for(var i=0;i<IX.length;i++){ if(String(IX[i].name).toLowerCase()===want) return i; }
+  return -1;
+}
+function stkIx(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var i=stkIxFind(name);
+  if(i>=0){ sheet('indexlist'); openIx(i); }
+  else { sheet('indexlist'); }
+}
+function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
+/* A group re-renders whenever the cycle toggle moves, so remember which ones
+   the reader had open and put them back. */
+function cgOpenSet(){
+  var o={}; var n=document.querySelectorAll('#cmplist .cgrp.on');
+  for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
+}
+function cgrpHTML(key,title,meta,rows,open,extra){
+  if(!rows.length) return '';
+  return '<div class="cgrp'+(open?' on':'')+(extra?' '+extra:'')+'" id="cg-'+key+'">'+
+    '<div class="cgrp-hd" onclick="cgTog(\''+key+'\')">'+
+      '<div><div class="cgrp-t">'+title+'</div>'+(meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
+      '<div class="cgrp-r"><span class="cgrp-n">'+rows.length+'</span><span class="cgrp-cv">\u203a</span></div>'+
+    '</div>'+
+    '<div class="cgrp-bd">'+rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</div></div>';
+}
+function renderAbout(){
+  var host=document.getElementById('protoabout'); if(!host) return;
+  if(typeof CYCABOUT==='undefined'||!CYCABOUT||!cycOn()){ host.innerHTML=''; return; }
+  var h='';
+  for(var k=0;k<CYCS.length;k++){
+    var cy=CYCS[k], a=CYCABOUT[cy.n];
+    /* A cycle with no copy - a closing block that holds no compounds, say -
+       simply gets no card rather than an empty one. */
+    if(!a) continue;
+    var isNow=cy.n===cycCurrent();
+    var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
+    var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+    var mine=[];
+    for(var j=0;j<ALL.length;j++){ if(cycNames(ALL[j]).indexOf(cy.n)>=0) mine.push({c:ALL[j],i:j}); }
+    var stack='';
+    if(mine.length){
+      stack='<div class="abt-l">The stack</div><div class="stk">'+mine.map(function(x){
+        var nm=String(x.c.n).split(' \u00b7 ')[0];
+        return '<button type="button" class="stk-a" onclick="stkIx(\''+nm.replace(/'/g,"\\'")+'\',event)">'+
+          nm+'<span class="stk-cv">\u203a</span></button>';
+      }).join('')+'</div>';
+    }
+    h+='<div class="cgrp" id="cg-ab'+k+'">'+
+       '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
+         '<div><div class="cgrp-t">'+cy.n+'</div>'+
+         (meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
+         '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
+       '</div>'+
+       '<div class="cgrp-bd"><div class="abt">'+
+         stack+
+         '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
+         '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
+         '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
+       '</div></div></div>';
+  }
+  host.innerHTML=h?('<div class="seclbl">About This Protocol</div>'+h):'';
+}
+
 function renderCyc(){
   var host=document.getElementById('cycbar');
   if(!host) return;
@@ -1826,36 +1956,41 @@ function renderAll(){
   var past=idx.filter(function(x){return cmpArch(x.c)});
   var h='', live;
   if(cycOn()){
-    /* The foundation never pauses, so it is shown as its own group above
-       whichever cycle is being viewed rather than mixed in with it. */
+    /* Every cycle is listed, not just the selected one, so the whole plan
+       reads top to bottom in one pass. Each cycle is its own collapsible
+       group with the current one open and the rest shut, so five cycles do
+       not turn into a mile of scroll. Membership is tested against the
+       compound's OWN cycle names rather than cycHas(), because cycHas() is
+       true for a foundation compound in every cycle and that would emit the
+       same DOM id several times over. */
     var found=idx.filter(function(x){return cycIsBase(x.c)&&!cmpArch(x.c)});
-    var cyc=idx.filter(function(x){return !cycIsBase(x.c)&&cycHas(x.c,cycSel)&&!cmpArch(x.c)});
     var declared=false;
     for(var q=0;q<ALL.length;q++){ if(ALL[q].found) declared=true; }
-    live=idx.filter(function(x){return schOn(x.c)});
-    var sel=null;
-    for(var i=0;i<CYCS.length;i++){ if(CYCS[i].n===cycSel) sel=CYCS[i]; }
-    var isNow=cycSel===cycCurrent();
     var baseLbl=(typeof CYCBASE!=='undefined'&&CYCBASE)?CYCBASE
         :(declared?'Foundation \u00b7 every week, all year'
                   :'Ongoing \u00b7 runs through every cycle');
-    if(found.length) h+='<div class="cxsub found">'+baseLbl+'</div>'+
-      '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,'f'+x.i)}).join('')+'</div>';
-    h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
-       (sel&&sel.wk?' \u00b7 '+sel.wk:'')+
-       (isNow?'':(sel&&sel.arch?' \u00b7 already run':' \u00b7 not running yet'))+'</div>';
-    h+=cyc.length
-      ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,'c'+x.i)}).join('')+'</div>'
-      : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
-        '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
+    var was=cgOpenSet(), first=!document.querySelector('#cmplist .cgrp');
+    function inCyc(x,n){return !cycIsBase(x.c)&&!cmpArch(x.c)&&cycNames(x.c).indexOf(n)>=0;}
+    function openFor(id,def){ return first?def:!!was[id]; }
+    if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',false),'');
+    for(var k=0;k<CYCS.length;k++){
+      var cy=CYCS[k];
+      var rows=idx.filter(function(x){return inCyc(x,cy.n)});
+      var isNow=cy.n===cycCurrent();
+      var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
+      var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,false),'');
+    }
+    if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
+    /* The count is what the client has switched on, not what the current
+       cycle happens to hold -- those diverge the moment anything is curated. */
+    live=idx.filter(function(x){return schOn(x.c)});
   } else {
     /* One list, A-Z. A compound that is finished stays in place with a quiet
        "Past" tag rather than being moved into a section of its own. */
-    live=idx.filter(function(x){return schOn(x.c)});
-    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,'a'+x.i)}).join('')+'</div>';
+    live=idx.filter(function(x){return !cmpArch(x.c)});
+    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
-  if(cycOn()&&past.length) h+='<div class="cxsub">Past \u00b7 no longer running</div>'+
-    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,'p'+x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;
   document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
@@ -4196,7 +4331,7 @@ if('serviceWorker' in navigator){
 }
 
 CYCS=cycList(); cycSel=cycCurrent();
-renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
+renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
 /* The views are written into the scroller after it exists, so read its layout
    back on the next frame and let iOS measure the extent against the content
    that is actually there. */
