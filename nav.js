@@ -46,7 +46,7 @@
   const navCSS = `<style>
 .bl-nav{background:var(--surface,#fff);border-bottom:1px solid var(--border,#eaeaea);position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
 .bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
-.bl-nav-logo{text-decoration:none;display:flex;flex-direction:column;line-height:1}
+.bl-nav-logo{color:var(--text,#1a1a1a);text-decoration:none;display:flex;flex-direction:column;line-height:1}
 .bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text,#1a1a1a);letter-spacing:0.1em}
 .bl-nav-logo-sub{font-size:9px;color:var(--gold,#7A6530);letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
 .bl-nav-links{display:flex;align-items:center;gap:2px}
