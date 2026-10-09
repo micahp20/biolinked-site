@@ -804,7 +804,14 @@
        growing to fit its content. Without it the column overflows the shell. */
     .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
       display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
-      padding:0 0 26px}
+      /* The bottom tab bar is collapsed to height 0 on a phone, and it was the
+         thing that used to clear the home indicator -- it still carries
+         env(safe-area-inset-bottom) in its own padding. With it gone, nothing
+         reserved that space and 26px is less than the ~34px inset, so the last
+         line of the final card sat under the indicator with no scroll left to
+         reach it. .sheet and .tabs both add the inset; .scroll was the one that
+         did not. Zero effect where the inset is 0. */
+      padding:0 0 calc(26px + env(safe-area-inset-bottom))}
     .view.on{flex:none}
     /* last flex child -> always on the true visual bottom edge */
     .tabs{position:static;flex:0 0 auto;height:auto;

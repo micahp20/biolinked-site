@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jcress/.
-const CACHE = 'jcress-v8';
+const CACHE = 'jcress-v9';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/jcress/',
