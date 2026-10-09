@@ -1019,6 +1019,38 @@
 :root[data-theme="dark"] .gk .viewbar button{border-color:#3c3f3e}
 :root[data-theme="dark"] .gk-toast{background:#25262a;color:#ffffff;border:1px solid #3c3b36}
 :root[data-theme="dark"] .cyc.on{background:var(--cu-gold);border-color:var(--cu-gold-lt);color:#0b0b0c}
+
+  /* About-this-protocol card + stack list, same rules as the
+     multi-cycle pages so this page reads identically. */
+.cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+.cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+.cgrp-m{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+.cgrp-n{font-size:11px;font-weight:800;color:var(--gold)}
+.cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+.cgrp.on .cgrp-cv{transform:rotate(90deg)}
+.cgrp-bd{display:none;border-top:1px solid var(--line2)}
+.cgrp.on .cgrp-bd{display:block}
+.cgrp-bd .cx:last-child{border-bottom:none}
+.cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+.cgrp.pastgrp .cgrp-bd{opacity:.72}
+.abt{padding:11px 13px 13px}
+.abt-l{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+.abt-l+.abt-p{margin-bottom:11px}
+.abt-p{font-size:12.5px;line-height:1.55;color:var(--ink2)}
+.abt-p:last-child{margin-bottom:0}
+.stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+.stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.stk-a:last-child{border-bottom:none}
+.stk-a:active{background:var(--gold-soft)}
+.stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
 </style>
 <script src="/compound-library.js?v=2"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1122,6 +1154,7 @@
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
       </div>
+      <div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
@@ -4775,6 +4808,70 @@ function blReady(){
   blNote();
   if(BL_PENDING && BL_DIRTY){ BL_PENDING=false; gkPush(); }
 }
+
+/* ----------------------------------------------------------------------
+   About this protocol.
+
+   One card, not a per-cycle set: this page runs a year-round protocol and
+   has no cycles to split it into. The stack reads off gkSeed's ACTIVE
+   compounds, so it cannot drift from the schedule - archive something over
+   there and it leaves here too. Doses, recon and days stay in the Schedule
+   tab; this card is the why, not the how much.
+   ---------------------------------------------------------------------- */
+var STK_IX_ALIAS={"HGH":"Somatropin (HGH)"};
+/* The catalog has no testosterone entry, so TRT falls through to the index
+   list rather than failing silently - same fallback the other pages use. */
+function stkIxFind(name){
+  if(typeof IX==='undefined'||!IX) return -1;
+  var want=((typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS[name])||name).toLowerCase();
+  for(var i=0;i<IX.length;i++){ if(String(IX[i].name).toLowerCase()===want) return i; }
+  return -1;
+}
+function stkIx(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var i=stkIxFind(name);
+  if(i>=0){ sheet('indexlist'); openIx(i); }
+  else { sheet('indexlist'); }
+}
+function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
+var PROTOABOUT={
+  t:"A year-round foundation rather than a cycle \u2014 hormones held steady, body composition, and the recovery and sleep that let the training stick.",
+  s:"Testosterone and HCG run together so the replacement does not switch off your own production. HGH and Ipamorelin are two different levers on the same system \u2014 one supplies growth hormone directly, the other prompts your own pulse, which is why they sit in opposite blocks. Tirzepatide handles appetite and body composition alongside them. BPC-157 covers repair from both directions, oral for the gut lining and injectable systemically, with KPV calming the inflammation around it. Dihexa is the one cognitive lever in the stack.",
+  w:"Mornings carry testosterone, Tirzepatide, HGH fasted, and the oral compounds. Evenings carry HCG, Ipamorelin fasted, and the pre-bed group \u2014 DSIP, KPV and injectable BPC-157. HGH and Ipamorelin stay split across the two blocks so they are not competing for the same receptors."
+};
+function renderAbout(){
+  var host=document.getElementById('protoabout'); if(!host) return;
+  var seen={}, mine=[];
+  var src=(typeof gkSeed!=='undefined'&&gkSeed&&gkSeed.compounds)?gkSeed.compounds:[];
+  for(var j=0;j<src.length;j++){
+    if(!src[j].active) continue;
+    /* Both BPC-157 routes resolve to one catalog entry, so the stack lists
+       the compound once; the schedule is where the two routes show up. */
+    var nm=String(src[j].name).split(' \u00b7 ')[0];
+    if(seen[nm]) continue;
+    seen[nm]=1; mine.push(nm);
+  }
+  if(!mine.length){ host.innerHTML=''; return; }
+  var stack='<div class="abt-l">The stack</div><div class="stk">'+mine.map(function(nm){
+    return '<button type="button" class="stk-a" onclick="stkIx(\''+nm.replace(/'/g,"\\'")+'\',event)">'+
+      nm+'<span class="stk-cv">\u203a</span></button>';
+  }).join('')+'</div>';
+  host.innerHTML='<div class="seclbl">About This Protocol</div>'+
+    '<div class="cgrp" id="cg-ab0">'+
+      '<div class="cgrp-hd" onclick="cgTog(\'ab0\')">'+
+        '<div><div class="cgrp-t">Your protocol</div>'+
+        '<div class="cgrp-m">'+mine.length+' compounds \u00b7 year-round</div></div>'+
+        '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
+      '</div>'+
+      '<div class="cgrp-bd"><div class="abt">'+
+        stack+
+        '<div class="abt-l">What it targets</div><div class="abt-p">'+PROTOABOUT.t+'</div>'+
+        '<div class="abt-l">Why these together</div><div class="abt-p">'+PROTOABOUT.s+'</div>'+
+        '<div class="abt-l">Timing</div><div class="abt-p">'+PROTOABOUT.w+'</div>'+
+      '</div></div></div>';
+}
+try{ renderAbout(); }catch(e){}
+
 (function blBoot(){
   if(!BL_KEY){ blReady(); return; }      /* local-only: nothing to read, nothing to push */
 
