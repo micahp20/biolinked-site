@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /wsonmore/.
-const CACHE = 'wsonmore-v8';
+const CACHE = 'wsonmore-v9';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/wsonmore/',

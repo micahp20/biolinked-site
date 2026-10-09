@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'jboykin-v14';
+const CACHE = 'jboykin-v15';
 const ASSETS = [
   '/jboykin/',
   '/jboykin/index.html',

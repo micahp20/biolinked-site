@@ -161,7 +161,7 @@
 
   /* Scroll area fills the frame and simply pads past the bar, so content can
      always be scrolled clear of it and nothing ends up trapped underneath. */
-  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
     padding:calc(58px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 26px)}
   .scroll::-webkit-scrollbar{width:0}
   .pad{padding:0 16px}
@@ -207,12 +207,12 @@
   .days{display:flex;gap:6px;margin:2px -16px 14px;padding:0 16px;overflow-x:auto}
   .days::-webkit-scrollbar{height:0}
   .day{flex:1 0 auto;min-width:44px;background:var(--card);border:1px solid var(--line);border-radius:13px;
-    padding:9px 0 8px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
-  .day .dw{font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}
-  .day .dn{font-family:var(--serif);font-size:17px;color:var(--ink);margin-top:2px;line-height:1}
+    padding:13px 0 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
+  .day .dw{font-family:var(--serif);font-size:15px;font-weight:400;letter-spacing:.2px;
+    text-transform:none;color:var(--ink);line-height:1}
   .day.on{background:var(--gold);border-color:var(--gold)}
-  .day.on .dw,.day.on .dn{color:var(--on-gold)}
-  .day.today:not(.on) .dn{color:var(--gold)}
+  .day.on .dw{color:var(--on-gold)}
+  .day.today:not(.on) .dw{color:var(--gold)}
 
   /* Dose rows are READ-ONLY -- no check-off control, no stored state. */
   .dgrp{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
@@ -259,6 +259,16 @@
   .cx-ab{font-size:12.5px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
   .cx.hist .cx-n{color:var(--ink2)}
+  /* One-tap control deciding whether a compound reaches the day view. Its own
+     tap target inside the row header; the click never reaches the header, so
+     it cannot open the Recon/Draw detail by accident. */
+  .schbtn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;border-radius:999px;
+    padding:6px 11px;font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.5px;
+    text-transform:uppercase;cursor:pointer;touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    border:1px solid var(--line);background:var(--cream);color:var(--muted)}
+  .schbtn.on{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+  .schbtn:active{opacity:.75}
   /* cycle selector -- only drawn when a client has more than one cycle */
   .cycrow{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px}
   .cycrow::-webkit-scrollbar{height:0}
@@ -773,7 +783,7 @@
     /* min-height:0 is what lets a flex child actually scroll instead of
        growing to fit its content. Without it the column overflows the shell. */
     .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
-      display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+      display:block;overflow-y:auto;overflow-x:hidden;
       padding:0 0 26px}
     .view.on{flex:none}
     /* last flex child -> always on the true visual bottom edge */
@@ -1616,12 +1626,13 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
-  var now=new Date(), start=new Date(now); start.setDate(now.getDate()-now.getDay());
+  /* Days only, no calendar dates -- a client rarely starts on the date shown.
+     Today is still marked, by weekday. */
+  var now=new Date();
   var h='';
   for(var i=0;i<7;i++){
-    var d=new Date(start); d.setDate(start.getDate()+i);
     h+='<div class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+'" onclick="pickDay('+i+')">'+
-       '<div class="dw">'+DW[i]+'</div><div class="dn">'+d.getDate()+'</div></div>';
+       '<div class="dw">'+DW[i]+'</div></div>';
   }
   document.getElementById('daystrip').innerHTML=h;
 }
@@ -1630,7 +1641,8 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
    Morning block and again in the Night block. */
 function inBlock(c,g){return c.b===g||c.b==='BOTH';}
 function renderDoses(){
-  var rows=cycRows().filter(function(c){return due(c,sel)});
+  /* Only what the client has on their schedule, and only what is due today. */
+  var rows=schRows().filter(function(c){return due(c,sel)});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
@@ -1662,11 +1674,16 @@ function renderDoses(){
    Everything starts collapsed. No grouping and no sort toggle: one list. */
 function cmpArch(c){return !!(c.hist||/^\s*(archived|prior|past)\b/i.test(c.tag||''));}
 function cmpRow(c,i){
-  var arch=cmpArch(c);
-  var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
+  /* i is a scoped string key, not the bare ALL index: a compound can render
+     in more than one section and each copy needs its own id. */
+  var arch=cmpArch(c), on=schOn(c);
+  var sub=(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c;
+  var nm=String(c.n).replace(/'/g,"\\'");
+  var btn='<button type="button" class="schbtn'+(on?' on':'')+'" onclick="schTog(\''+nm+'\',event)">'+
+    (on?'\u2713 On schedule':'+ Add to schedule')+'</button>';
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
-    '<div class="cx-hd" onclick="cxTog('+i+')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
+    '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+'</div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
@@ -1679,7 +1696,35 @@ function cmpRow(c,i){
       '</div>'+
     '</div></div>';
 }
-function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
+function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
+/* ===== CLIENT-CURATED SCHEDULE ========================================
+   ALL is the prescribed protocol and never changes. On top of it sits a set
+   of which compounds belong on the day view, kept in localStorage under
+   this page's own key. Every read is guarded and falls back to the
+   prescribed default rather than breaking the page. */
+var SCHKEY='biolinked-sched-mamaholm';
+var schState=null;
+function schDefault(){ var o={}; for(var i=0;i<CMP.length;i++) o[CMP[i].n]=1; return o; }
+function schLoad(){
+  try{
+    var raw=localStorage.getItem(SCHKEY);
+    if(!raw) return schDefault();
+    var p=JSON.parse(raw);
+    if(!p||typeof p!=='object'||!p.on||typeof p.on!=='object') return schDefault();
+    var o={}; for(var i=0;i<ALL.length;i++){ if(p.on[ALL[i].n]) o[ALL[i].n]=1; }
+    return o;
+  }catch(e){ return schDefault(); }
+}
+function schGet(){ if(!schState) schState=schLoad(); return schState; }
+function schSave(){ try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schGet()})); }catch(e){} }
+function schOn(c){ return !!schGet()[c.n]; }
+function schRows(){ return ALL.filter(schOn); }
+function schTog(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var st=schGet();
+  if(st[name]) delete st[name]; else st[name]=1;
+  schSave(); renderDoses(); renderAll(); renderSubline();
+}
 /* ---------- CYCLES ----------
    Some clients run their protocol as a sequence of cycles rather than one
    standing schedule. Cycles are derived from the tag a compound already
@@ -1760,7 +1805,7 @@ function renderCyc(){
 }
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
-  var n=cycRows().length;
+  var n=schRows().length;
   e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks'+
     (cycOn()&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
 }
@@ -1776,7 +1821,7 @@ function renderAll(){
     var cyc=idx.filter(function(x){return !cycIsBase(x.c)&&cycHas(x.c,cycSel)&&!cmpArch(x.c)});
     var declared=false;
     for(var q=0;q<ALL.length;q++){ if(ALL[q].found) declared=true; }
-    live=found.concat(cyc);
+    live=idx.filter(function(x){return schOn(x.c)});
     var sel=null;
     for(var i=0;i<CYCS.length;i++){ if(CYCS[i].n===cycSel) sel=CYCS[i]; }
     var isNow=cycSel===cycCurrent();
@@ -1784,24 +1829,24 @@ function renderAll(){
         :(declared?'Foundation \u00b7 every week, all year'
                   :'Ongoing \u00b7 runs through every cycle');
     if(found.length) h+='<div class="cxsub found">'+baseLbl+'</div>'+
-      '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+      '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,'f'+x.i)}).join('')+'</div>';
     h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
        (sel&&sel.wk?' \u00b7 '+sel.wk:'')+
        (isNow?'':(sel&&sel.arch?' \u00b7 already run':' \u00b7 not running yet'))+'</div>';
     h+=cyc.length
-      ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>'
+      ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,'c'+x.i)}).join('')+'</div>'
       : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
         '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
   } else {
     /* One list, A-Z. A compound that is finished stays in place with a quiet
        "Past" tag rather than being moved into a section of its own. */
-    live=idx.filter(function(x){return !cmpArch(x.c)});
-    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+    live=idx.filter(function(x){return schOn(x.c)});
+    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,'a'+x.i)}).join('')+'</div>';
   }
   if(cycOn()&&past.length) h+='<div class="cxsub">Past \u00b7 no longer running</div>'+
-    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,'p'+x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;
-  document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+live.length+' ACTIVE';
+  document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
 var ixCat='all', ixQ='';
@@ -4141,5 +4186,16 @@ if('serviceWorker' in navigator){
 
 CYCS=cycList(); cycSel=cycCurrent();
 renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
+/* The views are written into the scroller after it exists, so read its layout
+   back on the next frame and let iOS measure the extent against the content
+   that is actually there. */
+function scrollRemeasure(){
+  var sc=document.getElementById('scroll'); if(!sc) return;
+  if(window.requestAnimationFrame) requestAnimationFrame(function(){ void sc.scrollHeight; });
+  else void sc.scrollHeight;
+}
+scrollRemeasure();
+window.addEventListener('load',scrollRemeasure);
+window.addEventListener('orientationchange',scrollRemeasure);
 if(typeof nutInit==='function') nutInit();
 </script>

@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /lcianciullo/, which is now the real page: the app layout
 // was promoted here from the /lcianciullo/app/ pilot.
-const CACHE = 'lcianciullo-v5';
+const CACHE = 'lcianciullo-v6';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/lcianciullo/',
