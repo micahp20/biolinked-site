@@ -273,6 +273,27 @@
   .abt-l+.abt-p{margin-bottom:11px}
   .abt-p{font-size:12.5px;line-height:1.55;color:var(--ink2)}
   .abt-p:last-child{margin-bottom:0}
+  /* "The stack" -- the compounds of whichever cycle card is open, each one
+     tappable for a plain-English line on what it does. Same chevron idiom as
+     .cx so there is nothing new to theme. The rows live inside .cgrp-bd and
+     the cycle card's own toggle sits on .cgrp-hd, a sibling, so opening a row
+     cannot fold the card; the handler stops propagation anyway. */
+  .stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+  .stk-r{border-bottom:1px solid var(--line2)}
+  .stk-r:last-child{border-bottom:none}
+  .stk-hd{display:flex;align-items:center;gap:10px;padding:9px 11px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .stk-n{font-family:var(--serif);font-size:13.5px;line-height:1.2;color:var(--ink)}
+  .stk-s{font-size:10.5px;color:var(--muted);margin-top:1px;line-height:1.35}
+  .stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1;transition:transform .2s}
+  .stk-r.on .stk-cv{transform:rotate(90deg)}
+  .stk-bd{display:none;padding:0 11px 11px}
+  .stk-r.on .stk-bd{display:block}
+  .stk-p{font-size:12px;line-height:1.55;color:var(--ink2)}
+  .stk-ix{display:inline-block;margin-top:8px;background:transparent;border:1px solid var(--line);
+    border-radius:8px;padding:5px 9px;font-family:inherit;font-size:10.5px;font-weight:800;
+    letter-spacing:.3px;color:var(--gold);cursor:pointer;touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent}
   .cx.on .cx-bd{display:block}
   .cx-ab{font-size:12.5px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
@@ -1770,6 +1791,31 @@ var CYCABOUT={"Cycle 1 · Fat Loss": {"t": "Twenty pounds off, at a pace your di
    This no longer tracks the Schedule tab's selector -- there is nothing to
    follow when all five are on screen -- so a cycle switch over there leaves
    whatever the reader has open here alone. */
+var STKABOUT={"Retatrutide": "Acts on three appetite and blood-sugar pathways at once, so you feel full sooner and stay that way longer. It is the compound doing the actual weight work.", "MOTS-c": "Tells your cells to burn fuel more efficiently, using the same switch exercise flips. It makes the training you already do count for more.", "NAD+": "Tops up the coenzyme your cells spend on energy and repair, which drops off as you get older. Most people notice steadier daytime energy.", "N-Acetyl Semax Amidate": "A focus compound. It lifts the brain's own growth factors, so attention holds longer and mental fog lifts.", "N-Acetyl Selank Amidate": "Takes the edge off without making you drowsy. It is the calm half of the pair, so the focus does not turn into restlessness.", "N-Acetyl Adamax Amidate": "Works on memory rather than alertness — how well things stick, not how awake you feel.", "Wolverine 2.0": "Three repair peptides in one vial. Together they bring blood flow to damaged tissue, help cells move in to rebuild it, and support the cartilage around a joint.", "KPV": "Turns down inflammation without switching your immune system off. That matters when you are trying to heal rather than fight something.", "GHK-Cu": "A copper peptide that tells skin and connective tissue to make collagen — the raw material anything healing is rebuilt from.", "Cerebrolysin": "A mix of small neural peptides used to support brain resilience and recovery. Think maintenance for the wiring rather than a stimulant.", "Dihexa": "Encourages the brain to build new connections between cells, not just maintain the ones you have. It is the most forward-looking compound in the cycle.", "Cortagen": "A bioregulator aimed at connective tissue — it nudges the repair signalling in tendon and joint tissue back toward how it behaved when you were younger.", "Epitalon": "Helps reset your body's night-time rhythm so the sleep you get is the restorative kind, rather than knocking you out.", "FOXO4-DRI": "Clears out worn-out cells that have stopped working but refuse to die, which otherwise sit in tissue causing low-grade inflammation.", "Kisspeptin-10": "Signals the top of your hormone chain to get going, prompting your own hormones rather than replacing them.", "PT-141": "Works in the brain on desire itself, which is why it applies to women — most libido compounds only act on blood flow.", "Oxytocin": "The bonding and wellbeing hormone. It shapes how connected an experience feels rather than whether it starts.", "Pinealon": "Supports the structure of your sleep — the proportion of the night spent in the deeper stages that actually restore you.", "SS-31": "Works inside the mitochondria to steady energy production, which is usually what fixes feeling drained by late afternoon.", "DSIP": "Aimed at how deeply you sleep rather than how fast you drop off. The target is waking up actually rested."};
+var STK_IX_ALIAS={"N-Acetyl Semax Amidate": "Semax or NA Semax Amidate", "N-Acetyl Selank Amidate": "Selank or NA Selank Amidate", "N-Acetyl Adamax Amidate": "Adamax", "MOTS-c": "MOTS-C", "Kisspeptin-10": "Kisspeptin"};
+/* A stack row toggles on its own. The key is scoped per cycle ("c3_7") and
+   quoted in the onclick, so a compound appearing in two cycles still gets a
+   unique id and the handler still receives a string. */
+function stkTog(k,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var e=document.getElementById('stk'+k); if(e) e.classList.toggle('on');
+}
+/* Jump straight to the compound's Index entry where the catalog has one.
+   Names differ between a protocol card and the catalog in a handful of cases,
+   so a small alias map covers those; anything unmatched opens the Index list
+   rather than failing silently. */
+function stkIxFind(name){
+  if(typeof IX==='undefined'||!IX) return -1;
+  var want=((typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS[name])||name).toLowerCase();
+  for(var i=0;i<IX.length;i++){ if(String(IX[i].name).toLowerCase()===want) return i; }
+  return -1;
+}
+function stkIx(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var i=stkIxFind(name);
+  if(i>=0){ sheet('indexlist'); openIx(i); }
+  else { sheet('indexlist'); }
+}
 function renderAbout(){
   var host=document.getElementById('protoabout'); if(!host) return;
   if(typeof CYCABOUT==='undefined'||!CYCABOUT||!cycOn()){ host.innerHTML=''; return; }
@@ -1780,6 +1826,26 @@ function renderAbout(){
     var isNow=cy.n===cycCurrent();
     var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
     var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+    /* The stack is driven off ALL, so it always matches whatever compounds
+       the cycle actually holds rather than a second hand-kept list. */
+    var mine=[];
+    for(var j=0;j<ALL.length;j++){ if(cycNames(ALL[j]).indexOf(cy.n)>=0) mine.push({c:ALL[j],i:j}); }
+    var stack='';
+    if(mine.length){
+      stack='<div class="abt-l">The stack</div><div class="stk">'+mine.map(function(x){
+        var key='c'+k+'_'+x.i, nm=String(x.c.n).split(' \u00b7 ')[0],
+            blurb=(typeof STKABOUT!=='undefined'&&STKABOUT[nm])||'',
+            sub=[x.c.d,x.c.c,x.c.b].filter(Boolean).join(' \u00b7 ');
+        return '<div class="stk-r" id="stk'+key+'">'+
+          '<div class="stk-hd" onclick="stkTog(\''+key+'\',event)">'+
+            '<div><div class="stk-n">'+x.c.n+'</div><div class="stk-s">'+sub+'</div></div>'+
+            '<span class="stk-cv">\u203a</span>'+
+          '</div>'+
+          '<div class="stk-bd"><div class="stk-p">'+blurb+'</div>'+
+            '<button type="button" class="stk-ix" onclick="stkIx(\''+nm.replace(/'/g,"\\'")+'\',event)">View in index \u203a</button>'+
+          '</div></div>';
+      }).join('')+'</div>';
+    }
     h+='<div class="cgrp" id="cg-ab'+k+'">'+
        '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
          '<div><div class="cgrp-t">'+cy.n+'</div>'+
@@ -1787,6 +1853,7 @@ function renderAbout(){
          '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
        '</div>'+
        '<div class="cgrp-bd"><div class="abt">'+
+         stack+
          '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
          '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
          '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
