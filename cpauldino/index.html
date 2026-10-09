@@ -249,17 +249,6 @@
     border:1px solid var(--line);background:var(--cream);color:var(--muted)}
   .schbtn.on{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
   .schbtn:active{opacity:.75}
-  .archsec{margin:16px 0 0}
-  .archhd{display:flex;align-items:center;gap:9px;cursor:pointer;padding:11px 13px;
-    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
-    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-  .archhd .at{font-family:var(--serif);font-size:14.5px;color:var(--ink)}
-  .archhd .as{font-size:10.5px;color:var(--muted);margin-top:2px}
-  .archhd .an{margin-left:auto;font-size:11px;font-weight:800;color:var(--gold);flex:none}
-  .archhd .acv{color:var(--faint);font-size:16px;line-height:1;flex:none;transition:transform .2s}
-  .archsec.on .archhd .acv{transform:rotate(90deg)}
-  .archbd{display:none;margin-top:9px}
-  .archsec.on .archbd{display:block}
   /* cycle selector -- only drawn when a client has more than one cycle */
   .cycrow{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px}
   .cycrow::-webkit-scrollbar{height:0}
@@ -1693,7 +1682,7 @@ function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggl
    Storage can be unavailable or hold junk, so every read is guarded and
    falls back to the prescribed default rather than breaking the page. */
 var SCHKEY='biolinked-sched-cpauldino';
-var schState=null, archOpen=false;
+var schState=null;
 function schDefault(){ var o={}; for(var i=0;i<CMP.length;i++) o[CMP[i].n]=1; return o; }
 function schLoad(){
   try{
@@ -1717,7 +1706,6 @@ function schTog(name,ev){
   if(st[name]) delete st[name]; else st[name]=1;
   schSave(); renderDoses(); renderAll(); renderSubline();
 }
-function archTog(){ var e=document.getElementById('archsec'); if(e){ e.classList.toggle('on'); archOpen=e.classList.contains('on'); } }
 /* ---------- CYCLES ----------
    Some clients run their protocol as a sequence of cycles rather than one
    standing schedule. Cycles are derived from the tag a compound already
@@ -1833,19 +1821,12 @@ function renderAll(){
   } else {
     /* The protocol list is the full prescribed set, A-Z, and never changes --
        it is the reference. What the client curates is which of these appear
-       on the day view, which the pill on each row controls. Compounds that
-       are off also get their own collapsed Archived section underneath, so
-       restoring one when it is re-ordered is a single tap. */
+       on the day view, which the pill on each row controls. One list only:
+       a compound that is off simply sits in place showing "Add to schedule",
+       so turning it back on when it is re-ordered is a single tap where you
+       already are. */
     live=idx.filter(function(x){return schOn(x.c)});
-    var off=idx.filter(function(x){return !schOn(x.c)});
     if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,'p'+x.i)}).join('')+'</div>';
-    if(off.length) h+='<div class="archsec'+(archOpen?' on':'')+'" id="archsec">'+
-      '<div class="archhd" onclick="archTog()">'+
-        '<div><div class="at">Archived</div><div class="as">Off your schedule \u2014 tap one to add it back</div></div>'+
-        '<span class="an">'+off.length+'</span><span class="acv">\u203a</span>'+
-      '</div>'+
-      '<div class="archbd"><div class="cxwrap past">'+
-        off.map(function(x){return cmpRow(x.c,'a'+x.i)}).join('')+'</div></div></div>';
   }
   document.getElementById('cmplist').innerHTML=h;
   document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';

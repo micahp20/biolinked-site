@@ -1671,7 +1671,9 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
    Morning block and again in the Night block. */
 function inBlock(c,g){return c.b===g||c.b==='BOTH';}
 function renderDoses(){
-  var rows=cycRows().filter(function(c){return due(c,sel)});
+  /* Only what the client has switched on, across whatever cycles, and only
+     what is due today. A cycle that is off never reaches the day view. */
+  var rows=schRows().filter(function(c){return due(c,sel)});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
@@ -1705,11 +1707,14 @@ function cmpArch(c){return !!(c.hist||/^\s*(archived|prior|past)\b/i.test(c.tag|
 function cmpRow(c,i){
   /* i is any unique key, not just the ALL index: a compound that runs in more
      than one cycle is rendered once per group and each copy needs its own id. */
-  var arch=cmpArch(c);
+  var arch=cmpArch(c), on=schOn(c);
   var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
+  var nm=String(c.n).replace(/'/g,"\\'");
+  var btn='<button type="button" class="schbtn'+(on?' on':'')+'" onclick="schTog(\''+nm+'\',event)">'+
+    (on?'\u2713 On schedule':'+ Add to schedule')+'</button>';
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+'</div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
@@ -1722,7 +1727,47 @@ function cmpRow(c,i){
       '</div>'+
     '</div></div>';
 }
-function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
+function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
+/* ===== CLIENT-CURATED SCHEDULE (multi-cycle) ===========================
+   ALL is the prescribed protocol and never changes. On top of it sits a set
+   of which compounds currently belong on the day view, kept in localStorage
+   under this client's own key. On a cycle page the sensible starting point
+   is the CURRENT cycle on and every later cycle off, so the client opens to
+   what they are actually running and switches the next cycle on when they
+   reach it. A compound that runs in more than one cycle is one entry keyed
+   by name, so both rendered copies always agree. Storage can be unavailable
+   or hold junk, so every read is guarded and falls back to the default. */
+var SCHKEY='biolinked-sched-jcress';
+var schState=null;
+function schDefault(){
+  var o={}, cur=(typeof cycCurrent==='function')?cycCurrent():null;
+  for(var i=0;i<ALL.length;i++){
+    var c=ALL[i];
+    if(cmpArch(c)) continue;
+    if(!cur || cycIsBase(c) || cycNames(c).indexOf(cur)>=0) o[c.n]=1;
+  }
+  return o;
+}
+function schLoad(){
+  try{
+    var raw=localStorage.getItem(SCHKEY);
+    if(!raw) return schDefault();
+    var p=JSON.parse(raw);
+    if(!p||typeof p!=='object'||!p.on||typeof p.on!=='object') return schDefault();
+    var o={}; for(var i=0;i<ALL.length;i++){ if(p.on[ALL[i].n]) o[ALL[i].n]=1; }
+    return o;
+  }catch(e){ return schDefault(); }
+}
+function schGet(){ if(!schState) schState=schLoad(); return schState; }
+function schSave(){ try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schGet()})); }catch(e){} }
+function schOn(c){ return !!schGet()[c.n]; }
+function schRows(){ return ALL.filter(schOn); }
+function schTog(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var st=schGet();
+  if(st[name]) delete st[name]; else st[name]=1;
+  schSave(); renderDoses(); renderAll(); renderSubline();
+}
 /* ---------- CYCLES ----------
    Some clients run their protocol as a sequence of cycles rather than one
    standing schedule. Cycles are derived from the tag a compound already
@@ -1879,7 +1924,7 @@ function renderCyc(){
 }
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
-  var n=cycRows().length;
+  var n=schRows().length;
   e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks'+
     (cycOn()&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
 }
