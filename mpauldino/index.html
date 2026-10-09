@@ -175,7 +175,7 @@
 
   /* Scroll area fills the frame and simply pads past the bar, so content can
      always be scrolled clear of it and nothing ends up trapped underneath. */
-  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+  .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
     padding:calc(58px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 26px)}
   .scroll::-webkit-scrollbar{width:0}
   .pad{padding:0 16px}
@@ -794,7 +794,7 @@
     /* min-height:0 is what lets a flex child actually scroll instead of
        growing to fit its content. Without it the column overflows the shell. */
     .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
-      display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;
+      display:block;overflow-y:auto;overflow-x:hidden;
       padding:0 0 26px}
     .view.on{flex:none}
     /* last flex child -> always on the true visual bottom edge */
@@ -4462,7 +4462,18 @@ if('serviceWorker' in navigator){
 }
 
 CYCS=cycList(); cycSel=cycCurrent();
-renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
+renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats();
+/* The views are written into the scroller after it exists, so read its layout
+   back on the next frame and let iOS measure the extent against the content
+   that is actually there. */
+function scrollRemeasure(){
+  var sc=document.getElementById('scroll'); if(!sc) return;
+  if(window.requestAnimationFrame) requestAnimationFrame(function(){ void sc.scrollHeight; });
+  else void sc.scrollHeight;
+}
+scrollRemeasure();
+window.addEventListener('load',scrollRemeasure);
+window.addEventListener('orientationchange',scrollRemeasure); renderIx(); renderPay(); renderLabs(); renderSubline();
 /* nutInit runs once, from the end of this script. It used to run from a
    DOMContentLoaded hook as well, which bound every diet chip twice and left
    them doing nothing at all. */
@@ -4670,8 +4681,9 @@ function gkRender(){
   var strip=document.getElementById("gkDayStrip");
   strip.style.display=gkState.view==="schedule"?"grid":"none";
   strip.innerHTML=GK_DAY.map(function(label,i){
-    var d=new Date(); d.setDate(d.getDate()-d.getDay()+i);
-    return '<button class="day'+(gkState.selected===i?" on":"")+'" data-gkday="'+i+'"><b>'+label.toUpperCase()+'</b><span>'+d.getDate()+'</span></button>';
+    /* Days only -- a client rarely starts on the date shown, so a real date
+       reads as a promise the schedule is not making. */
+    return '<button class="day'+(gkState.selected===i?" on":"")+'" data-gkday="'+i+'"><b>'+label.toUpperCase()+'</b></button>';
   }).join("");
   var active=gkState.compounds.filter(function(c){return c.active;});
   var dueNow=active.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
