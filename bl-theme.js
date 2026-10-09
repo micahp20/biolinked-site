@@ -1,20 +1,20 @@
 /* ======================================================================
-   BioLinked site theme controller — light only.
+   BioLinked site theme controller — dark only.
 
-   The dark palette and its toggle were removed. This script exists to make
-   sure a visitor who tapped the old toggle before it was removed does not
-   stay stuck on a half-dark page: it forces data-theme="light", clears the
-   saved preference, and removes any toggle button still sitting in a cached
-   copy of a page. bl-theme.css also no longer contains any dark rules, so
-   even a stale attribute renders light.
+   The site runs the Colorado dark palette. This script pins
+   data-theme="dark" so a visitor holding a cached copy of a page, or a
+   stale saved preference from the old toggle, cannot end up on a
+   half-light page. It also removes any toggle button still sitting in a
+   cached copy. bl-theme.css carries the dark values under
+   :root[data-theme="dark"].
    ====================================================================== */
 (function(){
   var root = document.documentElement;
 
-  function forceLight(){
-    root.setAttribute('data-theme', 'light');
+  function forceDark(){
+    root.setAttribute('data-theme', 'dark');
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', '#fbf7ec');
+    if (meta) meta.setAttribute('content', '#0b0b0c');
     var stale = document.querySelectorAll('.bl-theme-toggle');
     for (var i = 0; i < stale.length; i++){
       if (stale[i].parentNode) stale[i].parentNode.removeChild(stale[i]);
@@ -22,16 +22,16 @@
   }
 
   try { localStorage.removeItem('bl-theme'); } catch(e){}
-  forceLight();
+  forceDark();
 
   if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', forceLight);
+    document.addEventListener('DOMContentLoaded', forceDark);
   }
   // nav.js injects its markup asynchronously on some pages; sweep once more
   // after it lands in case a cached page re-inserted a toggle.
   var tries = 0;
   var iv = setInterval(function(){
-    forceLight();
+    forceDark();
     if (++tries > 12) clearInterval(iv);
   }, 200);
 })();
