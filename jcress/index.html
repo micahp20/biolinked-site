@@ -1960,8 +1960,9 @@ function renderAll(){
       h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,false),'');
     }
     if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
-    var cur=idx.filter(function(x){return inCyc(x,cycCurrent())});
-    live=found.concat(cur);
+    /* The count is what the client has switched on, not what the current
+       cycle happens to hold -- those diverge the moment anything is curated. */
+    live=idx.filter(function(x){return schOn(x.c)});
   } else {
     /* One list, A-Z. A compound that is finished stays in place with a quiet
        "Past" tag rather than being moved into a section of its own. */
@@ -1969,7 +1970,7 @@ function renderAll(){
     if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
   document.getElementById('cmplist').innerHTML=h;
-  document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+live.length+' ACTIVE';
+  document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
 var ixCat='all', ixQ='';
