@@ -186,12 +186,12 @@
   .days{display:flex;gap:6px;margin:2px -16px 14px;padding:0 16px;overflow-x:auto}
   .days::-webkit-scrollbar{height:0}
   .day{flex:1 0 auto;min-width:44px;background:var(--card);border:1px solid var(--line);border-radius:13px;
-    padding:9px 0 8px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
-  .day .dw{font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}
-  .day .dn{font-family:var(--serif);font-size:17px;color:var(--ink);margin-top:2px;line-height:1}
+    padding:13px 0 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
+  .day .dw{font-family:var(--serif);font-size:15px;font-weight:400;letter-spacing:.2px;
+    text-transform:none;color:var(--ink);line-height:1}
   .day.on{background:var(--gold);border-color:var(--gold)}
-  .day.on .dw,.day.on .dn{color:var(--on-gold)}
-  .day.today:not(.on) .dn{color:var(--gold)}
+  .day.on .dw{color:var(--on-gold)}
+  .day.today:not(.on) .dw{color:var(--gold)}
 
   /* Dose rows are READ-ONLY -- no check-off control, no stored state. */
   .dgrp{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
@@ -238,6 +238,28 @@
   .cx-ab{font-size:12.5px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
   .cx.hist .cx-n{color:var(--ink2)}
+  /* ===== CLIENT-CURATED SCHEDULE =====
+     One tap per compound decides whether it appears in the day view. The
+     button is its own tap target inside the row header and stops the click
+     from reaching the header, so it never opens the detail by accident. */
+  .schbtn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;border-radius:999px;
+    padding:6px 11px;font-family:var(--sans);font-size:10px;font-weight:800;letter-spacing:.5px;
+    text-transform:uppercase;cursor:pointer;touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    border:1px solid var(--line);background:var(--cream);color:var(--muted)}
+  .schbtn.on{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+  .schbtn:active{opacity:.75}
+  .archsec{margin:16px 0 0}
+  .archhd{display:flex;align-items:center;gap:9px;cursor:pointer;padding:11px 13px;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .archhd .at{font-family:var(--serif);font-size:14.5px;color:var(--ink)}
+  .archhd .as{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .archhd .an{margin-left:auto;font-size:11px;font-weight:800;color:var(--gold);flex:none}
+  .archhd .acv{color:var(--faint);font-size:16px;line-height:1;flex:none;transition:transform .2s}
+  .archsec.on .archhd .acv{transform:rotate(90deg)}
+  .archbd{display:none;margin-top:9px}
+  .archsec.on .archbd{display:block}
   /* cycle selector -- only drawn when a client has more than one cycle */
   .cycrow{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px}
   .cycrow::-webkit-scrollbar{height:0}
@@ -1587,12 +1609,13 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
-  var now=new Date(), start=new Date(now); start.setDate(now.getDate()-now.getDay());
+  /* Days only, no calendar dates -- a client rarely starts on the date shown.
+     Today is still marked, by weekday. */
+  var now=new Date();
   var h='';
   for(var i=0;i<7;i++){
-    var d=new Date(start); d.setDate(start.getDate()+i);
     h+='<div class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+'" onclick="pickDay('+i+')">'+
-       '<div class="dw">'+DW[i]+'</div><div class="dn">'+d.getDate()+'</div></div>';
+       '<div class="dw">'+DW[i]+'</div></div>';
   }
   document.getElementById('daystrip').innerHTML=h;
 }
@@ -1601,11 +1624,16 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
    Morning block and again in the Night block. */
 function inBlock(c,g){return c.b===g||c.b==='BOTH';}
 function renderDoses(){
-  var rows=cycRows().filter(function(c){return due(c,sel)});
+  /* Only what the client has on their schedule, and only what is due today.
+     Archived compounds never reach the day view. */
+  var rows=schRows().filter(function(c){return due(c,sel)});
   var host=document.getElementById('doses');
   if(!rows.length){
-    host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
-      ' is clear — the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
+    var anyOn=schRows().length;
+    host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+
+      (anyOn? FULL[sel]+' is clear \u2014 nothing on your schedule falls on this day.'
+            : 'Your schedule is empty. Open All Compounds below and add what you are running.')+
+      '</div></div>';
     document.getElementById('dosenote').textContent='';return;
   }
   var h='', total=0;
@@ -1633,11 +1661,17 @@ function renderDoses(){
    Everything starts collapsed. No grouping and no sort toggle: one list. */
 function cmpArch(c){return !!(c.hist||/^\s*(archived|prior|past)\b/i.test(c.tag||''));}
 function cmpRow(c,i){
-  var arch=cmpArch(c);
-  var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
+  /* i is a scoped string key, not the bare ALL index: a compound shows once
+     in the protocol list and again in Archived, so each copy needs its own
+     id. The key is quoted in both handlers. */
+  var arch=cmpArch(c), on=schOn(c);
+  var sub=(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c;
+  var nm=String(c.n).replace(/'/g,"\\'");
+  var btn='<button type="button" class="schbtn'+(on?' on':'')+'" onclick="schTog(\''+nm+'\',event)">'+
+    (on?'\u2713 On schedule':'+ Add to schedule')+'</button>';
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
-    '<div class="cx-hd" onclick="cxTog('+i+')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
+    '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+'</div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
@@ -1650,7 +1684,40 @@ function cmpRow(c,i){
       '</div>'+
     '</div></div>';
 }
-function cxTog(i){document.getElementById('cx'+i).classList.toggle('on');}
+function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
+/* ===== CLIENT-CURATED SCHEDULE =========================================
+   Two layers. ALL is the prescribed protocol and never changes -- it is the
+   read-only reference at the bottom. On top of it sits a per-client set of
+   which compounds currently belong on the day view, kept in localStorage
+   under this client's own key. Nothing here touches dosing or billing.
+   Storage can be unavailable or hold junk, so every read is guarded and
+   falls back to the prescribed default rather than breaking the page. */
+var SCHKEY='biolinked-sched-cpauldino';
+var schState=null, archOpen=false;
+function schDefault(){ var o={}; for(var i=0;i<CMP.length;i++) o[CMP[i].n]=1; return o; }
+function schLoad(){
+  try{
+    var raw=localStorage.getItem(SCHKEY);
+    if(!raw) return schDefault();
+    var p=JSON.parse(raw);
+    if(!p||typeof p!=='object'||!p.on||typeof p.on!=='object') return schDefault();
+    /* Keep only names the protocol still carries, so a compound that is
+       renamed or removed upstream cannot linger as a ghost entry. */
+    var o={}; for(var i=0;i<ALL.length;i++){ if(p.on[ALL[i].n]) o[ALL[i].n]=1; }
+    return o;
+  }catch(e){ return schDefault(); }
+}
+function schGet(){ if(!schState) schState=schLoad(); return schState; }
+function schSave(){ try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schGet()})); }catch(e){} }
+function schOn(c){ return !!schGet()[c.n]; }
+function schRows(){ return ALL.filter(schOn); }
+function schTog(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var st=schGet();
+  if(st[name]) delete st[name]; else st[name]=1;
+  schSave(); renderDoses(); renderAll(); renderSubline();
+}
+function archTog(){ var e=document.getElementById('archsec'); if(e){ e.classList.toggle('on'); archOpen=e.classList.contains('on'); } }
 /* ---------- CYCLES ----------
    Some clients run their protocol as a sequence of cycles rather than one
    standing schedule. Cycles are derived from the tag a compound already
@@ -1731,7 +1798,7 @@ function renderCyc(){
 }
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
-  var n=cycRows().length;
+  var n=schRows().length;
   e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks'+
     (cycOn()&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
 }
@@ -1764,15 +1831,24 @@ function renderAll(){
       : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
         '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
   } else {
-    /* One list, A-Z. A compound that is finished stays in place with a quiet
-       "Past" tag rather than being moved into a section of its own. */
-    live=idx.filter(function(x){return !cmpArch(x.c)});
-    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
+    /* The protocol list is the full prescribed set, A-Z, and never changes --
+       it is the reference. What the client curates is which of these appear
+       on the day view, which the pill on each row controls. Compounds that
+       are off also get their own collapsed Archived section underneath, so
+       restoring one when it is re-ordered is a single tap. */
+    live=idx.filter(function(x){return schOn(x.c)});
+    var off=idx.filter(function(x){return !schOn(x.c)});
+    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,'p'+x.i)}).join('')+'</div>';
+    if(off.length) h+='<div class="archsec'+(archOpen?' on':'')+'" id="archsec">'+
+      '<div class="archhd" onclick="archTog()">'+
+        '<div><div class="at">Archived</div><div class="as">Off your schedule \u2014 tap one to add it back</div></div>'+
+        '<span class="an">'+off.length+'</span><span class="acv">\u203a</span>'+
+      '</div>'+
+      '<div class="archbd"><div class="cxwrap past">'+
+        off.map(function(x){return cmpRow(x.c,'a'+x.i)}).join('')+'</div></div></div>';
   }
-  if(cycOn()&&past.length) h+='<div class="cxsub">Past \u00b7 no longer running</div>'+
-    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;
-  document.getElementById('allcount').textContent=ALL.length+' TOTAL \u00b7 '+live.length+' ACTIVE';
+  document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
 var ixCat='all', ixQ='';
