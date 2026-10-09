@@ -80,27 +80,27 @@
 
   const ctaBar = '';
 
-  const siteFooter = `<div style="background:#f0f0f0;border-top:1px solid rgba(0,0,0,0.10);padding:40px 32px;margin-top:auto;">
+  const siteFooter = `<div style="background:var(--bg-alt,#f0f0f0);border-top:1px solid rgba(0,0,0,0.10);padding:40px 32px;margin-top:auto;">
   <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex-wrap:wrap;">
     <div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#1a1a1a;letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
-      <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Peptide Solutions</div>
-      <p style="font-size:12.5px;color:#777770;font-weight:400;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text,#1a1a1a);letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
+      <div style="font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold,#7A6530);margin-bottom:12px;">Peptide Solutions</div>
+      <p style="font-size:12.5px;color:var(--muted,#777770);font-weight:400;line-height:1.7;">Evidence-based peptide research, education, and personalized protocol consulting.</p>
     </div>
     <div>
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Resources</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold,#7A6530);margin-bottom:12px;">Resources</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Home</a>
-        <a href="/peptide-index.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Index</a>
-        <a href="/stacks-blends.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stacks & Blends</a>
+        <a href="/" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Home</a>
+        <a href="/peptide-index.html" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Index</a>
+        <a href="/stacks-blends.html" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stacks & Blends</a>
       </div>
     </div>
     <div>
-      <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#7A6530;margin-bottom:12px;">Tools & Services</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold,#7A6530);margin-bottom:12px;">Tools & Services</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
-        <a href="/peptide-tracker.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Peptide Tracker</a>
-        <a href="/stack-analyzer.html" style="font-size:13px;color:#444440;text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stack Analyzer</a>
-        <a href="/biomarker-landing.html" style="font-size:13px;color:#7A6530;text-decoration:none;font-weight:600;padding:12px 0;display:flex;align-items:center;min-height:44px;">Biomarker Analysis →</a>
+        <a href="/peptide-tracker.html" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Peptide Tracker</a>
+        <a href="/stack-analyzer.html" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stack Analyzer</a>
+        <a href="/biomarker-landing.html" style="font-size:13px;color:var(--gold,#7A6530);text-decoration:none;font-weight:600;padding:12px 0;display:flex;align-items:center;min-height:44px;">Biomarker Analysis →</a>
       </div>
     </div>
   </div>
