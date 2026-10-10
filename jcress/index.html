@@ -2416,7 +2416,7 @@ function openInv(i){
   }
   function calcWrite(){
     try{ localStorage.setItem(CALCKEY, JSON.stringify(calcPayload())); }catch(_){}
-    try{ if(typeof csQueue==='function') csQueue('calculator'); }catch(_){}
+    try{ if(typeof csQueue==='function' && !csApplying) csQueue('calculator'); }catch(_){}
   }
   function calcRead(){
     var p=null;
@@ -4420,6 +4420,9 @@ var CS_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZi
 var CS_SLUG='jcress';
 var CS_KINDS=['schedule','nutrition','calculator'];
 var csVer={}, csTimer={}, csWant={}, csBooted=false, csInFlight={};
+/* set while a cloud value is being written into the local stores, so the
+   write hooks do not mistake hydration for an edit and push it back */
+var csApplying=false;
 
 function csRpc(fn,body){
   try{
@@ -4486,8 +4489,9 @@ function csHasLocal(kind){
 function csApply(kind,payload){
   try{
     if(!payload) return;
+    csApplying=true;
     if(kind==='schedule'){
-      if(!payload.on || typeof payload.on!=='object') return;
+      if(!payload.on || typeof payload.on!=='object'){ csApplying=false; return; }
       schState=payload.on;
       try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schState})); }catch(e){}
       if(typeof renderDoses==='function') renderDoses();
@@ -4503,6 +4507,7 @@ function csApply(kind,payload){
       if(window.calcSync && window.calcSync.applyPayload) window.calcSync.applyPayload(payload);
     }
   }catch(e){}
+  finally{ csApplying=false; }
 }
 
 /* ---- initial read: cloud wins, and a first-time local copy goes up --- */
@@ -4575,8 +4580,8 @@ renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats
    still run first, so the cache is correct even if the network is not. */
 (function csHooks(){
   try{
-    if(typeof schSave==='function'){ var _ss=schSave; schSave=function(){ _ss.apply(this,arguments); csQueue('schedule'); }; }
-    if(typeof nStore==='function'){ var _ns=nStore; nStore=function(k,v){ var r=_ns.apply(this,arguments); csQueue('nutrition'); return r; }; }
+    if(typeof schSave==='function'){ var _ss=schSave; schSave=function(){ _ss.apply(this,arguments); if(!csApplying) csQueue('schedule'); }; }
+    if(typeof nStore==='function'){ var _ns=nStore; nStore=function(k,v){ var r=_ns.apply(this,arguments); if(!csApplying) csQueue('nutrition'); return r; }; }
   }catch(e){}
 })();
 try{ csPull(); }catch(e){}
