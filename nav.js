@@ -44,7 +44,7 @@
 </nav>`;
 
   const navCSS = `<style>
-.bl-nav{background:var(--surface,#fff);border-bottom:1px solid var(--border,#eaeaea);position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
+.bl-nav{background:var(--surface,var(--bg,#fff));border-bottom:1px solid var(--border,#eaeaea);position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
 .bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
 .bl-nav-logo{color:var(--text,#1a1a1a);text-decoration:none;display:flex;flex-direction:column;line-height:1}
 .bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text,#1a1a1a);letter-spacing:0.1em}
@@ -53,14 +53,14 @@
 .bl-nav-link{font-size:11.5px;color:var(--text-2,var(--muted,#444));text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap}
 .bl-nav-link:hover,.bl-nav-link.active{color:var(--gold,#7A6530);background:var(--gold-dim,rgba(154,123,47,0.07))}
 .bl-nav-dropdown{position:relative}
-.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:var(--surface,#fff);border:1px solid var(--border,#eaeaea);border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
+.bl-nav-dropdown-menu{display:none;position:absolute;top:calc(100% - 1px);right:0;background:var(--surface,var(--bg,#fff));border:1px solid var(--border,#eaeaea);border-radius:0 0 6px 6px;box-shadow:0 8px 24px rgba(0,0,0,0.08);min-width:190px;z-index:700;padding:4px 0}
 .bl-nav-dropdown:hover .bl-nav-dropdown-menu,.bl-nav-dropdown-menu:hover{display:block}
 .bl-nav-dropdown-btn{border-bottom-left-radius:0;border-bottom-right-radius:0}
 .bl-nav-dropdown:hover .bl-dropdown-btn{color:var(--gold,#7A6530);background:var(--gold-dim,rgba(154,123,47,0.07))}
 .bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:var(--text-2,var(--muted,#444));text-decoration:none;transition:all .15s;font-family:'Montserrat',sans-serif;white-space:nowrap}
 .bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:var(--bg,#f8f8f8);color:var(--gold,#7A6530);padding-left:20px}
 .bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text,#1a1a1a);padding:8px}
-.bl-nav-mobile-menu{display:none;border-top:1px solid var(--border,#eaeaea);background:var(--surface,#fff);padding:12px 20px 20px}
+.bl-nav-mobile-menu{display:none;border-top:1px solid var(--border,#eaeaea);background:var(--surface,var(--bg,#fff));padding:12px 20px 20px}
 .bl-nav-mobile-menu.open{display:block}
 .bl-nav-mobile-link{display:flex;align-items:center;min-height:44px;padding:11px 0;font-size:13px;color:var(--text-2,var(--muted,#444));text-decoration:none;border-bottom:1px solid var(--border,#eaeaea);font-family:'Montserrat',sans-serif}
 .bl-nav-mobile-link:last-child{border-bottom:none}
@@ -80,7 +80,7 @@
 
   const ctaBar = '';
 
-  const siteFooter = `<div style="background:var(--bg-alt,#f0f0f0);border-top:1px solid rgba(0,0,0,0.10);padding:40px 32px;margin-top:auto;">
+  const siteFooter = `<div style="background:var(--bg-alt,var(--bg,#f0f0f0));border-top:1px solid rgba(0,0,0,0.10);padding:40px 32px;margin-top:auto;">
   <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;flex-wrap:wrap;">
     <div>
       <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--text,#1a1a1a);letter-spacing:0.06em;margin-bottom:8px;">BioLinked</div>
