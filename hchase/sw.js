@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'hchase-v43';
+const CACHE = 'hchase-v44';
 const ASSETS = [
   '/hchase/',
   '/hchase/index.html',

@@ -908,6 +908,19 @@
   .xp{padding:0 16px;margin:0 0 6px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
   .xp:empty{display:none}
   #x-edu[hidden]{display:none}
+  /* cloud-sync status: a quiet word beside the subline, and one toast */
+  .cs-stat{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 2px;min-height:12px;
+    opacity:0;transition:opacity .18s}
+  .cs-stat.on{opacity:1}
+  .cs-stat.saved{color:var(--gold)}
+  .cs-stat.offline,.cs-stat.error{color:var(--muted)}
+  .cs-toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));
+    transform:translate(-50%,8px);max-width:min(88vw,340px);z-index:80;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    box-shadow:var(--shadow);padding:10px 14px;font-family:var(--sans);font-size:12.5px;
+    color:var(--ink2);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+  .cs-toast.on{opacity:1;transform:translate(-50%,0)}
 </style>
 <script src="/compound-library.js?v=2"></script>
 </head>
@@ -1016,6 +1029,7 @@
     </div></section>
     <section class="view" id="v-sched"><div class="pad">
       <h1 class="scrn" id="greet">Schedule</h1>
+      <div class="cs-stat" id="csstat"></div>
       <p class="sub" id="subline"></p>
       <div id="duebar"></div>
       <div id="cycbar"></div>
@@ -2272,6 +2286,7 @@ function openInv(i){
   }
   function calcWrite(){
     try{ localStorage.setItem(CALCKEY, JSON.stringify(calcPayload())); }catch(_){}
+    try{ if(typeof csQueue==='function' && !csApplying) csQueue('calculator'); }catch(_){}
   }
   function calcRead(){
     var p=null;
@@ -2413,6 +2428,16 @@ function openInv(i){
     fromDose();
   }
   initCalc();
+  /* the sync layer lives outside this closure */
+  window.calcSync={payload:calcPayload, applyPayload:function(p){
+    try{
+      if(!p||typeof p!=='object') return;
+      if(Object.prototype.toString.call(p.saved)==='[object Array]'){ saved=p.saved; renderList(); }
+      calcApply(p);
+      try{ localStorage.setItem(CALCKEY, JSON.stringify(p)); }catch(e){}
+      fromDose();
+    }catch(e){}
+  }};
 })();
 
 /* ---------- NUTRITION ----------
@@ -4246,7 +4271,190 @@ if('serviceWorker' in navigator){
 }
 
 CYCS=cycList(); cycSel=cycCurrent();
-renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
+renderCyc(); /* ======================================================================
+   CLOUD SYNC  (schedule / nutrition / calculator)
+
+   No key and no login: the page knows its own slug and calls two RPCs.
+   The cloud is the source of truth on load; localStorage stays the cache
+   so the page works fully offline and keeps working if the network or the
+   storage API throws. Every entry point is wrapped, so a failure here can
+   degrade the sync but never the page.
+
+   Writes are per kind, debounced, and carry the version the client last
+   saw. A stale write comes back 409 rather than silently winning, and the
+   answer to that is always to take the cloud copy -- another device wrote
+   something newer.
+   ====================================================================== */
+var CS_URL='https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/rpc/';
+var CS_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
+var CS_SLUG='jboykin';
+var CS_KINDS=['schedule','nutrition','calculator'];
+var csVer={}, csTimer={}, csWant={}, csBooted=false, csInFlight={};
+/* set while a cloud value is being written into the local stores, so the
+   write hooks do not mistake hydration for an edit and push it back */
+var csApplying=false;
+
+function csRpc(fn,body){
+  try{
+    return fetch(CS_URL+fn,{
+      method:'POST',
+      headers:{'apikey':CS_ANON,'Authorization':'Bearer '+CS_ANON,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    }).then(function(r){
+      return r.text().then(function(t){
+        var b=null; try{ b=JSON.parse(t); }catch(e){ b=t; }
+        return {status:r.status, body:b};
+      });
+    }).catch(function(){ return {status:0, body:null}; });   /* offline */
+  }catch(e){ return Promise.resolve({status:0, body:null}); }
+}
+
+/* ---- status pill ---------------------------------------------------- */
+function csStat(s){
+  try{
+    var e=document.getElementById('csstat'); if(!e) return;
+    var map={saving:'Saving…', saved:'Saved', offline:'Offline', error:'Save failed'};
+    e.textContent=map[s]||'';
+    e.className='cs-stat'+(s?' on '+s:'');
+    if(s==='saved'){ clearTimeout(csStat._t); csStat._t=setTimeout(function(){
+      var x=document.getElementById('csstat'); if(x&&/Saved/.test(x.textContent)){ x.textContent=''; x.className='cs-stat'; }
+    },1800); }
+  }catch(e){}
+}
+function csToast(msg){
+  try{
+    var e=document.getElementById('cstoast');
+    if(!e){
+      /* built here rather than in the markup: these pages do not all end
+         with a </body> to anchor to */
+      e=document.createElement('div'); e.className='cs-toast'; e.id='cstoast';
+      (document.querySelector('.device')||document.body).appendChild(e);
+    }
+    e.textContent=msg; e.classList.add('on');
+    clearTimeout(csToast._t); csToast._t=setTimeout(function(){ e.classList.remove('on'); },4200);
+  }catch(e){}
+}
+
+/* ---- per-kind bridges to the three local stores --------------------- */
+function csRead(kind){
+  try{
+    if(kind==='schedule') return {v:1, on:schGet()};
+    if(kind==='nutrition'){
+      var p=nLoad(NUT_CFG.STORE_PLAN), t=nLoad(NUT_CFG.STORE_TARGETS);
+      if(p==null && t==null) return null;
+      return {v:1, plan:p, targets:t};
+    }
+    if(kind==='calculator') return (window.calcSync && window.calcSync.payload) ? window.calcSync.payload() : null;
+  }catch(e){}
+  return null;
+}
+function csHasLocal(kind){
+  var p=csRead(kind);
+  if(!p) return false;
+  if(kind==='schedule')  return p.on && Object.keys(p.on).length>0;
+  if(kind==='nutrition') return p.plan!=null || p.targets!=null;
+  if(kind==='calculator') return (p.saved&&p.saved.length) || (p.inputs&&Object.keys(p.inputs).length);
+  return false;
+}
+function csApply(kind,payload){
+  try{
+    if(!payload) return;
+    csApplying=true;
+    if(kind==='schedule'){
+      if(!payload.on || typeof payload.on!=='object'){ csApplying=false; return; }
+      schState=payload.on;
+      try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schState})); }catch(e){}
+      if(typeof renderDoses==='function') renderDoses();
+      if(typeof renderAll==='function') renderAll();
+      if(typeof renderSubline==='function') renderSubline();
+      if(typeof renderDue==='function') renderDue();
+    } else if(kind==='nutrition'){
+      if(payload.plan!=null) nStore(NUT_CFG.STORE_PLAN,payload.plan);
+      if(payload.targets!=null) nStore(NUT_CFG.STORE_TARGETS,payload.targets);
+      if(typeof nutInit==='function') nutInit();
+      if(typeof nutRender==='function') nutRender();
+    } else if(kind==='calculator'){
+      if(window.calcSync && window.calcSync.applyPayload) window.calcSync.applyPayload(payload);
+    }
+  }catch(e){}
+  finally{ csApplying=false; }
+}
+
+/* ---- initial read: cloud wins, and a first-time local copy goes up --- */
+function csPull(){
+  return csRpc('get_state',{p_slug:CS_SLUG}).then(function(r){
+    if(r.status===0){ csStat('offline'); csBooted=true; return; }
+    if(r.status!==200 || !r.body || !r.body.length && !Array.isArray(r.body)){ csBooted=true; return; }
+    var rows=Array.isArray(r.body)?r.body:[];
+    var seen={};
+    rows.forEach(function(row){
+      seen[row.kind]=1; csVer[row.kind]=row.version;
+      csApply(row.kind,row.payload);
+    });
+    csBooted=true;
+    /* nothing in the cloud for a kind this device already has: lift it up
+       once, so an existing client does not start from empty */
+    CS_KINDS.forEach(function(k){
+      if(seen[k]) return;
+      csVer[k]=0;
+      if(csHasLocal(k)) csQueue(k,true);
+    });
+    csStat('');
+  }).catch(function(){ csBooted=true; });
+}
+
+/* ---- writes --------------------------------------------------------- */
+function csQueue(kind,now){
+  if(CS_KINDS.indexOf(kind)<0) return;
+  csWant[kind]=1;
+  clearTimeout(csTimer[kind]);
+  csTimer[kind]=setTimeout(function(){ csFlush(kind); }, now?60:900);
+}
+function csFlush(kind){
+  if(!csWant[kind] || csInFlight[kind]) return;
+  var payload=csRead(kind);
+  if(payload==null) { csWant[kind]=0; return; }
+  csInFlight[kind]=1; csStat('saving');
+  csRpc('save_state',{p_slug:CS_SLUG,p_kind:kind,p_payload:payload,
+                      p_expected_version:(csVer[kind]||0)}).then(function(r){
+    csInFlight[kind]=0;
+    if(r.status===200){
+      csVer[kind]=r.body; csWant[kind]=0; csStat('saved'); return;
+    }
+    if(r.status===409){
+      /* another device moved first: take theirs, never clobber it */
+      csWant[kind]=0;
+      return csRpc('get_state',{p_slug:CS_SLUG}).then(function(g){
+        if(g.status!==200 || !Array.isArray(g.body)) return;
+        g.body.forEach(function(row){
+          if(row.kind!==kind) return;
+          csVer[kind]=row.version; csApply(kind,row.payload);
+        });
+        csStat(''); csToast('Updated from your other device');
+      });
+    }
+    if(r.status===0){ csStat('offline'); return; }   /* keep csWant set to retry */
+    csWant[kind]=0; csStat('error');
+  }).catch(function(){ csInFlight[kind]=0; csStat('offline'); });
+}
+/* back online: push whatever never made it */
+function csFlushAll(){ CS_KINDS.forEach(function(k){ if(csWant[k]) csFlush(k); }); }
+try{
+  window.addEventListener('online', function(){ csStat(''); csFlushAll(); });
+  window.addEventListener('offline', function(){ csStat('offline'); });
+}catch(e){}
+
+renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderLabs(); renderSubline();
+
+/* Every local write also queues the matching cloud write. The originals
+   still run first, so the cache is correct even if the network is not. */
+(function csHooks(){
+  try{
+    if(typeof schSave==='function'){ var _ss=schSave; schSave=function(){ _ss.apply(this,arguments); if(!csApplying) csQueue('schedule'); }; }
+    if(typeof nStore==='function'){ var _ns=nStore; nStore=function(k,v){ var r=_ns.apply(this,arguments); if(!csApplying) csQueue('nutrition'); return r; }; }
+  }catch(e){}
+})();
+try{ csPull(); }catch(e){}
 /* The views are written into the scroller after it exists, so read its layout
    back on the next frame and let iOS measure the extent against the content
    that is actually there. */

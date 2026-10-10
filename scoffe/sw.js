@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'scoffe-v47';
+const CACHE = 'scoffe-v48';
 const ASSETS = [
   '/scoffe/',
   '/scoffe/index.html',
