@@ -1,5 +1,5 @@
 -- =====================================================================
--- BioLinked — slug-based cloud sync for schedule + nutrition state
+-- BioLinked — slug-based cloud sync for schedule, nutrition and calculator state
 -- Run once in the Supabase SQL editor. Safe to re-run (idempotent).
 --
 -- Model: no key, no login. A page knows its own slug and calls two RPCs.
@@ -17,12 +17,12 @@ create table if not exists public.member_state (
   version     bigint      not null default 1,
   updated_at  timestamptz not null default now(),
   constraint member_state_pkey primary key (slug, kind),
-  constraint member_state_kind_ck check (kind in ('schedule','nutrition')),
+  constraint member_state_kind_ck check (kind in ('schedule','nutrition','calculator')),
   constraint member_state_slug_ck check (slug ~ '^[a-z0-9][a-z0-9-]{1,39}$')
 );
 
 comment on table public.member_state is
-  'Per-client UI state (schedule curation, nutrition plan) keyed by page slug. Reached only through get_state/save_state.';
+  'Per-client UI state (schedule curation, nutrition plan, calculator inputs) keyed by page slug. Reached only through get_state/save_state.';
 
 -- ---------- 2. lock the table down -----------------------------------
 alter table public.member_state enable row level security;
@@ -35,7 +35,7 @@ revoke all on table public.member_state from public;
 revoke all on table public.member_state from anon;
 revoke all on table public.member_state from authenticated;
 
--- ---------- 3. read both kinds for one slug --------------------------
+-- ---------- 3. read every kind for one slug --------------------------
 create or replace function public.get_state(p_slug text)
 returns table (kind text, payload jsonb, version bigint, updated_at timestamptz)
 language plpgsql
@@ -79,7 +79,7 @@ begin
   if p_slug is null or p_slug !~ '^[a-z0-9][a-z0-9-]{1,39}$' then
     raise exception 'bad slug' using errcode = 'PT400';
   end if;
-  if p_kind not in ('schedule','nutrition') then
+  if p_kind not in ('schedule','nutrition','calculator') then
     raise exception 'bad kind' using errcode = 'PT400';
   end if;
   if p_payload is null or jsonb_typeof(p_payload) <> 'object' then
