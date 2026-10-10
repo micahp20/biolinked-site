@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dpacello/, which is now the real page: the app layout
 // was promoted here from the /dpacello/app/ pilot.
-const CACHE = 'dpacello-v6';
+const CACHE = 'dpacello-v7';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/dpacello/',
