@@ -1743,15 +1743,61 @@ function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggl
    prescribed default rather than breaking the page. */
 var SCHKEY='biolinked-sched-dianamaes';
 var schState=null;
-function schDefault(){
-  /* Multi-cycle page: start with the cycle the client is actually on. */
-  var o={}, cur=(typeof cycCurrent==='function')?cycCurrent():null;
+/* Cycles are recommendations, not a plan of record: building someone six
+   cycles does not mean they are running six cycles. So the day view starts
+   with what has actually been bought -- the compounds on a paid order --
+   and every recommended compound waits until the client switches it on.
+   A protocol that is still all quotes starts empty.
+
+   This is only the starting point. Once there is saved or synced state,
+   that wins and none of this runs. */
+function schPaidNorm(s){
+  return String(s||'').toLowerCase()
+    .replace(/^\s*\d+\s*[x×]\s*/,'')   /* some invoices lead with "2x " */
+    .replace(/·/g,' ')
+    .replace(/[–—]/g,'-')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+var SCH_PAID_ALIAS={
+  'selank':'n-acetyl selank amidate',
+  'semax':'n-acetyl semax amidate',
+  'adamax':'n-acetyl adamax amidate',
+  'epithalon':'epitalon',
+  'fox04-dri':'foxo4-dri'
+};
+/* Longest base name wins, so "Selank" cannot claim a line that belongs to
+   "N-Acetyl Selank Amidate". */
+function schPaidMatch(itemName){
+  var it=schPaidNorm(itemName), best=null, bestLen=-1;
   for(var i=0;i<ALL.length;i++){
-    var c=ALL[i];
-    if(cmpArch(c)) continue;
-    if(!cur || (typeof cycIsBase==='function'&&cycIsBase(c)) ||
-       (typeof cycNames==='function'&&cycNames(c).indexOf(cur)>=0)) o[c.n]=1;
+    var base=schPaidNorm(String(ALL[i].n).split('·')[0]);
+    if(!base) continue;
+    var hit=it.indexOf(base)===0;
+    if(!hit){
+      var al=SCH_PAID_ALIAS[base];
+      if(al && it.indexOf(al)===0) hit=true;
+      if(!hit){ var ia=SCH_PAID_ALIAS[it.split(' ')[0]]; if(ia && ia===base) hit=true; }
+    }
+    if(hit && base.length>bestLen){ best=ALL[i]; bestLen=base.length; }
   }
+  return best;
+}
+function schDefault(){
+  var o={};
+  try{
+    if(typeof INV==='undefined' || !INV) return o;
+    for(var i=0;i<INV.length;i++){
+      if(INV[i].status!=='paid') continue;
+      var items=INV[i].items||[];
+      for(var j=0;j<items.length;j++){
+        var c=schPaidMatch(items[j].n);
+        /* a line that cannot be matched confidently is left off: the one
+           thing never to do here is switch on something unbought */
+        if(c && !cmpArch(c)) o[c.n]=1;
+      }
+    }
+  }catch(e){}
   return o;
 }
 function schLoad(){
@@ -4466,7 +4512,11 @@ function csRead(kind){
 function csHasLocal(kind){
   var p=csRead(kind);
   if(!p) return false;
-  if(kind==='schedule')  return p.on && Object.keys(p.on).length>0;
+  if(kind==='schedule'){
+    /* schGet() synthesises the default when nothing is saved, so ask
+       storage directly: only real curation should be lifted up. */
+    try{ return !!localStorage.getItem(SCHKEY); }catch(e){ return false; }
+  }
   if(kind==='nutrition') return p.plan!=null || p.targets!=null;
   if(kind==='calculator') return (p.saved&&p.saved.length) || (p.inputs&&Object.keys(p.inputs).length);
   return false;
