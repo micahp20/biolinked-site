@@ -1,41 +1,11 @@
 /* ======================================================================
-   BioLinked site theme controller — dark only.
+   BioLinked site theme notes.
 
-   The site runs the Colorado dark palette. This script pins
-   data-theme="dark" so a visitor holding a cached copy of a page, or a
-   stale saved preference from the old toggle, cannot end up on a
-   half-light page. It also removes any toggle button still sitting in a
-   cached copy. bl-theme.css carries the dark values under
-   :root[data-theme="dark"].
+   Theme selection lives in bl-theme-toggle.js plus the pre-paint snippet
+   in each page's <head>. This file no longer pins a theme: it used to
+   force one, which is what stopped the light palette rendering at all.
+   What remains here is the wide-table handling below.
    ====================================================================== */
-(function(){
-  var root = document.documentElement;
-
-  function forceDark(){
-    root.setAttribute('data-theme', 'dark');
-    var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', '#0b0b0c');
-    var stale = document.querySelectorAll('.bl-theme-toggle');
-    for (var i = 0; i < stale.length; i++){
-      if (stale[i].parentNode) stale[i].parentNode.removeChild(stale[i]);
-    }
-  }
-
-  try { localStorage.removeItem('bl-theme'); } catch(e){}
-  forceDark();
-
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', forceDark);
-  }
-  // nav.js injects its markup asynchronously on some pages; sweep once more
-  // after it lands in case a cached page re-inserted a toggle.
-  var tries = 0;
-  var iv = setInterval(function(){
-    forceDark();
-    if (++tries > 12) clearInterval(iv);
-  }, 200);
-})();
-
 /* ---------------------------------------------------------------------
    Wide tables on phones. A few pages carry tables whose content cannot
    shrink below ~560px (schedule grids, price ladders), which pushed the
