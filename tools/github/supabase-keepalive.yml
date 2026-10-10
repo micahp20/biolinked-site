@@ -1,0 +1,50 @@
+# ---------------------------------------------------------------------
+# Keep the Supabase project warm.
+#
+# A free project pauses after a stretch with no activity, and the client
+# pings only happen while someone has a protocol page open, which is not
+# a guarantee. This calls get_state once on a slug that belongs to nobody.
+# It is a read, so it writes nothing and creates no row.
+#
+# The key below is the project's PUBLIC anon key -- the same one already
+# served in the protocol pages -- so no repository secret is needed. It is
+# not a service-role key and grants nothing beyond the two sync RPCs.
+# ---------------------------------------------------------------------
+name: supabase-keepalive
+
+on:
+  schedule:
+    # 07:12 UTC every third day. GitHub skips a scheduled run only if the
+    # repository has had no activity for 60 days; a push resets that.
+    - cron: '12 7 */3 * *'
+  workflow_dispatch:        # so it can be run by hand from the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Call get_state once
+        env:
+          SUPABASE_URL: https://bfjydzealeethhcpdfxl.supabase.co
+          SUPABASE_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o /tmp/out.json -w '%{http_code}' \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/get_state" \
+            -H "apikey: $SUPABASE_ANON" \
+            -H "Authorization: Bearer $SUPABASE_ANON" \
+            -H "Content-Type: application/json" \
+            --data '{"p_slug":"keepalive-ping"}' \
+            --max-time 30 --retry 3 --retry-delay 10 --retry-connrefused)
+          echo "HTTP $code"
+          cat /tmp/out.json
+          # an unknown slug legitimately returns 200 with an empty array
+          if [ "$code" != "200" ]; then
+            echo "::error::keep-alive ping failed with HTTP $code"
+            exit 1
+          fi
+          echo "Supabase project is awake."
