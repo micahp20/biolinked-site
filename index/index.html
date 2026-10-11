@@ -212,34 +212,100 @@ html[data-theme] body{padding:0}
 
   .dir-meta{margin-top:14px;font-family:var(--bls-sans);font-size:12px;color:var(--bls-muted)}
   .dir-meta b{font-family:var(--bls-serif);font-size:15px;color:var(--bls-ink);font-weight:600}
-  .dir-disc{margin:7px 0 0;font-family:var(--bls-sans);font-size:10.5px;line-height:1.5;color:var(--bls-faint)}
+  .dir-disc{margin:8px 0 0;font-family:var(--bls-sans);font-size:11.5px;line-height:1.55;color:var(--bls-muted)}
 
-  /* results: compact rows, detail opens in place */
-  .dir-sec{font-family:var(--bls-sans);font-size:9.5px;font-weight:700;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--bls-gold);padding:22px 2px 9px}
-  .dir-list{border-top:1px solid var(--bls-line)}
-  .dir-row{border-bottom:1px solid var(--bls-line)}
-  .dir-row-head{display:flex;align-items:center;gap:11px;padding:14px 2px;cursor:pointer;
-    -webkit-tap-highlight-color:transparent}
-  .dir-star{flex:0 0 auto;width:32px;height:32px;margin-left:-5px;border:none;background:none;
-    display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;
-    color:var(--bls-faint);font-size:15px;line-height:1;transition:color .15s;
-    -webkit-tap-highlight-color:transparent}
+  /* ---- results: bold outlined cards -------------------------------
+     The border is gold-tinted rather than --bls-line: the neutral line
+     is nearly invisible against --bls-card on the dark ground, which is
+     exactly the "can't see some of the stuff" complaint. */
+  .dir-sec{font-family:var(--bls-sans);font-size:11px;font-weight:800;letter-spacing:.17em;
+    text-transform:uppercase;color:var(--bls-gold);padding:26px 2px 11px}
+  .dir-list{display:flex;flex-direction:column;gap:11px}
+  .dir-card{display:flex;align-items:flex-start;gap:10px;width:100%;box-sizing:border-box;
+    text-align:left;background:var(--bls-card);border:1.5px solid rgba(138,115,56,.34);
+    border-radius:16px;padding:16px 12px 16px 14px;cursor:pointer;font:inherit;
+    transition:border-color .15s,transform .12s;-webkit-tap-highlight-color:transparent}
+  :root[data-theme="dark"] .dir-card{border-color:rgba(207,184,124,.32);
+    box-shadow:0 1px 0 rgba(0,0,0,.4)}
+  .dir-card:active{transform:scale(.985);border-color:var(--bls-gold)}
+  .dir-card-txt{flex:1 1 auto;min-width:0}
+  .dir-card-nm{font-family:var(--bls-sans);font-size:18px;font-weight:800;letter-spacing:-.012em;
+    color:var(--bls-ink);line-height:1.22}
+  .dir-card-sub{font-family:var(--bls-sans);font-size:12.5px;line-height:1.45;
+    color:var(--bls-muted);margin-top:5px}
+  .dir-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .dir-badge{display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;
+    font-family:var(--bls-sans);font-size:10.5px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;background:var(--bls-gold);color:var(--bls-on-gold)}
+  .dir-star{flex:0 0 auto;width:38px;height:38px;margin:-4px -2px 0 0;border:none;
+    background:none;display:flex;align-items:center;justify-content:center;border-radius:50%;
+    cursor:pointer;color:var(--bls-faint);font-size:19px;line-height:1;
+    transition:color .15s;-webkit-tap-highlight-color:transparent}
   .dir-star.on{color:var(--bls-gold)}
   .dir-star:active{background:var(--bls-gold-soft)}
-  .dir-row-txt{flex:1 1 auto;min-width:0}
-  .dir-row-nm{font-family:var(--bls-serif);font-size:16.5px;font-weight:600;color:var(--bls-ink);
-    line-height:1.3}
-  .dir-row-cat{font-family:var(--bls-sans);font-size:11.5px;color:var(--bls-muted);margin-top:3px}
-  .dir-chev{flex:0 0 auto;color:var(--bls-gold);font-size:18px;line-height:1;
-    transition:transform .2s}
-  .dir-row.open .dir-chev{transform:rotate(90deg)}
-  .dir-row-detail{display:none;padding:0 2px 18px 43px}
-  .dir-row.open .dir-row-detail{display:block}
-  @media(max-width:420px){.dir-row-detail{padding-left:4px}}
-  /* these two carried card padding; inside a row they sit flush */
-  .dir-row-detail .m-card-sub,.dir-row-detail .m-card-goal{padding:0}
-  .dir-empty{padding:40px 2px;text-align:center}
+  .dir-chev{flex:0 0 auto;align-self:center;color:var(--bls-gold);font-size:23px;
+    font-weight:700;line-height:1;margin-left:2px}
+  .dir-empty{padding:48px 2px;text-align:center}
+
+  /* ---- full-screen detail ------------------------------------------
+     A real screen rather than an inline fold: the list, the search bar,
+     the legal block and the footer all stand down while it is up, and
+     the list's scroll position is restored on the way back. */
+  .dir-detail{display:none}
+  body.dtl .dir-detail{display:block}
+  body.dtl .ix-bar,body.dtl #dirResults,body.dtl .ix-legal,
+  body.dtl .bls-foot,body.dtl .bls-rule{display:none!important}
+
+  .dtl-bar{position:sticky;top:0;z-index:45;display:flex;align-items:center;gap:8px;
+    padding:11px 0;margin-bottom:4px;
+    background:rgba(var(--wash-rgb,251,250,246),.97);backdrop-filter:saturate(1.2) blur(8px);
+    border-bottom:1.5px solid rgba(138,115,56,.30)}
+  :root[data-theme="dark"] .dtl-bar{border-bottom-color:rgba(207,184,124,.28)}
+  .dtl-btn{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;min-height:40px;
+    padding:8px 12px 8px 6px;border:none;background:none;cursor:pointer;
+    font-family:var(--bls-sans);font-size:14.5px;font-weight:700;color:var(--bls-gold);
+    -webkit-tap-highlight-color:transparent}
+  .dtl-btn:active{opacity:.6}
+  .dtl-bar-nm{flex:1 1 auto;min-width:0;text-align:center;font-family:var(--bls-sans);
+    font-size:13.5px;font-weight:700;color:var(--bls-ink);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dtl-save{flex:0 0 auto;width:40px;height:40px;border:none;background:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;
+    color:var(--bls-faint);font-size:20px;-webkit-tap-highlight-color:transparent}
+  .dtl-save.on{color:var(--bls-gold)}
+
+  .dtl-head{padding:18px 2px 4px}
+  .dtl-h1{font-family:var(--bls-sans);font-size:28px;font-weight:800;letter-spacing:-.02em;
+    line-height:1.14;color:var(--bls-ink);margin:0}
+  .dtl-sub{font-family:var(--bls-sans);font-size:13.5px;line-height:1.5;
+    color:var(--bls-muted);margin:8px 0 0}
+  .dtl-goal{font-family:var(--bls-sans);font-size:14.5px;line-height:1.55;
+    color:var(--bls-ink2);margin:13px 0 0}
+
+  .dtl-rows{margin-top:20px;border-top:1.5px solid rgba(138,115,56,.22)}
+  :root[data-theme="dark"] .dtl-rows{border-top-color:rgba(207,184,124,.22)}
+  .dtl-row{display:flex;align-items:flex-start;gap:12px;padding:15px 2px;
+    border-bottom:1px solid var(--bls-line)}
+  .dtl-ico{flex:0 0 auto;width:30px;height:30px;border-radius:9px;display:flex;
+    align-items:center;justify-content:center;font-size:14px;
+    background:var(--bls-gold-soft);color:var(--bls-gold)}
+  .dtl-rtx{flex:1 1 auto;min-width:0}
+  .dtl-k{font-family:var(--bls-sans);font-size:10px;font-weight:800;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--bls-gold)}
+  .dtl-v{font-family:var(--bls-sans);font-size:14.5px;line-height:1.55;
+    color:var(--bls-ink);margin-top:4px;font-weight:600}
+
+  .dtl-sec{margin-top:24px}
+  .dtl-sec-k{font-family:var(--bls-sans);font-size:10px;font-weight:800;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--bls-gold);margin-bottom:9px}
+  .dtl-sec-v{font-family:var(--bls-sans);font-size:14px;line-height:1.68;color:var(--bls-ink2)}
+  .dtl-note{margin:26px 0 8px;padding:15px;border-radius:13px;
+    background:var(--bls-gold-soft);border:1.5px solid rgba(138,115,56,.30)}
+    <div class="dir-detail" id="dirDetail" role="region" aria-label="Compound detail"></div>
+  :root[data-theme="dark"] .dtl-note{border-color:rgba(207,184,124,.28)}
+  .dtl-note .dtl-sec-k{margin-bottom:7px}
+  .dtl-note p{margin:0;font-family:var(--bls-sans);font-size:12.5px;line-height:1.6;
+    color:var(--bls-ink2)}
 
   /* result cards */
   .m-card{background:var(--bls-card);border:1px solid var(--bls-line);border-radius:18px;
@@ -509,27 +575,6 @@ const COMPOUNDS = [
 })();
 
 /* Dosing panel rendered on every card, replacing the old "View Cheat Sheet" link. */
-function dosingBlock(c){
-  var d = c.cs || {};
-  var rows = [
-    ['Dose',         d.dose   || c.dose],
-    ['Frequency',    d.freq   || c.frequency],
-    ['Timing',       d.timing || c.timing],
-    ['Duration',     d.dur    || c.cycle],
-    ['Vial Size',    d.vial],
-    ['BAC Water',    d.bac],
-    ['Draw',         d.units && d.units !== 'N/A' ? d.units + ' units' : d.units]
-  ].filter(function(r){ return r[1]; });
-  if (!rows.length) return '';
-  return '<div class="dose-box"><div class="dkey">Dosing &amp; Reconstitution</div>'
-       + '<div class="dose-grid">'
-       + rows.map(function(r){
-           return '<div class="dose-row"><span class="dose-k">' + r[0] + '</span>'
-                + '<span class="dose-v">' + r[1] + '</span></div>';
-         }).join('')
-       + '</div></div>';
-}
-
 let activeCat='all', searchQ='', dirMode='all';
 
 /* Saved rows live in localStorage, namespaced per page so the Index and the
@@ -545,21 +590,24 @@ function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,
 function isSaved(n){ return SAVED.indexOf(n)>-1; }
 function saveWrite(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(SAVED)); }catch(e){} }
 function dirSavedCount(){ const el=document.getElementById('dirSavedN'); if(el) el.textContent=SAVED.length; }
-function toggleSave(n,btn){
+function toggleSave(n){
   const i=SAVED.indexOf(n);
   if(i>-1) SAVED.splice(i,1); else SAVED.push(n);
   saveWrite();
   const on=isSaved(n);
-  if(btn){
-    btn.classList.toggle('on',on);
-    btn.setAttribute('aria-pressed',on?'true':'false');
-    btn.innerHTML=on?'&#9733;':'&#9734;';
-  }
+  /* the same compound can have two controls on screen - the card's star and
+     the detail bar's bookmark - so sync every control that names it */
+  const sel='.dir-star[data-n],.dtl-save[data-n]';
+  [].forEach.call(document.querySelectorAll(sel),function(el){
+    if(el.getAttribute('data-n')!==n) return;
+    el.classList.toggle('on',on);
+    el.setAttribute('aria-pressed',on?'true':'false');
+    el.innerHTML=on?'&#9733;':'&#9734;';
+  });
   dirSavedCount();
-  /* unstarring while the Saved filter is up should drop the row straight away */
-  if(dirMode==='saved') render();
+  /* unstarring while the Saved filter is up should drop the card straight away */
+  if(dirMode==='saved'&&!document.body.classList.contains('dtl')) render();
 }
-
 function filtered(){
   const ql=searchQ.toLowerCase().trim();
   return COMPOUNDS.filter(c=>{
@@ -570,28 +618,89 @@ function filtered(){
   });
 }
 
-function rowDetail(c){
-  return (c.sub ? `<div class="m-card-sub" style="margin-bottom:5px">${c.sub}</div>` : '')
-    + (c.goal ? `<div class="m-card-goal" style="margin-bottom:13px">${c.goal}</div>` : '')
-    + (c.mechanism ? `<div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${c.mechanism}</div></div>` : '')
-    + dosingBlock(c)
-    + (c.notes ? `<div class="m-notes"><div class="m-detail-label">Research Notes</div><div class="m-detail-text" style="font-size:11.5px">${c.notes}</div></div>` : '');
+/* A card, not a fold. The whole thing is one button so it is reachable by
+   keyboard; the star inside stops the click so saving never opens the
+   detail. Badges carry the category only - this data has no evidence tier
+   and no regulatory status, so nothing of that sort is shown. */
+function buildCard(c){
+  const on=isSaved(c.name);
+  return '<div class="dir-card" role="button" tabindex="0" data-n="'+esc(c.name)+'">'
+    + '<div class="dir-card-txt">'
+    +   '<div class="dir-card-nm">'+c.name+'</div>'
+    +   (c.sub?'<div class="dir-card-sub">'+c.sub+'</div>':'')
+    +   '<div class="dir-badges"><span class="dir-badge">'+c.cat+'</span></div>'
+    + '</div>'
+    + '<button type="button" class="dir-star'+(on?' on':'')+'" data-n="'+esc(c.name)+'"'
+    +   ' aria-pressed="'+(on?'true':'false')+'" aria-label="Save '+esc(c.name)+'">'
+    +   (on?'&#9733;':'&#9734;')+'</button>'
+    + '<span class="dir-chev" aria-hidden="true">&#8250;</span>'
+    + '</div>';
 }
 
-function buildRow(c){
-  const on=isSaved(c.name);
-  return `<div class="dir-row">
-  <div class="dir-row-head">
-    <button type="button" class="dir-star${on?' on':''}" data-n="${esc(c.name)}" aria-pressed="${on?'true':'false'}" aria-label="Save ${esc(c.name)}">${on?'&#9733;':'&#9734;'}</button>
-    <div class="dir-row-txt">
-      <div class="dir-row-nm">${c.name}</div>
-      <div class="dir-row-cat">${c.cat}</div>
-    </div>
-    <span class="dir-chev" aria-hidden="true">&#8250;</span>
-  </div>
-  <div class="dir-row-detail">${rowDetail(c)}</div>
-</div>`;
+function dtlRow(icon,k,v){
+  if(!v) return '';
+  return '<div class="dtl-row"><div class="dtl-ico" aria-hidden="true">'+icon+'</div>'
+       + '<div class="dtl-rtx"><div class="dtl-k">'+k+'</div><div class="dtl-v">'+v+'</div></div></div>';
 }
+function dtlSec(k,v){
+  return v?'<div class="dtl-sec"><div class="dtl-sec-k">'+k+'</div><div class="dtl-sec-v">'+v+'</div></div>':'';
+}
+
+function detailHTML(c){
+  const d=c.cs||{}, on=isSaved(c.name);
+  return '<div class="dtl-bar">'
+    +   '<button type="button" class="dtl-btn" id="dtlBack">&#8249; Back</button>'
+    +   '<span class="dtl-bar-nm">'+c.name+'</span>'
+    +   '<button type="button" class="dtl-save'+(on?' on':'')+'" id="dtlSave" data-n="'+esc(c.name)+'"'
+    +     ' aria-pressed="'+(on?'true':'false')+'" aria-label="Save '+esc(c.name)+'">'
+    +     (on?'&#9733;':'&#9734;')+'</button>'
+    + '</div>'
+    + '<div class="dtl-head">'
+    +   '<h2 class="dtl-h1">'+c.name+'</h2>'
+    +   (c.sub?'<p class="dtl-sub">'+c.sub+'</p>':'')
+    +   '<div class="dir-badges"><span class="dir-badge">'+c.cat+'</span></div>'
+    +   (c.goal?'<p class="dtl-goal">'+c.goal+'</p>':'')
+    + '</div>'
+    + '<div class="dtl-rows">'
+    +   dtlRow('&#9878;','Typical Range', d.dose||c.dose)
+    +   dtlRow('&#8635;','Frequency',     d.freq||c.frequency)
+    +   dtlRow('&#9679;','Administration',d.timing||c.timing)
+    +   dtlRow('&#9203;','Cycle Length',  d.dur||c.cycle)
+    +   dtlRow('&#9881;','Vial Size',     d.vial)
+    +   dtlRow('&#9663;','BAC Water',     d.bac)
+    +   dtlRow('&#8599;','Draw',          d.units&&d.units!=='N/A'?d.units+' units':'')
+    + '</div>'
+    + dtlSec('Mechanism / How It Works', c.mechanism)
+    + dtlSec('Research Notes', c.notes)
+    + '<div class="dtl-note"><div class="dtl-sec-k">&#9888; Important</div>'
+    +   '<p>Research reference only &mdash; not for human use &middot; not medical advice. '
+    +   'Compiled from publicly available literature for educational purposes. '
+    +   'Always consult a qualified healthcare provider.</p></div>';
+}
+
+/* The list's scroll position is remembered so Back lands you where you were,
+   and the detail is pushed onto history so the phone's own back gesture
+   closes it instead of leaving the site. */
+let LIST_Y=0;
+function openDetail(n){
+  const c=COMPOUNDS.filter(function(x){ return x.name===n; })[0];
+  if(!c) return;
+  LIST_Y=window.scrollY;
+  document.getElementById('dirDetail').innerHTML=detailHTML(c);
+  document.body.classList.add('dtl');
+  window.scrollTo(0,0);
+  try{ history.pushState({dtl:n},''); }catch(e){}
+}
+function closeDetail(){
+  if(!document.body.classList.contains('dtl')) return;
+  document.body.classList.remove('dtl');
+  requestAnimationFrame(function(){ window.scrollTo(0,LIST_Y); });
+}
+function backFromDetail(){
+  if(history.state&&history.state.dtl){ history.back(); }
+  else closeDetail();
+}
+window.addEventListener('popstate',closeDetail);
 
 
 /* ---------- Directory browse controls ----------
@@ -649,14 +758,27 @@ function dirWire(){
   document.getElementById('dirAllBtn').addEventListener('click',()=>setMode('all'));
   document.getElementById('dirSavedBtn').addEventListener('click',()=>setMode('saved'));
 
-  /* One delegated handler for the whole list. The star sits inside the row
-     header, so it has to swallow the click or every save would also open
-     the detail underneath it. */
-  document.getElementById('dirResults').addEventListener('click',ev=>{
+  /* One delegated handler for the list. The star has to swallow its own
+     click, or saving would also open the detail behind it. */
+  const host=document.getElementById('dirResults');
+  host.addEventListener('click',ev=>{
     const star=ev.target.closest('.dir-star');
-    if(star){ ev.stopPropagation(); toggleSave(star.getAttribute('data-n'),star); return; }
-    const head=ev.target.closest('.dir-row-head');
-    if(head) head.parentNode.classList.toggle('open');
+    if(star){ ev.stopPropagation(); toggleSave(star.getAttribute('data-n')); return; }
+    const card=ev.target.closest('.dir-card');
+    if(card) openDetail(card.getAttribute('data-n'));
+  });
+  host.addEventListener('keydown',ev=>{
+    if(ev.key!=='Enter'&&ev.key!==' ') return;
+    const card=ev.target.closest('.dir-card');
+    if(card&&ev.target===card){ ev.preventDefault(); openDetail(card.getAttribute('data-n')); }
+  });
+
+  /* The detail is re-rendered each time it opens, so bind by delegation
+     rather than to buttons that will not exist yet. */
+  document.getElementById('dirDetail').addEventListener('click',ev=>{
+    if(ev.target.closest('#dtlBack')){ backFromDetail(); return; }
+    const sv=ev.target.closest('#dtlSave');
+    if(sv) toggleSave(sv.getAttribute('data-n'));
   });
 }
 
@@ -669,21 +791,21 @@ function render(){
   if(!list.length){
     host.innerHTML='<div class="dir-empty"><div class="empty-t">'+
       (dirMode==='saved'?'Nothing saved yet':'No compounds found')+'</div><div class="empty-d">'+
-      (dirMode==='saved'?'Tap the star on any row to keep it here.':'Try a different search term or category.')+
+      (dirMode==='saved'?'Tap the star on any card to keep it here.':'Try a different search term or category.')+
       '</div></div>';
     return;
   }
-  /* Group only while nothing is narrowed down - it is what keeps 100+ rows
-     scannable. The moment you search or pick a facet, the flat list is the
-     clearer read. */
+  /* Group only while nothing is narrowed down - it is what keeps 100+ cards
+     scannable. The moment you search or pick a facet, the flat list reads
+     more clearly. */
   const grouped = activeCat==='all' && dirMode==='all' && !searchQ.trim();
   if(grouped){
     const groups={}, order=[];
     list.forEach(c=>{ if(!groups[c.cat]){ groups[c.cat]=[]; order.push(c.cat); } groups[c.cat].push(c); });
     host.innerHTML=order.map(ct=>'<div class="dir-sec">'+ct+' &middot; '+groups[ct].length+'</div>'+
-      groups[ct].map(buildRow).join('')).join('');
+      '<div class="dir-list">'+groups[ct].map(buildCard).join('')+'</div>').join('');
   } else {
-    host.innerHTML=list.map(buildRow).join('');
+    host.innerHTML='<div class="dir-list">'+list.map(buildCard).join('')+'</div>';
   }
 }
 
