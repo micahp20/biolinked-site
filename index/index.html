@@ -683,6 +683,10 @@ function detailHTML(c){
    and the detail is pushed onto history so the phone's own back gesture
    closes it instead of leaving the site. */
 let LIST_Y=0;
+/* The browser restores its own scroll position on popstate, which lands on
+   0 and undoes the restore below. Taking manual control is what makes Back
+   return you to the card you tapped. */
+try{ if('scrollRestoration' in history) history.scrollRestoration='manual'; }catch(e){}
 function openDetail(n){
   const c=COMPOUNDS.filter(function(x){ return x.name===n; })[0];
   if(!c) return;
@@ -695,7 +699,13 @@ function openDetail(n){
 function closeDetail(){
   if(!document.body.classList.contains('dtl')) return;
   document.body.classList.remove('dtl');
-  requestAnimationFrame(function(){ window.scrollTo(0,LIST_Y); });
+  const y=LIST_Y;
+  /* twice: once as soon as the list is laid out again, once after the
+     browser has finished whatever it wanted to do with the scroll */
+  requestAnimationFrame(function(){
+    window.scrollTo(0,y);
+    setTimeout(function(){ window.scrollTo(0,y); },0);
+  });
 }
 function backFromDetail(){
   if(history.state&&history.state.dtl){ history.back(); }
