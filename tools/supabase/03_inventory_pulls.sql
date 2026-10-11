@@ -121,78 +121,95 @@ commit;
 
 
 -- ---------------------------------------------------------------------
--- B) dmaynes — Derek Maynes — the "ordered 4, only 2 pulled" correction
+-- ---------------------------------------------------------------------
+-- B) dmaynes — Derek Maynes — VIP correction (confirmed 2026-10-11)
 --
--- DELIBERATELY NOT WRITTEN AS RUNNABLE SQL.
+-- Micah confirmed the short line is VIP, not Wolverine Blend: Derek was
+-- given 4 vials of VIP but only 2 were ever pulled, so stock is
+-- overstated by 2. This adds the missing 2 and takes them off the shelf.
+-- Expected: Derek's pulled VIP qty 2 -> 4, VIP stock 8 -> 6.
 --
--- Two of his lines are 4 vials and the data available did not say which
--- one is short, so guessing would risk pulling the wrong compound:
+-- >>> FLAG — worth reading before you run this:
+--     Derek's VIP line is "New Order · VIP Cycled Course", 4 vials @ $45
+--     = $180, and its status is DUE. It is a quote, and it is his only
+--     unpaid line. Booking these 2 vials into pl_sales at $45 adds $90
+--     of revenue against an order nobody has paid for, which cuts
+--     against the usual rule that only paid cycles count. Two vials were
+--     evidently already pulled the same way, so this at least stays
+--     consistent with what is already recorded.
+--     The stock decrement is right either way — the vials are gone. If
+--     you would rather not book the revenue, see B2 for the stock-only
+--     version and skip B1.
 --
---   * Wolverine Blend 10 mg x 4 @ $40  — Paid Order #003, $160
---   * VIP 10 mg x 4 @ $45              — New Order, still DUE, $180
---
--- Wolverine Blend is the likelier of the two, being paid; a due order
--- would normally have pulled nothing at all rather than half. But that
--- is an inference, not his record.
---
--- Run B0 to see which of his rows is short, then uncomment the matching
--- block in B1 and fill in the two ids it prints.
+-- Ids are resolved by name rather than hardcoded, because the VIP
+-- product and inventory ids were never read. The block refuses to act
+-- unless exactly one product matches, so a name collision is a no-op
+-- rather than a wrong pull. Run B0 first and eyeball what it matches.
 -- ---------------------------------------------------------------------
 
--- B0. What has actually been pulled for Derek, next to the product and
---     the stock it draws from. Compare qty against the order quantity.
-select s.id            as sale_id,
-       s.date,
-       s.qty           as pulled_qty,
-       s.price,
-       s.note,
-       p.id            as product_id,
-       p.name          as product,
-       p.cost,
-       i.id            as inventory_id,
-       i.name          as inventory_item,
-       i.vials         as stock_now
-  from public.pl_sales s
-  join public.pl_products p on p.id = s.product_id
-  left join public.inventory i on i.id = p.inventory_id
- where s.note ilike '%maynes%'
-    or s.customer ilike '%maynes%'
-    or s.client_id in (select id from public.pl_clients where name ilike '%derek%maynes%')
- order by s.date, s.id;
-
--- B0b. The product and inventory ids for the two candidates, so the
---      block below can be filled in without guessing.
+-- B0. Confirm the match first. Expect ONE product row, stock_now = 8.
 select p.id as product_id, p.name as product, p.cost,
-       i.id as inventory_id, i.name as inventory_item, i.vials as stock_now
+       i.id as inventory_id, i.name as inventory_item,
+       i.vials as stock_now, i.status
   from public.pl_products p
   left join public.inventory i on i.id = p.inventory_id
- where p.name ilike '%wolverine%'
-    or p.name ilike '%vip%'
+ where p.name ilike '%vip%'
     or p.name ilike '%vasoactive%'
  order by p.name;
 
--- B1. The correction, once the compound is known. Replace <PRODUCT_ID>,
---     <INVENTORY_ID> and <UNIT_PRICE> with the values B0/B0b printed,
---     then uncomment. It adds the 2 missing vials and takes 2 off stock;
---     it does not touch the existing partial row.
+-- B0b. What has already been pulled for Derek. Expect a VIP row of qty 2.
+select s.id as sale_id, s.date, s.qty as pulled_qty, s.price, s.note,
+       p.name as product
+  from public.pl_sales s
+  join public.pl_products p on p.id = s.product_id
+ where s.note ilike '%maynes%'
+ order by s.date, s.id;
+
+-- B1. The correction: books the 2 missing vials AND takes them off stock.
+--     Idempotent — the sale inserts only if the correction row is not
+--     already there, and the decrement is gated on that insert, so
+--     re-running does nothing. Will not take stock below zero, and does
+--     nothing at all unless exactly one product matched above.
+with vip as (
+  select p.id as product_id, p.inventory_id
+    from public.pl_products p
+   where p.name ilike '%vip%'
+      or p.name ilike '%vasoactive%'
+),
+one as (
+  select product_id, inventory_id from vip
+   where (select count(*) from vip) = 1
+),
+ins as (
+  insert into public.pl_sales (product_id, date, qty, price, note)
+  select o.product_id, date '2026-10-11', 2, 45,
+         'Derek Maynes · inventory correction · 2 of 4 VIP vials not pulled'
+    from one o
+   where not exists (select 1 from public.pl_sales
+                      where note like 'Derek Maynes · inventory correction%')
+  returning qty
+)
+update public.inventory i
+   set vials  = i.vials - 2,
+       status = case when i.vials - 2 = 0  then 'out'
+                     when i.vials - 2 <= 3 then 'low'
+                     else 'in-stock' end
+ where i.id in (select inventory_id from one)
+   and exists (select 1 from ins)
+   and i.vials >= 2;
+
+-- B2. ALTERNATIVE — stock only, no revenue booked. Use this INSTEAD of
+--     B1 if you do not want $90 on an unpaid quote. Not idempotent on
+--     its own (it has no sale row to gate on), so run it exactly once.
 --
--- with ins as (
---   insert into public.pl_sales (product_id, date, qty, price, note)
---   select <PRODUCT_ID>, date '2026-10-11', 2, <UNIT_PRICE>,
---          'Derek Maynes · inventory correction · 2 of 4 vials not pulled'
---    where not exists (select 1 from public.pl_sales
---                       where product_id = <PRODUCT_ID>
---                         and note like 'Derek Maynes · inventory correction%')
---   returning qty
--- )
 -- update public.inventory i
---    set vials  = i.vials - (select qty from ins),
---        status = case when i.vials - (select qty from ins) = 0  then 'out'
---                      when i.vials - (select qty from ins) <= 3 then 'low'
+--    set vials  = i.vials - 2,
+--        status = case when i.vials - 2 = 0  then 'out'
+--                      when i.vials - 2 <= 3 then 'low'
 --                      else 'in-stock' end
---  where i.id = <INVENTORY_ID>
---    and exists (select 1 from ins)
---    and i.vials >= (select qty from ins);
+--  where i.id = (select p.inventory_id from public.pl_products p
+--                 where p.name ilike '%vip%' or p.name ilike '%vasoactive%')
+--    and i.vials >= 2;
 
 
 -- ---------------------------------------------------------------------
@@ -222,3 +239,19 @@ select id, name, vials, status
   from public.inventory
  where id in (108, 126, 52, 6)
  order by name;
+
+-- V4. Section B: Derek's VIP after the correction.
+--     expect: two rows, pulled_qty 2 + 2 = 4 vials total
+select s.id, s.date, s.qty, s.price, s.note
+  from public.pl_sales s
+  join public.pl_products p on p.id = s.product_id
+ where s.note ilike '%maynes%'
+   and (p.name ilike '%vip%' or p.name ilike '%vasoactive%')
+ order by s.date, s.id;
+
+-- V5. VIP stock after the correction.
+--     expect: vials 6, status in-stock
+select i.id, i.name, i.vials, i.status
+  from public.inventory i
+  join public.pl_products p on p.inventory_id = i.id
+ where p.name ilike '%vip%' or p.name ilike '%vasoactive%';
