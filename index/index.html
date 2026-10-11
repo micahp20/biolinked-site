@@ -158,9 +158,6 @@ html[data-theme] body{padding:0}
 .ix-legal p{font-size:12.5px;line-height:1.7;color:var(--bls-ink2);margin:0}
 
 /* hide the mobile renderer on tablet+ and the desktop one on phone */
-#mobile-content{display:block}
-#desktop-content{display:none}
-@media(min-width:768px){#mobile-content{display:none}#desktop-content{display:block}}
 .mobile-filters{display:flex}
 @media(min-width:768px){.mobile-filters,#mobileSearch{display:none}}
 /* Below that the mobile pair takes over, so the desktop search box has to
@@ -168,68 +165,80 @@ html[data-theme] body{padding:0}
 @media(max-width:767px){.search-wrap{display:none}}
 @media(max-width:767px){.filter-row{display:none}}
   /* =====================================================================
-     Browse UI — search, category cards, facet pills, result cards.
+     Directory browse UI — ruled search, facet pills, compact result rows.
      Built on the CU tokens, so it follows light and dark with the page.
      ===================================================================== */
-  /* vertical only: the wrap owns the side gutter, and zeroing it here
-     pushed the rail's negative margins off-screen */
-  .pxs{padding-top:var(--bls-s4);padding-bottom:var(--bls-s3)}
-  .pxs-search{position:relative;display:flex;align-items:center}
-  .pxs-search-ico{position:absolute;left:16px;display:flex;pointer-events:none;color:var(--bls-faint)}
-  .pxs-search-ico svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;
-    stroke-linecap:round}
-  .pxs-search input{width:100%;box-sizing:border-box;min-height:54px;padding:15px 46px 15px 44px;
-    font-family:var(--bls-sans);font-size:15.5px;color:var(--bls-ink);background:var(--bls-card);
-    border:1px solid var(--bls-line);border-radius:16px;outline:none;
-    transition:border-color .16s,box-shadow .16s;-webkit-appearance:none}
-  .pxs-search input::placeholder{color:var(--bls-faint)}
-  .pxs-search input:focus{border-color:var(--bls-gold);box-shadow:0 0 0 3px var(--bls-gold-soft)}
-  .pxs-clear{position:absolute;right:8px;width:32px;height:32px;border:none;background:none;
-    color:var(--bls-faint);font-size:19px;line-height:1;cursor:pointer;border-radius:50%;
-    display:none;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
-  .pxs-clear.on{display:flex}
-  .pxs-clear:active{background:var(--bls-gold-soft)}
+  .dir{padding-top:var(--bls-s4);padding-bottom:var(--bls-s3)}
+  .dir-eyebrow{font-family:var(--bls-sans);font-size:10.5px;font-weight:700;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--bls-gold);margin:0 0 13px}
 
-  .pxs-lbl{font-family:var(--bls-sans);font-size:10px;font-weight:700;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--bls-faint);margin:var(--bls-s4) 0 10px}
+  /* the search is a ruled line, not a filled box */
+  .dir-search{display:flex;align-items:center;gap:12px;
+    border-bottom:1.5px solid var(--bls-gold);padding-bottom:8px}
+  .dir-search input{flex:1 1 auto;min-width:0;background:none;border:none;outline:none;
+    font-family:var(--bls-serif);font-size:18px;color:var(--bls-ink);padding:5px 0;
+    -webkit-appearance:none;border-radius:0}
+  .dir-search input::placeholder{font-family:var(--bls-sans);font-size:14.5px;color:var(--bls-faint)}
+  .dir-clear{flex:0 0 auto;border:none;background:none;padding:5px 2px;cursor:pointer;
+    font-family:var(--bls-sans);font-size:13px;font-weight:600;color:var(--bls-gold);
+    -webkit-tap-highlight-color:transparent}
+  .dir-clear:active{opacity:.6}
 
-  /* category cards: one horizontal rail, snapping, no visible scrollbar */
-  .pxs-cats{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x proximity;
-    /* the wrap carries no side padding on this page, so there is no gutter
-       to bleed into: the rail simply scrolls inside it */
-    margin:0;padding:2px 0 6px;
-    -webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .pxs-cats::-webkit-scrollbar{display:none}
-  .pxs-cat{flex:0 0 auto;scroll-snap-align:start;width:104px;min-height:98px;padding:13px 11px;
-    display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;
-    gap:6px;background:var(--bls-card);border:1px solid var(--bls-line);border-radius:16px;
-    cursor:pointer;text-align:left;font-family:var(--bls-sans);
-    transition:transform .14s,border-color .16s,background .16s;-webkit-tap-highlight-color:transparent}
-  .pxs-cat:active{transform:scale(.96)}
-  .pxs-cat-ico{font-size:21px;line-height:1}
-  .pxs-cat-nm{font-size:11.5px;font-weight:600;color:var(--bls-ink2);line-height:1.25}
-  .pxs-cat-n{font-family:var(--bls-serif);font-size:19px;font-weight:600;color:var(--bls-gold);line-height:1}
-  .pxs-cat.on{background:var(--bls-gold);border-color:var(--bls-gold)}
-  .pxs-cat.on .pxs-cat-nm{color:var(--bls-on-gold);opacity:.82}
-  .pxs-cat.on .pxs-cat-n{color:var(--bls-on-gold)}
+  .dir-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
+  .dir-pill{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;min-height:36px;
+    padding:8px 15px;border-radius:999px;border:1px solid var(--bls-line);background:none;
+    cursor:pointer;font-family:var(--bls-sans);font-size:13px;color:var(--bls-muted);
+    transition:border-color .15s,color .15s;-webkit-tap-highlight-color:transparent}
+  .dir-pill:active{transform:scale(.97)}
+  .dir-pill.on{border-color:var(--bls-gold);color:var(--bls-gold)}
+  .dir-pill-n{font-size:11px;opacity:.7}
+  .dir-plus{font-size:14px;line-height:1;display:inline-block;transition:transform .2s}
+  .dir-pill.exp .dir-plus{transform:rotate(45deg)}
 
-  /* facet pills */
-  .pxs-pills{display:flex;flex-wrap:wrap;gap:8px}
-  .pxs-pill{flex:0 0 auto;padding:9px 14px;min-height:38px;display:inline-flex;align-items:center;
-    font-family:var(--bls-sans);font-size:12.5px;font-weight:600;color:var(--bls-ink2);
-    background:var(--bls-card);border:1px solid var(--bls-line);border-radius:999px;cursor:pointer;
-    transition:transform .14s,background .16s,border-color .16s;-webkit-tap-highlight-color:transparent}
-  .pxs-pill:active{transform:scale(.95)}
-  .pxs-pill.on{background:var(--bls-gold);border-color:var(--bls-gold);color:var(--bls-on-gold)}
+  /* category / level picker, collapsed until asked for */
+  .dir-facets{margin-top:12px;border:1px solid var(--bls-line);border-radius:14px;padding:2px}
+  .dir-facets[hidden]{display:none}
+  .dir-grp{padding:11px 12px}
+  .dir-grp+.dir-grp{border-top:1px solid var(--bls-line)}
+  .dir-grp-lbl{font-family:var(--bls-sans);font-size:9.5px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--bls-faint);margin-bottom:9px}
+  .dir-grp-wrap{display:flex;flex-wrap:wrap;gap:7px}
+  .dir-fb{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;min-height:32px;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--bls-line);background:none;
+    cursor:pointer;font-family:var(--bls-sans);font-size:12.5px;color:var(--bls-muted);
+    transition:border-color .15s,color .15s;-webkit-tap-highlight-color:transparent}
+  .dir-fb.on{border-color:var(--bls-gold);color:var(--bls-gold)}
+  .dir-fb-n{font-size:10.5px;opacity:.7}
 
-  .pxs-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;
-    margin-top:var(--bls-s4);font-family:var(--bls-sans)}
-  .pxs-count{font-size:12.5px;color:var(--bls-muted)}
-  .pxs-count b{font-family:var(--bls-serif);font-size:17px;color:var(--bls-ink);font-weight:600}
-  .pxs-reset{border:none;background:none;padding:6px 2px;font-family:var(--bls-sans);font-size:12.5px;
-    font-weight:600;color:var(--bls-gold);cursor:pointer;opacity:0;pointer-events:none;
-    transition:opacity .16s;-webkit-tap-highlight-color:transparent}
-  .pxs-reset.on{opacity:1;pointer-events:auto}
+  .dir-meta{margin-top:14px;font-family:var(--bls-sans);font-size:12px;color:var(--bls-muted)}
+  .dir-meta b{font-family:var(--bls-serif);font-size:15px;color:var(--bls-ink);font-weight:600}
+
+  /* results: compact rows, detail opens in place */
+  .dir-sec{font-family:var(--bls-sans);font-size:9.5px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--bls-gold);padding:22px 2px 9px}
+  .dir-list{border-top:1px solid var(--bls-line)}
+  .dir-row{border-bottom:1px solid var(--bls-line)}
+  .dir-row-head{display:flex;align-items:center;gap:11px;padding:14px 2px;cursor:pointer;
+    -webkit-tap-highlight-color:transparent}
+  .dir-star{flex:0 0 auto;width:32px;height:32px;margin-left:-5px;border:none;background:none;
+    display:flex;align-items:center;justify-content:center;border-radius:50%;cursor:pointer;
+    color:var(--bls-faint);font-size:15px;line-height:1;transition:color .15s;
+    -webkit-tap-highlight-color:transparent}
+  .dir-star.on{color:var(--bls-gold)}
+  .dir-star:active{background:var(--bls-gold-soft)}
+  .dir-row-txt{flex:1 1 auto;min-width:0}
+  .dir-row-nm{font-family:var(--bls-serif);font-size:16.5px;font-weight:600;color:var(--bls-ink);
+    line-height:1.3}
+  .dir-row-cat{font-family:var(--bls-sans);font-size:11.5px;color:var(--bls-muted);margin-top:3px}
+  .dir-chev{flex:0 0 auto;color:var(--bls-gold);font-size:18px;line-height:1;
+    transition:transform .2s}
+  .dir-row.open .dir-chev{transform:rotate(90deg)}
+  .dir-row-detail{display:none;padding:0 2px 18px 43px}
+  .dir-row.open .dir-row-detail{display:block}
+  @media(max-width:420px){.dir-row-detail{padding-left:4px}}
+  /* these two carried card padding; inside a row they sit flush */
+  .dir-row-detail .m-card-sub,.dir-row-detail .m-card-goal{padding:0}
+  .dir-empty{padding:40px 2px;text-align:center}
 
   /* result cards */
   .m-card{background:var(--bls-card);border:1px solid var(--bls-line);border-radius:18px;
@@ -278,36 +287,31 @@ html[data-theme] body{padding:0}
   </div>
 </header>
 
-<!-- search + filters (ids and handlers unchanged — the engine binds to these) -->
+<!-- directory browse bar (searchInput / countNum keep their ids) -->
 <div class="ix-bar">
-  <div class="bls-wrap ix-bar-in pxs">
-    <div class="pxs-search">
-      <span class="pxs-search-ico" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></span>
-      <input type="text" id="searchInput" placeholder="Search peptides&hellip;" autocomplete="off" aria-label="Search peptides">
-      <button type="button" class="pxs-clear" id="pxsClear" aria-label="Clear search">&times;</button>
+  <div class="bls-wrap ix-bar-in dir">
+    <p class="dir-eyebrow">Peptide Index</p>
+
+    <div class="dir-search">
+      <input type="text" id="searchInput" placeholder="Search compound names&hellip;" autocomplete="off" aria-label="Search compound names">
+      <button type="button" class="dir-clear" id="dirClear">Clear</button>
     </div>
 
-    <div class="pxs-lbl">Categories</div>
-    <div class="pxs-cats" id="pxsCats" role="group" aria-label="Filter by category"></div>
-
-    <div class="pxs-lbl">Availability</div>
-    <div class="pxs-pills" id="pxsAvail" role="group" aria-label="Filter by availability"></div>
-
-    <div class="pxs-meta">
-      <span class="pxs-count"><b id="countNum">0</b> <span id="pxsWord">results</span></span>
-      <button type="button" class="pxs-reset" id="pxsReset">Clear filters</button>
+    <div class="dir-pills">
+      <button type="button" class="dir-pill" id="dirFacetBtn" aria-expanded="false" aria-controls="dirFacets">Categories <span class="dir-plus" aria-hidden="true">+</span></button>
+      <button type="button" class="dir-pill on" id="dirAllBtn">All profiles</button>
+      <button type="button" class="dir-pill" id="dirSavedBtn">Saved <span class="dir-pill-n" id="dirSavedN">0</span></button>
     </div>
+
+    <div class="dir-facets" id="dirFacets" hidden></div>
+
+    <div class="dir-meta"><b id="countNum">0</b> <span id="pxsWord">results</span></div>
   </div>
 </div>
 
 <main class="bls-sec" style="padding-top:var(--bls-s6)">
   <div class="bls-wrap main" id="mainContainer">
-    <div id="desktop-content"></div>
-    <div class="mobile-card-list" id="mobile-content"></div>
-    <div id="empty-state" class="empty" style="display:none">
-      <div class="empty-t">No compounds found</div>
-      <div class="empty-d">Try a different search term or category.</div>
-    </div>
+    <div class="dir-list" id="dirResults"></div>
   </div>
 </main>
 
@@ -537,183 +541,160 @@ function dosingBlock(c){
        + '</div></div>';
 }
 
-const CAT_CHIPS = [
-  {cat:'all', label:'All'},
-  {cat:'Recovery', label:'🩹 Recovery', pill:'pill-recovery'},
-  {cat:'GLP-1 / Metabolic', label:'⚖ GLP-1 / Metabolic', pill:'pill-metabolic'},
-  {cat:'Growth Hormone', label:'📈 Growth Hormone', pill:'pill-gh'},
-  {cat:'Cognitive', label:'🧠 Cognitive', pill:'pill-cognitive'},
-  {cat:'Longevity', label:'⏳ Longevity', pill:'pill-longevity'},
-  {cat:'Immune', label:'🛡 Immune', pill:'pill-immune'},
-  {cat:'Energy / NAD+', label:'⚡ Energy / NAD+', pill:'pill-energy'},
-  {cat:'Sexual Health', label:'💛 Sexual Health', pill:'pill-sexual'},
-  {cat:'Bioregulators', label:'🔬 Bioregulators', pill:'pill-bioregulator'},
-  {cat:'Skin & Cosmetic', label:'✨ Skin & Cosmetic', pill:'pill-skin'},
-  {cat:'Other', label:'🧪 Other', pill:'pill-other'},
-];
-function pillClass(cat){ return CAT_CHIPS.find(c=>c.cat===cat)?.pill || 'pill-other'; }
+let activeCat='all', searchQ='', dirMode='all';
 
-let view='grid', activeCat='all', searchQ='', activeAvail='all';
+/* Saved rows live in localStorage, namespaced per page so the Index and the
+   Stacks list never tread on each other. Storage can fail outright (private
+   window, blocked site data), so every read and write is guarded and the
+   page simply behaves as though nothing is saved. */
+const SAVE_KEY='bl-saved-index';
+let SAVED=[];
+try{ const raw=localStorage.getItem(SAVE_KEY); if(raw) SAVED=JSON.parse(raw)||[]; }catch(e){ SAVED=[]; }
+if(!Array.isArray(SAVED)) SAVED=[];
 
-function buildMobileFilters(){
-  const mf = document.getElementById('mobile-filters');
-  mf.innerHTML = CAT_CHIPS.map((c,i) =>
-    `<button class="fchip ${i===0?'active':''}" data-cat="${c.cat}" onclick="setMobileCat('${c.cat}',this)">${c.label}</button>`
-  ).join('');
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+function isSaved(n){ return SAVED.indexOf(n)>-1; }
+function saveWrite(){ try{ localStorage.setItem(SAVE_KEY,JSON.stringify(SAVED)); }catch(e){} }
+function dirSavedCount(){ const el=document.getElementById('dirSavedN'); if(el) el.textContent=SAVED.length; }
+function toggleSave(n,btn){
+  const i=SAVED.indexOf(n);
+  if(i>-1) SAVED.splice(i,1); else SAVED.push(n);
+  saveWrite();
+  const on=isSaved(n);
+  if(btn){
+    btn.classList.toggle('on',on);
+    btn.setAttribute('aria-pressed',on?'true':'false');
+    btn.innerHTML=on?'&#9733;':'&#9734;';
+  }
+  dirSavedCount();
+  /* unstarring while the Saved filter is up should drop the row straight away */
+  if(dirMode==='saved') render();
 }
-
-function setMobileCat(cat, btn){
-  activeCat = cat;
-  document.querySelectorAll('#mobile-filters .fchip').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
-
-function setView(v){
-  view=v;
-  document.getElementById('btnGrid').classList.toggle('active',v==='grid');
-  document.getElementById('btnList').classList.toggle('active',v==='list');
-  render();
-}
-
-function onSearch(q){ searchQ=q; render(); }
-function toggleCard(el){ el.classList.toggle('open'); }
 
 function filtered(){
-  const ql = searchQ.toLowerCase().trim();
-  return COMPOUNDS.filter(c => {
-    if(activeCat !== 'all' && c.cat !== activeCat) return false;
-    /* availLabel is the page's own availability wording, not a regulatory
-       claim; it is the only status-like facet the data actually carries. */
-    if(activeAvail !== 'all' && c.availLabel !== activeAvail) return false;
+  const ql=searchQ.toLowerCase().trim();
+  return COMPOUNDS.filter(c=>{
+    if(dirMode==='saved' && !isSaved(c.name)) return false;
+    if(activeCat!=='all' && c.cat!==activeCat) return false;
     if(ql){ const d=c.cs||{}; const hay=[c.name,c.sub,c.goal,c.mechanism,c.notes,c.cat,c.dose,c.frequency,c.timing,d.dose,d.vial,d.bac,d.units,d.freq,d.timing,d.dur].join(' ').toLowerCase(); return ql.split(' ').every(w=>hay.includes(w)); }
     return true;
   });
 }
 
-function tagClass(avail){ return {rx:'tag-blue',research:'',compound:'tag-green',cosmetic:'tag-purple',mixed:''}[avail]||''; }
-
-function buildDesktopCard(c, i){
-  return `<div class="card">
-  <div class="card-top">
-    <div class="card-row1"><div class="card-name">${c.name}</div></div>
-    <div class="card-subtitle">${c.sub}</div>
-    <div class="card-goal">${c.goal}</div>
-  </div>
-  <div class="card-footer" onclick="toggleCard(this.closest('.card'))">
-    <span class="view-details-btn">View Details</span>
-    <span class="expand-icon">▾</span>
-  </div>
-  <div class="card-detail">
-    ${c.mechanism ? `<div class="detail-grid">
-      <div class="dblock full"><span class="dkey">Mechanism / How It Works</span><span class="dval">${c.mechanism}</span></div>
-    </div>` : ''}
-    ${dosingBlock(c)}
-    ${c.notes ? `<div class="notes-box"><div class="dkey">Research Notes &amp; Clinical Context</div><div class="dval">${c.notes}</div></div>` : ''}
-  </div>
-</div>`;
+function rowDetail(c){
+  return (c.sub ? `<div class="m-card-sub" style="margin-bottom:5px">${c.sub}</div>` : '')
+    + (c.goal ? `<div class="m-card-goal" style="margin-bottom:13px">${c.goal}</div>` : '')
+    + (c.mechanism ? `<div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${c.mechanism}</div></div>` : '')
+    + dosingBlock(c)
+    + (c.notes ? `<div class="m-notes"><div class="m-detail-label">Research Notes</div><div class="m-detail-text" style="font-size:11.5px">${c.notes}</div></div>` : '');
 }
 
-function buildMobileCard(c, i){
-  const pClass = pillClass(c.cat);
-  return `<div class="m-card">
-  <div class="m-card-header">
-    <div class="m-card-row1"><div class="m-card-name">${c.name}</div></div>
-    <div class="m-card-sub">${c.sub}</div>
+function buildRow(c){
+  const on=isSaved(c.name);
+  return `<div class="dir-row">
+  <div class="dir-row-head">
+    <button type="button" class="dir-star${on?' on':''}" data-n="${esc(c.name)}" aria-pressed="${on?'true':'false'}" aria-label="Save ${esc(c.name)}">${on?'&#9733;':'&#9734;'}</button>
+    <div class="dir-row-txt">
+      <div class="dir-row-nm">${c.name}</div>
+      <div class="dir-row-cat">${c.cat}</div>
+    </div>
+    <span class="dir-chev" aria-hidden="true">&#8250;</span>
   </div>
-  <div class="m-card-goal">${c.goal}</div>
-  <div class="m-badges"><span class="m-badge gold">${c.cat}</span><span class="m-badge">${c.availLabel}</span></div>
-  <div class="m-card-toggle" onclick="toggleCard(this.closest('.m-card'))">
-    <span class="m-toggle-lbl">View Mechanism &amp; Details</span>
-    <span class="m-toggle-icon">›</span>
-  </div>
-  <div class="m-card-detail">
-    ${c.mechanism ? `<div class="m-detail-section"><div class="m-detail-label">Mechanism / How It Works</div><div class="m-detail-text">${c.mechanism}</div></div>` : ''}
-    ${dosingBlock(c)}
-    ${c.notes ? `<div class="m-notes"><div class="m-detail-label">Research Notes</div><div class="m-detail-text" style="font-size:11.5px">${c.notes}</div></div>` : ''}
-  </div>
+  <div class="dir-row-detail">${rowDetail(c)}</div>
 </div>`;
 }
 
 
-/* ---------- Browse controls ----------
-   Categories and availability are both counted off COMPOUNDS, so the numbers
-   on screen are always the live ones and a facet with nothing behind it never
-   appears. These two are the only facets the data supports: there is no
-   evidence tier and no approval status in this dataset, so none is shown. */
-function pxsCounts(key){
+/* ---------- Directory browse controls ----------
+   Category is the only facet this data supports. Availability was removed
+   on request; there is no evidence tier and no approval status here, so
+   nothing else is offered. Counts come off COMPOUNDS, which means a
+   category with nothing behind it never appears. */
+function dirCounts(key){
   const m={};
   COMPOUNDS.forEach(c=>{ const v=c[key]; if(v) m[v]=(m[v]||0)+1; });
   return m;
 }
-function pxsBuild(){
-  const cats=pxsCounts('cat'), av=pxsCounts('availLabel');
-  const icon={}; COMPOUNDS.forEach(c=>{ if(!icon[c.cat]&&c.emoji) icon[c.cat]=c.emoji; });
+function dirBuild(){
+  const cats=dirCounts('cat');
   const order=Object.keys(cats).sort((a,b)=>cats[b]-cats[a]);
-  const host=document.getElementById('pxsCats');
-  host.innerHTML='<button type="button" class="pxs-cat on" data-cat="all">'+
-      '<span class="pxs-cat-ico">◉</span><span class="pxs-cat-nm">All</span>'+
-      '<span class="pxs-cat-n">'+COMPOUNDS.length+'</span></button>'+
-    order.map(ct=>'<button type="button" class="pxs-cat" data-cat="'+ct.replace(/"/g,'&quot;')+'">'+
-      '<span class="pxs-cat-ico">'+(icon[ct]||'◉')+'</span>'+
-      '<span class="pxs-cat-nm">'+ct+'</span>'+
-      '<span class="pxs-cat-n">'+cats[ct]+'</span></button>').join('');
-  host.querySelectorAll('.pxs-cat').forEach(b=>b.addEventListener('click',()=>{
-    host.querySelectorAll('.pxs-cat').forEach(x=>x.classList.remove('on'));
+  const host=document.getElementById('dirFacets');
+  host.innerHTML='<div class="dir-grp"><div class="dir-grp-lbl">Category</div><div class="dir-grp-wrap">'+
+    '<button type="button" class="dir-fb on" data-cat="all">All <span class="dir-fb-n">'+COMPOUNDS.length+'</span></button>'+
+    order.map(ct=>'<button type="button" class="dir-fb" data-cat="'+esc(ct)+'">'+ct+
+      ' <span class="dir-fb-n">'+cats[ct]+'</span></button>').join('')+
+    '</div></div>';
+  host.querySelectorAll('.dir-fb').forEach(b=>b.addEventListener('click',()=>{
+    host.querySelectorAll('.dir-fb').forEach(x=>x.classList.remove('on'));
     b.classList.add('on'); activeCat=b.dataset.cat; render();
   }));
-
-  const ah=document.getElementById('pxsAvail');
-  const aOrder=Object.keys(av).sort((a,b)=>av[b]-av[a]);
-  ah.innerHTML='<button type="button" class="pxs-pill on" data-av="all">All</button>'+
-    aOrder.map(a=>'<button type="button" class="pxs-pill" data-av="'+a.replace(/"/g,'&quot;')+'">'+
-      a+' <span style="opacity:.6;margin-left:5px">'+av[a]+'</span></button>').join('');
-  ah.querySelectorAll('.pxs-pill').forEach(b=>b.addEventListener('click',()=>{
-    ah.querySelectorAll('.pxs-pill').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); activeAvail=b.dataset.av; render();
-  }));
+  dirSavedCount();
 }
-function pxsReset(){
-  activeCat='all'; activeAvail='all'; searchQ='';
-  const si=document.getElementById('searchInput'); if(si) si.value='';
-  document.querySelectorAll('#pxsCats .pxs-cat').forEach((x,i)=>x.classList.toggle('on',i===0));
-  document.querySelectorAll('#pxsAvail .pxs-pill').forEach((x,i)=>x.classList.toggle('on',i===0));
+function setMode(m){
+  dirMode=m;
+  document.getElementById('dirAllBtn').classList.toggle('on',m==='all');
+  document.getElementById('dirSavedBtn').classList.toggle('on',m==='saved');
   render();
 }
-/* The reset only offers itself once something is actually filtered. */
-function pxsSyncChrome(n){
-  const anyFilter = activeCat!=='all' || activeAvail!=='all' || !!searchQ.trim();
-  const r=document.getElementById('pxsReset'); if(r) r.classList.toggle('on',anyFilter);
-  const c=document.getElementById('pxsClear'); if(c) c.classList.toggle('on',!!searchQ.trim());
-  const w=document.getElementById('pxsWord'); if(w) w.textContent = n===1?'result':'results';
+/* One control resets everything, so there is no half-filtered state to get
+   stuck in: search text, category and the Saved filter all go back at once. */
+function dirReset(){
+  activeCat=''; searchQ='';
+  activeCat='all';
+  const si=document.getElementById('searchInput'); if(si) si.value='';
+  document.querySelectorAll('#dirFacets .dir-fb').forEach((x,i)=>x.classList.toggle('on',i===0));
+  setMode('all');
+}
+function dirWire(){
+  document.getElementById('searchInput').addEventListener('input',e=>{ searchQ=e.target.value; render(); });
+  document.getElementById('dirClear').addEventListener('click',dirReset);
+
+  const fb=document.getElementById('dirFacetBtn'), fx=document.getElementById('dirFacets');
+  fb.addEventListener('click',()=>{
+    const opening=fx.hasAttribute('hidden');
+    if(opening) fx.removeAttribute('hidden'); else fx.setAttribute('hidden','');
+    fb.classList.toggle('exp',opening);
+    fb.setAttribute('aria-expanded',opening?'true':'false');
+  });
+
+  document.getElementById('dirAllBtn').addEventListener('click',()=>setMode('all'));
+  document.getElementById('dirSavedBtn').addEventListener('click',()=>setMode('saved'));
+
+  /* One delegated handler for the whole list. The star sits inside the row
+     header, so it has to swallow the click or every save would also open
+     the detail underneath it. */
+  document.getElementById('dirResults').addEventListener('click',ev=>{
+    const star=ev.target.closest('.dir-star');
+    if(star){ ev.stopPropagation(); toggleSave(star.getAttribute('data-n'),star); return; }
+    const head=ev.target.closest('.dir-row-head');
+    if(head) head.parentNode.classList.toggle('open');
+  });
 }
 
 function render(){
-  const list = filtered();
-  document.getElementById('countNum').textContent = list.length;
-  const lc=document.getElementById('liveCount'); if(lc) lc.textContent = list.length;
-  pxsSyncChrome(list.length);
-  const desktopEl = document.getElementById('desktop-content');
-  const mobileEl  = document.getElementById('mobile-content');
-  const emptyEl   = document.getElementById('empty-state');
-  if(!list.length){ desktopEl.innerHTML=''; mobileEl.innerHTML=''; emptyEl.style.display='block'; return; }
-  emptyEl.style.display = 'none';
-  const grouped = activeCat === 'all' && activeAvail === 'all' && !searchQ.trim();
+  const list=filtered();
+  document.getElementById('countNum').textContent=list.length;
+  const lc=document.getElementById('liveCount'); if(lc) lc.textContent=list.length;
+  const w=document.getElementById('pxsWord'); if(w) w.textContent=list.length===1?'result':'results';
+  const host=document.getElementById('dirResults');
+  if(!list.length){
+    host.innerHTML='<div class="dir-empty"><div class="empty-t">'+
+      (dirMode==='saved'?'Nothing saved yet':'No compounds found')+'</div><div class="empty-d">'+
+      (dirMode==='saved'?'Tap the star on any row to keep it here.':'Try a different search term or category.')+
+      '</div></div>';
+    return;
+  }
+  /* Group only while nothing is narrowed down - it is what keeps 100+ rows
+     scannable. The moment you search or pick a facet, the flat list is the
+     clearer read. */
+  const grouped = activeCat==='all' && dirMode==='all' && !searchQ.trim();
   if(grouped){
-    const groups = {}, order = [];
-    list.forEach(c => { if(!groups[c.cat]){ groups[c.cat]=[]; order.push(c.cat); } groups[c.cat].push(c); });
-    let idx = 0;
-    desktopEl.innerHTML = order.map(ct => {
-      const items = groups[ct];
-      return `<div class="cat-section"><div class="cat-heading"><span class="cat-icon">${items[0].emoji}</span><span class="cat-name">${ct}</span><span class="cat-count">${items.length} Compound${items.length>1?'s':''}</span></div><div class="${view==='grid'?'cards-grid':'cards-list'}">${items.map(c=>buildDesktopCard(c,idx++)).join('')}</div></div>`;
-    }).join('');
-    mobileEl.innerHTML = order.map((ct, gi) => {
-      const items = groups[ct];
-      return `<div class="m-cat-section"><div class="m-cat-heading"><span class="m-cat-icon">${items[0].emoji}</span><span class="m-cat-name">${ct}</span><span class="m-cat-count">${items.length}</span></div>${items.map((c,i)=>buildMobileCard(c,gi*10+i)).join('')}</div>`;
-    }).join('');
+    const groups={}, order=[];
+    list.forEach(c=>{ if(!groups[c.cat]){ groups[c.cat]=[]; order.push(c.cat); } groups[c.cat].push(c); });
+    host.innerHTML=order.map(ct=>'<div class="dir-sec">'+ct+' &middot; '+groups[ct].length+'</div>'+
+      groups[ct].map(buildRow).join('')).join('');
   } else {
-    desktopEl.innerHTML = `<div class="${view==='grid'?'cards-grid':'cards-list'}">${list.map((c,i)=>buildDesktopCard(c,i)).join('')}</div>`;
-    mobileEl.innerHTML  = list.map((c,i)=>buildMobileCard(c,i)).join('');
+    host.innerHTML=list.map(buildRow).join('');
   }
 }
 
@@ -736,12 +717,8 @@ function render(){
   });
   if(window.console&&console.debug) console.debug('[BL] library prose applied to '+n+'/'+COMPOUNDS.length+' compounds');
 })();
-pxsBuild();
-document.getElementById('searchInput').addEventListener('input', e => { searchQ=e.target.value; render(); });
-document.getElementById('pxsClear').addEventListener('click', () => {
-  searchQ=''; document.getElementById('searchInput').value=''; render();
-});
-document.getElementById('pxsReset').addEventListener('click', pxsReset);
+dirBuild();
+dirWire();
 render();
 </script>
 
