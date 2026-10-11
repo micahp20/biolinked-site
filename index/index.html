@@ -699,13 +699,12 @@ function openDetail(n){
 function closeDetail(){
   if(!document.body.classList.contains('dtl')) return;
   document.body.classList.remove('dtl');
-  const y=LIST_Y;
-  /* twice: once as soon as the list is laid out again, once after the
-     browser has finished whatever it wanted to do with the scroll */
-  requestAnimationFrame(function(){
-    window.scrollTo(0,y);
-    setTimeout(function(){ window.scrollTo(0,y); },0);
-  });
+  /* Read the height back before scrolling. That forces the list to lay out
+     again; without it scrollTo clamps against the detail's much shorter
+     page and lands at the top. Deferring to rAF does not help - the frame
+     still runs before layout. */
+  void document.documentElement.scrollHeight;
+  window.scrollTo(0,LIST_Y);
 }
 function backFromDetail(){
   if(history.state&&history.state.dtl){ history.back(); }
