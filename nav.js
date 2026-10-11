@@ -34,7 +34,7 @@
         </div>
       </div>
     </div>
-    <button class="bl-nav-mobile-btn" id="bl-mobile-btn">☰</button>
+    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-expanded="false">Menu</button>
   </div>
   <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
     ${links.map(l=>`<a href="${l.href}" class="bl-nav-mobile-link">${l.label}</a>`).join('')}
@@ -59,7 +59,8 @@
 .bl-nav-dropdown:hover .bl-dropdown-btn{color:var(--gold,#7A6530);background:var(--gold-dim,rgba(154,123,47,0.07))}
 .bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:var(--text-2,var(--muted,#444));text-decoration:none;transition:all .15s;font-family:'Montserrat',sans-serif;white-space:nowrap}
 .bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:var(--bg,#f8f8f8);color:var(--gold,#7A6530);padding-left:20px}
-.bl-nav-mobile-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--text,#1a1a1a);padding:8px}
+.bl-nav-mobile-btn{display:none;background:none;border:1px solid var(--gold,#7A6530);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;line-height:1;cursor:pointer;color:var(--text,#1a1a1a);padding:10px 16px;-webkit-tap-highlight-color:transparent}
+.bl-nav-mobile-btn:active{background:var(--gold-dim,rgba(154,123,47,0.07))}
 .bl-nav-mobile-menu{display:none;border-top:1px solid var(--border,#eaeaea);background:var(--surface,var(--bg,#fff));padding:12px 20px 20px}
 .bl-nav-mobile-menu.open{display:block}
 .bl-nav-mobile-link{display:flex;align-items:center;min-height:44px;padding:11px 0;font-size:13px;color:var(--text-2,var(--muted,#444));text-decoration:none;border-bottom:1px solid var(--border,#eaeaea);font-family:'Montserrat',sans-serif}
@@ -71,7 +72,7 @@
 @media(max-width:640px){
   .bl-nav-logo-main{font-size:19px}
   .bl-nav-logo-sub{font-size:11px;letter-spacing:0.16em}
-  .bl-nav-mobile-btn{font-size:26px;padding:10px 12px;min-width:46px;min-height:46px}
+  .bl-nav-mobile-btn{font-size:13.5px;padding:12px 18px;min-width:46px;min-height:46px}
   .bl-nav-mobile-menu{padding:8px 20px 20px}
   .bl-nav-mobile-link{font-size:16px;font-weight:500;padding:14px 0;min-height:46px;display:flex;align-items:center}
   .bl-nav-inner{height:62px}
@@ -122,7 +123,8 @@
   document.getElementById('bl-mobile-btn').addEventListener('click', function(){
     const menu = document.getElementById('bl-mobile-menu');
     menu.classList.toggle('open');
-    this.textContent = menu.classList.contains('open') ? '✕' : '☰';
+    this.textContent = menu.classList.contains('open') ? 'Close' : 'Menu';
+    this.setAttribute('aria-expanded', menu.classList.contains('open') ? 'true' : 'false');
   });
 
   // Fix dropdown - keep open when moving mouse between button and menu
