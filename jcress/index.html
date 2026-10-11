@@ -969,6 +969,25 @@
     box-shadow:var(--shadow);padding:10px 14px;font-family:var(--sans);font-size:12.5px;
     color:var(--ink2);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
   .cs-toast.on{opacity:1;transform:translate(-50%,0)}
+  /* ---- Supply tab -------------------------------------------------- */
+  .sup-note{font-size:12.5px;color:var(--ink2);line-height:1.6;margin:0 0 14px}
+  .sup-grp{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:18px 2px 8px}
+  .sup-row{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;margin-bottom:9px}
+  .sup-main{flex:1 1 auto;min-width:0}
+  .sup-nm{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);line-height:1.25}
+  .sup-dt{font-size:12px;color:var(--muted);line-height:1.5;margin-top:3px}
+  .sup-meta{font-size:10.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint);
+    font-weight:700;margin-top:6px}
+  .sup-buy{flex:0 0 auto;align-self:center;display:inline-flex;align-items:center;gap:5px;
+    padding:9px 13px;min-height:38px;border-radius:999px;background:var(--gold-soft);
+    border:1px solid var(--gold-border,var(--line));color:var(--gold);font-family:var(--sans);
+    font-size:11.5px;font-weight:700;letter-spacing:.03em;text-decoration:none;white-space:nowrap;
+    -webkit-tap-highlight-color:transparent;transition:transform .14s}
+  .sup-buy:active{transform:scale(.95)}
+  .sup-row.why{border-color:var(--gold-border,var(--line))}
+  .sup-why{font-size:11.5px;color:var(--gold);font-weight:600;margin-top:6px}
 </style>
 <script src="/compound-library.js?v=2"></script>
 </head>
@@ -1027,6 +1046,8 @@
       <div><div class="nl">Index</div><div class="nd">Look up any compound</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
       <div><div class="nl">Calculator</div><div class="nd">Vial, water and dose in, units out</div></div></button>
+    <button type="button" class="nav-item" onclick="closeNav();sheet('supply')">
+      <div><div class="nl">Supply</div><div class="nd">Syringes, water, sharps &mdash; what to buy</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('notes')">
       <div><div class="nl">Notes &amp; Tips</div><div class="nd">Storage, technique, week by week</div></div></button>
     <a href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" onclick="closeNav()">
@@ -1312,6 +1333,7 @@
         <div class="li" onclick="go('proto')"><div><div class="nm sans">Protocol</div><div class="pp">Your welcome screen and what each tab holds</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
         <div class="li" onclick="sheet('indexlist')"><div><div class="nm sans">Compound Index</div><div class="pp">Look up any compound &mdash; purpose, recon, dosing</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
         <div class="li" onclick="sheet('calc')"><div><div class="nm sans">Calculator</div><div class="pp">Vial, water and dose in, units out</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
+        <div class="li" onclick="sheet('supply')"><div><div class="nm sans">Supply</div><div class="pp">Syringes, water, sharps &mdash; what to buy</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
         <div class="li" onclick="sheet('notes')"><div><div class="nm sans">Notes &amp; Tips</div><div class="pp">Storage &amp; handling, technique, week by week</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
 <a class="li" href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div><div class="nm sans">BL Tools Access</div><div class="pp">Biomarker analyzer and the rest of the BioLinked tools</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></a>
       </div>
@@ -1460,6 +1482,13 @@
       <div id="pc-list"></div>
       <div class="pc-empty" id="pc-empty" hidden>Nothing matches that search.</div>
     </div>
+    </div>
+  </div>
+  <div class="sheet" id="s-supply">
+    <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Supply</div></div>
+    <div class="pad"><h1 class="scrn">Supply</h1><p class="sub">What to buy, and where</p>
+      <p class="sup-note">The consumables your protocol runs on. These are not supplied with your peptides &mdash; order them yourself, once, and you are set for the cycle. Storage and handling is covered in Notes &amp; Tips.</p>
+      <div id="supplylist"></div>
     </div>
   </div>
   <div class="sheet" id="s-notes">
@@ -2106,6 +2135,67 @@ function noteRows(o){
   }).join('');
 }
 function money(n){return (n<0?'-$':'$')+Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});}
+/* ----------------------------------------------------------------------
+   Supply tab.
+
+   Purchasable supplies only: the storage and handling writeup stays in
+   Notes & Tips. Every link here is one already in use somewhere on the
+   site, so nothing points at a guessed product. Two rows are conditional
+   and resolve from this page's own prescribed compounds, which is why the
+   same block can sit on every protocol unchanged.
+   ---------------------------------------------------------------------- */
+var SUPPLY=[
+  {g:'Injecting', n:'Insulin Syringes', d:'29–31 gauge, 1 mL. Sterile single-use, for the subcutaneous shots.',
+   m:'100-pack · about $18', u:'https://a.co/d/04JCzBqF', t:'Amazon'},
+  {g:'Injecting', n:'23G 1 mL Luer-Lock Syringes', d:'For drawing the testosterone only — the oil is too thick to pull through an insulin needle. Draw with this, then swap to the insulin syringe to inject.',
+   m:'draw needle', u:'https://amazon.com/dp/B0F26CGRQC', t:'Amazon', need:'testosterone',
+   why:'On your protocol because you run testosterone.'},
+  {g:'Injecting', n:'3 mL Luer-Lock + 25G × 1.5″ Needle', d:'For the intramuscular L-Carnitine shots. Get 50+ to cover a full cycle with buffer.',
+   m:'IM needle', u:'https://www.amazon.com/Industrial-Scientific-Accessories-Refilling-Individually/dp/B0F4VDCJ89/', t:'Amazon',
+   need:'carnitine', why:'On your protocol because you run L-Carnitine IM.'},
+  {g:'Mixing', n:'Bacteriostatic Water — 3 mL', d:'Sterile water with a preservative. This is what you mix the dry peptide powder with.',
+   m:'3 mL · about $4', u:'https://ebac-water.com/', t:'eBAC Water'},
+  {g:'Mixing', n:'Bacteriostatic Water — 10 mL', d:'The larger bottle. Worth it if several compounds are running at once.',
+   m:'10 mL · about $6', u:'https://ebac-water.com/', t:'eBAC Water'},
+  {g:'Hygiene & disposal', n:'Alcohol Prep Pads', d:'70% isopropyl. Wipe the vial stopper and the injection site before every shot.',
+   m:'200-pack · about $7', u:'https://a.co/d/0fnbd8VV', t:'Amazon'},
+  {g:'Hygiene & disposal', n:'Sharps Container', d:'FDA-cleared, puncture-proof. Used needles go straight in — never in household rubbish.',
+   m:'1 quart · about $8', u:'https://a.co/d/0jhnMLPg', t:'Amazon'},
+  {g:'Storage', n:'Mini Fridge', d:'Reconstituted peptides live in the fridge. A small dedicated one keeps them at a steady temperature and out of the kitchen door shelf.',
+   m:'countertop', u:'https://a.co/d/08MT0BDi', t:'Amazon'},
+  {g:'Storage', n:'Peptide Organizer / Cold Storage', d:'Holds the vials upright and labelled inside the fridge, out of the light.',
+   m:'holds 6+', u:'https://www.amazon.com/dp/B0FH62NMF8', t:'Amazon'}
+];
+/* A conditional row appears only when the protocol actually calls for it. */
+function supNeeds(key){
+  try{
+    if(typeof ALL==='undefined'||!ALL) return false;
+    for(var i=0;i<ALL.length;i++){
+      var n=String(ALL[i].n||'').toLowerCase();
+      if(key==='testosterone' && /testosterone|\btrt\b/.test(n)) return true;
+      if(key==='carnitine'    && /carnitine/.test(n)) return true;
+    }
+  }catch(e){}
+  return false;
+}
+function renderSupply(){
+  var host=document.getElementById('supplylist'); if(!host) return;
+  var rows=SUPPLY.filter(function(s){ return !s.need || supNeeds(s.need); });
+  var h='', grp='';
+  rows.forEach(function(s){
+    if(s.g!==grp){ grp=s.g; h+='<div class="sup-grp">'+grp+'</div>'; }
+    h+='<div class="sup-row'+(s.why?' why':'')+'">'+
+         '<div class="sup-main"><div class="sup-nm">'+s.n+'</div>'+
+         '<div class="sup-dt">'+s.d+'</div>'+
+         (s.m?'<div class="sup-meta">'+s.m+'</div>':'')+
+         (s.why?'<div class="sup-why">'+s.why+'</div>':'')+
+         '</div>'+
+         '<a class="sup-buy" href="'+s.u+'" target="_blank" rel="noopener">'+s.t+' →</a>'+
+       '</div>';
+  });
+  host.innerHTML=h;
+}
+
 function renderPay(){
   var dueO=INV.filter(function(o){return o.status==='due'});
   var dueT=dueO.reduce(function(a,o){return a+o.total},0);
@@ -4647,6 +4737,6 @@ function scrollRemeasure(){
 }
 scrollRemeasure();
 window.addEventListener('load',scrollRemeasure);
-window.addEventListener('orientationchange',scrollRemeasure); renderIx(); renderPay(); renderLabs(); renderSubline();
+window.addEventListener('orientationchange',scrollRemeasure); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
 if(typeof nutInit==='function') nutInit();
 </script>
