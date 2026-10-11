@@ -112,5 +112,6 @@ window.CHEAT_SHEET_DATA = [
   {name:'Vesugen',cat:'bioregulator',purpose:'Blood Flow / Vascular Endothelial',vial:'20 mg',bac:'2 ml',dose:'2 mg',units:'20',timing:'AM/PM',freq:'30 days in a row',dur:'1 mo on, 2 mo off, 2–3× per year'},
   {name:'Vesilute',cat:'bioregulator',purpose:'Bladder / Prostate / Vascular',vial:'20 mg',bac:'2 ml',dose:'2 mg',units:'20',timing:'AM/PM',freq:'30 days in a row',dur:'1 mo on, 2 mo off, 2–3× per year'},
   {name:'Vilon',cat:'bioregulator',purpose:'Thymus / Immune Longevity',vial:'20 mg',bac:'2 ml',dose:'0.5–2 mg',units:'N/A — 0.5–1 ml SubQ/IM',timing:'AM/PM',freq:'Daily',dur:'8–12 wks on, 6 wks off'},
-  {name:'Semaglutide 5mg (Bronze 1)',cat:'fatloss',purpose:'Fat Loss / GLP-1',vial:'5 mg',bac:'2 mL',dose:'0.25mg weeks 1–2; 0.50mg weeks 3–4; 0.75mg weeks 5–6',units:'10 / 20 / 30',timing:'Bedtime recommended',freq:'1× per week',dur:'Increase slowly; do not exceed 2.5mg per injection'}
+  {name:'Semaglutide 5mg (Bronze 1)',cat:'fatloss',purpose:'Fat Loss / GLP-1',vial:'5 mg',bac:'2 mL',dose:'0.25mg weeks 1–2; 0.50mg weeks 3–4; 0.75mg weeks 5–6',units:'10 / 20 / 30',timing:'Bedtime recommended',freq:'1× per week',dur:'Increase slowly; do not exceed 2.5mg per injection'},
+  {name:'Wolverine 2.0',cat:'blend',purpose:'Healing / Recovery + Joint',vial:'20 mg',bac:'2 ml',dose:'1 mg',units:'10',timing:'AM or PM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'}
 ];
