@@ -63,7 +63,7 @@ window.CHEAT_SHEET_DATA = [
   {name:'NAD+',cat:'energy',purpose:'Longevity / Energy / DNA Repair',vial:'500 mg',bac:'2 ml',dose:'100 mg',units:'40',timing:'AM',freq:'2–3 days per week',dur:'As needed'},
   {name:'Glutathione',cat:'energy',purpose:'Antioxidant / Detox / Recovery',vial:'1,500 mg',bac:'10–15 ml sterile water',dose:'600–1,500 mg',units:'Varies',timing:'AM',freq:'Weekly',dur:'Ongoing'},
   {name:'Thymosin Alpha-1',cat:'immunity',purpose:'Immunity / T-Cell Support',vial:'10 mg',bac:'2 ml',dose:'1.5 mg',units:'30',timing:'AM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'},
-  {name:'VIP',cat:'immunity',purpose:'Immunity / Gut / Neuroprotection',vial:'10 mg',bac:'3 ml',dose:'~333 mcg',units:'10',timing:'AM/PM',freq:'Every day',dur:'8 wks on, 8 wks off'},
+  {name:'VIP',cat:'immunity',purpose:'Immunity / Gut / Neuroprotection',vial:'10 mg',bac:'3 ml',dose:'~167 mcg',units:'5',timing:'AM/PM',freq:'Every day',dur:'8 wks on, 8 wks off'},
   {name:'Gonadorelin',cat:'immunity',purpose:'LH/FSH Stimulation / TRT Adjunct',vial:'2 mg',bac:'2 ml',dose:'100–200 mcg',units:'10–20',timing:'Morning SQ',freq:'2–3× per week',dur:'Ongoing with TRT'},
   {name:'5-Amino-1MQ',cat:'energy',purpose:'Fat Loss / Energy / NNMT Inhibitor',vial:'10 mg',bac:'2 ml',dose:'1 mg',units:'20',timing:'AM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'},
   {name:'SLU-PP-332',cat:'energy',purpose:'Exercise Mimetic / ERRα / Endurance',vial:'10 mg',bac:'2 ml',dose:'5–10 mg',units:'10–20',timing:'Morning',freq:'Daily',dur:'8–12 weeks'},
