@@ -45,10 +45,10 @@
 
   const navCSS = `<style>
 .bl-nav{background:var(--surface,var(--bg,#fff));border-bottom:1px solid var(--border,#eaeaea);position:sticky;top:0;z-index:600;font-family:'Montserrat',sans-serif}
-.bl-nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.bl-nav-inner{max-width:1200px;margin:0 auto;padding:10px 32px;display:flex;align-items:center;justify-content:space-between;min-height:64px}
 .bl-nav-logo{color:var(--text,#1a1a1a);text-decoration:none;display:flex;flex-direction:column;line-height:1}
-.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--text,#1a1a1a);letter-spacing:0.1em}
-.bl-nav-logo-sub{font-size:9px;color:var(--gold,#7A6530);letter-spacing:0.2em;text-transform:uppercase;margin-top:3px;font-weight:700}
+.bl-nav-logo-main{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;color:var(--text,#1a1a1a);letter-spacing:0.1em}
+.bl-nav-logo-sub{font-size:10px;color:var(--gold,#7A6530);letter-spacing:0.24em;text-transform:uppercase;margin-top:4px;font-weight:700}
 .bl-nav-links{display:flex;align-items:center;gap:2px}
 .bl-nav-link{font-size:11.5px;color:var(--text-2,var(--muted,#444));text-decoration:none;padding:7px 11px;border-radius:3px;transition:all .18s;background:none;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;white-space:nowrap}
 .bl-nav-link:hover,.bl-nav-link.active{color:var(--gold,#7A6530);background:var(--gold-dim,rgba(154,123,47,0.07))}
@@ -59,7 +59,7 @@
 .bl-nav-dropdown:hover .bl-dropdown-btn{color:var(--gold,#7A6530);background:var(--gold-dim,rgba(154,123,47,0.07))}
 .bl-nav-dropdown-item{display:block;padding:10px 16px;font-size:11.5px;color:var(--text-2,var(--muted,#444));text-decoration:none;transition:all .15s;font-family:'Montserrat',sans-serif;white-space:nowrap}
 .bl-nav-dropdown-item:hover,.bl-nav-dropdown-item.active{background:var(--bg,#f8f8f8);color:var(--gold,#7A6530);padding-left:20px}
-.bl-nav-mobile-btn{display:none;background:none;border:1px solid var(--gold,#7A6530);border-radius:10px;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;line-height:1;cursor:pointer;color:var(--text,#1a1a1a);padding:10px 16px;-webkit-tap-highlight-color:transparent}
+.bl-nav-mobile-btn{display:none;background:none;border:1px solid var(--border,#eaeaea);border-radius:12px;font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;line-height:1;cursor:pointer;color:var(--text,#1a1a1a);padding:13px 22px;-webkit-tap-highlight-color:transparent}
 .bl-nav-mobile-btn:active{background:var(--gold-dim,rgba(154,123,47,0.07))}
 .bl-nav-mobile-menu{display:none;border-top:1px solid var(--border,#eaeaea);background:var(--surface,var(--bg,#fff));padding:12px 20px 20px}
 .bl-nav-mobile-menu.open{display:block}
@@ -70,12 +70,12 @@
 @media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}
 /* Mobile readability: bigger type and 44px tap targets in the shared nav. */
 @media(max-width:640px){
-  .bl-nav-logo-main{font-size:19px}
-  .bl-nav-logo-sub{font-size:11px;letter-spacing:0.16em}
-  .bl-nav-mobile-btn{font-size:13.5px;padding:12px 18px;min-width:46px;min-height:46px}
+  .bl-nav-logo-main{font-size:30px;letter-spacing:0.09em}
+  .bl-nav-logo-sub{font-size:11.5px;letter-spacing:0.24em;margin-top:6px}
+  .bl-nav-mobile-btn{font-size:15px;padding:13px 22px;min-height:46px}
   .bl-nav-mobile-menu{padding:8px 20px 20px}
   .bl-nav-mobile-link{font-size:16px;font-weight:500;padding:14px 0;min-height:46px;display:flex;align-items:center}
-  .bl-nav-inner{height:62px}
+  .bl-nav-inner{padding:14px 16px;min-height:76px}
 }
 </style>`;
 
