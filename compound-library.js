@@ -650,6 +650,12 @@ var BL_LIB = {
   "mech": "Synthetic dipeptide bioregulator researched for thymus function and immune aging. Researched for longevity effects through immune system restoration.",
   "notes": "Part of the Khavinson immune aging protocol alongside Thymalin and Thymagen.",
   "sub": "Dipeptide Thymus/Immune Bioregulator"
+ },
+ "Testosterone": {
+  "goal": "Hormone optimization, lean mass, strength, libido, energy, mood and recovery",
+  "mech": "The primary male androgen, given as a long-ester injectable (cypionate or enanthate) that releases slowly from the injection depot over roughly 7\u201310 days for steady serum levels. Binds androgen receptors in muscle, bone, CNS and reproductive tissue to drive protein synthesis, red-cell production, bone density, libido and mood.",
+  "notes": "Foundation of most hormone-optimization protocols. Prescription / controlled substance \u2014 proper use calls for baseline and follow-up bloodwork (total and free testosterone, estradiol, hematocrit, PSA) and physician oversight. Often paired with HCG or Gonadorelin to preserve testicular function, with an aromatase inhibitor added only if estradiol climbs. The oil is thick \u2014 draw with a 23G needle, then inject. Dosed in the morning.",
+  "sub": "Injectable Testosterone (TRT)"
  }
 };
 
@@ -658,7 +664,12 @@ var BL_ALIAS = {
  "Epitalon": "Epithalon",
  "MOTS-C": "MOTS-c",
  "Semaglutide (Oral)": "Semaglutide",
- "Tesofine": "Tesofensine"
+ "Tesofine": "Tesofensine",
+ "HGH": "Somatropin (HGH)",
+ "Human Growth Hormone": "Somatropin (HGH)",
+ "Testosterone Cypionate": "Testosterone",
+ "Testosterone Enanthate": "Testosterone",
+ "TRT": "Testosterone"
 };
 
 /* Normalised lookup: punctuation and case insensitive, alias-aware. */
