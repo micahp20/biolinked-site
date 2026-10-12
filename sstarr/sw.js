@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'sstarr-v62';
+const CACHE = 'sstarr-v63';
 const ASSETS = [
   '/sstarr/',
   '/sstarr/index.html',

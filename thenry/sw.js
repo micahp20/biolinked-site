@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'thenry-v40';
+const CACHE = 'thenry-v41';
 const ASSETS = [
   '/thenry/',
   '/thenry/index.html',
