@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'benhartman-v47';
+const CACHE = 'benhartman-v48';
 const ASSETS = [
   '/benhartman/',
   '/benhartman/index.html',

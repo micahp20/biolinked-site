@@ -953,6 +953,9 @@
   .sup-buy:active{transform:scale(.95)}
   .sup-row.why{border-color:var(--gold-border,var(--line))}
   .sup-why{font-size:11.5px;color:var(--gold);font-weight:600;margin-top:6px}
+.schblk{display:inline-flex;gap:5px;margin-left:8px;vertical-align:middle}
+.blkb{border:1px solid var(--line,#ddd);background:none;color:var(--muted,#888);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
+.blkb.on{background:var(--gold,#9a7b2f);border-color:var(--gold,#9a7b2f);color:#fff}
 </style>
 <script src="/compound-library.js?v=2"></script>
 </head>
@@ -1688,7 +1691,7 @@ function renderDays(){
 function pickDay(i){sel=i;renderDays();renderDoses();}
 /* A compound tagged BOTH (Ipamorelin) is a real second shot, so it shows in the
    Morning block and again in the Night block. */
-function inBlock(c,g){return c.b===g||c.b==='BOTH';}
+function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
 function renderDoses(){
   /* Only what the client has on their schedule, and only what is due today. */
   var rows=schRows().filter(function(c){return due(c,sel)});
@@ -1730,9 +1733,10 @@ function cmpRow(c,i){
   var nm=String(c.n).replace(/'/g,"\\'");
   var btn='<button type="button" class="schbtn'+(on?' on':'')+'" onclick="schTog(\''+nm+'\',event)">'+
     (on?'\u2713 On schedule':'+ Add to schedule')+'</button>';
+  var _blk=(typeof schBlk==='function'?schBlk(c):c.b); var ampm=(on&&c.b!=='BOTH')?('<span class="schblk"><button type="button" class="blkb'+(_blk==='AM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'AM\',event)">AM</button><button type="button" class="blkb'+(_blk==='PM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'PM\',event)">PM</button></span>'):'';
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+'</div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+ampm+'</div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
@@ -1765,7 +1769,12 @@ function schLoad(){
   }catch(e){ return schDefault(); }
 }
 function schGet(){ if(!schState) schState=schLoad(); return schState; }
-function schSave(){ try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schGet()})); }catch(e){} }
+function schSave(){ try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schGet(),blk:schBlkGet()})); }catch(e){} }
+var schBlkState=null;
+function schBlkLoad(){ try{ var raw=localStorage.getItem(SCHKEY); if(raw){ var p=JSON.parse(raw); if(p&&p.blk&&typeof p.blk==='object') return p.blk; } }catch(e){} return {}; }
+function schBlkGet(){ if(!schBlkState) schBlkState=schBlkLoad(); return schBlkState; }
+function schBlk(c){ var b=schBlkGet()[c.n]; return (b==='AM'||b==='PM'||b==='BOTH')?b:c.b; }
+function schBlkSet(name,blk,ev){ if(ev&&ev.stopPropagation) ev.stopPropagation(); var st=schBlkGet(); if(st[name]===blk){ delete st[name]; } else { st[name]=blk; } schSave(); if(typeof renderDoses==='function')renderDoses(); if(typeof renderAll==='function')renderAll(); if(typeof renderSubline==='function')renderSubline(); }
 function schOn(c){ return !!schGet()[c.n]; }
 function schRows(){ return ALL.filter(schOn); }
 function schTog(name,ev){
@@ -4434,7 +4443,7 @@ function csToast(msg){
 /* ---- per-kind bridges to the three local stores --------------------- */
 function csRead(kind){
   try{
-    if(kind==='schedule') return {v:1, on:schGet()};
+    if(kind==='schedule') return {v:1, on:schGet(), blk:(typeof schBlkGet==='function'?schBlkGet():{})};
     if(kind==='nutrition'){
       var p=nLoad(NUT_CFG.STORE_PLAN), t=nLoad(NUT_CFG.STORE_TARGETS);
       if(p==null && t==null) return null;
@@ -4459,7 +4468,8 @@ function csApply(kind,payload){
     if(kind==='schedule'){
       if(!payload.on || typeof payload.on!=='object'){ csApplying=false; return; }
       schState=payload.on;
-      try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schState})); }catch(e){}
+      schBlkState=(payload.blk&&typeof payload.blk==='object')?payload.blk:{};
+      try{ localStorage.setItem(SCHKEY,JSON.stringify({v:1,on:schState,blk:schBlkState})); }catch(e){}
       if(typeof renderDoses==='function') renderDoses();
       if(typeof renderAll==='function') renderAll();
       if(typeof renderSubline==='function') renderSubline();
