@@ -70,12 +70,12 @@
 @media(max-width:768px){.bl-nav-links{display:none}.bl-nav-mobile-btn{display:block}.bl-nav-inner{padding:0 16px}
 /* Mobile readability: bigger type and 44px tap targets in the shared nav. */
 @media(max-width:640px){
-  .bl-nav-logo-main{font-size:30px;letter-spacing:0.09em}
-  .bl-nav-logo-sub{font-size:11.5px;letter-spacing:0.24em;margin-top:6px}
-  .bl-nav-mobile-btn{font-size:15px;padding:13px 22px;min-height:46px}
+  .bl-nav-logo-main{font-size:38px;letter-spacing:0.07em}
+  .bl-nav-logo-sub{font-size:13px;letter-spacing:0.26em;margin-top:8px}
+  .bl-nav-mobile-btn{font-size:16px;padding:14px 24px;min-height:46px}
   .bl-nav-mobile-menu{padding:8px 20px 20px}
   .bl-nav-mobile-link{font-size:16px;font-weight:500;padding:14px 0;min-height:46px;display:flex;align-items:center}
-  .bl-nav-inner{padding:14px 16px;min-height:76px}
+  .bl-nav-inner{padding:18px 18px;min-height:92px}
 }
 </style>`;
 
