@@ -4877,7 +4877,21 @@ var gkSeed = {
     {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:true}
   ]
 };
-function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }catch(e){ return JSON.parse(JSON.stringify(gkSeed)); } }
+function gkLoad(){
+  var st;
+  try{ st = JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }
+  catch(e){ st = JSON.parse(JSON.stringify(gkSeed)); }
+  /* Backfill draws: earlier saved state carried placeholder "\u2014" for some
+     injectables. Adopt the seed's real draw for any compound still blank so the
+     units show; a draw the user actually set is a real value and is kept. */
+  try{
+    var sd={}; gkSeed.compounds.forEach(function(c){ sd[c.id]=c.draw; });
+    (st.compounds||[]).forEach(function(c){
+      if((!c.draw || c.draw==='\u2014') && sd[c.id] && sd[c.id]!=='\u2014') c.draw=sd[c.id];
+    });
+  }catch(e){}
+  return st;
+}
 /* Local write is the offline cache and happens immediately so the UI never
    waits. The server write is debounced and authoritative: if it refuses, we
    roll the page back to the last state the server accepted rather than leaving
