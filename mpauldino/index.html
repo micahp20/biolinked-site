@@ -4866,7 +4866,7 @@ var gkSeed = {
     {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"40u",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
     {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, unit:"mg",  draw:"20u",       block:"PM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
     {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"20u",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
-    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, unit:"mg",  draw:"30u",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
+    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:250,step:50,   unit:"mcg", draw:"7.5u",      block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
     /* already off his stack - these seed the Archive */
     {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:true},
     {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:true},
@@ -4914,7 +4914,7 @@ function gkSave(edit){
 function gkPayload(){
   return {
     compounds: gkState.compounds.map(function(c){
-      var o={ id:c.id, dose:c.dose, days:c.days, block:c.block, draw:c.draw,
+      var o={ id:c.id, dose:c.dose, days:c.days, block:c.block, draw:c.draw, unit:c.unit, step:c.step,
               active:!!c.active, archivedOn:c.archivedOn||null };
       if(c.runWeeks!==undefined) o.runWeeks=c.runWeeks;
       /* Compounds added from the Calculator are not in the page's seed, so the
@@ -5009,6 +5009,8 @@ function gkHydrate(p){
     if(typeof v.active==='boolean')  c.active=v.active;
     if(v.runWeeks!==undefined)       c.runWeeks=v.runWeeks;
     if(typeof v.draw==='string' && v.draw && v.draw!=='—') c.draw=v.draw;
+    if(typeof v.unit==='string' && v.unit) c.unit=v.unit;
+    if(typeof v.step==='number' && v.step>0) c.step=v.step;
     c.archivedOn = v.archivedOn || null;
   });
   /* Calculator-added compounds are not in the seed, so adopt any the server has
