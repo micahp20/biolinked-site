@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'cbraketa-v52';
+const CACHE = 'cbraketa-v1002 1002(0))';
 const ASSETS = [
   '/cbraketa/',
   '/cbraketa/index.html',

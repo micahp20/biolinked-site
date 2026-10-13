@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'jckelley-v54';
+const CACHE = 'jckelley-v1002 1002(0))';
 const ASSETS = [
   '/jckelley/',
   '/jckelley/index.html',
