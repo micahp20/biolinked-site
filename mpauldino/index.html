@@ -1194,7 +1194,7 @@
       </ul>
     </div></section>
     <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p><div class="gk-note" id="gkNote" hidden></div>
-<section class="cycle" id="gkCycle"></section><div class="viewbar"><button id="gkTabSchedule" class="on">Schedule</button><button id="gkTabArchive">Archive</button></div><div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
+<div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Your numbers, your targets, and a meal plan built from them</p>
       <div class="nut-wrap">
@@ -1616,6 +1616,7 @@
       </div>
       <div class="pc-warn" id="pc-warn" hidden></div>
       <button class="pc-add" id="pc-addbtn" type="button">+ Add to My List</button>
+      <button class="pc-add" id="pc-schedbtn" type="button">+ Add to Schedule</button>
       <div class="pc-note" id="pc-srcnote" hidden></div>
       <div class="pc-saved-head" id="pc-saved-head" hidden>
         <span class="pc-saved-title">My Compounds</span>
@@ -1626,6 +1627,27 @@
       <div class="pc-empty" id="pc-empty" hidden>Nothing matches that search.</div>
     </div>
     </div>
+  </div>
+  <div class="sheet" id="s-sched-add">
+    <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; Calculator</div><div class="ttl">Add to Schedule</div></div>
+    <div class="pad"><div class="gk"><h1 class="scrn">Add to Schedule</h1><p class="sub">Pick the days and timing &mdash; dose and draw come from your calculator</p>
+      <div class="pc-card accent">
+        <div class="pc-field"><div class="pc-label">Compound</div><div class="pc-stat-v" id="sa-name">&mdash;</div></div>
+        <div class="pc-field"><div class="pc-label">Dose</div><div class="pc-stat-v" id="sa-dose">&mdash;</div></div>
+        <div class="pc-field"><div class="pc-label">Draw</div><div class="pc-stat-v" id="sa-draw">&mdash;</div></div>
+      </div>
+      <div class="gk-label" style="margin-top:14px">DAYS</div>
+      <div class="gk-days" id="sa-days"></div>
+      <div class="gk-label" style="margin-top:14px">TIMING</div>
+      <div class="days-edit"><button type="button" class="blkb on" id="sa-am">AM</button><button type="button" class="blkb" id="sa-pm">PM</button></div>
+      <div class="gk-label" style="margin-top:14px">DURATION</div>
+      <div class="days-edit" style="align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--ink-soft)">Run for <input type="number" id="sa-weeks" min="1" step="1" value="8" style="width:58px;padding:5px 7px;border:1px solid var(--gk-line);border-radius:8px;background:var(--paper);color:var(--gk-ink)"> weeks</span>
+        <button type="button" class="blkb" id="sa-ongoing">Ongoing</button>
+      </div>
+      <div class="pc-warn" id="sa-err" hidden></div>
+      <button class="pc-add" id="sa-confirm" type="button">Add to Schedule</button>
+    </div></div>
   </div>
   <div class="sheet" id="s-notes">
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Notes &amp; Tips</div></div>
@@ -2690,6 +2712,79 @@ function openInv(i){
     fromDose();
   }
   initCalc();
+})();
+
+/* ---------- CALCULATOR -> SCHEDULE ----------
+   "Add to Schedule" reads the current calculator values, lets the member pick
+   days / AM-PM / duration, then pushes a new compound onto the gk schedule
+   using the same local+cloud save path the rest of the schedule UI uses. */
+(function(){
+  function el(id){ return document.getElementById(id); }
+  var saDays=[], saBlock='AM', saOngoing=false;
+  function renderSaDays(){
+    var host=el('sa-days'); if(!host) return;
+    host.innerHTML=GK_DAY.map(function(label,i){
+      return '<button type="button" class="day'+(saDays.indexOf(i)>=0?' on':'')+'" data-saday="'+i+'"><b>'+label.toUpperCase()+'</b></button>';
+    }).join('');
+  }
+  function saDraw(){ return (el('pc-units')?(el('pc-units').textContent||''):'').replace(/\s+/g,'')||'—'; }
+  function openSchedAdd(){
+    var name=((el('pc-name')&&el('pc-name').value)||'').trim();
+    el('sa-name').textContent=name||'Custom';
+    el('sa-dose').textContent=((el('pc-dose')&&el('pc-dose').value)||'')+' '+((el('pc-doseunit')&&el('pc-doseunit').value)||'');
+    el('sa-draw').textContent=saDraw();
+    saDays=[]; saBlock='AM'; saOngoing=false;
+    el('sa-am').className='blkb on'; el('sa-pm').className='blkb';
+    el('sa-ongoing').className='blkb';
+    var w=el('sa-weeks'); if(w){ w.disabled=false; }
+    el('sa-err').hidden=true;
+    renderSaDays();
+    if(typeof sheet==='function') sheet('sched-add');
+  }
+  function showErr(m){ var e=el('sa-err'); if(!e) return; e.textContent=m; e.hidden=false; }
+  function setBlock(b){ saBlock=b; el('sa-am').className='blkb'+(b==='AM'?' on':''); el('sa-pm').className='blkb'+(b==='PM'?' on':''); }
+  function setOngoing(on){
+    saOngoing=on; el('sa-ongoing').className='blkb'+(on?' on':'');
+    var w=el('sa-weeks'); if(w) w.disabled=on;
+  }
+  function confirmSchedAdd(){
+    var name=(((el('pc-name')&&el('pc-name').value)||'').trim())||'Custom';
+    var doseNum=parseFloat(el('pc-dose')&&el('pc-dose').value);
+    if(saDays.length===0){ showErr('Pick at least one day.'); return; }
+    if(!(doseNum>0)){ showErr('Enter a dose greater than zero on the calculator.'); return; }
+    var weeks=null;
+    if(!saOngoing){ weeks=parseInt(el('sa-weeks')&&el('sa-weeks').value,10); if(!(weeks>0)){ showErr('Enter a number of weeks, or choose Ongoing.'); return; } }
+    var unit=(((el('pc-doseunit')&&el('pc-doseunit').value)||'mg')+'').toLowerCase();
+    var vial=(((el('pc-vial')&&el('pc-vial').value)||'')+'').trim()||'Custom';
+    var cmp={
+      id:'calc-'+Date.now().toString(36),
+      name:name, vial:vial, dose:doseNum,
+      step:(doseNum/4)||0.25, unit:unit, draw:saDraw(),
+      block:saBlock, days:saDays.slice().sort(function(a,b){return a-b;}),
+      foundation:false, active:true, runWeeks:saOngoing?null:weeks
+    };
+    if(typeof gkState==='undefined' || !gkState.compounds){ showErr('Schedule is not ready yet.'); return; }
+    gkState.compounds.push(cmp);
+    if(typeof gkSave==='function') gkSave(true);
+    else if(typeof gkCacheLocal==='function') gkCacheLocal();
+    if(typeof gkRender==='function') gkRender();
+    if(typeof closeSheet==='function') closeSheet();
+    if(typeof go==='function') go('sched');
+    if(typeof gkToast==='function') gkToast(name+' added to your schedule.');
+  }
+  var sb=el('pc-schedbtn'); if(sb) sb.addEventListener('click', openSchedAdd);
+  var daysHost=el('sa-days');
+  if(daysHost) daysHost.addEventListener('click', function(e){
+    var t=e.target.closest&&e.target.closest('[data-saday]'); if(!t) return;
+    var i=Number(t.getAttribute('data-saday'));
+    saDays = saDays.indexOf(i)>=0 ? saDays.filter(function(x){return x!==i;}) : saDays.concat([i]);
+    el('sa-err').hidden=true; renderSaDays();
+  });
+  if(el('sa-am')) el('sa-am').addEventListener('click', function(){ setBlock('AM'); });
+  if(el('sa-pm')) el('sa-pm').addEventListener('click', function(){ setBlock('PM'); });
+  if(el('sa-ongoing')) el('sa-ongoing').addEventListener('click', function(){ setOngoing(!saOngoing); });
+  if(el('sa-weeks')) el('sa-weeks').addEventListener('input', function(){ if(saOngoing) setOngoing(false); });
+  if(el('sa-confirm')) el('sa-confirm').addEventListener('click', confirmSchedAdd);
 })();
 
 /* ---------- NUTRITION ----------
@@ -4645,13 +4740,13 @@ var gkSeed = {
     {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
     {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:1,  step:0.25, unit:"mg",  draw:"—",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
     /* already off his stack - these seed the Archive */
-    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:false},
-    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:false},
-    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:false},
-    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:false},
-    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5], foundation:false, active:false},
-    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:false},
-    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:false}
+    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:true},
+    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:true},
+    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:true},
+    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:true},
+    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5], foundation:false, active:true},
+    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:true},
+    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:true}
   ]
 };
 function gkLoad(){ try{ return JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }catch(e){ return JSON.parse(JSON.stringify(gkSeed)); } }
@@ -4677,8 +4772,14 @@ function gkSave(edit){
 function gkPayload(){
   return {
     compounds: gkState.compounds.map(function(c){
-      return { id:c.id, dose:c.dose, days:c.days, block:c.block,
-               active:!!c.active, archivedOn:c.archivedOn||null };
+      var o={ id:c.id, dose:c.dose, days:c.days, block:c.block,
+              active:!!c.active, archivedOn:c.archivedOn||null };
+      if(c.runWeeks!==undefined) o.runWeeks=c.runWeeks;
+      /* Compounds added from the Calculator are not in the page's seed, so the
+         full definition travels with the payload or another device never sees it. */
+      if(/^calc-/.test(c.id)){ o.name=c.name; o.vial=c.vial; o.unit=c.unit;
+        o.draw=c.draw; o.step=c.step; o.foundation=!!c.foundation; }
+      return o;
     }),
     selected: gkState.selected,
     view: gkState.view
@@ -4764,7 +4865,23 @@ function gkHydrate(p){
     if(Array.isArray(v.days) && v.days.length) c.days=v.days.slice();
     if(v.block==='AM'||v.block==='PM') c.block=v.block;
     if(typeof v.active==='boolean')  c.active=v.active;
+    if(v.runWeeks!==undefined)       c.runWeeks=v.runWeeks;
     c.archivedOn = v.archivedOn || null;
+  });
+  /* Calculator-added compounds are not in the seed, so adopt any the server has
+     that this device does not already carry -- their full definition rides along
+     in the payload. */
+  var have={}; gkState.compounds.forEach(function(c){ have[c.id]=true; });
+  p.compounds.forEach(function(v){
+    if(!v || !v.id || have[v.id] || !/^calc-/.test(v.id) || !v.name) return;
+    gkState.compounds.push({
+      id:v.id, name:v.name, vial:v.vial||"Custom",
+      dose:typeof v.dose==='number'?v.dose:0, step:typeof v.step==='number'?v.step:0.25,
+      unit:v.unit||"mg", draw:v.draw||"—", block:(v.block==='PM'?'PM':'AM'),
+      days:(Array.isArray(v.days)&&v.days.length)?v.days.slice():[],
+      foundation:!!v.foundation, active:v.active!==false,
+      runWeeks:(v.runWeeks===undefined?null:v.runWeeks)
+    });
   });
   if(typeof p.selected==='number') gkState.selected=p.selected;
   if(p.view) gkState.view=p.view;
@@ -4778,14 +4895,9 @@ function gkDaysInto(){ var st=new Date(gkState.cycleStart+"T00:00:00"), n=new Da
 function gkCycleDone(){ return gkDaysInto() >= gkState.cycleWeeks*7; }
 /* Fires on page open, so a client who does not open the page is not swept.
    Good enough while this is local-only; a scheduled job would do it properly. */
-function gkArchiveIfDue(){
-  if(!gkCycleDone()) return;
-  var moved=0;
-  gkState.compounds.forEach(function(c){
-    if(c.active && !c.foundation){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); moved++; }
-  });
-  if(moved){ gkSave(true); gkToast("Week "+gkState.cycleWeeks+" complete. Cycled compounds moved to archive."); }
-}
+/* Archiving has been removed: the schedule now lists every compound on its due
+   days. Kept as a no-op so existing callers stay valid. */
+function gkArchiveIfDue(){ return; }
 function gkToast(msg){ var el=document.getElementById("gkToast"); if(!el) return;
   el.textContent=msg; el.classList.add("show"); clearTimeout(gkToast._t);
   gkToast._t=setTimeout(function(){ el.classList.remove("show"); },2400); }
@@ -4798,28 +4910,17 @@ function gkRender(){
   gkArchiveIfDue();
   var h=new Date().getHours();
   document.getElementById("gkGreet").textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", "+gkState.member.split(" ")[0];
-  var week=gkWeek(), pct=Math.min(100,Math.round(gkDaysInto()/(gkState.cycleWeeks*7)*100));
-  var end=new Date(gkState.cycleStart+"T00:00:00"); end.setDate(end.getDate()+gkState.cycleWeeks*7);
-  document.getElementById("gkCycle").innerHTML='<div class="cycle-kicker">PROTOCOL CLOCK</div><h2>Week '+week+' of '+gkState.cycleWeeks+'</h2><p>'+
-    (gkCycleDone()?"Cycle complete. Cycled compounds are in the archive.":"Cycled compounds move to archive on "+end.toLocaleDateString(undefined,{month:"short",day:"numeric"})+".")+
-    '</p><div class="bar"><i style="width:'+pct+'%"></i></div><div class="cycle-meta"><span>'+pct+'% through</span><span>Foundation stays on</span></div>';
-  document.getElementById("gkTabSchedule").className=gkState.view==="schedule"?"on":"";
-  document.getElementById("gkTabArchive").className=gkState.view==="archive"?"on":"";
   var strip=document.getElementById("gkDayStrip");
-  strip.style.display=gkState.view==="schedule"?"grid":"none";
   strip.innerHTML=GK_DAY.map(function(label,i){
     /* Days only -- a client rarely starts on the date shown, so a real date
        reads as a promise the schedule is not making. */
     return '<button class="day'+(gkState.selected===i?" on":"")+'" data-gkday="'+i+'"><b>'+label.toUpperCase()+'</b></button>';
   }).join("");
-  var active=gkState.compounds.filter(function(c){return c.active;});
-  var dueNow=active.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
-  var arch=gkState.compounds.filter(function(c){return !c.active;});
-  document.getElementById("gkTabArchive").textContent="Archive"+(arch.length?" · "+arch.length:"");
-  document.getElementById("gkSummary").textContent=gkState.view==="archive"
-    ? "Removed from the schedule. Add back to return it. New compounds cannot be added."
-    : dueNow.length+" due "+GK_DAY[gkState.selected]+" · off-days are hidden";
-  document.getElementById("gkList").innerHTML=gkState.view==="archive"?gkArchiveView(arch):gkDayView(dueNow);
+  /* Every compound is shown on its due days now -- there is no archive. */
+  var all=gkState.compounds;
+  var dueNow=all.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
+  document.getElementById("gkSummary").textContent=dueNow.length+" due "+GK_DAY[gkState.selected]+" · off-days are hidden";
+  document.getElementById("gkList").innerHTML=gkDayView(dueNow);
 }
 /* The client can move any compound between the Morning (AM) and Night (PM)
    blocks from its edit panel. The choice lives on the compound's own block
@@ -4838,18 +4939,23 @@ function gkDayView(dueNow){
       (items.map(gkCard).join("")||'<div class="gk-empty">Nothing scheduled '+(block==="AM"?"this morning":"tonight")+'.</div>');
   }).join("");
 }
+function gkRunNote(c){
+  if(c.runWeeks===undefined || c.runWeeks===null && c.foundation) return "";
+  if(c.runWeeks===null) return " · ongoing";
+  return " · runs "+c.runWeeks+" wk"+(c.runWeeks===1?"":"s");
+}
 function gkCard(c){
   var open=gkState.open===c.id;
   return '<article class="gk-card"><div class="gk-row">'+
     '<div class="dose-mark">'+gkFmt(c.dose)+'<small>'+c.unit+'</small></div>'+
-    '<div><div class="gk-name">'+c.name+'</div><div class="gk-meta">'+c.vial+' · '+gkDayText(c.days)+(c.foundation?" · year-round":"")+'</div></div>'+
+    '<div><div class="gk-name">'+c.name+'</div><div class="gk-meta">'+c.vial+' · '+gkDayText(c.days)+(c.foundation?" · year-round":"")+gkRunNote(c)+'</div></div>'+
     '<button class="edit'+(open?" on":"")+'" data-gkedit="'+c.id+'">'+(open?"Done":"Edit")+'</button>'+
     '</div>'+(open?gkPanel(c):"")+'</article>';
 }
 function gkPanel(c){
   /* Dose is the protocol and is shown, not offered -- there is no stepper and
      nothing here writes to it. Days ARE the client's: they pick which days
-     they take it, and that choice syncs. Archive takes it off every day. */
+     they take it, and that choice syncs. Remove takes it off the schedule. */
   return '<div class="panel"><div class="gk-label">DOSE</div>'+
     '<div class="gk-row"><div class="fixed-dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div>'+
     '<div class="range">'+c.draw+' draw</div></div>'+
@@ -4859,7 +4965,7 @@ function gkPanel(c){
     '<div class="gk-label" style="margin-top:14px">TIMING</div>'+
     '<div class="days-edit"><button type="button" class="blkb'+(schBlk(c)==='AM'?' on':'')+'" data-gkblock="'+c.id+'" data-gkb="AM">AM</button>'+
       '<button type="button" class="blkb'+(schBlk(c)==='PM'?' on':'')+'" data-gkblock="'+c.id+'" data-gkb="PM">PM</button></div>'+
-    '<div class="actions"><button class="ghost" data-gkremove="'+c.id+'">Archive</button></div></div>';
+    '<div class="actions"><button class="ghost" data-gkremove="'+c.id+'">Remove</button></div></div>';
 }
 function gkArchiveView(items){
   if(!items.length) return '<div class="gk-empty">Archive is empty. Archiving a compound removes it from every day. Add back returns it with the same dose and days.</div>';
@@ -4870,21 +4976,22 @@ function gkArchiveView(items){
 }
 document.addEventListener("click",function(e){
   var t=e.target.closest&&e.target.closest("button"); if(!t) return;
-  if(t.id==="gkTabSchedule"){ gkState.view="schedule"; gkSave(); gkRender(); return; }
-  if(t.id==="gkTabArchive"){ gkState.view="archive"; gkState.open=null; gkSave(); gkRender(); return; }
   if(t.dataset.gkday!=null){ gkState.selected=Number(t.dataset.gkday); gkState.open=null; gkSave(); gkRender(); return; }
   if(t.dataset.gkblock!=null){ schBlkSet(t.dataset.gkblock, t.dataset.gkb, e); return; }
-  var id=t.dataset.gkedit||t.dataset.gktoggle||t.dataset.gkremove||t.dataset.gkrestore;
+  var id=t.dataset.gkedit||t.dataset.gktoggle||t.dataset.gkremove;
   if(!id) return;
   /* gkedit only opens or closes the panel -- navigation, not an edit. */
-  var mutates = !!(t.dataset.gktoggle||t.dataset.gkremove||t.dataset.gkrestore);
+  var mutates = !!(t.dataset.gktoggle||t.dataset.gkremove);
   var c=gkState.compounds.filter(function(x){return x.id===id;})[0]; if(!c) return;
   if(t.dataset.gkedit) gkState.open = gkState.open===id ? null : id;
   if(t.dataset.gktoggle){ var d=Number(t.dataset.gkd);
     c.days = c.days.indexOf(d)>=0 ? c.days.filter(function(x){return x!==d;}) : c.days.concat([d]);
-    if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or archive it."); } }
-  if(t.dataset.gkremove){ c.active=false; c.archivedOn=new Date().toISOString().slice(0,10); gkState.open=null; gkToast("Removed from the schedule. It is in Archive."); }
-  if(t.dataset.gkrestore){ c.active=true; c.archivedOn=null; gkToast("Added back to the schedule."); }
+    if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or remove it."); } }
+  if(t.dataset.gkremove){
+    /* Archiving is gone -- Remove deletes the compound from the schedule. */
+    gkState.compounds = gkState.compounds.filter(function(x){return x.id!==id;});
+    gkState.open=null; gkToast(c.name+" removed from the schedule.");
+  }
   gkSave(mutates); gkRender();
 });
 
