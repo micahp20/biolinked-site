@@ -988,7 +988,7 @@
 .gk .gk-label{letter-spacing:.16em;font-size:10px;color:var(--ink-soft);margin-bottom:8px}
 .gk .range{margin-left:auto;font-size:11px;color:var(--ink-soft);text-align:right;font-weight:300}
 /* Read-only dose: same weight as the old stepper readout, without controls. */
-.gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}
+.gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}.dose-adj{display:flex;align-items:center;gap:14px}.dstep{min-width:42px;font-size:19px;font-weight:600;line-height:1}
 .gk .fixed-dose small{display:block;font-family:"Outfit",sans-serif;font-size:10px;letter-spacing:.12em;color:var(--ink-soft)}
 /* Shown only when there is no key, or the key was refused. */
 .gk .gk-note{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:14px;
@@ -1194,7 +1194,7 @@
       </ul>
     </div></section>
     <section class="view" id="v-sched"><div class="pad"><div class="gk"><h1 class="gk-h" id="gkGreet">Schedule</h1><p class="gk-sub" id="gkSummary"></p><div class="gk-note" id="gkNote" hidden></div>
-<div class="gk-days" id="gkDayStrip"></div><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
+<div class="gk-days" id="gkDayStrip"></div><button class="pc-add" id="gkAddBtn" type="button" style="min-height:44px;margin:0 0 16px">+ Add compound</button><div id="gkList"></div></div></div></section><section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Your numbers, your targets, and a meal plan built from them</p>
       <div class="nut-wrap">
@@ -1647,6 +1647,51 @@
       </div>
       <div class="pc-warn" id="sa-err" hidden></div>
       <button class="pc-add" id="sa-confirm" type="button">Add to Schedule</button>
+    </div></div>
+  </div>
+  <div class="sheet" id="s-man-add">
+    <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; Schedule</div><div class="ttl">Add Compound</div></div>
+    <div class="pad"><div class="gk"><h1 class="scrn">Add Compound</h1><p class="sub">Add a tablet, capsule, or anything else to your schedule</p>
+      <div class="pc-card accent">
+        <div class="pc-field">
+          <div class="pc-label">Name</div>
+          <input class="pc-input" id="ma-name" type="text" placeholder="e.g. Metformin" autocomplete="off">
+        </div>
+        <div class="pc-field">
+          <div class="pc-label">Dose</div>
+          <div class="pc-dose-row">
+            <input class="pc-input" id="ma-dose" type="number" inputmode="decimal" step="any" min="0" placeholder="e.g. 500">
+            <select class="pc-unit-sel" id="ma-unit" aria-label="Dose unit">
+              <option value="mg">mg</option>
+              <option value="mcg">mcg</option>
+              <option value="iu">IU</option>
+              <option value="g">g</option>
+              <option value="tab">tab</option>
+              <option value="cap">cap</option>
+            </select>
+          </div>
+        </div>
+        <div class="pc-field" style="margin-bottom:0">
+          <div class="pc-label">Form</div>
+          <div class="days-edit">
+            <button type="button" class="blkb on" id="ma-f-tablet">Tablet</button>
+            <button type="button" class="blkb" id="ma-f-capsule">Capsule</button>
+            <button type="button" class="blkb" id="ma-f-injection">Injection</button>
+            <button type="button" class="blkb" id="ma-f-topical">Topical</button>
+          </div>
+        </div>
+      </div>
+      <div class="gk-label" style="margin-top:14px">DAYS</div>
+      <div class="gk-days" id="ma-days"></div>
+      <div class="gk-label" style="margin-top:14px">TIMING</div>
+      <div class="days-edit"><button type="button" class="blkb on" id="ma-am">AM</button><button type="button" class="blkb" id="ma-pm">PM</button></div>
+      <div class="gk-label" style="margin-top:14px">DURATION</div>
+      <div class="days-edit" style="align-items:center;gap:10px">
+        <span style="font-size:13px;color:var(--ink-soft)">Run for <input type="number" id="ma-weeks" min="1" step="1" value="8" style="width:58px;padding:5px 7px;border:1px solid var(--gk-line);border-radius:8px;background:var(--paper);color:var(--gk-ink)"> weeks</span>
+        <button type="button" class="blkb" id="ma-ongoing">Ongoing</button>
+      </div>
+      <div class="pc-warn" id="ma-err" hidden></div>
+      <button class="pc-add" id="ma-confirm" type="button">Add to Schedule</button>
     </div></div>
   </div>
   <div class="sheet" id="s-notes">
@@ -2785,6 +2830,89 @@ function openInv(i){
   if(el('sa-ongoing')) el('sa-ongoing').addEventListener('click', function(){ setOngoing(!saOngoing); });
   if(el('sa-weeks')) el('sa-weeks').addEventListener('input', function(){ if(saOngoing) setOngoing(false); });
   if(el('sa-confirm')) el('sa-confirm').addEventListener('click', confirmSchedAdd);
+})();
+
+/* ---------- MANUAL "+ Add compound" (Schedule page) ----------
+   A plain entry form for tablets / orals / anything that needs no calculator
+   math. Builds a `man-` compound and pushes it with the same local+cloud save
+   path as the calculator flow, so it syncs to the member's other devices. */
+(function(){
+  function el(id){ return document.getElementById(id); }
+  var FORMS={
+    tablet:    {vial:'Tablet',  draw:'1 tab'},
+    capsule:   {vial:'Capsule', draw:'1 cap'},
+    injection: {vial:'Custom',  draw:'—'},
+    topical:   {vial:'Topical', draw:'topical'}
+  };
+  var maDays=[], maBlock='AM', maForm='tablet', maOngoing=false;
+  function renderMaDays(){
+    var host=el('ma-days'); if(!host) return;
+    host.innerHTML=GK_DAY.map(function(label,i){
+      return '<button type="button" class="day'+(maDays.indexOf(i)>=0?' on':'')+'" data-maday="'+i+'"><b>'+label.toUpperCase()+'</b></button>';
+    }).join('');
+  }
+  function setForm(f){
+    maForm=f;
+    ['tablet','capsule','injection','topical'].forEach(function(k){
+      var b=el('ma-f-'+k); if(b) b.className='blkb'+(k===f?' on':'');
+    });
+  }
+  function setBlock(b){ maBlock=b; el('ma-am').className='blkb'+(b==='AM'?' on':''); el('ma-pm').className='blkb'+(b==='PM'?' on':''); }
+  function setOngoing(on){ maOngoing=on; el('ma-ongoing').className='blkb'+(on?' on':''); var w=el('ma-weeks'); if(w) w.disabled=on; }
+  function showErr(m){ var e=el('ma-err'); if(!e) return; e.textContent=m; e.hidden=false; }
+  function openManAdd(){
+    if(el('ma-name')) el('ma-name').value='';
+    if(el('ma-dose')) el('ma-dose').value='';
+    if(el('ma-unit')) el('ma-unit').value='mg';
+    maDays=[]; maBlock='AM'; maOngoing=false;
+    setForm('tablet'); setBlock('AM'); setOngoing(false);
+    var w=el('ma-weeks'); if(w){ w.disabled=false; w.value='8'; }
+    if(el('ma-err')) el('ma-err').hidden=true;
+    renderMaDays();
+    if(typeof sheet==='function') sheet('man-add');
+  }
+  function confirmManAdd(){
+    var name=((el('ma-name')&&el('ma-name').value)||'').trim();
+    var doseNum=parseFloat(el('ma-dose')&&el('ma-dose').value);
+    if(!name){ showErr('Enter a name.'); return; }
+    if(maDays.length===0){ showErr('Pick at least one day.'); return; }
+    if(!(doseNum>0)){ showErr('Enter a dose greater than zero.'); return; }
+    var weeks=null;
+    if(!maOngoing){ weeks=parseInt(el('ma-weeks')&&el('ma-weeks').value,10); if(!(weeks>0)){ showErr('Enter a number of weeks, or choose Ongoing.'); return; } }
+    var unit=(((el('ma-unit')&&el('ma-unit').value)||'mg')+'').toLowerCase();
+    var f=FORMS[maForm]||FORMS.tablet;
+    var cmp={
+      id:'man-'+Date.now().toString(36),
+      name:name, vial:f.vial, dose:doseNum,
+      step:(doseNum/4)||0.25, unit:unit, draw:f.draw,
+      block:maBlock, days:maDays.slice().sort(function(a,b){return a-b;}),
+      foundation:false, active:true, runWeeks:maOngoing?null:weeks
+    };
+    if(typeof gkState==='undefined' || !gkState.compounds){ showErr('Schedule is not ready yet.'); return; }
+    gkState.compounds.push(cmp);
+    if(typeof gkSave==='function') gkSave(true);
+    else if(typeof gkCacheLocal==='function') gkCacheLocal();
+    if(typeof gkRender==='function') gkRender();
+    if(typeof closeSheet==='function') closeSheet();
+    if(typeof gkToast==='function') gkToast(name+' added to your schedule.');
+  }
+  var ab=el('gkAddBtn'); if(ab) ab.addEventListener('click', openManAdd);
+  var daysHost=el('ma-days');
+  if(daysHost) daysHost.addEventListener('click', function(e){
+    var t=e.target.closest&&e.target.closest('[data-maday]'); if(!t) return;
+    var i=Number(t.getAttribute('data-maday'));
+    maDays = maDays.indexOf(i)>=0 ? maDays.filter(function(x){return x!==i;}) : maDays.concat([i]);
+    if(el('ma-err')) el('ma-err').hidden=true; renderMaDays();
+  });
+  if(el('ma-f-tablet'))    el('ma-f-tablet').addEventListener('click', function(){ setForm('tablet'); });
+  if(el('ma-f-capsule'))   el('ma-f-capsule').addEventListener('click', function(){ setForm('capsule'); });
+  if(el('ma-f-injection')) el('ma-f-injection').addEventListener('click', function(){ setForm('injection'); });
+  if(el('ma-f-topical'))   el('ma-f-topical').addEventListener('click', function(){ setForm('topical'); });
+  if(el('ma-am')) el('ma-am').addEventListener('click', function(){ setBlock('AM'); });
+  if(el('ma-pm')) el('ma-pm').addEventListener('click', function(){ setBlock('PM'); });
+  if(el('ma-ongoing')) el('ma-ongoing').addEventListener('click', function(){ setOngoing(!maOngoing); });
+  if(el('ma-weeks')) el('ma-weeks').addEventListener('input', function(){ if(maOngoing) setOngoing(false); });
+  if(el('ma-confirm')) el('ma-confirm').addEventListener('click', confirmManAdd);
 })();
 
 /* ---------- NUTRITION ----------
@@ -4777,7 +4905,7 @@ function gkPayload(){
       if(c.runWeeks!==undefined) o.runWeeks=c.runWeeks;
       /* Compounds added from the Calculator are not in the page's seed, so the
          full definition travels with the payload or another device never sees it. */
-      if(/^calc-/.test(c.id)){ o.name=c.name; o.vial=c.vial; o.unit=c.unit;
+      if(/^(calc|man)-/.test(c.id)){ o.name=c.name; o.vial=c.vial; o.unit=c.unit;
         o.draw=c.draw; o.step=c.step; o.foundation=!!c.foundation; }
       return o;
     }),
@@ -4873,7 +5001,7 @@ function gkHydrate(p){
      in the payload. */
   var have={}; gkState.compounds.forEach(function(c){ have[c.id]=true; });
   p.compounds.forEach(function(v){
-    if(!v || !v.id || have[v.id] || !/^calc-/.test(v.id) || !v.name) return;
+    if(!v || !v.id || have[v.id] || !/^(calc|man)-/.test(v.id) || !v.name) return;
     gkState.compounds.push({
       id:v.id, name:v.name, vial:v.vial||"Custom",
       dose:typeof v.dose==='number'?v.dose:0, step:typeof v.step==='number'?v.step:0.25,
@@ -4953,11 +5081,11 @@ function gkCard(c){
     '</div>'+(open?gkPanel(c):"")+'</article>';
 }
 function gkPanel(c){
-  /* Dose is the protocol and is shown, not offered -- there is no stepper and
-     nothing here writes to it. Days ARE the client's: they pick which days
+  /* Dose has a +/- stepper on this (owner) page; it writes to the compound
+     and syncs like everything else. Days ARE the client's: they pick which days
      they take it, and that choice syncs. Remove takes it off the schedule. */
   return '<div class="panel"><div class="gk-label">DOSE</div>'+
-    '<div class="gk-row"><div class="fixed-dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div>'+
+    '<div class="gk-row"><div class="dose-adj"><button type="button" class="blkb dstep" data-gkdose="'+c.id+'" data-gkdir="-1">&minus;</button><div class="fixed-dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div><button type="button" class="blkb dstep" data-gkdose="'+c.id+'" data-gkdir="1">+</button></div>'+
     '<div class="range">'+c.draw+' draw</div></div>'+
     '<div class="gk-label" style="margin-top:14px">DAYS</div>'+
     '<div class="days-edit">'+GK_SHORT.map(function(l,i){
@@ -4978,6 +5106,12 @@ document.addEventListener("click",function(e){
   var t=e.target.closest&&e.target.closest("button"); if(!t) return;
   if(t.dataset.gkday!=null){ gkState.selected=Number(t.dataset.gkday); gkState.open=null; gkSave(); gkRender(); return; }
   if(t.dataset.gkblock!=null){ schBlkSet(t.dataset.gkblock, t.dataset.gkb, e); return; }
+  if(t.dataset.gkdose!=null){
+    var cd=gkState.compounds.filter(function(x){return x.id===t.dataset.gkdose;})[0]; if(!cd) return;
+    var stp=(typeof cd.step==='number'&&cd.step>0)?cd.step:0.25;
+    cd.dose=Math.max(0, gkRound(cd.dose + Number(t.dataset.gkdir)*stp));
+    gkSave(true); gkRender(); return;
+  }
   var id=t.dataset.gkedit||t.dataset.gktoggle||t.dataset.gkremove;
   if(!id) return;
   /* gkedit only opens or closes the panel -- navigation, not an edit. */
