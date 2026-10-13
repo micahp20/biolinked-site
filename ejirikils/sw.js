@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ejirikils/, which is now the real page: the app layout
 // was promoted here from the /ejirikils/app/ pilot.
-const CACHE = 'ejirikils-v16';
+const CACHE = 'ejirikils-v17';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/ejirikils/',

@@ -2246,25 +2246,25 @@ function renderPay(){
   }
   sum.textContent=(DUE===0&&PAID===0&&quoteO.length)
     ? (quoteO.length+' cycles quoted \u00b7 '+money(quoteT)+' total · nothing billed yet')
-    : 'Paid to date '+money(PAID)+' · Balance due '+money(DUE);
-  hero.innerHTML = dueT>0 ? ('<div class="bal"><div class="l">Balance due</div><div class="n">'+money(dueT)+
+    : 'Paid to date '+money(PAID)+' · Quoted '+money(DUE);
+  hero.innerHTML = dueT>0 ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(dueT)+
     '</div><div class="o">'+dueO.map(function(o){return o.label}).join(', ')+
     '</div><div class="np">'+dueO.length+' unpaid invoice'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
-    payButtons(dueT,'BioLinked \u2014 balance due')+'</div>')
+    payButtons(dueT,'BioLinked \u2014 quoted')+'</div>')
     : (quoteO.length ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(quoteT)+
        '</div><div class="o">'+quoteO.map(function(o){return o.label.split(' \u00b7 ')[0]+' \u00b7 '+o.label.split(' \u00b7 ')[1]}).join(', ')+
        '</div><div class="np">'+quoteO.length+' cycle'+(quoteO.length===1?'':'s')+' quoted \u00b7 nothing billed yet \u00b7 run them one at a time</div></div>')
-       : ('<div class="bal"><div class="l">Balance due</div><div class="n">'+money(0)+
+       : ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(0)+
        '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>'));
   list.innerHTML=INV.map(function(o,i){
     var pc=o.status==='due'?'due':(o.status==='free'?'free':(o.status==='quote'?'quote':'paid'));
-    var pl=o.status==='due'?'Due':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
+    var pl=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
     return '<div class="ocard" onclick="openInv('+i+')"><div class="ohd"><div><div class="ot">'+o.label+
       '</div><div class="os">'+o.summary+'</div></div><span class="pill '+pc+'">'+pl+'</span></div>'+
       o.items.map(function(it){return '<div class="irow'+(it.amt===0?' freeln':'')+'"><span class="in">'+it.n+
         '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>'}).join('')+
-      '<div class="irow tot"><span class="in">'+(o.status==='due'?'Due':(o.status==='free'?'No charge':(o.status==='quote'?'Quoted':'Paid in full')))+
+      '<div class="irow tot"><span class="in">'+(o.status==='due'?'Quoted':(o.status==='free'?'No charge':(o.status==='quote'?'Quoted':'Paid in full')))+
       '</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o)+'</div>';
   }).join('');
   note.textContent='Tap an order for its full breakdown. Figures are copied from your protocol page — nothing is charged in the app.';
@@ -2273,7 +2273,7 @@ function openInv(i){
   var o=INV[i]; if(!o) return;
   document.getElementById('i-name').textContent=o.label;
   document.getElementById('i-sum').textContent=o.summary;
-  document.getElementById('i-tag').textContent=o.status==='due'?'Due':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
+  document.getElementById('i-tag').textContent=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
   document.getElementById('i-items').innerHTML=o.items.map(function(it){
     return '<div class="irow"><span class="in"><b>'+it.n+'</b>'+(it.sub?'<br><span style="color:var(--muted);font-size:11px">'+it.sub+'</span>':'')+
       '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>';
