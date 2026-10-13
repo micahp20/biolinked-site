@@ -1095,7 +1095,7 @@
 .stk-a:last-child{border-bottom:none}
 .stk-a:active{background:var(--gold-soft)}
 .stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
-</style>
+.gk-viewonly #gkAddBtn,.gk-viewonly #gkMedAddBtn,.gk-viewonly #pc-schedbtn,.gk-viewonly .gk .edit,.gk-viewonly [data-gkremove],.gk-viewonly [data-gkmedremove],.gk-viewonly [data-gkrestore],.gk-viewonly [data-gkmedrestore],.gk-viewonly .gk-offtog,.gk-viewonly .gk-offwrap{display:none!important}.gk-view-badge{display:inline-block;margin:6px 0 0 0;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold,#8a7335);border:1px solid var(--gold,#8a7335);border-radius:999px;padding:3px 10px}</style>
 <script src="/compound-library.js?v=3"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1826,6 +1826,8 @@ var BL_KEY=(function(){
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
 })();
 function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; }
+/* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
+var GK_VIEWONLY=!BL_KEY;
 
 function blRpc(fn,body,signal){
   var opt={
@@ -4990,6 +4992,7 @@ function gkPayload(){
   };
 }
 function gkPush(){
+  if(typeof GK_VIEWONLY!=='undefined'&&GK_VIEWONLY) return;
   /* If the boot read failed we still do not know what is on the server, so read
      before writing rather than overwriting blind. The member's edit wins once
      the read succeeds -- it is an explicit action on their own device. */
@@ -5132,6 +5135,7 @@ function gkRender(){
   if(!document.getElementById("gkList")) return;
   gkArchiveIfDue();
   gkEnsureMeds();
+  if(typeof GK_VIEWONLY!=='undefined'&&GK_VIEWONLY){document.documentElement.classList.add('gk-viewonly');var _gr=document.getElementById('gkGreet');if(_gr&&!document.getElementById('gkViewBadge')){var _b=document.createElement('span');_b.id='gkViewBadge';_b.className='gk-view-badge';_b.textContent='● View only';if(_gr.nextSibling)_gr.parentNode.insertBefore(_b,_gr.nextSibling);else _gr.parentNode.appendChild(_b);}}
   var h=new Date().getHours();
   document.getElementById("gkGreet").textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", "+gkState.member.split(" ")[0];
   var strip=document.getElementById("gkDayStrip");
