@@ -5046,9 +5046,11 @@ function gkRender(){
   }).join("");
   /* Every compound is shown on its due days now -- there is no archive. */
   var all=gkState.compounds;
-  var dueNow=all.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
+  var onSched=all.filter(function(c){return c.active!==false;});
+  var dueNow=onSched.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
+  var off=all.filter(function(c){return c.active===false;});
   document.getElementById("gkSummary").textContent=dueNow.length+" due "+GK_DAY[gkState.selected]+" · off-days are hidden";
-  document.getElementById("gkList").innerHTML=gkDayView(dueNow);
+  document.getElementById("gkList").innerHTML=gkDayView(dueNow)+(off.length?('<div class="block-head" style="margin-top:24px"><h3>ALL COMPOUNDS</h3><em>not on schedule</em></div>'+gkArchiveView(off)):"");
 }
 /* The client can move any compound between the Morning (AM) and Night (PM)
    blocks from its edit panel. The choice lives on the compound's own block
@@ -5112,6 +5114,10 @@ document.addEventListener("click",function(e){
     cd.dose=Math.max(0, gkRound(cd.dose + Number(t.dataset.gkdir)*stp));
     gkSave(true); gkRender(); return;
   }
+  if(t.dataset.gkrestore!=null){
+    var cr=gkState.compounds.filter(function(x){return x.id===t.dataset.gkrestore;})[0]; if(!cr) return;
+    cr.active=true; cr.archivedOn=null; gkState.open=null; gkSave(true); gkRender(); gkToast(cr.name+" added back to your schedule."); return;
+  }
   var id=t.dataset.gkedit||t.dataset.gktoggle||t.dataset.gkremove;
   if(!id) return;
   /* gkedit only opens or closes the panel -- navigation, not an edit. */
@@ -5122,15 +5128,14 @@ document.addEventListener("click",function(e){
     c.days = c.days.indexOf(d)>=0 ? c.days.filter(function(x){return x!==d;}) : c.days.concat([d]);
     if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or remove it."); } }
   if(t.dataset.gkremove){
-    /* Archiving is gone -- Remove deletes the compound from the schedule. */
-    gkState.compounds = gkState.compounds.filter(function(x){return x.id!==id;});
-    gkState.open=null; gkToast(c.name+" removed from the schedule.");
+    c.active=false; gkState.open=null; gkToast(c.name+" moved to All compounds \u2014 add it back anytime.");
   }
   gkSave(mutates); gkRender();
 });
 
 function blNote(){
   var el=document.getElementById('gkNote'); if(!el) return;
+  el.hidden=true; return; /* note suppressed on owner page */
   if(BL_KEYBAD){
     el.innerHTML='<b>This link is no longer valid.</b> Open your personal link again to pick your schedule back up. Changes made here stay on this device.';
     el.hidden=false; return;
