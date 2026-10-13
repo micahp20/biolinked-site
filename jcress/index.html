@@ -1959,9 +1959,33 @@ var STK_IX_ALIAS={"N-Acetyl Semax Amidate": "Semax or NA Semax Amidate", "N-Acet
    rather than failing silently. */
 function stkIxFind(name){
   if(typeof IX==='undefined'||!IX) return -1;
-  var want=((typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS[name])||name).toLowerCase();
-  for(var i=0;i<IX.length;i++){ if(String(IX[i].name).toLowerCase()===want) return i; }
-  return -1;
+  var norm=function(x){return String(x).toLowerCase().replace(/[^a-z0-9]/g,'');};
+  var base=String(name).split(/\s+[·—–-]\s+/)[0].trim();
+  var SHARED={
+    'hgh':'Somatropin (HGH)','hghsomatropin':'Somatropin (HGH)','hghhumangrowthhormone':'Somatropin (HGH)','humangrowthhormone':'Somatropin (HGH)','somatropin':'Somatropin (HGH)',
+    'trt':'Testosterone','trttestosteronecypionate':'Testosterone','testosteronecypionate':'Testosterone','testosteroneenanthate':'Testosterone',
+    'cjc1295ipamorelin':'Ipamorelin / CJC-1295 No DAC','ipamorelincjc1295':'Ipamorelin / CJC-1295 No DAC','cjc1295wdac':'CJC-1295 No DAC','cjc1295withdac':'CJC-1295 No DAC',
+    'nacetylsemaxamidate':'Semax or NA Semax Amidate','nasemaxamidate':'Semax or NA Semax Amidate','semax':'Semax or NA Semax Amidate',
+    'nacetylselankamidate':'Selank or NA Selank Amidate','naselankamidate':'Selank or NA Selank Amidate','selank':'Selank or NA Selank Amidate',
+    'nacetyladamaxamidate':'Adamax','naadamaxamidate':'Adamax',
+    'epithalon':'Epitalon',
+    'fox04dri':'FOXO4-DRI',
+    'kisspeptin10':'Kisspeptin',
+    'pt141bremelanotide':'PT-141',
+    'klowblend':'KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)',
+    'glowblend':'GLOW Blend (GHK-Cu, BPC-157, TB-500)',
+    'wolverinestack':'Wolverine 2.0','wolverine':'Wolverine 2.0',
+    'bpc157tb500':'BPC-157 / TB-500 5mg/5mg Blend','bpc157tb500blend':'BPC-157 / TB-500 5mg/5mg Blend',
+    'melanotan':'Melanotan 2'
+  };
+  var pageAlias=(typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS)||{};
+  var target=pageAlias[name]||pageAlias[base]||SHARED[norm(base)]||base;
+  var want=norm(target); var i;
+  for(i=0;i<IX.length;i++){ if(norm(IX[i].name)===want) return i; }
+  var bestI=-1,bestLen=1e9;
+  for(i=0;i<IX.length;i++){ var n2=norm(IX[i].name);
+    if(n2 && (n2.indexOf(want)>-1 || want.indexOf(n2)>-1) && n2.length<bestLen){ bestLen=n2.length; bestI=i; } }
+  return bestI;
 }
 function stkIx(name,ev){
   if(ev&&ev.stopPropagation) ev.stopPropagation();
