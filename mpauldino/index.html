@@ -988,7 +988,7 @@
 .gk .gk-label{letter-spacing:.16em;font-size:10px;color:var(--ink-soft);margin-bottom:8px}
 .gk .range{margin-left:auto;font-size:11px;color:var(--ink-soft);text-align:right;font-weight:300}
 /* Read-only dose: same weight as the old stepper readout, without controls. */
-.gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}.dose-adj{display:flex;align-items:center;gap:14px}.dstep{min-width:42px;font-size:19px;font-weight:600;line-height:1}
+.gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}.dose-adj{display:flex;align-items:center;gap:14px}.dstep{min-width:42px;font-size:19px;font-weight:600;line-height:1}.draw-in{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:10px;font:inherit;background:transparent;color:inherit}.draw-in:focus{outline:none;border-color:var(--gold,#8a7335)}
 .gk .fixed-dose small{display:block;font-family:"Outfit",sans-serif;font-size:10px;letter-spacing:.12em;color:var(--ink-soft)}
 /* Shown only when there is no key, or the key was refused. */
 .gk .gk-note{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:14px;
@@ -4900,7 +4900,7 @@ function gkSave(edit){
 function gkPayload(){
   return {
     compounds: gkState.compounds.map(function(c){
-      var o={ id:c.id, dose:c.dose, days:c.days, block:c.block,
+      var o={ id:c.id, dose:c.dose, days:c.days, block:c.block, draw:c.draw,
               active:!!c.active, archivedOn:c.archivedOn||null };
       if(c.runWeeks!==undefined) o.runWeeks=c.runWeeks;
       /* Compounds added from the Calculator are not in the page's seed, so the
@@ -4994,6 +4994,7 @@ function gkHydrate(p){
     if(v.block==='AM'||v.block==='PM') c.block=v.block;
     if(typeof v.active==='boolean')  c.active=v.active;
     if(v.runWeeks!==undefined)       c.runWeeks=v.runWeeks;
+    if(typeof v.draw==='string' && v.draw) c.draw=v.draw;
     c.archivedOn = v.archivedOn || null;
   });
   /* Calculator-added compounds are not in the seed, so adopt any the server has
@@ -5089,6 +5090,8 @@ function gkPanel(c){
   return '<div class="panel"><div class="gk-label">DOSE</div>'+
     '<div class="gk-row"><div class="dose-adj"><button type="button" class="blkb dstep" data-gkdose="'+c.id+'" data-gkdir="-1">&minus;</button><div class="fixed-dose">'+gkFmt(c.dose)+'<small>'+c.unit.toUpperCase()+'</small></div><button type="button" class="blkb dstep" data-gkdose="'+c.id+'" data-gkdir="1">+</button></div>'+
     '<div class="range">'+c.draw+' draw</div></div>'+
+    '<div class="gk-label" style="margin-top:14px">DRAW</div>'+
+    '<div class="gk-row"><input class="draw-in" type="text" value="'+(c.draw&&c.draw!=='\u2014'?c.draw:'')+'" data-gkdrawid="'+c.id+'" placeholder="units to pull \u2014 e.g. 40u (leave blank for tablets)"></div>'+
     '<div class="gk-label" style="margin-top:14px">DAYS</div>'+
     '<div class="days-edit">'+GK_SHORT.map(function(l,i){
       return '<button class="chip'+(c.days.indexOf(i)>=0?" on":"")+'" data-gktoggle="'+c.id+'" data-gkd="'+i+'">'+l+'</button>';}).join("")+'</div>'+
@@ -5131,6 +5134,11 @@ document.addEventListener("click",function(e){
     c.active=false; gkState.open=null; gkToast(c.name+" moved to All compounds \u2014 add it back anytime.");
   }
   gkSave(mutates); gkRender();
+});
+document.addEventListener("change",function(e){
+  var inp=e.target.closest&&e.target.closest("input[data-gkdrawid]"); if(!inp) return;
+  var c=gkState.compounds.filter(function(x){return x.id===inp.dataset.gkdrawid;})[0]; if(!c) return;
+  var v=inp.value.trim(); c.draw = v || "\u2014"; gkSave(true); gkRender();
 });
 
 function blNote(){
