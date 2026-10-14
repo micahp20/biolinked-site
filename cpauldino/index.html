@@ -1758,9 +1758,9 @@ var BL_KEY=(function(){
   }
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
 })();
-function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); if(k==='1211'){ try{ localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); if(n-lt<=320){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); if(k==='1211'){ try{ localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); if(n-lt<=320){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
 /* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
-var GK_VIEWONLY=!(BL_KEY || (function(){try{return localStorage.getItem(KP+'unlocked')==='1';}catch(e){return false;}})()); /* View-only until unlocked with the passcode (or a key) */
+var GK_VIEWONLY=!(function(){try{return localStorage.getItem(KP+'unlocked')==='1';}catch(e){return false;}})(); /* view-only until unlocked with the passcode */
 
 function blRpc(fn,body,signal){
   var opt={
@@ -5067,7 +5067,7 @@ function gkRender(){
   if(!document.getElementById("gkList")) return;
   gkArchiveIfDue();
   gkEnsureMeds();
-  if(typeof GK_VIEWONLY!=='undefined'&&GK_VIEWONLY){document.documentElement.classList.add('gk-viewonly');var _gr=document.getElementById('gkGreet');if(_gr&&!document.getElementById('gkViewBadge')){var _b=document.createElement('span');_b.id='gkViewBadge';_b.className='gk-view-badge';_b.textContent='● View only · tap to unlock';_b.style.cursor='pointer';_b.setAttribute('role','button');_b.onclick=blUnlock;if(_gr.nextSibling)_gr.parentNode.insertBefore(_b,_gr.nextSibling);else _gr.parentNode.appendChild(_b);}}
+  (function(){var _gr=document.getElementById('gkGreet');if(!_gr)return;var _o=document.getElementById('gkViewBadge');if(_o)_o.parentNode.removeChild(_o);var _b=document.createElement('span');_b.id='gkViewBadge';_b.className='gk-view-badge';_b.style.cursor='pointer';_b.setAttribute('role','button');if(GK_VIEWONLY){document.documentElement.classList.add('gk-viewonly');_b.textContent='● View only · tap to unlock';_b.onclick=blUnlock;}else{document.documentElement.classList.remove('gk-viewonly');_b.textContent='✎ Editing · tap to lock';_b.onclick=blLock;}if(_gr.nextSibling)_gr.parentNode.insertBefore(_b,_gr.nextSibling);else _gr.parentNode.appendChild(_b);})();
   var h=new Date().getHours();
   document.getElementById("gkGreet").textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", "+gkState.member.split(" ")[0];
   var strip=document.getElementById("gkDayStrip");
