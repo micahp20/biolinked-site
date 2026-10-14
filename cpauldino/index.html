@@ -4843,13 +4843,14 @@ var gkSeed = {
   open: null,
   compounds: [
     {id:"hgh",  name:"HGH \u00b7 40 iu",                      vial:"1 mL BAC \u00b7 40 iu vial", dose:4,    step:0.5,  unit:"iu",  draw:"10u",      block:"AM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
-    {id:"ghk",  name:"GHK-Cu \u00b7 50 mg",                    vial:"3 mL BAC \u00b7 50 mg vial", dose:1.67, step:0.25, unit:"mg",  draw:"10u",      block:"AM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
+    {id:"ghk",  name:"GHK-Cu \u00b7 50 mg",                    vial:"3 mL BAC \u00b7 50 mg vial", dose:1.67, step:0.25, unit:"mg",  draw:"10u",      block:"AM", days:[1,2,3,4,5], foundation:true,  active:true},
     {id:"teso", name:"Tesofine (Tesofensine) \u00b7 300 mcg",  vial:"Capsule \u00b7 oral",        dose:300,  step:50,   unit:"mcg", draw:"1 capsule",block:"AM", days:[1,2,3,4,5],     foundation:false, active:true},
     {id:"slu",  name:"SLU-PP-332 \u00b7 500 mcg",              vial:"Tablet \u00b7 oral",         dose:1000, step:250,  unit:"mcg", draw:"2 tablets",block:"AM", days:[1,2,3,4,5],     foundation:false, active:true},
     {id:"cort", name:"Cortagen \u00b7 20 mg",                  vial:"2 mL BAC \u00b7 \u00d72 vials",   dose:2,    step:0.5,  unit:"mg",  draw:"20u",      block:"AM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
     {id:"cere", name:"Cerebrolysin \u00b7 60 mg",              vial:"2 mL BAC \u00b7 \u00d72 vials",   dose:5,    step:1,    unit:"mg",  draw:"~16.7u",   block:"AM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
     {id:"epi",  name:"Epithalon \u00b7 50 mg",                 vial:"2 mL BAC \u00b7 \u00d72 vials",   dose:2.5,  step:0.5,  unit:"mg",  draw:"10u",      block:"PM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
-    {id:"pine", name:"Pinealon \u00b7 20 mg",                 vial:"2 mL BAC \u00b7 20 mg vial", dose:2,    step:0.5,  unit:"mg",  draw:"20u",      block:"PM", days:[0,1,2,3,4,5,6], foundation:true,  active:true}
+    {id:"pine", name:"Pinealon \u00b7 20 mg",                 vial:"2 mL BAC \u00b7 20 mg vial", dose:2,    step:0.5,  unit:"mg",  draw:"20u",      block:"PM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
+    {id:"cagri",name:"Cagrilintide \u00b7 10 mg",            vial:"As needed \u00b7 2 mL BAC",  dose:250,  step:50,   unit:"mcg", draw:"10u",      block:"AM", days:[0,1,2,3,4,5,6], foundation:false, active:true}
   ]
 };
 function gkLoad(){
@@ -4864,6 +4865,14 @@ function gkLoad(){
     (st.compounds||[]).forEach(function(c){
       if((!c.draw || c.draw==='\u2014') && sd[c.id] && sd[c.id]!=='\u2014') c.draw=sd[c.id];
     });
+  }catch(e){}
+  /* Merge in any NEW compound the owner added to the seed but that an
+     earlier saved state does not have yet (match by id). Owner updates
+     to brand-new compounds reach already-open devices; existing ones and
+     the user's own edits are left untouched. */
+  try{
+    var have={}; (st.compounds||[]).forEach(function(c){ have[c.id]=1; });
+    gkSeed.compounds.forEach(function(c){ if(!have[c.id]) st.compounds.push(JSON.parse(JSON.stringify(c))); });
   }catch(e){}
   return st;
 }
