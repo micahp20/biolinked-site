@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mpauldino/, which is now the real page: the app layout
 // was promoted here from the /mpauldino/app/ pilot.
-const CACHE = 'mpauldino-v1008 1002(0))';
+const CACHE = 'mpauldino-v1009 1002(0))';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mpauldino/',
