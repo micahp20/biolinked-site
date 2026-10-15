@@ -1852,7 +1852,8 @@ function schBlkLoad(){ try{ var raw=localStorage.getItem(SCHKEY); if(raw){ var p
 function schBlkGet(){ if(!schBlkState) schBlkState=schBlkLoad(); return schBlkState; }
 function schBlk(c){ var b=schBlkGet()[c.n]; return (b==='AM'||b==='PM'||b==='BOTH')?b:c.b; }
 function schBlkSet(name,blk,ev){ if(ev&&ev.stopPropagation) ev.stopPropagation(); var st=schBlkGet(); if(st[name]===blk){ delete st[name]; } else { st[name]=blk; } schSave(); if(typeof renderDoses==='function')renderDoses(); if(typeof renderAll==='function')renderAll(); if(typeof renderSubline==='function')renderSubline(); }
-function schOn(c){ return !!schGet()[c.n]; }
+function schEff(){ var st=schGet()||{}; for(var _k in st){ if(st[_k]) return st; } return (typeof schDefault==='function')?schDefault():st; }
+function schOn(c){ return !!schEff()[c.n]; }
 function schRows(){ return ALL.filter(schOn); }
 function schTog(name,ev){
   if(ev&&ev.stopPropagation) ev.stopPropagation();

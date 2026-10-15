@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dcoone/, which is now the real page: the app layout
 // was promoted here from the /dcoone/app/ pilot.
-const CACHE = 'dcoone-v1004 1002(0))';
+const CACHE = 'dcoone-v1005 1002(0))';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/dcoone/',

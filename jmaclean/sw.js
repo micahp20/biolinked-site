@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jmaclean/, which is now the real page: the app layout
 // was promoted here from the /jmaclean/app/ pilot.
-const CACHE = 'jmaclean-v1004 1002(0))';
+const CACHE = 'jmaclean-v1005 1002(0))';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/jmaclean/',

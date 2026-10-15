@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'mderby-v1004 1002(0))';
+const CACHE = 'mderby-v1005 1002(0))';
 const ASSETS = [
   '/mderby/',
   '/mderby/index.html',
