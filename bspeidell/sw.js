@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'bspeidell-v1003 1002(0))';
+const CACHE = 'bspeidell-v1004 1002(0))';
 const ASSETS = [
   '/bspeidell/',
   '/bspeidell/index.html',

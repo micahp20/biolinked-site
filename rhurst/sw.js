@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'rhurst-v1003 1002(0))';
+const CACHE = 'rhurst-v1004 1002(0))';
 const ASSETS = [
   '/rhurst/',
   '/rhurst/index.html',
