@@ -1030,7 +1030,7 @@
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
       </div>
-      <div class="seclbl">Why This Protocol</div><p class="lx-sub" style="text-align:left;max-width:none">Built around your April target — down to 235 while holding strength, sleep and drive. Six cycles run in order; your Schedule always shows the one you’re on.</p><ul class="lx-exp"><li><b>Cycle 1 · Fat Loss.</b> Retatrutide, MOTS-c and NAD+ drive the cut while keeping energy up to train.</li><li><b>Cycle 2 · Cognitive.</b> N-Acetyl Semax, Selank and Adamax for focus and mental drive.</li><li><b>Cycle 3 · Recovery &amp; Healing.</b> BPC-157/TB-500, KPV, GHK-Cu and Cartalax to repair tissue and calm inflammation.</li><li><b>Cycle 4 · Longevity &amp; Anti-Aging.</b> Epitalon, Pinealon, Cortagen, Cerebrolysin and FOXO4-DRI for cellular aging.</li><li><b>Cycle 5 · Sexual / Hormonal + Muscle.</b> TRT, PT-141, GH support and recomp peptides for libido, hormones and lean mass.</li><li><b>Cycle 6 · Sleep &amp; Stress.</b> Pinealon, Epithalon, SS-31 and NA-Selank for deeper sleep and lower stress.</li></ul><div class="seclbl">What You&rsquo;ll Find</div>
+      <div class="seclbl">Why This Protocol</div><p class="lx-sub" style="text-align:left;max-width:none">Built around your April target — down to 235 while holding strength, sleep and drive. Six cycles run in order; your Schedule always shows the one you’re on.</p><div id="whycyc" class="list"></div><div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card" role="button" tabindex="0" onclick="go('sched')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
           <div><div class="lx-t">Schedule</div><div class="lx-d">Your daily doses and timing. What to take, how much, and when.</div></div></div>
@@ -1737,6 +1737,35 @@ function cmpRow(c,i){
     '</div></div>';
 }
 function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
+var CYCWHY={"Cycle 1": {"t": "Fat Loss", "why": "Retatrutide, MOTS-c and NAD+ drive the cut while keeping energy up to train."}, "Cycle 2": {"t": "Cognitive", "why": "N-Acetyl Semax, Selank and Adamax for focus and mental drive."}, "Cycle 3": {"t": "Recovery & Healing", "why": "BPC-157/TB-500, KPV, GHK-Cu and Cartalax to repair tissue and calm inflammation."}, "Cycle 4": {"t": "Longevity & Anti-Aging", "why": "Epitalon, Pinealon, Cortagen, Cerebrolysin and FOXO4-DRI for cellular aging."}, "Cycle 5": {"t": "Sexual / Hormonal + Muscle", "why": "TRT, PT-141, GH support and recomp peptides for libido, hormones and lean mass."}, "Cycle 6": {"t": "Sleep & Stress", "why": "Pinealon, Epithalon, SS-31 and NA-Selank for deeper sleep and lower stress."}};
+
+function renderWhyCyc(){
+  var host=document.getElementById('whycyc'); if(!host) return;
+  var W=(typeof CYCWHY!=='undefined')?CYCWHY:{};
+  function facts(list){ return '<div class="facts" style="margin:4px 0 0">'+list.map(function(c){
+    return '<div class="frow"><div class="fl">'+c.n+'</div><div class="fchips">'+
+      (c.d?'<b>'+c.d+'</b>':'')+(c.u?'<b>'+c.u+'</b>':'')+(c.c?'<b>'+c.c+'</b>':'')+'</div></div>';}).join('')+'</div>'; }
+  var h='', cys=(typeof CYC!=='undefined'&&CYC&&CYC.length)?CYC.map(function(x){return x.n;}):[];
+  if(cys.length){
+    cys.forEach(function(cn,k){
+      var mine=ALL.filter(function(c){return (c.cy||[]).indexOf(cn)>=0;});
+      var w=W[cn]||{t:'',why:''}; var id='wc'+k;
+      h+='<div class="cx" id="cx'+id+'"><div class="cx-hd" onclick="cxTog(\''+id+'\')">'+
+         '<div class="cx-t"><div class="cx-n">'+cn+(w.t?(' · '+w.t):'')+'</div><div class="cx-s">'+(w.why||'')+'</div></div>'+
+         '<div class="cx-r"><span class="cx-u">'+mine.length+'</span><span class="cx-cv">›</span></div></div>'+
+         '<div class="cx-bd"><div class="cx-ab">'+(w.why||'')+'</div>'+facts(mine)+'</div></div>';
+    });
+  } else {
+    var mine=ALL.filter(function(c){return !(typeof cmpArch==='function'&&cmpArch(c));});
+    var w=W['_stack']||{t:'',why:''};
+    h+='<div class="cx" id="cxwc0"><div class="cx-hd" onclick="cxTog(\'wc0\')">'+
+       '<div class="cx-t"><div class="cx-n">Your Stack</div><div class="cx-s">'+(w.why||(mine.length+' compounds'))+'</div></div>'+
+       '<div class="cx-r"><span class="cx-u">'+mine.length+'</span><span class="cx-cv">›</span></div></div>'+
+       '<div class="cx-bd">'+(w.why?'<div class="cx-ab">'+w.why+'</div>':'')+facts(mine)+'</div></div>';
+  }
+  host.innerHTML=h;
+}
+
 /* ===== CLIENT-CURATED SCHEDULE ========================================
    ALL is the prescribed protocol and never changes. On top of it sits a set
    of which compounds belong on the day view, kept in localStorage under
@@ -4533,7 +4562,7 @@ try{
   window.addEventListener('offline', function(){ csStat('offline'); });
 }catch(e){}
 
-renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
+renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline(); if(typeof renderWhyCyc==='function') renderWhyCyc();
 
 /* Every local write also queues the matching cloud write. The originals
    still run first, so the cache is correct even if the network is not. */
