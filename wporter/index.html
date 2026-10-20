@@ -943,6 +943,39 @@
 .schblk{display:inline-flex;gap:5px;margin-left:8px;vertical-align:middle}
 .blkb{border:1px solid var(--line,#ddd);background:none;color:var(--muted,#888);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
 .blkb.on{background:var(--gold,#9a7b2f);border-color:var(--gold,#9a7b2f);color:#fff}
+  .cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+  .cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+  .cgrp-m{font-size:10.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+  .cgrp-n{font-size:11px;font-weight:800;color:var(--gold)}
+  .cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+  .cgrp.on .cgrp-cv{transform:rotate(90deg)}
+  .cgrp-bd{display:none;border-top:1px solid var(--line2)}
+  .cgrp.on .cgrp-bd{display:block}
+  .cgrp-bd .cx:last-child{border-bottom:none}
+  .cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+  .cgrp.pastgrp .cgrp-bd{opacity:.72}
+  .abt{padding:11px 13px 13px}
+  .abt-l{font-size:9.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+  .abt-l+.abt-p{margin-bottom:11px}
+  .abt-p{font-size:12.5px;line-height:1.55;color:var(--ink2)}
+  .abt-p:last-child{margin-bottom:0}
+  /* "The stack" -- just the compound names for whichever cycle card is open,
+     each one a link into the Index. Deliberately carries no strength, dose or
+     schedule: all of that lives on the Schedule tab, and repeating it here is
+     what made the section heavy. */
+  .stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+  .stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .stk-a:last-child{border-bottom:none}
+  .stk-a:active{background:var(--gold-soft)}
+  .stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
 </style>
 <script src="/compound-library.js?v=3"></script>
 </head>
@@ -1030,7 +1063,7 @@
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
       </div>
-      <div class="seclbl">What You&rsquo;ll Find</div>
+      <div id="protoabout"></div><div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card" role="button" tabindex="0" onclick="go('sched')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
           <div><div class="lx-t">Schedule</div><div class="lx-d">Your daily doses and timing. What to take, how much, and when.</div></div></div>
@@ -1737,6 +1770,82 @@ function cmpRow(c,i){
     '</div></div>';
 }
 function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
+var CYCABOUT={"Cycle 1 \u00b7 Fat Loss": {"t": "Thirty pounds off by April, without burning through muscle or energy to get there.", "s": "Retatrutide does the appetite and blood-sugar work; MOTS-c switches on AMPK so the training you already do most days burns more; NAD+ keeps cellular energy and recovery up while you're eating in a deficit.", "w": "Retatrutide once weekly, AM and fasted, since nausea is lowest on an empty stomach. MOTS-c and NAD+ M/W/F in the morning. Titrate the Reta up slowly \u2014 appetite control should arrive at a pace your gut keeps up with."}, "Cycle 2 \u00b7 Cognitive": {"t": "Focus, drive and mental clarity to match the physical work.", "s": "Semax drives attention and raises BDNF; Selank is the calm counterweight so the lift doesn't tip into agitation; Adamax works on memory and motivation \u2014 a different job from the other two.", "w": "All three in the morning \u2014 they're alerting and an evening dose costs you sleep. M/W/F keeps the receptors from blunting over the run."}, "Cycle 3 \u00b7 Recovery & Healing": {"t": "Keep joints and soft tissue ahead of the training load so nothing sidelines the cut.", "s": "BPC-157/TB-500 drive new blood supply and cell migration into worked tissue; KPV calms the inflammation around it; GHK-Cu supplies the collagen the others rebuild with; Cartalax covers cartilage and joints.", "w": "Daily or weekday \u2014 this is the cycle where consistency matters more than spacing."}, "Cycle 4 \u00b7 Longevity & Anti-Aging": {"t": "Cellular ageing, repair capacity and brain resilience \u2014 the long game.", "s": "Cortagen works on connective tissue, Cerebrolysin on neural resilience, Epitalon and Pinealon on the nightly rhythm and the neural cells it reaches; FOXO4-DRI is the senolytic that clears cells which have stopped dividing but won't die.", "w": "Cerebrolysin and the bioregulators run as defined 20-day courses, not continuously. FOXO4-DRI is a short pulse \u2014 every other day, six doses, then done."}, "Cycle 5 \u00b7 Sexual / Hormonal + Muscle": {"t": "Libido, hormonal balance and lean mass \u2014 built on your existing TRT.", "s": "Testosterone is the hormonal base; PT-141 works centrally on desire; CJC-1295/Ipamorelin prompts your own GH pulse for recomposition; AOD leans the fat-loss side; the rest carry recovery and sleep support.", "w": "Testosterone in the AM, M/W/F, to keep levels steady. PT-141 as needed in the evening. GH-axis peptides before bed, riding the natural overnight release."}, "Cycle 6 \u00b7 Sleep & Stress": {"t": "Deeper sleep and lower stress \u2014 you're running on about four hours.", "s": "SS-31 holds daytime mitochondrial energy so the evening isn't wired-but-tired; Pinealon and Epithalon rebuild the nightly melatonin rhythm rather than sedating you; NA-Selank takes the edge off stress without sedation.", "w": "Evening dosing. Pinealon and Epithalon as 20-day courses inside the cycle; Selank on the days you need it."}};
+function stkIxFind(name){
+  if(typeof IX==='undefined'||!IX) return -1;
+  var norm=function(x){return String(x).toLowerCase().replace(/[^a-z0-9]/g,'');};
+  var base=String(name).split(/\s+[·—–-]\s+/)[0].trim();
+  var SHARED={
+    'hgh':'Somatropin (HGH)','hghsomatropin':'Somatropin (HGH)','hghhumangrowthhormone':'Somatropin (HGH)','humangrowthhormone':'Somatropin (HGH)','somatropin':'Somatropin (HGH)',
+    'trt':'Testosterone','trttestosteronecypionate':'Testosterone','testosteronecypionate':'Testosterone','testosteroneenanthate':'Testosterone',
+    'cjc1295ipamorelin':'Ipamorelin / CJC-1295 No DAC','ipamorelincjc1295':'Ipamorelin / CJC-1295 No DAC','cjc1295wdac':'CJC-1295 No DAC','cjc1295withdac':'CJC-1295 No DAC',
+    'nacetylsemaxamidate':'Semax or NA Semax Amidate','nasemaxamidate':'Semax or NA Semax Amidate','semax':'Semax or NA Semax Amidate',
+    'nacetylselankamidate':'Selank or NA Selank Amidate','naselankamidate':'Selank or NA Selank Amidate','selank':'Selank or NA Selank Amidate',
+    'nacetyladamaxamidate':'Adamax','naadamaxamidate':'Adamax',
+    'epithalon':'Epitalon',
+    'fox04dri':'FOXO4-DRI',
+    'kisspeptin10':'Kisspeptin',
+    'pt141bremelanotide':'PT-141',
+    'klowblend':'KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)',
+    'glowblend':'GLOW Blend (GHK-Cu, BPC-157, TB-500)',
+    'wolverinestack':'Wolverine 2.0','wolverine':'Wolverine 2.0',
+    'bpc157tb500':'BPC-157 / TB-500 5mg/5mg Blend','bpc157tb500blend':'BPC-157 / TB-500 5mg/5mg Blend',
+    'melanotan':'Melanotan 2'
+  };
+  var pageAlias=(typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS)||{};
+  var target=pageAlias[name]||pageAlias[base]||SHARED[norm(base)]||base;
+  var want=norm(target); var i;
+  for(i=0;i<IX.length;i++){ if(norm(IX[i].name)===want) return i; }
+  var bestI=-1,bestLen=1e9;
+  for(i=0;i<IX.length;i++){ var n2=norm(IX[i].name);
+    if(n2 && (n2.indexOf(want)>-1 || want.indexOf(n2)>-1) && n2.length<bestLen){ bestLen=n2.length; bestI=i; } }
+  return bestI;
+}
+function stkIx(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var i=stkIxFind(name);
+  if(i>=0){ sheet('indexlist'); openIx(i); }
+  else { sheet('indexlist'); }
+}
+function renderAbout(){
+  var host=document.getElementById('protoabout'); if(!host) return;
+  if(typeof CYCABOUT==='undefined'||!CYCABOUT||!cycOn()){ host.innerHTML=''; return; }
+  var h='';
+  for(var k=0;k<CYCS.length;k++){
+    var cy=CYCS[k], a=CYCABOUT[cy.n];
+    if(!a) continue;
+    var isNow=cy.n===cycCurrent();
+    var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
+    var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+    /* The stack is driven off ALL, so it always matches whatever compounds
+       the cycle actually holds rather than a second hand-kept list. */
+    var mine=[];
+    for(var j=0;j<ALL.length;j++){ if(cycNames(ALL[j]).indexOf(cy.n)>=0) mine.push({c:ALL[j],i:j}); }
+    var stack='';
+    if(mine.length){
+      stack='<div class="abt-l">The stack</div><div class="stk">'+mine.map(function(x){
+        var nm=String(x.c.n).split(' \u00b7 ')[0];
+        return '<button type="button" class="stk-a" onclick="stkIx(\''+nm.replace(/'/g,"\\'")+'\',event)">'+
+          nm+'<span class="stk-cv">\u203a</span></button>';
+      }).join('')+'</div>';
+    }
+    h+='<div class="cgrp" id="cg-ab'+k+'">'+
+       '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
+         '<div><div class="cgrp-t">'+cy.n+'</div>'+
+         (meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
+         '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
+       '</div>'+
+       '<div class="cgrp-bd"><div class="abt">'+
+         stack+
+         '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
+         '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
+         '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
+       '</div></div></div>';
+  }
+  host.innerHTML=h?('<div class="seclbl">About This Protocol</div>'+h):'';
+}
+function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
+
 
 /* ===== CLIENT-CURATED SCHEDULE ========================================
    ALL is the prescribed protocol and never changes. On top of it sits a set
@@ -4534,7 +4643,7 @@ try{
   window.addEventListener('offline', function(){ csStat('offline'); });
 }catch(e){}
 
-renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
+renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats(); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
 
 /* Every local write also queues the matching cloud write. The originals
    still run first, so the cache is correct even if the network is not. */
