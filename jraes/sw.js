@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'jraes-v1006';
+const CACHE = 'jraes-vquote';
 const ASSETS = [
   '/jraes/',
   '/jraes/index.html',
