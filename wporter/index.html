@@ -1681,7 +1681,7 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
 function renderDoses(){
   /* Only what the client has on their schedule, and only what is due today. */
-  var rows=schRows().filter(function(c){return due(c,sel);});
+  var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
@@ -1773,7 +1773,7 @@ function renderWhyCyc(){
    prescribed default rather than breaking the page. */
 var SCHKEY='biolinked-sched-wporter';
 var schState=null;
-function schDefault(){ var o={}; var _c=(typeof cycCurrent==="function")?cycCurrent():null; for(var i=0;i<CMP.length;i++){ o[CMP[i].n]=(_c&&typeof cycHas==="function")?(cycHas(CMP[i],_c)?1:0):1; } return o; }
+function schDefault(){ var o={}; for(var i=0;i<CMP.length;i++) o[CMP[i].n]=1; return o; }
 function schLoad(){
   try{
     var raw=localStorage.getItem(SCHKEY);
@@ -1907,7 +1907,7 @@ function renderAll(){
       '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,'f'+x.i)}).join('')+'</div>';
     h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
        (sel&&sel.wk?' \u00b7 '+sel.wk:'')+
-       (isNow?'':(sel&&sel.arch?' \u00b7 already run':' \u00b7 available \u2014 add anytime'))+'</div>';
+       (isNow?'':(sel&&sel.arch?' \u00b7 already run':' \u00b7 not running yet'))+'</div>';
     h+=cyc.length
       ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,'c'+x.i)}).join('')+'</div>'
       : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
