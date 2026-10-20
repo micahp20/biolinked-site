@@ -4828,7 +4828,7 @@ var gkSeed = {
   selected: new Date().getDay(),
   view: "schedule",
   open: null,
-  seedVersion: 3,
+  seedVersion: 4,
   compounds: [
     {id:"hgh",  name:"HGH \u00b7 40 iu",                      vial:"1 mL BAC \u00b7 40 iu vial", dose:4,    step:0.5,  unit:"iu",  draw:"10u",      block:"AM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
     {id:"ghk",  name:"GHK-Cu \u00b7 50 mg",                    vial:"3 mL BAC \u00b7 50 mg vial", dose:1.67, step:0.25, unit:"mg",  draw:"10u",      block:"AM", days:[1,2,3,4,5], foundation:true,  active:true},
@@ -4851,6 +4851,16 @@ function gkLoad(){
      while keeping the user's meds, selected day and view. */
   try{
     if(!st.seedVersion || st.seedVersion !== gkSeed.seedVersion){
+      st.compounds = JSON.parse(JSON.stringify(gkSeed.compounds));
+      st.seedVersion = gkSeed.seedVersion;
+      try{ localStorage.setItem(GK_STORAGE, JSON.stringify(st)); }catch(e){}
+    }
+  }catch(e){}
+  /* Self-heal: an empty compound list (cleared in edit mode, or a corrupt
+     saved state) would render a blank schedule that never recovers. Any time
+     the saved compounds are missing or empty, re-adopt the seed. */
+  try{
+    if(!st.compounds || !st.compounds.length){
       st.compounds = JSON.parse(JSON.stringify(gkSeed.compounds));
       st.seedVersion = gkSeed.seedVersion;
       try{ localStorage.setItem(GK_STORAGE, JSON.stringify(st)); }catch(e){}
