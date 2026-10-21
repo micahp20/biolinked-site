@@ -4846,16 +4846,11 @@ function gkLoad(){
   var st;
   try{ st = JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }
   catch(e){ st = JSON.parse(JSON.stringify(gkSeed)); }
-  /* Owner protocol push: when the seed version advances, adopt the seed's
-     compound list on every device (overrides stale cached compounds),
-     while keeping the user's meds, selected day and view. */
-  try{
-    if(!st.seedVersion || st.seedVersion !== gkSeed.seedVersion){
-      st.compounds = JSON.parse(JSON.stringify(gkSeed.compounds));
-      st.seedVersion = gkSeed.seedVersion;
-      try{ localStorage.setItem(GK_STORAGE, JSON.stringify(st)); }catch(e){}
-    }
-  }catch(e){}
+  /* NOTE: the old "owner protocol push" that re-copied the entire seed over the
+     saved list on every version bump has been removed on purpose — it was
+     re-activating compounds the user had removed. New compounds now reach the
+     page additively (see the merge block below), which never touches anything
+     the user already has. */
   /* Self-heal: an empty compound list (cleared in edit mode, or a corrupt
      saved state) would render a blank schedule that never recovers. Any time
      the saved compounds are missing or empty, re-adopt the seed. */
