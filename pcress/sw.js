@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /pcress/.
-const CACHE = 'pcress-v1012 1002(0))-cyctitle';
+const CACHE = 'pcress-v1012 1002(0))-cyctitle-cg2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/pcress/',

@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'dianamaes-v1008 1002(0))-cyctitle';
+const CACHE = 'dianamaes-v1008 1002(0))-cyctitle-cg2';
 const ASSETS = [
   '/dianamaes/',
   '/dianamaes/index.html',
