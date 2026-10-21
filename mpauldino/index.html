@@ -1819,9 +1819,9 @@ var BL_KEY=(function(){
   }
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
 })();
-function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); var REAL='fyZDECQVBvyHcithQAsWqVoote0Gs_MhJkUfrP8QeB0'; if(k==='1211'||k===REAL){ try{ localStorage.setItem(KP+'mkey',REAL); localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } /* Block pinch / double-tap zoom so the layout (esp. the Calculator) stays put. */ (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); if(n-lt<=320){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ /* editing disabled */ } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } /* Block pinch / double-tap zoom so the layout (esp. the Calculator) stays put. */ (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); if(n-lt<=320){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
 /* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
-var GK_VIEWONLY=!(function(){try{return localStorage.getItem(KP+'unlocked')==='1';}catch(e){return false;}})();
+var GK_VIEWONLY=true; /* STATIC: permanently read-only. */
 
 function blRpc(fn,body,signal){
   var opt={
@@ -4898,41 +4898,21 @@ var gkSeed = {
   view: "schedule",
   open: null,
   compounds: [
-    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL", dose:50, step:10,  unit:"mg",  draw:"20u",     block:"AM", days:[1,3,5],  foundation:true,  active:true},
-    {id:"tirz",  name:"Tirzepatide",                  vial:"As supplied", dose:1, step:0.5, unit:"mg",  draw:"1 mg",    block:"AM", days:[1,4],  foundation:true, active:true},
-    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted",    dose:2,  step:0.5,   unit:"iu",  draw:"~17u",    block:"AM", days:[0,1,2,3,4,5,6],  foundation:true,  active:true},
-    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet",    dose:500,step:250,unit:"mcg", draw:"1 tab",   block:"AM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
-    {id:"dihexa",name:"Dihexa · Oral",                vial:"Tablet",    dose:10, step:5,  unit:"mg",  draw:"2 tabs",  block:"AM", days:[1,3,5], foundation:false, active:false},
-    {id:"hcg",   name:"HCG",                          vial:"500 iu",    dose:500,step:100, unit:"iu",  draw:"20u",       block:"PM", days:[1,3,5],  foundation:true,  active:false},
-    {id:"dsip",  name:"DSIP",                         vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"40u",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:true},
-    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",   dose:1,  step:0.25, unit:"mg",  draw:"20u",       block:"PM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
-    {id:"kpv",   name:"KPV",                          vial:"Pre-bed",   dose:1,  step:0.25, unit:"mg",  draw:"20u",       block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:false},
-    {id:"ipa",   name:"Ipamorelin",                   vial:"Fasted",    dose:250,step:50,   unit:"mcg", draw:"7.5u",      block:"PM", days:[0,1,2,3,4,5,6],  foundation:false, active:false},
-    /* already off his stack - these seed the Archive */
-    {id:"mots",  name:"MOTS-c",      vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:false},
-    {id:"amino", name:"5-Amino-1MQ", vial:"Prior stack", dose:500,step:250,unit:"mcg",draw:"—", block:"AM", days:[1,2,3,4,5], foundation:false, active:false},
-    {id:"mt",    name:"Melanotan",   vial:"Prior stack", dose:0.5,step:0.25,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:false},
-    {id:"reta",  name:"Retatrutide", vial:"Prior stack", dose:1,  step:0.5,  unit:"mg",  draw:"—", block:"AM", days:[1,4], foundation:false, active:false},
-    {id:"vesu",  name:"Vesugen",     vial:"Prior stack", dose:2,  step:0.5,  unit:"mg",  draw:"—", block:"PM", days:[1,2,3,4,5], foundation:false, active:false},
-    {id:"epi",   name:"Epithalon",   vial:"Prior stack", dose:10, step:2.5, unit:"mg",  draw:"40u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:false},
-    {id:"pine",  name:"Pinealon",    vial:"Prior stack", dose:4,  step:1,  unit:"mg",  draw:"20u",block:"PM",days:[0,1,2,3,4,5,6], foundation:false, active:false}
+    {id:"trt",   name:"TRT · Testosterone Cypionate", vial:"250 mg/mL · draw with 23G", dose:50,    step:10,   unit:"mg",  draw:"20u",   block:"AM", days:[1,3,5],         foundation:true,  active:true},
+    {id:"hgh",   name:"HGH · Somatropin",             vial:"Fasted · AM",               dose:2,     step:0.5,  unit:"iu",  draw:"~17u",  block:"AM", days:[0,1,2,3,4,5,6], foundation:true,  active:true},
+    {id:"ahk",   name:"AHK-Cu · 100 mg",              vial:"3 mL BAC · 100 mg vial",    dose:3.333, step:0.5,  unit:"mg",  draw:"10u",   block:"AM", days:[1,2,3,4,5],     foundation:false, active:true},
+    {id:"nad",   name:"NAD+ · 1000 mg",               vial:"5 mL BAC · 1000 mg vial",   dose:50,    step:5,    unit:"mg",  draw:"25u",   block:"AM", days:[1,3,5],         foundation:false, active:true},
+    {id:"glut",  name:"Glutathione · 1500 mg",        vial:"5 mL BAC · 1500 mg vial",   dose:150,   step:10,   unit:"mg",  draw:"50u",   block:"AM", days:[1,3,5],         foundation:false, active:true},
+    {id:"hcg",   name:"HCG · 5000 iu",                vial:"2 mL BAC · 5000 iu vial",   dose:250,   step:50,   unit:"iu",  draw:"15u",   block:"AM", days:[1,3,5],         foundation:false, active:true},
+    {id:"slu",   name:"SLU-PP-332 · Oral",            vial:"Tablet · oral",             dose:2,     step:0.5,  unit:"mg",  draw:"1 tab", block:"AM", days:[1,2,3,4],       foundation:false, active:true},
+    {id:"mazd",  name:"Mazdutide · 10 mg",            vial:"2 mL BAC · 10 mg vial",     dose:1,     step:0.5,  unit:"mg",  draw:"20u",   block:"AM", days:[1,3,5],         foundation:false, active:true},
+    {id:"vilon", name:"Vilon · 20 mg",                vial:"2 mL BAC · 20 mg vial",     dose:1,     step:0.5,  unit:"mg",  draw:"10u",   block:"AM", days:[1,2,3,4,5],     foundation:false, active:true},
+    {id:"bpc-o", name:"BPC-157 · Oral",               vial:"Tablet · oral",             dose:500,   step:250,  unit:"mcg", draw:"1 tab", block:"PM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
+    {id:"dsip",  name:"DSIP",                              vial:"Pre-bed",                        dose:1,     step:0.25, unit:"mg",  draw:"40u",   block:"PM", days:[0,1,2,3,4,5,6], foundation:false, active:true},
+    {id:"bpc-i", name:"BPC-157 · Injectable",         vial:"Nightly",                        dose:1,     step:0.25, unit:"mg",  draw:"20u",   block:"PM", days:[0,1,2,3,4,5,6], foundation:false, active:true}
   ]
 };
-function gkLoad(){
-  var st;
-  try{ st = JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }
-  catch(e){ st = JSON.parse(JSON.stringify(gkSeed)); }
-  /* Backfill draws: earlier saved state carried placeholder "\u2014" for some
-     injectables. Adopt the seed's real draw for any compound still blank so the
-     units show; a draw the user actually set is a real value and is kept. */
-  try{
-    var sd={}; gkSeed.compounds.forEach(function(c){ sd[c.id]=c.draw; });
-    (st.compounds||[]).forEach(function(c){
-      if((!c.draw || c.draw==='\u2014') && sd[c.id] && sd[c.id]!=='\u2014') c.draw=sd[c.id];
-    });
-  }catch(e){}
-  return st;
-}
+function gkLoad(){ /* STATIC: fixed schedule, no storage, no cloud. */ return JSON.parse(JSON.stringify(gkSeed)); }
 /* Local write is the offline cache and happens immediately so the UI never
    waits. The server write is debounced and authoritative: if it refuses, we
    roll the page back to the last state the server accepted rather than leaving
@@ -4943,15 +4923,7 @@ function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gk
    navigation and must not reach the server: a brand-new member who opens their
    link and taps around has written nothing, and an existing member on a slow
    connection cannot clobber their own saved row before it has even arrived. */
-function gkSave(edit){
-  if(edit) BL_DIRTY=true;
-  gkCacheLocal();
-  if(!BL_KEY || BL_KEYBAD) return;
-  if(!BL_DIRTY) return;
-  if(!BL_READY || !BL_SEEN){ BL_PENDING=true; return; }
-  clearTimeout(gkPushT);
-  gkPushT=setTimeout(gkPush, 350);
-}
+function gkSave(edit){ /* STATIC: editing disabled, nothing saves or syncs. */ }
 function gkPayload(){
   return {
     compounds: gkState.compounds.map(function(c){
@@ -5580,36 +5552,9 @@ try{ renderMeds(); }catch(e){}
      and is replaced the moment the real state lands. The previous version
      treated this as settled and then THREW AWAY the server's response, which
      is what let page defaults overwrite a saved schedule. */
-  var paint=setTimeout(function(){ if(!BL_READY){ try{ gkRender(); }catch(e){} } }, 2000);
-
-  var ctl = (typeof AbortController!=='undefined') ? new AbortController() : null;
-  var hard = setTimeout(function(){ if(ctl){ try{ ctl.abort(); }catch(e){} } }, 12000);
-
-  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}, ctl && ctl.signal)
-    .then(function(r){
-      clearTimeout(paint); clearTimeout(hard);
-      if(r.ok){
-        BL_ONLINE=true;
-        BL_SEEN=true;                    /* we have read the server: writing is now safe */
-        if(r.data){
-          var u=blUnwrap(r.data);
-          BL_VER=u.versions||{};         /* remember what we saw, for the write check */
-          gkHydrate(u.state.schedule);
-          if(u.state.nutrition){ try{
-            if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
-            if(u.state.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(u.state.nutrition.plan));
-          }catch(e){} }
-        }
-      } else if(r.status===401){
-        BL_KEYBAD=true; blForgetKey(); BL_SEEN=true;
-      }
-      blReady();
-    })
-    .catch(function(){
-      clearTimeout(paint); clearTimeout(hard);
-      BL_SEEN=false;                     /* read failed: stay local until one succeeds */
-      blReady();
-    });
+  /* STATIC: no cloud read, no hydrate. Render the fixed schedule and finish. */
+  try{ gkRender(); }catch(e){}
+  blReady();
 })();
 
 </script>
