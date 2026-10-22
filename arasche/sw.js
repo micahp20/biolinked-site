@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'arasche-v1';
+const CACHE = 'arasche-v2';
 const ASSETS = [
   '/arasche/',
   '/arasche/index.html',
