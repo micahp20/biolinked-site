@@ -21,6 +21,18 @@ var BL_LIB = {
   "notes": "Available as 5AM at Bio Linked. Works synergistically with NAD+ protocols and GLP-1 therapy. Oral delivery makes it convenient. Excellent for clients who want metabolic optimization without injectable peptides.",
   "sub": "NNMT Enzyme Inhibitor"
  },
+ "Adamax": {
+  "goal": "Enhanced cognitive effects vs Semax",
+  "mech": "Enhanced variant of Semax with modifications for improved potency and/or duration. Developed for cognitive enhancement research with similar BDNF-upregulating and neuroprotective properties to Semax.",
+  "notes": "Consider as an upgrade from standard Semax for clients who have plateaued. Limited comparative data.",
+  "sub": "Enhanced Semax Variant"
+ },
+ "Adipotide": {
+  "goal": "Targeted fat cell elimination, visceral fat reduction",
+  "mech": "Proapoptotic peptide that selectively targets and induces programmed cell death (apoptosis) in fat cell vasculature, reducing blood supply to adipose tissue. Unique mechanism: eliminates fat cells rather than just shrinking them.",
+  "notes": "Highly experimental. Shows dramatic visceral fat reduction in primate studies. Kidney function monitoring recommended. Represents a fundamentally different approach to fat loss \u2014 ablation vs. suppression. Not widely available.",
+  "sub": "Proapoptotic Peptide / Fat Cell Targeting"
+ },
  "AHK-Cu": {
   "goal": "Hair growth stimulation, follicle health, scalp improvement",
   "mech": "Copper peptide complex (Ala-His-Lys-Cu) researched for hair follicle health and growth stimulation. Activates follicle stem cells, improves scalp blood circulation, and stimulates follicle-supporting growth factors.",
@@ -45,23 +57,17 @@ var BL_LIB = {
   "notes": "Particularly valuable for diabetic neuropathy, small fiber neuropathy, and chronic pain research. Does not raise red blood cell count like EPO. Emerging research for sarcoidosis-related neuropathy.",
   "sub": "Erythropoietin-Derived Peptide"
  },
- "Adamax": {
-  "goal": "Enhanced cognitive effects vs Semax",
-  "mech": "Enhanced variant of Semax with modifications for improved potency and/or duration. Developed for cognitive enhancement research with similar BDNF-upregulating and neuroprotective properties to Semax.",
-  "notes": "Consider as an upgrade from standard Semax for clients who have plateaued. Limited comparative data.",
-  "sub": "Enhanced Semax Variant"
- },
- "Adipotide": {
-  "goal": "Targeted fat cell elimination, visceral fat reduction",
-  "mech": "Proapoptotic peptide that selectively targets and induces programmed cell death (apoptosis) in fat cell vasculature, reducing blood supply to adipose tissue. Unique mechanism: eliminates fat cells rather than just shrinking them.",
-  "notes": "Highly experimental. Shows dramatic visceral fat reduction in primate studies. Kidney function monitoring recommended. Represents a fundamentally different approach to fat loss \u2014 ablation vs. suppression. Not widely available.",
-  "sub": "Proapoptotic Peptide / Fat Cell Targeting"
- },
  "Argireline": {
   "goal": "Expression wrinkle reduction, muscle relaxation",
   "mech": "Cosmetic peptide mimicking the N-terminal end of SNAP-25 \u2014 inhibits neuromuscular junction signaling to reduce muscle contractions that cause expression lines.",
   "notes": "Most popular topical anti-wrinkle peptide. Pairs with Syn-Ake for enhanced NMJ inhibition.",
   "sub": "Acetyl Hexapeptide-3 \u2014 Topical Botox-Like"
+ },
+ "Armodafinil": {
+  "sub": "A prescription wakefulness medication (eugeroic) \u2014 the longer-acting R-isomer of modafinil. Sold as Nuvigil. Not a peptide and not an amphetamine.",
+  "mech": "Mainly blocks the dopamine transporter, so more dopamine stays active, and turns up the brain's wake systems (orexin, histamine and norepinephrine) while calming GABA. The effect is steady alertness rather than a jittery rush. Its half-life is about 15 hours, which is why one morning tablet carries through the day \u2014 and why a late dose ruins sleep.",
+  "goal": "Daytime alertness, sustained focus and mental stamina \u2014 prescribed for narcolepsy, shift-work sleep disorder and sleep apnea fatigue, and used off-label for ADHD-type focus and fatigue.",
+  "notes": "Timing: morning only, one 150 mg tablet, with water \u2014 never after about 10 AM. Use it on demanding days (max 2\u20133 days a week), not as a daily stack item. Never on the same day as Bromantane, other stimulants or alcohol. Common effects: headache, dry mouth, lower appetite, trouble sleeping; stop and seek care right away for any rash, chest pain or racing heart. It can lower the effect of hormonal birth control. If you are on a prescribed ADHD medication (Adderall, Vyvanse, Ritalin, Strattera, etc.), blood-pressure meds or antidepressants, talk to your doctor first. Prescription-only in the US (Schedule IV). Education, not medical advice."
  },
  "BPC-157": {
   "goal": "Tissue healing, gut repair, tendon & ligament recovery",
@@ -69,17 +75,17 @@ var BL_LIB = {
   "notes": "#1 most researched healing peptide. Can be taken orally for gut-specific benefits (swallowed in BAC water). Often stacked with TB-500 as 'The Wolverine Stack'. Available as premix BB10 at Bio Linked.",
   "sub": "Body Protection Compound-157"
  },
+ "Bromantane": {
+  "sub": "An adamantane-class compound developed in Russia (sold there as Ladasten) for fatigue and low-drive states. Not a peptide, not a classic stimulant, and not FDA-approved.",
+  "mech": "Raises the brain's ability to make dopamine (it switches on tyrosine hydroxylase and DOPA-decarboxylase, the enzymes that build dopamine) instead of forcing dopamine out the way stimulants do. It also has mild anti-anxiety and immune effects. The result is a gentle lift in drive and focus that builds over a few days with little crash.",
+  "goal": "Motivation, focus and mental and physical stamina, and fighting fatigue \u2014 used for low-drive, burned-out and ADHD-type focus struggles, often as a smoother, non-stimulant option.",
+  "notes": "Timing: one 100 mg tablet in the morning, with food, on days you don't take Armodafinil \u2014 never both on the same day. It works best taken consistently for 2\u20134 weeks, then a break. Stop if it affects sleep, mood or causes headache or a racing heart. Human research is limited and mostly Russian. It is on the WADA banned list for tested athletes. If you are on a prescribed ADHD medication, an antidepressant (especially an MAOI) or blood-pressure meds, talk to your doctor first. Education, not medical advice."
+ },
  "Bronchogen": {
   "goal": "Bronchial tissue support, respiratory function, COPD research",
   "mech": "Khavinson tetrapeptide functioning as a DNA-stabilizing agent with bronchodilating and anti-inflammatory properties specific to respiratory tissue. Modulates airway epithelial gene expression, reduces inflammation in bronchial tissue.",
   "notes": "Primary lung/respiratory bioregulator. Research applications include COPD, bronchial asthma, and post-infection respiratory recovery. Pairs with Chonluten for comprehensive respiratory protocol.",
   "sub": "Lung & Respiratory Cytogen"
- },
- "CJC-1295": {
-  "goal": "Optimize natural GH output, lean mass, recovery, sleep",
-  "mech": "GHRH (growth hormone-releasing hormone) analog that extends the duration of natural GH pulses from the pituitary. No DAC version has shorter half-life creating more physiologic pulsatile release. Synergizes powerfully with GHRPs like Ipamorelin.",
-  "notes": "Available as CND5/10 and as premix CP10 (with Ipamorelin) at Bio Linked. Most widely used GH peptide globally. No cortisol or prolactin spike. Stack with Ipamorelin for dual-pathway GH amplification.",
-  "sub": "GHRH Analog (No DAC)"
  },
  "Cagrilintide": {
   "goal": "Appetite regulation, weight management, complementary GLP-1 stack",
@@ -111,17 +117,17 @@ var BL_LIB = {
   "notes": "Dual respiratory/GI bioregulator. Pairs with Bronchogen for lung health stack. Synergistic with KPV for GI inflammatory conditions.",
   "sub": "Lung & GI Epithelial Cytogen"
  },
+ "CJC-1295": {
+  "goal": "Optimize natural GH output, lean mass, recovery, sleep",
+  "mech": "GHRH (growth hormone-releasing hormone) analog that extends the duration of natural GH pulses from the pituitary. No DAC version has shorter half-life creating more physiologic pulsatile release. Synergizes powerfully with GHRPs like Ipamorelin.",
+  "notes": "Available as CND5/10 and as premix CP10 (with Ipamorelin) at Bio Linked. Most widely used GH peptide globally. No cortisol or prolactin spike. Stack with Ipamorelin for dual-pathway GH amplification.",
+  "sub": "GHRH Analog (No DAC)"
+ },
  "Cortagen": {
   "goal": "Brain cortex support, neuroprotection, cognitive aging",
   "mech": "Khavinson tetrapeptide targeting cerebral cortex cells. Modulates chromatin accessibility and transcriptional activation in CNS tissue. Influences gene expression patterns associated with cellular stress responses and oxidative balance in neural cells.",
   "notes": "CNS bioregulator for brain aging. Pairs with Semax/Selank for comprehensive cognitive protocol. Stack with Pinealon for brain aging.",
   "sub": "Cerebral Cortex & CNS Cytogen"
- },
- "DSIP": {
-  "goal": "Sleep quality improvement, stress recovery, relaxation",
-  "mech": "Neuropeptide that promotes delta (slow-wave) sleep stages and modulates stress response via CRH pathways. Reduces cortisol during stress and promotes deeper, more restorative sleep architecture.",
-  "notes": "Interesting option for sleep-focused protocols. Pairs well with CJC-1295/Ipamorelin for comprehensive sleep optimization. Non-habit forming unlike pharmaceutical sleep aids.",
-  "sub": "Delta Sleep-Inducing Peptide"
  },
  "Decapeptide-12": {
   "goal": "Hyperpigmentation reduction, dark spot treatment, brightening",
@@ -140,6 +146,12 @@ var BL_LIB = {
   "mech": "Derived from angiotensin IV \u2014 potentiates HGF/c-Met signaling pathway to promote synapse formation (synaptogenesis). Reportedly 7 orders of magnitude more potent than BDNF in crossing the blood-brain barrier. Promotes long-term cognitive improvement.",
   "notes": "Most potent nootropic peptide known. Start at 10 mg and do not exceed 15 mg weekly. Effects accumulate \u2014 results continue building weeks after dosing. Confirm stock. Stack with Semax/Selank for comprehensive cognitive protocol.",
   "sub": "Angiotensin IV Derivative \u2014 Potent Nootropic"
+ },
+ "DSIP": {
+  "goal": "Sleep quality improvement, stress recovery, relaxation",
+  "mech": "Neuropeptide that promotes delta (slow-wave) sleep stages and modulates stress response via CRH pathways. Reduces cortisol during stress and promotes deeper, more restorative sleep architecture.",
+  "notes": "Interesting option for sleep-focused protocols. Pairs well with CJC-1295/Ipamorelin for comprehensive sleep optimization. Non-habit forming unlike pharmaceutical sleep aids.",
+  "sub": "Delta Sleep-Inducing Peptide"
  },
  "Dulaglutide": {
   "goal": "Blood sugar regulation, cardiovascular risk reduction",
@@ -165,12 +177,6 @@ var BL_LIB = {
   "notes": "Available at Bio Linked \u2014 confirm stock. Most evidence-backed anti-aging peptide. The quarterly 10-day protocol is standard. Stack with GHK-Cu and NAD+ for comprehensive longevity protocol. Human longevity data from Russian 40-year studies.",
   "sub": "Pineal Gland Tetrapeptide"
  },
- "FOXO4-DRI": {
-  "goal": "Senescent cell clearance, cellular renewal, anti-aging",
-  "mech": "Designed to interrupt FOXO4-p53 interaction in senescent cells, triggering apoptosis selectively in 'zombie cells' that accumulate with age and promote inflammation and tissue dysfunction. Does not harm healthy cells.",
-  "notes": "Experimental senolytic \u2014 eliminates senescent cells that contribute to aging. Emerging research area. Shows restoration of fitness, fur density, and kidney function in aged mouse models. Confirm availability.",
-  "sub": "Senolytic Peptide"
- },
  "Follistatin 315": {
   "goal": "Localized muscle support, lean mass preservation",
   "mech": "Tissue-bound isoform of follistatin with more localized myostatin-blocking activity compared to the systemic Follistatin 344. Targets muscle tissue more specifically with less systemic distribution.",
@@ -182,6 +188,12 @@ var BL_LIB = {
   "mech": "Naturally occurring glycoprotein that binds and inhibits myostatin (the protein that limits muscle growth) and activin. Follistatin 344 is the circulating form with systemic effects throughout the body.",
   "notes": "Very potent muscle growth research compound. Short cycles recommended. Widely discussed in bodybuilding research. Combines well with IGF-1 protocols. Not widely available \u2014 confirm stock.",
   "sub": "Myostatin Inhibitor \u2014 Circulating Form"
+ },
+ "FOXO4-DRI": {
+  "goal": "Senescent cell clearance, cellular renewal, anti-aging",
+  "mech": "Designed to interrupt FOXO4-p53 interaction in senescent cells, triggering apoptosis selectively in 'zombie cells' that accumulate with age and promote inflammation and tissue dysfunction. Does not harm healthy cells.",
+  "notes": "Experimental senolytic \u2014 eliminates senescent cells that contribute to aging. Emerging research area. Shows restoration of fitness, fur density, and kidney function in aged mouse models. Confirm availability.",
+  "sub": "Senolytic Peptide"
  },
  "GHK-Cu": {
   "goal": "Skin rejuvenation, collagen production, wound healing",
@@ -225,6 +237,12 @@ var BL_LIB = {
   "notes": "Available as GK5/G10K at Bio Linked. Standard adjunct for TRT protocols. Note: FDA has restricted compounded HCG, making Gonadorelin an alternative worth considering.",
   "sub": "Human Chorionic Gonadotropin"
  },
+ "Hexarelin": {
+  "goal": "Maximum GH output, muscle, cardioprotection",
+  "mech": "Considered the most potent GHRP available \u2014 produces the strongest GH secretion of any GHRP. Unlike other GHRPs, maintains potency even after repeated administration. Also shows unique cardioprotective properties through GHS-R1b receptors.",
+  "notes": "Reserve for maximum GH output protocols. Cardioprotective data makes it interesting for cardiovascular health applications. Cortisol/prolactin elevation similar to GHRP-2. Stack with GHRH analog.",
+  "sub": "Most Potent GHRP"
+ },
  "HGH Fragment 176-191": {
   "goal": "Fat loss, lipolysis, body composition",
   "mech": "Fragment of HGH containing the fat-burning region (amino acids 176\u2013191) without growth-promoting properties. Activates beta-3 adrenergic receptor in fat cells.",
@@ -236,12 +254,6 @@ var BL_LIB = {
   "mech": "Supplies FSH and LH signal directly to the gonads, acting downstream of the pituitary rather than stimulating it. The FSH component is what distinguishes it from hCG, which is LH-like only.",
   "notes": "This is prescriber territory \u2014 it is a hormone with direct endocrine effects and warrants medical supervision and bloodwork.",
   "sub": "A gonadotropin preparation containing both FSH and LH activity. A prescription hormone, not a research peptide."
- },
- "Hexarelin": {
-  "goal": "Maximum GH output, muscle, cardioprotection",
-  "mech": "Considered the most potent GHRP available \u2014 produces the strongest GH secretion of any GHRP. Unlike other GHRPs, maintains potency even after repeated administration. Also shows unique cardioprotective properties through GHS-R1b receptors.",
-  "notes": "Reserve for maximum GH output protocols. Cardioprotective data makes it interesting for cardiovascular health applications. Cortisol/prolactin elevation similar to GHRP-2. Stack with GHRH analog.",
-  "sub": "Most Potent GHRP"
  },
  "Humanin": {
   "goal": "Neuroprotection, mitochondrial support, anti-aging",
@@ -267,6 +279,12 @@ var BL_LIB = {
   "notes": "Available as IP10 and as premix CP10 (with CJC-1295) at Bio Linked. The gold standard pairing: CJC-1295 extends pulse duration, Ipamorelin amplifies pulse amplitude. No hunger or cortisol side effects.",
   "sub": "Selective GHRP"
  },
+ "Kisspeptin-10": {
+  "goal": "Libido, hormone axis stimulation, reproductive function",
+  "mech": "Neuropeptide that activates GPR54 receptor \u2014 the master regulator of reproductive hormone cascade. Stimulates GnRH release, triggering LH and FSH, which then drive testosterone/estrogen production. Addresses libido at the hormonal root.",
+  "notes": "Particularly interesting for low libido linked to low LH/testosterone. Different mechanism from PT-141 \u2014 hormonal vs. CNS. Emerging use in fertility protocols and hypogonadism research.",
+  "sub": "Reproductive Hormone Axis Activator"
+ },
  "KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)": {
   "goal": "Covered in one shot \u2014 Skin rejuvenation, collagen production, wound healing; Tissue healing, gut repair, tendon & ligament recovery; Systemic tissue repair, inflammation reduction, flexibility; Anti-inflammatory, gut healing, IBS/IBD support.",
   "mech": "Each component works on its own pathway, which is why they are combined. GHK-Cu: Copper-binding tripeptide upregulates collagen I/III synthesis, glycosaminoglycans, and antioxidant enzymes. BPC-157: Activates VEGFR2 signaling for angiogenesis. TB-500: Thymosin Beta-4 fragment promotes actin polymerization, cell migration, and anti-inflammatory responses. KPV: Tripeptide fragment of alpha-MSH that directly inhibits NF-\u03baB signaling and pro-inflammatory cytokine cascade.",
@@ -279,23 +297,11 @@ var BL_LIB = {
   "notes": "Key component of Bio Linked's KLOW blend. Especially effective for IBS, Crohn's, leaky gut, and inflammatory skin conditions. Can be swallowed in BAC water for direct GI anti-inflammatory effect.",
   "sub": "Alpha-MSH Tripeptide Fragment"
  },
- "Kisspeptin-10": {
-  "goal": "Libido, hormone axis stimulation, reproductive function",
-  "mech": "Neuropeptide that activates GPR54 receptor \u2014 the master regulator of reproductive hormone cascade. Stimulates GnRH release, triggering LH and FSH, which then drive testosterone/estrogen production. Addresses libido at the hormonal root.",
-  "notes": "Particularly interesting for low libido linked to low LH/testosterone. Different mechanism from PT-141 \u2014 hormonal vs. CNS. Emerging use in fertility protocols and hypogonadism research.",
-  "sub": "Reproductive Hormone Axis Activator"
- },
  "L-Carnitine": {
   "goal": "Fat oxidation and perceived recovery alongside training.",
   "mech": "Carries long-chain fatty acids across the inner mitochondrial membrane, the rate-limiting step before they can be oxidised for fuel. Injectable forms bypass the low oral bioavailability (~15%) that limits the tablet form.",
   "notes": "Commonly timed before cardio on the reasoning that released fatty acids need movement to be burned. Injections are reported to sting; warming the vial and pushing slowly is the usual advice.",
   "sub": "An amino-acid derivative that shuttles fatty acids into the mitochondria; sold as an injectable solution rather than a reconstituted peptide."
- },
- "LL-37": {
-  "goal": "Wound healing, antimicrobial defense, immune modulation",
-  "mech": "Naturally occurring cathelicidin peptide with broad-spectrum antimicrobial activity. Promotes wound healing through keratinocyte migration, angiogenesis, and re-epithelialization. Modulates innate immune response without overstimulation.",
-  "notes": "Excellent addition to healing protocols where infection risk is present or wound healing is impaired. Synergistic with BPC-157 for chronic wound or post-surgical recovery. Emerging use in antibiotic-resistant infection research.",
-  "sub": "Human Cathelicidin Antimicrobial Peptide"
  },
  "Liraglutide": {
   "goal": "Weight management, blood sugar regulation",
@@ -309,23 +315,11 @@ var BL_LIB = {
   "notes": "Liver bioregulator. Pairs with Ovagen (GI/liver) for comprehensive hepatic support.",
   "sub": "Liver Tissue Cytogen"
  },
- "MGF": {
-  "goal": "Local muscle repair, satellite cell activation",
-  "mech": "Splice variant of IGF-1 produced in response to muscle stretching and damage. Activates muscle satellite (stem) cells for repair and growth. Short half-life (minutes) means effects are highly localized to injection site.",
-  "notes": "Pairs well with PEG-MGF (extended half-life version) or IGF-1 LR3. Rapidly clears so must inject immediately post-workout. Research use for muscle recovery and hypertrophy.",
-  "sub": "Mechano Growth Factor"
- },
- "MK-677": {
-  "goal": "GH/IGF-1 elevation, sleep quality, convenience",
-  "mech": "Oral ghrelin mimetic activating GHS-R1a receptor \u2014 stimulates GH and IGF-1 release without injection. Raises IGF-1 by 60\u201370%. The only oral GH secretagogue available. Also improves deep sleep (REM and slow-wave).",
-  "notes": "Best for clients who won't inject. Significantly increases appetite \u2014 take with dinner to buffer. Excellent for sleep improvement, recovery, and anti-aging in older clients. Water retention common at higher doses.",
-  "sub": "Ibutamoren \u2014 Oral GH Secretagogue"
- },
- "MOTS-c": {
-  "goal": "Mitochondrial restoration, metabolic reset, exercise mimetic",
-  "mech": "Mitochondria-derived peptide that activates AMPK pathway, improving insulin sensitivity, mitochondrial biogenesis, and metabolic flexibility. Mimics exercise effects at cellular level. Reduces neuroinflammation and supports longevity pathways.",
-  "notes": "Available as MS10/MS40 at Bio Linked. Foundation of mitochondrial and metabolic protocols. Pairs with NAD+ and SS-31 for complete cellular energy optimization.",
-  "sub": "Mitochondrial Peptide \u2014 Exercise Mimetic"
+ "LL-37": {
+  "goal": "Wound healing, antimicrobial defense, immune modulation",
+  "mech": "Naturally occurring cathelicidin peptide with broad-spectrum antimicrobial activity. Promotes wound healing through keratinocyte migration, angiogenesis, and re-epithelialization. Modulates innate immune response without overstimulation.",
+  "notes": "Excellent addition to healing protocols where infection risk is present or wound healing is impaired. Synergistic with BPC-157 for chronic wound or post-surgical recovery. Emerging use in antibiotic-resistant infection research.",
+  "sub": "Human Cathelicidin Antimicrobial Peptide"
  },
  "Matrixyl": {
   "goal": "Collagen synthesis, ECM production, wrinkle reduction",
@@ -363,6 +357,24 @@ var BL_LIB = {
   "notes": "Nausea and facial flushing common with first doses \u2014 start at 0.25 mg and titrate. Unwanted erections in men possible (shared MC4R with PT-141). Reduces UV exposure needed for tanning.",
   "sub": "Melanocortin Tanning Peptide"
  },
+ "MGF": {
+  "goal": "Local muscle repair, satellite cell activation",
+  "mech": "Splice variant of IGF-1 produced in response to muscle stretching and damage. Activates muscle satellite (stem) cells for repair and growth. Short half-life (minutes) means effects are highly localized to injection site.",
+  "notes": "Pairs well with PEG-MGF (extended half-life version) or IGF-1 LR3. Rapidly clears so must inject immediately post-workout. Research use for muscle recovery and hypertrophy.",
+  "sub": "Mechano Growth Factor"
+ },
+ "MK-677": {
+  "goal": "GH/IGF-1 elevation, sleep quality, convenience",
+  "mech": "Oral ghrelin mimetic activating GHS-R1a receptor \u2014 stimulates GH and IGF-1 release without injection. Raises IGF-1 by 60\u201370%. The only oral GH secretagogue available. Also improves deep sleep (REM and slow-wave).",
+  "notes": "Best for clients who won't inject. Significantly increases appetite \u2014 take with dinner to buffer. Excellent for sleep improvement, recovery, and anti-aging in older clients. Water retention common at higher doses.",
+  "sub": "Ibutamoren \u2014 Oral GH Secretagogue"
+ },
+ "MOTS-c": {
+  "goal": "Mitochondrial restoration, metabolic reset, exercise mimetic",
+  "mech": "Mitochondria-derived peptide that activates AMPK pathway, improving insulin sensitivity, mitochondrial biogenesis, and metabolic flexibility. Mimics exercise effects at cellular level. Reduces neuroinflammation and supports longevity pathways.",
+  "notes": "Available as MS10/MS40 at Bio Linked. Foundation of mitochondrial and metabolic protocols. Pairs with NAD+ and SS-31 for complete cellular energy optimization.",
+  "sub": "Mitochondrial Peptide \u2014 Exercise Mimetic"
+ },
  "NAD+": {
   "goal": "Cellular energy, DNA repair, recovery, longevity",
   "mech": "Essential coenzyme for every energy-producing reaction in the body. Powers sirtuin (SIRT1/3) longevity pathways, supports mitochondrial function, and activates DNA repair mechanisms. Declines 50%+ with age. Injectable NAD+ provides superior bioavailability vs oral precursors.",
@@ -399,36 +411,6 @@ var BL_LIB = {
   "notes": "Safer than direct BDNF administration. Research shows improved spatial memory and learning in preclinical models. Good stack companion with Semax for comprehensive BDNF-pathway cognitive enhancement.",
   "sub": "BDNF Mimetic Nootropic"
  },
- "PE-22-28": {
-  "goal": "Antidepressant effects, mood support, cognitive enhancement",
-  "mech": "Synthetic peptide analog of Spadin (a natural antidepressant peptide). Blocks TREK-1 potassium channels \u2014 same target as many antidepressants. Shows rapid antidepressant-like effects with potential cognitive enhancement properties.",
-  "notes": "Interesting alternative for clients seeking antidepressant support through peptide mechanisms rather than pharmaceutical SSRIs. Emerging compound \u2014 limited human data but promising preclinical results.",
-  "sub": "Spadin Analog \u2014 Antidepressant Nootropic"
- },
- "PEG-MGF": {
-  "goal": "Systemic muscle repair, extended satellite cell activation",
-  "mech": "Pegylated version of MGF \u2014 polyethylene glycol (PEG) attachment extends half-life from minutes to days. Allows once or twice weekly dosing while maintaining systemic satellite cell activation for muscle repair.",
-  "notes": "More practical than native MGF due to extended half-life. Better for systemic muscle support vs localized repair. Can be dosed anywhere due to improved stability.",
-  "sub": "Pegylated Mechano Growth Factor"
- },
- "PGPIPN": {
-  "goal": "Anti-inflammation, tissue repair, immunomodulation",
-  "mech": "Therapeutic hexapeptide (Pro-Gly-Pro-Ile-Pro-Asn) that modulates inflammatory cytokine cascades. Inhibits pro-inflammatory signaling while supporting tissue repair mechanisms. Researched for chronic inflammatory conditions.",
-  "notes": "Emerging research compound. Shows promise in chronic inflammatory conditions and autoimmune-adjacent applications. Can be stacked with KPV for comprehensive anti-inflammatory protocols.",
-  "sub": "Anti-Inflammatory Hexapeptide"
- },
- "PNC-27": {
-  "goal": "Selective abnormal cell targeting research",
-  "mech": "Experimental peptide designed with an HDM-2 binding domain and a transmembrane-penetrating domain. Researched for selective effects on abnormal cells while potentially sparing healthy cells. Mechanism involves membrane disruption in target cells.",
-  "notes": "Highly experimental with limited human data. Pre-clinical research only. Confirm stock and research context before considering. Not for general wellness protocols \u2014 specialized research application.",
-  "sub": "Experimental Anti-Cancer Research Peptide"
- },
- "PT-141": {
-  "goal": "Sexual arousal, libido enhancement",
-  "mech": "Melanocortin receptor agonist activating MC3R and MC4R in the brain \u2014 stimulates desire through CNS rather than vascular mechanism. Works for both men and women. FDA-approved (Vyleesi) for premenopausal women with HSDD.",
-  "notes": "Available as P41 at Bio Linked. Unlike Viagra/Cialis which work on blood flow mechanics, PT-141 works on desire. Nausea most common side effect \u2014 start at 0.5 mg. Effective for both men and women.",
-  "sub": "Bremelanotide \u2014 Central Desire Peptide"
- },
  "Pal-AHK": {
   "goal": "Hair follicle stimulation, scalp health, hair thickness",
   "mech": "Lipopeptide combining palmitoyl group with AHK copper-binding sequence. Promotes hair follicle stem cell activity.",
@@ -453,11 +435,29 @@ var BL_LIB = {
   "notes": "Pancreatic bioregulator. Pairs with GLP-1 protocols for comprehensive metabolic support.",
   "sub": "Pancreatic & Beta-Cell Cytogen"
  },
+ "PE-22-28": {
+  "goal": "Antidepressant effects, mood support, cognitive enhancement",
+  "mech": "Synthetic peptide analog of Spadin (a natural antidepressant peptide). Blocks TREK-1 potassium channels \u2014 same target as many antidepressants. Shows rapid antidepressant-like effects with potential cognitive enhancement properties.",
+  "notes": "Interesting alternative for clients seeking antidepressant support through peptide mechanisms rather than pharmaceutical SSRIs. Emerging compound \u2014 limited human data but promising preclinical results.",
+  "sub": "Spadin Analog \u2014 Antidepressant Nootropic"
+ },
+ "PEG-MGF": {
+  "goal": "Systemic muscle repair, extended satellite cell activation",
+  "mech": "Pegylated version of MGF \u2014 polyethylene glycol (PEG) attachment extends half-life from minutes to days. Allows once or twice weekly dosing while maintaining systemic satellite cell activation for muscle repair.",
+  "notes": "More practical than native MGF due to extended half-life. Better for systemic muscle support vs localized repair. Can be dosed anywhere due to improved stability.",
+  "sub": "Pegylated Mechano Growth Factor"
+ },
  "Pentapeptide-18": {
   "goal": "Expression wrinkle reduction, synergistic NMJ inhibition",
   "mech": "Cosmetic peptide with opioid receptor modulation that reduces enkephalin release, indirectly reducing muscle contraction signals.",
   "notes": "Best used with Argireline for synergy. Standard in premium eye cream formulations.",
   "sub": "Leuphasyl \u2014 Expression Line Reducer"
+ },
+ "PGPIPN": {
+  "goal": "Anti-inflammation, tissue repair, immunomodulation",
+  "mech": "Therapeutic hexapeptide (Pro-Gly-Pro-Ile-Pro-Asn) that modulates inflammatory cytokine cascades. Inhibits pro-inflammatory signaling while supporting tissue repair mechanisms. Researched for chronic inflammatory conditions.",
+  "notes": "Emerging research compound. Shows promise in chronic inflammatory conditions and autoimmune-adjacent applications. Can be stacked with KPV for comprehensive anti-inflammatory protocols.",
+  "sub": "Anti-Inflammatory Hexapeptide"
  },
  "Pinealon": {
   "goal": "Brain aging, pineal function, cognitive support",
@@ -465,11 +465,23 @@ var BL_LIB = {
   "notes": "Brain bioregulator. Pairs with Cortagen for CNS aging protocol. Synergistic with Epithalon which also works on pineal regulation.",
   "sub": "Pineal Gland & Brain Cytogen"
  },
+ "PNC-27": {
+  "goal": "Selective abnormal cell targeting research",
+  "mech": "Experimental peptide designed with an HDM-2 binding domain and a transmembrane-penetrating domain. Researched for selective effects on abnormal cells while potentially sparing healthy cells. Mechanism involves membrane disruption in target cells.",
+  "notes": "Highly experimental with limited human data. Pre-clinical research only. Confirm stock and research context before considering. Not for general wellness protocols \u2014 specialized research application.",
+  "sub": "Experimental Anti-Cancer Research Peptide"
+ },
  "Prostamax": {
   "goal": "Prostate health, urological function, anti-aging",
   "mech": "Khavinson bioregulator peptide targeting prostate tissue. Researched for prostate health maintenance, urological function support, and anti-aging effects on prostate cells.",
   "notes": "Prostate bioregulator. Stack with Testagen for comprehensive male hormonal health bioregulator protocol.",
   "sub": "Prostate Cytogen"
+ },
+ "PT-141": {
+  "goal": "Sexual arousal, libido enhancement",
+  "mech": "Melanocortin receptor agonist activating MC3R and MC4R in the brain \u2014 stimulates desire through CNS rather than vascular mechanism. Works for both men and women. FDA-approved (Vyleesi) for premenopausal women with HSDD.",
+  "notes": "Available as P41 at Bio Linked. Unlike Viagra/Cialis which work on blood flow mechanics, PT-141 works on desire. Nausea most common side effect \u2014 start at 0.5 mg. Effective for both men and women.",
+  "sub": "Bremelanotide \u2014 Central Desire Peptide"
  },
  "Retatrutide": {
   "goal": "Aggressive fat loss, metabolic optimization",
@@ -482,24 +494,6 @@ var BL_LIB = {
   "mech": "Lipopeptide reducing inflammation-driven skin aging by inhibiting IL-6 secretion from skin cells.",
   "notes": "Pairs with Pal-GHK in premium anti-aging formulations. Addresses the inflammation side of aging skin.",
   "sub": "Palmitoyl Tetrapeptide-7 \u2014 Anti-Inflammaging"
- },
- "SLU-PP-332": {
-  "goal": "Exercise-mimetic effects, endurance, metabolic activation",
-  "mech": "Activates estrogen-related receptor alpha (ERR\u03b1) \u2014 upregulates mitochondrial gene expression mimicking exercise adaptations. Preclinical data shows increased running endurance by 70%+ in sedentary mice without training.",
-  "notes": "Available as 33210 at Bio Linked. Cutting-edge exercise mimetic. Pairs with MOTS-c and AICAR for triple metabolic activation. Very new \u2014 mostly preclinical data but highly promising.",
-  "sub": "ERR\u03b1 Agonist \u2014 Exercise Mimetic"
- },
- "SNAP-8": {
-  "goal": "Expression wrinkle reduction, advanced NMJ inhibition",
-  "mech": "Enhanced version of Argireline (8 amino acids vs 6). Inhibits SNARE complex formation at neuromuscular junctions.",
-  "notes": "More potent than Argireline. Often combined with Argireline for synergistic NMJ inhibition.",
-  "sub": "Acetyl Octapeptide-3 \u2014 Enhanced Botox-Like"
- },
- "SS-31": {
-  "goal": "Mitochondrial membrane repair, oxidative stress reduction",
-  "mech": "Concentrates in inner mitochondrial membrane binding to cardiolipin \u2014 reduces reactive oxygen species (ROS), restores electron transport chain function, and improves ATP production. Cardioprotective, neuroprotective, and muscle-preserving effects in research.",
-  "notes": "Available as 2S10 at Bio Linked. Most targeted mitochondrial repair peptide available. Pairs with MOTS-c for dual mitochondrial stack. Phase 2 clinical trials for heart failure ongoing.",
-  "sub": "Elamipretide \u2014 Mitochondrial Membrane Repair"
  },
  "Selank": {
   "goal": "Anxiety reduction, stress resilience, GABA modulation",
@@ -525,11 +519,29 @@ var BL_LIB = {
   "notes": "Available as SMO10 at Bio Linked. Best entry-level GH peptide for clients over 50. Most well-studied GHRH analog with decades of safety data. Pairs well with Ipamorelin.",
   "sub": "Original GHRH Analog"
  },
+ "SLU-PP-332": {
+  "goal": "Exercise-mimetic effects, endurance, metabolic activation",
+  "mech": "Activates estrogen-related receptor alpha (ERR\u03b1) \u2014 upregulates mitochondrial gene expression mimicking exercise adaptations. Preclinical data shows increased running endurance by 70%+ in sedentary mice without training.",
+  "notes": "Available as 33210 at Bio Linked. Cutting-edge exercise mimetic. Pairs with MOTS-c and AICAR for triple metabolic activation. Very new \u2014 mostly preclinical data but highly promising.",
+  "sub": "ERR\u03b1 Agonist \u2014 Exercise Mimetic"
+ },
+ "SNAP-8": {
+  "goal": "Expression wrinkle reduction, advanced NMJ inhibition",
+  "mech": "Enhanced version of Argireline (8 amino acids vs 6). Inhibits SNARE complex formation at neuromuscular junctions.",
+  "notes": "More potent than Argireline. Often combined with Argireline for synergistic NMJ inhibition.",
+  "sub": "Acetyl Octapeptide-3 \u2014 Enhanced Botox-Like"
+ },
  "Somatropin (HGH)": {
   "goal": "Direct GH supplementation, muscle growth, fat metabolism",
   "mech": "Recombinant human GH identical to endogenous GH. Provides direct, reliable GH elevation without relying on pituitary response. Promotes protein synthesis, fat lipolysis, IGF-1 production, and tissue repair throughout the body.",
   "notes": "Available as H10/H15 at Bio Linked. Most powerful GH option but also most expensive. Stack with IGF-1 LR3 for synergistic muscle-building effect. Requires monitoring for glucose and IGF-1 levels.",
   "sub": "Recombinant Human Growth Hormone"
+ },
+ "SS-31": {
+  "goal": "Mitochondrial membrane repair, oxidative stress reduction",
+  "mech": "Concentrates in inner mitochondrial membrane binding to cardiolipin \u2014 reduces reactive oxygen species (ROS), restores electron transport chain function, and improves ATP production. Cardioprotective, neuroprotective, and muscle-preserving effects in research.",
+  "notes": "Available as 2S10 at Bio Linked. Most targeted mitochondrial repair peptide available. Pairs with MOTS-c for dual mitochondrial stack. Phase 2 clinical trials for heart failure ongoing.",
+  "sub": "Elamipretide \u2014 Mitochondrial Membrane Repair"
  },
  "Survodutide": {
   "goal": "Weight loss, liver health, metabolic disease research",
@@ -549,17 +561,17 @@ var BL_LIB = {
   "notes": "Strong collagen stimulator. Pairs with Matrixyl for comprehensive collagen support.",
   "sub": "Palmitoyl Tripeptide-5"
  },
- "TB-500": {
-  "goal": "Systemic tissue repair, inflammation reduction, flexibility",
-  "mech": "Thymosin Beta-4 fragment promotes actin polymerization, cell migration, and anti-inflammatory responses. Enhances systemic healing of cardiac muscle, skeletal muscle, and connective tissue throughout the body.",
-  "notes": "Pairs perfectly with BPC-157 for the Wolverine Stack (premix BB10). TB-500 handles systemic healing while BPC-157 addresses local tissue. Reduces inflammation and speeds recovery from injuries, surgery, and overtraining.",
-  "sub": "Thymosin Beta-4 Fragment"
- },
  "Tadalafil (Cialis)": {
   "goal": "Vascular and erectile function, and sometimes low daily doses for blood-flow and pump effects during training.",
   "mech": "Blocks phosphodiesterase type 5, so cGMP persists and smooth muscle stays relaxed, increasing blood flow. Its ~17.5-hour half-life is far longer than others in the class, which is why it is described as daily rather than on-demand.",
   "notes": "Because it is a prescription medication with real cardiovascular interactions \u2014 nitrates in particular \u2014 this one belongs in a conversation with a prescriber, not a protocol page.",
   "sub": "A long-acting PDE5 inhibitor. A prescription medication in most jurisdictions, not a research peptide."
+ },
+ "TB-500": {
+  "goal": "Systemic tissue repair, inflammation reduction, flexibility",
+  "mech": "Thymosin Beta-4 fragment promotes actin polymerization, cell migration, and anti-inflammatory responses. Enhances systemic healing of cardiac muscle, skeletal muscle, and connective tissue throughout the body.",
+  "notes": "Pairs perfectly with BPC-157 for the Wolverine Stack (premix BB10). TB-500 handles systemic healing while BPC-157 addresses local tissue. Reduces inflammation and speeds recovery from injuries, surgery, and overtraining.",
+  "sub": "Thymosin Beta-4 Fragment"
  },
  "Tesamorelin": {
   "goal": "Visceral fat reduction, GH optimization",
@@ -578,6 +590,12 @@ var BL_LIB = {
   "mech": "Khavinson synthetic peptide bioregulator researched for testicular function and testosterone support. Supports Leydig cell function and steroidogenesis pathways.",
   "notes": "Male hormonal bioregulator. Pairs with Prostamax for comprehensive male health protocol.",
   "sub": "Testicular Cytogen"
+ },
+ "Testosterone": {
+  "goal": "Hormone optimization, lean mass, strength, libido, energy, mood and recovery",
+  "mech": "The primary male androgen, given as a long-ester injectable (cypionate or enanthate) that releases slowly from the injection depot over roughly 7\u201310 days for steady serum levels. Binds androgen receptors in muscle, bone, CNS and reproductive tissue to drive protein synthesis, red-cell production, bone density, libido and mood.",
+  "notes": "Foundation of most hormone-optimization protocols. Prescription / controlled substance \u2014 proper use calls for baseline and follow-up bloodwork (total and free testosterone, estradiol, hematocrit, PSA) and physician oversight. Often paired with HCG or Gonadorelin to preserve testicular function, with an aromatase inhibitor added only if estradiol climbs. The oil is thick \u2014 draw with a 23G needle, then inject. Dosed in the morning.",
+  "sub": "Injectable Testosterone (TRT)"
  },
  "Thymagen": {
   "goal": "Thymus support, T-cell function, immune aging",
@@ -621,12 +639,6 @@ var BL_LIB = {
   "notes": "Primarily known as prostate cancer treatment but gaining attention for 'hormonal reset' in TRT recovery protocols. Single low dose can stimulate significant LH surge. Consult healthcare provider \u2014 prescription only.",
   "sub": "GnRH Agonist"
  },
- "VIP": {
-  "goal": "Gut function, neuroprotection, immune modulation",
-  "mech": "Naturally occurring neuropeptide with wide-ranging effects \u2014 relaxes smooth muscle in gut (IBS benefit), promotes anti-inflammatory immune response, supports lung function, and has neuroprotective properties.",
-  "notes": "Emerging use in MCAS, CIRS (mold illness), and long COVID protocols. Shows particular promise for post-COVID autonomic dysfunction. Also researched for pulmonary hypertension and inflammatory bowel conditions.",
-  "sub": "Vasoactive Intestinal Peptide"
- },
  "Vesilute": {
   "goal": "Vascular tissue support, blood vessel function",
   "mech": "Khavinson bioregulator targeting vascular tissue and blood vessel wall function.",
@@ -651,11 +663,11 @@ var BL_LIB = {
   "notes": "Part of the Khavinson immune aging protocol alongside Thymalin and Thymagen.",
   "sub": "Dipeptide Thymus/Immune Bioregulator"
  },
- "Testosterone": {
-  "goal": "Hormone optimization, lean mass, strength, libido, energy, mood and recovery",
-  "mech": "The primary male androgen, given as a long-ester injectable (cypionate or enanthate) that releases slowly from the injection depot over roughly 7\u201310 days for steady serum levels. Binds androgen receptors in muscle, bone, CNS and reproductive tissue to drive protein synthesis, red-cell production, bone density, libido and mood.",
-  "notes": "Foundation of most hormone-optimization protocols. Prescription / controlled substance \u2014 proper use calls for baseline and follow-up bloodwork (total and free testosterone, estradiol, hematocrit, PSA) and physician oversight. Often paired with HCG or Gonadorelin to preserve testicular function, with an aromatase inhibitor added only if estradiol climbs. The oil is thick \u2014 draw with a 23G needle, then inject. Dosed in the morning.",
-  "sub": "Injectable Testosterone (TRT)"
+ "VIP": {
+  "goal": "Gut function, neuroprotection, immune modulation",
+  "mech": "Naturally occurring neuropeptide with wide-ranging effects \u2014 relaxes smooth muscle in gut (IBS benefit), promotes anti-inflammatory immune response, supports lung function, and has neuroprotective properties.",
+  "notes": "Emerging use in MCAS, CIRS (mold illness), and long COVID protocols. Shows particular promise for post-COVID autonomic dysfunction. Also researched for pulmonary hypertension and inflammatory bowel conditions.",
+  "sub": "Vasoactive Intestinal Peptide"
  }
 };
 

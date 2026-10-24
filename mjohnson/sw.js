@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'mjohnson-v1006-focus';
+const CACHE = 'mjohnson-v1007-lib';
 const ASSETS = [
   '/mjohnson/',
   '/mjohnson/index.html',
