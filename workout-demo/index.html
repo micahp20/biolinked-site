@@ -9,7 +9,7 @@
 <link rel="manifest" href="/workout-demo/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Demo">
+<meta name="apple-mobile-web-app-title" content="Alex">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="apple-touch-icon" href="/icon-192.png?v=5">
 <link rel="icon" type="image/png" href="/favicon.png">
@@ -862,7 +862,7 @@
     .cats{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   }
 
-  /* ===== HAMBURGER-ONLY NAV (phone) — mpauldino is the reference =======
+  /* ===== HAMBURGER-ONLY NAV (phone), mpauldino is the reference =======
      .tabs stays a flex child and collapses to zero height. display:none
      would pull it out of flow, which is what cost .scroll its flex sizing
      and froze the page on the first attempt. --tabh drops to 0 so bottom
@@ -1011,7 +1011,7 @@
 .wk-chk{flex:0 0 52px;height:52px;border-radius:50%;border:2px solid var(--gold);background:var(--card);color:var(--gold);font-size:1.4em;font-weight:900;cursor:pointer}
 .wk-chk.on{background:var(--gold);color:var(--on-gold)}
 .wk-nav{display:flex;gap:.6em;margin-top:.8em}.wk-nav>*{flex:1}
-.wk-timer{position:sticky;bottom:calc(var(--tabh,64px) + 12px);z-index:50;background:var(--ink);color:var(--bg);border-radius:18px;padding:.7em .8em;display:flex;align-items:center;gap:.5em;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-top:1em}
+.wk-timer{position:fixed;left:12px;right:12px;max-width:520px;margin:0 auto;bottom:calc(var(--tabh,0px) + 12px + env(safe-area-inset-bottom));z-index:50;background:var(--ink);color:var(--bg);border-radius:18px;padding:.7em .8em;display:flex;align-items:center;gap:.5em;box-shadow:0 8px 24px rgba(0,0,0,.25);margin-top:1em}
 .wk-timer .t{flex:1;font-weight:800;font-size:1.25em}
 .wk-timer .t small{display:block;font-size:.55em;letter-spacing:1.2px;text-transform:uppercase;opacity:.7}
 .wk-timer button{min-width:64px;min-height:50px;border-radius:12px;border:1.5px solid var(--gold);background:none;color:var(--gold2);font:inherit;font-weight:800;cursor:pointer}
@@ -1031,8 +1031,9 @@
 #v-work.wk-hc .wk-opt,#v-work.wk-hc .wk-step,#v-work.wk-hc .wk-card{border-width:2px}
 
 .wk-bwl{flex:1;min-height:52px;display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--line);border-radius:12px;font-weight:800;color:var(--muted);font-size:.9em}
-.wk-ph{position:relative;height:240px;background:#fff;border-radius:14px;overflow:hidden;margin:.4em 0 .8em;border:1px solid var(--line)}
-.wk-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.wk-ph{position:relative;width:100%;aspect-ratio:16/9;height:auto;background:#111;border-radius:14px;overflow:hidden;margin:.5em 0 .8em;border:1px solid var(--line)}
+.wk-ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 35%}
+.wk-ph img[src*="kb-swing"]{filter:grayscale(1) contrast(1.05) brightness(1.08)}
 .wk-ph img.b{animation:wkx 4s ease-in-out infinite}
 @keyframes wkx{0%,25%{opacity:0}50%,75%{opacity:1}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){.wk-ph img.b{animation:none;opacity:1}.wk-ph img{position:static;width:50%;height:100%;display:inline-block}.wk-ph{display:flex}}
@@ -1049,6 +1050,11 @@
 .wk-conf i:nth-child(1){--x:-120px;--y:-70px}.wk-conf i:nth-child(2){--x:-80px;--y:-110px}.wk-conf i:nth-child(3){--x:-30px;--y:-130px}.wk-conf i:nth-child(4){--x:30px;--y:-125px}.wk-conf i:nth-child(5){--x:85px;--y:-105px}.wk-conf i:nth-child(6){--x:125px;--y:-60px}.wk-conf i:nth-child(7){--x:-60px;--y:-40px}.wk-conf i:nth-child(8){--x:60px;--y:-45px}
 @keyframes wkc{0%{opacity:1;transform:translate(0,0) rotate(0)}100%{opacity:0;transform:translate(var(--x),var(--y)) rotate(320deg)}}
 @media (prefers-reduced-motion:reduce){.wk-chk.pop,.wk-conf i{animation:none}}
+
+.wk-chart svg{width:100%;height:auto;display:block}.wk-chart .ln{fill:none;stroke:var(--gold);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}.wk-chart circle{fill:var(--gold)}
+.wk-prd{display:block;font-weight:600;font-size:13px;color:var(--muted);margin-top:2px}
+.wk-session{padding-bottom:96px}
+#wkbody{padding-bottom:84px}
 </style>
 <style>.wk-hero{margin-top:10px;background:var(--cream)!important;color:var(--gold)!important;border:1.5px solid var(--gold)!important}</style>
 <style id="n2-css">
@@ -1152,6 +1158,42 @@
 #n2sync.n2-pill.warn{background:#fff3cd;color:#7a5200;border-color:#d9a400}
 :root[data-theme="dark"] #n2sync.n2-pill.warn{background:#3a2c00;color:#ffd666;border-color:#d9a400}
 @media (prefers-reduced-motion:reduce){.n2-toast{animation:none}}
+.n2-over{margin-top:.5em;display:inline-block;font-size:13px;font-weight:800;color:#a3361f;background:rgba(163,54,31,.08);border-radius:999px;padding:.25em .7em}.n2-left{margin-top:.5em;font-size:13px;font-weight:700;color:var(--gold)}
+</style>
+<script>window.BL_DEMO=1</script>
+<style id="demo-css">
+/* demo page polish (workout-demo only) */
+.bl-demo{display:inline-block;font-size:10px;letter-spacing:1.4px;font-weight:800;text-transform:uppercase;color:var(--on-gold,#fff);background:linear-gradient(135deg,var(--gold2),var(--gold));border-radius:999px;padding:2px 8px}
+.top .bl-aa{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);background:var(--card,#fff);color:var(--gold);font:800 15px/1 var(--serif,Georgia),serif;cursor:pointer;margin-right:6px}
+.top .bl-aa[aria-pressed="true"]{background:var(--gold);color:var(--on-gold,#fff);border-color:var(--gold)}
+:root.bl-big .scroll,:root.bl-big .sheet{zoom:1.12}
+.view{animation:fade .12s ease-out!important}
+/* inactive overlays are out of the page and the accessibility tree */
+.sheet{visibility:hidden;transition:transform .28s ease,visibility 0s linear .28s}
+.sheet.on{visibility:visible;transition:transform .28s ease,visibility 0s}
+/* readability */
+.sub,.note,.lx-d,.lx-sub,.pp,.empty .d,.wk-mut,.n2-mut,.lx-exp li,.nut-note{font-size:16px!important;line-height:1.5}
+.seclbl,.wk-eb,.n2-eb,.n2-lbl,.nut-label,.nut-card-head,.lmeta,.lref{font-size:13px!important}
+:root:not([data-theme="dark"]){--muted:#5c574d}
+#v-labs .banner{background:var(--card,#fff)!important;border:1px solid var(--line)!important;color:#9a2f1b!important;font-size:13px!important;font-weight:700}
+/* home */
+.lx-cta.bl-link{background:none!important;border:none!important;box-shadow:none!important;color:var(--gold)!important;text-decoration:underline;text-underline-offset:3px;margin-top:6px;font-weight:700}
+.bl-disc{margin:22px 0 6px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;line-height:1.45;color:var(--muted);text-align:center;letter-spacing:.1px}
+.bl-sample{margin:4px 0 14px;padding:12px 14px;border-radius:14px;border:1px solid var(--gold);background:var(--gold-soft,rgba(168,135,58,.08));font-size:14px;line-height:1.45;color:var(--ink)}
+.bl-sample b{color:var(--gold)}
+.bl-rest{margin:4px 0 10px;font-size:14px;color:var(--muted)}
+/* nutrition */
+.bl-smp{margin-left:6px;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:800;color:var(--gold);border:1px solid var(--gold);border-radius:999px;padding:1px 6px;vertical-align:1px}
+.bl-def{margin-top:6px;font-size:14px;font-weight:800;color:var(--gold)}
+.nut-card.bl-col>.nut-field,.nut-card.bl-col>.nut-inputs{display:none}
+.nut-card.bl-cc>.nut-card-head{cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.nut-card.bl-cc>.nut-card-head::after{content:'';width:9px;height:9px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(-135deg);margin-right:4px;transition:transform .2s}
+.nut-card.bl-col>.nut-card-head::after{transform:rotate(45deg)}
+.nut-card.bl-col>.nut-card-head{margin-bottom:0}
+.nut-range{-webkit-appearance:none;appearance:none;height:8px;border-radius:999px;background:linear-gradient(90deg,var(--gold) var(--p,40%),var(--line) var(--p,40%));outline:none}
+.nut-range::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid var(--gold);box-shadow:0 2px 8px rgba(0,0,0,.18);cursor:pointer}
+.nut-range::-moz-range-thumb{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid var(--gold);box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.nut-range-val{font-weight:800;color:var(--gold)}
 </style>
 </head>
 <body><script>/*BL_NOZOOM*/(function(){try{document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false});var lt=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-lt<=320){e.preventDefault();}lt=n;},{passive:false});}catch(e){}})();</script>
@@ -1159,7 +1201,7 @@
   <nav class="side">
     <div class="side-top">
       <div class="side-brand">BIO LINKED<small>Client Portal</small></div>
-      <div class="side-who"><div class="wn">Demo Member</div><div class="wl">Member</div></div>
+      <div class="side-who"><div class="wn">Alex Morgan</div><div class="wl">Member</div></div>
     </div>
     <div class="side-nav">
       <button class="snav on" data-v="proto" onclick="go('proto')"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v6h6"/><path d="M9 13h6M9 17h4"/></svg><span>Protocol</span></button>
@@ -1184,8 +1226,9 @@
   </nav>
   <div class="top">
     <div class="brand">BIO LINKED<small>CLIENT PORTAL</small></div>
-    <div class="who"><div class="wn">Demo Member</div><div class="wl">Member</div></div>
-    <button class="tgl" onclick="toggleTheme()" aria-label="Switch between light and dark">
+    <div class="who"><div class="wn">Alex Morgan</div><div class="wl"><span class="bl-demo">Demo</span></div></div>
+    <button class="bl-aa" id="bl-aa" type="button" aria-pressed="false" aria-label="Bigger text" title="Bigger text">Aa</button>
+    <button class="tgl" onclick="toggleTheme()" aria-label="Theme: switch light or dark" title="Theme: light or dark">
       <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
       <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>
     </button>
@@ -1213,7 +1256,7 @@
     <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
       <div><div class="nl">Calculator</div><div class="nd">Vial, water and dose in, units out</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('supply')">
-      <div><div class="nl">Supply</div><div class="nd">Syringes, water, sharps &mdash; what to buy</div></div></button>
+      <div><div class="nl">Supply</div><div class="nd">Syringes, water, sharps, what to buy</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('notes')">
       <div><div class="nl">Notes &amp; Tips</div><div class="nd">Storage, technique, week by week</div></div></button>
     <a href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" onclick="closeNav()">
@@ -1238,32 +1281,33 @@
         </svg>
         <div class="lx-eyebrow">BioLinked</div>
         <h1 class="lx-title">Your Protocol</h1>
-        <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
-        <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
+        <p class="lx-sub">Your protocol, nutrition, training and labs in one place.</p>
+        <button class="lx-cta" onclick="go('nutr')">Log today&rsquo;s food &rarr;</button>
         <button class="lx-cta wk-hero" onclick="go('work')"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg> Start my workout &rarr;</button>
+        <button class="lx-cta bl-link" onclick="go('sched')">View my schedule</button>
       </div>
       <div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
-        <div class="lx-card" role="button" tabindex="0" onclick="go('sched')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
-          <div><div class="lx-t">Schedule</div><div class="lx-d">Your daily doses and timing. What to take, how much, and when.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('nutr')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M8.5 3c1.9 0 3.5 1.6 3.5 3.5V9H9.5C7.6 9 6 7.4 6 5.5S7.6 3 8.5 3z"/><path d="M15.5 6c1.4 0 2.5 1.1 2.5 2.5S16.9 11 15.5 11H13V8.5C13 7.1 14.1 6 15.5 6z"/><path d="M5 14h14l-1.2 6.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 14z"/></svg></div>
           <div><div class="lx-t">Nutrition</div><div class="lx-d">Build and save your meals and hit your macro targets.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('work')" onkeydown="if(event.key==='Enter')go('work')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></div>
           <div><div class="lx-t">Workout</div><div class="lx-d">A simple plan that pairs with your protocol. Log sets in a tap and see your progress.</div></div></div>
+        <div class="lx-card" role="button" tabindex="0" onclick="go('sched')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
+          <div><div class="lx-t">Schedule</div><div class="lx-d">Your daily doses and timing. What to take, how much, and when.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('labs')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
           <div><div class="lx-t">Labs</div><div class="lx-d">Your bloodwork, every marker explained, with your overall read.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('pay')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg></div>
-          <div><div class="lx-t">Invoice</div><div class="lx-d">Your invoices and balance &mdash; pay in a tap.</div></div></div>
+          <div><div class="lx-t">Invoice</div><div class="lx-d">Your invoices and balance, with payment links.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('more')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></div>
           <div><div class="lx-t">More</div><div class="lx-d">Compound index, dose calculator, and storage &amp; handling notes.</div></div></div>
       </div>
       <div class="seclbl">What to Expect</div>
       <ul class="lx-exp">
-        <li><b>Protocols run in cycles.</b> Some compounds are daily, others a few days a week &mdash; your Schedule tab always shows today&rsquo;s.</li>
-        <li><b>Reconstitute and store as noted</b> &mdash; keep peptides refrigerated once mixed.</li>
+        <li><b>Protocols run in cycles.</b> Some compounds are daily, others a few days a week, your Schedule tab always shows today&rsquo;s.</li>
+        <li><b>Reconstitute and store as noted</b>, keep peptides refrigerated once mixed.</li>
         <li><b>Recheck your labs periodically</b> so your protocol can be adjusted. Your Labs tab tracks it.</li>
-        <li><b>Questions about your protocol?</b> Just reach out anytime.</li>
+        <li><b>Questions about your protocol?</b> Message your BioLinked coach anytime.</li>
       </ul>
     </div></section>
     <section class="view" id="v-sched"><div class="pad">
@@ -1276,11 +1320,11 @@
       <p class="note" id="dosenote"></p>
       <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
       <div id="cmplist"></div>
-      <p class="note">Every compound across Demo’s five cycles. Tap a compound to open its recon, draw, site and timing in place.</p>
+      <p class="note">Every compound across your cycles. Tap one to see reconstitution (mixing with BAC water), draw, injection site and timing.</p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
-      <p class="sub">Log what you eat in a few taps, then set your targets below <span class="wk-sync" id="n2sync"></span></p>
+      <p class="sub">Log meals in a few taps. Your numbers and targets sit further down. <span class="wk-sync" id="n2sync"></span></p>
       <div class="n2" id="n2body"></div>
       <div class="nut-wrap">
             <div class="nut-saved" id="nut-saved" hidden>
@@ -1301,15 +1345,15 @@
                 </div>
               </div>
               <div class="nut-field">
-                <label class="nut-label" for="nut-age">Age</label>
+                <label class="nut-label" for="nut-age">Age<span class="bl-smp">Sample</span></label>
                 <div class="nut-inputs"><input class="nut-input" id="nut-age" type="number" inputmode="numeric" min="14" max="99" value="38"><span class="nut-unit">yrs</span></div>
               </div>
               <div class="nut-field">
-                <label class="nut-label" for="nut-w">Weight</label>
+                <label class="nut-label" for="nut-w">Weight<span class="bl-smp">Sample</span></label>
                 <div class="nut-inputs"><input class="nut-input" id="nut-w" type="number" inputmode="decimal" value="245"><span class="nut-unit" id="nut-w-unit">lb</span></div>
               </div>
               <div class="nut-field">
-                <span class="nut-label">Height</span>
+                <span class="nut-label">Height<span class="bl-smp">Sample</span></span>
                 <div class="nut-inputs" id="nut-h-imp">
                   <input class="nut-input" id="nut-ft" type="number" inputmode="numeric" min="4" max="7" value="6"><span class="nut-unit">ft</span>
                   <input class="nut-input" id="nut-in" type="number" inputmode="numeric" min="0" max="11" value="0"><span class="nut-unit">in</span>
@@ -1383,6 +1427,7 @@
                   <button class="nut-seg-btn on" data-grp="glp1" data-val="off" aria-pressed="true">Normal</button>
                   <button class="nut-seg-btn" data-grp="glp1" data-val="on" aria-pressed="false">On GLP-1<small>reduced appetite</small></button>
                 </div>
+                <div class="nut-note">On GLP-1 keeps protein high and makes each meal smaller, since appetite runs lower.</div>
               </div>
             </div>
             <div class="nut-card">
@@ -1435,7 +1480,7 @@
             <div class="nut-card">
               <div class="nut-cal-lbl">Daily Calories</div>
               <div class="nut-cal-big" id="nut-cal">2,763</div>
-              <div class="nut-cal-sub" id="nut-cal-sub">BMR 1,783 | TDEE 2,763</div>
+              <div class="bl-def" id="bl-def"></div><div class="nut-cal-sub" id="nut-cal-sub">BMR 1,783 | TDEE 2,763</div>
               <hr style="border:none;border-top:1px solid var(--line-soft);margin:16px 0;">
               <div class="nut-split">
                 <div class="nut-donut" id="nut-donut"></div>
@@ -1487,15 +1532,12 @@
     </div></div></section>
     <section class="view" id="v-labs"><div class="pad" id="labsbody">
       <h1 class="scrn">Labs</h1>
-      <p class="sub">No bloodwork on file yet</p>
-      <div class="empty">
-        <div class="t">No bloodwork on file</div>
-        <div class="d">Once you get a panel drawn it goes here &mdash; every marker, what it means in plain language, and an overall read.</div>
-      </div>
-      <div class="banner" style="margin-top:12px"><span class="d"></span>No bloodwork on file. Draw a baseline before you start &mdash; CMP, lipids, HbA1c, thyroid, and a hormone panel while you are on testosterone &mdash; and review it with a prescriber.</div>
+      <p class="sub">Your bloodwork, explained</p>
+      <div class="empty"><div class="t">No bloodwork on file</div><div class="d">Add your bloodwork here once you have a panel. Review results with your physician.</div></div>
     </div></section>
     <section class="view" id="v-pay"><div class="pad">
       <h1 class="scrn">Invoices</h1>
+      <div class="bl-sample"><b>Sample invoices.</b> These five bundles show how billing looks for a real member. They are marked paid, so nothing here is owed.</div>
       <p class="sub" id="paysum"></p>
       <div id="payhero"></div>
       <div id="paylist"></div>
@@ -1505,10 +1547,9 @@
       <h1 class="scrn">More</h1>
       <p class="sub">Tools, your notes, and the full site</p>
       <div class="list">
-        <div class="li" onclick="go('proto')"><div><div class="nm sans">Protocol</div><div class="pp">Your welcome screen and what each tab holds</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
-        <div class="li" onclick="sheet('indexlist')"><div><div class="nm sans">Compound Index</div><div class="pp">Look up any compound &mdash; purpose, recon, dosing</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
+        <div class="li" onclick="sheet('indexlist')"><div><div class="nm sans">Compound Index</div><div class="pp">Look up any compound, purpose, recon, dosing</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
         <div class="li" onclick="sheet('calc')"><div><div class="nm sans">Calculator</div><div class="pp">Vial, water and dose in, units out</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
-        <div class="li" onclick="sheet('supply')"><div><div class="nm sans">Supply</div><div class="pp">Syringes, water, sharps &mdash; what to buy</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
+        <div class="li" onclick="sheet('supply')"><div><div class="nm sans">Supply</div><div class="pp">Syringes, water, sharps, what to buy</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
         <div class="li" onclick="sheet('notes')"><div><div class="nm sans">Notes &amp; Tips</div><div class="pp">Storage &amp; handling, technique, week by week</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></div>
 <a class="li" href="https://biolinkedsolutions.com/bl-tools-access.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit"><div><div class="nm sans">BL Tools Access</div><div class="pp">Biomarker analyzer and the rest of the BioLinked tools</div></div><div class="rt"><div class="chev">&rsaquo;</div></div></a>
       </div>
@@ -1518,7 +1559,7 @@
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Compound Index</div></div>
     <div class="pad">
       <h1 class="scrn">Compound Index</h1>
-      <p class="sub">Look up any compound &mdash; what it is for, how it is mixed, how it is dosed</p>
+      <p class="sub">Look up any compound, what it is for, how it is mixed, how it is dosed</p>
       <div class="srch">
         <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
         <input id="ixq" type="search" placeholder="Search by name or purpose" autocomplete="off" autocapitalize="none" spellcheck="false">
@@ -1549,7 +1590,7 @@
     <div class="dl first">Line Items</div>
     <div style="padding:6px 16px 0" id="i-items"></div>
     <div style="padding:4px 16px 0" id="i-pay"></div>
-    <p class="note" style="padding:0 16px">Tapping opens your payment app &mdash; nothing is charged inside this app.</p>
+    <p class="note" style="padding:0 16px">Payment buttons open your own payment app. Nothing is charged inside this page.</p>
   </div>
   <div class="sheet" id="s-calc">
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Calculator</div></div>
@@ -1563,7 +1604,7 @@
       <div class="pc-card accent">
         <div class="pc-field">
           <div class="pc-label">Compound <span class="info-tip" tabindex="0">?<span class="info-tip-text">Pulled from the Index. Picking one fills in whatever dosing is on file for it; anything missing you can type over.</span></span></div>
-          <select class="pc-select" id="pc-compound"><option value="__custom__">Custom &mdash; enter my own</option></select>
+          <select class="pc-select" id="pc-compound"><option value="__custom__">Custom, enter my own</option></select>
         </div>
         <div class="pc-field" id="pc-name-field">
           <div class="pc-label">Name <span class="info-tip" tabindex="0">?<span class="info-tip-text">What to call this one while you work it out.</span></span></div>
@@ -1578,7 +1619,7 @@
           <input class="pc-input" id="pc-bac" type="number" inputmode="decimal" step="any" min="0" value="1">
         </div>
         <div class="pc-field">
-          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection, in whichever unit you pick beside it. Type here, or drag the syringe below &mdash; they stay in sync. Vial Size keeps its own unit and never changes.</span></span></div>
+          <div class="pc-label">Desired Dose <span class="info-tip" tabindex="0">?<span class="info-tip-text">The dose you want per injection, in whichever unit you pick beside it. Type here, or drag the syringe below, they stay in sync. Vial Size keeps its own unit and never changes.</span></span></div>
           <div class="pc-dose-row">
             <input class="pc-input" id="pc-dose" type="number" inputmode="decimal" step="any" min="0" value="1.4">
             <select class="pc-unit-sel" id="pc-doseunit" aria-label="Dose unit">
@@ -1618,7 +1659,7 @@
             </g>
           </svg>
         </div>
-        <div class="pc-hint">Drag the bar, or type a dose above &mdash; <b>they stay in sync</b>.</div>
+        <div class="pc-hint">Drag the bar, or type a dose above, <b>they stay in sync</b>.</div>
       </div>
       <div class="pc-grid">
         <div class="pc-stat">
@@ -1634,7 +1675,7 @@
           <div class="pc-stat-v" id="pc-units">14<em>u</em></div>
         </div>
         <div class="pc-stat">
-          <div class="pc-stat-l">Doses Per Vial <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial size divided by your dose, rounded down. Drug-limited only &mdash; it does not account for the shelf clock once mixed.</span></span></div>
+          <div class="pc-stat-l">Doses Per Vial <span class="info-tip" tabindex="0">?<span class="info-tip-text">Vial size divided by your dose, rounded down. Drug-limited only, it does not account for the shelf clock once mixed.</span></span></div>
           <div class="pc-stat-v" id="pc-doses">7</div>
         </div>
       </div>
@@ -1654,7 +1695,7 @@
   <div class="sheet" id="s-supply">
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Supply</div></div>
     <div class="pad"><h1 class="scrn">Supply</h1><p class="sub">What to buy, and where</p>
-      <p class="sup-note">The consumables your protocol runs on. These are not supplied with your peptides &mdash; order them yourself, once, and you are set for the cycle. Storage and handling is covered in Notes &amp; Tips.</p>
+      <p class="sup-note">The consumables your protocol runs on. These are not supplied with your peptides, order them yourself, once, and you are set for the cycle. Storage and handling is covered in Notes &amp; Tips.</p>
       <div id="supplylist"></div>
     </div>
   </div>
@@ -1662,11 +1703,11 @@
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Notes &amp; Tips</div></div>
     <div class="pad"><h1 class="scrn">Notes &amp; Tips</h1><p class="sub">Storage and handling, technique, and what to expect</p>
       <div id="notelist"></div>
-      <p class="note">Tap a card to open it. Research compounds &mdash; not FDA evaluated, not medical advice, and no substitute for your physician. Keep your prescriber informed about everything you run.</p>
+      <p class="note">Tap a card to open it. Research compounds, not FDA evaluated, not medical advice, and no substitute for your physician. Keep your prescriber informed about everything you run.</p>
     </div>
   </div>
   <div class="a2hs" id="a2hs">
-    <div class="tx"><b>Add BioLinked to your home screen.</b> Tap <span style="font-size:14px">&#8682;</span> Share, then &ldquo;Add to Home Screen&rdquo; &mdash; it opens full screen like an app.</div>
+    <div class="tx"><b>Add BioLinked to your home screen.</b> Tap <span style="font-size:14px">&#8682;</span> Share, then &ldquo;Add to Home Screen&rdquo;, it opens full screen like an app.</div>
     <button class="x" onclick="hideA2(1)">&times;</button>
   </div>
   <nav class="tabs">
@@ -1680,14 +1721,14 @@
 </div>
 <script>
 var CMP=[{"n":"Retatrutide · 30 mg","b":"AM","cad":"MON","c":"Mon","d":"0.5 mg","u":"5u","rec":"3 mL BAC water","site":"SubQ","about":"30 mg in 3 mL is 10 mg/mL, so a 5u draw is 0.5 mg. Start at 0.5 mg and titrate up slowly.","tag":"Cycle 1","days":[1]},{"n":"Tesamorelin · 20 mg","b":"PM","cad":"MF","c":"Mon–Fri","d":"1 mg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"20 mg in 2 mL is 10 mg/mL, so a 10u draw is 1 mg.","tag":"Cycle 1","days":[1,2,3,4,5]},{"n":"MOTS-c · 40 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~1.33 mg","u":"10u","rec":"3 mL BAC water","site":"SubQ","about":"40 mg in 3 mL is 13.3 mg/mL, so a 10u draw is about 1.33 mg.","tag":"Cycle 1","days":[1,3,5]},{"n":"NAD+ · 1000 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"50 mg","u":"25u","rec":"5 mL BAC water","site":"SubQ","about":"1000 mg in 5 mL is 200 mg/mL, so a 25u draw is 50 mg.","tag":"Cycle 1","days":[1,3,5]}];
-var INV=[{"label":"Cycle 1 · Fat Loss","summary":"Retatrutide + Tesamorelin + MOTS-c + NAD+ · 6 vials · tap to view","status":"free","total":339.97,"items":[{"n":"Retatrutide 30 mg · 1 vial @ $50","sub":"Monday AM · start 0.5 mg","amt":50},{"n":"Tesamorelin 20 mg · 2 vials @ $60","sub":"Mon–Fri PM · 1 mg","amt":120},{"n":"MOTS-c 40 mg · 1 vial @ $50","sub":"Mon / Wed / Fri AM · ~1.33 mg","amt":50},{"n":"NAD+ 1000 mg · 2 vials @ $50","sub":"Mon / Wed / Fri AM · 50 mg","amt":100},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 2 · Muscle Building","summary":"CJC/Ipamorelin + IGF-1 LR3 + KLOW + AOD-9604 + 5-Amino-1MQ · 9 vials · tap to view","status":"free","total":389.97,"items":[{"n":"CJC-1295 / Ipamorelin 5+5 mg · 2 vials @ $45","sub":"Mon–Fri PM · 250/250 mcg","amt":90},{"n":"IGF-1 LR3 1 mg · 2 vials @ $50","sub":"Mon–Fri post-workout · 50 mcg","amt":100},{"n":"KLOW 80 mg · 2 vials @ $40","sub":"Mon / Wed / Fri PM · 4 mg","amt":80},{"n":"AOD-9604 5 mg · 2 vials @ $25","sub":"Mon–Fri AM · 250 mcg","amt":50},{"n":"5-Amino-1MQ 50 mg · 1 vial @ $50","sub":"Mon / Wed / Fri AM · ~1.67 mg","amt":50},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 3 · Recovery & Healing","summary":"BPC-157/TB-500 + Cartalax + KPV + GHK-Cu · 6 vials · tap to view","status":"free","total":179.97,"items":[{"n":"BPC-157 + TB-500 10 mg · 2 vials @ $30","sub":"Mon / Wed / Fri PM · 1 mg","amt":60},{"n":"Cartalax 20 mg · 1 vial @ $25","sub":"Daily PM · 1 mg","amt":25},{"n":"KPV 10 mg · 2 vials @ $25","sub":"Daily AM · 500 mcg","amt":50},{"n":"GHK-Cu 50 mg · 1 vial @ $25","sub":"Daily AM · ~1.7 mg","amt":25},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 4 · Longevity & Anti-Aging","summary":"Cortagen + FOXO4-DRI + Glutathione + Cerebrolysin · 7 vials · tap to view","status":"free","total":289.97,"items":[{"n":"Cortagen 20 mg · 2 vials @ $25","sub":"Daily · run straight · 2 mg","amt":50},{"n":"FOXO4-DRI 10 mg · 1 vial @ $50","sub":"Every other day · 3 mg","amt":50},{"n":"Glutathione 1500 mg · 2 vials @ $25","sub":"Weekly Monday AM · 150 mg","amt":50},{"n":"Cerebrolysin 60 mg · 2 vials @ $60","sub":"Daily · run straight · 6 mg","amt":120},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 5 · Sleep & Stress","summary":"DSIP + Epithalon + Pinealon + N-Acetyl Selank · 5 vials · tap to view","status":"free","total":159.98,"items":[{"n":"DSIP 10 mg · 1 vial @ $25","sub":"Mon–Fri · 1–3 hrs before bed · 500 mcg","amt":25},{"n":"Epithalon 50 mg · 1 vial @ $50","sub":"Nightly · run straight · ~2.5 mg","amt":50},{"n":"Pinealon 10 mg · 2 vials @ $15","sub":"Nightly · run straight · 2 mg","amt":30},{"n":"N-Acetyl Selank Amidate 30 mg · 1 vial @ $40","sub":"Mon / Wed / Fri PM · 1 mg","amt":40},{"n":"BAC Water 10 mL × 1 vial @ $4.99","sub":"Enough to reconstitute this cycle","amt":4.99},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]}];
-var PAID=0.0,DUE=0.0;
-var IX=[{"name": "Ipamorelin", "cat": "fatloss", "purpose": "Fat Loss", "vial": "10 mg", "bac": "3 ml", "dose": "300 mcg", "units": "9", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Tesamorelin", "cat": "fatloss", "purpose": "Fat Loss", "vial": "10 mg", "bac": "2 ml", "dose": "1 mg", "units": "20", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "AOD-9604", "cat": "fatloss", "purpose": "Fat Loss / Lipolysis", "vial": "5 mg", "bac": "2 ml", "dose": "300 mcg", "units": "11", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Semaglutide", "cat": "fatloss", "purpose": "Fat Loss / GLP-1", "vial": "3 mg", "bac": "2 ml", "dose": "250 mcg", "units": "17", "timing": "AM", "freq": "Once per week", "dur": "8 wks on, 8 wks off"}, {"name": "Tirzepatide", "cat": "fatloss", "purpose": "Fat Loss / GLP-1/GIP", "vial": "10 mg", "bac": "2 ml", "dose": "0.5 mg", "units": "10", "timing": "AM", "freq": "3× per week", "dur": "8 wks on, 8 wks off or until goal weight"}, {"name": "Retatrutide", "cat": "fatloss", "purpose": "Fat Loss / Triple Agonist", "vial": "10 mg", "bac": "2 ml", "dose": "0.5–1 mg", "units": "10–20", "timing": "AM", "freq": "3–4× per week", "dur": "8 wks on, 8 wks off or until goal weight"}, {"name": "Cagrilintide", "cat": "fatloss", "purpose": "Appetite Suppression / Amylin", "vial": "5 mg", "bac": "2 ml", "dose": "250 mcg", "units": "10", "timing": "AM", "freq": "3 days per week", "dur": "8 wks on, 8 wks off or as needed"}, {"name": "Liraglutide", "cat": "fatloss", "purpose": "Fat Loss / GLP-1 (Daily)", "vial": "18 mg/3 ml pen", "bac": "N/A — pre-filled", "dose": "0.6–3 mg", "units": "N/A", "timing": "Any time daily", "freq": "Daily", "dur": "Ongoing — titrate over 5 wks"}, {"name": "Dulaglutide", "cat": "fatloss", "purpose": "Blood Sugar / Cardiovascular", "vial": "Auto-injector", "bac": "N/A — pre-filled", "dose": "0.75–4.5 mg", "units": "N/A", "timing": "Same day each week", "freq": "Once weekly", "dur": "Ongoing"}, {"name": "Survodutide", "cat": "fatloss", "purpose": "Fat Loss / Liver Health", "vial": "Research vial", "bac": "Per research protocol", "dose": "0.6–6 mg", "units": "Varies", "timing": "Same day each week", "freq": "Once weekly", "dur": "12–20 weeks"}, {"name": "Mazdutide", "cat": "fatloss", "purpose": "Fat Loss / Metabolic", "vial": "Research vial", "bac": "Per research protocol", "dose": "3–9 mg", "units": "Varies", "timing": "Same day each week", "freq": "Once weekly", "dur": "12–24 weeks"}, {"name": "Orforglipron", "cat": "fatloss", "purpose": "Fat Loss / Oral GLP-1", "vial": "Oral tablet", "bac": "N/A — oral", "dose": "12–45 mg", "units": "N/A", "timing": "Daily oral", "freq": "Daily oral", "dur": "Ongoing"}, {"name": "Tesofensine", "cat": "fatloss", "purpose": "Appetite Suppression / CNS", "vial": "Oral tablet", "bac": "N/A — oral", "dose": "0.25–0.5 mg", "units": "N/A", "timing": "Morning oral", "freq": "Daily oral", "dur": "12–24 weeks"}, {"name": "AICAR", "cat": "fatloss", "purpose": "Fat Oxidation / AMPK Activator", "vial": "50 mg", "bac": "1 ml sterile water", "dose": "10–50 mg", "units": "10–100", "timing": "Pre-exercise or AM", "freq": "Daily", "dur": "4–8 weeks"}, {"name": "5-Amino-1MQ", "cat": "fatloss", "purpose": "Fat Loss / NAD+ / NNMT Inhibitor", "vial": "10 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM", "freq": "5 days per week", "dur": "6–8 wks on, 6–8 wks off"}, {"name": "MOTS-C", "cat": "fatloss", "purpose": "Fat Loss / Energy / Mitochondrial", "vial": "10 mg", "bac": "2 ml", "dose": "1 mg", "units": "20", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Ipamorelin / CJC-1295 No DAC", "cat": "fatloss", "purpose": "Fat Loss / GH Stack", "vial": "5mg/5mg", "bac": "2 ml", "dose": "250mcg/250mcg", "units": "10", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "CJC-1295 No DAC", "cat": "fatloss", "purpose": "Longevity / Fat Loss / GH", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "10", "timing": "PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "BPC-157", "cat": "healing", "purpose": "Healing / Gut Repair", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM/PM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "TB-500", "cat": "healing", "purpose": "Healing / Systemic Repair", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "BPC-157 / TB-500 5mg/5mg Blend", "cat": "healing", "purpose": "Healing / Wolverine Stack", "vial": "5mg/5mg", "bac": "2 ml", "dose": "250mcg/250mcg", "units": "10", "timing": "AM/PM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "GHK-Cu", "cat": "healing", "purpose": "Healing / Collagen / Skin", "vial": "50 mg", "bac": "3 ml", "dose": "1.7 mg", "units": "10", "timing": "AM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "ARA-290", "cat": "healing", "purpose": "Healing / Neuropathy Pain", "vial": "15 mg", "bac": "1 ml", "dose": "1.5 mg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "KPV", "cat": "healing", "purpose": "Immunity / Anti-Inflammatory", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "SS-31", "cat": "healing", "purpose": "Longevity / Mitochondrial", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "LL-37", "cat": "healing", "purpose": "Immunity / Antimicrobial / Wound", "vial": "5 mg", "bac": "2 ml", "dose": "125 mcg", "units": "5", "timing": "AM", "freq": "Every day", "dur": "50 days straight, 4 wks off"}, {"name": "PGPIPN", "cat": "healing", "purpose": "Anti-Inflammatory / Tissue Repair", "vial": "5 mg", "bac": "2 ml", "dose": "1–2 mg", "units": "20–40", "timing": "AM", "freq": "Daily", "dur": "6–8 weeks"}, {"name": "IGF-1 LR3", "cat": "muscle", "purpose": "Muscle Building / IGF-1", "vial": "1 mg", "bac": "1 ml", "dose": "50 mcg", "units": "5", "timing": "AM", "freq": "10 days in a row", "dur": "10 days on, 4 wks off"}, {"name": "IGF-1 DES", "cat": "muscle", "purpose": "Localized Muscle Growth", "vial": "1 mg", "bac": "1 ml", "dose": "20–50 mcg", "units": "2–5", "timing": "Post-workout near target", "freq": "Training days", "dur": "4–6 weeks"}, {"name": "Follistatin 344", "cat": "muscle", "purpose": "Muscle Building / Myostatin Inhibitor", "vial": "1 mg", "bac": "2 ml", "dose": "50 mcg", "units": "10", "timing": "30 min pre-workout (IM)", "freq": "Training days", "dur": "8 wks on, 8 wks off"}, {"name": "Follistatin 315", "cat": "muscle", "purpose": "Localized Muscle Support", "vial": "1 mg", "bac": "2 ml", "dose": "50 mcg", "units": "10", "timing": "Near target muscle SQ", "freq": "Daily", "dur": "10–30 days"}, {"name": "MGF", "cat": "muscle", "purpose": "Local Muscle Repair / Satellite Cell Activation", "vial": "2 mg", "bac": "2 ml", "dose": "200–400 mcg", "units": "20–40", "timing": "Immediately post-workout", "freq": "Post-workout 2–3×/week", "dur": "4–8 weeks"}, {"name": "PEG-MGF", "cat": "muscle", "purpose": "Systemic Muscle Repair", "vial": "5 mg", "bac": "2.5 ml", "dose": "200 mcg", "units": "10", "timing": "Post-workout", "freq": "2–3 days per week", "dur": "6–8 wks on, 8 wks off"}, {"name": "L-Carnitine", "cat": "muscle", "purpose": "Muscle / Energy", "vial": "600 mg/ml · 20 ml bottle", "bac": "N/A — pre-mixed", "dose": "200–600 mg", "units": "33–100", "timing": "AM", "freq": "Every day", "dur": "As needed"}, {"name": "Somatropin (HGH)", "cat": "gh", "purpose": "Direct GH / Muscle / Fat Loss", "vial": "10 IU or 15 IU", "bac": "1 ml per 10 IU", "dose": "1–4 IU", "units": "10–40", "timing": "AM or pre-bed", "freq": "Daily", "dur": "3–6 months minimum"}, {"name": "GHRP-2", "cat": "gh", "purpose": "Potent GH Release", "vial": "5 mg", "bac": "2 ml", "dose": "100–300 mcg", "units": "4–12", "timing": "Pre-bed, AM fasted, pre-workout", "freq": "2–3× daily", "dur": "8–12 weeks"}, {"name": "GHRP-6", "cat": "gh", "purpose": "GH Release / Appetite Stimulation", "vial": "5 mg", "bac": "2 ml", "dose": "100–300 mcg", "units": "4–12", "timing": "Pre-workout, AM, pre-bed", "freq": "2–3× daily", "dur": "8–12 weeks"}, {"name": "Hexarelin", "cat": "gh", "purpose": "Max GH Output / Cardioprotection", "vial": "2 mg", "bac": "2 ml", "dose": "100–200 mcg", "units": "10–20", "timing": "Pre-bed and AM fasted", "freq": "2× daily", "dur": "8–12 weeks"}, {"name": "MK-677", "cat": "gh", "purpose": "Oral GH Secretagogue / Sleep", "vial": "Oral — 10/25mg", "bac": "N/A — oral", "dose": "10–25 mg", "units": "N/A", "timing": "Evening with food", "freq": "Daily oral", "dur": "12–24 weeks"}, {"name": "Sermorelin", "cat": "gh", "purpose": "GH Stimulation / Anti-Aging", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "PM (before bed)", "freq": "Monday–Friday", "dur": "8 wks on, 8 wks off"}, {"name": "Semax or NA Semax Amidate", "cat": "cognition", "purpose": "Cognition / BDNF / Focus", "vial": "30 mg", "bac": "3 ml", "dose": "1 mg", "units": "10", "timing": "AM", "freq": "2–3 days per week", "dur": "8 wks on, 8 wks off"}, {"name": "Selank or NA Selank Amidate", "cat": "cognition", "purpose": "Cognition / Anxiety / GABA", "vial": "30 mg", "bac": "3 ml", "dose": "1 mg", "units": "10", "timing": "AM", "freq": "2–3 days per week", "dur": "8 wks on, 8 wks off"}, {"name": "PE-22-28", "cat": "cognition", "purpose": "Mood / Antidepressant", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM", "freq": "3–4× per week", "dur": "8 wks on, 8 wks off"}, {"name": "Dihexa", "cat": "cognition", "purpose": "Cognition / Memory / Synaptogenesis", "vial": "5 mg", "bac": "1–2 ml", "dose": "5–10 mcg/kg", "units": "Varies", "timing": "AM", "freq": "Once weekly", "dur": "4–6 wks"}, {"name": "P21", "cat": "cognition", "purpose": "Cognition / Neurogenesis / BDNF Mimetic", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM", "freq": "3–4× per week", "dur": "8 wks on, 8 wks off"}, {"name": "Cerebrolysin", "cat": "cognition", "purpose": "Brain Recovery / Neuroprotection", "vial": "10–30 mL", "bac": "N/A — pre-mixed", "dose": "10–30 mL", "units": "N/A", "timing": "AM IM or IV", "freq": "Daily during course", "dur": "10–20 day courses"}, {"name": "Adamax", "cat": "cognition", "purpose": "Enhanced Cognition (Semax Variant)", "vial": "30 mg", "bac": "3 ml", "dose": "300–600 mcg", "units": "3–6", "timing": "AM", "freq": "2–3 days per week", "dur": "10–14 day cycles"}, {"name": "DSIP", "cat": "sleep", "purpose": "Sleep Quality / Stress Recovery", "vial": "5 mg", "bac": "2 ml", "dose": "250 mcg", "units": "10", "timing": "1–3 hrs before bed", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Epitalon", "cat": "longevity", "purpose": "Longevity / Telomere / Circadian", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "PM", "freq": "Every day", "dur": "20 days in a row, 3× per year"}, {"name": "Thymalin or Thymogen", "cat": "longevity", "purpose": "Longevity / Thymus Anti-Aging", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "PM", "freq": "Every day", "dur": "20 days in a row, 3× per year"}, {"name": "FOXO4-DRI", "cat": "longevity", "purpose": "Longevity / Senolytic", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM/PM", "freq": "Once daily", "dur": "16 days on, 16 days off"}, {"name": "Humanin", "cat": "longevity", "purpose": "Neuroprotection / Mitochondrial Anti-Aging", "vial": "5 mg", "bac": "2 ml", "dose": "2–4 mg", "units": "20–40", "timing": "Any time SQ", "freq": "2–3× per week", "dur": "8–12 weeks"}, {"name": "NAD+", "cat": "energy", "purpose": "Longevity / Energy / DNA Repair", "vial": "500 mg", "bac": "2 ml", "dose": "100 mg", "units": "40", "timing": "AM", "freq": "2–3 days per week", "dur": "As needed"}, {"name": "Glutathione", "cat": "energy", "purpose": "Antioxidant / Detox / Recovery", "vial": "1,500 mg", "bac": "10–15 ml sterile water", "dose": "600–1,500 mg", "units": "Varies", "timing": "AM", "freq": "Weekly", "dur": "Ongoing"}, {"name": "Thymosin Alpha-1", "cat": "immunity", "purpose": "Immunity / T-Cell Support", "vial": "10 mg", "bac": "2 ml", "dose": "1.5 mg", "units": "30", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "VIP", "cat": "immunity", "purpose": "Immunity / Gut / Neuroprotection", "vial": "5 mg", "bac": "3 ml", "dose": "50 mcg", "units": "5", "timing": "AM/PM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "Gonadorelin", "cat": "immunity", "purpose": "LH/FSH Stimulation / TRT Adjunct", "vial": "2 mg", "bac": "2 ml", "dose": "100–200 mcg", "units": "10–20", "timing": "Morning SQ", "freq": "2–3× per week", "dur": "Ongoing with TRT"}, {"name": "SLU-PP-332", "cat": "energy", "purpose": "Exercise Mimetic / ERRα / Endurance", "vial": "10 mg", "bac": "2 ml", "dose": "5–10 mg", "units": "10–20", "timing": "Morning", "freq": "Daily", "dur": "8–12 weeks"}, {"name": "PT-141", "cat": "sexual", "purpose": "Sexual Health / Libido / Desire", "vial": "5 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "30 min before activity", "freq": "As needed", "dur": "As needed"}, {"name": "Melanotan 1", "cat": "sexual", "purpose": "Tanning / Selective MC1R", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM", "freq": "2 days per week", "dur": "8 wks on, 8 wks off"}, {"name": "Melanotan 2", "cat": "sexual", "purpose": "Tanning / Sexual / Libido", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "PM", "freq": "Daily loading → maint", "dur": "3–4 wks loading, then maint"}, {"name": "Kisspeptin", "cat": "sexual", "purpose": "Sexual Health / Hormonal Axis", "vial": "10 mg", "bac": "2 ml", "dose": "125 mcg", "units": "5", "timing": "1 hr before bed", "freq": "Every day", "dur": "30 days on, 30 days off"}, {"name": "Oxytocin", "cat": "sexual", "purpose": "Sexual Health / Bonding", "vial": "10 mg", "bac": "2 ml", "dose": "50 mcg", "units": "1", "timing": "AM", "freq": "As needed", "dur": "As needed"}, {"name": "Tadalafil (Cialis)", "cat": "sexual", "purpose": "Sexual Health / ED / Vascular", "vial": "Tabs 5/10/20mg", "bac": "N/A", "dose": "5mg daily or 10–20mg as needed", "units": "N/A", "timing": "As needed", "freq": "Daily or as needed", "dur": "Ongoing"}, {"name": "Enclomiphene", "cat": "sexual", "purpose": "Testosterone Restoration / Fertility", "vial": "Oral tablet", "bac": "N/A — oral", "dose": "12.5–25 mg", "units": "N/A", "timing": "Morning oral", "freq": "Daily oral", "dur": "3–6 months"}, {"name": "HCG", "cat": "sexual", "purpose": "Testosterone Support / Testicular Function", "vial": "5,000 IU", "bac": "2 ml", "dose": "250–500 IU", "units": "10–20", "timing": "AM", "freq": "2–3× per week", "dur": "As needed"}, {"name": "HMG", "cat": "hormones", "purpose": "Hormonal Support / FSH + LH", "vial": "75 IU", "bac": "0.5 ml", "dose": "75 IU", "units": "50", "timing": "AM", "freq": "3× per week", "dur": "As needed"}, {"name": "Triptorelin", "cat": "sexual", "purpose": "Hormonal Reset / GnRH", "vial": "100 mcg", "bac": "1 ml", "dose": "100 mcg single shot", "units": "10", "timing": "Per protocol", "freq": "Single dose for reset", "dur": "Single dose — per protocol"}, {"name": "Argireline", "cat": "skin", "purpose": "Wrinkle Reduction / Topical Botox-Like", "vial": "Topical serum 5–10%", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and/or PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Matrixyl", "cat": "skin", "purpose": "Collagen Synthesis / Anti-Aging", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Syn-Ake", "cat": "skin", "purpose": "Wrinkle Smoothing / NMJ Relaxant", "vial": "Topical 2–4%", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "PM or twice daily topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Syn-Coll", "cat": "skin", "purpose": "Collagen Stimulation / Elasticity", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "SNAP-8", "cat": "skin", "purpose": "Expression Wrinkle Reduction", "vial": "Topical serum 5–10%", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "PM or twice daily", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Rigin", "cat": "skin", "purpose": "Anti-Inflammaging / IL-6 Suppression", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Pal-GHK", "cat": "skin", "purpose": "Enhanced Collagen / Skin Repair", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Pal-AHK", "cat": "skin", "purpose": "Hair Follicle Stimulation", "vial": "Topical scalp serum", "bac": "N/A — topical", "dose": "Topical to scalp", "units": "N/A", "timing": "Post-shower", "freq": "Daily topical", "dur": "3–6 months"}, {"name": "AHK-Cu", "cat": "skin", "purpose": "Hair Growth / Follicle Health", "vial": "Topical scalp serum", "bac": "N/A — topical", "dose": "Topical to scalp", "units": "N/A", "timing": "Post-shower", "freq": "Daily topical", "dur": "3–6 months"}, {"name": "Nonapeptide-1", "cat": "skin", "purpose": "Skin Brightening / Melanin Inhibitor", "vial": "Topical 1–5%", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM + SPF AM", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Decapeptide-12", "cat": "skin", "purpose": "Hyperpigmentation / Dark Spots", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM + SPF", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Tripeptide-29", "cat": "skin", "purpose": "Collagen Signal / Skin Structure", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Palmitoyl Dipeptide-6", "cat": "skin", "purpose": "Retinol Alternative / Cell Renewal", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "PM (retinol-like protocol)", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Pentapeptide-18", "cat": "skin", "purpose": "Expression Line Reducer", "vial": "Topical eye serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Vialox", "cat": "skin", "purpose": "Muscle Relaxation / Wrinkle Reduction", "vial": "Topical serum", "bac": "N/A — topical", "dose": "Topical application", "units": "N/A", "timing": "PM or twice daily", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "HGH Fragment 176-191", "cat": "fatloss", "purpose": "Fat Loss / Lipolysis (HGH Frag)", "vial": "5 mg", "bac": "2 ml", "dose": "250–500 mcg", "units": "10–20", "timing": "AM fasted and/or pre-bed", "freq": "2× daily", "dur": "12–16 weeks"}, {"name": "GLOW Blend (GHK-Cu, BPC-157, TB-500)", "cat": "blend", "purpose": "Healing / Beauty", "vial": "50mg/10mg/10mg", "bac": "2 ml", "dose": "2.5mg/500mcg/500mcg", "units": "10", "timing": "AM or PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)", "cat": "blend", "purpose": "Healing / Recovery", "vial": "50mg/10mg/10mg/10mg", "bac": "2 ml", "dose": "2.5mg/500mcg/500mcg/500mcg", "units": "10", "timing": "AM or PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Triple Threat Blend (NAD+, MOTS-C, 5-Amino-1MQ)", "cat": "blend", "purpose": "Fat Loss / Energy", "vial": "100mg/10mg/10mg", "bac": "2 ml", "dose": "5mg/500mcg/500mcg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Tesamorelin / Ipamorelin Blend", "cat": "blend", "purpose": "Fat Loss / Muscle", "vial": "6mg/2mg", "bac": "2 ml", "dose": "300mcg/100mcg", "units": "10", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Bronchogen", "cat": "bioregulator", "purpose": "Lung / Respiratory Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Cardiogen", "cat": "bioregulator", "purpose": "Heart / Cardiac Tissue Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Cartalax", "cat": "bioregulator", "purpose": "Joint / Cartilage / Bone", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Chonluten", "cat": "bioregulator", "purpose": "Respiratory / GI Epithelial", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Cortagen", "cat": "bioregulator", "purpose": "Brain Cortex / CNS Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Livagen", "cat": "bioregulator", "purpose": "Liver / Hepatocyte Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Ovagen", "cat": "bioregulator", "purpose": "Liver / Stomach / GI Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Pancragen", "cat": "bioregulator", "purpose": "Pancreas / Beta-Cell Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Pinealon", "cat": "bioregulator", "purpose": "Brain / Pineal / Circadian", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Prostamax", "cat": "bioregulator", "purpose": "Prostate Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Testagen", "cat": "bioregulator", "purpose": "Male Hormones / Testicular", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Thymagen", "cat": "bioregulator", "purpose": "Immune / Thymus Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Vesugen", "cat": "bioregulator", "purpose": "Blood Flow / Vascular Endothelial", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Vesilute", "cat": "bioregulator", "purpose": "Bladder / Prostate / Vascular", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Vilon", "cat": "bioregulator", "purpose": "Thymus / Immune Longevity", "vial": "20 mg", "bac": "2 ml", "dose": "0.5–2 mg", "units": "N/A — 0.5–1 ml SubQ/IM", "timing": "AM/PM", "freq": "Daily", "dur": "8–12 wks on, 6 wks off"}, {"name": "Semaglutide 5mg (Bronze 1)", "cat": "fatloss", "purpose": "Fat Loss / GLP-1", "vial": "5 mg", "bac": "2 mL", "dose": "0.25mg weeks 1–2; 0.50mg weeks 3–4; 0.75mg weeks 5–6", "units": "10 / 20 / 30", "timing": "Bedtime recommended", "freq": "1× per week", "dur": "Increase slowly; do not exceed 2.5mg per injection"}, {"name": "Wolverine 2.0", "cat": "blend", "purpose": "Healing / Recovery + Joint (BPC-157, TB-500, Cartalax)", "vial": "20 mg", "bac": "2 ml", "dose": "1 mg", "units": "10", "timing": "AM or PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Testosterone", "cat": "hormones", "purpose": "Hormone Optimization / TRT", "vial": "250 mg/mL", "bac": "None — pre-mixed oil", "dose": "100–200 mg/week", "units": "N/A", "timing": "AM", "freq": "1–2× per week", "dur": "Ongoing"}, {"name": "Armodafinil", "cat": "cognition", "purpose": "Wakefulness / Focus (Prescription Eugeroic)", "vial": "Tabs 150 mg", "bac": "N/A", "dose": "150 mg (1 tablet)", "units": "N/A", "timing": "AM only", "freq": "As needed · max 2–3 days/week", "dur": "Short-term / as needed"}, {"name": "Bromantane", "cat": "cognition", "purpose": "Focus / Motivation / Fatigue (Dopamine Support)", "vial": "Tabs 100 mg", "bac": "N/A", "dose": "100 mg (1 tablet)", "units": "N/A", "timing": "AM only", "freq": "Off-days from Armodafinil", "dur": "2–4 weeks on, then a break"}];
+var INV=[{"label":"Cycle 1 · Fat Loss","summary":"Retatrutide + Tesamorelin + MOTS-c + NAD+ · 6 vials · tap to view","status":"paid","total":339.97,"items":[{"n":"Retatrutide 30 mg · 1 vial @ $50","sub":"Monday AM · start 0.5 mg","amt":50},{"n":"Tesamorelin 20 mg · 2 vials @ $60","sub":"Mon–Fri PM · 1 mg","amt":120},{"n":"MOTS-c 40 mg · 1 vial @ $50","sub":"Mon / Wed / Fri AM · ~1.33 mg","amt":50},{"n":"NAD+ 1000 mg · 2 vials @ $50","sub":"Mon / Wed / Fri AM · 50 mg","amt":100},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 2 · Muscle Building","summary":"CJC/Ipamorelin + IGF-1 LR3 + KLOW + AOD-9604 + 5-Amino-1MQ · 9 vials · tap to view","status":"paid","total":389.97,"items":[{"n":"CJC-1295 / Ipamorelin 5+5 mg · 2 vials @ $45","sub":"Mon–Fri PM · 250/250 mcg","amt":90},{"n":"IGF-1 LR3 1 mg · 2 vials @ $50","sub":"Mon–Fri post-workout · 50 mcg","amt":100},{"n":"KLOW 80 mg · 2 vials @ $40","sub":"Mon / Wed / Fri PM · 4 mg","amt":80},{"n":"AOD-9604 5 mg · 2 vials @ $25","sub":"Mon–Fri AM · 250 mcg","amt":50},{"n":"5-Amino-1MQ 50 mg · 1 vial @ $50","sub":"Mon / Wed / Fri AM · ~1.67 mg","amt":50},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 3 · Recovery & Healing","summary":"BPC-157/TB-500 + Cartalax + KPV + GHK-Cu · 6 vials · tap to view","status":"paid","total":179.97,"items":[{"n":"BPC-157 + TB-500 10 mg · 2 vials @ $30","sub":"Mon / Wed / Fri PM · 1 mg","amt":60},{"n":"Cartalax 20 mg · 1 vial @ $25","sub":"Daily PM · 1 mg","amt":25},{"n":"KPV 10 mg · 2 vials @ $25","sub":"Daily AM · 500 mcg","amt":50},{"n":"GHK-Cu 50 mg · 1 vial @ $25","sub":"Daily AM · ~1.7 mg","amt":25},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 4 · Longevity & Anti-Aging","summary":"Cortagen + FOXO4-DRI + Glutathione + Cerebrolysin · 7 vials · tap to view","status":"paid","total":289.97,"items":[{"n":"Cortagen 20 mg · 2 vials @ $25","sub":"Daily · run straight · 2 mg","amt":50},{"n":"FOXO4-DRI 10 mg · 1 vial @ $50","sub":"Every other day · 3 mg","amt":50},{"n":"Glutathione 1500 mg · 2 vials @ $25","sub":"Weekly Monday AM · 150 mg","amt":50},{"n":"Cerebrolysin 60 mg · 2 vials @ $60","sub":"Daily · run straight · 6 mg","amt":120},{"n":"BAC Water 10 mL × 2 vials @ $4.99","sub":"Enough to reconstitute this cycle","amt":9.98},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]},{"label":"Cycle 5 · Sleep & Stress","summary":"DSIP + Epithalon + Pinealon + N-Acetyl Selank · 5 vials · tap to view","status":"paid","total":159.98,"items":[{"n":"DSIP 10 mg · 1 vial @ $25","sub":"Mon–Fri · 1–3 hrs before bed · 500 mcg","amt":25},{"n":"Epithalon 50 mg · 1 vial @ $50","sub":"Nightly · run straight · ~2.5 mg","amt":50},{"n":"Pinealon 10 mg · 2 vials @ $15","sub":"Nightly · run straight · 2 mg","amt":30},{"n":"N-Acetyl Selank Amidate 30 mg · 1 vial @ $40","sub":"Mon / Wed / Fri PM · 1 mg","amt":40},{"n":"BAC Water 10 mL × 1 vial @ $4.99","sub":"Enough to reconstitute this cycle","amt":4.99},{"n":"2-Day UPS","sub":"Shipping","amt":9.99}]}];
+var PAID=1359.86,DUE=0.0;
+var IX=[{"name": "Ipamorelin", "cat": "fatloss", "purpose": "Fat Loss", "vial": "10 mg", "bac": "3 ml", "dose": "300 mcg", "units": "9", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Tesamorelin", "cat": "fatloss", "purpose": "Fat Loss", "vial": "10 mg", "bac": "2 ml", "dose": "1 mg", "units": "20", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "AOD-9604", "cat": "fatloss", "purpose": "Fat Loss / Lipolysis", "vial": "5 mg", "bac": "2 ml", "dose": "300 mcg", "units": "11", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Semaglutide", "cat": "fatloss", "purpose": "Fat Loss / GLP-1", "vial": "3 mg", "bac": "2 ml", "dose": "250 mcg", "units": "17", "timing": "AM", "freq": "Once per week", "dur": "8 wks on, 8 wks off"}, {"name": "Tirzepatide", "cat": "fatloss", "purpose": "Fat Loss / GLP-1/GIP", "vial": "10 mg", "bac": "2 ml", "dose": "0.5 mg", "units": "10", "timing": "AM", "freq": "3× per week", "dur": "8 wks on, 8 wks off or until goal weight"}, {"name": "Retatrutide", "cat": "fatloss", "purpose": "Fat Loss / Triple Agonist", "vial": "10 mg", "bac": "2 ml", "dose": "0.5–1 mg", "units": "10–20", "timing": "AM", "freq": "3–4× per week", "dur": "8 wks on, 8 wks off or until goal weight"}, {"name": "Cagrilintide", "cat": "fatloss", "purpose": "Appetite Suppression / Amylin", "vial": "5 mg", "bac": "2 ml", "dose": "250 mcg", "units": "10", "timing": "AM", "freq": "3 days per week", "dur": "8 wks on, 8 wks off or as needed"}, {"name": "Liraglutide", "cat": "fatloss", "purpose": "Fat Loss / GLP-1 (Daily)", "vial": "18 mg/3 ml pen", "bac": "N/A, pre-filled", "dose": "0.6–3 mg", "units": "N/A", "timing": "Any time daily", "freq": "Daily", "dur": "Ongoing, titrate over 5 wks"}, {"name": "Dulaglutide", "cat": "fatloss", "purpose": "Blood Sugar / Cardiovascular", "vial": "Auto-injector", "bac": "N/A, pre-filled", "dose": "0.75–4.5 mg", "units": "N/A", "timing": "Same day each week", "freq": "Once weekly", "dur": "Ongoing"}, {"name": "Survodutide", "cat": "fatloss", "purpose": "Fat Loss / Liver Health", "vial": "Research vial", "bac": "Per research protocol", "dose": "0.6–6 mg", "units": "Varies", "timing": "Same day each week", "freq": "Once weekly", "dur": "12–20 weeks"}, {"name": "Mazdutide", "cat": "fatloss", "purpose": "Fat Loss / Metabolic", "vial": "Research vial", "bac": "Per research protocol", "dose": "3–9 mg", "units": "Varies", "timing": "Same day each week", "freq": "Once weekly", "dur": "12–24 weeks"}, {"name": "Orforglipron", "cat": "fatloss", "purpose": "Fat Loss / Oral GLP-1", "vial": "Oral tablet", "bac": "N/A, oral", "dose": "12–45 mg", "units": "N/A", "timing": "Daily oral", "freq": "Daily oral", "dur": "Ongoing"}, {"name": "Tesofensine", "cat": "fatloss", "purpose": "Appetite Suppression / CNS", "vial": "Oral tablet", "bac": "N/A, oral", "dose": "0.25–0.5 mg", "units": "N/A", "timing": "Morning oral", "freq": "Daily oral", "dur": "12–24 weeks"}, {"name": "AICAR", "cat": "fatloss", "purpose": "Fat Oxidation / AMPK Activator", "vial": "50 mg", "bac": "1 ml sterile water", "dose": "10–50 mg", "units": "10–100", "timing": "Pre-exercise or AM", "freq": "Daily", "dur": "4–8 weeks"}, {"name": "5-Amino-1MQ", "cat": "fatloss", "purpose": "Fat Loss / NAD+ / NNMT Inhibitor", "vial": "10 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM", "freq": "5 days per week", "dur": "6–8 wks on, 6–8 wks off"}, {"name": "MOTS-C", "cat": "fatloss", "purpose": "Fat Loss / Energy / Mitochondrial", "vial": "10 mg", "bac": "2 ml", "dose": "1 mg", "units": "20", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Ipamorelin / CJC-1295 No DAC", "cat": "fatloss", "purpose": "Fat Loss / GH Stack", "vial": "5mg/5mg", "bac": "2 ml", "dose": "250mcg/250mcg", "units": "10", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "CJC-1295 No DAC", "cat": "fatloss", "purpose": "Longevity / Fat Loss / GH", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "10", "timing": "PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "BPC-157", "cat": "healing", "purpose": "Healing / Gut Repair", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM/PM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "TB-500", "cat": "healing", "purpose": "Healing / Systemic Repair", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "BPC-157 / TB-500 5mg/5mg Blend", "cat": "healing", "purpose": "Healing / Wolverine Stack", "vial": "5mg/5mg", "bac": "2 ml", "dose": "250mcg/250mcg", "units": "10", "timing": "AM/PM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "GHK-Cu", "cat": "healing", "purpose": "Healing / Collagen / Skin", "vial": "50 mg", "bac": "3 ml", "dose": "1.7 mg", "units": "10", "timing": "AM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "ARA-290", "cat": "healing", "purpose": "Healing / Neuropathy Pain", "vial": "15 mg", "bac": "1 ml", "dose": "1.5 mg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "KPV", "cat": "healing", "purpose": "Immunity / Anti-Inflammatory", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "SS-31", "cat": "healing", "purpose": "Longevity / Mitochondrial", "vial": "10 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "LL-37", "cat": "healing", "purpose": "Immunity / Antimicrobial / Wound", "vial": "5 mg", "bac": "2 ml", "dose": "125 mcg", "units": "5", "timing": "AM", "freq": "Every day", "dur": "50 days straight, 4 wks off"}, {"name": "PGPIPN", "cat": "healing", "purpose": "Anti-Inflammatory / Tissue Repair", "vial": "5 mg", "bac": "2 ml", "dose": "1–2 mg", "units": "20–40", "timing": "AM", "freq": "Daily", "dur": "6–8 weeks"}, {"name": "IGF-1 LR3", "cat": "muscle", "purpose": "Muscle Building / IGF-1", "vial": "1 mg", "bac": "1 ml", "dose": "50 mcg", "units": "5", "timing": "AM", "freq": "10 days in a row", "dur": "10 days on, 4 wks off"}, {"name": "IGF-1 DES", "cat": "muscle", "purpose": "Localized Muscle Growth", "vial": "1 mg", "bac": "1 ml", "dose": "20–50 mcg", "units": "2–5", "timing": "Post-workout near target", "freq": "Training days", "dur": "4–6 weeks"}, {"name": "Follistatin 344", "cat": "muscle", "purpose": "Muscle Building / Myostatin Inhibitor", "vial": "1 mg", "bac": "2 ml", "dose": "50 mcg", "units": "10", "timing": "30 min pre-workout (IM)", "freq": "Training days", "dur": "8 wks on, 8 wks off"}, {"name": "Follistatin 315", "cat": "muscle", "purpose": "Localized Muscle Support", "vial": "1 mg", "bac": "2 ml", "dose": "50 mcg", "units": "10", "timing": "Near target muscle SQ", "freq": "Daily", "dur": "10–30 days"}, {"name": "MGF", "cat": "muscle", "purpose": "Local Muscle Repair / Satellite Cell Activation", "vial": "2 mg", "bac": "2 ml", "dose": "200–400 mcg", "units": "20–40", "timing": "Immediately post-workout", "freq": "Post-workout 2–3×/week", "dur": "4–8 weeks"}, {"name": "PEG-MGF", "cat": "muscle", "purpose": "Systemic Muscle Repair", "vial": "5 mg", "bac": "2.5 ml", "dose": "200 mcg", "units": "10", "timing": "Post-workout", "freq": "2–3 days per week", "dur": "6–8 wks on, 8 wks off"}, {"name": "L-Carnitine", "cat": "muscle", "purpose": "Muscle / Energy", "vial": "600 mg/ml · 20 ml bottle", "bac": "N/A, pre-mixed", "dose": "200–600 mg", "units": "33–100", "timing": "AM", "freq": "Every day", "dur": "As needed"}, {"name": "Somatropin (HGH)", "cat": "gh", "purpose": "Direct GH / Muscle / Fat Loss", "vial": "10 IU or 15 IU", "bac": "1 ml per 10 IU", "dose": "1–4 IU", "units": "10–40", "timing": "AM or pre-bed", "freq": "Daily", "dur": "3–6 months minimum"}, {"name": "GHRP-2", "cat": "gh", "purpose": "Potent GH Release", "vial": "5 mg", "bac": "2 ml", "dose": "100–300 mcg", "units": "4–12", "timing": "Pre-bed, AM fasted, pre-workout", "freq": "2–3× daily", "dur": "8–12 weeks"}, {"name": "GHRP-6", "cat": "gh", "purpose": "GH Release / Appetite Stimulation", "vial": "5 mg", "bac": "2 ml", "dose": "100–300 mcg", "units": "4–12", "timing": "Pre-workout, AM, pre-bed", "freq": "2–3× daily", "dur": "8–12 weeks"}, {"name": "Hexarelin", "cat": "gh", "purpose": "Max GH Output / Cardioprotection", "vial": "2 mg", "bac": "2 ml", "dose": "100–200 mcg", "units": "10–20", "timing": "Pre-bed and AM fasted", "freq": "2× daily", "dur": "8–12 weeks"}, {"name": "MK-677", "cat": "gh", "purpose": "Oral GH Secretagogue / Sleep", "vial": "Oral, 10/25mg", "bac": "N/A, oral", "dose": "10–25 mg", "units": "N/A", "timing": "Evening with food", "freq": "Daily oral", "dur": "12–24 weeks"}, {"name": "Sermorelin", "cat": "gh", "purpose": "GH Stimulation / Anti-Aging", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "PM (before bed)", "freq": "Monday–Friday", "dur": "8 wks on, 8 wks off"}, {"name": "Semax or NA Semax Amidate", "cat": "cognition", "purpose": "Cognition / BDNF / Focus", "vial": "30 mg", "bac": "3 ml", "dose": "1 mg", "units": "10", "timing": "AM", "freq": "2–3 days per week", "dur": "8 wks on, 8 wks off"}, {"name": "Selank or NA Selank Amidate", "cat": "cognition", "purpose": "Cognition / Anxiety / GABA", "vial": "30 mg", "bac": "3 ml", "dose": "1 mg", "units": "10", "timing": "AM", "freq": "2–3 days per week", "dur": "8 wks on, 8 wks off"}, {"name": "PE-22-28", "cat": "cognition", "purpose": "Mood / Antidepressant", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM", "freq": "3–4× per week", "dur": "8 wks on, 8 wks off"}, {"name": "Dihexa", "cat": "cognition", "purpose": "Cognition / Memory / Synaptogenesis", "vial": "5 mg", "bac": "1–2 ml", "dose": "5–10 mcg/kg", "units": "Varies", "timing": "AM", "freq": "Once weekly", "dur": "4–6 wks"}, {"name": "P21", "cat": "cognition", "purpose": "Cognition / Neurogenesis / BDNF Mimetic", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM", "freq": "3–4× per week", "dur": "8 wks on, 8 wks off"}, {"name": "Cerebrolysin", "cat": "cognition", "purpose": "Brain Recovery / Neuroprotection", "vial": "10–30 mL", "bac": "N/A, pre-mixed", "dose": "10–30 mL", "units": "N/A", "timing": "AM IM or IV", "freq": "Daily during course", "dur": "10–20 day courses"}, {"name": "Adamax", "cat": "cognition", "purpose": "Enhanced Cognition (Semax Variant)", "vial": "30 mg", "bac": "3 ml", "dose": "300–600 mcg", "units": "3–6", "timing": "AM", "freq": "2–3 days per week", "dur": "10–14 day cycles"}, {"name": "DSIP", "cat": "sleep", "purpose": "Sleep Quality / Stress Recovery", "vial": "5 mg", "bac": "2 ml", "dose": "250 mcg", "units": "10", "timing": "1–3 hrs before bed", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Epitalon", "cat": "longevity", "purpose": "Longevity / Telomere / Circadian", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "PM", "freq": "Every day", "dur": "20 days in a row, 3× per year"}, {"name": "Thymalin or Thymogen", "cat": "longevity", "purpose": "Longevity / Thymus Anti-Aging", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "PM", "freq": "Every day", "dur": "20 days in a row, 3× per year"}, {"name": "FOXO4-DRI", "cat": "longevity", "purpose": "Longevity / Senolytic", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM/PM", "freq": "Once daily", "dur": "16 days on, 16 days off"}, {"name": "Humanin", "cat": "longevity", "purpose": "Neuroprotection / Mitochondrial Anti-Aging", "vial": "5 mg", "bac": "2 ml", "dose": "2–4 mg", "units": "20–40", "timing": "Any time SQ", "freq": "2–3× per week", "dur": "8–12 weeks"}, {"name": "NAD+", "cat": "energy", "purpose": "Longevity / Energy / DNA Repair", "vial": "500 mg", "bac": "2 ml", "dose": "100 mg", "units": "40", "timing": "AM", "freq": "2–3 days per week", "dur": "As needed"}, {"name": "Glutathione", "cat": "energy", "purpose": "Antioxidant / Detox / Recovery", "vial": "1,500 mg", "bac": "10–15 ml sterile water", "dose": "600–1,500 mg", "units": "Varies", "timing": "AM", "freq": "Weekly", "dur": "Ongoing"}, {"name": "Thymosin Alpha-1", "cat": "immunity", "purpose": "Immunity / T-Cell Support", "vial": "10 mg", "bac": "2 ml", "dose": "1.5 mg", "units": "30", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "VIP", "cat": "immunity", "purpose": "Immunity / Gut / Neuroprotection", "vial": "5 mg", "bac": "3 ml", "dose": "50 mcg", "units": "5", "timing": "AM/PM", "freq": "Every day", "dur": "8 wks on, 8 wks off"}, {"name": "Gonadorelin", "cat": "immunity", "purpose": "LH/FSH Stimulation / TRT Adjunct", "vial": "2 mg", "bac": "2 ml", "dose": "100–200 mcg", "units": "10–20", "timing": "Morning SQ", "freq": "2–3× per week", "dur": "Ongoing with TRT"}, {"name": "SLU-PP-332", "cat": "energy", "purpose": "Exercise Mimetic / ERRα / Endurance", "vial": "10 mg", "bac": "2 ml", "dose": "5–10 mg", "units": "10–20", "timing": "Morning", "freq": "Daily", "dur": "8–12 weeks"}, {"name": "PT-141", "cat": "sexual", "purpose": "Sexual Health / Libido / Desire", "vial": "5 mg", "bac": "2 ml", "dose": "500 mcg", "units": "10", "timing": "30 min before activity", "freq": "As needed", "dur": "As needed"}, {"name": "Melanotan 1", "cat": "sexual", "purpose": "Tanning / Selective MC1R", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "AM", "freq": "2 days per week", "dur": "8 wks on, 8 wks off"}, {"name": "Melanotan 2", "cat": "sexual", "purpose": "Tanning / Sexual / Libido", "vial": "10 mg", "bac": "2 ml", "dose": "250 mcg", "units": "5", "timing": "PM", "freq": "Daily loading → maint", "dur": "3–4 wks loading, then maint"}, {"name": "Kisspeptin", "cat": "sexual", "purpose": "Sexual Health / Hormonal Axis", "vial": "10 mg", "bac": "2 ml", "dose": "125 mcg", "units": "5", "timing": "1 hr before bed", "freq": "Every day", "dur": "30 days on, 30 days off"}, {"name": "Oxytocin", "cat": "sexual", "purpose": "Sexual Health / Bonding", "vial": "10 mg", "bac": "2 ml", "dose": "50 mcg", "units": "1", "timing": "AM", "freq": "As needed", "dur": "As needed"}, {"name": "Tadalafil (Cialis)", "cat": "sexual", "purpose": "Sexual Health / ED / Vascular", "vial": "Tabs 5/10/20mg", "bac": "N/A", "dose": "5mg daily or 10–20mg as needed", "units": "N/A", "timing": "As needed", "freq": "Daily or as needed", "dur": "Ongoing"}, {"name": "Enclomiphene", "cat": "sexual", "purpose": "Testosterone Restoration / Fertility", "vial": "Oral tablet", "bac": "N/A, oral", "dose": "12.5–25 mg", "units": "N/A", "timing": "Morning oral", "freq": "Daily oral", "dur": "3–6 months"}, {"name": "HCG", "cat": "sexual", "purpose": "Testosterone Support / Testicular Function", "vial": "5,000 IU", "bac": "2 ml", "dose": "250–500 IU", "units": "10–20", "timing": "AM", "freq": "2–3× per week", "dur": "As needed"}, {"name": "HMG", "cat": "hormones", "purpose": "Hormonal Support / FSH + LH", "vial": "75 IU", "bac": "0.5 ml", "dose": "75 IU", "units": "50", "timing": "AM", "freq": "3× per week", "dur": "As needed"}, {"name": "Triptorelin", "cat": "sexual", "purpose": "Hormonal Reset / GnRH", "vial": "100 mcg", "bac": "1 ml", "dose": "100 mcg single shot", "units": "10", "timing": "Per protocol", "freq": "Single dose for reset", "dur": "Single dose, per protocol"}, {"name": "Argireline", "cat": "skin", "purpose": "Wrinkle Reduction / Topical Botox-Like", "vial": "Topical serum 5–10%", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and/or PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Matrixyl", "cat": "skin", "purpose": "Collagen Synthesis / Anti-Aging", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Syn-Ake", "cat": "skin", "purpose": "Wrinkle Smoothing / NMJ Relaxant", "vial": "Topical 2–4%", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "PM or twice daily topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Syn-Coll", "cat": "skin", "purpose": "Collagen Stimulation / Elasticity", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "SNAP-8", "cat": "skin", "purpose": "Expression Wrinkle Reduction", "vial": "Topical serum 5–10%", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "PM or twice daily", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Rigin", "cat": "skin", "purpose": "Anti-Inflammaging / IL-6 Suppression", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Pal-GHK", "cat": "skin", "purpose": "Enhanced Collagen / Skin Repair", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Pal-AHK", "cat": "skin", "purpose": "Hair Follicle Stimulation", "vial": "Topical scalp serum", "bac": "N/A, topical", "dose": "Topical to scalp", "units": "N/A", "timing": "Post-shower", "freq": "Daily topical", "dur": "3–6 months"}, {"name": "AHK-Cu", "cat": "skin", "purpose": "Hair Growth / Follicle Health", "vial": "Topical scalp serum", "bac": "N/A, topical", "dose": "Topical to scalp", "units": "N/A", "timing": "Post-shower", "freq": "Daily topical", "dur": "3–6 months"}, {"name": "Nonapeptide-1", "cat": "skin", "purpose": "Skin Brightening / Melanin Inhibitor", "vial": "Topical 1–5%", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM + SPF AM", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Decapeptide-12", "cat": "skin", "purpose": "Hyperpigmentation / Dark Spots", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM + SPF", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Tripeptide-29", "cat": "skin", "purpose": "Collagen Signal / Skin Structure", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Palmitoyl Dipeptide-6", "cat": "skin", "purpose": "Retinol Alternative / Cell Renewal", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "PM (retinol-like protocol)", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Pentapeptide-18", "cat": "skin", "purpose": "Expression Line Reducer", "vial": "Topical eye serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "AM and PM topical", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "Vialox", "cat": "skin", "purpose": "Muscle Relaxation / Wrinkle Reduction", "vial": "Topical serum", "bac": "N/A, topical", "dose": "Topical application", "units": "N/A", "timing": "PM or twice daily", "freq": "Daily topical", "dur": "Ongoing"}, {"name": "HGH Fragment 176-191", "cat": "fatloss", "purpose": "Fat Loss / Lipolysis (HGH Frag)", "vial": "5 mg", "bac": "2 ml", "dose": "250–500 mcg", "units": "10–20", "timing": "AM fasted and/or pre-bed", "freq": "2× daily", "dur": "12–16 weeks"}, {"name": "GLOW Blend (GHK-Cu, BPC-157, TB-500)", "cat": "blend", "purpose": "Healing / Beauty", "vial": "50mg/10mg/10mg", "bac": "2 ml", "dose": "2.5mg/500mcg/500mcg", "units": "10", "timing": "AM or PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)", "cat": "blend", "purpose": "Healing / Recovery", "vial": "50mg/10mg/10mg/10mg", "bac": "2 ml", "dose": "2.5mg/500mcg/500mcg/500mcg", "units": "10", "timing": "AM or PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Triple Threat Blend (NAD+, MOTS-C, 5-Amino-1MQ)", "cat": "blend", "purpose": "Fat Loss / Energy", "vial": "100mg/10mg/10mg", "bac": "2 ml", "dose": "5mg/500mcg/500mcg", "units": "10", "timing": "AM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Tesamorelin / Ipamorelin Blend", "cat": "blend", "purpose": "Fat Loss / Muscle", "vial": "6mg/2mg", "bac": "2 ml", "dose": "300mcg/100mcg", "units": "10", "timing": "AM/PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Bronchogen", "cat": "bioregulator", "purpose": "Lung / Respiratory Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Cardiogen", "cat": "bioregulator", "purpose": "Heart / Cardiac Tissue Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Cartalax", "cat": "bioregulator", "purpose": "Joint / Cartilage / Bone", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Chonluten", "cat": "bioregulator", "purpose": "Respiratory / GI Epithelial", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Cortagen", "cat": "bioregulator", "purpose": "Brain Cortex / CNS Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Livagen", "cat": "bioregulator", "purpose": "Liver / Hepatocyte Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Ovagen", "cat": "bioregulator", "purpose": "Liver / Stomach / GI Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Pancragen", "cat": "bioregulator", "purpose": "Pancreas / Beta-Cell Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Pinealon", "cat": "bioregulator", "purpose": "Brain / Pineal / Circadian", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Prostamax", "cat": "bioregulator", "purpose": "Prostate Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Testagen", "cat": "bioregulator", "purpose": "Male Hormones / Testicular", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Thymagen", "cat": "bioregulator", "purpose": "Immune / Thymus Health", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Vesugen", "cat": "bioregulator", "purpose": "Blood Flow / Vascular Endothelial", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Vesilute", "cat": "bioregulator", "purpose": "Bladder / Prostate / Vascular", "vial": "20 mg", "bac": "2 ml", "dose": "2 mg", "units": "20", "timing": "AM/PM", "freq": "30 days in a row", "dur": "1 mo on, 2 mo off, 2–3× per year"}, {"name": "Vilon", "cat": "bioregulator", "purpose": "Thymus / Immune Longevity", "vial": "20 mg", "bac": "2 ml", "dose": "0.5–2 mg", "units": "N/A, 0.5–1 ml SubQ/IM", "timing": "AM/PM", "freq": "Daily", "dur": "8–12 wks on, 6 wks off"}, {"name": "Semaglutide 5mg (Bronze 1)", "cat": "fatloss", "purpose": "Fat Loss / GLP-1", "vial": "5 mg", "bac": "2 mL", "dose": "0.25mg weeks 1–2; 0.50mg weeks 3–4; 0.75mg weeks 5–6", "units": "10 / 20 / 30", "timing": "Bedtime recommended", "freq": "1× per week", "dur": "Increase slowly; do not exceed 2.5mg per injection"}, {"name": "Wolverine 2.0", "cat": "blend", "purpose": "Healing / Recovery + Joint (BPC-157, TB-500, Cartalax)", "vial": "20 mg", "bac": "2 ml", "dose": "1 mg", "units": "10", "timing": "AM or PM", "freq": "5 days on, 2 days off", "dur": "8 wks on, 8 wks off"}, {"name": "Testosterone", "cat": "hormones", "purpose": "Hormone Optimization / TRT", "vial": "250 mg/mL", "bac": "None, pre-mixed oil", "dose": "100–200 mg/week", "units": "N/A", "timing": "AM", "freq": "1–2× per week", "dur": "Ongoing"}, {"name": "Armodafinil", "cat": "cognition", "purpose": "Wakefulness / Focus (Prescription Eugeroic)", "vial": "Tabs 150 mg", "bac": "N/A", "dose": "150 mg (1 tablet)", "units": "N/A", "timing": "AM only", "freq": "As needed · max 2–3 days/week", "dur": "Short-term / as needed"}, {"name": "Bromantane", "cat": "cognition", "purpose": "Focus / Motivation / Fatigue (Dopamine Support)", "vial": "Tabs 100 mg", "bac": "N/A", "dose": "100 mg (1 tablet)", "units": "N/A", "timing": "AM only", "freq": "Off-days from Armodafinil", "dur": "2–4 weeks on, then a break"}];
 var CATL={"fatloss": "Fat Loss", "muscle": "Muscle", "gh": "Growth Hormone", "healing": "Healing", "longevity": "Longevity", "cognition": "Cognition", "sleep": "Sleep", "energy": "Energy / NAD+", "immunity": "Immunity", "sexual": "Sexual Health", "hormones": "Hormones", "skin": "Skin & Cosmetic", "blend": "Blend", "bioregulator": "Bioregulator"};
-var NOTES=[{"eb":"Note 01 — Storage & Handling","tt":"Keep Vials Cold And Water Clean","bd":"<p>Unmixed vials keep in the <strong>fridge</strong>. They can sit at room temperature in transit, then go cold once they arrive. After you add BAC water, the mixed vial stays in the <strong>refrigerator</strong>.</p><p>Reconstitute with <strong>bacteriostatic (BAC) water</strong> only &mdash; never tap or distilled. Wipe the stopper with alcohol before every draw, aim the water down the inside wall, and <strong>swirl gently &mdash; never shake</strong>.</p>"},{"eb":"Note 02 — Technique","tt":"Experienced Injector, New To Most Peptides","bd":"<p>You already inject. These are <strong>subcutaneous</strong> shots into the fat under the skin, usually the lower belly a couple of inches off the navel, or the side of the thigh. Pinch, insert, push slow.</p><p><strong>Rotate the site every time</strong> and use a <strong>fresh pin</strong> each injection. <strong>NAD+</strong> is the only peptide you have run before. Add the others <strong>one at a time</strong>, several days apart.</p>"},{"eb":"Note 03 — Alcohol","tt":"3–7 Drinks A Week","bd":"<p>Alcohol at <strong>3&ndash;7 drinks a week</strong> works against recovery, sleep, and fat loss, and it loads the liver. Reducing it will help this protocol.</p>"},{"eb":"Note 04 — No Current Physician","tt":"Get A Bloodwork Baseline","bd":"<p>You are not under a physician right now. Draw a <strong>baseline panel</strong> before or early in this protocol and review it with a prescriber.</p>"},{"eb":"Note 05 — How The Courses Run","tt":"Consecutive Days, And Mon–Fri For Ipamorelin","bd":"<p><strong>Cortagen, Cerebrolysin, Epithalon, and Pinealon</strong> run on consecutive days (about 20 days straight, then rest). <strong>FOXO4-DRI</strong> is every other day. <strong>CJC-1295/Ipamorelin</strong> is <strong>Mon&ndash;Fri only</strong>.</p>"}];
+var NOTES=[{"eb":"Note 01, Storage & Handling","tt":"Keep Vials Cold And Water Clean","bd":"<p>Unmixed vials keep in the <strong>fridge</strong>. They can sit at room temperature in transit, then go cold once they arrive. After you add BAC water, the mixed vial stays in the <strong>refrigerator</strong>.</p><p>Reconstitute with <strong>bacteriostatic (BAC) water</strong> only, never tap or distilled. Wipe the stopper with alcohol before every draw, aim the water down the inside wall, and <strong>swirl gently, never shake</strong>.</p>"},{"eb":"Note 02, Technique","tt":"Experienced Injector, New To Most Peptides","bd":"<p>You already inject. These are <strong>subcutaneous</strong> shots into the fat under the skin, usually the lower belly a couple of inches off the navel, or the side of the thigh. Pinch, insert, push slow.</p><p><strong>Rotate the site every time</strong> and use a <strong>fresh pin</strong> each injection. <strong>NAD+</strong> is the only peptide you have run before. Add the others <strong>one at a time</strong>, several days apart.</p>"},{"eb":"Note 03, Alcohol","tt":"3–7 Drinks A Week","bd":"<p>Alcohol at <strong>3&ndash;7 drinks a week</strong> works against recovery, sleep, and fat loss, and it loads the liver. Reducing it will help this protocol.</p>"},{"eb":"Note 04, No Current Physician","tt":"Get A Bloodwork Baseline","bd":"<p>You are not under a physician right now. Draw a <strong>baseline panel</strong> before or early in this protocol and review it with a prescriber.</p>"},{"eb":"Note 05, How The Courses Run","tt":"Consecutive Days, And Mon–Fri For Ipamorelin","bd":"<p><strong>Cortagen, Cerebrolysin, Epithalon, and Pinealon</strong> run on consecutive days (about 20 days straight, then rest). <strong>FOXO4-DRI</strong> is every other day. <strong>CJC-1295/Ipamorelin</strong> is <strong>Mon&ndash;Fri only</strong>.</p>"}];
 var MINE=[{"name":"Retatrutide","cat":"mine","purpose":"Cycle 1","vial":"30 mg","bac":"3 mL BAC water","dose":"0.5 mg","units":"5"},{"name":"Tesamorelin","cat":"mine","purpose":"Cycle 1","vial":"20 mg","bac":"2 mL BAC water","dose":"1 mg","units":"10"},{"name":"MOTS-c","cat":"mine","purpose":"Cycle 1","vial":"40 mg","bac":"3 mL BAC water","dose":"~1.33 mg","units":"10"},{"name":"NAD+","cat":"mine","purpose":"Cycle 1","vial":"1000 mg","bac":"5 mL BAC water","dose":"50 mg","units":"25"},{"name":"CJC-1295 / Ipamorelin","cat":"mine","purpose":"Cycle 2","vial":"5+5 mg","bac":"2 mL BAC water","dose":"250 mcg","units":"10"},{"name":"IGF-1 LR3","cat":"mine","purpose":"Cycle 2","vial":"1 mg","bac":"1 mL BAC water","dose":"50 mcg","units":"5"},{"name":"KLOW","cat":"mine","purpose":"Cycle 2","vial":"80 mg","bac":"3 mL BAC water","dose":"4 mg","units":"15"},{"name":"AOD-9604","cat":"mine","purpose":"Cycle 2","vial":"5 mg","bac":"2 mL BAC water","dose":"250 mcg","units":"10"},{"name":"5-Amino-1MQ","cat":"mine","purpose":"Cycle 2","vial":"50 mg","bac":"3 mL BAC water","dose":"~1.67 mg","units":"10"},{"name":"BPC-157 / TB-500","cat":"mine","purpose":"Cycle 3","vial":"10 mg","bac":"2 mL BAC water","dose":"1 mg","units":"20"},{"name":"Cartalax","cat":"mine","purpose":"Cycle 3","vial":"20 mg","bac":"2 mL BAC water","dose":"1 mg","units":"10"},{"name":"KPV","cat":"mine","purpose":"Cycle 3","vial":"10 mg","bac":"2 mL BAC water","dose":"500 mcg","units":"10"},{"name":"GHK-Cu","cat":"mine","purpose":"Cycle 3","vial":"50 mg","bac":"3 mL BAC water","dose":"1.67 mg","units":"10"},{"name":"Cortagen","cat":"mine","purpose":"Cycle 4","vial":"20 mg","bac":"2 mL BAC water","dose":"2 mg","units":"20"},{"name":"FOXO4-DRI","cat":"mine","purpose":"Cycle 4","vial":"10 mg","bac":"2 mL BAC water","dose":"3 mg","units":"60"},{"name":"Glutathione","cat":"mine","purpose":"Cycle 4","vial":"1500 mg","bac":"5 mL BAC water","dose":"150 mg","units":"50"},{"name":"Cerebrolysin","cat":"mine","purpose":"Cycle 4","vial":"60 mg","bac":"2 mL BAC water","dose":"6 mg","units":"20"},{"name":"DSIP","cat":"mine","purpose":"Cycle 5","vial":"10 mg","bac":"2 mL BAC water","dose":"500 mcg","units":"10"},{"name":"Epithalon","cat":"mine","purpose":"Cycle 5","vial":"50 mg","bac":"3 mL BAC water","dose":"~2.5 mg","units":"15"},{"name":"Pinealon","cat":"mine","purpose":"Cycle 5","vial":"10 mg","bac":"1 mL BAC water","dose":"2 mg","units":"20"},{"name":"N-Acetyl Selank Amidate","cat":"mine","purpose":"Cycle 5","vial":"30 mg","bac":"3 mL BAC water","dose":"1 mg","units":"10"}];
 var ALL=[{"n":"Retatrutide · 30 mg","b":"AM","cad":"MON","c":"Mon","d":"0.5 mg","u":"5u","rec":"3 mL BAC water","site":"SubQ","about":"30 mg in 3 mL is 10 mg/mL, so a 5u draw is 0.5 mg. Start at 0.5 mg and titrate up slowly.","tag":"Cycle 1","days":[1]},{"n":"Tesamorelin · 20 mg","b":"PM","cad":"MF","c":"Mon–Fri","d":"1 mg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"20 mg in 2 mL is 10 mg/mL, so a 10u draw is 1 mg.","tag":"Cycle 1","days":[1,2,3,4,5]},{"n":"MOTS-c · 40 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~1.33 mg","u":"10u","rec":"3 mL BAC water","site":"SubQ","about":"40 mg in 3 mL is 13.3 mg/mL, so a 10u draw is about 1.33 mg.","tag":"Cycle 1","days":[1,3,5]},{"n":"NAD+ · 1000 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"50 mg","u":"25u","rec":"5 mL BAC water","site":"SubQ","about":"1000 mg in 5 mL is 200 mg/mL, so a 25u draw is 50 mg.","tag":"Cycle 1","days":[1,3,5]},{"n":"CJC-1295 / Ipamorelin · 5+5 mg","b":"PM","cad":"MF","c":"Mon–Fri","d":"250 / 250 mcg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"5+5 mg in 2 mL. A 10u draw is 250 mcg of each (500 mcg total). Mon–Fri only.","tag":"Cycle 2","days":[1,2,3,4,5]},{"n":"IGF-1 LR3 · 1 mg","b":"PM","cad":"MF","c":"Mon–Fri · post-workout","d":"50 mcg","u":"5u","rec":"1 mL BAC water","site":"SubQ","about":"1 mg in 1 mL is 1000 mcg/mL, so a 5u draw is 50 mcg.","tag":"Cycle 2","days":[1,2,3,4,5]},{"n":"KLOW · 80 mg","b":"PM","cad":"MWF","c":"Mon / Wed / Fri","d":"4 mg","u":"15u","rec":"3 mL BAC water","site":"SubQ","about":"80 mg in 3 mL is 26.7 mg/mL, so a 15u draw is 4 mg.","tag":"Cycle 2","days":[1,3,5]},{"n":"AOD-9604 · 5 mg","b":"AM","cad":"MF","c":"Mon–Fri","d":"250 mcg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"5 mg in 2 mL is 2.5 mg/mL, so a 10u draw is 250 mcg.","tag":"Cycle 2","days":[1,2,3,4,5]},{"n":"5-Amino-1MQ · 50 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~1.67 mg","u":"10u","rec":"3 mL BAC water","site":"SubQ","about":"50 mg in 3 mL is 16.7 mg/mL, so a 10u draw is about 1.67 mg.","tag":"Cycle 2","days":[1,3,5]},{"n":"BPC-157 + TB-500 · 10 mg","b":"PM","cad":"MWF","c":"Mon / Wed / Fri","d":"1 mg","u":"20u","rec":"2 mL BAC water","site":"SubQ","about":"10 mg in 2 mL is 5 mg/mL, so a 20u draw is 1 mg.","tag":"Cycle 3","days":[1,3,5]},{"n":"Cartalax · 20 mg","b":"PM","cad":"DAILY","c":"Daily","d":"1 mg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"20 mg in 2 mL is 10 mg/mL, so a 10u draw is 1 mg. Consecutive days.","tag":"Cycle 3","days":[0,1,2,3,4,5,6]},{"n":"KPV · 10 mg","b":"AM","cad":"DAILY","c":"Daily","d":"500 mcg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"10 mg in 2 mL is 5 mg/mL, so a 10u draw is 500 mcg.","tag":"Cycle 3","days":[0,1,2,3,4,5,6]},{"n":"GHK-Cu · 50 mg","b":"AM","cad":"DAILY","c":"Daily","d":"~1.7 mg","u":"10u","rec":"3 mL BAC water","site":"SubQ","about":"50 mg in 3 mL is 16.7 mg/mL, so a 10u draw is about 1.7 mg.","tag":"Cycle 3","days":[0,1,2,3,4,5,6]},{"n":"Cortagen · 20 mg","b":"AM","cad":"DAILY","c":"Daily","d":"2 mg","u":"20u","rec":"2 mL BAC water","site":"SubQ","about":"20 mg in 2 mL is 10 mg/mL, so a 20u draw is 2 mg. Run straight.","tag":"Cycle 4","days":[0,1,2,3,4,5,6]},{"n":"FOXO4-DRI · 10 mg","b":"AM","cad":"EOD","c":"Every other day","d":"3 mg","u":"60u","rec":"2 mL BAC water","site":"SubQ","about":"10 mg in 2 mL is 5 mg/mL, so a 60u draw is 3 mg. Every other day.","tag":"Cycle 4","days":[1,3,5]},{"n":"Glutathione · 1500 mg","b":"AM","cad":"WK","c":"Weekly · Mon","d":"150 mg","u":"50u","rec":"5 mL BAC water","site":"SubQ","about":"1500 mg in 5 mL is 300 mg/mL, so a 50u draw is 150 mg.","tag":"Cycle 4","days":[1]},{"n":"Cerebrolysin · 60 mg","b":"AM","cad":"DAILY","c":"Daily","d":"6 mg","u":"20u","rec":"2 mL BAC water","site":"SubQ","about":"60 mg in 2 mL is 30 mg/mL, so a 20u draw is 6 mg. Run straight.","tag":"Cycle 4","days":[0,1,2,3,4,5,6]},{"n":"DSIP · 10 mg","b":"PM","cad":"MF","c":"Mon–Fri","d":"500 mcg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"10 mg in 2 mL is 5 mg/mL, so a 10u draw is 500 mcg. Take 1–3 hours before bed.","tag":"Cycle 5","days":[1,2,3,4,5]},{"n":"Epithalon · 50 mg","b":"PM","cad":"DAILY","c":"Daily","d":"~2.5 mg","u":"15u","rec":"3 mL BAC water","site":"SubQ","about":"50 mg in 3 mL is 16.7 mg/mL, so a 15u draw is about 2.5 mg. Run straight.","tag":"Cycle 5","days":[0,1,2,3,4,5,6]},{"n":"Pinealon · 10 mg","b":"PM","cad":"DAILY","c":"Daily","d":"2 mg","u":"20u","rec":"1 mL BAC water","site":"SubQ","about":"10 mg in 1 mL is 10 mg/mL, so a 20u draw is 2 mg. Run straight.","tag":"Cycle 5","days":[0,1,2,3,4,5,6]},{"n":"N-Acetyl Selank Amidate · 30 mg","b":"PM","cad":"MWF","c":"Mon / Wed / Fri","d":"1 mg","u":"10u","rec":"3 mL BAC water","site":"SubQ","about":"30 mg in 3 mL is 10 mg/mL, so a 10u draw is 1 mg.","tag":"Cycle 5","days":[1,3,5]}];
-var LABS=null;
+var LABS={"sub":"Sample panel · CMP, lipids, HbA1c, CBC, thyroid and hormones · 10/04/2026","l":"Overall Score","score":"84","outof":"/100","g":"Solid baseline, 3 things to watch","c":"Kidneys, liver, thyroid and blood count look good. Watch: fasting glucose and HbA1c at the high end, triglycerides a little high, and vitamin D low.","domains":[{"v":"B","n":"Blood sugar"},{"v":"B-","n":"Lipids"},{"v":"A","n":"Liver"},{"v":"A","n":"Kidney"},{"v":"A-","n":"Thyroid"},{"v":"A","n":"Blood count"},{"v":"B","n":"Hormones"},{"v":"C","n":"Vitamins"}],"bannerattr":"","banner":"Sample results for the demo. Tap any marker for what it means in plain language. Grades are an educational review, not a diagnosis.","secs":[{"t":"Blood Sugar · Grade B","rows":[{"id":"lb0","n":"Glucose (fasting)","vc":"hi","v":"98","u":"mg/dL","ref":"70–99","pc":"hi","p":"High normal","tip":"<strong>Glucose (fasting).</strong> At the top of normal. Losing body fat and walking after meals usually brings this down."},{"id":"lb1","n":"HbA1c","vc":"hi","v":"5.6","u":"%","ref":"4.8–5.6","pc":"hi","p":"High normal","tip":"<strong>HbA1c.</strong> Your 3-month blood sugar average. Right at the line, so worth rechecking in 3 months."}]},{"t":"Lipids · Grade B-","rows":[{"id":"lb2","n":"Total Cholesterol","vc":"ok","v":"192","u":"mg/dL","ref":"100–199","pc":"ok","p":"In range","tip":"<strong>Total Cholesterol.</strong> In range."},{"id":"lb3","n":"LDL","vc":"hi","v":"118","u":"mg/dL","ref":"0–99","pc":"hi","p":"Slightly high","tip":"<strong>LDL.</strong> A bit above the target. Fiber, fish and weight loss all help."},{"id":"lb4","n":"HDL","vc":"ok","v":"44","u":"mg/dL","ref":"40+","pc":"ok","p":"In range","tip":"<strong>HDL.</strong> The protective kind. Training tends to raise it."},{"id":"lb5","n":"Triglycerides","vc":"hi","v":"168","u":"mg/dL","ref":"0–149","pc":"hi","p":"High","tip":"<strong>Triglycerides.</strong> Above range. Usually tracks with carbs, alcohol and body fat, and drops fast with fat loss."}]},{"t":"Liver · Grade A","rows":[{"id":"lb6","n":"ALT","vc":"ok","v":"28","u":"U/L","ref":"0–44","pc":"ok","p":"Optimal","tip":"<strong>ALT.</strong> Liver enzyme in a healthy range."},{"id":"lb7","n":"AST","vc":"ok","v":"24","u":"U/L","ref":"0–40","pc":"ok","p":"Optimal","tip":"<strong>AST.</strong> Healthy."}]},{"t":"Kidney · Grade A","rows":[{"id":"lb8","n":"Creatinine","vc":"ok","v":"1.05","u":"mg/dL","ref":"0.76–1.27","pc":"ok","p":"In range","tip":"<strong>Creatinine.</strong> Normal kidney filtering for your size."},{"id":"lb9","n":"eGFR","vc":"ok","v":"92","u":"mL/min","ref":"59+","pc":"ok","p":"Optimal","tip":"<strong>eGFR.</strong> Healthy filtering rate."}]},{"t":"Thyroid · Grade A-","rows":[{"id":"lb10","n":"TSH","vc":"ok","v":"2.1","u":"uIU/mL","ref":"0.45–4.5","pc":"ok","p":"In range","tip":"<strong>TSH.</strong> Thyroid signal is normal."}]},{"t":"Blood Count · Grade A","rows":[{"id":"lb11","n":"Hemoglobin","vc":"ok","v":"15.2","u":"g/dL","ref":"13–17.7","pc":"ok","p":"In range","tip":"<strong>Hemoglobin.</strong> Normal oxygen-carrying capacity."},{"id":"lb12","n":"Hematocrit","vc":"ok","v":"45","u":"%","ref":"37.5–51","pc":"ok","p":"In range","tip":"<strong>Hematocrit.</strong> Normal blood thickness."}]},{"t":"Hormones · Grade B","rows":[{"id":"lb13","n":"Total Testosterone","vc":"ok","v":"486","u":"ng/dL","ref":"264–916","pc":"ok","p":"In range","tip":"<strong>Total Testosterone.</strong> Mid range. Sleep, fat loss and lifting tend to support it."},{"id":"lb14","n":"IGF-1","vc":"ok","v":"162","u":"ng/mL","ref":"83–233","pc":"ok","p":"In range","tip":"<strong>IGF-1.</strong> A marker of growth hormone activity. Useful as a baseline before GH-axis compounds."}]},{"t":"Vitamins · Grade C","rows":[{"id":"lb15","n":"Vitamin D","vc":"lo","v":"24","u":"ng/mL","ref":"30–100","pc":"lo","p":"Low","tip":"<strong>Vitamin D.</strong> Below range. Common in winter. Ask your physician about supplementing and recheck."}]}],"note":"Sample data for the demo page. Review real results with your physician."};
 var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var sel=new Date().getDay();
@@ -1873,7 +1914,7 @@ function payCopyFallback(text,done){
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
 (function(){var h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Demo';
+  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Alex';
   renderSubline();})();
 
 function renderDue(){
@@ -1905,7 +1946,7 @@ function renderDoses(){
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
-      ' is clear — the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
+      ' is clear, the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
     document.getElementById('dosenote').textContent='';return;
   }
   var h='', total=0;
@@ -2366,19 +2407,19 @@ function money(n){return (n<0?'-$':'$')+Math.abs(n).toLocaleString(undefined,{mi
 var SUPPLY=[
   {g:'Injecting', n:'Insulin Syringes', d:'29–31 gauge, 1 mL. Sterile single-use, for the subcutaneous shots.',
    m:'100-pack · about $18', u:'https://a.co/d/04JCzBqF', t:'Amazon'},
-  {g:'Injecting', n:'23G 1 mL Luer-Lock Syringes', d:'For drawing the testosterone only — the oil is too thick to pull through an insulin needle. Draw with this, then swap to the insulin syringe to inject.',
+  {g:'Injecting', n:'23G 1 mL Luer-Lock Syringes', d:'For drawing the testosterone only, the oil is too thick to pull through an insulin needle. Draw with this, then swap to the insulin syringe to inject.',
    m:'draw needle', u:'https://amazon.com/dp/B0F26CGRQC', t:'Amazon', need:'testosterone',
    why:'On your protocol because you run testosterone.'},
   {g:'Injecting', n:'3 mL Luer-Lock + 25G × 1.5″ Needle', d:'For the intramuscular L-Carnitine shots. Get 50+ to cover a full cycle with buffer.',
    m:'IM needle', u:'https://www.amazon.com/Industrial-Scientific-Accessories-Refilling-Individually/dp/B0F4VDCJ89/', t:'Amazon',
    need:'carnitine', why:'On your protocol because you run L-Carnitine IM.'},
-  {g:'Mixing', n:'Bacteriostatic Water — 3 mL', d:'Sterile water with a preservative. This is what you mix the dry peptide powder with.',
+  {g:'Mixing', n:'Bacteriostatic Water, 3 mL', d:'Sterile water with a preservative. This is what you mix the dry peptide powder with.',
    m:'3 mL · about $4', u:'https://ebac-water.com/', t:'eBAC Water'},
-  {g:'Mixing', n:'Bacteriostatic Water — 10 mL', d:'The larger bottle. Worth it if several compounds are running at once.',
+  {g:'Mixing', n:'Bacteriostatic Water, 10 mL', d:'The larger bottle. Worth it if several compounds are running at once.',
    m:'10 mL · about $6', u:'https://ebac-water.com/', t:'eBAC Water'},
   {g:'Hygiene & disposal', n:'Alcohol Prep Pads', d:'70% isopropyl. Wipe the vial stopper and the injection site before every shot.',
    m:'200-pack · about $7', u:'https://a.co/d/0fnbd8VV', t:'Amazon'},
-  {g:'Hygiene & disposal', n:'Sharps Container', d:'FDA-cleared, puncture-proof. Used needles go straight in — never in household rubbish.',
+  {g:'Hygiene & disposal', n:'Sharps Container', d:'FDA-cleared, puncture-proof. Used needles go straight in, never in household rubbish.',
    m:'1 quart · about $8', u:'https://a.co/d/0jhnMLPg', t:'Amazon'},
   {g:'Storage', n:'Mini Fridge', d:'Reconstituted peptides live in the fridge. A small dedicated one keeps them at a steady temperature and out of the kitchen door shelf.',
    m:'countertop', u:'https://a.co/d/08MT0BDi', t:'Amazon'},
@@ -2433,7 +2474,7 @@ function renderPay(){
     '</div><div class="o">'+dueO.map(function(o){return o.label}).join(', ')+
     '</div><div class="np">'+dueO.length+' quoted order'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
-    payButtons(dueT,'BioLinked \u2014 quoted')+'</div>')
+    payButtons(dueT,'BioLinked, quoted')+'</div>')
     : ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(0)+
        '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>');
   list.innerHTML=INV.map(function(o,i){
@@ -2446,7 +2487,7 @@ function renderPay(){
       '<div class="irow tot"><span class="in">'+(o.status==='due'?'Quoted':(o.status==='free'?'No charge':'Paid in full'))+
       '</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o)+'</div>';
   }).join('');
-  note.textContent='Tap an order for its full breakdown. Figures are copied from your protocol page — nothing is charged in the app.';
+  note.textContent='Tap an order for its full breakdown. Figures are copied from your protocol page, nothing is charged in the app.';
 }
 function openInv(i){
   var o=INV[i]; if(!o) return;
@@ -2459,7 +2500,7 @@ function openInv(i){
   }).join('')+'<div class="irow tot"><span class="in">Order total</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o);
   var pay=document.getElementById('i-pay');
   pay.innerHTML = o.status==='due'
-    ? payButtons(o.total,'BioLinked \u2014 '+o.label.split(' \u00b7 ')[0])
+    ? payButtons(o.total,'BioLinked, '+o.label.split(' \u00b7 ')[0])
     : '';
   sheet('inv');
 }
@@ -2584,7 +2625,7 @@ function openInv(i){
     var msgs = [];
     if(!(num(bacEl.value, 0) > 0)) msgs.push('Enter a BAC water volume to get a concentration.');
     if(curU >= maxU - 0.01 && doseV > 0 && c > 0 && (doseV / c) * 100 > maxU)
-      msgs.push('That dose needs ' + fmt((doseV / c) * 100, 1) + ' units &mdash; more than this syringe holds. Use a larger syringe or more BAC water.');
+      msgs.push('That dose needs ' + fmt((doseV / c) * 100, 1) + ' units, more than this syringe holds. Use a larger syringe or more BAC water.');
     var wEl = el('pc-warn');
     if(msgs.length){ wEl.innerHTML = msgs.join('<br>'); wEl.hidden = false; } else { wEl.hidden = true; }
   }
@@ -2672,7 +2713,7 @@ function openInv(i){
       if(v && v.u && v.u !== unit && v.u !== 'ml'){
         if(v.u === 'mg'  && unit === 'mcg') vialN = v.n * 1000;
         else if(v.u === 'mcg' && unit === 'mg') vialN = v.n / 1000;
-        else if(v.u !== unit) unit = v.u;        /* IU vs mass — trust the vial */
+        else if(v.u !== unit) unit = v.u;        /* IU vs mass, trust the vial */
       }
       return {name:d.name, cat:d.cat||'', purpose:d.purpose||'', label:vialLabel(d.vial),
               vial:vialN, vialU:(v?v.u:''), bac:(b?b.n:null),
@@ -2683,7 +2724,7 @@ function openInv(i){
 
   function optText(c){
     var n = c.name.replace(/[<>&]/g,'');
-    return c.label ? (n + ' \u2014 ' + c.label) : n;
+    return c.label ? (n + ', ' + c.label) : n;
   }
 
   function fillCompoundSelect(){
@@ -2691,7 +2732,7 @@ function openInv(i){
     var order = lib.map(function(c,i){ return i; }).sort(function(a,b){
       return lib[a].name.localeCompare(lib[b].name, undefined, {numeric:true, sensitivity:'base'});
     });
-    var html = '<option value="__custom__">Custom &mdash; enter my own</option>';
+    var html = '<option value="__custom__">Custom, enter my own</option>';
     order.forEach(function(i){
       html += '<option value="' + i + '">' + optText(lib[i]) + '</option>';
     });
@@ -2727,10 +2768,10 @@ function openInv(i){
     if(c.dose == null) gaps.push('dose');
     if(gaps.length){
       srcNote.innerHTML = 'No ' + gaps.join(' or ') + ' on file for ' + c.name.replace(/[<>&]/g,'') +
-        ' &mdash; enter it manually.' + (c.rawDose ? ' Index lists: ' + String(c.rawDose).replace(/[<>&]/g,'') + '.' : '');
+        ', enter it manually.' + (c.rawDose ? ' Index lists: ' + String(c.rawDose).replace(/[<>&]/g,'') + '.' : '');
       srcNote.hidden = false;
     } else if(/[-–]/.test(String(c.rawDose||''))){
-      srcNote.innerHTML = 'Index lists a range (' + String(c.rawDose).replace(/[<>&]/g,'') + ') &mdash; filled at the low end.';
+      srcNote.innerHTML = 'Index lists a range (' + String(c.rawDose).replace(/[<>&]/g,'') + '), filled at the low end.';
       srcNote.hidden = false;
     } else { srcNote.hidden = true; }
     fromDose();
@@ -4106,7 +4147,7 @@ function nutRender(){
   if(m.dietOverrides){
     slider.disabled=true; fatRow.classList.add('is-off');
     note.hidden=false;
-    note.textContent=(NUT_CFG.DIET_LABELS[st.diet]||st.diet)+' sets the macro split \u2014 '+
+    note.textContent=(NUT_CFG.DIET_LABELS[st.diet]||st.diet)+' sets the macro split, '+
       Math.round(m.cPct)+'% carbs, '+Math.round(m.fPct)+'% fat.';
     nutEl('nut-fat-val').textContent=Math.round(m.fPct)+'%';
   } else {
@@ -4135,13 +4176,13 @@ function nutRender(){
   if(mealsCap){
     var capped = mx < 6;
     mealsCap.hidden = !capped;
-    if(capped) mealsCap.textContent = nutWindow(st).label+' caps this at '+mx+' meal'+(mx>1?'s':'')+' a day \u2014 widen the eating window for more.';
+    if(capped) mealsCap.textContent = nutWindow(st).label+' caps this at '+mx+' meal'+(mx>1?'s':'')+' a day, widen the eating window for more.';
   }
   nutEl('nut-win-custom').hidden = (st.window!=='custom');
   var wn=nutWindow(st);
   nutEl('nut-win-note').textContent = st.window==='none'
-    ? 'No fasting window \u2014 meals spread across the day.'
-    : wn.label+' \u2014 eat between '+nutFmtTime(wn.start)+' and '+nutFmtTime(wn.end)+
+    ? 'No fasting window, meals spread across the day.'
+    : wn.label+', eat between '+nutFmtTime(wn.start)+' and '+nutFmtTime(wn.end)+
       ' \u00b7 up to '+wn.maxMeals+' meal'+(wn.maxMeals>1?'s':'')+'.';
   nutEl('nut-cal').textContent=nutFmt(m.cal);
   nutEl('nut-cal-sub').textContent='BMR '+nutFmt(m.bmr)+'  |  TDEE '+nutFmt(m.tdee)+
@@ -4185,7 +4226,7 @@ function nutRenderPlan(plan, mountId){
   if(plan.thin && plan.thin.length){
     var names={pro:'protein',carb:'carb',fat:'fat',veg:'vegetable',fruit:'fruit'};
     pre+='<div class="nut-note warn">Limited '+plan.thin.map(function(k){return names[k]||k;}).join(' and ')+
-         ' sources with these exclusions \u2014 plan may run under target.</div>';
+         ' sources with these exclusions, plan may run under target.</div>';
   }
   h=pre+h;
   var t=plan.total, g=plan.target;
@@ -4552,7 +4593,7 @@ else nutInit();
     var h = '<table class="mk-tbl"><thead><tr><th>Draw</th><th class="r">Value</th>'
           + '<th class="r">Change</th></tr></thead><tbody>';
     pts.forEach(function(p,i){
-      var prev = i ? pts[i-1].v : null, cell = '&mdash;';
+      var prev = i ? pts[i-1].v : null, cell = ', ';
       if(prev !== null){
         var dv = p.v - prev;
         var cls = Math.abs(dv) < 1e-9 ? 'mk-flat' : (dv > 0 ? 'mk-up' : 'mk-dn');
@@ -4662,7 +4703,7 @@ else nutInit();
     row.setAttribute('role','button');
     row.setAttribute('tabindex','0');
     var nm = row.querySelector('.lab-name');
-    row.setAttribute('aria-label', (nm ? nm.textContent.trim() : 'Marker') + ' — open details');
+    row.setAttribute('aria-label', (nm ? nm.textContent.trim() : 'Marker') + ', open details');
     row.addEventListener('click', function(){ open(row); });
     row.addEventListener('keydown', function(e){
       if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(row); }
@@ -4782,6 +4823,7 @@ var csVer={}, csTimer={}, csWant={}, csBooted=false, csInFlight={};
 var csApplying=false;
 
 function csRpc(fn,body){
+  if(window.BL_DEMO) return Promise.resolve(fn==='get_state'?{status:200,body:[]}:/_get$/.test(fn)?{status:200,body:{}}:{status:200,body:1});
   try{
     return fetch(CS_URL+fn,{
       method:'POST',
@@ -5067,7 +5109,7 @@ function lastFor(ex,n){
   if(!all.length) return null; var sid=all[0].data.sid; return all.filter(function(r){return r.data.sid===sid&&r.data.n===n;})[0]||all[0];
 }
 function prs(){ var m={}; Object.keys(S.sets).forEach(function(k){ var d=S.sets[k].data; if(!d.done) return; var e=EXM[d.ex]; if(!e) return;
-  var v=e.bw?d.r:d.w; if(!m[d.ex]||v>m[d.ex].v) m[d.ex]={v:v,bw:e.bw,r:d.r}; }); return m; }
+  var v=e.bw?d.r:d.w; if(!m[d.ex]||v>m[d.ex].v) m[d.ex]={v:v,bw:e.bw,r:d.r,at:d.at}; }); return m; }
 function wkStart(d){ d=new Date(d); var g=(d.getDay()+6)%7; d.setHours(0,0,0,0); d.setDate(d.getDate()-g); return d.getTime(); }
 function streak(){
   var per=(S.profile&&+S.profile.data.days)||3, need=Math.max(1,per-1), c={};
@@ -5119,6 +5161,37 @@ function quiz(){
   h+='<p class="wk-note">Check with a professional before starting a new exercise program. Stop if anything hurts.</p>';
   return h;
 }
+/* progress chart: top working weight per session for the most-logged loaded lift */
+function chart(){
+  var cnt={}; Object.keys(S.sets).forEach(function(k){ var d=S.sets[k].data; if(d.done&&+d.w>0) cnt[d.ex]=(cnt[d.ex]||0)+1; });
+  var ex=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];})[0]; if(!ex||!EXM[ex]) return '';
+  var by={}; Object.keys(S.sets).forEach(function(k){ var d=S.sets[k].data; if(d.ex!==ex||!d.done) return; var s=S.sessions[d.sid]; var t=s&&s.data.fin?s.data.fin:d.at; if(!by[d.sid]||+d.w>by[d.sid].w) by[d.sid]={w:+d.w,t:t}; });
+  var pts=Object.keys(by).map(function(k){return by[k];}).sort(function(a,b){return a.t<b.t?-1:1;}).slice(-8); if(pts.length<2) return '';
+  var lo=Math.min.apply(null,pts.map(function(p){return p.w;})), hi=Math.max.apply(null,pts.map(function(p){return p.w;})); if(hi===lo){hi+=5;lo-=5;}
+  var W=300,H=96,px=function(i){return 14+i*(W-28)/(pts.length-1);},py=function(w){return H-14-(w-lo)/(hi-lo)*(H-34);};
+  var d=pts.map(function(p,i){return (i?'L':'M')+px(i).toFixed(1)+' '+py(p.w).toFixed(1);}).join(' ');
+  var dots=pts.map(function(p,i){return '<circle cx="'+px(i).toFixed(1)+'" cy="'+py(p.w).toFixed(1)+'" r="3.6"/>';}).join('');
+  var f=pts[0],l=pts[pts.length-1];
+  return '<div class="wk-card"><div class="wk-eb">Progress · '+esc(EXM[ex].n)+'</div><div class="wk-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Top set weight over your last '+pts.length+' workouts"><path class="ln" d="'+d+'"/>'+dots+'</svg></div>'+
+    '<p class="wk-mut" style="margin:.3em 0 0">'+f.w+' lb to <b style="color:var(--ink)">'+l.w+' lb</b> over your last '+pts.length+' workouts'+(l.w>f.w?' (+'+(l.w-f.w)+' lb)':'')+'.</p></div>';
+}
+/* demo page only: a ready-made plan and three weeks of history, kept on this device */
+function demoSeed(){
+  var VER='v3'; try{ if(localStorage.getItem(KP+'demo-wk')===VER) return; }catch(e){ return; }
+  S={profile:null,plans:{},sessions:{},sets:{},dirty:{}};
+  var p={goal:'fatloss',exp:'some',age:'30-49',days:'3',mins:'35',equip:'gym',limits:[],_lim:1,ui:{}};
+  var t0=new Date(Date.now()-24*864e5).toISOString();
+  S.profile={id:'me',data:p,updated_at:t0};
+  var pl=buildPlan(p), pid=uuid(); pl.created=t0; S.plans[pid]={id:pid,data:pl,updated_at:t0};
+  var mon=wkStart(new Date()), slots=[-21,-19,-17,-14,-12,-10,-7,-5,-3,0,2], k=0, now=new Date();
+  slots.forEach(function(off){ var day=new Date(mon+off*864e5); day.setHours(7,15,0,0); if(day>now) return;
+    var di=k%pl.days.length, d=pl.days[di], sid=uuid(), fin=new Date(day.getTime()+38*6e4).toISOString(), wk=Math.floor(k/3); k++;
+    S.sessions[sid]={id:sid,data:{plan:pid,day:di,t:d.t,feel:'good',items:d.items,start:day.toISOString(),fin:fin},updated_at:fin};
+    d.items.forEach(function(it){ var e=EXM[it.ex]; for(var n=1;n<=it.sets;n++){ var w=noLoad(e)?0:(START[it.ex]||10)+5*wk;
+      var id=uuid(), r=(parseInt(it.reps,10)||10)+(e.bw?wk:0);
+      S.sets[id]={id:id,data:{sid:sid,ex:it.ex,n:n,w:w,r:r,done:true,at:fin},updated_at:fin}; } }); });
+  save(); try{ localStorage.setItem(KP+'demo-wk',VER); }catch(e){}
+}
 function home(){
   var pl=activePlan(); if(!pl) return quiz();
   var p=S.profile.data, di=nextDay(pl), d=pl.data.days[di], st=streak(), pr=prs(), op=openSession(), oc=op?setCount(op.id):null, dt=doneToday();
@@ -5130,14 +5203,14 @@ function home(){
   h+='<div class="wk-card"><div class="wk-eb">Your week</div><div class="wk-stats">'+
     '<div class="wk-stat"><div class="b">'+Math.min(st.thisW,st.per)+'<span style="font-size:.5em;color:var(--muted)"> of '+st.per+(st.thisW>=st.per?' ✓':'')+'</span></div><div class="l">This week</div></div>'+
     '<div class="wk-stat"><div class="b">'+st.n+'</div><div class="l">Week streak</div></div></div>'+
-    '<p class="wk-mut" style="margin:.7em 0 0">Hit '+st.need+' of '+st.per+' workouts to keep your streak. One missed day a week is a free grace day.</p></div>';
+    '<p class="wk-mut" style="margin:.7em 0 0">'+(st.n?st.n+'-week streak going. ':'')+(st.thisW>=st.need?'This week counts toward your streak.':(st.need-st.thisW)+' more workout'+(st.need-st.thisW>1?'s':'')+' this week keeps your streak.')+'</p></div>'+chart();
   h+='<div class="wk-card"><div class="wk-eb">Today\'s exercises</div>';
   d.items.forEach(function(it){ var e=EXM[it.ex]; h+='<div class="wk-li"><b>'+esc(e.n)+'</b><span class="wk-mut">'+it.sets+' × '+esc(it.reps)+'</span></div>'; });
   h+='</div>';
   var keys=Object.keys(pr);
   h+='<div class="wk-card"><div class="wk-eb">Personal records</div>';
   if(!keys.length) h+='<p class="wk-mut" style="margin:0">Your bests show up here after your first workout.</p>';
-  keys.slice(0,8).forEach(function(k){ var x=pr[k]; h+='<div class="wk-li"><b>'+esc(EXM[k].n)+'</b><span>'+(x.bw?x.v+' reps':x.v+' lb × '+x.r)+'</span></div>'; });
+  keys.slice(0,8).forEach(function(k){ var x=pr[k]; var dt=x.at?new Date(x.at).toLocaleDateString(undefined,{month:'short',day:'numeric'}):''; h+='<div class="wk-li"><b>'+esc(EXM[k].n)+(dt?'<small class="wk-prd">'+dt+'</small>':'')+'</b><span>'+(x.bw?x.v+' reps':x.v+' lb × '+x.r)+'</span></div>'; });
   h+='</div>';
   h+='<div class="wk-card"><div class="wk-eb">Plan</div><p style="margin:0 0 .3em;font-weight:700">'+esc(pl.data.name)+'</p><p class="wk-mut" style="margin:0 0 .8em">'+pl.data.perWeek+' days a week · about '+p.mins+' min · pairs with your plan</p><button class="wk-btn sec" data-wkgo="quiz">Change my answers</button></div>';
   h+=settings();
@@ -5179,7 +5252,7 @@ function sessionView(){
     var v=lg?lg.data:null;
     if(!v){ var last=lastFor(it.ex,n); var r0=parseInt(it.reps,10)||10; v={w:startW(it.ex,n),guess:!(last&&+last.data.w>0),r:last?last.data.r:r0,done:false}; }
     h+='<div class="wk-set"><span class="n">'+n+'</span>';
-    if(noLoad(e)) h+='<div class="wk-bwl">'+(e.bw?'Bodyweight':'Band')+'</div>'; else h+='<div class="wk-step"><button aria-label="Less weight set '+n+'" data-wkst="w,-5,'+n+'">−</button><span class="v">'+v.w+'<small>LB'+(v.guess&&!v.done?' · START':'')+'</small></span><button aria-label="More weight set '+n+'" data-wkst="w,5,'+n+'">+</button></div>';
+    if(noLoad(e)) h+='<div class="wk-bwl">'+(e.bw?'Bodyweight':'Band')+'</div>'; else h+='<div class="wk-step"><button aria-label="Less weight set '+n+'" data-wkst="w,-5,'+n+'">−</button><span class="v">'+v.w+'<small>LB'+(v.guess&&!v.done?' (SUGGESTED)':'')+'</small></span><button aria-label="More weight set '+n+'" data-wkst="w,5,'+n+'">+</button></div>';
     h+='<div class="wk-step"><button aria-label="Fewer reps set '+n+'" data-wkst="r,-1,'+n+'">−</button><span class="v">'+v.r+'<small>REPS</small></span><button aria-label="More reps set '+n+'" data-wkst="r,1,'+n+'">+</button></div>';
     h+='<button class="wk-chk'+(v.done?' on':'')+(ui.pop===i+':'+n?' pop':'')+'" aria-label="Set '+n+' done" aria-pressed="'+!!v.done+'" data-wkdone="'+n+'"><svg class="wk-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button></div>';
   }
@@ -5248,7 +5321,7 @@ document.addEventListener('click',function(ev){
 try{ window.addEventListener('online',function(){ push(); }); }catch(e){}
 /* phone Back during a workout: pause (keep sets), never finish */
 try{ window.addEventListener('popstate',function(){ if(ui.view==='session'||ui.view==='feel'){ stopTimer(); ui.view='home'; ui.confirm=false; render(); } }); }catch(e){}
-load(); applyUi(); render(); pull();
+load(); if(window.BL_DEMO) demoSeed(); applyUi(); render(); pull();
 /* shared with the Nutrition tab: one Bigger text / High contrast setting */
 window.wkPrefs={get:function(){ return S.profile?(S.profile.data.ui||{}):null; },
   set:function(k,v){ if(!S.profile) return false; var pd=JSON.parse(JSON.stringify(S.profile.data)); pd.ui=pd.ui||{}; pd.ui[k]=v; put('profile','me',pd); applyUi(); render(); return true; }};
@@ -5366,7 +5439,7 @@ function panel(day){
   if(p==='search'){ h+='<div class="n2-eb">Step 1 of 2 · Find it</div><input class="n2-in" id="n2-q" type="search" inputmode="search" autocomplete="off" placeholder="Type a food, like chicken or banana" value="'+esc(ui.q)+'">';
     var res=search(ui.q); h+='<div id="n2-res">'+resHtml(res)+'</div>'; }
   if(p==='quick'){ h+='<div class="n2-eb">Quick add numbers</div><p class="n2-mut">For a food that is not in the list.</p>'+
-    '<input class="n2-in" id="n2-qn" placeholder="Name (optional)"><div style="height:.5em"></div><div class="wk-row2" style="display:flex;gap:.5em"><input class="n2-in" id="n2-qk" type="number" inputmode="numeric" placeholder="kcal"><input class="n2-in" id="n2-qp" type="number" inputmode="numeric" placeholder="Protein g"></div><div style="height:.6em"></div><button class="n2-btn" id="n2-qadd">Add</button>'; }
+    '<input class="n2-in" id="n2-qn" placeholder="Name (optional)"><div style="height:.5em"></div><div class="wk-row2" style="display:flex;gap:.5em"><input class="n2-in" id="n2-qk" type="number" inputmode="numeric" placeholder="Calories (kcal)"><input class="n2-in" id="n2-qp" type="number" inputmode="numeric" placeholder="Protein (g)"></div><div style="height:.6em"></div><button class="n2-btn" id="n2-qadd">Add</button>'; }
   return h+'</div>';
 }
 function resHtml(res){ var h='';
@@ -5392,10 +5465,10 @@ function render(){
   var h='<div class="n2-day"><button class="n2-ib" data-n2day="-1" aria-label="Previous day" '+(ui.off<=-6?'disabled':'')+'>‹</button><b>'+lbl+'</b><button class="n2-ib" data-n2day="1" aria-label="Next day" '+(ui.off>=0?'disabled':'')+'>›</button></div>';
   h+='<div class="n2-card gold"><div class="n2-ring"><div class="n2-rw">'+ring(t,tg)+'<div class="n2-rc"><b>'+r0(t.p)+'</b><span>g protein</span></div></div><div class="n2-rt">'+
      '<div class="n2-big">'+r0(t.p)+'<span class="n2-of"> / '+tg.p+' g</span></div><div class="n2-lbl">Protein eaten / your goal</div>'+
-     '<div class="n2-big n2-k">'+r0(t.k).toLocaleString()+'<span class="n2-of"> / '+(+tg.k).toLocaleString()+' kcal</span></div><div class="n2-lbl">Calories eaten / your goal</div></div></div>';
-  h+='<button class="n2-btn sec" id="n2-more" aria-expanded="'+ui.more+'" style="min-height:48px;margin-top:.6em">'+(ui.more?'Less':'More: carbs and fat')+'</button>';
+     '<div class="n2-big n2-k">'+r0(t.k).toLocaleString()+'<span class="n2-of"> / '+(+tg.k).toLocaleString()+' kcal</span></div><div class="n2-lbl">Calories eaten / your goal</div>'+(t.k>tg.k?'<div class="n2-over">Over by '+r0(t.k-tg.k).toLocaleString()+' kcal</div>':t.k?'<div class="n2-left">'+r0(tg.k-t.k).toLocaleString()+' kcal left today</div>':'')+'</div></div>';
+  h+='<button class="n2-btn sec" id="n2-more" aria-expanded="'+ui.more+'" style="min-height:48px;margin-top:.6em">'+(ui.more?'Hide carbs & fat':'Show carbs & fat')+'</button>';
   if(ui.more) h+='<div style="margin-top:.7em"><div class="n2-mut">Carbs '+r0(t.c)+' of '+tg.c+' g</div><div class="n2-mb"><i style="width:'+Math.min(100,t.c/(tg.c||1)*100)+'%"></i></div><div class="n2-mut">Fat '+r0(t.f)+' of '+tg.f+' g</div><div class="n2-mb"><i style="width:'+Math.min(100,t.f/(tg.f||1)*100)+'%"></i></div></div>';
-  h+='<p class="n2-mut" style="margin:.6em 0 0">Targets come from the numbers you chose below. Change them any time.</p></div>';
+  h+='<p class="n2-mut" style="margin:.6em 0 0">Your goals come from Your Numbers further down this page. Change them any time.</p></div>';
   function tile(a,ic,lab,on){ return '<button class="n2-tile'+(on?' on':'')+'" '+a+'><svg class="n2-ic" viewBox="0 0 24 24" aria-hidden="true">'+ic+'</svg><span>'+lab+'</span></button>'; }
   h+='<div class="n2-qa">'+tile('data-n2panel="recent"','<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>','Recent',ui.panel==='recent')+
      tile('data-n2panel="fav"','<path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8L12 16.9l-5.3 2.7 1-5.8-4.2-4.1 5.9-.9z"/>','Favorites',ui.panel==='fav')+
@@ -5471,8 +5544,74 @@ document.addEventListener('click',function(ev){
 try{ window.addEventListener('online',function(){ push(); }); }catch(e){}
 /* re-render the ring when the member saves new targets in the calculator below */
 try{ if(typeof nStore==='function'){ var _n2s=nStore; nStore=function(){ var r=_n2s.apply(this,arguments); setTimeout(render,0); return r; }; } }catch(e){}
-load(); applyUi(); render(); pull();
+/* demo page only: a realistic week of logs, kept on this device */
+function demoSeed(){
+  var VER='v3'; try{ if(localStorage.getItem(KP+'demo-n2')===VER) return; }catch(e){ return; }
+  S={logs:{},saved:{},dirty:{}};
+  var M={
+    eggs:['Egg scramble with spinach','3 eggs + 1 cup spinach',260,20,4,18], oats:['Oatmeal with berries','1 cup cooked',230,8,42,4],
+    yog:['Greek yogurt, plain nonfat','1 cup',130,23,9,1], chick:['Chicken breast, grilled','8 oz',370,70,0,8],
+    rice:['Jasmine rice','1 cup cooked',205,4,45,0], broc:['Broccoli, steamed','1.5 cups',80,6,15,1],
+    shake:['Whey protein shake','2 scoops',240,48,6,3], salmon:['Salmon fillet','6 oz',350,38,0,21],
+    pot:['Sweet potato, baked','1 medium',115,2,27,0], salad:['Turkey and avocado salad','1 large bowl',520,42,18,30],
+    alm:['Almonds','1 oz',165,6,6,14], burger:['Cheeseburger and fries','restaurant',1150,45,95,62], pizza:['Pepperoni pizza','3 slices',900,36,96,39]};
+  var days={0:[['eggs',8],['oats',8],['salad',12.5],['shake',15.5]],
+    '-1':[['eggs',8],['shake',10],['burger',13],['alm',16],['pizza',19.5]],
+    '-2':[['yog',7.5],['chick',12.5],['rice',12.5],['broc',12.5],['shake',16],['salmon',19],['pot',19]],
+    '-3':[['eggs',8],['oats',8],['salad',13],['chick',19],['rice',19],['broc',19]],
+    '-4':[['yog',7],['shake',10],['chick',13],['pot',13],['salmon',19.5],['broc',19.5]],
+    '-6':[['eggs',8.5],['salad',13],['shake',16],['chick',19],['rice',19]]};
+  var now=new Date();
+  Object.keys(days).forEach(function(o){ var day=dkey(+o);
+    days[o].forEach(function(x){ var m=M[x[0]], d=new Date(day+'T12:00'); d.setHours(Math.floor(x[1]),(x[1]%1)*60,0,0);
+      if(+o===0&&d>now) d=new Date(now.getTime()-60000*(5-days[o].indexOf(x))*20);
+      var id=uuid(), at=d.toISOString(); S.logs[id]={id:id,data:{kind:'food',day:day,at:at,name:m[0],amt:m[1],k:m[2],p:m[3],c:m[4],f:m[5]},updated_at:at}; });
+    var oz=+o===0?40:+o===-1?48:80; for(var i=0;i<oz/8;i++){ var id=uuid(); S.logs[id]={id:id,data:{kind:'water',day:day,oz:8,at:new Date(day+'T13:00').toISOString()},updated_at:new Date(day+'T13:00').toISOString()}; } });
+  var fav=uuid(); S.saved[fav]={id:fav,data:{kind:'fav',name:M.shake[0],amt:M.shake[1],k:240,p:48,c:6,f:3},updated_at:new Date().toISOString()};
+  save(); try{ localStorage.setItem(KP+'demo-n2',VER); }catch(e){}
+}
+load(); if(window.BL_DEMO) demoSeed(); applyUi(); render(); pull();
 window.n2Debug={state:function(){return S;},push:push,pull:pull,targets:targets,waterGoal:waterGoal};
+})();
+
+
+/* ===== demo page polish (workout-demo only) ===== */
+(function(){
+function $(s,r){return (r||document).querySelector(s);}
+function $$(s,r){return [].slice.call((r||document).querySelectorAll(s));}
+var DISC='Research compounds. Not medical advice. Review with your prescriber.';
+function disc(host){ if(host&&!$('.bl-disc',host)){ var p=document.createElement('p'); p.className='bl-disc'; p.textContent=DISC; host.appendChild(p); } }
+try{ disc($('#v-sched .pad')); disc($('#s-calc .pad')); disc($('#s-indexlist .pad')); }catch(e){}
+/* bigger text, easy to find in the header */
+try{ var aa=$('#bl-aa'); var big=localStorage.getItem(KP+'big')==='1';
+  function setBig(v){ document.documentElement.classList.toggle('bl-big',v); aa.setAttribute('aria-pressed',v?'true':'false'); try{localStorage.setItem(KP+'big',v?'1':'0');}catch(e){} }
+  setBig(big); aa.addEventListener('click',function(){ setBig(!document.documentElement.classList.contains('bl-big')); }); }catch(e){}
+/* schedule: name the cycles, and on a rest day show the next dose day */
+try{ var _ra=renderAll; renderAll=function(){ _ra.apply(this,arguments); nameCycles(); }; }catch(e){}
+function nameCycles(){ var h=$('#cmplist'); if(!h||typeof cycTitle!=='function') return;
+  var w=document.createTreeWalker(h,NodeFilter.SHOW_TEXT,null,false),n; while((n=w.nextNode())){ var t=n.nodeValue.trim(); if(/^Cycle \d+$/.test(t)) n.nodeValue=cycTitle(t); } }
+nameCycles();
+try{ var today=new Date().getDay();
+  if($('#doses .empty')){ for(var i=1;i<7;i++){ var d=(today+i)%7; pickDay(d); if(!$('#doses .empty')){
+    var note=document.createElement('p'); note.className='bl-rest'; note.id='bl-rest'; note.textContent='Today is a rest day for this cycle. Here is '+FULL[d]+', your next dose day.';
+    var ds=$('#daystrip'); ds.parentNode.insertBefore(note,ds.nextSibling); break; } } } }catch(e){}
+try{ var _pd=pickDay; pickDay=function(i){ _pd(i); var n=$('#bl-rest'); if(n) n.remove(); }; }catch(e){}
+/* nutrition: deficit next to Daily Calories, goal-led macro defaults, collapsible sections */
+function showDef(){ try{ var m=nutCompute(nutState), e=$('#bl-def'); if(!e) return; var d=Math.round(m.cal-m.tdee);
+  e.textContent=d<0?(Math.abs(d).toLocaleString()+' kcal a day under maintenance ('+m.tdee.toLocaleString()+')'):d>0?('+'+d.toLocaleString()+' kcal a day over maintenance ('+m.tdee.toLocaleString()+')'):'At maintenance';
+  var r=$('#nut-fat'); if(r) r.style.setProperty('--p',((r.value-r.min)/(r.max-r.min)*100)+'%'); }catch(e){} }
+try{ var cal=$('#nut-cal'); if(cal) new MutationObserver(showDef).observe(cal,{childList:true,characterData:true,subtree:true}); showDef();
+  var FAT={lose:35,maintain:25,gain:25};
+  function goalFat(g){ var r=$('#nut-fat'); if(!r||!FAT[g]) return; if(+r.value!==FAT[g]){ r.value=FAT[g]; r.dispatchEvent(new Event('input',{bubbles:true})); r.dispatchEvent(new Event('change',{bubbles:true})); } showDef(); }
+  $$('[data-grp="goal"]').forEach(function(b){ b.addEventListener('click',function(){ setTimeout(function(){ goalFat(b.dataset.val); },0); }); });
+  if(localStorage.getItem(KP+'demo-fat')!=='1'){ setTimeout(function(){ goalFat(nutState.goal); try{localStorage.setItem(KP+'demo-fat','1');}catch(e){} },50); }
+  var fr=$('#nut-fat'); if(fr) fr.addEventListener('input',showDef);
+  $$('#v-nutr .nut-card').forEach(function(c){ var hd=$('.nut-card-head',c); if(!hd) return; var t=hd.textContent.trim();
+    if(/^Diet|^Allergies/.test(t)){ c.classList.add('bl-cc'); if(window.innerWidth<768) c.classList.add('bl-col'); hd.setAttribute('role','button'); hd.setAttribute('tabindex','0');
+      hd.setAttribute('aria-expanded',c.classList.contains('bl-col')?'false':'true');
+      var tg=function(){ c.classList.toggle('bl-col'); hd.setAttribute('aria-expanded',c.classList.contains('bl-col')?'false':'true'); };
+      hd.addEventListener('click',tg); hd.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tg(); } }); } });
+}catch(e){}
 })();
 
 </script>
