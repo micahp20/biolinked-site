@@ -1030,6 +1030,7 @@
 :root[data-theme="dark"] #v-work.wk-hc{--ink:#fff;--ink2:#fff;--muted:#e6e6e6;--line:#fff;--line2:#bbb;--card:#000;--cream:#000;--gold:#ffd966;--gold2:#ffe48a;--gold-soft:#1a1606;--on-gold:#000;--bg:#000}
 #v-work.wk-hc .wk-opt,#v-work.wk-hc .wk-step,#v-work.wk-hc .wk-card{border-width:2px}
 </style>
+<style>.wk-hero{margin-top:10px;background:var(--cream)!important;color:var(--gold)!important;border:1.5px solid var(--gold)!important}</style>
 </head>
 <body><script>/*BL_NOZOOM*/(function(){try{document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false});var lt=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-lt<=320){e.preventDefault();}lt=n;},{passive:false});}catch(e){}})();</script>
 <div class="device">
@@ -1079,6 +1080,8 @@
       <div><div class="nl">Schedule</div><div class="nd">Today's doses, timing and the week</div></div></button>
     <button type="button" class="nav-item" onclick="go('nutr')">
       <div><div class="nl">Nutrition</div><div class="nd">Meal builder and macro targets</div></div></button>
+    <button type="button" class="nav-item" onclick="go('work')">
+      <div><div class="nl">Workout</div><div class="nd">Today's workout, logging and progress</div></div></button>
     <button type="button" class="nav-item" onclick="go('labs')">
       <div><div class="nl">Labs</div><div class="nd">Your bloodwork, explained</div></div></button>
     <button type="button" class="nav-item" onclick="go('pay')">
@@ -1115,6 +1118,7 @@
         <h1 class="lx-title">Your Protocol</h1>
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
+        <button class="lx-cta wk-hero" onclick="go('work')"><svg width="18" height="18" style="stroke:currentColor;fill:none;stroke-width:2" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg> Start my workout &rarr;</button>
       </div>
       <div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
@@ -1123,6 +1127,8 @@
           <div><div class="lx-t">Schedule</div><div class="lx-d">Your daily doses and timing. What to take, how much, and when.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('nutr')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M8.5 3c1.9 0 3.5 1.6 3.5 3.5V9H9.5C7.6 9 6 7.4 6 5.5S7.6 3 8.5 3z"/><path d="M15.5 6c1.4 0 2.5 1.1 2.5 2.5S16.9 11 15.5 11H13V8.5C13 7.1 14.1 6 15.5 6z"/><path d="M5 14h14l-1.2 6.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 14z"/></svg></div>
           <div><div class="lx-t">Nutrition</div><div class="lx-d">Build and save your meals and hit your macro targets.</div></div></div>
+        <div class="lx-card" role="button" tabindex="0" onclick="go('work')" onkeydown="if(event.key==='Enter')go('work')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></svg></div>
+          <div><div class="lx-t">Workout</div><div class="lx-d">A simple plan that pairs with your protocol. Log sets in a tap and see your progress.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('labs')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div>
           <div><div class="lx-t">Labs</div><div class="lx-d">Your bloodwork, every marker explained, with your overall read.</div></div></div>
         <div class="lx-card" role="button" tabindex="0" onclick="go('pay')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg></div>
@@ -5054,7 +5060,8 @@ function startTimer(sec){ timer.end=Date.now()+sec*1000; clearInterval(timer.h);
 function stopTimer(){ clearInterval(timer.h); timer.end=0; var t=document.getElementById('wk-timer'); if(t) t.remove(); }
 function doneView(){ var s=S.sessions[ui.last]; var n=setsFor(ui.last).filter(function(r){return r.data.done;}).length;
   return '<div class="wk-card gold"><div class="wk-eb">Workout complete</div><h2>Nice work.</h2><p class="wk-mut">'+n+' sets logged'+(s?' · '+esc(s.data.t):'')+'. It is saved and will show on your other devices.</p></div><button class="wk-btn" data-wkgo="home">Done</button>'; }
-function applyUi(){ var v=document.getElementById('v-work'); if(!v) return; var u=(S.profile&&S.profile.data.ui)||{}; v.classList.toggle('wk-big',!!u.big); v.classList.toggle('wk-hc',!!u.hc); }
+function applyUi(){ var u=(S.profile&&S.profile.data.ui)||{}; var v=document.getElementById('v-work'); if(v){ v.classList.toggle('wk-big',!!u.big); v.classList.toggle('wk-hc',!!u.hc); }
+  try{ document.dispatchEvent(new CustomEvent('wk-prefs',{detail:u})); }catch(e){} }
 function render(){
   var host=document.getElementById('wkbody'); if(!host) return;
   var h=ui.view==='quiz'||!S.profile?quiz():ui.view==='feel'?feel():ui.view==='session'?sessionView():ui.view==='done'?doneView():home();
@@ -5095,6 +5102,9 @@ document.addEventListener('click',function(ev){
 });
 try{ window.addEventListener('online',function(){ push(); }); }catch(e){}
 load(); applyUi(); render(); pull();
+/* shared with the Nutrition tab: one Bigger text / High contrast setting */
+window.wkPrefs={get:function(){ return S.profile?(S.profile.data.ui||{}):null; },
+  set:function(k,v){ if(!S.profile) return false; var pd=JSON.parse(JSON.stringify(S.profile.data)); pd.ui=pd.ui||{}; pd.ui[k]=v; put('profile','me',pd); applyUi(); render(); return true; }};
 window.wkDebug={state:function(){return S;},push:push,pull:pull};
 })();
 
