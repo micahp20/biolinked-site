@@ -519,7 +519,7 @@
   .pill.hi{background:var(--warn-soft);color:var(--warn)} .pill.lo{background:var(--lo-soft);color:var(--lo)}
   .ltip{display:none;font-size:12px;line-height:1.55;color:var(--ink2);background:var(--cream);
     border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:9px}
-  .ltip.on{display:block}
+  .ltip.on{display:block}.ltip .ldef{margin:0 0 8px;padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}.ltip .ldef b{color:var(--ink);font-weight:700}.ltip .ldt{font-weight:700;color:var(--gold);margin-bottom:3px;font-size:12.5px}.ltip .lyour{margin-top:2px}.ltip .ldef:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
   .ltip strong{color:var(--gold)}
   .banner{display:flex;align-items:flex-start;gap:8px;background:var(--warn-soft);color:var(--warn);
     border:1px solid var(--warn-line);border-radius:11px;padding:9px 12px;font-size:11px;font-weight:700;margin:4px 0 13px;line-height:1.45}
@@ -1627,13 +1627,127 @@ function renderLabs(){
         '<span class="qm">?</span><span class="ln">'+r.n+'</span>'+
         '<span class="lv'+(r.vc?' '+r.vc:'')+'">'+r.v+em+'</span></div>'+
         '<div class="lmeta">'+ref+pill+'</div>'+
-        '<div class="ltip" id="'+r.id+'">'+r.tip+'</div></div>');
+        '<div class="ltip" id="'+r.id+'">'+labTip(r)+'</div></div>');
     });
     o.push('</div>');
   });
   if(LABS.note!=null) o.push('<p class="note">'+LABS.note+'</p>');
   host.innerHTML=o.join('\n');
 }
+/* ---------- LAB DEFINITIONS (shared) ----------
+   Every "?" on a lab row opens a plain-language definition (what it measures,
+   why it matters, what high/low means) followed by the client's own note. */
+var LABDEFS=[
+[/(trig|tg).*hdl/i,'Triglyceride / HDL ratio','Compares blood fats (triglycerides) to "good" HDL cholesterol.','A quick read on insulin resistance and heart risk.','Higher points to insulin resistance and higher heart risk.','Low is good.',1],
+[/(total\s*)?chol(esterol)?\s*(total)?\s*[\/:]\s*hdl|total\s*\/\s*hdl|chol\s*:\s*hdl/i,'Cholesterol / HDL ratio','Total cholesterol divided by HDL ("good") cholesterol.','One number that sums up the balance of harmful vs protective cholesterol.','Higher means more heart risk.','Lower is better.',1],
+[/ldl\s*[\/:]\s*hdl/i,'LDL / HDL ratio','LDL ("bad") cholesterol divided by HDL ("good") cholesterol.','Shows the balance between cholesterol that builds plaque and cholesterol that clears it.','Higher means more heart risk.','Lower is better.',1],
+[/free\s*t3\s*:\s*free\s*t4/i,'Free T3 : Free T4','How much active thyroid hormone (T3) you make from the storage form (T4).','Shows how well your body converts thyroid hormone into its active form.','High can mean fast conversion or T3 medication.','Low can mean poor conversion (stress, low calories, illness).',1],
+[/non.?hdl/i,'Non-HDL cholesterol','All the cholesterol carried by plaque-forming particles (total minus HDL).','A better heart-risk number than LDL alone.','Higher means more heart risk.','Lower is better.'],
+[/remnant/i,'Remnant cholesterol','Cholesterol in triglyceride-rich particles left over after fat is digested.','These particles get into artery walls easily.','Higher adds heart risk.','Lower is better.'],
+[/vldl/i,'VLDL cholesterol','Cholesterol carried by the particles that move triglycerides around.','Tracks with triglycerides and diet.','High usually means high triglycerides (sugar, alcohol, insulin resistance).','Low is fine.'],
+[/ldl/i,'LDL cholesterol','The "bad" cholesterol that can build up in artery walls.','The main cholesterol target for heart and stroke risk.','High raises the risk of plaque and heart disease.','Low is generally good.'],
+[/hdl/i,'HDL cholesterol','The "good" cholesterol that carries extra cholesterol back to the liver.','Protects the arteries.','Very high is usually fine.','Low raises heart risk; exercise helps raise it.'],
+[/apo\s*b/i,'ApoB','A count of the particles that carry cholesterol into artery walls.','The single best blood test for plaque-building risk.','High means more plaque-forming particles.','Low is good.'],
+[/lipoprotein\s*\(?a/i,'Lipoprotein(a)','An inherited cholesterol particle that is extra sticky.','Mostly genetic; it sets a baseline heart risk that diet barely changes.','High means more inherited heart risk.','Low is good.'],
+[/triglycer/i,'Triglycerides','The main fat in your blood, from food and from extra sugar the liver turns into fat.','Tied to diet, alcohol, insulin resistance and heart risk.','High often follows sugar, refined carbs or alcohol.','Low is good.'],
+[/cholesterol/i,'Total cholesterol','All the cholesterol in your blood, good and bad together.','A starting point; LDL, HDL and ApoB tell the real story.','High can raise heart risk, depending on the mix.','Very low is uncommon and can follow poor nutrition.'],
+[/a1c|hba1c/i,'Hemoglobin A1c','Your average blood sugar over the last 2–3 months.','The main test for prediabetes and diabetes.','5.7–6.4% is prediabetes; 6.5%+ is diabetes range.','Low is usually fine.'],
+[/eag|estimated average glucose/i,'Estimated average glucose','Your A1c translated into an average blood sugar number.','Makes A1c easier to picture.','Higher means more sugar in the blood on average.','Low is usually fine.'],
+[/fructosamine/i,'Fructosamine','Average blood sugar over the last 2–3 weeks.','A shorter-term check than A1c.','High means blood sugar has been running high.','Low is usually fine.'],
+[/insulin/i,'Fasting insulin','How much insulin your body needs to keep blood sugar normal while fasting.','An early warning for insulin resistance, years before sugar rises.','High means your body is working hard to control sugar.','Low is usually good.'],
+[/glucose/i,'Glucose','Your blood sugar at the time of the draw (best when fasting).','Fuel for the body; checks for prediabetes and diabetes.','100–125 fasting is prediabetes range; 126+ is diabetes range.','Low can cause shakiness, sweating or fogginess.'],
+[/egfr|gfr/i,'eGFR','An estimate of how well your kidneys filter blood.','The main kidney-function number.','High is usually fine.','Below 60 for months suggests reduced kidney function.'],
+[/bun.*creat/i,'BUN / Creatinine ratio','Compares two kidney waste products.','Helps sort out hydration, diet and kidney causes.','High often means dehydration or a high-protein diet.','Low can follow low protein or liver issues.',1],
+[/creatinine/i,'Creatinine','A waste product from muscle that the kidneys clear.','Used to estimate kidney function.','High can mean reduced kidney filtering, dehydration, lots of muscle or creatine use.','Low can mean low muscle mass.'],
+[/^bun|urea/i,'BUN (blood urea nitrogen)','A waste product from breaking down protein, cleared by the kidneys.','A basic kidney and hydration check.','High often means dehydration or a high-protein diet.','Low can follow low protein intake.'],
+[/uric/i,'Uric acid','A waste product from breaking down purines (meat, seafood, alcohol, fructose).','Tied to gout, kidney stones and metabolic health.','High raises gout risk.','Low is usually fine.'],
+[/sodium/i,'Sodium','A salt that controls fluid balance and nerve signals.','Keeps fluid, blood pressure and nerves working.','High usually means dehydration.','Low can come from too much water, some medicines or hormone issues.'],
+[/potassium/i,'Potassium','A mineral that runs muscles and the heartbeat.','Small changes can affect heart rhythm.','High can affect heart rhythm; sometimes a sample handling issue.','Low can cause cramps and weakness.'],
+[/chloride/i,'Chloride','A salt that works with sodium to balance fluids and acid.','Part of fluid and acid–base balance.','High can mean dehydration.','Low can follow vomiting or fluid loss.'],
+[/co2|co&#8322;|co₂|bicarbonate|carbon dioxide/i,'CO2 (bicarbonate)','The body\'s main acid buffer in the blood.','Shows acid–base balance; also affected by altitude and breathing.','High can follow vomiting or dehydration.','Slightly low is common at altitude or with mild dehydration.'],
+[/anion/i,'Anion gap','A calculation from your salts that flags hidden acids in the blood.','A screen for acid–base problems.','High can mean extra acid (e.g. ketones, kidney issues).','Low is usually not a concern.'],
+[/calcium/i,'Calcium','A mineral for bones, muscles, nerves and heartbeat.','Tightly controlled by hormones.','High can point to parathyroid issues or too much vitamin D.','Low can follow low vitamin D or magnesium.'],
+[/magnesium/i,'Magnesium','A mineral used in hundreds of body processes, including sleep and muscle relaxation.','Supports sleep, muscle, heart rhythm and blood sugar.','High is rare, usually from supplements with weak kidneys.','Low can cause cramps, poor sleep and palpitations.'],
+[/thyroglobulin/i,'Thyroglobulin antibodies','Immune antibodies against a thyroid protein.','Another marker of autoimmune thyroid disease.','High suggests autoimmune thyroid activity.','Negative is normal.'],
+[/17-?oh/i,'17-OH progesterone','A building block the adrenal glands use to make hormones.','Checks adrenal hormone production.','High can point to an adrenal enzyme issue.','Low is usually fine.'],
+[/albumin\s*\/\s*glob|a\s*\/\s*g/i,'Albumin / Globulin ratio','Compares your two main blood proteins.','A general read on liver, nutrition and immune activity.','High is usually fine.','Low can mean inflammation or immune activity.',1],
+[/albumin/i,'Albumin','The main protein made by your liver.','Reflects nutrition, liver health and hydration.','High usually means dehydration.','Low can mean poor nutrition, inflammation or liver/kidney issues.'],
+[/globulin/i,'Globulin','Blood proteins that include antibodies.','Reflects immune activity and liver health.','High can mean inflammation or immune activity.','Low can mean a weaker antibody supply.'],
+[/protein/i,'Total protein','All the protein in your blood (albumin plus globulins).','A general nutrition, liver and immune check.','High can mean dehydration or inflammation.','Low can mean poor nutrition or liver/kidney issues.'],
+[/alk|alp/i,'Alkaline phosphatase','An enzyme from the liver, bile ducts and bones.','Flags liver, bile-duct or bone issues.','High can mean bile-duct, liver or bone activity.','Low can follow low zinc or magnesium.'],
+[/bilirubin/i,'Bilirubin','A yellow pigment from old red blood cells, cleared by the liver.','A liver and red-cell check.','Mildly high is often harmless (Gilbert\'s); higher can mean liver issues.','Low is fine.'],
+[/^alt|sgpt/i,'ALT','A liver enzyme that leaks into blood when liver cells are stressed.','The most liver-specific enzyme.','High can mean fatty liver, alcohol, medicines or hard workouts.','Low is fine.'],
+[/^ast|sgot/i,'AST','An enzyme from liver and muscle.','Read with ALT for liver health.','High can mean liver stress or recent intense exercise.','Low is fine.'],
+[/ggt/i,'GGT','A liver and bile-duct enzyme that is sensitive to alcohol.','An early marker of liver stress and alcohol use.','High often tracks with alcohol or fatty liver.','Low is fine.'],
+[/amylase/i,'Amylase','A digestive enzyme mostly from the pancreas.','Checks the pancreas.','High can mean pancreas irritation.','Low is usually not a concern.'],
+[/hematocrit/i,'Hematocrit','The share of your blood made of red cells.','Shows oxygen-carrying capacity and blood thickness.','High means thicker blood (testosterone, dehydration, altitude) and more clot risk.','Low can mean anemia, causing tiredness.'],
+[/hemoglobin|^hgb/i,'Hemoglobin','The protein in red cells that carries oxygen.','Core test for anemia and blood thickness.','High can mean thick blood (testosterone, dehydration, altitude).','Low means anemia: tiredness and shortness of breath.'],
+[/^rbc|red blood cell/i,'Red blood cells (RBC)','How many red blood cells you have.','They carry oxygen to every tissue.','High can mean thick blood (testosterone, altitude, dehydration).','Low can mean anemia.'],
+[/mchc/i,'MCHC','How concentrated the hemoglobin is inside red cells.','Helps classify anemia.','High is uncommon.','Low can point to iron deficiency.'],
+[/mch\b/i,'MCH','The average amount of hemoglobin in each red cell.','Helps classify anemia.','High can follow low B12 or folate.','Low can point to iron deficiency.'],
+[/mcv/i,'MCV','The average size of your red blood cells.','Helps find the cause of anemia.','High (large cells) can follow low B12/folate or alcohol.','Low (small cells) can point to iron deficiency.'],
+[/rdw/i,'RDW','How much your red cells vary in size.','An early clue to nutrient shortages.','High can mean mixed iron, B12 or folate shortages.','Low is fine.'],
+[/mpv/i,'MPV','The average size of your platelets.','Read alongside platelet count.','High means younger, larger platelets.','Low can follow lower platelet production.'],
+[/platelet/i,'Platelets','Cell pieces that help your blood clot.','Needed to stop bleeding.','High can follow inflammation or iron deficiency.','Low can mean easier bruising or bleeding.'],
+[/reticulocyte/i,'Reticulocyte count','Young red blood cells just released from bone marrow.','Shows how fast you are making new red cells.','High means the marrow is working hard (after blood loss).','Low can mean slow red-cell production.'],
+[/nucleated/i,'Nucleated RBC','Immature red cells that normally stay in the bone marrow.','Should be zero in adults.','Any present needs follow-up with your doctor.','Zero is normal.'],
+[/neutrophil/i,'Neutrophils','The most common white cells; first responders to bacteria.','Part of your immune defense.','High can mean infection, stress or steroids.','Low can mean weaker defense against bacteria.'],
+[/lymph/i,'Lymphocytes','White cells that fight viruses and make antibodies.','Part of your immune defense.','High can follow a viral infection.','Low can follow stress, illness or steroids.'],
+[/monocyte/i,'Monocytes','White cells that clean up debris and fight infection.','Part of your immune defense.','High can follow recovery from infection or chronic inflammation.','Low is usually not a concern.'],
+[/eosinophil/i,'Eosinophils','White cells involved in allergies and parasites.','Track allergy activity.','High can mean allergies, asthma or parasites.','Low is usually fine.'],
+[/basophil/i,'Basophils','Rare white cells involved in allergic reactions.','Part of allergy and inflammation responses.','High can follow allergies or inflammation.','Low is normal.'],
+[/immature gran/i,'Immature granulocytes','Young white cells released early from the bone marrow.','Usually near zero.','High can mean infection or strong inflammation.','Zero is normal.'],
+[/wbc|white blood cell/i,'White blood cells (WBC)','Your total infection-fighting cells.','A general immune and infection check.','High can mean infection, inflammation or stress.','Low can mean a weaker immune defense.'],
+[/cbc|differential|absolute counts/i,'Complete blood count','A count of your red cells, white cells and platelets.','The basic blood health check.','Out-of-range parts are explained in each row.','Out-of-range parts are explained in each row.',1],
+[/bioavailable/i,'Bioavailable testosterone','Testosterone that is free or loosely bound and usable by tissues.','Closer to what your body can actually use than total testosterone.','High can mean too much testosterone (side effects, thick blood).','Low can mean low energy, drive and muscle.'],
+[/free\s*test|test(osterone)?,?\s*free/i,'Free testosterone','The small share of testosterone that is unbound and active.','The part that drives energy, libido and muscle.','High can bring acne, irritability and thick blood.','Low can mean low energy, drive, mood and muscle.'],
+[/test(osterone)?/i,'Total testosterone','All the testosterone in your blood, bound and free.','Main male hormone for energy, libido, muscle, mood and bone (also important in women at low levels).','High can bring acne, hair loss, irritability and thick blood.','Low can mean fatigue, low drive, weight gain and low mood.'],
+[/dht/i,'DHT','A strong hormone made from testosterone.','Drives body hair, prostate growth and scalp hair loss.','High can speed hair loss and prostate growth.','Low can lower libido.'],
+[/shbg/i,'SHBG','A protein that binds and locks up sex hormones.','Controls how much testosterone and estrogen are free to act.','High means less free testosterone.','Low means more free hormone; often seen with insulin resistance.'],
+[/estradiol|estrogen|e2/i,'Estradiol','The main estrogen.','Key for women\'s cycles; in men it supports bone, libido and mood in small amounts.','In men, high can cause water retention, moodiness and low drive.','Low can cause joint aches, low libido and poor bone health.'],
+[/progesterone/i,'Progesterone','A hormone that balances estrogen and supports sleep and calm.','Key for women\'s cycles and HRT.','High is expected after ovulation or on progesterone.','Low can mean poor sleep, anxiety or irregular cycles.'],
+[/fsh\s*&\s*lh/i,'FSH & LH','Brain signals that tell the testes or ovaries to make hormones.','Show whether hormone problems start in the brain or the glands.','High means the glands are not responding well.','Low means the brain signal is quiet (or suppressed by testosterone).',1],
+[/fsh/i,'FSH','A brain signal that drives sperm or egg development.','Shows fertility signaling.','High can mean the testes/ovaries are underperforming (or menopause).','Low can mean suppressed signaling (often from testosterone use).'],
+[/\blh\b/i,'LH','A brain signal that tells the testes or ovaries to make hormones.','Drives your own testosterone production.','High can mean the glands are not responding.','Low can mean suppressed signaling (often from testosterone use).'],
+[/prolactin/i,'Prolactin','A pituitary hormone best known for milk production.','Affects libido and hormone balance in both sexes.','High can lower libido and testosterone.','Low is usually fine.'],
+[/dhea/i,'DHEA-S','An adrenal hormone the body turns into testosterone and estrogen.','A marker of adrenal output and aging.','High can come from supplements or the adrenals.','Low often falls with age and stress.'],
+[/cortisol rhythm/i,'Cortisol rhythm','Your stress hormone measured at several times of day.','Should be highest in the morning and lowest at night.','High at night can mean tired-but-wired and poor sleep.','Low in the morning can mean dragging, low energy.',1],
+[/cortisol/i,'Cortisol','Your main stress hormone.','Controls energy, blood sugar and the stress response.','High can mean ongoing stress and poor sleep.','Low can mean fatigue and poor stress tolerance.'],
+[/growth hormone/i,'Growth hormone','Hormone that drives repair, muscle and fat burning.','Comes in pulses, so one random value is hard to read.','High can come from GH-boosting compounds.','Low on one random draw is common and not conclusive.'],
+[/igf/i,'IGF-1','The liver\'s response to growth hormone; a steady stand-in for GH.','Used to track growth-hormone status and GH-axis compounds.','High can mean too much GH effect.','Low can mean low growth-hormone output.'],
+[/hcg/i,'hCG','A hormone that mimics LH (used for fertility or with testosterone).','Usually checks for pregnancy or hCG use.','High means pregnancy or hCG use.','Low/undetectable is normal otherwise.'],
+[/psa,?\s*free/i,'PSA (free & total)','A protein made by the prostate, measured two ways.','A lower free share can raise concern; a higher free share is reassuring.','Higher total PSA needs follow-up.','A low free percentage needs follow-up.',1],
+[/psa/i,'PSA','A protein made by the prostate.','Screens prostate health; important to track on testosterone.','High can mean enlargement, inflammation or rarely cancer; ask your doctor.','Low is good.'],
+[/ft4|free t4|t4,?\s*free|free thyroxine index/i,'Free T4','The storage form of thyroid hormone that is free to use.','Shows thyroid output.','High can mean overactive thyroid or too much medication.','Low can mean underactive thyroid.'],
+[/ft3|free t3|t3,?\s*free/i,'Free T3','The active thyroid hormone.','Drives metabolism, energy and temperature.','High can mean overactive thyroid.','Low can mean slow metabolism, tiredness, feeling cold.'],
+[/t3 uptake/i,'T3 uptake','An older test of thyroid-binding proteins.','Used with T4 to estimate free thyroid hormone.','High can follow overactive thyroid.','Low can follow estrogen or underactive thyroid.'],
+[/t3/i,'Total T3','All the active thyroid hormone, bound and free.','A broad read on thyroid activity.','High can mean overactive thyroid.','Low can mean slow thyroid or low calories.'],
+[/t4/i,'Total T4','All the storage thyroid hormone, bound and free.','A broad read on thyroid output.','High can mean overactive thyroid.','Low can mean underactive thyroid.'],
+[/tsh/i,'TSH','The brain signal that tells the thyroid how hard to work.','The main thyroid screening test.','High means the thyroid is underactive (sluggish).','Low means the thyroid is overactive or on high medication.'],
+[/tpo|thyroid peroxidase/i,'TPO antibodies','Immune antibodies against the thyroid.','Flags autoimmune thyroid disease (Hashimoto\'s).','High suggests the immune system is attacking the thyroid.','Low/negative is normal.'],
+[/crp/i,'hs-CRP','A sensitive marker of inflammation in the body.','Tracks body-wide inflammation and heart risk.','High means inflammation (injury, illness, poor sleep, excess fat).','Low is good.'],
+[/homocysteine/i,'Homocysteine','An amino acid that builds up when B vitamins run low.','Linked to heart and brain health.','High can mean low B12, folate or B6.','Low is good.'],
+[/ferritin/i,'Ferritin','Your stored iron.','The best test of iron reserves.','High can mean iron overload or inflammation.','Low means low iron stores: tiredness, hair loss.'],
+[/iron sat|saturation/i,'Iron saturation','How much of your iron carrier is filled with iron.','Shows usable iron.','High can mean iron overload.','Low can mean iron deficiency.'],
+[/tibc/i,'TIBC','How much iron your blood could carry.','Helps tell iron deficiency from other causes.','High often means low iron.','Low can follow inflammation or iron overload.'],
+[/uibc/i,'UIBC','Unused iron-carrying capacity.','Read with iron and TIBC.','High often means low iron.','Low can mean iron overload.'],
+[/iron/i,'Serum iron','The iron circulating in your blood right now.','Iron carries oxygen; read with ferritin.','High can mean overload or a recent supplement.','Low can mean iron deficiency.'],
+[/b12\s*&\s*folate/i,'Vitamin B12 & folate','Two B vitamins needed for red cells and nerves.','Low levels cause tiredness and large red cells.','High is usually from supplements.','Low can cause fatigue, tingling and anemia.',1],
+[/b12/i,'Vitamin B12','A vitamin for nerves, energy and red blood cells.','Low B12 causes fatigue and nerve symptoms.','High is usually from supplements.','Low can cause tiredness, tingling and brain fog.'],
+[/folate/i,'Folate','A B vitamin for red cells and DNA.','Needed for energy and healthy cells.','High is usually from supplements.','Low can cause anemia and fatigue.'],
+[/vitamin d/i,'Vitamin D','Your vitamin D stores.','Supports bone, immune health, mood and muscle.','Very high (over 100) can raise calcium.','Low is common and tied to low energy, mood and weak bones.'],
+[/food panel|igg/i,'IgG food panel','IgG antibodies to common foods.','Sometimes used to explore food sensitivities; not a true allergy test.','Higher classes suggest more exposure or sensitivity.','Low means little reaction.'],
+[/glutamate|dopamine/i,'Urine neurotransmitters','Brain-chemical breakdown products measured in urine.','An indirect, research-style look at stress and mood chemistry.','High can track with stress or stimulants.','Low can track with fatigue or low mood.']
+];
+function labDef(n){var s=String(n).replace(/<[^>]+>/g,'').trim();
+  function one(x){for(var i=0;i<LABDEFS.length;i++){if(LABDEFS[i][0].test(x))return LABDEFS[i];}return null;}
+  var d=one(s);if(d&&d[6])return[d];
+  var parts=s.split(/\s*(?:\/|&|:)\s*/),out=[];if(parts.length>1)parts.forEach(function(p){var e=one(p);if(e&&out.indexOf(e)<0)out.push(e);});
+  if(out.length)return out;return d?[d]:[];}
+function labTip(r){var ds=labDef(r.n),h='';
+  if(!ds.length){h='<div class="ldef"><b>What it is</b> A blood marker your physician ordered. <b>Why it matters</b> It is one piece of your overall health picture. Values outside the reference range are flagged and explained below; ask your physician what yours means for you.</div>';}
+  ds.forEach(function(d){h+='<div class="ldef"><div class="ldt">'+d[1]+'</div><b>What it measures</b> '+d[2]+'<br><b>Why it matters</b> '+d[3]+'<br><b>If high</b> '+d[4]+'<br><b>If low</b> '+d[5]+'</div>';});
+  return h+(r.tip?'<div class="lyour"><div class="ldt">Your result</div>'+r.tip+'</div>':'');}
 function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
 function sheet(n){var e=document.getElementById('s-'+n);e.scrollTop=0;e.classList.add('on');}
 function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});}
