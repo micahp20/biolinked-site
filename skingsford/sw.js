@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'skingsford-v1006 1002(0))-labdefs1';
+const CACHE = 'skingsford-v1006 1002(0))-labdefs1-tapfix1';
 const ASSETS = [
   '/skingsford/',
   '/skingsford/index.html',
