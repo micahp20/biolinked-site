@@ -6626,9 +6626,17 @@ var aa=document.getElementById('bl-aa'); if(aa) aa.addEventListener('click',func
 sync(); })();</script>
 <script id="bl-tiles-js">(function(){
 function set(id,s,na){ var e=document.getElementById(id); if(e) e.textContent=s; if(na){ var o=e&&e.parentNode.parentNode.querySelector('.o'); if(o){ o.textContent='Not on file yet'; o.className='o na'; } } }
-function labs(){ try{ if(typeof LABS!=='undefined'&&LABS){ var s=String(LABS.sub||'').replace(/<[^>]+>/g,''); if(LABS.score) s+=(s?' · ':'')+'score '+LABS.score; set('bts-labs',s||'On file'); return; } }catch(e){}
+function labs(){ try{ if(typeof LABS!=='undefined'&&LABS){ var dv=document.createElement('div'); dv.innerHTML=String(LABS.sub||''); var s=dv.textContent.trim(); if(LABS.score) s+=(s?' · ':'')+'score '+LABS.score; set('bts-labs',s||'On file'); return; } }catch(e){}
   set('bts-labs','No bloodwork on file yet',1); var b=document.getElementById('bt-labs'); }
-function dna(){ set('bts-dna','No DNA report on file yet',1); }
+function dna(){ var h=document.getElementById('s-dna')||document.getElementById('v-dna'), rows=h?h.querySelectorAll('.lrow'):[];
+  if(!h||!rows.length){ set('bts-dna','No DNA report on file yet',1); return; }
+  var g=[]; [].forEach.call(h.querySelectorAll('.lref'),function(e){ var n=e.textContent.trim(); if(n&&n!=='\u2014'&&g.indexOf(n)<0) g.push(n); });
+  var P=['MTHFR','APOE','COMT','VDR','FTO','MTR','MTRR','GSTP1','SOD2','FADS1','HFE'], key=P.filter(function(x){return g.indexOf(x)>=0;}).slice(0,3);
+  if(key.length<3) g.forEach(function(x){ if(key.length<3&&key.indexOf(x)<0) key.push(x); });
+  set('bts-dna',rows.length+' results'+(g.length?' across '+g.length+' genes':'')+(key.length?' \u00b7 '+key.join(', '):''));
+  var t=document.getElementById('bt-dna'); if(t&&!t.dataset.on){ t.dataset.on=1; var sh=h.id==='s-dna'; t.setAttribute('role','button'); t.tabIndex=0; t.style.cursor='pointer';
+    var open=function(){ if(sh) sheet('dna'); else go('dna'); }; t.addEventListener('click',open); t.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(); } });
+    var o=t.querySelector('.o'); if(o){ o.innerHTML='Open &rarr;'; o.className='o'; } } }
 function work(){ var S=null; try{ S=JSON.parse(localStorage.getItem(KP+'wk')||'null'); }catch(e){}
   var best=null; if(S&&S.plans) Object.keys(S.plans).forEach(function(k){ var r=S.plans[k]; if(r&&r.data&&r.data.active&&!r.data.del&&(!best||r.updated_at>best.updated_at)) best=r; });
   if(!best){ set('bts-work','Build your plan in about a minute'); return; }
