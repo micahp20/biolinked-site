@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'wporter-vquote-cyctitle-cg2-labdefs1-tapfix1-wk1-dna1-sch1';
+const CACHE = 'wporter-vquote-cyctitle-cg2-labdefs1-tapfix1-wk1-dna1-sch1-days1';
 const ASSETS = [
   '/wporter/',
   '/wporter/index.html',

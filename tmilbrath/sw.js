@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'tmilbrath-v1006 1002(0))-wk1-dna1-sch1';
+const CACHE = 'tmilbrath-v1006 1002(0))-wk1-dna1-sch1-days1';
 const ASSETS = [
   '/tmilbrath/',
   '/tmilbrath/index.html',
