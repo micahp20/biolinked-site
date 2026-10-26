@@ -1227,6 +1227,15 @@ button.bl-tile{cursor:pointer}button.bl-tile:focus-visible{outline:3px solid #CF
 .sa-tag{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-left:6px}
 .sa-list .lrow2{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,rgba(127,127,127,.18));font-size:13.5px}
 .sa-list .lrow2 .sm{font-size:12px;opacity:.7}
+</style><style id="schdays-css">
+.dp{margin-top:12px;padding-top:12px;border-top:1px solid var(--line,rgba(127,127,127,.2));font-family:var(--sans)}
+.dp-h{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:8px}.dp-h b{font-weight:600}.dp-t{opacity:.7}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dp-d{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:44px;font-size:12px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:10px;cursor:pointer}
+.dp-d input{width:18px;height:18px;margin:0;accent-color:var(--acc,#c9a96e)}
+.dp-n{font-size:12px;margin-top:8px;opacity:.8}.dp-n:empty{display:none}
+.dp-r{margin-top:8px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:12.5px;cursor:pointer}
+.dp-r[hidden]{display:none}
 </style></head>
 <body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
@@ -5235,6 +5244,60 @@ function saRender(){
   var sel=document.getElementById('pc-compound'); if(sel) sel.addEventListener('change',function(){ pan.hidden=true; });
 })();
 try{ renderDoses(); saRender(); }catch(e){}
+/* SCHDAYS v1 */
+/* A client's own weekdays for a protocol compound. Personal override only:
+   the protocol text, dose and cycles are never touched. Saved in the
+   'schedule' sync kind as payload.days, merged per compound (newest wins);
+   "Reset to protocol" is a tombstone so a stale device cannot bring it back. */
+var DP_KEY=SCHKEY+'-days', dpState=null;
+function dpGet(){ if(!dpState){ try{ dpState=JSON.parse(localStorage.getItem(DP_KEY)||'null'); }catch(e){ dpState=null; } if(!dpState||typeof dpState!=='object'||Array.isArray(dpState)) dpState={}; } return dpState; }
+function dpOwn(n){ var r=dpGet()[n]; return (r&&!r.del&&r.days&&r.days.length)?r.days:null; }
+var _dpDue=due;
+function dpProto(c){ var o=[]; for(var i=0;i<7;i++){ if(_dpDue(c,i)) o.push(i); } return o; }
+due=function(c,d){ if(c&&typeof c==='object'&&!c.sa&&c.n){ var own=dpOwn(c.n); if(own) return own.indexOf(d)>=0; } return _dpDue(c,d); };
+function dpSet(n,days){ var s=dpGet(), p=s[n]; s[n]=days?{days:days.slice().sort(),updated_at:saStamp(p)}:{del:true,updated_at:saStamp(p)};
+  try{ localStorage.setItem(DP_KEY,JSON.stringify(s)); }catch(e){} try{ if(!csApplying) csQueue('schedule'); }catch(e){} }
+function dpMerge(remote){
+  var s=dpGet(), ahead=false, k; remote=(remote&&typeof remote==='object')?remote:{};
+  for(k in remote){ var r=remote[k], l=s[k]; if(!r||!r.updated_at) continue; if(!l||Date.parse(r.updated_at)>Date.parse(l.updated_at||0)) s[k]=r; }
+  for(k in s){ var R=remote[k]; if(!R||Date.parse(s[k].updated_at||0)>Date.parse(R.updated_at||0)) ahead=true; }
+  try{ localStorage.setItem(DP_KEY,JSON.stringify(s)); }catch(e){} return ahead;
+}
+function dpNote(c){
+  var p=dpProto(c), own=dpOwn(c.n), cur=own||p;
+  if(!p.length) return {t:'', n:''};
+  var same=cur.length===p.length&&cur.every(function(d){return p.indexOf(d)>=0;});
+  var t='Protocol: '+p.length+' day'+(p.length===1?'':'s')+'/week';
+  var n=same?'':(cur.length<p.length?'You have '+cur.length+' of '+p.length+' days picked. Your protocol calls for '+p.length+' a week.':
+    cur.length>p.length?'You have '+cur.length+' days picked. Your protocol calls for '+p.length+' a week.':'Same number of days as your protocol, on different days.');
+  return {t:t,n:n,own:!!own,cur:cur};
+}
+function dpHTML(c){
+  var nm=saEsc(c.n), x=dpNote(c), cur=x.cur||dpProto(c);
+  return '<div class="dp" data-dp="'+nm+'"><div class="dp-h"><b>Your days</b><span class="dp-t">'+saEsc(x.t)+'</span></div>'+
+    '<div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-dpd="'+i+'"'+(cur.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div>'+
+    '<div class="dp-n">'+saEsc(x.n)+'</div><button type="button" class="dp-r"'+(x.own?'':' hidden')+'>Reset to protocol</button></div>';
+}
+function dpFind(n){ for(var i=0;i<ALL.length;i++){ if(ALL[i].n===n) return ALL[i]; } return null; }
+function dpRefresh(){ try{ renderDoses(); if(typeof renderDue==='function') renderDue(); }catch(e){} }
+(function(){
+  var _cr=cmpRow; cmpRow=function(c,i){ var h=_cr.apply(this,arguments); if(!c||cmpArch(c)||!schOn(c)||!dpProto(c).length) return h;
+    var k=h.lastIndexOf('</div></div>'); return k<0?h:h.slice(0,k)+dpHTML(c)+h.slice(k); };
+  function repaint(box){ var c=dpFind(box.getAttribute('data-dp')); if(!c) return; box.outerHTML=dpHTML(c); }
+  document.addEventListener('change',function(e){ var t=e.target; if(!t||t.getAttribute('data-dpd')==null) return; var box=t.closest('.dp'); if(!box) return;
+    var c=dpFind(box.getAttribute('data-dp')); if(!c) return;
+    var days=[].map.call(box.querySelectorAll('input[data-dpd]:checked'),function(x){return +x.getAttribute('data-dpd');});
+    if(!days.length){ t.checked=true; try{ csToast('Keep at least one day, or tap Reset to protocol'); }catch(_){} return; }
+    var p=dpProto(c), same=days.length===p.length&&days.every(function(d){return p.indexOf(d)>=0;});
+    dpSet(c.n, same?null:days); [].forEach.call(document.querySelectorAll('.dp'),function(b){ if(b.getAttribute('data-dp')===c.n) repaint(b); }); dpRefresh(); });
+  document.addEventListener('click',function(e){ var b=e.target&&e.target.closest&&e.target.closest('.dp-r'); if(!b) return; e.stopPropagation(); var box=b.closest('.dp'), n=box.getAttribute('data-dp');
+    dpSet(n,null); [].forEach.call(document.querySelectorAll('.dp'),function(x){ if(x.getAttribute('data-dp')===n) repaint(x); }); dpRefresh(); try{ csToast('Back to your protocol days'); }catch(_){} });
+  var _cr2=csRead; csRead=function(k){ var p=_cr2.apply(this,arguments); if(k==='schedule'&&p) p.days=dpGet(); return p; };
+  var _ch=csHasLocal; csHasLocal=function(k){ if(k==='schedule'){ for(var x in dpGet()) return true; } return _ch.apply(this,arguments); };
+  var _ca=csApply; csApply=function(k,p){ _ca.apply(this,arguments);
+    if(k==='schedule'&&p){ var ahead=dpMerge(p.days); dpRefresh(); try{ renderAll(); }catch(e){} if(ahead){ try{ csQueue('schedule'); }catch(e){} } } };
+})();
+try{ renderAll(); dpRefresh(); }catch(e){}
 try{ csPull(); }catch(e){}
 /* The views are written into the scroller after it exists, so read its layout
    back on the next frame and let iOS measure the extent against the content
