@@ -1122,7 +1122,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 </head>
-<body><script>/*BL_NOZOOM*/(function(){try{document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false});var lt=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-lt<=320){e.preventDefault();}lt=n;},{passive:false});}catch(e){}})();</script>
+<body><script>/*BL_NOZOOM*/(function(){try{document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false});var lt=0;document.addEventListener('touchend',function(e){var n=Date.now();var it=e.target&&e.target.closest&&e.target.closest('button,a,input,select,textarea,label,summary,[role=\'button\'],[onclick],[data-saday],[data-gkday],[data-maday]');if(n-lt<=320&&!it){e.preventDefault();}lt=n;},{passive:false});}catch(e){}})();</script>
 <div class="device">
   <nav class="side">
     <div class="side-top">
@@ -1218,6 +1218,7 @@
         <p class="lx-sub">Everything for your program &mdash; doses, labs, and payments &mdash; in one place, kept current.</p>
         <button class="lx-cta" onclick="go('sched')">View my schedule &rarr;</button>
       </div>
+      <div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card" role="button" tabindex="0" onclick="go('sched')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
@@ -1807,7 +1808,7 @@ var BL_KEY=(function(){
   }
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
 })();
-function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); if(k==='1234'){ try{ localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); if(n-lt<=320){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); if(k==='1234'){ try{ localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); var it=e.target&&e.target.closest&&e.target.closest('button,a,input,select,textarea,label,summary,[role=\'button\'],[onclick],[data-saday],[data-gkday],[data-maday]'); if(n-lt<=320&&!it){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
 /* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
 var GK_VIEWONLY=!(function(){try{return localStorage.getItem(KP+'unlocked')==='1';}catch(e){return false;}})(); /* view-only until unlocked with the passcode */
 
@@ -2889,14 +2890,23 @@ function openInv(i){
       block:saBlock, days:saDays.slice().sort(function(a,b){return a-b;}),
       foundation:false, active:true, runWeeks:saOngoing?null:weeks
     };
-    if(typeof gkState==='undefined' || !gkState.compounds){ showErr('Schedule is not ready yet.'); return; }
-    gkState.compounds.push(cmp);
-    if(typeof gkSave==='function') gkSave(true);
-    else if(typeof gkCacheLocal==='function') gkCacheLocal();
-    if(typeof gkRender==='function') gkRender();
+    if(typeof gkState==='undefined' || !gkState || !gkState.compounds){ showErr('Schedule is not ready yet. Close this screen and try again.'); return; }
+    /* Never fail silently: any error shows on this screen instead of the tap doing nothing. */
+    try{
+      gkState.compounds.push(cmp);
+      /* Jump the schedule to a day the new compound is actually due, so the
+         member sees it land (today may be an off-day for it). */
+      var today=(new Date()).getDay(), show=null;
+      for(var k=0;k<7;k++){ var d=(today+k)%7; if(cmp.days.indexOf(d)>=0){ show=d; break; } }
+      if(show!==null && typeof gkState.selected==='number' && cmp.days.indexOf(gkState.selected)<0){ gkState.selected=show; gkState.open=null; }
+      if(typeof gkSave==='function') gkSave(true);
+      else if(typeof gkCacheLocal==='function') gkCacheLocal();
+      if(typeof gkRender==='function') gkRender();
+    }catch(err){ showErr('Could not add it: '+((err&&err.message)||err)+'. Please try again.'); return; }
+    try{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); }catch(e){}
     if(typeof closeSheet==='function') closeSheet();
     if(typeof go==='function') go('sched');
-    if(typeof gkToast==='function') gkToast(name+' added to your schedule.');
+    if(typeof gkToast==='function') gkToast(name+' added \u00b7 '+(typeof gkDayText==='function'?gkDayText(cmp.days):'')+' '+cmp.block);
   }
   var sb=el('pc-schedbtn'); if(sb) sb.addEventListener('click', openSchedAdd);
   var daysHost=el('sa-days');
@@ -5543,19 +5553,18 @@ function stkIx(name,ev){
 }
 function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
 var PROTOABOUT={
-  t:"A daily foundation built around recovery, skin and tissue quality, cognition and sleep \u2014 HGH and GHK-Cu every morning, Cortagen and Cerebrolysin alongside them, and a pineal pair at night.",
-  s:"The morning cluster \u2014 HGH, GHK-Cu, Cortagen and Cerebrolysin \u2014 covers growth-hormone support, collagen and tissue, and the cognitive side. Tesofine and SLU-PP-332 run Monday to Friday as the oral pair. Epithalon and Pinealon sit at night for the sleep-and-recovery side of the cycle.",
-  w:"Mornings carry the four AM shots plus the two orals, taken fasted. Evenings carry Epithalon and Pinealon. Weekends drop the two orals."
+  t:"Your program runs in phases on a steady base. First a sleep-and-stress reset (Pinealon + Epitalon), then cell-energy repair (SS-31), then energy, tissue and a nightly growth-hormone pulse (MOTS-C, GHK-Cu and CJC/Ipa), with Retatrutide twice a week for fat loss. The Rebuild (Order 3) adds a recovery layer: BPC-157/TB-500, KPV, Cartalax, GHK-Cu and Epitalon.",
+  s:"Each phase sets up the next. Better sleep comes first so the repair work lands, and repaired cells respond better to the energy and growth-hormone signals that follow. Retatrutide handles appetite and fat loss while protein and training protect muscle. The Rebuild compounds target healing and inflammation, so recovery keeps up with training. None of them conflict with your testosterone pellets, finasteride, tamsulosin or trazodone (see Notes &amp; Tips).",
+  w:"Your Schedule tab has the exact days and AM/PM timing for every compound. CJC/Ipa is PM, Monday to Friday, fasted (last food 1.5\u20132 hours before). Retatrutide is AM on Monday and Thursday."
 };
-/* Groups the full stack (ALL) by its tag so every compound -- current AND
-   past -- shows up as a clickable button into its Index card. The narrative
-   (What it targets / Why / Timing) stays on top in its own group. */
+/* Edward's page has no CYCS, so the protocol is shown by order: each paid order
+   lists its compounds as buttons into the Compound Index, and anything else on
+   his schedule is listed after them. Pricing lives on the Invoices tab. */
 var ABOUT_GROUPS=[
-  {tag:'Baseline', meta:'the ongoing baseline'},
-  {tag:'Daily', meta:'daily AM cluster'},
-  {tag:'Oral \u00b7 M\u2013F', meta:'weekday orals'},
-  {tag:'Daily \u00b7 PM', meta:'evening block'},
-  {tag:'Past', meta:'kept for reference'}
+  {tag:'The Rebuild \u00b7 Order 3', meta:'$365 \u00b7 paid', ns:['BPC-157 / TB-500 \u00b7 10 mg','KPV \u00b7 10 mg','Cartalax \u00b7 20 mg','GHK-Cu \u00b7 50 mg','Epitalon \u00b7 50 mg']},
+  {tag:'Core Stack \u00b7 Order 1', meta:'$1,093 \u00b7 paid', ns:['Pinealon \u00b7 10 mg','Epitalon \u00b7 50 mg','SS-31 (Elamipretide) \u00b7 50 mg','MOTS-C \u00b7 20 mg','CJC-1295 / Ipamorelin Blend \u00b7 5 / 5 mg','GHK-Cu \u00b7 50 mg','Retatrutide \u00b7 30 mg','BPC-157 \u00b7 10 mg','Cartalax \u00b7 20 mg']},
+  {tag:'Retatrutide \u00b7 Order 2', meta:'$160 \u00b7 paid', ns:['Retatrutide \u00b7 40 mg']},
+  {tag:'Also on your schedule', meta:'household and as-needed', rest:true}
 ];
 function renderAbout(){
   var host=document.getElementById('protoabout'); if(!host) return;
@@ -5570,7 +5579,12 @@ function renderAbout(){
   var g='';
   for(var k=0;k<ABOUT_GROUPS.length;k++){
     var tg=ABOUT_GROUPS[k].tag, rows=[];
-    for(var j=0;j<src.length;j++){ if((src[j].tag||'')===tg) rows.push(src[j]); }
+    var G=ABOUT_GROUPS[k];
+    for(var j=0;j<src.length;j++){
+      var nn=src[j].n, inAny=false;
+      for(var q=0;q<ABOUT_GROUPS.length;q++){ if(ABOUT_GROUPS[q].ns&&ABOUT_GROUPS[q].ns.indexOf(nn)>=0) inAny=true; }
+      if(G.ns ? G.ns.indexOf(nn)>=0 : (G.rest ? !inAny : (src[j].tag||'')===tg)) rows.push(src[j]);
+    }
     if(!rows.length) continue;
     g+='<div class="cgrp'+(tg==='Past'?' pastgrp':'')+'" id="cg-ab'+k+'">'+
        '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
@@ -5582,7 +5596,7 @@ function renderAbout(){
   }
   if(!g){ host.innerHTML=''; return; }
   host.innerHTML='<div class="seclbl">About This Protocol</div>'+
-    '<div class="cgrp on" id="cg-abx">'+
+    '<div class="cgrp" id="cg-abx">'+
       '<div class="cgrp-hd" onclick="cgTog(\'abx\')">'+
         '<div><div class="cgrp-t">How the stack is built</div>'+
         '<div class="cgrp-m">what it targets, why, and timing</div></div>'+
@@ -5592,7 +5606,8 @@ function renderAbout(){
         '<div class="abt-l">What it targets</div><div class="abt-p">'+PROTOABOUT.t+'</div>'+
         '<div class="abt-l">Why these together</div><div class="abt-p">'+PROTOABOUT.s+'</div>'+
         '<div class="abt-l">Timing</div><div class="abt-p">'+PROTOABOUT.w+'</div>'+
-      '</div></div></div>'+g;
+      '</div></div></div>'+g+
+    '<button type="button" class="lx-cta" style="margin:14px auto 4px;display:block" onclick="go(\'pay\')">View orders &amp; pricing &rarr;</button>';
 }
 /* ---------- MEDS DETAIL ---------- */
 function renderMeds(){

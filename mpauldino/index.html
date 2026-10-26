@@ -1103,7 +1103,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 </head>
-<body><script>/*BL_NOZOOM*/(function(){try{document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false});var lt=0;document.addEventListener('touchend',function(e){var n=Date.now();if(n-lt<=320){e.preventDefault();}lt=n;},{passive:false});}catch(e){}})();</script>
+<body><script>/*BL_NOZOOM*/(function(){try{document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false});document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false});var lt=0;document.addEventListener('touchend',function(e){var n=Date.now();var it=e.target&&e.target.closest&&e.target.closest('button,a,input,select,textarea,label,summary,[role=\'button\'],[onclick],[data-saday],[data-gkday],[data-maday]');if(n-lt<=320&&!it){e.preventDefault();}lt=n;},{passive:false});}catch(e){}})();</script>
 <div class="device">
   <nav class="side">
     <div class="side-top">
@@ -1819,7 +1819,7 @@ var BL_KEY=(function(){
   }
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
 })();
-function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); var REAL='fyZDECQVBvyHcithQAsWqVoote0Gs_MhJkUfrP8QeB0'; if(k==='1211'||k===REAL){ try{ localStorage.setItem(KP+'mkey',REAL); localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } /* Block pinch / double-tap zoom so the layout (esp. the Calculator) stays put. */ (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); if(n-lt<=320){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); var REAL='fyZDECQVBvyHcithQAsWqVoote0Gs_MhJkUfrP8QeB0'; if(k==='1211'||k===REAL){ try{ localStorage.setItem(KP+'mkey',REAL); localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } /* Block pinch / double-tap zoom so the layout (esp. the Calculator) stays put. */ (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); var it=e.target&&e.target.closest&&e.target.closest('button,a,input,select,textarea,label,summary,[role=\'button\'],[onclick],[data-saday],[data-gkday],[data-maday]'); if(n-lt<=320&&!it){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
 /* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
 var GK_VIEWONLY=!(function(){try{return localStorage.getItem(KP+'unlocked')==='1';}catch(e){return false;}})();
 
@@ -2963,14 +2963,23 @@ function openInv(i){
       block:saBlock, days:saDays.slice().sort(function(a,b){return a-b;}),
       foundation:false, active:true, runWeeks:saOngoing?null:weeks
     };
-    if(typeof gkState==='undefined' || !gkState.compounds){ showErr('Schedule is not ready yet.'); return; }
-    gkState.compounds.push(cmp);
-    if(typeof gkSave==='function') gkSave(true);
-    else if(typeof gkCacheLocal==='function') gkCacheLocal();
-    if(typeof gkRender==='function') gkRender();
+    if(typeof gkState==='undefined' || !gkState || !gkState.compounds){ showErr('Schedule is not ready yet. Close this screen and try again.'); return; }
+    /* Never fail silently: any error shows on this screen instead of the tap doing nothing. */
+    try{
+      gkState.compounds.push(cmp);
+      /* Jump the schedule to a day the new compound is actually due, so the
+         member sees it land (today may be an off-day for it). */
+      var today=(new Date()).getDay(), show=null;
+      for(var k=0;k<7;k++){ var d=(today+k)%7; if(cmp.days.indexOf(d)>=0){ show=d; break; } }
+      if(show!==null && typeof gkState.selected==='number' && cmp.days.indexOf(gkState.selected)<0){ gkState.selected=show; gkState.open=null; }
+      if(typeof gkSave==='function') gkSave(true);
+      else if(typeof gkCacheLocal==='function') gkCacheLocal();
+      if(typeof gkRender==='function') gkRender();
+    }catch(err){ showErr('Could not add it: '+((err&&err.message)||err)+'. Please try again.'); return; }
+    try{ if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); }catch(e){}
     if(typeof closeSheet==='function') closeSheet();
     if(typeof go==='function') go('sched');
-    if(typeof gkToast==='function') gkToast(name+' added to your schedule.');
+    if(typeof gkToast==='function') gkToast(name+' added \u00b7 '+(typeof gkDayText==='function'?gkDayText(cmp.days):'')+' '+cmp.block);
   }
   var sb=el('pc-schedbtn'); if(sb) sb.addEventListener('click', openSchedAdd);
   var daysHost=el('sa-days');
