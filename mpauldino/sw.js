@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mpauldino/, which is now the real page: the app layout
 // was promoted here from the /mpauldino/app/ pilot.
-const CACHE = 'mpauldino-vedit-fix-labdefs1-tapfix1-wk1-dna1';
+const CACHE = 'mpauldino-vedit-fix-labdefs1-tapfix1-wk1-dna1-sch1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mpauldino/',
