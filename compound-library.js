@@ -36,8 +36,8 @@ var BL_LIB = {
  "AHK-Cu": {
   "goal": "Hair growth stimulation, follicle health, scalp improvement",
   "mech": "Copper peptide complex (Ala-His-Lys-Cu) researched for hair follicle health and growth stimulation. Activates follicle stem cells, improves scalp blood circulation, and stimulates follicle-supporting growth factors.",
-  "notes": "Popular in hair loss prevention protocols. Pairs with Pal-AHK for comprehensive follicle support.",
-  "sub": "Copper Peptide for Hair"
+  "notes": "Available at Bio Linked as an injectable: 100 mg vial mixed with 3 mL bacteriostatic water, 10 units (about 3.3 mg) SubQ Monday to Friday, usually run 8 weeks on and 8 weeks off. $35 per vial. Popular in hair loss prevention protocols; pairs with GHK-Cu for skin and nails and with Pal-AHK for topical follicle support.",
+  "sub": "Copper Peptide for Hair, Skin & Nails"
  },
  "AICAR": {
   "goal": "Fat oxidation, metabolic adaptation, exercise-mimetic effects",
