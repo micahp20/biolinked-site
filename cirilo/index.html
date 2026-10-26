@@ -1209,7 +1209,25 @@ button.bl-tile{cursor:pointer}button.bl-tile:focus-visible{outline:3px solid #CF
 .bl-tile .t{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:700;line-height:1}
 .bl-tile .s{display:block;color:#c9c9c9;font-size:13px;margin-top:5px;line-height:1.35}
 .bl-tile .o{color:#CFB87C;font-size:13px;font-weight:700}.bl-tile .o.na{color:#8d8d8d;font-weight:600}</style>
-<style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style></head>
+<style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style><style id="schadd-css">
+.pc-sch{background:transparent!important;border:1.5px solid var(--acc,#c9a96e)!important;color:var(--ink,inherit)!important;margin-top:8px}
+.sa-pan{margin-top:10px;padding:14px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;font-family:var(--sans)}
+.sa-pan[hidden]{display:none}
+.sa-t{font-size:14px;font-weight:600;margin:0 0 2px}.sa-s{font-size:12.5px;opacity:.7;margin:0 0 10px}
+.sa-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px}
+.sa-d{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;padding:8px 0;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:10px;cursor:pointer;min-height:44px;justify-content:center}
+.sa-d input{width:18px;height:18px;margin:0;accent-color:var(--acc,#c9a96e)}
+.sa-row{display:flex;gap:8px;margin-bottom:10px}
+.sa-b{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:13.5px;cursor:pointer}
+.sa-b.on{background:var(--acc,#c9a96e);color:#111;border-color:transparent}
+.sa-b.pri{background:var(--acc,#c9a96e);color:#111;border-color:transparent;font-weight:600}
+.sa-b:disabled{opacity:.45;cursor:default}
+.sa-rm{margin-left:auto;align-self:center;min-height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font-size:12px;cursor:pointer;font-family:var(--sans)}
+.drow.sa-own{align-items:center}
+.sa-tag{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-left:6px}
+.sa-list .lrow2{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,rgba(127,127,127,.18));font-size:13.5px}
+.sa-list .lrow2 .sm{font-size:12px;opacity:.7}
+</style></head>
 <body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
   <nav class="side">
@@ -2722,7 +2740,7 @@ function openInv(i){
          and every draw off it, comes out wrong by 1000x. */
       var vialN = v ? v.n : null;
       if(v && v.u && v.u !== unit && v.u !== 'ml'){
-        if(v.u === 'mg'  && unit === 'mcg') vialN = v.n * 1000;
+        if(v.u === 'mg'  && unit === 'mcg') vialN = v.n;   /* the vial field is always mg; the dose converts from mcg */
         else if(v.u === 'mcg' && unit === 'mg') vialN = v.n / 1000;
         else if(v.u !== unit) unit = v.u;        /* IU vs mass — trust the vial */
       }
@@ -2759,9 +2777,9 @@ function openInv(i){
     var c = LIB[+v]; if(!c) return;
     nameField.hidden = true;
     nameEl.value = c.name;
-    if(c.vial != null) vialEl.value = String(c.vial);
-    if(c.bac  != null) bacEl.value  = String(c.bac);
-    if(c.dose != null) doseEl.value = String(c.dose);
+    vialEl.value = (c.vial != null) ? String(c.vial) : '';   /* never keep the last compound's numbers */
+    bacEl.value  = (c.bac  != null) ? String(c.bac)  : '';
+    doseEl.value = (c.dose != null) ? String(c.dose) : '';
     setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
     curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
@@ -4992,6 +5010,123 @@ renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats
     if(typeof nStore==='function'){ var _ns=nStore; nStore=function(k,v){ var r=_ns.apply(this,arguments); if(!csApplying) csQueue('nutrition'); return r; }; }
   }catch(e){}
 })();
+/* SCHADD v1 */
+/* Compounds a client adds from the dosing calculator. They live beside the
+   protocol schedule (never inside ALL), save in the 'schedule' sync kind as
+   payload.add, and merge per item: the newer updated_at wins, and a removal is
+   a tombstone so it cannot be undone by a stale device. */
+var SA_KEY=SCHKEY+'-add', saState=null;
+var SA_DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'], SA_ORD=[1,2,3,4,5,6,0];
+function saGet(){ if(!saState){ try{ saState=JSON.parse(localStorage.getItem(SA_KEY)||'null'); }catch(e){ saState=null; } if(!saState||typeof saState!=='object'||Array.isArray(saState)) saState={}; } return saState; }
+function saStore(){ try{ localStorage.setItem(SA_KEY,JSON.stringify(saGet())); }catch(e){} }
+function saStamp(p){ var q=p&&p.updated_at?Date.parse(p.updated_at)+1:0; return new Date(Math.max(Date.now(),q||0)).toISOString(); }
+function saLive(){ var s=saGet(),o=[]; for(var k in s){ if(s[k]&&!s[k].del) o.push(s[k]); } o.sort(function(a,b){return String(a.n).localeCompare(String(b.n));}); return o; }
+function saDaysTxt(d){ d=(d||[]).slice().sort(); if(d.length===7) return 'Daily'; if(d.join()==='1,2,3,4,5') return 'Mon–Fri';
+  return SA_ORD.filter(function(i){return d.indexOf(i)>=0;}).map(function(i){return SA_DN[i];}).join(' / '); }
+function saRow(it){ return {n:it.n,d:it.d||'',u:it.u||'',b:it.b==='PM'?'PM':'AM',days:it.days||[],c:saDaysTxt(it.days),sa:it.id}; }
+function saEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
+function saCommit(){ saStore(); try{ if(!csApplying) csQueue('schedule'); }catch(e){} saRender(); }
+function saPut(it){ var s=saGet(); var prev=s[it.id]; it.updated_at=saStamp(prev); s[it.id]=it; saCommit(); }
+function saRemove(id){ var s=saGet(), p=s[id]; if(!p) return; s[id]={id:id,n:p.n,del:true,updated_at:saStamp(p)}; saCommit(); }
+function saFind(name){ var l=saLive(); for(var i=0;i<l.length;i++){ if(String(l[i].n).toLowerCase()===String(name).toLowerCase()) return l[i]; } return null; }
+function saMerge(remote){
+  /* newest edit per item wins; returns true when this device still holds something newer */
+  var s=saGet(), ahead=false, k;
+  remote=(remote&&typeof remote==='object')?remote:{};
+  for(k in remote){ var r=remote[k], l=s[k]; if(!r||!r.updated_at) continue; if(!l||Date.parse(r.updated_at)>Date.parse(l.updated_at||0)) s[k]=r; }
+  for(k in s){ var R=remote[k]; if(!R||Date.parse(s[k].updated_at||0)>Date.parse(R.updated_at||0)) ahead=true; }
+  saStore(); return ahead;
+}
+(function(){
+  var _sr=schRows; schRows=function(){ return _sr.apply(this,arguments).concat(saLive().map(saRow)); };
+  var _rd=renderDoses; renderDoses=function(){
+    var _cy=window.cycHas; if(typeof _cy==='function') window.cycHas=function(c){ return c&&c.sa?true:_cy.apply(this,arguments); };
+    try{ _rd.apply(this,arguments); } finally { if(typeof _cy==='function') window.cycHas=_cy; }
+    /* mark the client-added rows and give them a Remove button */
+    var host=document.getElementById('doses'); if(!host) return;
+    /* Rebuild the exact row order renderDoses drew (Morning then Night) and
+       tag by position, never by name: a protocol row that shares a name with
+       a client-added item must never get the tag or a Remove button. */
+    var _c=(typeof cycCurrent==='function')?cycCurrent():null, list=[];
+    var rows=schRows().filter(function(c){ return due(c,sel)&&(c.sa||!_c||(typeof cycHas==='function'?cycHas(c,_c):true)); });
+    ['AM','PM'].forEach(function(g){ rows.forEach(function(c){ if(inBlock(c,g)) list.push(c); }); });
+    var drs=host.querySelectorAll('.drow'); if(drs.length!==list.length) return;
+    for(var i=0;i<drs.length;i++){ var c=list[i], r=drs[i], nm=r.querySelector('.nm'); if(!c.sa||!nm) continue;
+      r.classList.add('sa-own'); nm.insertAdjacentHTML('beforeend','<span class="sa-tag">Added</span>');
+      r.insertAdjacentHTML('beforeend','<button type="button" class="sa-rm" data-sa="'+saEsc(c.sa)+'">Remove</button>'); }
+  };
+  var _cr=csRead; csRead=function(k){ var p=_cr.apply(this,arguments); if(k==='schedule'&&p) p.add=saGet(); return p; };
+  var _ch=csHasLocal; csHasLocal=function(k){ if(k==='schedule'){ for(var x in saGet()) return true; } return _ch.apply(this,arguments); };
+  var _ca=csApply; csApply=function(k,p){
+    if(k==='schedule'&&p&&!p.on&&p.add){ p=JSON.parse(JSON.stringify(p)); }
+    _ca.apply(this,arguments);
+    if(k==='schedule'&&p){ var ahead=saMerge(p.add); try{ renderDoses(); saRender(); }catch(e){} if(ahead){ try{ csQueue('schedule'); }catch(e){} } }
+  };
+  document.addEventListener('click',function(e){ var b=e.target&&e.target.closest&&e.target.closest('.sa-rm'); if(!b) return; e.preventDefault(); e.stopPropagation(); saRemove(b.getAttribute('data-sa')); renderDoses(); });
+})();
+function saGuideDays(f){
+  f=String(f||'');
+  if(/mon\s*[–-]\s*fri/i.test(f)) return [1,2,3,4,5];
+  if(/every other day/i.test(f)) return [1,3,5];
+  if(/daily|AM only|every day/i.test(f)) return [0,1,2,3,4,5,6];
+  return [];
+}
+function saGuide(name){ var L=window.BL_DOSING||[]; for(var i=0;i<L.length;i++){ if(L[i].name===name) return L[i]; } return null; }
+/* Schedule tab: a short list of everything the client added, removable on any day */
+function saRender(){
+  var host=document.getElementById('sa-list');
+  if(!host){ var dn=document.getElementById('dosenote'); if(!dn) return; host=document.createElement('div'); host.id='sa-list'; host.className='sa-list'; dn.parentNode.insertBefore(host,dn.nextSibling); }
+  var l=saLive();
+  if(!l.length){ host.innerHTML=''; return; }
+  host.innerHTML='<div class="seclbl">Added From Calculator<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
+    return '<div class="lrow2"><div><div>'+saEsc(it.n)+'</div><div class="sm">'+saEsc([it.d,it.u,saDaysTxt(it.days),it.b==='PM'?'Night':'Morning'].filter(Boolean).join(' · '))+'</div></div><button type="button" class="sa-rm" data-sa="'+saEsc(it.id)+'">Remove</button></div>';
+  }).join('');
+}
+/* Calculator: "+ Add to my schedule" with Mon–Sun day boxes */
+(function(){
+  var add=document.getElementById('pc-addbtn'); if(!add) return;
+  var btn=document.createElement('button'); btn.type='button'; btn.className='pc-add pc-sch'; btn.id='pc-schbtn'; btn.textContent='+ Add to my schedule';
+  var pan=document.createElement('div'); pan.className='sa-pan'; pan.id='sa-pan'; pan.hidden=true;
+  add.parentNode.insertBefore(btn,add.nextSibling); btn.parentNode.insertBefore(pan,btn.nextSibling);
+  var cur=null;
+  function val(id){ var e=document.getElementById(id); return e?e.value:''; }
+  function compound(){
+    var sel=document.getElementById('pc-compound'), name='';
+    if(sel && sel.value==='__custom__') name=val('pc-name').trim();
+    else if(sel && sel.selectedIndex>=0){ name=val('pc-name').trim()||sel.options[sel.selectedIndex].text; }
+    var du=document.getElementById('pc-doseunit'), dose=val('pc-dose');
+    var u=(document.getElementById('pc-units')||{}).textContent||'';
+    u=String(u).replace(/\s+/g,'').replace(/^(\d+(\.\d+)?)u?$/,'$1u'); if(!/[1-9]/.test(u)) u='';
+    return {n:name, d:dose?(dose+' '+(du?du.value:'mg')):'', u:u};
+  }
+  function open(){
+    var c=compound(); if(!c.n){ pan.hidden=false; pan.innerHTML='<p class="sa-s">Pick a compound first.</p>'; return; }
+    var ex=saFind(c.n), g=saGuide(c.n);
+    var days=ex?ex.days.slice():saGuideDays(g&&g.freq);
+    cur={id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)), n:c.n, d:c.d, u:c.u, b:ex?ex.b:(/pm|night|bed/i.test(g&&g.timing||'')?'PM':'AM'), days:days};
+    var note=g&&g.freq?('Dosing guide: '+saEsc(g.freq)+'. Change the days to suit you.'):'No schedule on file in the dosing guide. Pick your days.';
+    pan.hidden=false;
+    pan.innerHTML='<p class="sa-t">'+(ex?'Update ':'Add ')+saEsc(c.n)+'</p><p class="sa-s">'+saEsc([c.d,c.u].filter(Boolean).join(' · '))+(c.d?' · ':'')+note+'</p>'+
+      '<div class="sa-days">'+SA_ORD.map(function(i){ return '<label class="sa-d"><input type="checkbox" data-d="'+i+'"'+(days.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div>'+
+      '<div class="sa-row"><button type="button" class="sa-b'+(cur.b==='AM'?' on':'')+'" data-b="AM">Morning</button><button type="button" class="sa-b'+(cur.b==='PM'?' on':'')+'" data-b="PM">Night</button></div>'+
+      '<div class="sa-row"><button type="button" class="sa-b" data-x="cancel">Cancel</button><button type="button" class="sa-b pri" data-x="save">'+(ex?'Save changes':'Add to schedule')+'</button></div>'+
+      (ex?'<div class="sa-row"><button type="button" class="sa-b" data-x="rm">Remove from schedule</button></div>':'');
+    sync();
+  }
+  function sync(){ var s=pan.querySelector('[data-x="save"]'); if(s) s.disabled=!cur||!cur.days.length; }
+  pan.addEventListener('change',function(e){ var d=e.target.getAttribute('data-d'); if(d==null||!cur) return; d=+d; var i=cur.days.indexOf(d); if(e.target.checked&&i<0) cur.days.push(d); if(!e.target.checked&&i>=0) cur.days.splice(i,1); sync(); });
+  pan.addEventListener('click',function(e){ var t=e.target.closest('button'); if(!t||!cur) return;
+    var b=t.getAttribute('data-b'); if(b){ cur.b=b; pan.querySelectorAll('[data-b]').forEach(function(x){ x.classList.toggle('on',x===t); }); return; }
+    var x=t.getAttribute('data-x');
+    if(x==='cancel'){ pan.hidden=true; return; }
+    if(x==='rm'){ saRemove(cur.id); renderDoses(); pan.hidden=true; try{ csToast('Removed from your schedule'); }catch(_){} return; }
+    if(x==='save'&&cur.days.length){ cur.days.sort(); saPut({id:cur.id,n:cur.n,d:cur.d,u:cur.u,b:cur.b,days:cur.days.slice()}); renderDoses(); pan.hidden=true;
+      try{ csToast(cur.n+' is on your schedule · '+saDaysTxt(cur.days)); }catch(_){} }
+  });
+  btn.addEventListener('click',function(){ if(!pan.hidden){ pan.hidden=true; return; } open(); });
+  var sel=document.getElementById('pc-compound'); if(sel) sel.addEventListener('change',function(){ pan.hidden=true; });
+})();
+try{ renderDoses(); saRender(); }catch(e){}
 try{ csPull(); }catch(e){}
 /* The views are written into the scroller after it exists, so read its layout
    back on the next frame and let iOS measure the extent against the content

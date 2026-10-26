@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'vbernal-quintana-reta-disc-labdefs1-tapfix1-wk1-dna1';
+const CACHE = 'vbernal-quintana-reta-disc-labdefs1-tapfix1-wk1-dna1-sch1';
 const ASSETS = [
   '/vbernal-quintana/',
   '/vbernal-quintana/index.html',

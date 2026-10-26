@@ -2855,7 +2855,7 @@ function openInv(i){
          and every draw off it, comes out wrong by 1000x. */
       var vialN = v ? v.n : null;
       if(v && v.u && v.u !== unit && v.u !== 'ml'){
-        if(v.u === 'mg'  && unit === 'mcg') vialN = v.n * 1000;
+        if(v.u === 'mg'  && unit === 'mcg') vialN = v.n;   /* the vial field is always mg; the dose converts from mcg */
         else if(v.u === 'mcg' && unit === 'mg') vialN = v.n / 1000;
         else if(v.u !== unit) unit = v.u;        /* IU vs mass — trust the vial */
       }
@@ -2892,9 +2892,9 @@ function openInv(i){
     var c = LIB[+v]; if(!c) return;
     nameField.hidden = true;
     nameEl.value = c.name;
-    if(c.vial != null) vialEl.value = String(c.vial);
-    if(c.bac  != null) bacEl.value  = String(c.bac);
-    if(c.dose != null) doseEl.value = String(c.dose);
+    vialEl.value = (c.vial != null) ? String(c.vial) : '';   /* never keep the last compound's numbers */
+    bacEl.value  = (c.bac  != null) ? String(c.bac)  : '';
+    doseEl.value = (c.dose != null) ? String(c.dose) : '';
     setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
     curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
