@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'ejirikils-v2-tapfix1-mf1-hsn1-wk1-dna1-sch1-days1-std1';
+const CACHE = 'ejirikils-v2-tapfix1-mf1-hsn1-wk1-dna1-sch1-days1-std2';
 const ASSETS = [
   '/ejirikils/',
   '/ejirikils/index.html',
