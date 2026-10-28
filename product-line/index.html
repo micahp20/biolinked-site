@@ -304,6 +304,25 @@ html[data-theme] body{
 .confirm-step{font-size:14px;color:var(--ink);line-height:1.6;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin-top:10px;}
 .confirm-step b{color:var(--gold);}
 .confirm-step a{color:var(--gold);font-weight:600;}
+/* one-tap pay button on the confirmation screen */
+.pay-now{
+  display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
+  font-family:var(--body-font);font-size:15px;font-weight:700;letter-spacing:.02em;
+  color:#fff;background:var(--gold);border:none;border-radius:99px;padding:16px;
+  margin-top:14px;cursor:pointer;text-decoration:none;transition:background .15s;
+}
+.pay-now:hover{background:var(--gold-hi);}
+.pay-now .pn-amt{font-family:var(--head-font);font-size:19px;font-weight:600;}
+.pay-copy{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
+  font-family:var(--body-font);font-size:15px;font-weight:600;color:var(--ink);
+  background:var(--cream);border:1px solid var(--gold-line);border-radius:12px;
+  padding:14px 16px;margin-top:14px;cursor:pointer;transition:border-color .15s,background .15s;
+}
+.pay-copy:hover{border-color:var(--gold);background:var(--gold-dim);}
+.pay-copy .pc-num{font-family:var(--head-font);font-size:18px;color:var(--gold);}
+.pay-copy .pc-tag{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.confirm-hint{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.55;}
 
 /* ── compound info modal ──────────────────────────────────────────── */
 .modal{
@@ -480,6 +499,8 @@ html[data-theme] body{
       <div class="confirm-title">Order Received!</div>
       <div class="confirm-total" id="confTotal">$0.00</div>
       <div class="confirm-step" id="confStep"></div>
+      <div id="confPay"></div>
+      <div class="confirm-hint" id="confHint"></div>
     </div>
   </aside>
 
@@ -1037,16 +1058,52 @@ html[data-theme] body{
     checkout.style.display = 'none';
     document.getElementById('confTotal').textContent = money(grand);
 
-    var step;
+    var amt = grand.toFixed(2);
+    var note = 'BioLinked Order';
+    var stepEl = document.getElementById('confStep');
+    var payEl  = document.getElementById('confPay');
+    var hintEl = document.getElementById('confHint');
+    payEl.innerHTML = '';
+    hintEl.textContent = '';
+
     if (pay.method === 'Cash App') {
-      step = 'Now send <b>' + money(grand) + '</b> via <b>Cash App</b> to ' +
-             '<a href="https://cash.app/$micahpauldino" target="_blank" rel="noopener">$micahpauldino</a>. ' +
-             'Your order ships once payment is confirmed.';
+      stepEl.innerHTML = 'One tap to finish — this opens <b>Cash App</b> with your total already filled in. Just hit pay.';
+      // Cash App deep link with the amount prefilled
+      var caUrl = 'https://cash.app/$micahpauldino/' + amt;
+      payEl.innerHTML = '<a class="pay-now" href="' + caUrl + '" target="_blank" rel="noopener">' +
+                        'Pay <span class="pn-amt">' + money(grand) + '</span> in Cash App &rarr;</a>';
+      hintEl.textContent = 'If it doesn’t open, send ' + money(grand) + ' to $micahpauldino manually. Your order ships once payment is confirmed.';
+    } else if (pay.method === 'Venmo') {
+      stepEl.innerHTML = 'One tap to finish — this opens <b>Venmo</b> with your total already filled in. Just hit pay.';
+      // Venmo pay link: amount + note prefilled; redirects into the app on mobile
+      var vUrl = 'https://venmo.com/micahp20?txn=pay&amount=' + amt + '&note=' + encodeURIComponent(note);
+      payEl.innerHTML = '<a class="pay-now" href="' + vUrl + '" target="_blank" rel="noopener">' +
+                        'Pay <span class="pn-amt">' + money(grand) + '</span> in Venmo &rarr;</a>';
+      hintEl.textContent = 'If it doesn’t open, send ' + money(grand) + ' to @micahp20 manually. Your order ships once payment is confirmed.';
     } else {
-      step = 'Now send <b>' + money(grand) + '</b> via <b>' + esc(pay.method) +
-             '</b> to <b>' + esc(pay.handle) + '</b>. Your order ships once payment is confirmed.';
+      // Zelle — no deep link; tap to copy the number
+      stepEl.innerHTML = 'Send <b>' + money(grand) + '</b> via <b>Zelle</b>. Tap below to copy the number.';
+      payEl.innerHTML = '<button type="button" class="pay-copy" id="zelleCopy">' +
+                          '<span><span class="pc-tag">Tap to copy</span><br><span class="pc-num">720-938-0698</span></span>' +
+                          '<span class="pc-tag" id="zelleState">Copy</span>' +
+                        '</button>';
+      var btn = document.getElementById('zelleCopy');
+      btn.addEventListener('click', function () {
+        var num = '720-938-0698';
+        var done = function () { document.getElementById('zelleState').textContent = 'Copied ✓'; };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(num).then(done, function () { done(); });
+        } else {
+          try {
+            var t = document.createElement('textarea'); t.value = num;
+            document.body.appendChild(t); t.select(); document.execCommand('copy');
+            document.body.removeChild(t); done();
+          } catch (e) {}
+        }
+      });
+      hintEl.textContent = 'Send ' + money(grand) + ' to 720-938-0698 in your bank’s Zelle. Your order ships once payment is confirmed.';
     }
-    document.getElementById('confStep').innerHTML = step;
+
     confirmEl.classList.add('on');
     try { confirmEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
   }
