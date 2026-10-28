@@ -358,12 +358,16 @@ a{color:inherit}
 <!-- lock zoom on iOS Safari (ignores user-scalable=no) -->
 <script>
 (function(){
+  // block pinch zoom
   document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
-  var lastTouch=0;
+  // block double-TAP-to-zoom only when the two taps are in the same spot,
+  // so fast tapping of different buttons / the +/- steppers still works
+  var lastT=0,lastX=0,lastY=0;
   document.addEventListener('touchend',function(e){
-    var now=Date.now();
-    if(now-lastTouch<=350){e.preventDefault();}
-    lastTouch=now;
+    var now=Date.now(), t=(e.changedTouches&&e.changedTouches[0])||null;
+    var x=t?t.clientX:0, y=t?t.clientY:0;
+    if(now-lastT<=320 && Math.abs(x-lastX)<34 && Math.abs(y-lastY)<34){e.preventDefault();}
+    lastT=now;lastX=x;lastY=y;
   },{passive:false});
 })();
 </script>
