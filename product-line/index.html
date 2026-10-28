@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <!-- light face, matching the rest of the site -->
 <script>document.documentElement.setAttribute('data-theme','light');</script>
 <title>BioLinked — Product Line</title>
@@ -47,6 +47,8 @@
 }
 *{box-sizing:border-box}
 html{overflow-x:hidden}
+/* lock the page: no pinch-zoom / double-tap zoom (matches the rest of the site) */
+html,body{touch-action:pan-x pan-y}
 /* neutralise the house body padding so the hero/sections run full width */
 html[data-theme] body{padding:0;margin:0;background:var(--bg);color:var(--ink);font-family:var(--body-font);font-size:16px;line-height:1.6;overflow-x:hidden;max-width:100vw;-webkit-text-size-adjust:100%}
 button,input,select{font:inherit}
@@ -176,8 +178,9 @@ a{color:inherit}
 .pay:hover{border-color:var(--gold-line)}
 .pay.sel{border-color:var(--gold);background:var(--gold-soft)}
 .pay input{accent-color:var(--gold);width:17px;height:17px;flex:none}
+.pay{flex-wrap:wrap}
 .pay .pn{font-weight:600;font-size:14px}
-.pay .ph{margin-left:auto;color:var(--gold);font-weight:700;font-size:12.5px;white-space:nowrap}
+.pay .ph{margin-left:auto;padding-left:10px;color:var(--gold);font-weight:700;font-size:12.5px;white-space:nowrap}
 .payer{display:none;color:var(--red);font-size:11px;margin-top:6px}
 .payer.on{display:block}
 .disc{background:var(--gold-soft);border:1px solid var(--gold-line);border-left:3px solid var(--gold);border-radius:8px;padding:11px 13px;margin:14px 0;font-size:12px;line-height:1.5;color:var(--ink)}
@@ -351,6 +354,19 @@ a{color:inherit}
     <div class="mfoot">Research &amp; educational reference only. Not medical advice.</div>
   </div>
 </div>
+
+<!-- lock zoom on iOS Safari (ignores user-scalable=no) -->
+<script>
+(function(){
+  document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});
+  var lastTouch=0;
+  document.addEventListener('touchend',function(e){
+    var now=Date.now();
+    if(now-lastTouch<=350){e.preventDefault();}
+    lastTouch=now;
+  },{passive:false});
+})();
+</script>
 
 <!-- shared site header + footer -->
 <script src="/nav.js?v=7" defer></script>
