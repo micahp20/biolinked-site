@@ -1,1118 +1,691 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<link rel="icon" href="/favicon.ico?v=6" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png?v=6">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png?v=6">
-<link rel="icon" type="image/png" href="/favicon.png?v=6">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>BioLinked — Product Line</title>
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#f6f3ea">
+<link rel="icon" href="/favicon.png?v=6" type="image/png">
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-K8D30QZ2W8"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-K8D30QZ2W8');
-</script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-K8D30QZ2W8');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<!-- Force the brand light look; storefront palette is hard-coded below so there is no dark theme here. -->
-<script>document.documentElement.setAttribute('data-theme','light');</script>
-<link rel="stylesheet" href="/bl-theme.css?v=38">
-<!-- Shared compound prose (optional). If present on the site it feeds the "What is this?" panels. -->
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- optional shared compound prose feeds the "learn more" modal if present -->
 <script src="/compound-library.js"></script>
 <style>
 /* ======================================================================
-   Product line — SHOPPING-CART storefront. Products are pulled LIVE and
-   READ-ONLY from the P&L database (pl_products) + inventory (for stock)
-   at page load. No inventory is ever written or decremented here; this
-   page only quotes + emails an order to the owner via Formspree.
-   Brand restyle: block cards, Cormorant/Montserrat, cream + gold palette.
+   BioLinked Product Line — editorial catalog (Chad's layout), LIGHT theme.
+   Live, READ-ONLY feed from the P&L (pl_products) + inventory (for stock).
+   Never writes to the DB / never touches inventory. Builds a quote and
+   emails the order to the owner via Formspree, then offers one-tap pay.
    ====================================================================== */
-
 :root{
-  --head-font:'Cormorant Garamond',Georgia,serif;
-  --body-font:'Montserrat',system-ui,sans-serif;
-  --cream:#f6f3ea;
-  --cream-2:#efeadd;
-  --card:#ffffff;
-  --gold:#8B7335;
+  --bg:#f6f3ea;        /* cream canvas */
+  --panel:#ffffff;     /* cards / surfaces */
+  --panel2:#efeadd;    /* subtle fill */
+  --line:#e4ddcb;      /* hairlines */
+  --gold:#8B7335;      /* brand gold (readable on light) */
   --gold-hi:#a98a3f;
-  --gold-dim:rgba(139,115,53,.12);
-  --gold-line:rgba(139,115,53,.30);
-  --ink:#2a2a28;
-  --muted:#716e64;
-  --line:#e4ddcb;
+  --gold-soft:rgba(139,115,53,.12);
+  --ink:#2a2a28;       /* primary text */
+  --muted:#716e64;     /* secondary text */
   --red:#b14a3e;
-  --shadow:0 1px 2px rgba(42,42,40,.05);
-  --r:12px;
 }
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'DM Sans',Arial,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{color:inherit}
 
-*{box-sizing:border-box;}
+/* research-use banner */
+.rub{background:var(--panel2);border-bottom:1px solid var(--line)}
+.rub-in{max-width:1450px;margin:auto;padding:9px 28px;display:flex;gap:11px;align-items:center;flex-wrap:wrap}
+.rub-badge{font-size:9px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);border-radius:99px;padding:3px 10px;white-space:nowrap}
+.rub-txt{font-size:11px;color:var(--muted);line-height:1.5;margin:0}
+.rub-txt b{color:var(--ink)}
 
-html[data-theme] body{
-  margin:0;padding:0;background:var(--cream);color:var(--ink);
-  font-family:var(--body-font);font-size:16px;line-height:1.6;
-  -webkit-text-size-adjust:100%;
-}
+/* header */
+header{position:sticky;top:0;z-index:20;background:rgba(246,243,234,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.nav{max-width:1450px;margin:auto;height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 28px}
+.brand{font:700 27px 'Space Grotesk';letter-spacing:-1.4px;color:var(--ink);text-decoration:none;line-height:1}
+.brand b{color:var(--gold)}
+.brand small{display:block;font:700 9px 'DM Sans';letter-spacing:3.4px;color:var(--muted);margin-top:2px}
+.navlinks{display:flex;gap:26px;color:var(--muted);font-size:13px;font-weight:600}
+.navlinks a{text-decoration:none}
+.navlinks a:hover{color:var(--gold)}
+.cartIcon{position:relative;background:var(--gold);border:0;border-radius:10px;padding:11px 16px;color:#fff;font-weight:800;font-size:13px;letter-spacing:.3px;display:inline-flex;align-items:center}
+.cartIcon:hover{background:var(--gold-hi)}
+.bubble{display:inline-flex;border-radius:50%;background:#2a2a28;color:#fff;min-width:21px;height:21px;padding:0 5px;align-items:center;justify-content:center;margin-left:7px;font-size:11px}
 
-/* keep the shared nav legible on the cream canvas */
-.bl-nav-logo-main{color:var(--ink);}
-.bl-nav-logo-sub{color:var(--muted);}
+/* hero */
+.hero{border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 84% 20%,rgba(139,115,53,.12) 0,transparent 46%),var(--bg)}
+.shell{max-width:1450px;margin:auto;padding-left:28px;padding-right:28px}
+.heroin{padding-top:60px;padding-bottom:56px}
+.kicker{letter-spacing:3px;color:var(--gold);font-weight:800;font-size:11px;text-transform:uppercase}
+.hero h1{font:700 clamp(46px,7vw,92px)/.98 'Space Grotesk';letter-spacing:-4px;margin:18px 0}
+.hero h1 em{font-style:normal;color:var(--gold)}
+.hero p{max-width:720px;line-height:1.7;color:var(--muted);margin:20px 0;font-size:15px}
+.notice{display:inline-block;border:1px solid var(--gold);color:#6b5a2f;background:#efe6cf;padding:9px 14px;border-radius:8px;font-size:11px;letter-spacing:1.3px;font-weight:800}
 
-/* ── research-use banner ──────────────────────────────────────────── */
-.pl-warn{background:var(--cream-2);border-bottom:1px solid var(--line);padding:10px 0;}
-.pl-warn-inner{max-width:1180px;margin:0 auto;padding:0 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
-.pl-warn-badge{
-  font-family:var(--body-font);font-size:9.5px;font-weight:600;letter-spacing:.18em;
-  text-transform:uppercase;color:var(--gold);border:1px solid var(--gold-line);
-  border-radius:99px;padding:4px 11px;white-space:nowrap;flex:none;
-}
-.pl-warn-text{font-size:11.5px;color:var(--muted);line-height:1.55;margin:0;}
-.pl-warn-text b{color:var(--ink);font-weight:600;}
+/* toolbar */
+.toolbar{padding-top:34px;display:flex;gap:12px;flex-wrap:wrap}
+.search{flex:1;min-width:240px;background:var(--panel);border:1px solid var(--line);border-radius:9px;color:var(--ink);padding:16px 19px;outline:none}
+.search::placeholder{color:#a7a394}
+.search:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.sort{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:0 14px;color:var(--ink);outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238B7335' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
+.sort:focus{border-color:var(--gold)}
+.disclaimer{margin:17px 0 22px;color:#6b6456;font-size:12px;line-height:1.6;background:#f3eede;border-left:3px solid var(--gold);padding:12px 15px;border-radius:0 8px 8px 0}
+.disclaimer b{color:var(--ink)}
 
-/* ── storefront header bar w/ cart icon (sticky, in-flow) ─────────── */
-.shop-bar{
-  position:sticky;top:0;z-index:40;background:rgba(246,243,234,.94);
-  backdrop-filter:saturate(1.1) blur(6px);-webkit-backdrop-filter:saturate(1.1) blur(6px);
-  border-bottom:1px solid var(--line);
-}
-.shop-bar-inner{max-width:1180px;margin:0 auto;padding:10px 18px;display:flex;align-items:center;gap:12px;}
-.shop-bar-brand{
-  font-family:var(--head-font);font-size:22px;font-weight:600;color:var(--ink);
-  letter-spacing:.02em;line-height:1;text-decoration:none;
-}
-.shop-bar-brand span{color:var(--gold);}
-.cart-btn{
-  margin-left:auto;position:relative;display:inline-flex;align-items:center;gap:8px;
-  font-family:var(--body-font);font-size:12px;font-weight:600;letter-spacing:.08em;
-  text-transform:uppercase;color:var(--ink);background:var(--card);
-  border:1px solid var(--gold-line);border-radius:99px;padding:9px 16px 9px 14px;
-  cursor:pointer;white-space:nowrap;transition:border-color .15s,background .15s;
-}
-.cart-btn:hover{border-color:var(--gold);background:var(--gold-dim);}
-.cart-btn svg{width:19px;height:19px;color:var(--gold);}
-.cart-btn .cart-badge{
-  position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;
-  display:none;align-items:center;justify-content:center;
-  font-size:11px;font-weight:700;color:#fff;background:var(--gold);border-radius:99px;
-  border:2px solid var(--cream);line-height:1;
-}
-.cart-btn.has-items .cart-badge{display:inline-flex;}
+/* category chips */
+.chips{display:flex;gap:9px;overflow-x:auto;padding-bottom:22px;scrollbar-width:thin}
+.chip{white-space:nowrap;background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:6px;padding:10px 14px;font-size:12px;font-weight:800;letter-spacing:.3px}
+.chip:hover{border-color:var(--gold)}
+.chip.active{background:var(--gold);border-color:var(--gold);color:#fff}
 
-/* ── hero ─────────────────────────────────────────────────────────── */
-.shop-hero{max-width:1180px;margin:0 auto;padding:26px 18px 8px;}
-.shop-hero-tag{
-  font-family:var(--body-font);font-size:10px;font-weight:600;letter-spacing:.26em;
-  text-transform:uppercase;color:var(--gold);
-}
-.shop-hero-title{
-  font-family:var(--head-font);font-size:46px;font-weight:600;line-height:1.0;
-  color:var(--ink);margin:6px 0 0;letter-spacing:.005em;
-}
-.shop-hero-sub{font-size:13px;color:var(--muted);line-height:1.6;margin:10px 0 0;max-width:62ch;}
+/* section title */
+.titlebar{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px;gap:14px}
+.titlebar h2{font:700 30px 'Space Grotesk';margin:0;letter-spacing:-1px;color:var(--ink)}
+.titlebar span{color:var(--muted);font-size:13px;white-space:nowrap}
 
-/* ── layout: products + cart ──────────────────────────────────────── */
-.shop-wrap{max-width:1180px;margin:0 auto;padding:16px 18px 44px;display:grid;gap:24px;grid-template-columns:1fr;}
-@media(min-width:960px){
-  .shop-wrap{grid-template-columns:1fr 360px;align-items:start;}
-  .shop-cart{position:sticky;top:76px;}
-}
+/* product grid */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:55px}
+.card{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:8px;min-height:250px;padding:22px;display:flex;flex-direction:column;transition:border-color .18s,transform .18s,box-shadow .18s}
+.card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 6px 20px rgba(42,42,40,.08)}
+.card.oos{opacity:.9}
+.card .cat{color:var(--gold);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;min-height:22px}
+.card .name{font:700 clamp(19px,2vw,24px) 'Space Grotesk';letter-spacing:-.6px;background:none;border:0;text-align:left;color:var(--ink);padding:0;margin:11px 0 6px;overflow-wrap:anywhere;cursor:pointer}
+.card .name:hover{text-decoration:underline;text-decoration-color:var(--gold)}
+.card .name .arr{color:var(--gold);font-weight:700;font-size:.72em;vertical-align:1px}
+.card .learn{align-self:flex-start;background:none;border:0;padding:0;color:var(--muted);font-size:11.5px;font-weight:600;text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--line);cursor:pointer}
+.card .learn:hover{color:var(--gold)}
+.card .bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:15px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.price{font:700 16px 'Space Grotesk';color:var(--ink)}
+.card.oos .price{text-decoration:line-through;color:var(--muted);font-size:14px}
+.add{background:var(--gold);border:0;color:#fff;font-size:12px;font-weight:800;padding:11px 14px;border-radius:6px;white-space:nowrap;letter-spacing:.3px}
+.add:hover{background:var(--gold-hi)}
+.oostag{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--red);border:1px solid rgba(177,74,62,.4);background:rgba(177,74,62,.08);border-radius:99px;padding:8px 12px;white-space:nowrap}
+/* stepper on card + line items */
+.stp{display:inline-flex;align-items:center;border:1px solid var(--gold);border-radius:6px;overflow:hidden}
+.stp button{width:34px;height:34px;border:0;background:none;color:var(--gold);font-size:19px;line-height:1;display:flex;align-items:center;justify-content:center}
+.stp button:active{background:var(--gold-soft)}
+.stp .q{min-width:28px;text-align:center;font-weight:700;color:var(--ink)}
 
-/* ── search ───────────────────────────────────────────────────────── */
-.shop-search{position:relative;margin-bottom:12px;display:block;}
-.shop-search input{
-  width:100%;font-family:var(--body-font);font-size:16px;color:var(--ink);
-  background:var(--card);border:1px solid var(--line);border-radius:12px;
-  padding:13px 40px 13px 42px;outline:none;-webkit-appearance:none;appearance:none;
-}
-.shop-search input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);}
-.shop-search svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);}
-.shop-search-clear{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);border:none;background:none;
-  color:var(--muted);font-size:22px;line-height:1;cursor:pointer;padding:4px 8px;display:none;
-}
-.shop-search.has-value .shop-search-clear{display:block;}
+/* loading / empty */
+.state{grid-column:1/-1;padding:50px 10px;text-align:center;color:var(--muted);font-size:14px}
+.state b{display:block;font:700 24px 'Space Grotesk';color:var(--ink);margin-bottom:6px}
+.spin{width:26px;height:26px;border:3px solid var(--gold-soft);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
 
-/* ── category chips ───────────────────────────────────────────────── */
-.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
-.chip{
-  font-family:var(--body-font);font-size:10.5px;font-weight:600;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--gold);background:var(--card);
-  border:1px solid var(--gold-line);border-radius:99px;padding:7px 13px;cursor:pointer;
-  transition:all .12s;
-}
-.chip:hover{background:var(--gold-dim);}
-.chip.on{background:var(--gold);color:#fff;border-color:var(--gold);}
+/* cart drawer */
+.overlay{position:fixed;inset:0;background:rgba(42,42,40,.45);z-index:29;display:none}
+.overlay.show{display:block}
+.drawer{position:fixed;top:0;bottom:0;right:0;z-index:30;background:var(--panel);border-left:1px solid var(--line);width:min(440px,100%);transform:translateX(102%);transition:transform .25s;display:flex;flex-direction:column}
+.drawer.open{transform:translateX(0)}
+.dhead{padding:22px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.dhead h2{font:700 24px 'Space Grotesk';margin:0;letter-spacing:-.5px}
+.close{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:7px;padding:5px 11px;font-size:20px;line-height:1}
+.close:hover{border-color:var(--gold);color:var(--gold)}
+.items{padding:18px 24px;overflow:auto;flex:1}
+.empty{color:var(--muted);line-height:1.7;text-align:center;padding:30px 0}
+.lineitem{border-bottom:1px solid var(--line);padding:16px 0;display:flex;justify-content:space-between;gap:12px}
+.lineitem .li-name{font:700 16px 'Space Grotesk';color:var(--ink);line-height:1.2;overflow-wrap:anywhere}
+.lineitem .li-each{color:var(--muted);font-size:11.5px;margin-top:4px}
+.lineitem .li-right{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none}
+.lineitem .li-line{font:700 15px 'Space Grotesk';white-space:nowrap}
+.li-rm{border:0;background:none;color:var(--muted);font-size:17px;line-height:1;padding:0 2px}
+.li-rm:hover{color:var(--red)}
+.lineitem .stp button{width:30px;height:30px;font-size:16px}
+.lineitem .stp .q{min-width:22px;font-size:13px}
 
-.shop-result{font-size:11.5px;color:var(--muted);margin:0 0 12px;letter-spacing:.02em;}
-.shop-result b{color:var(--ink);}
+.tfoot{border-top:1px solid var(--line);padding:20px 24px;background:var(--bg)}
+.trow{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:7px}
+.trow span:last-child{color:var(--ink);font-weight:600}
+.tgrand{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--line);margin-top:5px;padding-top:12px}
+.tgrand .tg-l{font:700 18px 'Space Grotesk';color:var(--ink)}
+.tgrand .tg-r{font:700 26px 'Space Grotesk';color:var(--gold)}
+.checkout{width:100%;padding:15px;background:var(--gold);border:0;border-radius:7px;font-weight:800;color:#fff;font-size:13px;letter-spacing:.5px;margin-top:14px}
+.checkout:hover{background:var(--gold-hi)}
+.checkout:disabled{opacity:.55}
 
-/* ── product grid of BLOCK cards ──────────────────────────────────── */
-.shop-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
-@media(min-width:620px){.shop-grid{grid-template-columns:repeat(2,1fr);}}
-@media(min-width:960px){.shop-grid{grid-template-columns:repeat(2,1fr);}}
-@media(min-width:1180px){.shop-grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:400px){.shop-grid{grid-template-columns:1fr;}}
+/* checkout form (revealed inside drawer) */
+.cform{margin-top:16px;display:none}
+.cform.on{display:block}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:10.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.fld input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:11px 12px;color:var(--ink);outline:none;-webkit-appearance:none}
+.fld input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-soft)}
+.fld.bad input{border-color:var(--red)}
+.fld .er{display:none;color:var(--red);font-size:11px;margin-top:4px}
+.fld.bad .er{display:block}
+.payopts{display:flex;flex-direction:column;gap:8px}
+.pay{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:11px 12px;background:var(--panel)}
+.pay:hover{border-color:var(--gold)}
+.pay.sel{border-color:var(--gold);background:var(--gold-soft)}
+.pay input{accent-color:var(--gold);width:17px;height:17px;flex:none}
+.pay .pn{font-weight:700;font-size:14px}
+.pay .ph{margin-left:auto;color:var(--gold);font-weight:700;font-size:12.5px;white-space:nowrap}
+.payer{display:none;color:var(--red);font-size:11px;margin-top:6px}
+.payer.on{display:block}
+.disc{background:var(--gold-soft);border:1px solid var(--gold);border-left:3px solid var(--gold);border-radius:8px;padding:11px 13px;margin:14px 0;font-size:12px;line-height:1.5;color:var(--ink)}
+.disc b{color:var(--gold)}
+.submitErr{display:none;color:var(--red);font-size:12px;text-align:center;margin-top:9px;line-height:1.5}
+.submitErr.on{display:block}
 
-.prod{
-  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
-  box-shadow:var(--shadow);padding:16px 15px 15px;display:flex;flex-direction:column;
-  gap:8px;min-height:148px;transition:border-color .15s,box-shadow .15s,transform .15s;
-}
-.prod:hover{border-color:var(--gold-line);box-shadow:0 4px 14px rgba(42,42,40,.08);}
-.prod.oos{opacity:.92;}
-.prod-cat{
-  font-family:var(--body-font);font-size:9.5px;font-weight:600;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--gold);
-}
-.prod-name{
-  font-family:var(--head-font);font-size:22px;font-weight:600;line-height:1.08;
-  color:var(--ink);overflow-wrap:anywhere;cursor:pointer;
-}
-.prod-name:hover{color:var(--gold);}
-.prod-what{
-  display:inline-block;font-family:var(--body-font);font-size:11px;font-weight:500;
-  color:var(--gold);background:none;border:none;padding:0;cursor:pointer;text-align:left;
-  text-decoration:underline;text-underline-offset:2px;text-decoration-color:var(--gold-line);
-}
-.prod-what:hover{color:var(--gold-hi);}
-.prod-foot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding-top:6px;}
-.prod-price{font-family:var(--head-font);font-size:26px;font-weight:600;color:var(--ink);line-height:1;}
-.prod.oos .prod-price{text-decoration:line-through;color:var(--muted);font-size:22px;}
-.prod-oos-tag{
-  font-family:var(--body-font);font-size:10px;font-weight:700;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--red);border:1px solid rgba(177,74,62,.35);
-  background:rgba(177,74,62,.08);border-radius:99px;padding:8px 13px;white-space:nowrap;
-}
-.btn-add{
-  font-family:var(--body-font);font-size:11px;font-weight:600;letter-spacing:.12em;
-  text-transform:uppercase;color:#fff;background:var(--gold);
-  border:none;border-radius:99px;padding:11px 18px;cursor:pointer;white-space:nowrap;
-  transition:background .15s;
-}
-.btn-add:hover{background:var(--gold-hi);}
+/* confirmation + one-tap pay */
+.confirm{display:none;text-align:center;padding:6px 2px}
+.confirm.on{display:block}
+.confirm .ck{font-size:40px;line-height:1}
+.confirm .ct{font:700 26px 'Space Grotesk';color:var(--ink);margin:8px 0 2px;letter-spacing:-.5px}
+.confirm .ctot{font:700 32px 'Space Grotesk';color:var(--gold);margin:6px 0}
+.confirm .cstep{font-size:13.5px;color:var(--ink);line-height:1.6;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 14px;margin-top:8px}
+.confirm .cstep b{color:var(--gold)}
+.paynow{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-weight:800;font-size:15px;color:#fff;background:var(--gold);border:0;border-radius:99px;padding:16px;margin-top:13px;text-decoration:none}
+.paynow:hover{background:var(--gold-hi)}
+.paynow .amt{font:700 19px 'Space Grotesk'}
+.paycopy{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;font-weight:700;color:var(--ink);background:var(--panel);border:1px solid var(--gold);border-radius:10px;padding:13px 15px;margin-top:13px}
+.paycopy:hover{background:var(--gold-soft)}
+.paycopy .pc-num{font:700 17px 'Space Grotesk';color:var(--gold)}
+.paycopy .pc-tag{font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.chint{font-size:12px;color:var(--muted);margin-top:11px;line-height:1.5}
 
-/* qty stepper (shared style for cards + cart) */
-.stepper{display:inline-flex;align-items:center;border:1px solid var(--gold-line);border-radius:99px;overflow:hidden;background:var(--card);}
-.stepper button{
-  width:38px;height:38px;border:none;background:none;color:var(--gold);font-size:20px;
-  line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
-.stepper button:active{background:var(--gold-dim);}
-.stepper .q{min-width:30px;text-align:center;font-weight:600;font-size:15px;color:var(--ink);}
+/* compound modal */
+.modal{position:fixed;inset:0;z-index:31;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(42,42,40,.45)}
+.modal.show{display:flex}
+.modalbox{background:var(--panel);border:1px solid var(--gold);border-radius:14px;padding:26px 26px 24px;max-width:500px;width:100%;max-height:86vh;overflow:auto;box-shadow:0 25px 80px rgba(42,42,40,.25)}
+.modalbox .mclose{float:right;margin:-6px -6px 0 0;border:0;background:none;color:var(--muted);font-size:26px;line-height:1;padding:2px 6px}
+.modalbox .mclose:hover{color:var(--ink)}
+.modalbox .mcat{color:var(--gold);font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+.modalbox h2{font:700 32px 'Space Grotesk';letter-spacing:-1.2px;margin:4px 0 12px;color:var(--ink)}
+.modalbox p{line-height:1.7;color:var(--ink);font-size:14px;margin:0}
+.modalbox .mfoot{margin-top:16px;border-top:1px solid var(--line);padding-top:11px;font-size:11px;color:var(--muted)}
 
-/* loading / error / empty states */
-.shop-state{padding:44px 10px;text-align:center;color:var(--muted);font-size:14px;line-height:1.6;grid-column:1/-1;}
-.shop-state b{color:var(--ink);display:block;font-family:var(--head-font);font-size:22px;margin-bottom:6px;}
-.spin{width:26px;height:26px;border:3px solid var(--gold-dim);border-top-color:var(--gold);border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
+footer{border-top:1px solid var(--line);padding:26px 0 90px;color:var(--muted);font-size:12px;line-height:1.7}
 
-/* ── cart ─────────────────────────────────────────────────────────── */
-.shop-cart{
-  background:var(--card);border:1px solid var(--line);border-radius:16px;
-  box-shadow:var(--shadow);padding:20px 18px;
+/* mobile sticky cart */
+.mobilecart{display:none}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){
+  .nav{height:66px;padding:0 17px}.navlinks{display:none}
+  .shell{padding-left:17px;padding-right:17px}
+  .rub-in{padding:9px 17px}
+  .heroin{padding-top:46px;padding-bottom:42px}
+  .hero h1{letter-spacing:-2.5px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .card{padding:16px;min-height:220px}
+  .card .name{font-size:19px}
+  .titlebar h2{font-size:22px}
+  .mobilecart{display:flex;align-items:center;justify-content:center;gap:8px;position:fixed;bottom:0;left:0;right:0;z-index:17;background:var(--gold);color:#fff;border:0;font-weight:800;padding:16px;box-shadow:0 -4px 24px rgba(0,0,0,.12)}
 }
-.cart-title{
-  font-family:var(--head-font);font-size:26px;font-weight:600;
-  color:var(--ink);display:flex;align-items:center;gap:9px;padding-bottom:12px;
-  border-bottom:1px solid var(--line);margin-bottom:14px;
-}
-.cart-count{
-  font-family:var(--body-font);font-size:11px;font-weight:700;color:#fff;
-  background:var(--gold);border-radius:99px;min-width:22px;height:22px;padding:0 7px;
-  display:inline-flex;align-items:center;justify-content:center;
-}
-.cart-empty{color:var(--muted);font-size:13px;text-align:center;padding:18px 0;}
-.cart-items{display:flex;flex-direction:column;gap:14px;}
-.ci{display:flex;align-items:flex-start;gap:10px;}
-.ci-main{flex:1;min-width:0;}
-.ci-name{font-family:var(--head-font);font-size:17px;font-weight:600;color:var(--ink);line-height:1.15;overflow-wrap:anywhere;}
-.ci-each{font-size:11px;color:var(--muted);margin-top:1px;}
-.ci-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex:none;}
-.ci-line{font-family:var(--head-font);font-size:18px;font-weight:600;color:var(--ink);white-space:nowrap;}
-.ci-rm{border:none;background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:0 2px;}
-.ci-rm:hover{color:var(--red);}
-.ci .stepper button{width:32px;height:32px;font-size:17px;}
-.ci .stepper .q{min-width:24px;font-size:13px;}
-
-.cart-totals{border-top:1px solid var(--line);margin-top:16px;padding-top:13px;font-size:13px;color:var(--muted);}
-.cart-totals .row{display:flex;justify-content:space-between;margin-bottom:7px;}
-.cart-totals .row span:last-child{color:var(--ink);font-weight:500;}
-.cart-totals .grand{border-top:1px dashed var(--line);margin-top:6px;padding-top:12px;font-size:15px;color:var(--ink);font-weight:600;}
-.cart-totals .grand span:first-child{font-family:var(--head-font);font-size:20px;}
-.cart-totals .grand span:last-child{font-family:var(--head-font);font-size:26px;font-weight:600;color:var(--gold);}
-
-/* ── checkout ─────────────────────────────────────────────────────── */
-.checkout{margin-top:18px;border-top:1px solid var(--line);padding-top:16px;}
-.checkout.off{display:none;}
-.co-head{font-family:var(--head-font);font-size:22px;font-weight:600;color:var(--ink);margin-bottom:12px;}
-.fld{margin-bottom:13px;}
-.fld label{display:block;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
-.fld input[type=text]{
-  width:100%;font-family:var(--body-font);font-size:16px;color:var(--ink);background:var(--cream);
-  border:1px solid var(--line);border-radius:10px;padding:11px 12px;outline:none;-webkit-appearance:none;appearance:none;
-}
-.fld input[type=text]:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-dim);}
-.fld .err{color:var(--red);font-size:11.5px;margin-top:5px;display:none;}
-.fld.invalid .err{display:block;}
-.fld.invalid input[type=text]{border-color:var(--red);}
-
-.pay-opts{display:flex;flex-direction:column;gap:8px;}
-.pay{
-  display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:12px;
-  padding:12px 13px;cursor:pointer;background:var(--cream);transition:border-color .12s,background .12s;
-}
-.pay:hover{border-color:var(--gold-line);}
-.pay.sel{border-color:var(--gold);background:var(--gold-dim);}
-.pay input{accent-color:var(--gold);width:18px;height:18px;flex:none;}
-.pay-name{font-weight:600;font-size:14px;color:var(--ink);}
-.pay-handle{font-size:12.5px;color:var(--gold);margin-left:auto;font-weight:600;white-space:nowrap;}
-.pay-err{color:var(--red);font-size:11.5px;margin-top:7px;display:none;}
-.pay-err.on{display:block;}
-
-.disc{
-  background:var(--gold-dim);border:1px solid var(--gold-line);
-  border-left:3px solid var(--gold);border-radius:10px;padding:12px 14px;margin:16px 0;
-  font-size:12.5px;line-height:1.55;color:var(--ink);
-}
-.disc b{color:var(--gold);}
-
-.btn-submit{
-  width:100%;font-family:var(--body-font);font-size:12px;font-weight:600;letter-spacing:.14em;
-  text-transform:uppercase;color:#fff;background:var(--gold);border:none;
-  border-radius:99px;padding:16px;cursor:pointer;transition:background .15s;
-}
-.btn-submit:hover{background:var(--gold-hi);}
-.btn-submit:disabled{opacity:.55;cursor:default;}
-.submit-err{color:var(--red);font-size:12.5px;margin-top:10px;text-align:center;display:none;line-height:1.5;}
-.submit-err.on{display:block;}
-
-/* confirmation */
-.confirm{display:none;text-align:center;padding:14px 4px;}
-.confirm.on{display:block;}
-.confirm-check{font-size:40px;line-height:1;}
-.confirm-title{font-family:var(--head-font);font-size:30px;font-weight:600;color:var(--ink);margin:8px 0 4px;}
-.confirm-total{font-family:var(--head-font);font-size:34px;font-weight:600;color:var(--gold);margin:8px 0;}
-.confirm-step{font-size:14px;color:var(--ink);line-height:1.6;background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin-top:10px;}
-.confirm-step b{color:var(--gold);}
-.confirm-step a{color:var(--gold);font-weight:600;}
-/* one-tap pay button on the confirmation screen */
-.pay-now{
-  display:flex;align-items:center;justify-content:center;gap:9px;width:100%;
-  font-family:var(--body-font);font-size:15px;font-weight:700;letter-spacing:.02em;
-  color:#fff;background:var(--gold);border:none;border-radius:99px;padding:16px;
-  margin-top:14px;cursor:pointer;text-decoration:none;transition:background .15s;
-}
-.pay-now:hover{background:var(--gold-hi);}
-.pay-now .pn-amt{font-family:var(--head-font);font-size:19px;font-weight:600;}
-.pay-copy{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;
-  font-family:var(--body-font);font-size:15px;font-weight:600;color:var(--ink);
-  background:var(--cream);border:1px solid var(--gold-line);border-radius:12px;
-  padding:14px 16px;margin-top:14px;cursor:pointer;transition:border-color .15s,background .15s;
-}
-.pay-copy:hover{border-color:var(--gold);background:var(--gold-dim);}
-.pay-copy .pc-num{font-family:var(--head-font);font-size:18px;color:var(--gold);}
-.pay-copy .pc-tag{font-size:10.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.confirm-hint{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.55;}
-
-/* ── compound info modal ──────────────────────────────────────────── */
-.modal{
-  position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(42,42,40,.45);
-}
-.modal.on{display:flex;}
-.modal-box{
-  background:var(--card);border:1px solid var(--line);border-radius:16px;
-  max-width:440px;width:100%;max-height:86vh;overflow:auto;padding:22px 22px 24px;
-  box-shadow:0 20px 60px rgba(42,42,40,.25);
-}
-.modal-cat{font-family:var(--body-font);font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);}
-.modal-name{font-family:var(--head-font);font-size:30px;font-weight:600;line-height:1.05;color:var(--ink);margin:4px 0 12px;}
-.modal-body{font-size:14px;line-height:1.65;color:var(--ink);}
-.modal-sub{font-weight:600;color:var(--gold);margin-top:14px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;}
-.modal-foot{margin-top:18px;font-size:11px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:12px;}
-.modal-close{
-  float:right;margin:-6px -6px 0 0;border:none;background:none;color:var(--muted);
-  font-size:26px;line-height:1;cursor:pointer;padding:2px 6px;
-}
-.modal-close:hover{color:var(--ink);}
-
-.shop-note{max-width:1180px;margin:0 auto;padding:0 18px 40px;}
-.shop-note .note-box{font-size:11.5px;color:var(--muted);line-height:1.65;background:var(--cream-2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
-.shop-note .note-box b{color:var(--ink);}
-.shop-note .nl{font-family:var(--body-font);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:6px;}
-
-@media(max-width:640px){
-  .shop-hero-title{font-size:36px;}
-  .prod-name{font-size:20px;}
-}
+@media(max-width:400px){.grid{grid-template-columns:1fr}.card{min-height:auto}}
 </style>
 </head>
 <body>
 
-<div class="pl-warn">
-  <div class="pl-warn-inner">
-    <span class="pl-warn-badge">Research Use Only</span>
-    <p class="pl-warn-text"><b>NOT FOR HUMAN USE.</b> All information is strictly for educational &amp; scientific research reference. Not medical advice. Consult a licensed healthcare professional before any use.</p>
+<div class="rub">
+  <div class="rub-in">
+    <span class="rub-badge">Research Use Only</span>
+    <p class="rub-txt"><b>NOT FOR HUMAN USE.</b> Strictly for educational &amp; scientific research reference. Not medical advice.</p>
   </div>
 </div>
 
-<!-- shared house header — same .bl-nav the rest of the site uses; the link
-     set stays product-line specific, so nav.js?v=5 is not loaded here. -->
-<nav class="bl-nav" id="bl-nav">
-  <div class="bl-nav-inner">
-    <a href="/" class="bl-nav-logo">
-      <span class="bl-nav-logo-main">BIO LINKED</span>
-      <span class="bl-nav-logo-sub">Peptide Solutions</span>
-    </a>
-    <div class="bl-nav-links">
-      <a href="/" class="bl-nav-link">Home</a>
-      <a href="/advanced-protocols" class="bl-nav-link">Protocols</a>
-      <a href="/peptide-tracker" class="bl-nav-link">Peptide Calculator</a>
-    </div>
-    <button class="bl-nav-mobile-btn" id="bl-mobile-btn" aria-label="Menu" aria-expanded="false">&#9776;</button>
+<header>
+  <div class="nav">
+    <a href="/" class="brand">bio<b>linked</b><small>PEPTIDE SOLUTIONS</small></a>
+    <nav class="navlinks">
+      <a href="/product-line/">Product Line</a>
+      <a href="/advanced-protocols">Protocols</a>
+      <a href="/peptide-tracker">Calculator</a>
+    </nav>
+    <button class="cartIcon" id="cartBtn" aria-label="Open cart">🛒 CART <span class="bubble" id="bubble">0</span></button>
   </div>
-  <div class="bl-nav-mobile-menu" id="bl-mobile-menu">
-    <a href="/" class="bl-nav-mobile-link">Home</a>
-    <a href="/advanced-protocols" class="bl-nav-mobile-link">Protocols</a>
-    <a href="/peptide-tracker" class="bl-nav-mobile-link">Peptide Calculator</a>
-  </div>
-</nav>
-<script>
-(function(){
-  var btn = document.getElementById('bl-mobile-btn');
-  var menu = document.getElementById('bl-mobile-menu');
-  if (!btn || !menu) return;
-  btn.addEventListener('click', function(){
-    var open = menu.classList.toggle('open');
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  });
-})();
-</script>
+</header>
 
-<!-- sticky storefront bar with the quick-checkout cart button -->
-<div class="shop-bar">
-  <div class="shop-bar-inner">
-    <a href="#top" class="shop-bar-brand">Product <span>Line</span></a>
-    <button type="button" class="cart-btn" id="cartBtn" aria-label="Go to cart">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-      Cart
-      <span class="cart-badge" id="cartBadge">0</span>
-    </button>
+<section class="hero">
+  <div class="shell heroin">
+    <div class="kicker">The Research Collection · 2026</div>
+    <h1>Explore the <em>Product Line.</em></h1>
+    <p>A streamlined catalog. Find compounds quickly, tap any name to read what it is, and build your cart from any screen — then pick how you want to pay and submit.</p>
+    <span class="notice">Research Reference Only · Not For Human Use</span>
   </div>
-</div>
-
-<section class="shop-hero" id="top">
-  <div class="shop-hero-tag">Bio Linked Peptide Solutions</div>
-  <h1 class="shop-hero-title">Product Line</h1>
-  <p class="shop-hero-sub">Research-grade peptides and compounds. Tap <b>What is this?</b> on any product to learn what it is, add what you need to your cart, pick how you want to pay, and submit — we'll confirm once payment lands.</p>
 </section>
 
-<div class="shop-wrap">
-
-  <!-- PRODUCTS -->
-  <div class="shop-products">
-    <label class="shop-search" id="searchWrap">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input id="search" type="search" placeholder="Search products&hellip;" autocomplete="off" aria-label="Search products">
-      <button class="shop-search-clear" id="searchClear" type="button" aria-label="Clear search">&times;</button>
-    </label>
-    <div class="chips" id="chips"></div>
-    <p class="shop-result" id="resultLine"></p>
-    <div id="productList" class="shop-grid"></div>
-    <div id="shopState" class="shop-state">
-      <div class="spin"></div>
-      Loading the catalog&hellip;
-    </div>
+<div class="shell">
+  <div class="toolbar">
+    <input class="search" id="search" type="search" placeholder="Search products…" autocomplete="off" aria-label="Search products">
+    <select class="sort" id="sort" aria-label="Sort">
+      <option value="az">Sort A–Z</option>
+      <option value="za">Sort Z–A</option>
+      <option value="plow">Price: Low → High</option>
+      <option value="phigh">Price: High → Low</option>
+    </select>
   </div>
+  <div class="disclaimer">
+    Live catalog pulled from our inventory. <b>Out-of-stock items are shown struck through and can't be added.</b> Prices are per the current BioLinked price sheet and subject to change.
+  </div>
+  <div class="chips" id="chips"></div>
 
-  <!-- CART + CHECKOUT -->
-  <aside class="shop-cart" id="cartAnchor">
-    <div class="cart-title">Your Cart <span class="cart-count" id="cartCount">0</span></div>
+  <div class="titlebar">
+    <h2 id="curCat">All compounds</h2>
+    <span id="curCount"></span>
+  </div>
+  <div class="grid" id="grid">
+    <div class="state"><div class="spin"></div>Loading the catalog…</div>
+  </div>
+</div>
 
-    <div id="cartBody">
-      <div class="cart-empty" id="cartEmpty">Your cart is empty.</div>
-      <div class="cart-items" id="cartItems"></div>
-      <div class="cart-totals" id="cartTotals" style="display:none;">
-        <div class="row"><span>Subtotal</span><span id="tSub">$0.00</span></div>
-        <div class="row" id="shipRow"><span>Shipping &mdash; 2-Day UPS</span><span>$9.99</span></div>
-        <div class="row grand"><span>Total</span><span id="tGrand">$0.00</span></div>
-      </div>
+<footer>
+  <div class="shell">
+    BIO LINKED PEPTIDE SOLUTIONS · RESEARCH USE ONLY<br>
+    All products are intended for research and educational purposes only and are not approved for human use unless otherwise stated. Nothing here is medical advice. Prices subject to change without notice.
+  </div>
+</footer>
+
+<button class="mobilecart" id="mobileCart">🛒 View Cart · <span id="mobileCount">0</span></button>
+
+<!-- cart drawer -->
+<div class="overlay" id="overlay"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <div class="dhead">
+    <h2>Research Cart</h2>
+    <button class="close" id="drawerClose" aria-label="Close">×</button>
+  </div>
+  <div class="items" id="items">
+    <div class="empty" id="cartEmpty">Your cart is empty.<br>Add products to get started.</div>
+    <div id="lineItems"></div>
+  </div>
+  <div class="tfoot" id="tfoot" style="display:none">
+    <div id="totals">
+      <div class="trow"><span>Subtotal</span><span id="tSub">$0.00</span></div>
+      <div class="trow"><span>Shipping — 2-Day UPS</span><span>$9.99</span></div>
+      <div class="tgrand"><span class="tg-l">Total</span><span class="tg-r" id="tGrand">$0.00</span></div>
     </div>
+    <button class="checkout" id="toCheckout">Continue to Checkout →</button>
 
-    <form class="checkout off" id="checkout" autocomplete="off" novalidate>
-      <div class="co-head">Checkout</div>
-
+    <form class="cform" id="cform" novalidate autocomplete="off">
       <div class="fld" id="fldName">
         <label for="coName">Your Name</label>
-        <input type="text" id="coName" name="name" placeholder="Full name">
-        <div class="err">Please enter your name.</div>
+        <input type="text" id="coName" placeholder="Full name">
+        <div class="er">Please enter your name.</div>
       </div>
-
       <div class="fld" id="fldContact">
         <label for="coContact">Phone or Email</label>
-        <input type="text" id="coContact" name="contact" placeholder="So we can confirm your order">
-        <div class="err">Please enter a phone number or email.</div>
+        <input type="text" id="coContact" placeholder="So we can confirm your order">
+        <div class="er">Please enter a phone or email.</div>
       </div>
-
       <div class="fld" id="fldPay">
         <label>Payment Method</label>
-        <div class="pay-opts" id="payOpts">
-          <label class="pay" data-method="Venmo" data-handle="@micahp20">
-            <input type="radio" name="pay" value="Venmo @micahp20">
-            <span class="pay-name">Venmo</span><span class="pay-handle">@micahp20</span>
-          </label>
-          <label class="pay" data-method="Cash App" data-handle="$micahpauldino">
-            <input type="radio" name="pay" value="Cash App $micahpauldino">
-            <span class="pay-name">Cash App</span><span class="pay-handle">$micahpauldino</span>
-          </label>
-          <label class="pay" data-method="Zelle" data-handle="720-938-0698">
-            <input type="radio" name="pay" value="Zelle 720-938-0698">
-            <span class="pay-name">Zelle</span><span class="pay-handle">720-938-0698</span>
-          </label>
+        <div class="payopts" id="payOpts">
+          <label class="pay" data-method="Venmo" data-handle="@micahp20"><input type="radio" name="pay" value="Venmo @micahp20"><span class="pn">Venmo</span><span class="ph">@micahp20</span></label>
+          <label class="pay" data-method="Cash App" data-handle="$micahpauldino"><input type="radio" name="pay" value="Cash App $micahpauldino"><span class="pn">Cash App</span><span class="ph">$micahpauldino</span></label>
+          <label class="pay" data-method="Zelle" data-handle="720-938-0698"><input type="radio" name="pay" value="Zelle 720-938-0698"><span class="pn">Zelle</span><span class="ph">720-938-0698</span></label>
         </div>
-        <div class="pay-err" id="payErr">Please choose a payment method.</div>
+        <div class="payer" id="payErr">Please choose a payment method.</div>
       </div>
-
-      <div class="disc">
-        &#9888;&#65039; <b>Your order is NOT confirmed until payment is received.</b>
-        After you submit, send your total to the payment method you chose.
-        We'll confirm once your payment lands.
-      </div>
-
-      <button type="submit" class="btn-submit" id="submitBtn">Submit Order</button>
-      <div class="submit-err" id="submitErr"></div>
+      <div class="disc">⚠️ <b>Your order is NOT confirmed until payment is received.</b> After you submit, send your total to the method you chose — we'll confirm once it lands.</div>
+      <button type="submit" class="checkout" id="submitBtn" style="margin-top:0">Submit Order</button>
+      <div class="submitErr" id="submitErr"></div>
     </form>
 
-    <!-- confirmation -->
     <div class="confirm" id="confirm">
-      <div class="confirm-check">&#9989;</div>
-      <div class="confirm-title">Order Received!</div>
-      <div class="confirm-total" id="confTotal">$0.00</div>
-      <div class="confirm-step" id="confStep"></div>
+      <div class="ck">✅</div>
+      <div class="ct">Order Received!</div>
+      <div class="ctot" id="confTotal">$0.00</div>
+      <div class="cstep" id="confStep"></div>
       <div id="confPay"></div>
-      <div class="confirm-hint" id="confHint"></div>
+      <div class="chint" id="confHint"></div>
     </div>
-  </aside>
-
-</div>
-
-<div class="shop-note">
-  <div class="note-box">
-    <span class="nl">Research Use Only</span>
-    All products are intended for research and educational purposes only. These compounds are not approved
-    by the FDA for human use unless otherwise stated. Nothing on this page constitutes medical advice.
-    Consult a qualified healthcare provider before beginning any peptide protocol.
-    <b>Prices are subject to change without notice.</b>
   </div>
-</div>
+</aside>
 
 <!-- compound info modal -->
-<div class="modal" id="infoModal" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalName">
-    <button type="button" class="modal-close" id="modalClose" aria-label="Close">&times;</button>
-    <div class="modal-cat" id="modalCat"></div>
-    <div class="modal-name" id="modalName"></div>
-    <div class="modal-body" id="modalBody"></div>
-    <div class="modal-foot">Research &amp; educational reference only. Not medical advice.</div>
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modalbox" role="dialog" aria-modal="true" aria-labelledby="mName">
+    <button class="mclose" id="mClose" aria-label="Close">×</button>
+    <div class="mcat" id="mCat"></div>
+    <h2 id="mName"></h2>
+    <p id="mBody"></p>
+    <div class="mfoot">Research &amp; educational reference only. Not medical advice.</div>
   </div>
 </div>
 
 <script>
-/* ======================================================================
-   BioLinked storefront. READ-ONLY live feed from the P&L database
-   (pl_products) plus the inventory table (for stock status). This page
-   never writes to the DB and never touches inventory — it builds a quote
-   and emails the order to the owner via Formspree.
-   ====================================================================== */
-(function () {
+(function(){
   'use strict';
 
-  var SUPABASE_URL = 'https://bfjydzealeethhcpdfxl.supabase.co';
-  var SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
-  var FORMSPREE = 'https://formspree.io/f/meerdpwk';
-  var SHIPPING = 9.99;
+  var SUPABASE_URL='https://bfjydzealeethhcpdfxl.supabase.co';
+  var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
+  var FORMSPREE='https://formspree.io/f/meerdpwk';
+  var SHIPPING=9.99;
 
-  // names that must never show: personal-use + internal line items
-  var BLOCK = ['cortexin', 'dihexa', 'ipamorelin', 'shipping', '2-day ups'];
+  // never show: personal-use + internal line items
+  var BLOCK=['cortexin','dihexa','ipamorelin','shipping','2-day ups'];
 
-  var products = [];   // kept catalog [{id,name,price,inStock,cat}]
-  var cart = {};       // id -> {id,name,price,qty}
-  var query = '';
-  var activeCat = 'All';
-  var submitted = false;
+  var products=[], cart={}, query='', activeCat='All', sortMode='az', submitted=false;
 
-  var listEl    = document.getElementById('productList');
-  var stateEl   = document.getElementById('shopState');
-  var resultEl  = document.getElementById('resultLine');
-  var searchEl  = document.getElementById('search');
-  var searchWrap= document.getElementById('searchWrap');
-  var clearEl   = document.getElementById('searchClear');
-  var chipsEl   = document.getElementById('chips');
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function money(n){return '$'+Number(n).toFixed(2);}
 
-  var cartCount = document.getElementById('cartCount');
-  var cartBadge = document.getElementById('cartBadge');
-  var cartBtn   = document.getElementById('cartBtn');
-  var cartEmpty = document.getElementById('cartEmpty');
-  var cartItems = document.getElementById('cartItems');
-  var cartTotals= document.getElementById('cartTotals');
-  var tSub      = document.getElementById('tSub');
-  var tGrand    = document.getElementById('tGrand');
-  var checkout  = document.getElementById('checkout');
-  var confirmEl = document.getElementById('confirm');
-
-  function esc(s) {
-    return String(s == null ? '' : s)
-      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  }
-  function money(n) { return '$' + Number(n).toFixed(2); }
-
-  // ── compound descriptions ─────────────────────────────────────────
-  // Built-in concise copy for the common sellers (fallback / when the
-  // shared library is not deployed). Accurate, brief, educational only.
-  var BUILTIN = {
-    'retatrutide': 'A triple-receptor (GLP-1 / GIP / glucagon) agonist researched for substantial weight loss and metabolic improvement. Studied as a next-generation peptide beyond tirzepatide.',
-    'tesamorelin': 'A growth-hormone-releasing hormone (GHRH) analog studied for reducing visceral (deep belly) fat and raising natural GH / IGF-1.',
-    'tirzepatide': 'A dual GLP-1 / GIP receptor agonist researched for appetite control, blood-sugar regulation and significant weight loss.',
-    'semaglutide': 'A GLP-1 receptor agonist studied for appetite suppression, blood-sugar control and weight loss.',
-    'cagrilintide': 'A long-acting amylin analog researched for appetite control and weight loss, often paired with a GLP-1.',
-    'mots-c': 'A mitochondria-derived peptide studied for metabolic health, insulin sensitivity, endurance and exercise-like effects.',
-    '5-amino-1mq': 'An oral NNMT enzyme inhibitor researched for fat-cell metabolism and preserving cellular NAD+ levels.',
-    '5am': 'An oral NNMT enzyme inhibitor researched for fat-cell metabolism and preserving cellular NAD+ levels.',
-    'nad+': 'An essential cellular coenzyme that powers energy production and DNA-repair / longevity (sirtuin) pathways. Levels decline with age; studied for energy and anti-aging.',
-    'nad': 'An essential cellular coenzyme that powers energy production and DNA-repair / longevity (sirtuin) pathways. Levels decline with age; studied for energy and anti-aging.',
-    'glutathione': 'The body’s master antioxidant, studied for detoxification, immune support, skin brightening and cellular protection.',
-    'bpc-157': 'A stable gastric peptide widely researched for healing and recovery — tendon, ligament, muscle and gut-lining repair, plus reduced inflammation.',
-    'tb-500': 'A synthetic form of Thymosin Beta-4 studied for tissue repair, flexibility, reduced inflammation and faster recovery.',
-    'tb500': 'A synthetic form of Thymosin Beta-4 studied for tissue repair, flexibility, reduced inflammation and faster recovery.',
-    'klow': 'A recovery blend (commonly GHK-Cu, KPV, TB-500 and BPC-157) researched for comprehensive healing, skin and anti-inflammatory support.',
-    'ghk-cu': 'A copper peptide studied for skin regeneration, collagen production, wound healing, hair and anti-aging.',
-    'kpv': 'A small anti-inflammatory peptide (from alpha-MSH) researched for gut health and calming inflammation.',
-    'cartalax': 'A Khavinson bioregulator peptide studied for cartilage and joint / connective-tissue support.',
-    'wolverine': 'A recovery blend (Cartalax, TB-500 and BPC-157) researched for accelerated healing of joints, tendons and soft tissue.',
-    'cjc-1295': 'A GHRH analog studied, often with Ipamorelin, to boost natural growth hormone for recovery, body composition and sleep.',
-    'ipamorelin': 'A selective growth-hormone secretagogue studied for a clean, natural GH release supporting recovery and body composition.',
-    'igf-1 lr3': 'A long-acting form of insulin-like growth factor-1 researched for muscle growth, recovery and cell proliferation.',
-    'igf-1': 'A long-acting form of insulin-like growth factor-1 researched for muscle growth, recovery and cell proliferation.',
-    'hcg': 'Human chorionic gonadotropin, studied for maintaining testicular function and natural testosterone production, often during TRT.',
-    'semax': 'A nootropic peptide studied for focus, memory, mood and neuroprotection via BDNF support.',
-    'selank': 'A nootropic peptide studied for anxiety reduction, calm focus and immune modulation.',
-    'adamax': 'An enhanced Semax-type peptide researched for stronger, longer cognitive and neuroprotective effects.',
-    'pt-141': 'Also called Bremelanotide; studied for libido and sexual arousal in both men and women via melanocortin receptors.',
-    'kisspeptin': 'A reproductive hormone peptide studied for stimulating the natural sex-hormone (LH/FSH) axis, fertility and libido.',
-    'oxytocin': 'The “bonding” hormone studied for social connection, stress reduction, mood and intimacy.',
-    'dsip': 'Delta-sleep-inducing peptide, researched for improving deep sleep quality, stress and recovery.',
-    'epithalon': 'A Khavinson pineal tetrapeptide studied for telomere support, circadian rhythm, sleep and longevity.',
-    'epitalon': 'A Khavinson pineal tetrapeptide studied for telomere support, circadian rhythm, sleep and longevity.',
-    'pinealon': 'A Khavinson bioregulator peptide studied for brain aging, cognition and neuroprotection.',
-    'cerebrolysin': 'A neuropeptide preparation studied for neuroprotection, cognitive recovery and brain repair.',
-    'cortagen': 'A Khavinson bioregulator peptide studied for brain and nervous-system support and recovery.',
-    'foxo4-dri': 'A senolytic peptide researched for clearing “zombie” (senescent) cells that drive aging and inflammation.',
-    'ss-31': 'A mitochondrial-targeted peptide (elamipretide) studied for cellular energy, reducing oxidative stress and protecting heart, muscle and nerves.',
-    'aod-9604': 'A modified HGH fragment studied for targeted fat loss without the growth or blood-sugar effects of full HGH.',
-    '5ad': 'A modified HGH fragment (AOD-9604) studied for targeted fat loss without the growth or blood-sugar effects of full HGH.',
-    'hgh': 'Human growth hormone, studied for recovery, body composition, tissue repair and anti-aging.',
-    'testosterone': 'The primary male androgen, studied for energy, libido, muscle, mood and overall vitality.',
-    'melanotan': 'A melanocyte-stimulating peptide studied for skin tanning and, for MT-II, libido effects.',
-    'vilon': 'A Khavinson di-peptide bioregulator studied for immune support and anti-aging.',
-    'vesugen': 'A Khavinson bioregulator peptide studied for vascular (blood-vessel) health and circulation.',
-    'thymosin alpha-1': 'An immune-modulating peptide studied for strengthening and balancing immune response.',
-    'vip': 'Vasoactive intestinal peptide, studied for anti-inflammatory, immune and respiratory / neuro support.',
-    'ahk-cu': 'A copper peptide studied for hair-follicle health, growth stimulation and scalp circulation.',
-    'testagen': 'A Khavinson bioregulator peptide studied for testicular function and natural testosterone support.',
-    'p21': 'A nootropic peptide (Cerebrolysin-derived) studied for neurogenesis, memory and cognitive support.',
-    'pe-22-28': 'A peptide studied for mood, antidepressant-like effects and neuroplasticity via TREK-1 channels.'
+  /* ── compound descriptions (fallback copy, overlaid by BL_LIB if present) ── */
+  var BUILTIN={
+    'retatrutide':'A triple-receptor (GLP-1 / GIP / glucagon) agonist researched for substantial weight loss and metabolic improvement. Studied as a next-generation peptide beyond tirzepatide.',
+    'tesamorelin':'A growth-hormone-releasing hormone (GHRH) analog studied for reducing visceral (deep belly) fat and raising natural GH / IGF-1.',
+    'tirzepatide':'A dual GLP-1 / GIP receptor agonist researched for appetite control, blood-sugar regulation and significant weight loss.',
+    'semaglutide':'A GLP-1 receptor agonist studied for appetite suppression, blood-sugar control and weight loss.',
+    'cagrilintide':'A long-acting amylin analog researched for appetite control and weight loss, often paired with a GLP-1.',
+    'mots-c':'A mitochondria-derived peptide studied for metabolic health, insulin sensitivity, endurance and exercise-like effects.',
+    '5-amino-1mq':'An oral NNMT enzyme inhibitor researched for fat-cell metabolism and preserving cellular NAD+ levels.',
+    '5am':'An oral NNMT enzyme inhibitor researched for fat-cell metabolism and preserving cellular NAD+ levels.',
+    'nad+':'An essential cellular coenzyme that powers energy production and DNA-repair / longevity (sirtuin) pathways. Studied for energy and anti-aging.',
+    'nad':'An essential cellular coenzyme that powers energy production and DNA-repair / longevity (sirtuin) pathways. Studied for energy and anti-aging.',
+    'glutathione':'The body’s master antioxidant, studied for detoxification, immune support, skin brightening and cellular protection.',
+    'bpc-157':'A stable gastric peptide widely researched for healing and recovery — tendon, ligament, muscle and gut-lining repair, plus reduced inflammation.',
+    'tb-500':'A synthetic form of Thymosin Beta-4 studied for tissue repair, flexibility, reduced inflammation and faster recovery.',
+    'tb500':'A synthetic form of Thymosin Beta-4 studied for tissue repair, flexibility, reduced inflammation and faster recovery.',
+    'klow':'A recovery blend (commonly GHK-Cu, KPV, TB-500 and BPC-157) researched for comprehensive healing, skin and anti-inflammatory support.',
+    'ghk-cu':'A copper peptide studied for skin regeneration, collagen production, wound healing, hair and anti-aging.',
+    'kpv':'A small anti-inflammatory peptide (from alpha-MSH) researched for gut health and calming inflammation.',
+    'cartalax':'A Khavinson bioregulator peptide studied for cartilage and joint / connective-tissue support.',
+    'wolverine':'A recovery blend (Cartalax, TB-500 and BPC-157) researched for accelerated healing of joints, tendons and soft tissue.',
+    'cjc-1295':'A GHRH analog studied, often with Ipamorelin, to boost natural growth hormone for recovery, body composition and sleep.',
+    'igf-1 lr3':'A long-acting form of insulin-like growth factor-1 researched for muscle growth, recovery and cell proliferation.',
+    'igf-1':'A long-acting form of insulin-like growth factor-1 researched for muscle growth, recovery and cell proliferation.',
+    'hcg':'Human chorionic gonadotropin, studied for maintaining testicular function and natural testosterone production, often during TRT.',
+    'semax':'A nootropic peptide studied for focus, memory, mood and neuroprotection via BDNF support.',
+    'selank':'A nootropic peptide studied for anxiety reduction, calm focus and immune modulation.',
+    'adamax':'An enhanced Semax-type peptide researched for stronger, longer cognitive and neuroprotective effects.',
+    'pt-141':'Also called Bremelanotide; studied for libido and sexual arousal in both men and women via melanocortin receptors.',
+    'kisspeptin':'A reproductive hormone peptide studied for stimulating the natural sex-hormone (LH/FSH) axis, fertility and libido.',
+    'oxytocin':'The “bonding” hormone studied for social connection, stress reduction, mood and intimacy.',
+    'dsip':'Delta-sleep-inducing peptide, researched for improving deep sleep quality, stress and recovery.',
+    'epithalon':'A Khavinson pineal tetrapeptide studied for telomere support, circadian rhythm, sleep and longevity.',
+    'epitalon':'A Khavinson pineal tetrapeptide studied for telomere support, circadian rhythm, sleep and longevity.',
+    'pinealon':'A Khavinson bioregulator peptide studied for brain aging, cognition and neuroprotection.',
+    'cerebrolysin':'A neuropeptide preparation studied for neuroprotection, cognitive recovery and brain repair.',
+    'cortagen':'A Khavinson bioregulator peptide studied for brain and nervous-system support and recovery.',
+    'foxo4-dri':'A senolytic peptide researched for clearing “zombie” (senescent) cells that drive aging and inflammation.',
+    'ss-31':'A mitochondrial-targeted peptide (elamipretide) studied for cellular energy, reducing oxidative stress and protecting heart, muscle and nerves.',
+    'aod-9604':'A modified HGH fragment studied for targeted fat loss without the growth or blood-sugar effects of full HGH.',
+    'hgh':'Human growth hormone, studied for recovery, body composition, tissue repair and anti-aging.',
+    'testosterone':'The primary male androgen, studied for energy, libido, muscle, mood and overall vitality.',
+    'melanotan':'A melanocyte-stimulating peptide studied for skin tanning and, for MT-II, libido effects.',
+    'vilon':'A Khavinson di-peptide bioregulator studied for immune support and anti-aging.',
+    'vesugen':'A Khavinson bioregulator peptide studied for vascular (blood-vessel) health and circulation.',
+    'thymosin alpha-1':'An immune-modulating peptide studied for strengthening and balancing immune response.',
+    'vip':'Vasoactive intestinal peptide, studied for anti-inflammatory, immune and respiratory / neuro support.',
+    'ahk-cu':'A copper peptide studied for hair-follicle health, growth stimulation and scalp circulation.',
+    'testagen':'A Khavinson bioregulator peptide studied for testicular function and natural testosterone support.',
+    'p21':'A nootropic peptide (Cerebrolysin-derived) studied for neurogenesis, memory and cognitive support.',
+    'pe-22-28':'A peptide studied for mood, antidepressant-like effects and neuroplasticity via TREK-1 channels.',
+    'slu-pp-332':'A metabolic peptide/compound studied for exercise-mimetic effects, fat oxidation and endurance.',
+    'cagrilintide':'A long-acting amylin analog researched for appetite control and weight loss, often paired with a GLP-1.',
+    'glutathione':'The body’s master antioxidant, studied for detoxification, immune support and cellular protection.',
+    'epithalon':'A Khavinson pineal tetrapeptide studied for telomere support, sleep and longevity.',
+    'bac water':'Bacteriostatic water for reconstituting lyophilized peptides. A research supply item.',
+    'bacteriostatic':'Bacteriostatic water for reconstituting lyophilized peptides. A research supply item.'
   };
-  var GENERIC = 'Research peptide — message us for details.';
+  var GENERIC='Research peptide — tap the name on a product to open its details, or message us for more.';
 
-  // Build the full lookup: start with built-ins, overlay the shared
-  // compound library (BL_LIB) if it loaded. Both keyed by compound name.
-  var DESC = {};          // normalizedKey -> {text, cat}
-  (function buildDesc() {
-    function put(key, text) {
-      var k = String(key).toLowerCase().trim();
-      if (!k) return;
-      DESC[k] = { text: text };
-    }
-    Object.keys(BUILTIN).forEach(function (k) { put(k, BUILTIN[k]); });
-    // overlay the vetted shared library when available
-    if (typeof BL_LIB === 'object' && BL_LIB) {
-      Object.keys(BL_LIB).forEach(function (name) {
-        var e = BL_LIB[name] || {};
-        var parts = [];
-        if (e.sub) parts.push(e.sub + '.');
-        if (e.goal) parts.push('Researched for: ' + e.goal + '.');
-        if (e.mech) parts.push(e.mech);
-        var text = parts.join(' ').trim();
-        if (text) DESC[String(name).toLowerCase().trim()] = { text: text, sub: e.sub || '' };
+  var DESC={};
+  (function(){
+    Object.keys(BUILTIN).forEach(function(k){DESC[k.toLowerCase().trim()]={text:BUILTIN[k]};});
+    if(typeof BL_LIB==='object'&&BL_LIB){
+      Object.keys(BL_LIB).forEach(function(name){
+        var e=BL_LIB[name]||{},parts=[];
+        if(e.sub)parts.push(e.sub+'.');
+        if(e.goal)parts.push('Researched for: '+e.goal+'.');
+        if(e.mech)parts.push(e.mech);
+        var t=parts.join(' ').trim();
+        if(t)DESC[String(name).toLowerCase().trim()]={text:t};
       });
     }
   })();
-
-  // sorted keys, longest first, so "igf-1 lr3" beats "igf-1"
-  var DESC_KEYS = Object.keys(DESC).sort(function (a, b) { return b.length - a.length; });
-
-  function descFor(name) {
-    var n = String(name || '').toLowerCase();
-    for (var i = 0; i < DESC_KEYS.length; i++) {
-      if (n.indexOf(DESC_KEYS[i]) !== -1) return DESC[DESC_KEYS[i]];
-    }
-    return { text: GENERIC };
+  var DESC_KEYS=Object.keys(DESC).sort(function(a,b){return b.length-a.length;});
+  function descFor(name){
+    var n=String(name||'').toLowerCase();
+    for(var i=0;i<DESC_KEYS.length;i++){if(n.indexOf(DESC_KEYS[i])!==-1)return DESC[DESC_KEYS[i]];}
+    return {text:GENERIC};
   }
 
-  // ── category (derived from the product name — no extra DB field) ──
-  var CAT_RULES = [
-    ['Weight Loss', ['retatrutide','tirzepatide','semaglutide','cagrilintide','mots-c','5-amino','5am','aod-9604','5ad','tesamorelin','adipotide','survodutide']],
-    ['Healing & Recovery', ['bpc','tb-500','tb500','klow','wolverine','ghk','kpv','cartalax','ara-290','pentosan','ll-37']],
-    ['Longevity', ['nad','epithalon','epitalon','pinealon','foxo4','ss-31','glutathione','vilon','vesugen','humanin']],
-    ['Cognitive', ['semax','selank','adamax','cerebrolysin','cortagen','p21','pe-22','dihexa','p-21','dsip']],
-    ['Hormone & Vitality', ['testosterone','hcg','kisspeptin','cjc','ipamorelin','igf','hgh','sermorelin','testagen','gonadorelin','enclomiphene','tesamorelin']],
-    ['Sexual Health', ['pt-141','pt141','bremelanotide','oxytocin','melanotan','mt-2','mt-ii']],
-    ['Immune & Skin', ['thymosin','thymulin','vip','ahk','ghk-cu','melanotan','snap-8','argireline','copper']]
+  /* ── category (derived from product name) ── */
+  var CAT_RULES=[
+    ['Metabolic & GLP Research',['retatrutide','tirzepatide','semaglutide','cagrilintide','survodutide','mazdutide','liraglutide','aod-9604','5-amino','5am','5ad','tesofensine','adipotide']],
+    ['Recovery & Tissue Research',['bpc','tb-500','tb500','thymosin beta','klow','wolverine','ghk','kpv','cartalax','cardalax','ara-290','pentosan','ll-37','thymosin alpha','p21','p-21']],
+    ['Growth & Endocrine',['testosterone','hcg','tesamorelin','cjc','sermorelin','ghrp','hexarelin','mk-677','igf','peg-mgf','hgh','somatropin','testagen','gonadorelin','enclomiphene']],
+    ['Cognitive & Focus',['semax','selank','adamax','bromantane','modafinil','armodafinil','noopept','cerebrolysin','pinealon','epithalon','epitalon','dsip','pe-22','cortagen']],
+    ['Mitochondrial & Longevity',['mots-c','ss-31','nad','slu-pp','humanin','foxo4','gdf-11','l-carnitine','glutathione','nmn','nr','vilon','vesugen']],
+    ['Skin & Cosmetic Research',['melanotan','mt-2','mt-ii','snap-8','argireline','matrixyl','ahk']],
+    ['Sexual & Hormonal',['pt-141','pt141','bremelanotide','kisspeptin','oxytocin']],
+    ['Other Research & Supplies',['vip','thymosin','bac water','bacteriostatic','sterile water','storage','syringe','supplies','thymulin']]
   ];
-  function categorize(name) {
-    var n = String(name || '').toLowerCase();
-    for (var i = 0; i < CAT_RULES.length; i++) {
-      var kws = CAT_RULES[i][1];
-      for (var j = 0; j < kws.length; j++) {
-        if (n.indexOf(kws[j]) !== -1) return CAT_RULES[i][0];
-      }
-    }
-    return 'Peptides';
+  var CAT_ORDER=CAT_RULES.map(function(r){return r[0];});
+  function categorize(name){
+    var n=String(name||'').toLowerCase();
+    for(var i=0;i<CAT_RULES.length;i++){var kws=CAT_RULES[i][1];for(var j=0;j<kws.length;j++){if(n.indexOf(kws[j])!==-1)return CAT_RULES[i][0];}}
+    return 'Other Research & Supplies';
   }
 
-  // ── sellable filter ───────────────────────────────────────────────
-  function isSellable(p) {
-    var sale = (typeof p.sale === 'string') ? parseFloat(p.sale) : p.sale;
-    if (typeof sale !== 'number' || isNaN(sale) || sale < 5) return false;
-    var name = String(p.name || '').toLowerCase();
-    for (var i = 0; i < BLOCK.length; i++) {
-      if (name.indexOf(BLOCK[i]) !== -1) return false;
-    }
-    // Epitalon/Epithalon 10mg was pulled by the owner; the 50mg stays.
-    if ((name.indexOf('epitalon') !== -1 || name.indexOf('epithalon') !== -1) && name.indexOf('10mg') !== -1) return false;
+  /* ── sellable filter ── */
+  function isSellable(p){
+    var sale=(typeof p.sale==='string')?parseFloat(p.sale):p.sale;
+    if(typeof sale!=='number'||isNaN(sale)||sale<5)return false;
+    var name=String(p.name||'').toLowerCase();
+    for(var i=0;i<BLOCK.length;i++){if(name.indexOf(BLOCK[i])!==-1)return false;}
+    if((name.indexOf('epitalon')!==-1||name.indexOf('epithalon')!==-1)&&name.indexOf('10mg')!==-1)return false;
     return true;
   }
 
-  // ── load live feed (READ ONLY): products + inventory in parallel ──
-  function sbFetch(path) {
-    return fetch(SUPABASE_URL + '/rest/v1/' + path, {
-      headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON }
-    }).then(function (r) {
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
-    });
+  /* ── live READ-ONLY feed ── */
+  function sbFetch(path){
+    return fetch(SUPABASE_URL+'/rest/v1/'+path,{headers:{apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON}})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();});
   }
-
-  function loadCatalog() {
+  function loadCatalog(){
     Promise.all([
       sbFetch('pl_products?select=id,name,sale,inventory_id&order=name.asc'),
-      // inventory is read ONLY for stock status — never written
-      sbFetch('inventory?select=id,vials,status').catch(function () { return []; })
-    ])
-    .then(function (res) {
-      var rows = res[0] || [];
-      var inv = res[1] || [];
-
-      // inventory_id -> inventory row
-      var invMap = {};
-      inv.forEach(function (row) { invMap[String(row.id)] = row; });
-
-      products = rows.filter(isSellable).map(function (p) {
-        var invRow = p.inventory_id != null ? invMap[String(p.inventory_id)] : null;
-        var vials = invRow ? Number(invRow.vials) : 0;
-        var status = invRow ? String(invRow.status || '').toLowerCase() : '';
-        // IN STOCK only if the linked row exists AND vials > 0 AND status !== 'out'
-        var inStock = !!(invRow && !isNaN(vials) && vials > 0 && status !== 'out');
-        return {
-          id: String(p.id),
-          name: p.name,
-          price: Number(p.sale),
-          inStock: inStock,
-          cat: categorize(p.name)
-        };
+      sbFetch('inventory?select=id,vials,status').catch(function(){return [];})
+    ]).then(function(res){
+      var rows=res[0]||[], inv=res[1]||[], invMap={};
+      inv.forEach(function(row){invMap[String(row.id)]=row;});
+      products=rows.filter(isSellable).map(function(p){
+        var ir=p.inventory_id!=null?invMap[String(p.inventory_id)]:null;
+        var vials=ir?Number(ir.vials):0, status=ir?String(ir.status||'').toLowerCase():'';
+        return {id:String(p.id),name:p.name,price:Number(p.sale),inStock:!!(ir&&!isNaN(vials)&&vials>0&&status!=='out'),cat:categorize(p.name)};
       });
-
-      // in-stock items read first
-      products.sort(function (a, b) {
-        if (a.inStock !== b.inStock) return a.inStock ? -1 : 1;
-        return a.name.localeCompare(b.name);
-      });
-
-      stateEl.style.display = 'none';
       buildChips();
-      renderProducts();
-    })
-    .catch(function () {
-      stateEl.innerHTML = '<b>Couldn’t load the catalog</b>Refresh to try again.';
+      render();
+    }).catch(function(){
+      $('grid').innerHTML='<div class="state"><b>Couldn’t load the catalog</b>Refresh to try again.</div>';
     });
   }
 
-  // ── category chips ─────────────────────────────────────────────────
-  function buildChips() {
-    var cats = {};
-    products.forEach(function (p) { cats[p.cat] = (cats[p.cat] || 0) + 1; });
-    var ordered = ['All'].concat(Object.keys(cats).sort());
-    chipsEl.innerHTML = ordered.map(function (c) {
-      return '<button type="button" class="chip' + (c === activeCat ? ' on' : '') +
-             '" data-cat="' + esc(c) + '">' + esc(c) + '</button>';
-    }).join('');
+  /* ── chips ── */
+  function buildChips(){
+    var counts={};
+    products.forEach(function(p){counts[p.cat]=(counts[p.cat]||0)+1;});
+    var cats=CAT_ORDER.filter(function(c){return counts[c];});
+    var html='<button class="chip'+(activeCat==='All'?' active':'')+'" data-cat="All">All compounds</button>';
+    cats.forEach(function(c){html+='<button class="chip'+(activeCat===c?' active':'')+'" data-cat="'+esc(c)+'">'+esc(c)+'</button>';});
+    $('chips').innerHTML=html;
   }
-  chipsEl.addEventListener('click', function (e) {
-    var chip = e.target.closest('.chip');
-    if (!chip) return;
-    activeCat = chip.getAttribute('data-cat');
-    Array.prototype.forEach.call(chipsEl.querySelectorAll('.chip'), function (c) {
-      c.classList.toggle('on', c.getAttribute('data-cat') === activeCat);
-    });
-    renderProducts();
+  $('chips').addEventListener('click',function(e){
+    var c=e.target.closest('.chip');if(!c)return;
+    activeCat=c.getAttribute('data-cat');
+    Array.prototype.forEach.call($('chips').querySelectorAll('.chip'),function(x){x.classList.toggle('active',x.getAttribute('data-cat')===activeCat);});
+    render();
+    window.scrollTo({top:document.querySelector('.titlebar').offsetTop-90,behavior:'smooth'});
   });
 
-  // ── product grid ────────────────────────────────────────────────────
-  function filtered() {
-    var list = products;
-    if (activeCat !== 'All') list = list.filter(function (p) { return p.cat === activeCat; });
-    if (query) {
-      var words = query.split(/\s+/);
-      list = list.filter(function (p) {
-        var h = p.name.toLowerCase();
-        return words.every(function (w) { return h.indexOf(w) !== -1; });
-      });
-    }
+  /* ── filter + sort ── */
+  function visible(){
+    var list=products.slice();
+    if(activeCat!=='All')list=list.filter(function(p){return p.cat===activeCat;});
+    if(query){var w=query.split(/\s+/);list=list.filter(function(p){var h=p.name.toLowerCase();return w.every(function(x){return h.indexOf(x)!==-1;});});}
+    list.sort(function(a,b){
+      if(a.inStock!==b.inStock)return a.inStock?-1:1; // in-stock always first
+      if(sortMode==='az')return a.name.localeCompare(b.name);
+      if(sortMode==='za')return b.name.localeCompare(a.name);
+      if(sortMode==='plow')return a.price-b.price||a.name.localeCompare(b.name);
+      if(sortMode==='phigh')return b.price-a.price||a.name.localeCompare(b.name);
+      return 0;
+    });
     return list;
   }
-
-  function renderProducts() {
-    var list = filtered();
-    if (!products.length) {
-      listEl.innerHTML = '';
-      resultEl.textContent = '';
-      return;
-    }
-    resultEl.innerHTML = 'Showing <b>' + list.length + '</b> of ' + products.length + ' products';
-    if (!list.length) {
-      listEl.innerHTML = '<div class="shop-state"><b>No products found</b>Try a shorter word or another category.</div>';
-      return;
-    }
-    listEl.innerHTML = list.map(function (p) {
-      var inCart = cart[p.id];
-      var foot;
-      if (!p.inStock) {
-        // OUT OF STOCK: struck price + label, NO add control (cannot order)
-        foot = '<div class="prod-price">' + money(p.price) + '</div>' +
-               '<span class="prod-oos-tag">Out of stock</span>';
-      } else if (inCart) {
-        foot = '<div class="prod-price">' + money(p.price) + '</div>' +
-               '<div class="stepper" data-id="' + esc(p.id) + '">' +
-                 '<button type="button" data-act="dec" aria-label="Decrease">&minus;</button>' +
-                 '<span class="q">' + inCart.qty + '</span>' +
-                 '<button type="button" data-act="inc" aria-label="Increase">+</button>' +
-               '</div>';
-      } else {
-        foot = '<div class="prod-price">' + money(p.price) + '</div>' +
-               '<button type="button" class="btn-add" data-id="' + esc(p.id) + '">Add +</button>';
+  function render(){
+    var list=visible(), grid=$('grid');
+    $('curCat').textContent=(activeCat==='All')?'All compounds':activeCat;
+    if(!products.length){grid.innerHTML='';$('curCount').textContent='';return;}
+    $('curCount').textContent=list.length+' '+(list.length===1?'compound':'compounds');
+    if(!list.length){grid.innerHTML='<div class="state"><b>No products found</b>Try a shorter word or another category.</div>';return;}
+    grid.innerHTML=list.map(function(p){
+      var inCart=cart[p.id], bottom;
+      if(!p.inStock){
+        bottom='<span class="price">'+money(p.price)+'</span><span class="oostag">Out of stock</span>';
+      }else if(inCart){
+        bottom='<span class="price">'+money(p.price)+'</span><div class="stp" data-id="'+esc(p.id)+'"><button data-act="dec" aria-label="Decrease">−</button><span class="q">'+inCart.qty+'</span><button data-act="inc" aria-label="Increase">+</button></div>';
+      }else{
+        bottom='<span class="price">'+money(p.price)+'</span><button class="add" data-id="'+esc(p.id)+'">+ Add to cart</button>';
       }
-      return '<div class="prod' + (p.inStock ? '' : ' oos') + '">' +
-               '<div class="prod-cat">' + esc(p.cat) + '</div>' +
-               '<div class="prod-name" data-info="' + esc(p.name) + '" role="button" tabindex="0">' + esc(p.name) + '</div>' +
-               '<button type="button" class="prod-what" data-info="' + esc(p.name) + '">What is this?</button>' +
-               '<div class="prod-foot">' + foot + '</div>' +
-             '</div>';
+      return '<div class="card'+(p.inStock?'':' oos')+'">'+
+        '<div class="cat">'+esc(p.cat)+'</div>'+
+        '<button class="name" data-info="'+esc(p.name)+'">'+esc(p.name)+' <span class="arr">↗</span></button>'+
+        '<button class="learn" data-info="'+esc(p.name)+'">What is this?</button>'+
+        '<div class="bottom">'+bottom+'</div>'+
+      '</div>';
     }).join('');
   }
 
-  // delegate product-grid clicks
-  listEl.addEventListener('click', function (e) {
-    var info = e.target.closest('[data-info]');
-    if (info) { openInfo(info.getAttribute('data-info')); return; }
-    var add = e.target.closest('.btn-add');
-    if (add) { addToCart(add.getAttribute('data-id')); return; }
-    var step = e.target.closest('.stepper button');
-    if (step) {
-      var id = step.closest('.stepper').getAttribute('data-id');
-      changeQty(id, step.getAttribute('data-act') === 'inc' ? 1 : -1);
-    }
-  });
-  listEl.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    var info = e.target.closest('.prod-name[data-info]');
-    if (info) { e.preventDefault(); openInfo(info.getAttribute('data-info')); }
+  $('grid').addEventListener('click',function(e){
+    var info=e.target.closest('[data-info]');if(info){openInfo(info.getAttribute('data-info'));return;}
+    var add=e.target.closest('.add');if(add){addToCart(add.getAttribute('data-id'));return;}
+    var s=e.target.closest('.stp button');if(s){changeQty(s.closest('.stp').getAttribute('data-id'),s.getAttribute('data-act')==='inc'?1:-1);}
   });
 
-  function productById(id) {
-    for (var i = 0; i < products.length; i++) if (products[i].id === id) return products[i];
-    return null;
-  }
+  function productById(id){for(var i=0;i<products.length;i++)if(products[i].id===id)return products[i];return null;}
+  function addToCart(id){var p=productById(id);if(!p||!p.inStock)return;if(cart[id])cart[id].qty+=1;else cart[id]={id:id,name:p.name,price:p.price,qty:1};sync();}
+  function changeQty(id,d){if(!cart[id]){if(d>0)return addToCart(id);return;}cart[id].qty+=d;if(cart[id].qty<=0)delete cart[id];sync();}
+  function removeFromCart(id){delete cart[id];sync();}
 
-  function addToCart(id) {
-    var p = productById(id);
-    if (!p || !p.inStock) return;          // never add an out-of-stock item
-    if (cart[id]) cart[id].qty += 1;
-    else cart[id] = { id: id, name: p.name, price: p.price, qty: 1 };
-    sync();
-  }
-  function changeQty(id, delta) {
-    if (!cart[id]) {
-      if (delta > 0) return addToCart(id);
-      return;
+  /* ── compound modal ── */
+  var modal=$('modal');
+  function openInfo(name){$('mCat').textContent=categorize(name);$('mName').textContent=name;$('mBody').textContent=descFor(name).text||GENERIC;modal.classList.add('show');modal.setAttribute('aria-hidden','false');}
+  function closeInfo(){modal.classList.remove('show');modal.setAttribute('aria-hidden','true');}
+  $('mClose').addEventListener('click',closeInfo);
+  modal.addEventListener('click',function(e){if(e.target===modal)closeInfo();});
+
+  /* ── cart drawer ── */
+  var drawer=$('drawer'), overlay=$('overlay');
+  function openCart(){drawer.classList.add('open');overlay.classList.add('show');}
+  function closeCart(){drawer.classList.remove('open');overlay.classList.remove('show');}
+  $('cartBtn').addEventListener('click',openCart);
+  $('mobileCart').addEventListener('click',openCart);
+  $('drawerClose').addEventListener('click',closeCart);
+  overlay.addEventListener('click',closeCart);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeInfo();closeCart();}});
+
+  function cartList(){return Object.keys(cart).map(function(k){return cart[k];});}
+  function subtotal(){return cartList().reduce(function(s,it){return s+it.price*it.qty;},0);}
+  function grandTotal(){return cartList().length?subtotal()+SHIPPING:0;}
+
+  function renderCart(){
+    var items=cartList(), count=items.reduce(function(s,it){return s+it.qty;},0);
+    $('bubble').textContent=count;$('mobileCount').textContent=count;
+    if(!items.length){
+      $('cartEmpty').style.display='block';$('lineItems').innerHTML='';$('tfoot').style.display='none';
+      $('cform').classList.remove('on');$('confirm').classList.remove('on');return;
     }
-    cart[id].qty += delta;
-    if (cart[id].qty <= 0) delete cart[id];
-    sync();
-  }
-  function removeFromCart(id) { delete cart[id]; sync(); }
-
-  // ── compound info modal ─────────────────────────────────────────────
-  var modal = document.getElementById('infoModal');
-  function openInfo(name) {
-    var d = descFor(name);
-    document.getElementById('modalCat').textContent = categorize(name);
-    document.getElementById('modalName').textContent = name;
-    document.getElementById('modalBody').textContent = d.text || GENERIC;
-    modal.classList.add('on');
-    modal.setAttribute('aria-hidden', 'false');
-  }
-  function closeInfo() { modal.classList.remove('on'); modal.setAttribute('aria-hidden', 'true'); }
-  document.getElementById('modalClose').addEventListener('click', closeInfo);
-  modal.addEventListener('click', function (e) { if (e.target === modal) closeInfo(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeInfo(); });
-
-  // ── cart render + totals ──────────────────────────────────────────
-  function cartList() {
-    return Object.keys(cart).map(function (k) { return cart[k]; });
-  }
-  function subtotal() {
-    return cartList().reduce(function (s, it) { return s + it.price * it.qty; }, 0);
-  }
-  function grandTotal() {
-    var items = cartList();
-    return items.length ? subtotal() + SHIPPING : 0;
-  }
-
-  function renderCart() {
-    var items = cartList();
-    var count = items.reduce(function (s, it) { return s + it.qty; }, 0);
-    cartCount.textContent = count;
-    cartBadge.textContent = count;
-    cartBtn.classList.toggle('has-items', count > 0);
-
-    if (!items.length) {
-      cartEmpty.style.display = 'block';
-      cartItems.innerHTML = '';
-      cartTotals.style.display = 'none';
-      checkout.classList.add('off');
-      return;
-    }
-    cartEmpty.style.display = 'none';
-    checkout.classList.remove('off');
-
-    cartItems.innerHTML = items.map(function (it) {
-      return '<div class="ci">' +
-               '<div class="ci-main">' +
-                 '<div class="ci-name">' + esc(it.name) + '</div>' +
-                 '<div class="ci-each">' + money(it.price) + ' each</div>' +
-                 '<div style="margin-top:7px"><div class="stepper" data-id="' + esc(it.id) + '">' +
-                   '<button type="button" data-act="dec" aria-label="Decrease">&minus;</button>' +
-                   '<span class="q">' + it.qty + '</span>' +
-                   '<button type="button" data-act="inc" aria-label="Increase">+</button>' +
-                 '</div></div>' +
-               '</div>' +
-               '<div class="ci-right">' +
-                 '<button type="button" class="ci-rm" data-rm="' + esc(it.id) + '" aria-label="Remove">&times;</button>' +
-                 '<div class="ci-line">' + money(it.price * it.qty) + '</div>' +
-               '</div>' +
-             '</div>';
+    $('cartEmpty').style.display='none';$('tfoot').style.display='block';
+    $('lineItems').innerHTML=items.map(function(it){
+      return '<div class="lineitem">'+
+        '<div><div class="li-name">'+esc(it.name)+'</div><div class="li-each">'+money(it.price)+' each</div>'+
+        '<div class="stp" data-id="'+esc(it.id)+'" style="margin-top:9px"><button data-act="dec">−</button><span class="q">'+it.qty+'</span><button data-act="inc">+</button></div></div>'+
+        '<div class="li-right"><button class="li-rm" data-rm="'+esc(it.id)+'" aria-label="Remove">×</button><div class="li-line">'+money(it.price*it.qty)+'</div></div>'+
+      '</div>';
     }).join('');
-
-    cartTotals.style.display = 'block';
-    tSub.textContent = money(subtotal());
-    tGrand.textContent = money(grandTotal());
+    $('tSub').textContent=money(subtotal());
+    $('tGrand').textContent=money(grandTotal());
   }
+  $('items').addEventListener('click',function(e){
+    var rm=e.target.closest('.li-rm');if(rm){removeFromCart(rm.getAttribute('data-rm'));return;}
+    var s=e.target.closest('.stp button');if(s){changeQty(s.closest('.stp').getAttribute('data-id'),s.getAttribute('data-act')==='inc'?1:-1);}
+  });
+  function sync(){render();renderCart();}
 
-  cartItems.addEventListener('click', function (e) {
-    var rm = e.target.closest('.ci-rm');
-    if (rm) { removeFromCart(rm.getAttribute('data-rm')); return; }
-    var step = e.target.closest('.stepper button');
-    if (step) {
-      var id = step.closest('.stepper').getAttribute('data-id');
-      changeQty(id, step.getAttribute('data-act') === 'inc' ? 1 : -1);
-    }
+  /* ── reveal checkout form ── */
+  $('toCheckout').addEventListener('click',function(){
+    $('toCheckout').style.display='none';
+    $('cform').classList.add('on');
+    $('coName').focus();
   });
 
-  function sync() { renderProducts(); renderCart(); }
+  /* ── search + sort ── */
+  $('search').addEventListener('input',function(){query=this.value.trim().toLowerCase();render();});
+  $('sort').addEventListener('change',function(){sortMode=this.value;render();});
 
-  // ── cart button: quick jump to the cart / checkout ────────────────
-  cartBtn.addEventListener('click', function () {
-    var anchor = document.getElementById('cartAnchor');
-    try { anchor.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    catch (e) { anchor.scrollIntoView(); }
+  /* ── payment selection ── */
+  var payOpts=$('payOpts');
+  payOpts.addEventListener('change',function(){
+    Array.prototype.forEach.call(payOpts.querySelectorAll('.pay'),function(l){l.classList.toggle('sel',l.querySelector('input').checked);});
+    $('payErr').classList.remove('on');
+  });
+  function selectedPay(){var r=payOpts.querySelector('input[name="pay"]:checked');if(!r)return null;var l=r.closest('.pay');return {value:r.value,method:l.getAttribute('data-method'),handle:l.getAttribute('data-handle')};}
+  ['coName','coContact'].forEach(function(id){$(id).addEventListener('input',function(){this.closest('.fld').classList.remove('bad');});});
+
+  /* ── submit ── */
+  $('cform').addEventListener('submit',function(e){
+    e.preventDefault();if(submitted)return;
+    $('submitErr').classList.remove('on');
+    var items=cartList();if(!items.length)return;
+    var name=$('coName').value.trim(), contact=$('coContact').value.trim(), pay=selectedPay(), ok=true;
+    if(!name){$('fldName').classList.add('bad');ok=false;}
+    if(!contact){$('fldContact').classList.add('bad');ok=false;}
+    if(!pay){$('payErr').classList.add('on');ok=false;}
+    if(!ok)return;
+    var sub=subtotal(), grand=grandTotal();
+    var lines=items.map(function(it){return it.qty+' × '+it.name+' @ '+money(it.price)+' = '+money(it.price*it.qty);});
+    var orderText=lines.join('\n')+'\n\nSubtotal '+money(sub)+'\nShipping '+money(SHIPPING)+'\nTOTAL '+money(grand);
+    var fd=new FormData();
+    fd.append('_subject','New BioLinked Order — '+money(grand));
+    fd.append('name',name);fd.append('contact',contact);fd.append('payment',pay.value);
+    fd.append('order',orderText);fd.append('total',grand.toFixed(2));
+    var btn=$('submitBtn');btn.disabled=true;btn.textContent='Submitting…';
+    fetch(FORMSPREE,{method:'POST',headers:{Accept:'application/json'},body:fd})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);submitted=true;showConfirm(grand,pay);})
+      .catch(function(){btn.disabled=false;btn.textContent='Submit Order';$('submitErr').textContent='Something went wrong submitting your order. Please try again, or reach out to the owner directly.';$('submitErr').classList.add('on');});
   });
 
-  // ── search ────────────────────────────────────────────────────────
-  searchEl.addEventListener('input', function () {
-    query = searchEl.value.trim().toLowerCase();
-    searchWrap.classList.toggle('has-value', searchEl.value.length > 0);
-    renderProducts();
-  });
-  clearEl.addEventListener('click', function () {
-    searchEl.value = ''; query = '';
-    searchWrap.classList.remove('has-value');
-    searchEl.focus();
-    renderProducts();
-  });
-
-  // ── payment selection styling ─────────────────────────────────────
-  var payOpts = document.getElementById('payOpts');
-  payOpts.addEventListener('change', function () {
-    Array.prototype.forEach.call(payOpts.querySelectorAll('.pay'), function (lbl) {
-      lbl.classList.toggle('sel', lbl.querySelector('input').checked);
-    });
-    document.getElementById('payErr').classList.remove('on');
-  });
-
-  function selectedPay() {
-    var r = payOpts.querySelector('input[name="pay"]:checked');
-    if (!r) return null;
-    var lbl = r.closest('.pay');
-    return { value: r.value, method: lbl.getAttribute('data-method'), handle: lbl.getAttribute('data-handle') };
-  }
-
-  // clear field errors on input
-  ['coName', 'coContact'].forEach(function (id) {
-    document.getElementById(id).addEventListener('input', function () {
-      this.closest('.fld').classList.remove('invalid');
-    });
-  });
-
-  // ── submit ────────────────────────────────────────────────────────
-  var submitErr = document.getElementById('submitErr');
-  var submitBtn = document.getElementById('submitBtn');
-
-  checkout.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (submitted) return;
-    submitErr.classList.remove('on');
-
-    var items = cartList();
-    if (!items.length) return;
-
-    var nameEl = document.getElementById('coName');
-    var contactEl = document.getElementById('coContact');
-    var name = nameEl.value.trim();
-    var contact = contactEl.value.trim();
-    var pay = selectedPay();
-    var ok = true;
-
-    if (!name) { document.getElementById('fldName').classList.add('invalid'); ok = false; }
-    if (!contact) { document.getElementById('fldContact').classList.add('invalid'); ok = false; }
-    if (!pay) { document.getElementById('payErr').classList.add('on'); ok = false; }
-    if (!ok) return;
-
-    var sub = subtotal();
-    var grand = grandTotal();
-
-    var lines = items.map(function (it) {
-      return it.qty + ' × ' + it.name + ' @ ' + money(it.price) + ' = ' + money(it.price * it.qty);
-    });
-    var orderText = lines.join('\n') +
-      '\n\nSubtotal ' + money(sub) +
-      '\nShipping ' + money(SHIPPING) +
-      '\nTOTAL ' + money(grand);
-
-    var fd = new FormData();
-    fd.append('_subject', 'New BioLinked Order — ' + money(grand));
-    fd.append('name', name);
-    fd.append('contact', contact);
-    fd.append('payment', pay.value);
-    fd.append('order', orderText);
-    fd.append('total', grand.toFixed(2));
-
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Submitting…';
-
-    fetch(FORMSPREE, { method: 'POST', headers: { Accept: 'application/json' }, body: fd })
-      .then(function (r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
-        submitted = true;
-        showConfirm(grand, pay);
-      })
-      .catch(function () {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Submit Order';
-        submitErr.textContent = 'Something went wrong submitting your order. Please try again, or reach out to the owner directly.';
-        submitErr.classList.add('on');
+  function showConfirm(grand,pay){
+    $('totals').style.display='none';$('toCheckout').style.display='none';$('cform').style.display='none';
+    $('confTotal').textContent=money(grand);
+    var amt=grand.toFixed(2), note='BioLinked Order', stepEl=$('confStep'), payEl=$('confPay'), hintEl=$('confHint');
+    payEl.innerHTML='';hintEl.textContent='';
+    if(pay.method==='Cash App'){
+      stepEl.innerHTML='One tap to finish — opens <b>Cash App</b> with your total already filled in. Just hit pay.';
+      payEl.innerHTML='<a class="paynow" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay <span class="amt">'+money(grand)+'</span> in Cash App →</a>';
+      hintEl.textContent='If it doesn’t open, send '+money(grand)+' to $micahpauldino. Your order ships once payment is confirmed.';
+    }else if(pay.method==='Venmo'){
+      stepEl.innerHTML='One tap to finish — opens <b>Venmo</b> with your total already filled in. Just hit pay.';
+      payEl.innerHTML='<a class="paynow" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent(note)+'" target="_blank" rel="noopener">Pay <span class="amt">'+money(grand)+'</span> in Venmo →</a>';
+      hintEl.textContent='If it doesn’t open, send '+money(grand)+' to @micahp20. Your order ships once payment is confirmed.';
+    }else{
+      stepEl.innerHTML='Send <b>'+money(grand)+'</b> via <b>Zelle</b>. Tap below to copy the number.';
+      payEl.innerHTML='<button type="button" class="paycopy" id="zc"><span><span class="pc-tag">Tap to copy</span><br><span class="pc-num">720-938-0698</span></span><span class="pc-tag" id="zcs">Copy</span></button>';
+      $('zc').addEventListener('click',function(){
+        var num='720-938-0698', done=function(){$('zcs').textContent='Copied ✓';};
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(num).then(done,done);}
+        else{try{var t=document.createElement('textarea');t.value=num;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);done();}catch(e){}}
       });
-  });
-
-  function showConfirm(grand, pay) {
-    document.getElementById('cartBody').style.display = 'none';
-    checkout.style.display = 'none';
-    document.getElementById('confTotal').textContent = money(grand);
-
-    var amt = grand.toFixed(2);
-    var note = 'BioLinked Order';
-    var stepEl = document.getElementById('confStep');
-    var payEl  = document.getElementById('confPay');
-    var hintEl = document.getElementById('confHint');
-    payEl.innerHTML = '';
-    hintEl.textContent = '';
-
-    if (pay.method === 'Cash App') {
-      stepEl.innerHTML = 'One tap to finish — this opens <b>Cash App</b> with your total already filled in. Just hit pay.';
-      // Cash App deep link with the amount prefilled
-      var caUrl = 'https://cash.app/$micahpauldino/' + amt;
-      payEl.innerHTML = '<a class="pay-now" href="' + caUrl + '" target="_blank" rel="noopener">' +
-                        'Pay <span class="pn-amt">' + money(grand) + '</span> in Cash App &rarr;</a>';
-      hintEl.textContent = 'If it doesn’t open, send ' + money(grand) + ' to $micahpauldino manually. Your order ships once payment is confirmed.';
-    } else if (pay.method === 'Venmo') {
-      stepEl.innerHTML = 'One tap to finish — this opens <b>Venmo</b> with your total already filled in. Just hit pay.';
-      // Venmo pay link: amount + note prefilled; redirects into the app on mobile
-      var vUrl = 'https://venmo.com/micahp20?txn=pay&amount=' + amt + '&note=' + encodeURIComponent(note);
-      payEl.innerHTML = '<a class="pay-now" href="' + vUrl + '" target="_blank" rel="noopener">' +
-                        'Pay <span class="pn-amt">' + money(grand) + '</span> in Venmo &rarr;</a>';
-      hintEl.textContent = 'If it doesn’t open, send ' + money(grand) + ' to @micahp20 manually. Your order ships once payment is confirmed.';
-    } else {
-      // Zelle — no deep link; tap to copy the number
-      stepEl.innerHTML = 'Send <b>' + money(grand) + '</b> via <b>Zelle</b>. Tap below to copy the number.';
-      payEl.innerHTML = '<button type="button" class="pay-copy" id="zelleCopy">' +
-                          '<span><span class="pc-tag">Tap to copy</span><br><span class="pc-num">720-938-0698</span></span>' +
-                          '<span class="pc-tag" id="zelleState">Copy</span>' +
-                        '</button>';
-      var btn = document.getElementById('zelleCopy');
-      btn.addEventListener('click', function () {
-        var num = '720-938-0698';
-        var done = function () { document.getElementById('zelleState').textContent = 'Copied ✓'; };
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(num).then(done, function () { done(); });
-        } else {
-          try {
-            var t = document.createElement('textarea'); t.value = num;
-            document.body.appendChild(t); t.select(); document.execCommand('copy');
-            document.body.removeChild(t); done();
-          } catch (e) {}
-        }
-      });
-      hintEl.textContent = 'Send ' + money(grand) + ' to 720-938-0698 in your bank’s Zelle. Your order ships once payment is confirmed.';
+      hintEl.textContent='Send '+money(grand)+' to 720-938-0698 in your bank’s Zelle. Your order ships once payment is confirmed.';
     }
-
-    confirmEl.classList.add('on');
-    try { confirmEl.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
+    $('confirm').classList.add('on');
   }
 
-  // go
-  loadCatalog();
-  renderCart();
+  loadCatalog();renderCart();
 })();
 </script>
-
 </body>
 </html>
