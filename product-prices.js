@@ -91,7 +91,7 @@ window.PRODUCT_PRICES = [
    forLine:'Cardiovascular health — heart muscle, blood pressure, circulation. Russian longevity research staple.',
    desc:'Khavinson peptide bioregulator targeting vascular tone and smooth-muscle function. Supports microcirculation, cardiac muscle integrity, and is used in longevity stacks alongside other tissue-specific bioregulators.',
    keywords:'adamax khavinson bioregulator cardiovascular vascular smooth muscle tetrapeptide'},
-  {name:'Cartalax',sec:'healing',cat:'healing',sku:'CTL20',size:'20mg vial',price:'$35',variants:[],stock:true,
+  {name:'Cartalax',sec:'healing',cat:'healing',sku:'CTL20',size:'20mg vial',price:'$25',variants:[],stock:true,
    forLine:'Joint pain — knees, shoulders, hips. Pair with BPC-157 for full joint repair.',
    desc:'Khavinson tetrapeptide targeting chondrocyte function. Supports cartilage regeneration and connective tissue integrity — paired with BPC-157 in joint-focused recovery protocols.',
    keywords:'cartalax khavinson cartilage joint chondrocyte connective tissue bioregulator tetrapeptide'},

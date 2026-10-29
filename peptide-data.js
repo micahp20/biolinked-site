@@ -140,7 +140,7 @@ window.PEPTIDE_DATA = [
   { name:'Testosterone Propionate',    cat:'hormones', vial:'100mg/mL 10mL', bac:'—', dose:'50mg', units:'50', schedule:'3x per week',  timing:'AM',                price:75,  in_stock:true },
 
   // ───── BIOREGULATORS ─────
-  { name:'Cartalax',                   cat:'bioregulator', vial:'20mg', bac:'2mL', dose:'1mg', units:'10', schedule:'Daily × 20-30 days', timing:'PM',             price:35,  in_stock:true },
+  { name:'Cartalax',                   cat:'bioregulator', vial:'20mg', bac:'2mL', dose:'1mg', units:'10', schedule:'Daily × 20-30 days', timing:'PM',             price:25,  in_stock:true },
   { name:'Cortagen',                   cat:'bioregulator', vial:'20mg', bac:'2mL', dose:'2mg', units:'20', schedule:'Daily × 20 days',    timing:'AM',             price:60,  in_stock:true }, // NEW — verify dosing vs cheat sheet
   { name:'Vesugen',                    cat:'bioregulator', vial:'20mg', bac:'2mL', dose:'2mg', units:'20', schedule:'Daily × 20 days',    timing:'AM/PM',          price:60,  in_stock:true }, // NEW — verify dosing vs cheat sheet
   { name:'Livagen',                    cat:'bioregulator', vial:'20mg', bac:'2mL', dose:'2mg', units:'20', schedule:'Daily × 30 days',    timing:'AM/PM',          price:30,  in_stock:false }, // not on product line
