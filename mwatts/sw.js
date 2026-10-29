@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'mwatts-v1006 1002(0))-wk1-dna1-sch1-days1-font1-tp1';
+const CACHE = 'mwatts-v1006 1002(0))-wk1-dna1-sch1-days1-font1-tp1-plskin1';
 const ASSETS = [
   '/dmaynes/',
   '/dmaynes/index.html',
