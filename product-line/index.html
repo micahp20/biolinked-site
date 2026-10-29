@@ -251,6 +251,34 @@ a{color:inherit}
   .oostag{text-align:center}
   .stp{align-self:flex-start}
 }
+
+/* ---- Pre-Built Cycles ---- */
+.cyc-wrap{margin:26px 0 8px}
+.cyc-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:6px}
+.cyc-head h2{font-family:var(--head-font);font-weight:600;text-transform:uppercase;font-size:28px;margin:0;letter-spacing:0.02em;color:var(--ink)}
+.cyc-sub{color:var(--muted);font-size:13px;margin:0 0 14px}
+.cyc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.cyc{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:18px 18px 16px;display:flex;flex-direction:column;min-width:0}
+.cyc .cyc-dur{font-family:var(--head-font);font-size:11px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold)}
+.cyc h3{font-family:var(--head-font);font-size:21px;font-weight:600;text-transform:uppercase;margin:6px 0 8px;line-height:1.15;color:var(--ink)}
+.cyc ul{list-style:none;margin:0 0 12px;padding:0;font-size:13px;color:var(--ink)}
+.cyc li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line-soft)}
+.cyc li span:last-child{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.cyc li.oosl span:first-child{text-decoration:line-through;color:var(--muted)}
+.cyc .cyc-note{font-size:11.5px;color:var(--red);margin:0 0 10px}
+.cyc .cyc-mf{font-size:11.5px;color:var(--muted);margin:0 0 10px}
+.cyc .cyc-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.cyc .cyc-price{font-family:var(--body-font);font-size:18px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.cyc .cyc-price small{display:block;font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted)}
+.cyc-add{background:#0b0b0c;border:1px solid var(--btn-ac);color:var(--btn-ac);font-family:var(--body-font);font-size:11.5px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;padding:12px 13px;border-radius:7px;white-space:nowrap;cursor:pointer}
+.cyc-add:hover{background:#1f1f1f;border-color:var(--btn-ac-hi);color:var(--btn-ac-hi)}
+.cyc-add[disabled]{opacity:.45;cursor:not-allowed}
+html[data-theme="dark"] .cyc{background:#141416;border-color:rgba(255,255,255,0.12)}
+html[data-theme="dark"] .cyc h3,html[data-theme="dark"] .cyc ul,html[data-theme="dark"] .cyc .cyc-price,html[data-theme="dark"] .cyc-head h2{color:#f2f2f2}
+html[data-theme="dark"] .cyc li{border-bottom-color:rgba(255,255,255,0.08)}
+html[data-theme="dark"] .cyc li span:last-child,html[data-theme="dark"] .cyc .cyc-mf,html[data-theme="dark"] .cyc-sub,html[data-theme="dark"] .cyc-disc,html[data-theme="dark"] .cyc .cyc-price small{color:#b9b9b2}
+html[data-theme="dark"] .cyc .cyc-dur{color:#D9B65C}
+.cyc-disc{font-size:11.5px;color:var(--muted);margin:12px 0 0}
 </style>
 </head>
 <body>
@@ -271,6 +299,15 @@ a{color:inherit}
     <span class="notice">Research Reference Only · Not For Human Use</span>
   </div>
 </section>
+
+<div class="shell">
+  <section class="cyc-wrap" id="cycles" aria-labelledby="cycTitle">
+    <div class="cyc-head"><h2 id="cycTitle">Pre-Built Cycles</h2></div>
+    <p class="cyc-sub">Our standard goal cycles. One tap adds every vial to your cart. The bundle price is the sum of the vial prices.</p>
+    <div class="cyc-grid" id="cycGrid"><div class="state"><div class="spin"></div>Loading cycles…</div></div>
+    <p class="cyc-disc">For research use only. Not medical advice.</p>
+  </section>
+</div>
 
 <div class="shell">
   <div class="toolbar">
@@ -528,7 +565,9 @@ a{color:inherit}
       });
       buildChips();
       render();
+      renderCycles();
     }).catch(function(){
+      if($('cycGrid'))$('cycGrid').innerHTML='';
       $('grid').innerHTML='<div class="state"><b>Couldn’t load the catalog</b>Refresh to try again.</div>';
     });
   }
@@ -593,6 +632,45 @@ a{color:inherit}
     var s=e.target.closest('.stp button');if(s){changeQty(s.closest('.stp').getAttribute('data-id'),s.getAttribute('data-act')==='inc'?1:-1);}
   });
 
+
+  /* ---- Pre-Built Cycles: saved standard goal cycles (vial name on the live catalog, qty) ---- */
+  var CYCLES=[
+    {name:'Fat Loss',dur:'About 8–13 weeks',items:[['Retatrutide - 30mg',1],['Tesamorelin - 20mg',2],['MOTS-C - 40mg',1],['NAD+ - 1000mg',2]]},
+    {name:'Muscle Building',dur:'About 8–13 weeks',items:[['CJC 1295/IPAm 5/5mg',2],['IGF-1 LR3',2],['KLOW - 80mg',2],['AOD-9604: 5mg',2],['5-AMINO-1MQ - 50mg',1]]},
+    {name:'Recovery & Healing',dur:'About 3–7 weeks',items:[['BPC-157 + TB-500: 10mg',2],['Cartalax 20mg',1],['KPV 10mg',2],['GHK-Cu 50mg',1]]},
+    {name:'Longevity & Anti-Aging',dur:'About 3 weeks · Glutathione up to 20',items:[['Cortagen: 20mg',2],['FOX04: 10mg',1],['Glutathione - 1500mg',2],['Cerebrolysin - 60mg',2]]},
+    {name:'Sexual Health & Hormonal Balance',dur:'12-month testosterone supply',mf:'Testosterone is for men only.',items:[['Testosterone cypionate 250mg',5],['KissPeptin - 10mg',2],['Oxytocin: 10mg',1],['PT-141: 10mg',1]]},
+    {name:'Cognitive Enhancement',dur:'About 2–12 weeks',items:[['N-Acetyl Semax Amidate - 30mg',1],['N-Acetyl Selank Amidate - 30mg',1],['N-Acetyl Adamax Amidate - 5mg',1]]},
+    {name:'Sleep & Stress',dur:'About 2–10 weeks',items:[['DSIP - 10mg',1],['Epitalon - 50mg',1],['Pinealon - 10mg',2],['N-Acetyl Selank Amidate - 30mg',1]]}
+  ];
+  function normName(n){return String(n||'').toLowerCase().replace(/\s+/g,' ').trim();}
+  function productByName(n){var k=normName(n);for(var i=0;i<products.length;i++)if(normName(products[i].name)===k)return products[i];return null;}
+  function cycleLines(c){return c.items.map(function(it){return {want:it[0],qty:it[1],p:productByName(it[0])};});}
+  function renderCycles(){
+    var g=$('cycGrid');if(!g)return;
+    var html=CYCLES.map(function(c,ci){
+      var L=cycleLines(c), total=0, out=[], missing=[];
+      L.forEach(function(l){if(!l.p){missing.push(l.want);return;}total+=l.p.price*l.qty;if(!l.p.inStock)out.push(l.p.name);});
+      if(missing.length)return '';
+      var addable=L.some(function(l){return l.p.inStock;});
+      return '<div class="cyc"><div class="cyc-dur">'+esc(c.dur)+'</div><h3>'+esc(c.name)+'</h3><ul>'+
+        L.map(function(l){return '<li'+(l.p.inStock?'':' class="oosl"')+'><span>'+esc(l.p.name)+'</span><span>× '+l.qty+' · '+money(l.p.price*l.qty)+'</span></li>';}).join('')+'</ul>'+
+        (c.mf?'<p class="cyc-mf">'+esc(c.mf)+'</p>':'')+
+        (out.length?'<p class="cyc-note">Out of stock right now: '+esc(out.join(', '))+'. The rest of the cycle is added.</p>':'')+
+        '<div class="cyc-foot"><div class="cyc-price"><small>Bundle</small>'+money(total)+'</div>'+
+        '<button class="cyc-add" data-cyc="'+ci+'"'+(addable?'':' disabled')+'>Add cycle to cart</button></div></div>';
+    }).join('');
+    g.innerHTML=html||'<div class="state">Cycles are unavailable right now.</div>';
+  }
+  function addCycle(ci){
+    var c=CYCLES[ci];if(!c)return;
+    cycleLines(c).forEach(function(l){
+      if(!l.p||!l.p.inStock)return;
+      if(cart[l.p.id])cart[l.p.id].qty+=l.qty;else cart[l.p.id]={id:l.p.id,name:l.p.name,price:l.p.price,qty:l.qty};
+    });
+    sync();openCart();
+  }
+  $('cycGrid').addEventListener('click',function(e){var b=e.target.closest('.cyc-add');if(b&&!b.disabled)addCycle(+b.getAttribute('data-cyc'));});
   function productById(id){for(var i=0;i<products.length;i++)if(products[i].id===id)return products[i];return null;}
   function addToCart(id){var p=productById(id);if(!p||!p.inStock)return;if(cart[id])cart[id].qty+=1;else cart[id]={id:id,name:p.name,price:p.price,qty:1};sync();}
   function changeQty(id,d){if(!cart[id]){if(d>0)return addToCart(id);return;}cart[id].qty+=d;if(cart[id].qty<=0)delete cart[id];sync();}
