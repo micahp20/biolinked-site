@@ -297,6 +297,14 @@ html[data-theme="dark"] .cyc .cyc-why summary,html[data-theme="dark"] .cyc .cyc-
 .tip8-add{background:#0b0b0c;border:1px solid var(--btn-ac);color:var(--btn-ac);font-family:var(--body-font);font-size:10px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:4px 8px;border-radius:6px;margin-left:4px;cursor:pointer;white-space:nowrap}
 .tip8-add:hover{background:#1f1f1f;border-color:var(--btn-ac-hi);color:var(--btn-ac-hi)}
 html[data-theme="dark"] .tip8{color:#D9B65C}
+.bactip{border:1px solid var(--line);border-radius:10px;padding:12px 13px;margin:0 0 12px;background:var(--panel)}
+.bactip-t{font-size:13px;font-weight:700;color:var(--ink)}
+.bactip-s{font-size:12px;color:var(--muted);margin:3px 0 9px;line-height:1.45}
+.bactip-add{background:#0b0b0c;border:1px solid var(--btn-ac);color:var(--btn-ac);font-family:var(--body-font);font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;padding:10px 12px;border-radius:7px;cursor:pointer;width:100%}
+.bactip-add:hover{background:#1f1f1f;border-color:var(--btn-ac-hi);color:var(--btn-ac-hi)}
+html[data-theme="dark"] .bactip{background:#141416;border-color:rgba(255,255,255,0.12)}
+html[data-theme="dark"] .bactip-t{color:#f2f2f2}
+html[data-theme="dark"] .bactip-s{color:#b9b9b2}
 .cyc-disc{font-size:11.5px;color:var(--muted);margin:12px 0 0}
 </style>
 </head>
@@ -369,9 +377,10 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
     <div id="lineItems"></div>
   </div>
   <div class="tfoot" id="tfoot" style="display:none">
+    <div id="bacTip"></div>
     <div id="totals">
       <div class="trow"><span>Subtotal</span><span id="tSub">$0.00</span></div>
-      <div class="trow"><span>Shipping — 2-Day UPS</span><span>$9.99</span></div>
+      <div class="trow" id="shipRow"><span>Shipping — 2-Day UPS</span><span id="tShip">$9.99</span></div>
       <div class="tgrand"><span class="tg-l">Total</span><span class="tg-r" id="tGrand">$0.00</span></div>
     </div>
     <button class="checkout" id="toCheckout">Continue to Checkout →</button>
@@ -451,7 +460,9 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
   var SUPABASE_URL='https://bfjydzealeethhcpdfxl.supabase.co';
   var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
   var ORDER_FN=SUPABASE_URL+'/functions/v1/order-confirm';
-  var SHIPPING=9.99;
+  /* 2-Day UPS is charged on EVERY order, whatever is in the cart. Not configurable, not removable;
+     order-confirm adds the same $9.99 server-side and its total is what we show and collect. */
+  var SHIPPING=9.99; Object.defineProperty(window,'BL_SHIPPING',{value:SHIPPING,writable:false});
 
   var BLOCK=['cortexin','dihexa','ipamorelin','shipping','2-day ups'];
 
@@ -700,6 +711,28 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
     'DSIP - 10mg':2,'KissPeptin - 10mg':3,'HCG - 5000iu':2,'SLU-PP-332: 5mg':4,'P21 (or Peptide 021)  - 5mg':4,'PE-22-28: 10mg':2,'Thymosin Alpha-1':5};
   function tipN(name){var k=normName(name);for(var n in TIP8)if(normName(n)===k)return TIP8[n];return 0;}
   function setQty(id,n){var p=productById(id);if(!p||!p.inStock)return;if(cart[id])cart[id].qty=Math.max(cart[id].qty,n);else cart[id]={id:id,name:p.name,price:p.price,qty:n};sync();}
+
+  /* ---- optional BAC water prompt: opt-in only, never auto-added ----
+     Suggest 1 x 10 mL BAC per 3 reconstitutable vials (rounded up, min 1).
+     Pre-mixed oils (testosterone), tablets and BAC itself don't count. */
+  function isBac(n){return /\bbac\b/i.test(String(n||''));}
+  function needsRecon(n){n=String(n||'').toLowerCase();return !isBac(n)&&!/testosterone|cypiomax|test blend|cyp\/|tablet|tesofensine/.test(n);}
+  function bacProduct(){
+    var best=null;
+    products.forEach(function(p){if(!isBac(p.name)||!p.inStock)return;var tenml=/10\s*ml/i.test(p.name);if(!best||(tenml&&!/10\s*ml/i.test(best.name)))best=p;});
+    return best;
+  }
+  function renderBacTip(items){
+    var el=$('bacTip');if(!el)return;
+    var hasBac=items.some(function(it){return isBac(it.name);});
+    var vials=items.reduce(function(s,it){return s+(needsRecon(it.name)?it.qty:0);},0);
+    var bp=bacProduct();
+    if(submitted||hasBac||!vials||!bp){el.innerHTML='';return;}
+    var n=Math.max(1,Math.ceil(vials/3));
+    el.innerHTML='<div class="bactip"><div class="bactip-t">Need BAC water for reconstitution?</div>'+
+      '<div class="bactip-s">We suggest '+n+' × '+esc(bp.name)+' ('+money(bp.price)+' each) for your '+vials+' vial'+(vials===1?'':'s')+'. Optional.</div>'+
+      '<button type="button" class="bactip-add" data-bac="'+esc(bp.id)+'" data-n="'+n+'">Add '+n+' BAC · '+money(bp.price*n)+'</button></div>';
+  }
   function productById(id){for(var i=0;i<products.length;i++)if(products[i].id===id)return products[i];return null;}
   function addToCart(id){var p=productById(id);if(!p||!p.inStock)return;if(cart[id])cart[id].qty+=1;else cart[id]={id:id,name:p.name,price:p.price,qty:1};sync();}
   function changeQty(id,d){if(!cart[id]){if(d>0)return addToCart(id);return;}cart[id].qty+=d;if(cart[id].qty<=0)delete cart[id];sync();}
@@ -741,7 +774,7 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
 
   function cartList(){return Object.keys(cart).map(function(k){return cart[k];});}
   function subtotal(){return cartList().reduce(function(s,it){return s+it.price*it.qty;},0);}
-  function grandTotal(){return cartList().length?subtotal()+SHIPPING:0;}
+  function grandTotal(){var l=cartList();return l.length?Math.round((subtotal()+SHIPPING)*100)/100:0;}
 
   function renderCart(){
     var items=cartList(), count=items.reduce(function(s,it){return s+it.qty;},0);
@@ -761,6 +794,8 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
     }).join('');
     $('tSub').textContent=money(subtotal());
     $('tGrand').textContent=money(grandTotal());
+    var sr=$('shipRow');if(sr){sr.style.display='';$('tShip').textContent=money(SHIPPING);}
+    renderBacTip(items);
   }
   $('items').addEventListener('click',function(e){
     var t8=e.target.closest('.tip8-add');if(t8){setQty(t8.getAttribute('data-tip'),+t8.getAttribute('data-n'));return;}
@@ -768,6 +803,7 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
     var s=e.target.closest('.stp button');if(s){changeQty(s.closest('.stp').getAttribute('data-id'),s.getAttribute('data-act')==='inc'?1:-1);}
   });
   function sync(){render();renderCart();}
+  $('tfoot').addEventListener('click',function(e){var bb=e.target.closest('.bactip-add');if(bb){setQty(bb.getAttribute('data-bac'),+bb.getAttribute('data-n'));}});
 
   $('toCheckout').addEventListener('click',function(){
     $('toCheckout').style.display='none';$('cform').classList.add('on');$('coName').focus();
@@ -800,12 +836,12 @@ html[data-theme="dark"] .tip8{color:#D9B65C}
     var body={name:name,contact:contact,payment:{method:pay.method},items:items.map(function(it){return {name:it.name,qty:it.qty,price:it.price};})};
     fetch(ORDER_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON},body:JSON.stringify(body)})
       .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-      .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;showConfirm(grand,pay,j.client_email==='sent');})
+      .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);showConfirm((isFinite(st)&&st>=SHIPPING)?st:grand,pay,j.client_email==='sent');})
       .catch(function(){btn.disabled=false;btn.textContent='Submit Order';$('submitErr').textContent='Something went wrong submitting your order. Please try again, or reach out to the owner directly.';$('submitErr').classList.add('on');});
   });
 
   function showConfirm(grand,pay,mailed){
-    $('totals').style.display='none';$('toCheckout').style.display='none';$('cform').style.display='none';
+    $('totals').style.display='none';$('bacTip').innerHTML='';$('toCheckout').style.display='none';$('cform').style.display='none';
     $('confTotal').textContent=money(grand);
     var amt=grand.toFixed(2), note='BioLinked Order', stepEl=$('confStep'), payEl=$('confPay'), hintEl=$('confHint');
     payEl.innerHTML='';hintEl.textContent='';
