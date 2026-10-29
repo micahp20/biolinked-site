@@ -701,24 +701,18 @@ a{color:inherit}
     $('confTotal').textContent=money(grand);
     var amt=grand.toFixed(2), note='BioLinked Order', stepEl=$('confStep'), payEl=$('confPay'), hintEl=$('confHint');
     payEl.innerHTML='';hintEl.textContent='';
-    if(pay.method==='Cash App'){
-      stepEl.innerHTML='One tap to finish — opens <b>Cash App</b> with your total already filled in. Just hit pay.';
-      payEl.innerHTML='<a class="paynow" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay <span class="amt">'+money(grand)+'</span> in Cash App →</a>';
-      hintEl.textContent='If it doesn’t open, send '+money(grand)+' to $micahpauldino. Your order ships once payment is confirmed.';
-    }else if(pay.method==='Venmo'){
-      stepEl.innerHTML='One tap to finish — opens <b>Venmo</b> with your total already filled in. Just hit pay.';
-      payEl.innerHTML='<a class="paynow" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent(note)+'" target="_blank" rel="noopener">Pay <span class="amt">'+money(grand)+'</span> in Venmo →</a>';
-      hintEl.textContent='If it doesn’t open, send '+money(grand)+' to @micahp20. Your order ships once payment is confirmed.';
-    }else{
-      stepEl.innerHTML='Send <b>'+money(grand)+'</b> via <b>Zelle</b>. Tap below to copy the number.';
-      payEl.innerHTML='<button type="button" class="paycopy" id="zc"><span><span class="pc-tag">Tap to copy</span><br><span class="pc-num">720-938-0698</span></span><span class="pc-tag" id="zcs">Copy</span></button>';
-      $('zc').addEventListener('click',function(){
-        var num='720-938-0698', done=function(){$('zcs').textContent='Copied ✓';};
-        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(num).then(done,done);}
-        else{try{var t=document.createElement('textarea');t.value=num;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);done();}catch(e){}}
-      });
-      hintEl.textContent='Send '+money(grand)+' to 720-938-0698 in your bank’s Zelle. Your order ships once payment is confirmed.';
-    }
+    var M=money(grand);
+    stepEl.innerHTML='One tap to finish — pick how you pay. Cash App and Venmo open with your total already filled in.';
+    payEl.innerHTML='<a class="paynow" style="display:block;margin-bottom:10px" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay <span class="amt">'+M+'</span> in Cash App →</a>'
+      +'<a class="paynow" style="display:block;margin-bottom:10px" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent(note)+'" target="_blank" rel="noopener">Pay <span class="amt">'+M+'</span> in Venmo →</a>'
+      +'<button type="button" class="paynow" id="zc" style="display:block;width:100%;cursor:pointer;font-family:inherit">Pay <span class="amt">'+M+'</span> via Zelle →</button>'
+      +'<div id="zcs" style="display:none;margin-top:8px;font-weight:600"></div>';
+    $('zc').addEventListener('click',function(){
+      var num='720-938-0698', done=function(){var s=$('zcs');s.textContent='Send '+M+' via Zelle to 720-938-0698 (copied)';s.style.display='block';};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(num).then(done,done);}
+      else{try{var t=document.createElement('textarea');t.value=num;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);}catch(e){}done();}
+    });
+    hintEl.textContent='If a button doesn’t open, send '+M+' to Cash App $micahpauldino, Venmo @micahp20, or Zelle 720-938-0698. Your order ships once payment is confirmed.';
     if(mailed) hintEl.textContent+=' A confirmation email is on its way.';
     $('confirm').classList.add('on');
   }
