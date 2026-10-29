@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /phorn/.
-const CACHE = 'phorn-v1007 1002(0))-cyctitle-cg2-wk1-dna1-sch1-days1-font1-tp1-plskin1';
+const CACHE = 'phorn-v1007 1002(0))-cyctitle-cg2-wk1-dna1-sch1-days1-font1-tp1-plskin2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/phorn/',

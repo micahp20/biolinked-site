@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mmccarthy/.
-const CACHE = 'mmccarthy-v1009-wk1-dna1-sch1-days1-bac3-font1-tp1-plskin1';
+const CACHE = 'mmccarthy-v1009-wk1-dna1-sch1-days1-bac3-font1-tp1-plskin2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mmccarthy/',
