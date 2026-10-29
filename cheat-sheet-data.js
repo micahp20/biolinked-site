@@ -31,7 +31,7 @@ window.CHEAT_SHEET_DATA = [
   {name:'BPC-157 / TB-500 5mg/5mg Blend',cat:'healing',purpose:'Healing / Wolverine Stack',vial:'5mg/5mg',bac:'2 ml',dose:'250mcg/250mcg',units:'10',timing:'AM/PM',freq:'Every day',dur:'8 wks on, 8 wks off'},
   {name:'GHK-Cu',cat:'healing',purpose:'Healing / Collagen / Skin',vial:'50 mg',bac:'3 ml',dose:'1.7 mg',units:'10',timing:'AM',freq:'Every day',dur:'8 wks on, 8 wks off'},
   {name:'ARA-290',cat:'healing',purpose:'Healing / Neuropathy Pain',vial:'15 mg',bac:'1 ml',dose:'1.5 mg',units:'10',timing:'AM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'},
-  {name:'KPV',cat:'healing',purpose:'Immunity / Anti-Inflammatory',vial:'10 mg',bac:'2 ml',dose:'500 mcg',units:'10',timing:'AM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'},
+  {name:'KPV',cat:'healing',purpose:'Immunity / Anti-Inflammatory',vial:'10 mg',bac:'2 ml',dose:'1 mg',units:'20',timing:'AM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'},
   {name:'SS-31',cat:'healing',purpose:'Longevity / Mitochondrial',vial:'10 mg',bac:'2 ml',dose:'500 mcg',units:'10',timing:'AM',freq:'5 days on, 2 days off',dur:'8 wks on, 8 wks off'},
   {name:'LL-37',cat:'healing',purpose:'Immunity / Antimicrobial / Wound',vial:'5 mg',bac:'2 ml',dose:'125 mcg',units:'5',timing:'AM',freq:'Every day',dur:'50 days straight, 4 wks off'},
   {name:'PGPIPN',cat:'healing',purpose:'Anti-Inflammatory / Tissue Repair',vial:'5 mg',bac:'2 ml',dose:'1–2 mg',units:'20–40',timing:'AM',freq:'Daily',dur:'6–8 weeks'},

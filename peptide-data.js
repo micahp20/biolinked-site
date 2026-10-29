@@ -67,7 +67,7 @@ window.PEPTIDE_DATA = [
   { name:'TB-500',                     cat:'healing', vial:'5mg',  bac:'2mL', dose:'250mcg',units:'10', schedule:'Every day',         timing:'AM',                 price:23,  in_stock:true },
   { name:'Wolverine Stack (BPC+TB 5/5)', cat:'healing', vial:'5mg+5mg', bac:'2mL', dose:'250mcg ea', units:'10', schedule:'Every day', timing:'AM/PM',            price:40,  in_stock:true },
   { name:'Wolverine Blend (BPC+TB 30/30)', cat:'healing', vial:'30mg+30mg', bac:'2mL', dose:'500mcg ea', units:'3', schedule:'Every day', timing:'AM/PM',        price:150, in_stock:false }, // not on product line
-  { name:'KPV',                        cat:'healing', vial:'10mg', bac:'2mL', dose:'500mcg',units:'10', schedule:'5 days on / 2 off', timing:'AM',                 price:50,  in_stock:false }, // not on product line (in KLOW blend)
+  { name:'KPV',                        cat:'healing', vial:'10mg', bac:'2mL', dose:'1mg',   units:'20', schedule:'5 days on / 2 off', timing:'AM',                 price:50,  in_stock:false }, // not on product line (in KLOW blend)
   { name:'GHK-Cu (50mg)',              cat:'healing', vial:'50mg', bac:'3mL', dose:'1.7mg', units:'10', schedule:'Every day',         timing:'AM',                 price:55,  in_stock:true },
   { name:'GHK-Cu (100mg)',             cat:'healing', vial:'100mg',bac:'5mL', dose:'1.7mg', units:'9',  schedule:'Every day',         timing:'AM',                 price:90,  in_stock:false }, // not on product line
   { name:'SS-31 (50mg)',               cat:'healing', vial:'50mg', bac:'3mL', dose:'1.67mg',units:'10', schedule:'5 days on / 2 off', timing:'AM',                 price:100, in_stock:true },

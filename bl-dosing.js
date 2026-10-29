@@ -415,8 +415,8 @@ window.BL_DOSING=[
 "purpose": "Gut · inflammation",
 "vial": "10 mg",
 "bac": "2 ml",
-"dose": "500 mcg",
-"units": "10",
+"dose": "1 mg",
+"units": "20",
 "timing": "",
 "freq": "",
 "dur": ""
