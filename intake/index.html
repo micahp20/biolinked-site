@@ -316,7 +316,9 @@ hr.div{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
   <div class="fg">
     <div class="flabel">Recent Blood Work <span class="opt">Optional</span></div>
     <div class="upload-box">
-      <div class="upload-hint">Have a recent lab panel? Email or text it to us after you submit this form and we&rsquo;ll attach it to your file &mdash; a PDF or a clear photo both work. It&rsquo;s optional, and nothing here is held up waiting on it.</div>
+      <label class="upload-btn" for="bwFiles">Upload your bloodwork</label>
+      <input type="file" id="bwFiles" multiple accept="application/pdf,image/jpeg,image/png,image/heic,image/heif,.pdf,.jpg,.jpeg,.png,.heic,.heif">
+      <div class="upload-hint" id="bwHint">Optional. PDF, JPG, PNG or HEIC, up to 20 MB each (up to 10 files). Files go to a private folder only BioLinked can open.</div>
     </div>
   </div>
   <div class="fnav"><button class="nbtn" onclick="goTo(2)">&larr; Back</button><span class="step-info">Step 3 of 7</span><button class="nbtn primary" onclick="goTo(4)">Next &rarr;</button></div>
@@ -454,7 +456,7 @@ async function submitForm(){
   if(!allConsent){alert('Please confirm all consent statements before submitting.');return;}
   const sigName=document.getElementById('sigName')?.value?.trim();
   if(!sigName){alert('Please enter your full name as an electronic signature.');return;}
-  const data=new FormData();
+  const data=new FormData(); const BW_FILES=Array.from(document.getElementById('bwFiles')?.files||[]);
   data.append('First Name',document.getElementById('firstName')?.value||'');
   data.append('Last Name',document.getElementById('lastName')?.value||'');
   data.append('Email',document.getElementById('email')?.value||'');
@@ -503,13 +505,28 @@ async function submitForm(){
   data.append('Consent Confirmed','Yes — all 8 consent statements acknowledged');
   data.append('Submission Timestamp',new Date().toISOString());
   data.append('_gotcha',document.getElementById('hpField')?.value||'');
+  const SB='https://bfjydzealeethhcpdfxl.supabase.co', ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ', AH={apikey:ANON,Authorization:'Bearer '+ANON};
+  const subBtn=document.querySelector('#sec7 .nbtn.primary'); if(subBtn){subBtn.disabled=true;}
   try{
-    const res=await fetch('https://formspree.io/f/meerdpwk',{method:'POST',body:data,headers:{'Accept':'application/json'}});
-    if(res.ok){document.getElementById('sec7').classList.remove('active');document.getElementById('successScreen').classList.add('active');document.getElementById('barFill').style.width='100%';document.getElementById('stepText').textContent='Complete ✓';cur=TOTAL;buildDots();window.scrollTo({top:0,behavior:'smooth'});}
-    else{alert('Submission error. Please try again or email us directly.');}
-  }catch(e){alert('Connection error. Please check your internet and try again.');}
+    const answers={}; data.forEach(function(v,k){answers[k]=v;});
+    const dir='intake/'+(crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2)), paths=[], MT={pdf:'application/pdf',jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',heic:'image/heic',heif:'image/heif'};
+    for(const f of BW_FILES.slice(0,10)){
+      const ext=(f.name.split('.').pop()||'').toLowerCase(), type=f.type||MT[ext]||'';
+      if(!MT[ext]&&!/^(application\/pdf|image\/(jpeg|png|heic|heif))$/.test(type)){alert('"'+f.name+'" is not a PDF, JPG, PNG or HEIC file.');if(subBtn)subBtn.disabled=false;return;}
+      if(f.size>20971520){alert('"'+f.name+'" is over 20 MB.');if(subBtn)subBtn.disabled=false;return;}
+      const nm=paths.length+'-'+f.name.replace(/[^A-Za-z0-9._-]+/g,'_').slice(-120), path=dir+'/'+nm;
+      const up=await fetch(SB+'/storage/v1/object/bloodwork/'+path,{method:'POST',headers:Object.assign({'Content-Type':type,'x-upsert':'false'},AH),body:f});
+      if(!up.ok){alert('Upload failed for "'+f.name+'". Please try again, or submit without it and send it to us later.');if(subBtn)subBtn.disabled=false;return;}
+      paths.push(path);
+    }
+    const res=await fetch(SB+'/functions/v1/intake-confirm',{method:'POST',headers:Object.assign({'Content-Type':'application/json'},AH),body:JSON.stringify({answers:answers,paths:paths})});
+    const j=res.ok?await res.json().catch(()=>null):null;
+    if(j&&j.ok){document.getElementById('sec7').classList.remove('active');document.getElementById('successScreen').classList.add('active');document.getElementById('barFill').style.width='100%';document.getElementById('stepText').textContent='Complete ✓';cur=TOTAL;buildDots();window.scrollTo({top:0,behavior:'smooth'});}
+    else{alert('Submission error. Please try again or email us directly.');if(subBtn)subBtn.disabled=false;}
+  }catch(e){alert('Connection error. Please check your internet and try again.');if(subBtn)subBtn.disabled=false;}
 }
 buildDots();
+(function(){var i=document.getElementById('bwFiles'),h=document.getElementById('bwHint');if(!i||!h)return;var d=h.textContent;i.addEventListener('change',function(){var n=i.files.length;h.textContent=n?(n+' file'+(n>1?'s':'')+' selected: '+Array.from(i.files).map(function(f){return f.name;}).join(', ')):d;h.classList.toggle('picked',!!n);});})();
 </script>
 
 <!-- mobile-floor -->
