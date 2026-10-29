@@ -177,7 +177,19 @@ a{color:inherit}
 .pay{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:11px 12px;background:var(--panel)}
 .pay:hover{border-color:var(--gold-line)}
 .pay.sel{border-color:var(--gold);background:var(--gold-soft)}
-.pay input{accent-color:var(--gold);width:17px;height:17px;flex:none}
+.pay{cursor:pointer;-webkit-tap-highlight-color:transparent;padding:13px 12px}
+.pay input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+.pay{position:relative}
+.pay .pbox{width:26px;height:26px;flex:none;border:2px solid var(--gold-line);border-radius:7px;background:var(--panel);display:inline-flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s}
+.pay .pbox svg{width:16px;height:16px;opacity:0;transform:scale(.6);transition:opacity .12s,transform .12s}
+.pay .pbox svg path{stroke:var(--btn-ac,#D9B65C);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pay.sel .pbox{background:#0b0b0c;border-color:#0b0b0c}
+.pay.sel .pbox svg{opacity:1;transform:scale(1)}
+.pay input:focus-visible+.pbox{box-shadow:0 0 0 3px var(--gold-soft)}
+.pay .pt{display:flex;flex-direction:column;line-height:1.2}
+.pay .tap{font-size:10.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.pay.sel .tap{color:var(--gold)}
+.pay.sel{border-width:2px;padding:12px 11px}
 .pay{flex-wrap:wrap}
 .pay .pn{font-weight:600;font-size:14px}
 .pay .ph{margin-left:auto;padding-left:10px;color:var(--gold);font-weight:700;font-size:12.5px;white-space:nowrap}
@@ -320,11 +332,11 @@ a{color:inherit}
         <div class="er">Please enter a phone or email.</div>
       </div>
       <div class="fld" id="fldPay">
-        <label>Payment Method</label>
+        <label>Payment Method <span style="text-transform:none;letter-spacing:0;font-weight:500">· tap one box to check it</span></label>
         <div class="payopts" id="payOpts">
-          <label class="pay" data-method="Venmo" data-handle="@micahp20"><input type="radio" name="pay" value="Venmo @micahp20"><span class="pn">Venmo</span><span class="ph">@micahp20</span></label>
-          <label class="pay" data-method="Cash App" data-handle="$micahpauldino"><input type="radio" name="pay" value="Cash App $micahpauldino"><span class="pn">Cash App</span><span class="ph">$micahpauldino</span></label>
-          <label class="pay" data-method="Zelle" data-handle="720-938-0698"><input type="radio" name="pay" value="Zelle 720-938-0698"><span class="pn">Zelle</span><span class="ph">720-938-0698</span></label>
+          <label class="pay" data-method="Venmo" data-handle="@micahp20"><input type="radio" name="pay" value="Venmo @micahp20"><span class="pbox" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="pt"><span class="pn">Venmo</span><span class="tap">Tap to select</span></span><span class="ph">@micahp20</span></label>
+          <label class="pay" data-method="Cash App" data-handle="$micahpauldino"><input type="radio" name="pay" value="Cash App $micahpauldino"><span class="pbox" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="pt"><span class="pn">Cash App</span><span class="tap">Tap to select</span></span><span class="ph">$micahpauldino</span></label>
+          <label class="pay" data-method="Zelle" data-handle="720-938-0698"><input type="radio" name="pay" value="Zelle 720-938-0698"><span class="pbox" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8.5l3.2 3.2L13 4.8"/></svg></span><span class="pt"><span class="pn">Zelle</span><span class="tap">Tap to select</span></span><span class="ph">720-938-0698</span></label>
         </div>
         <div class="payer" id="payErr">Please choose a payment method.</div>
       </div>
@@ -383,6 +395,10 @@ a{color:inherit}
   var SUPABASE_URL='https://bfjydzealeethhcpdfxl.supabase.co';
   var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
   var FORMSPREE='https://formspree.io/f/meerdpwk';
+  /* Client confirmation email. Formspree emails the owner; the client copy goes
+     through ORDER_CONFIRM_URL (a server function holding the mail-provider key)
+     once one is deployed. Left empty, nothing extra is sent. No secrets here. */
+  var ORDER_CONFIRM_URL='';
   var SHIPPING=9.99;
 
   var BLOCK=['cortexin','dihexa','ipamorelin','shipping','2-day ups'];
@@ -658,7 +674,7 @@ a{color:inherit}
 
   var payOpts=$('payOpts');
   payOpts.addEventListener('change',function(){
-    Array.prototype.forEach.call(payOpts.querySelectorAll('.pay'),function(l){l.classList.toggle('sel',l.querySelector('input').checked);});
+    Array.prototype.forEach.call(payOpts.querySelectorAll('.pay'),function(l){var on=l.querySelector('input').checked;l.classList.toggle('sel',on);var t=l.querySelector('.tap');if(t)t.textContent=on?'\u2713 Selected':'Tap to select';l.setAttribute('aria-checked',on?'true':'false');});
     $('payErr').classList.remove('on');
   });
   function selectedPay(){var r=payOpts.querySelector('input[name="pay"]:checked');if(!r)return null;var l=r.closest('.pay');return {value:r.value,method:l.getAttribute('data-method'),handle:l.getAttribute('data-handle')};}
@@ -680,9 +696,15 @@ a{color:inherit}
     fd.append('_subject','New BioLinked Order — '+money(grand));
     fd.append('name',name);fd.append('contact',contact);fd.append('payment',pay.value);
     fd.append('order',orderText);fd.append('total',grand.toFixed(2));
+    var em=(contact.match(/[^\s@<>(),;:]+@[^\s@<>(),;:]+\.[a-z]{2,}/i)||[])[0]||'';
+    var test=/^test\b/i.test(name);
+    if(em){fd.append('email',em);fd.append('_replyto',em);}
+    var confirmBody={to:em,name:name,test:test,items:items.map(function(it){return {name:it.name,qty:it.qty,price:it.price,line:+(it.price*it.qty).toFixed(2)};}),
+      subtotal:+sub.toFixed(2),shipping:SHIPPING,total:+grand.toFixed(2),payment:{method:pay.method,handle:pay.handle},
+      note:'Your order is NOT confirmed until payment is received.'};
     var btn=$('submitBtn');btn.disabled=true;btn.textContent='Submitting…';
     fetch(FORMSPREE,{method:'POST',headers:{Accept:'application/json'},body:fd})
-      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);submitted=true;showConfirm(grand,pay);})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);submitted=true;if(em&&ORDER_CONFIRM_URL){fetch(ORDER_CONFIRM_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(confirmBody)}).catch(function(){});}showConfirm(grand,pay,em);})
       .catch(function(){btn.disabled=false;btn.textContent='Submit Order';$('submitErr').textContent='Something went wrong submitting your order. Please try again, or reach out to the owner directly.';$('submitErr').classList.add('on');});
   });
 
