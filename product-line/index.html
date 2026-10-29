@@ -30,7 +30,7 @@
    system: #f5f5f5 ground, #7A6530 gold, Cormorant Garamond + Montserrat,
    1180px content width, shared bl-nav header + footer (nav.js).
    Live, READ-ONLY feed from pl_products + inventory. Never writes to the DB.
-   Emails the order via Formspree, then offers one-tap pay.
+   Saves the order via the order-confirm edge function (Supabase + Resend email), then offers one-tap pay.
    ====================================================================== */
 :root{
   /* light face — the site's default palette */
@@ -394,11 +394,7 @@ a{color:inherit}
 
   var SUPABASE_URL='https://bfjydzealeethhcpdfxl.supabase.co';
   var SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
-  var FORMSPREE='https://formspree.io/f/meerdpwk';
-  /* Client confirmation email. Formspree emails the owner; the client copy goes
-     through ORDER_CONFIRM_URL (a server function holding the mail-provider key)
-     once one is deployed. Left empty, nothing extra is sent. No secrets here. */
-  var ORDER_CONFIRM_URL='';
+  var ORDER_FN=SUPABASE_URL+'/functions/v1/order-confirm';
   var SHIPPING=9.99;
 
   var BLOCK=['cortexin','dihexa','ipamorelin','shipping','2-day ups'];
@@ -692,23 +688,15 @@ a{color:inherit}
     var sub=subtotal(), grand=grandTotal();
     var lines=items.map(function(it){return it.qty+' × '+it.name+' @ '+money(it.price)+' = '+money(it.price*it.qty);});
     var orderText=lines.join('\n')+'\n\nSubtotal '+money(sub)+'\nShipping '+money(SHIPPING)+'\nTOTAL '+money(grand);
-    var fd=new FormData();
-    fd.append('_subject','New BioLinked Order — '+money(grand));
-    fd.append('name',name);fd.append('contact',contact);fd.append('payment',pay.value);
-    fd.append('order',orderText);fd.append('total',grand.toFixed(2));
-    var em=(contact.match(/[^\s@<>(),;:]+@[^\s@<>(),;:]+\.[a-z]{2,}/i)||[])[0]||'';
-    var test=/^test\b/i.test(name);
-    if(em){fd.append('email',em);fd.append('_replyto',em);}
-    var confirmBody={to:em,name:name,test:test,items:items.map(function(it){return {name:it.name,qty:it.qty,price:it.price,line:+(it.price*it.qty).toFixed(2)};}),
-      subtotal:+sub.toFixed(2),shipping:SHIPPING,total:+grand.toFixed(2),payment:{method:pay.method,handle:pay.handle},
-      note:'Your order is NOT confirmed until payment is received.'};
     var btn=$('submitBtn');btn.disabled=true;btn.textContent='Submitting…';
-    fetch(FORMSPREE,{method:'POST',headers:{Accept:'application/json'},body:fd})
-      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);submitted=true;if(em&&ORDER_CONFIRM_URL){fetch(ORDER_CONFIRM_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(confirmBody)}).catch(function(){});}showConfirm(grand,pay,em);})
+    var body={name:name,contact:contact,payment:{method:pay.method},items:items.map(function(it){return {name:it.name,qty:it.qty,price:it.price};})};
+    fetch(ORDER_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:SUPABASE_ANON,Authorization:'Bearer '+SUPABASE_ANON},body:JSON.stringify(body)})
+      .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
+      .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;showConfirm(grand,pay,j.client_email==='sent');})
       .catch(function(){btn.disabled=false;btn.textContent='Submit Order';$('submitErr').textContent='Something went wrong submitting your order. Please try again, or reach out to the owner directly.';$('submitErr').classList.add('on');});
   });
 
-  function showConfirm(grand,pay){
+  function showConfirm(grand,pay,mailed){
     $('totals').style.display='none';$('toCheckout').style.display='none';$('cform').style.display='none';
     $('confTotal').textContent=money(grand);
     var amt=grand.toFixed(2), note='BioLinked Order', stepEl=$('confStep'), payEl=$('confPay'), hintEl=$('confHint');
@@ -731,6 +719,7 @@ a{color:inherit}
       });
       hintEl.textContent='Send '+money(grand)+' to 720-938-0698 in your bank’s Zelle. Your order ships once payment is confirmed.';
     }
+    if(mailed) hintEl.textContent+=' A confirmation email is on its way.';
     $('confirm').classList.add('on');
   }
 
