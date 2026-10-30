@@ -164,12 +164,20 @@ function openWeb(path,title){ensureViews();$('bls-webt').textContent=title;var f
 
 /* ---------- the one Order entry: top (hamburger) menu ---------- */
 function navEntries(){
-  /* the one Order button: on the Protocol tab, under the hero */
-  var hero=document.querySelector('#v-proto .lx-hero')||document.querySelector('#v-proto .pad');
-  if(hero&&!hero.querySelector('.bls-order')){
-    var c=document.createElement('button');c.type='button';c.className='bls-order';c.textContent='Order';
-    c.onclick=function(){openShop();};
-    var cta=hero.querySelector('.lx-cta'); if(cta&&cta.parentNode) cta.parentNode.insertBefore(c,cta.nextSibling); else hero.appendChild(c);
+  /* desktop sidebar (the hamburger is hidden on wide screens) */
+  var sn=document.querySelector('.side-nav');
+  if(sn&&!sn.querySelector('.bls-snorder')){
+    var sb=document.createElement('button');sb.type='button';sb.className='snav bls-snorder';
+    sb.onclick=function(){openShop();};
+    sb.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 001 .8h9.2a1 1 0 001-.8L20 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span>Order</span>';
+    var pay=sn.querySelector('[data-v="pay"]'); if(pay&&pay.nextSibling) sn.insertBefore(sb,pay.nextSibling); else sn.appendChild(sb);
+  }
+  var nm=$('navmenu');
+  if(nm&&!nm.querySelector('.bls-navorder')){
+    var a=document.createElement('button');a.type='button';a.className='nav-item bls-navorder';
+    a.onclick=function(){try{closeNav();}catch(e){}openShop();};
+    a.innerHTML='<div><div class="nl">Order</div><div class="nd">Pre-built cycles and the full product line</div></div>';
+    var h=nm.querySelector('.nh'); if(h&&h.nextSibling) nm.insertBefore(a,h.nextSibling); else nm.insertBefore(a,nm.firstChild);
   }
 }
 
@@ -213,13 +221,8 @@ function cycleLines(c){return c.items.map(function(it){return {want:it[0],qty:it
 function cycleTotal(c){var t=0,ok=true;cycleLines(c).forEach(function(l){if(!l.p)ok=false;else t+=l.p.price*l.qty;});return ok?Math.round(t*100)/100:null;}
 function renderShop(){
   var h=$('bls-shop'); if(!h) return;
-  var o=['<div class="bls-kick">BioLinked</div><h1 class="bls-h">Product Line</h1><p class="bls-lede">Your protocol first, then our pre-built cycles and the full line. $9.99 UPS 2-Day shipping on every order.</p>'];
+  var o=['<div class="bls-kick">BioLinked</div><h1 class="bls-h">Product Line</h1><p class="bls-lede">Pre-built cycles and the full line. $9.99 UPS 2-Day shipping on every order.</p>'];
   if(!loaded){h.innerHTML=o.join('')+(failed?'<div class="bls-state"><b>Couldn’t load the product line</b>Check your connection and try again.<br><button type="button" class="bls-add" id="bls-retry">Try again</button></div>':'<div class="bls-state">Loading the product line…</div>');var r=$('bls-retry');if(r)r.onclick=function(){failed=false;renderShop();loadCatalog();};return;}
-  var pl=protocolList();
-  if(pl.items.length){
-    o.push('<h2 class="bls-sec">Your protocol</h2><div class="bls-grid">'+pl.items.map(function(x){return cardHTML(x.p);}).join('')+'</div>');
-    if(pl.miss.length) o.push('<p class="bls-note">Not in the product line right now: '+esc(pl.miss.join(', '))+'. Message us to order these.</p>');
-  }
   var cyc=CYCLES.map(function(c,ci){var L=cycleLines(c),t=0,miss=0,av=0;L.forEach(function(l){if(!l.p){miss++;return;}t+=l.p.price*l.qty;if(l.p.inStock)av++;});if(miss)return '';
     return '<div class="bls-cyc"><div class="bls-dur">'+esc(c.dur||'')+'</div><p class="bls-ccat">'+esc(catLbl(c.cat||''))+'</p><h3>'+esc(c.name)+'</h3>'+(c.goal?'<p class="bls-goal"><span>Goal</span>'+esc(c.goal)+'</p>':'')+
       '<ul>'+L.map(function(l){var sp=splitName(l.p.name);return '<li'+(l.p.inStock?'':' class="oosl"')+'><span>'+esc(sp.n)+(sp.s?' <small>'+esc(sp.s)+'</small>':'')+'</span><span>'+l.qty+' × '+money(l.p.price)+' = '+money(l.p.price*l.qty)+'</span></li>';}).join('')+'</ul>'+
@@ -320,7 +323,7 @@ function init(){
   ensureViews(); backBars(); navEntries(); inAppLinks(); ensureOverlay();
   /* remove leftovers from the earlier version if a cached copy injected them */
   ['bls-dock','bls-paycta'].forEach(function(id){var x=$(id);if(x)x.remove();});
-  document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-navorder,.snav[data-v="shop"]').forEach(function(x){x.remove();});
+  document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-order,.snav[data-v="shop"]').forEach(function(x){x.remove();});
   try{history.replaceState({blv:'proto'},'');}catch(e){}
   renderShop(); renderCart(); renderBar(); loadCatalog();
   window.BLShop={open:openShop,cart:function(){return cartList();},products:function(){return products;},protocol:function(){return protocolList();},cycleTotals:function(){return CYCLES.map(function(c){return [c.name,cycleTotal(c)];});}};
