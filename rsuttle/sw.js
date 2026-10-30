@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'rsuttle-v1007 1002(0))-labdefs1-tapfix1-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1';
+const CACHE = 'rsuttle-v1007 1002(0))-labdefs1-tapfix1-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1-ord2';
 const ASSETS = [
   '/rsuttle/',
   '/rsuttle/index.html',
