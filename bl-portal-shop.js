@@ -211,11 +211,51 @@ function renderBar(){
   else {b.className='bls-cbar';b.textContent=n?('View cart · '+n+' item'+(n===1?'':'s')+' · '+money(subtotal())):'Your cart is empty';b.disabled=!n;b.onclick=openCart;}
 }
 
+
+/* ---------- compound info popup (same prose as the Peptide Index: /compound-library.js) ---------- */
+var INFO_EXTRA={
+  'bpc-157 + tb':{sub:'A repair pairing of BPC-157 and TB-500 (Thymosin Beta-4 fragment)',mech:'BPC-157 is studied for promoting new blood-vessel growth and tissue healing; TB-500 is studied for cell migration, flexibility and calming inflammation. Together they target repair from two directions.',goal:'Researched for recovery of tendons, ligaments, muscle and soft tissue'},
+  'bac water':{sub:'Bacteriostatic water: sterile water with 0.9% benzyl alcohol',mech:'Used to reconstitute lyophilized (freeze-dried) research peptides. The benzyl alcohol limits bacterial growth, so a reconstituted vial can be drawn from more than once.',goal:'A research supply item: the standard diluent for mixing peptides before use'},
+  'bam15':{sub:'A small-molecule mitochondrial uncoupler',mech:'Lets protons leak back across the inner mitochondrial membrane, so cells burn more fuel to make the same energy. Unlike older uncouplers, it is studied for acting on mitochondria without depolarizing the cell membrane.',goal:'Researched for energy expenditure, stubborn weight and metabolic health in preclinical models'},
+  'methylene blue':{sub:'A redox-active dye with a long history in research',mech:'Shuttles electrons in the mitochondrial electron transport chain, supporting cellular respiration and energy production, and has antioxidant activity at low concentrations.',goal:'Researched for cellular energy, cognition, memory and mitochondrial support'},
+  'wolverine':{sub:'A recovery blend of Cartalax, TB-500 and BPC-157',mech:'Combines a cartilage bioregulator (Cartalax) with two repair peptides: BPC-157, studied for blood-vessel growth and tissue healing, and TB-500, studied for cell migration and reduced inflammation.',goal:'Researched for faster recovery of joints, tendons, ligaments and soft tissue'}
+};
+var INFO_ALIAS=[[/fox0?4/i,'FOXO4-DRI'],[/vasoactive intestinal/i,'VIP'],[/cypiomax|test blend|cypionate|enanthate/i,'Testosterone'],[/\bcjc/i,'CJC-1295'],[/\bklow/i,'KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)'],[/\bglow\b/i,'GLOW Blend (GHK-Cu, BPC-157, TB-500)'],[/bpc-?157\s*\+\s*tb/i,'BPC-157'],[/5-?amino|\b5am\b/i,'5-Amino-1MQ']];
+function cleanTxt(t){
+  t=String(t||'').replace(/\bfat[\s-]+loss\b/gi,'stubborn weight loss').replace(/\bbody fat\b/gi,'stubborn weight').replace(/\bfat cells\b/gi,'adipocytes').replace(/\bfat cell\b/gi,'adipocyte').replace(/\bfat tissue\b/gi,'adipose tissue').replace(/\bfat (storage|burning|mass|oxidation|metabolism|loss)\b/gi,'stubborn weight $1').replace(/\bvisceral fat\b/gi,'deep belly weight').replace(/\bfat\b/gi,'stubborn weight').replace(/\bFat\b/g,'Stubborn weight');
+  /* keep it research-framed: drop sentences about our store, testing or COAs */
+  return t.split(/(?<=[.!?])\s+/).filter(function(s){return !/bio ?linked|\bcoa\b|lab[- ]test|third[- ]party|purity test/i.test(s);}).join(' ').trim();
+}
+function infoFor(name){
+  var n=String(name||''), raw=n.replace(/\(.*?\)/g,' ').replace(/\bN-Acetyl\b|\bAmidate\b/gi,' ').replace(/\s*[-–:·]?\s*\d[\d.,\/]*\s*(mg|mcg|iu|ml|g)\b.*$/i,'').replace(/\s+/g,' ').trim();
+  var lo=n.toLowerCase();
+  for(var k in INFO_EXTRA){ if(lo.indexOf(k)!==-1) return INFO_EXTRA[k]; }
+  var L=null, lib=(typeof BL_LIB==='object'&&BL_LIB)?BL_LIB:null;
+  for(var i=0;i<INFO_ALIAS.length&&!L;i++){ if(INFO_ALIAS[i][0].test(n)&&lib) L=lib[INFO_ALIAS[i][1]]; }
+  if(!L&&typeof blLib==='function') L=blLib(raw);
+  if(!L&&lib){ var keys=Object.keys(lib).sort(function(a,b){return b.length-a.length;}); for(var j=0;j<keys.length;j++){ var kk=keys[j].toLowerCase(); if(kk.length>=3&&lo.indexOf(kk)!==-1){L=lib[keys[j]];break;} } }
+  return L;
+}
+function infoBtn(name){return '<button type="button" class="bls-i" data-info="'+esc(name)+'" aria-label="About '+esc(name)+'">i</button>';}
+function openInfo(name){
+  var L=infoFor(name), sp=splitName(name), m=$('bls-im');
+  if(!m){m=document.createElement('div');m.id='bls-im';m.className='bls-im';m.innerHTML='<div class="bls-ibox" role="dialog" aria-modal="true" aria-labelledby="bls-in"><button type="button" class="bls-iclose" aria-label="Close">&times;</button><div class="bls-icat" id="bls-ic"></div><h2 id="bls-in"></h2><div id="bls-ib"></div><p class="bls-ifoot">For research use only. Not medical advice.</p></div>';document.body.appendChild(m);
+    m.addEventListener('click',function(e){if(e.target===m||e.target.closest('.bls-iclose'))closeInfo();});}
+  $('bls-ic').textContent=catLbl(categorize(name)); $('bls-in').textContent=sp.n;
+  var parts=[];
+  if(L){ if(L.sub)parts.push(['What it is',L.sub]); if(L.mech)parts.push(['How it works',L.mech]); if(L.goal)parts.push(['Why people use it',L.goal]); }
+  if(!parts.length) parts.push(['What it is','A research compound in the BioLinked product line. Message us for details on this one.']);
+  $('bls-ib').innerHTML=parts.map(function(p){var t=cleanTxt(p[1]);if(t&&!/[.!?]$/.test(t))t+='.';return '<div class="bls-isec"><b>'+p[0]+'</b><p>'+esc(t)+'</p></div>';}).join('');
+  m.classList.add('on'); var c=m.querySelector('.bls-iclose'); if(c) c.focus();
+}
+function closeInfo(){var m=$('bls-im'); if(m) m.classList.remove('on');}
+function ensureLib(){ if(typeof BL_LIB==='object') return; var s=document.createElement('script'); s.src='/compound-library.js'; document.head.appendChild(s); }
+
 /* ---------- render: shop (product-line look) ---------- */
 function splitName(n){n=String(n||'');var m=n.match(/^(.*?)\s*[-–:]\s*([\d.,\/]+\s*(?:mg|mcg|iu|ml|g)(?:\/[\d.]+\s*(?:mg|ml))?.*)$/i)||n.match(/^(.*?)\s+([\d.,\/]+\s*(?:mg|mcg|iu|ml|g)\b.*)$/i);return m?{n:m[1].trim(),s:m[2].trim()}:{n:n.trim(),s:''};}
 function ctlHTML(p){var c=cart[p.id];return !p.inStock?'<span class="bls-oos">Out of stock</span>':(c?stepper(p.id,c.qty):'<button type="button" class="bls-add" data-add="'+esc(p.id)+'">Add to cart</button>');}
 function cardHTML(p){var sp=splitName(p.name);
-  return '<div class="bls-card"><div class="bls-cat">'+esc(catLbl(p.cat))+'</div><div class="bls-nm">'+esc(sp.n)+'</div>'+(sp.s?'<div class="bls-sz">'+esc(sp.s)+'</div>':'')+'<div class="bls-ft"><span class="bls-pr">'+money(p.price)+'</span>'+ctlHTML(p)+'</div></div>';}
+  return '<div class="bls-card"><div class="bls-cat">'+esc(catLbl(p.cat))+'</div><div class="bls-nmrow"><div class="bls-nm">'+esc(sp.n)+'</div>'+infoBtn(p.name)+'</div>'+(sp.s?'<div class="bls-sz">'+esc(sp.s)+'</div>':'')+'<div class="bls-ft"><span class="bls-pr">'+money(p.price)+'</span>'+ctlHTML(p)+'</div></div>';}
 function stepper(id,q){return '<span class="bls-stp"><button type="button" data-dec="'+esc(id)+'" aria-label="One less">&minus;</button><b>'+q+'</b><button type="button" data-inc="'+esc(id)+'" aria-label="One more">+</button></span>';}
 function cycleLines(c){return c.items.map(function(it){return {want:it[0],qty:it[1],p:productByName(it[0])};});}
 function cycleTotal(c){var t=0,ok=true;cycleLines(c).forEach(function(l){if(!l.p)ok=false;else t+=l.p.price*l.qty;});return ok?Math.round(t*100)/100:null;}
@@ -224,8 +264,8 @@ function renderShop(){
   var o=['<div class="bls-kick">BioLinked</div><h1 class="bls-h">Product Line</h1><p class="bls-lede">Pre-built cycles and the full line. $9.99 UPS 2-Day shipping on every order.</p>'];
   if(!loaded){h.innerHTML=o.join('')+(failed?'<div class="bls-state"><b>Couldn’t load the product line</b>Check your connection and try again.<br><button type="button" class="bls-add" id="bls-retry">Try again</button></div>':'<div class="bls-state">Loading the product line…</div>');var r=$('bls-retry');if(r)r.onclick=function(){failed=false;renderShop();loadCatalog();};return;}
   var cyc=CYCLES.map(function(c,ci){var L=cycleLines(c),t=0,miss=0,av=0;L.forEach(function(l){if(!l.p){miss++;return;}t+=l.p.price*l.qty;if(l.p.inStock)av++;});if(miss)return '';
-    return '<div class="bls-cyc"><div class="bls-dur">'+esc(c.dur||'')+'</div><p class="bls-ccat">'+esc(catLbl(c.cat||''))+'</p><h3>'+esc(c.name)+'</h3>'+(c.goal?'<p class="bls-goal"><span>Goal</span>'+esc(c.goal)+'</p>':'')+
-      '<ul>'+L.map(function(l){var sp=splitName(l.p.name);return '<li'+(l.p.inStock?'':' class="oosl"')+'><span>'+esc(sp.n)+(sp.s?' <small>'+esc(sp.s)+'</small>':'')+'</span><span>'+l.qty+' × '+money(l.p.price)+' = '+money(l.p.price*l.qty)+'</span></li>';}).join('')+'</ul>'+
+    return '<div class="bls-cyc"><div class="bls-dur">'+esc(c.dur||'')+'</div><p class="bls-ccat">'+esc(catLbl(c.cat||''))+'</p><h3>'+esc(c.name)+'</h3>'+(c.goal?'<p class="bls-goal"><span>Goal</span>'+esc(c.goal)+'</p>':'')+(c.why&&c.why.length?'<details class="bls-why"><summary>Why these work together</summary><ul>'+c.why.map(function(w){return '<li>'+w+'</li>';}).join('')+'</ul></details>':'')+
+      '<ul class="bls-items">'+L.map(function(l){var sp=splitName(l.p.name);return '<li'+(l.p.inStock?'':' class="oosl"')+'><span class="bls-lnm">'+infoBtn(l.p.name)+'<span>'+esc(sp.n)+(sp.s?' <small>'+esc(sp.s)+'</small>':'')+'</span></span><span>'+l.qty+' × '+money(l.p.price)+' = '+money(l.p.price*l.qty)+'</span></li>';}).join('')+'</ul>'+
       '<div class="bls-ft"><div class="bls-pr"><small>Cycle total</small>'+money(t)+'</div><button type="button" class="bls-add" data-cyc="'+ci+'"'+(av?'':' disabled')+'>Add cycle to cart</button></div></div>';}).join('');
   if(cyc) o.push('<h2 class="bls-sec">Pre-built cycles</h2><div class="bls-cycs">'+cyc+'</div>');
   var counts={};products.forEach(function(p){counts[p.cat]=(counts[p.cat]||0)+1;});
@@ -309,6 +349,7 @@ document.addEventListener('click',function(e){
   if(t.classList.contains('bls-back')){e.preventDefault();goBack();return;}
   if(t.classList.contains('bls-home')){e.preventDefault();window.go('proto');return;}
   var a;
+  if((a=t.getAttribute('data-info'))){e.preventDefault();openInfo(a);return;}
   if((a=t.getAttribute('data-add'))){addQty(a,1);return;}
   if((a=t.getAttribute('data-inc'))){addQty(a,1);return;}
   if((a=t.getAttribute('data-dec'))){addQty(a,-1);return;}
@@ -317,10 +358,10 @@ document.addEventListener('click',function(e){
   if((a=t.getAttribute('data-cat'))&&t.classList.contains('bls-chip')){activeCat=a;renderShop();return;}
   if(t.hasAttribute('data-cyc')){var cy=CYCLES[+t.getAttribute('data-cyc')];if(cy){cycleLines(cy).forEach(function(l){if(l.p&&l.p.inStock){var c2=cart[l.p.id];setQtyQuiet(l.p.id,(c2?c2.qty:0)+l.qty);}});sync();}return;}
 });
-document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; if(pane){closeAll();return;} if(cur!=='proto'&&!document.querySelector('.sheet.on,.sheet.open')) goBack(); });
+document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; var im=$('bls-im'); if(im&&im.classList.contains('on')){closeInfo();return;} if(pane){closeAll();return;} if(cur!=='proto'&&!document.querySelector('.sheet.on,.sheet.open')) goBack(); });
 
 function init(){
-  ensureViews(); backBars(); navEntries(); inAppLinks(); ensureOverlay();
+  ensureLib(); ensureViews(); backBars(); navEntries(); inAppLinks(); ensureOverlay();
   /* remove leftovers from the earlier version if a cached copy injected them */
   ['bls-dock','bls-paycta'].forEach(function(id){var x=$(id);if(x)x.remove();});
   document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-order,.snav[data-v="shop"]').forEach(function(x){x.remove();});
