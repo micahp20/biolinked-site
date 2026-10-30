@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ahellyer/, which is now the real page: the app layout
 // was promoted here from the /ahellyer/app/ pilot.
-const CACHE = 'ahellyer-v1006 1002(0))-cyctitle-cg2-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1';
+const CACHE = 'ahellyer-v1006 1002(0))-cyctitle-cg2-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1-ord2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/ahellyer/',
