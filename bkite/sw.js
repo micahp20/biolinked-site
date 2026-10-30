@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'bkite-v-orals2-labdefs1-tapfix1-wk1-dna1-sch1-days1-font1-tp1-inv4-plskin2-shop1';
+const CACHE = 'bkite-v-orals2-labdefs1-tapfix1-wk1-dna1-sch1-days1-font1-tp1-inv4-plskin2-shop1-g1';
 const ASSETS = [
   '/sbahl/',
   '/bkite/index.html',
