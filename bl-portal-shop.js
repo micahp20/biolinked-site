@@ -23,6 +23,8 @@ var SHIPPING=9.99;
 var SLUG=(location.pathname.split('/').filter(Boolean)[0]||'portal');
 var CKEY='bl-shop-cart-'+SLUG;
 var BLOCK=['cortexin','dihexa','ipamorelin','shipping','2-day ups'];
+/* Optional per-page hide list (e.g. a client who cannot use GLP-1s): window.BLS_HIDE=['retatrutide',...]. Hides matching products and any cycle that contains one. */
+if(window.BLS_HIDE&&window.BLS_HIDE.length){BLOCK=BLOCK.concat(window.BLS_HIDE.map(function(x){return String(x).toLowerCase();}));}
 
 /* The 7 branded goal cycles, as saved on /product-line/ (vial name on the live catalog, qty). */
 var CYCLES=[
@@ -34,6 +36,7 @@ var CYCLES=[
   {name:'The Limitless Stack',cat:'Cognitive Enhancement',goal:"Sharpen focus, memory and mental clarity under pressure.",why:["<b>N-Acetyl Semax</b> is the focus driver, studied for BDNF and cognitive performance.", "<b>N-Acetyl Selank</b> balances it, researched for calm, stress-resilient clarity without sedation.", "<b>N-Acetyl Adamax</b> extends the neurotrophic support for memory and learning."],dur:'About 2–12 weeks',items:[['N-Acetyl Semax Amidate - 30mg',1],['N-Acetyl Selank Amidate - 30mg',1],['N-Acetyl Adamax Amidate - 5mg',1]]},
   {name:'The Deep Reset',cat:'Sleep & Stress',goal:"Fall asleep faster, sleep deeper and handle stress better.",why:["<b>DSIP</b> is studied for promoting deep, restorative sleep.", "<b>Epitalon</b> and <b>Pinealon</b> support the pineal side, researched for melatonin rhythm and circadian balance.", "<b>N-Acetyl Selank</b> takes the edge off stress, so the mind can settle at night."],dur:'About 2–10 weeks',items:[['DSIP - 10mg',1],['Epitalon - 50mg',1],['Pinealon - 10mg',2],['N-Acetyl Selank Amidate - 30mg',1]]}
 ];
+if(window.BLS_HIDE&&window.BLS_HIDE.length){CYCLES=CYCLES.filter(function(c){return !c.items.some(function(it){var n=String(it[0]).toLowerCase();return window.BLS_HIDE.some(function(h){return n.indexOf(String(h).toLowerCase())>=0;});});});}
 
 var CAT_RULES=[
   ['Metabolic & GLP Research',['retatrutide','tirzepatide','semaglutide','cagrilintide','survodutide','mazdutide','liraglutide','aod-9604','5-amino','5am','5ad','tesofensine','adipotide']],
