@@ -48,6 +48,7 @@ var CAT_RULES=[
   ['Sexual & Hormonal',['pt-141','pt141','bremelanotide','kisspeptin','oxytocin']],
   ['Other Research & Supplies',['vip','thymosin','bac water','bacteriostatic','sterile water','storage','syringe','supplies','thymulin']]
 ];
+if(window.BLS_HIDE&&window.BLS_HIDE.length){CAT_RULES.forEach(function(r){if(r[0]==='Metabolic & GLP Research')r[0]='Metabolic Research';});}
 var CAT_ORDER=CAT_RULES.map(function(r){return r[0];});
 function categorize(name){var n=String(name||'').toLowerCase();for(var i=0;i<CAT_RULES.length;i++){var k=CAT_RULES[i][1];for(var j=0;j<k.length;j++){if(n.indexOf(k[j])!==-1)return CAT_RULES[i][0];}}return 'Other Research & Supplies';}
 function catLbl(c){return String(c||'').replace(/fat[\s-]*loss/i,'Stubborn Weight Loss').replace(/\bfat\b/i,'Stubborn Weight');}
