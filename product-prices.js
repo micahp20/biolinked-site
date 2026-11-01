@@ -79,7 +79,7 @@ window.PRODUCT_PRICES = [
    forLine:'Full immune + healing reset when you\'re run-down, sick, or burning the candle at both ends.',
    desc:'TB-500 (10mg) + BPC-157 (10mg) + GHK-Cu (50mg) + KPV (10mg). Quad-peptide powerhouse adding targeted immune modulation and cytokine suppression.',
    keywords:'klow tb bpc ghk kpv blend immune cytokine inflammation'},
-  {name:'SS-31',sec:'healing',cat:'healing energy',sku:'2S50',size:'50mg vial',price:'$100',variants:[],stock:true,
+  {name:'SS-31',sec:'healing',cat:'healing energy',sku:'2S50',size:'50mg vial',price:'$50',variants:[],stock:true,
    forLine:'Keeping energy high during dieting, training, or aging. Protects the cells that produce your energy.',
    desc:'Elamipretide — targets the inner mitochondrial membrane to stabilize cardiolipin, scavenge ROS, and restore ATP synthesis.',
    keywords:'ss31 ss-31 elamipretide mitochondrial cardiolipin atp'},
