@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'bcotten-v3-klow60';
+const CACHE = 'bcotten-v3-klow60-vip1';
 const ASSETS = [
   '/bcotten/',
   '/bcotten/index.html',
