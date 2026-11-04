@@ -1343,65 +1343,129 @@ button.bl-tile{cursor:pointer}button.bl-tile:focus-visible{outline:3px solid #CF
 .bl-tile .o{color:#CFB87C;font-size:13px;font-weight:700}.bl-tile .o.na{color:#8d8d8d;font-weight:600}</style>
 <style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
 <style id="mp-gold-edition">
-  /* ===== GOLD EDITION (preview /mp-gold/) =====
-     Colour only -- no layout, markup, copy or JS changes. Loaded after
-     /bl-client-skin.css so it wins; !important appears only where that
-     sheet already used it. Scoped to the light theme; dark is untouched.
-     Contrast target: light type ONLY on the black header / hero / pills,
-     dark type everywhere else, and no gold-on-white below 4.5:1. */
-  :root:not([data-theme="dark"]) .top{background:#0b0b0c;border-bottom:2px solid #CFB87C}
-  :root:not([data-theme="dark"]) .top .brand{color:#ffffff}
-  :root:not([data-theme="dark"]) .top .brand small{color:#A2A4A3}
-  :root:not([data-theme="dark"]) .top .who .wn{color:#ffffff}
-  :root:not([data-theme="dark"]) .top .who .wl{color:#A2A4A3}
-  :root:not([data-theme="dark"]) .top .tgl,
-  :root:not([data-theme="dark"]) .top .navbtn,
-  :root:not([data-theme="dark"]) .top .bl-aa{
-    background:rgba(255,255,255,.06);border-color:rgba(207,184,124,.55);color:#CFB87C}
-  :root:not([data-theme="dark"]) .top .navbtn.on,
-  :root:not([data-theme="dark"]) .top .bl-aa[aria-pressed="true"]{
-    background:#CFB87C;border-color:#E2CE94;color:#0b0b0c}
+  /* ===== GOLD EDITION -- SOFT LIGHT VARIANT (preview /mp-gold/) =====
+     No black surfaces; every light surface carries gold type. Colour only --
+     no layout, markup, copy or JS changes. Scoped to the light theme; dark
+     is untouched.
 
-  /* ---- hero feature card: true black. Every child's colour is restated,
-          because the defaults are dark ink meant for a white card. ---- */
-  /* bl-client-skin.css carries `html:root .lx-hero{background-color:var(--card)
-     !important}` (0,2,1). This matches its html:root shape and adds :not(),
-     giving (0,3,1), and restates the longhand so it competes head-to-head
-     with that !important declaration rather than only via the shorthand. */
+     Palette, all measured against the three surfaces in use
+     (ground #f5f5f5, light surface #ededed, white card #ffffff):
+       #5f5327  headings / wordmark      6.5-7.6:1   AA
+       #6f6130  body, labels, accents    5.2-6.1:1   AA
+       #8a7840  borders and rules only   3.7-4.3:1   >=3:1 non-text
+     #CFB87C is deliberately absent as a foreground: it is 1.66:1 on #ededed,
+     which fails even the 3:1 non-text floor.
+
+     The token re-points below are the main lever. bl-client-skin.css paints
+     ~24 controls with `background:var(--pl-black)!important; color:
+     var(--pl-champ)!important`, so re-pointing those two variables turns all
+     of them light-with-gold at once -- a variable is resolved where it is
+     used, so no per-selector !important fight is needed. This block sits on
+     `html:root:not([data-theme="dark"])` (0,2,1), matching that sheet's own
+     light block, and loads after it, so it wins on source order. */
+  html:root:not([data-theme="dark"]){
+    /* type */
+    --ink:#5f5327; --ink2:#6f6130; --muted:#6f6130; --faint:#6f6130;
+    --gold:#6f6130; --gold2:#6f6130; --pm:#6f6130; --on-gold:#5f5327;
+    /* the two variables bl-client-skin's controls resolve */
+    --pl-black:#ededed; --pl-champ:#6f6130; --pl-champ-hi:#5f5327;
+    /* formerly-black surfaces */
+    --cu-black:#ededed; --cu-gold:#8a7840; --cu-gold-lt:#6f6130;
+    --topbg:#ededed;
+    --tip-bg:#ededed; --tip-tx:#5f5327; --tip-strong:#6f6130; --tip-line:#d9d9d9;
+    --barrel:#ededed; --syr-stroke:#6f6130;
+    --deep1:#ededed; --deep2:#ededed; --deep-tx:#5f5327; --deep-ac:#6f6130; --deep-sb:#6f6130;
+  }
+
+  /* ---- header ---- */
+  html:root:not([data-theme="dark"]) .top{background:#ededed;border-bottom:2px solid #8a7840}
+  html:root:not([data-theme="dark"]) .top .brand{color:#5f5327}
+  html:root:not([data-theme="dark"]) .top .brand small{color:#6f6130}
+  html:root:not([data-theme="dark"]) .top .who .wn{color:#5f5327}
+  html:root:not([data-theme="dark"]) .top .who .wl{color:#6f6130}
+  html:root:not([data-theme="dark"]) .top .tgl,
+  html:root:not([data-theme="dark"]) .top .navbtn,
+  html:root:not([data-theme="dark"]) .top .bl-aa{
+    background:#ffffff;border-color:#8a7840;color:#6f6130}
+  html:root:not([data-theme="dark"]) .top .navbtn.on,
+  html:root:not([data-theme="dark"]) .top .bl-aa[aria-pressed="true"]{
+    background:#ededed!important;color:#6f6130!important;border-color:#8a7840!important}
+
+  /* ---- hero feature card: light grey, gold throughout ---- */
   html:root:not([data-theme="dark"]) .lx-hero{
-    background:#0b0b0c!important;
-    background-color:#0b0b0c!important;
+    background:#ededed!important;
+    background-color:#ededed!important;
     background-image:none!important;
-    border-color:#2a2a2a!important}
-  :root:not([data-theme="dark"]) .lx-eyebrow{color:#CFB87C}
-  :root:not([data-theme="dark"]) .lx-title{color:#ffffff}
-  :root:not([data-theme="dark"]) .lx-sub{color:#c7ccd1}
-  :root:not([data-theme="dark"]) .lx-mark .lxbl{fill:#CFB87C}
-  :root:not([data-theme="dark"]) .lx-mark .lxhx{stroke:#CFB87C}
-  :root:not([data-theme="dark"]) .lx-mark .lxnd{fill:#E2CE94}
+    border-color:#dcdcd8!important}
+  html:root:not([data-theme="dark"]) .lx-eyebrow{color:#6f6130}
+  html:root:not([data-theme="dark"]) .lx-title{color:#5f5327}
+  html:root:not([data-theme="dark"]) .lx-sub{color:#6f6130}
+  html:root:not([data-theme="dark"]) .lx-mark .lxbl{fill:#5f5327}
+  html:root:not([data-theme="dark"]) .lx-mark .lxhx{stroke:#6f6130}
+  html:root:not([data-theme="dark"]) .lx-mark .lxnd{fill:#6f6130}
   html:root:not([data-theme="dark"]) .lx-hero .lx-cta{
-    background:#0b0b0c!important;color:#E2CE94!important;border:1px solid #CFB87C!important}
+    background:#ffffff!important;color:#6f6130!important;border:1px solid #8a7840!important}
 
-  /* ---- program tiles (Bloodwork / DNA): were a hard-coded near-black
-          gradient with #c9c9c9 type, which read as muddy on the light
-          ground. Now solid white with a gold top rule. ---- */
-  :root:not([data-theme="dark"]) .bl-tile{
+  /* ---- program tiles: white, gold type, gold top rule ---- */
+  html:root:not([data-theme="dark"]) .bl-tile{
     background:#ffffff!important;background-image:none!important;
-    border:1px solid #dcdcd8;border-top:3px solid #CFB87C;color:#43464a}
-  :root:not([data-theme="dark"]) .bl-tile .t{color:#0b0b0c}
-  :root:not([data-theme="dark"]) .bl-tile .s{color:#43464a}
-  :root:not([data-theme="dark"]) .bl-tile .o{color:#6f6130}
-  :root:not([data-theme="dark"]) .bl-tile .o.na{color:#6b6b64}
+    border:1px solid #dcdcd8;border-top:3px solid #8a7840;color:#6f6130}
+  html:root:not([data-theme="dark"]) .bl-tile .t{color:#5f5327}
+  html:root:not([data-theme="dark"]) .bl-tile .s{color:#6f6130}
+  html:root:not([data-theme="dark"]) .bl-tile .o{color:#6f6130}
+  html:root:not([data-theme="dark"]) .bl-tile .o.na{color:#6f6130}
+  html:root:not([data-theme="dark"]) .seclbl{color:#6f6130}
 
-  /* ---- section eyebrows in legible gold ---- */
-  :root:not([data-theme="dark"]) .seclbl{color:#6f6130}
+  /* ---- the two gold-gradient fills the shared sheet does not cover ---- */
+  html:root:not([data-theme="dark"]) .tab.on,
+  html:root:not([data-theme="dark"]) .btn{
+    background:#ededed!important;background-image:none!important;
+    color:#6f6130!important;border-color:#8a7840!important}
+  /* .paybtn is only ever used as .paybtn.vm / .ca / .zl -- Venmo blue, Cash
+     App green, Zelle purple. None of them are black, and flattening a brand
+     payment button to grey would cost recognition, so they are left alone. */
 
-  /* ---- primary action pills: black ground, gold type ---- */
-  :root:not([data-theme="dark"]) .paybtn,
-  :root:not([data-theme="dark"]) .lx-cta,
-  :root:not([data-theme="dark"]) .pc-add,
-  :root:not([data-theme="dark"]) .blkb.on{
-    background:#0b0b0c;border-color:#0b0b0c;color:#E2CE94}
+  /* ---- shop module: /bl-portal-shop.css loads AFTER this block, so these
+          need !important plus the higher specificity to land ---- */
+  html:root:not([data-theme="dark"]) .bls-btn,
+  html:root:not([data-theme="dark"]) .bls-stp,
+  html:root:not([data-theme="dark"]) .bls-order,
+  html:root:not([data-theme="dark"]) .bls-ob,
+  html:root:not([data-theme="dark"]) .bls-cbar,
+  html:root:not([data-theme="dark"]) .bls-add,
+  html:root:not([data-theme="dark"]) .bls-chip.on,
+  html:root:not([data-theme="dark"]) .bls-i,
+  html:root:not([data-theme="dark"]) .bls-iclose,
+  html:root:not([data-theme="dark"]) .bls-pay input:checked+span{
+    background:#ededed!important;background-image:none!important;
+    color:#6f6130!important;border-color:#8a7840!important}
+  html:root:not([data-theme="dark"]) .bls-cbar{border-top:2px solid #8a7840!important}
+  html:root:not([data-theme="dark"]) .bls-ov{
+    --ink:#5f5327; --ink2:#5f5327; --muted:#6f6130; --faint:#6f6130;
+    --gold:#6f6130; --ac:#6f6130}
+  html:root:not([data-theme="dark"]) .bls-ibox{color:#5f5327!important;border-color:#8a7840!important}
+  html:root:not([data-theme="dark"]) .bls-isec p{color:#6f6130!important}
+
+  /* ---- iPad/desktop sidebar: was black glass with cream type ---- */
+  html:root:not([data-theme="dark"]) .side{
+    background:#ededed!important;background-image:none!important;
+    border-right:1px solid #dcdcd8!important}
+  html:root:not([data-theme="dark"]) .side-top,
+  html:root:not([data-theme="dark"]) .side-foot{border-color:#d9d9d9!important}
+  html:root:not([data-theme="dark"]) .side-brand,
+  html:root:not([data-theme="dark"]) .side-who .wn{color:#5f5327!important}
+  html:root:not([data-theme="dark"]) .side-brand small,
+  html:root:not([data-theme="dark"]) .side-links a,
+  html:root:not([data-theme="dark"]) .side-who .wl,
+  html:root:not([data-theme="dark"]) .side-links a:hover{color:#6f6130!important}
+  html:root:not([data-theme="dark"]) .snav{color:#6f6130!important}
+  html:root:not([data-theme="dark"]) .snav:hover{background:#ffffff!important;color:#5f5327!important}
+  html:root:not([data-theme="dark"]) .snav.on{
+    background:#ffffff!important;background-image:none!important;
+    color:#5f5327!important;border-color:#8a7840!important;
+    box-shadow:inset 3px 0 0 #8a7840!important}
+  html:root:not([data-theme="dark"]) .snav.on svg,
+  html:root:not([data-theme="dark"]) .snav:hover svg{stroke:#6f6130!important}
 </style>
 </head>
 <body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
