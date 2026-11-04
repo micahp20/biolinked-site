@@ -1276,6 +1276,42 @@ html body .drow.pm .uu{color:var(--pm)}
 </style>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
 <link rel="stylesheet" href="/bl-connected-path.css?v=4">
+<style>
+/* ---- SCHEDULE EDIT MODE (?edit=1) — nothing below renders for the client ---- */
+html.bl-edit .drow.ed-row{cursor:pointer;border-bottom:none}
+html.bl-edit .drow.ed-row .ed-cv{margin-left:auto;flex:none;font-size:18px;line-height:1;color:var(--muted);transition:transform .16s ease}
+html.bl-edit .drow.ed-row.exp .ed-cv{transform:rotate(90deg)}
+html.bl-edit .ed-pan{display:none;border-bottom:1px solid var(--line2);background:rgba(127,127,127,.045)}
+html.bl-edit .ed-pan.open{display:block}
+html.bl-edit .dgrp>.ed-pan:last-child{border-bottom:none}
+html.bl-edit .ed-in{padding:12px 14px 14px;font-family:var(--sans)}
+html.bl-edit .ed-grp{margin-top:12px}
+html.bl-edit .ed-grp:first-child{margin-top:0}
+html.bl-edit .ed-l{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+html.bl-edit .ed-tag{font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--gold);text-transform:none}
+html.bl-edit .ed-row2{display:flex;gap:8px;margin-top:8px}
+html.bl-edit .ed-row2:first-child{margin-top:0}
+html.bl-edit .ed-b{flex:1;min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
+html.bl-edit .ed-b.on{background:var(--gold,#8a7840);color:#fff;border-color:transparent;font-weight:600}
+html.bl-edit .ed-b.pri{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html.bl-edit .ed-b:disabled{opacity:.45;cursor:default}
+html.bl-edit .ed-f{display:flex;gap:8px;margin-bottom:8px}
+html.bl-edit .ed-f.one{display:block}
+html.bl-edit .ed-f label{flex:1;display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+html.bl-edit .ed-f input{width:100%;box-sizing:border-box;margin-top:4px;min-height:42px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html.bl-edit .ed-pan .dp{margin-top:0;padding-top:0;border-top:none}
+html.bl-edit .ed-add{margin:14px 0 4px}
+html.bl-edit .ed-add-b{width:100%;min-height:48px;border-radius:12px;border:1px dashed var(--gold,#8a7840);background:transparent;color:var(--gold,#8a7840);font:inherit;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer}
+html.bl-edit .ed-add-p{margin-top:10px;padding:14px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;font-family:var(--sans);background:var(--card,#fff)}
+html.bl-edit .ed-add-p[hidden]{display:none}
+html.bl-edit .ed-seg{margin-bottom:12px}
+html.bl-edit .ed-sel{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+html.bl-edit .ed-sel select{width:100%;box-sizing:border-box;margin-top:4px;min-height:44px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html.bl-edit .ed-gd{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+html.bl-edit .ed-gd span{display:inline-flex;align-items:baseline;gap:5px;padding:5px 9px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:8px;font-size:12px}
+html.bl-edit .ed-gd i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+html.bl-edit .ed-add-p .dp-days{margin-bottom:10px}
+</style>
 </head>
 <body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
@@ -5100,7 +5136,7 @@ function saRender(){
   if(!host){ var dn=document.getElementById('dosenote'); if(!dn) return; host=document.createElement('div'); host.id='sa-list'; host.className='sa-list'; dn.parentNode.insertBefore(host,dn.nextSibling); }
   var l=saLive();
   if(!l.length){ host.innerHTML=''; return; }
-  host.innerHTML='<div class="seclbl">Added From Calculator<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
+  host.innerHTML='<div class="seclbl">Added Compounds<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
     return '<div class="lrow2"><div><div>'+saEsc(it.n)+'</div><div class="sm">'+saEsc([it.d,it.u,saDaysTxt(it.days),it.b==='PM'?'Night':'Morning'].filter(Boolean).join(' · '))+'</div></div><button type="button" class="sa-rm" data-sa="'+saEsc(it.id)+'">Remove</button></div>';
   }).join('');
 }
@@ -5216,6 +5252,287 @@ scrollRemeasure();
 window.addEventListener('load',scrollRemeasure);
 window.addEventListener('orientationchange',scrollRemeasure); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
 if(typeof nutInit==='function') nutInit();
+
+/* ======================================================================
+   SCHEDULE EDIT MODE  (?edit=1)
+   The client's link carries no flag, so they keep the clean read-only day
+   view untouched. With ?edit=1 every dose row becomes tap-to-expand and an
+   "Add compound" control appears under the list.
+
+   Nothing here writes the protocol. ALL, the prices and the invoice text are
+   read-only; every edit is an override layer, and all four stores ride the
+   existing 'schedule' sync kind so they survive reload and follow the client
+   across devices:
+     payload.on / payload.blk   on/off + AM/PM          SCHKEY
+     payload.days               weekdays                DP_KEY   (existing)
+     payload.add                added compounds         SA_KEY   (existing)
+     payload.ovr                dose / units / recon    OV_KEY   (new here)
+   ====================================================================== */
+var BLEDIT=/(?:^|[?&])edit=1(?:&|$)/.test(location.search);
+
+/* ---- dose / units / recon override. Per compound name, newest edit wins,
+        and a reset is a tombstone so a stale device cannot resurrect it. ---- */
+var OV_KEY=SCHKEY+'-ovr', ovState=null;
+function ovGet(){ if(!ovState){ try{ ovState=JSON.parse(localStorage.getItem(OV_KEY)||'null'); }catch(e){ ovState=null; } if(!ovState||typeof ovState!=='object'||Array.isArray(ovState)) ovState={}; } return ovState; }
+function ovStore(){ try{ localStorage.setItem(OV_KEY,JSON.stringify(ovGet())); }catch(e){} }
+function ovOwn(n){ var r=ovGet()[n]; return (r&&!r.del&&(r.d||r.u||r.rec))?r:null; }
+function ovSet(n,f){
+  var s=ovGet(), p=s[n], keep=!!(f&&(f.d||f.u||f.rec));
+  s[n]=keep?{d:f.d||'',u:f.u||'',rec:f.rec||'',updated_at:saStamp(p)}:{del:true,updated_at:saStamp(p)};
+  ovStore(); try{ if(!csApplying) csQueue('schedule'); }catch(e){}
+}
+function ovMerge(remote){
+  var s=ovGet(), ahead=false, k; remote=(remote&&typeof remote==='object')?remote:{};
+  for(k in remote){ var r=remote[k], l=s[k]; if(!r||!r.updated_at) continue; if(!l||Date.parse(r.updated_at)>Date.parse(l.updated_at||0)) s[k]=r; }
+  for(k in s){ var R=remote[k]; if(!R||Date.parse(s[k].updated_at||0)>Date.parse(R.updated_at||0)) ahead=true; }
+  ovStore(); return ahead;
+}
+/* The override applies for everyone, not just edit mode: once it is set the
+   client should see the dose they were actually told to draw. */
+(function(){
+  var _sr=schRows; schRows=function(){
+    return _sr.apply(this,arguments).map(function(c){
+      if(!c||!c.n) return c; var o=ovOwn(c.n); if(!o) return c;
+      var x={},k; for(k in c) x[k]=c[k];
+      if(o.d) x.d=o.d; if(o.u) x.u=o.u; if(o.rec) x.rec=o.rec; x.ovr=1; return x;
+    });
+  };
+  /* saRow drops recon and the blurb; the panel wants both */
+  var _saRow=saRow; saRow=function(it){ var r=_saRow.apply(this,arguments); if(it&&it.rec) r.rec=it.rec; if(it&&it.mg) r.mg=it.mg; return r; };
+  var _cr=csRead; csRead=function(k){ var p=_cr.apply(this,arguments); if(k==='schedule'&&p) p.ovr=ovGet(); return p; };
+  var _ch=csHasLocal; csHasLocal=function(k){ if(k==='schedule'){ for(var x in ovGet()) return true; } return _ch.apply(this,arguments); };
+  var _ca=csApply; csApply=function(k,p){ _ca.apply(this,arguments);
+    if(k==='schedule'&&p){ var ahead=ovMerge(p.ovr); try{ renderDoses(); }catch(e){} if(ahead){ try{ csQueue('schedule'); }catch(e){} } } };
+})();
+
+/* ---- which compound each .drow is. Must rebuild the exact order renderDoses
+        drew (Morning then Night) and match by position, never by name. ---- */
+var edOpen={};
+function edRows(){
+  var _c=(typeof cycCurrent==='function')?cycCurrent():null, list=[];
+  var rows=schRows().filter(function(c){ return due(c,sel)&&(c.sa||!_c||(typeof cycHas==='function'?cycHas(c,_c):true)); });
+  ['AM','PM'].forEach(function(g){ rows.forEach(function(c){ if(inBlock(c,g)) list.push(c); }); });
+  return list;
+}
+function edDaysBox(c){
+  /* an added compound keeps its days in its own record, so it cannot use the
+     protocol day picker (which resolves names against ALL) */
+  if(!c.sa) return dpProto(c).length?dpHTML(c):'';
+  var cur=c.days||[];
+  return '<div class="dp" data-sad="'+saEsc(c.sa)+'"><div class="dp-h"><b>Your days</b><span class="dp-t">Added compound</span></div>'+
+    '<div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-sadd="'+i+'"'+(cur.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div></div>';
+}
+function edPanel(c){
+  var nm=saEsc(c.n), js=String(c.n).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var blk=(typeof schBlk==='function'?schBlk(c):c.b), o=ovOwn(c.n);
+  var h='<div class="ed-pan" data-edp="'+nm+'"><div class="ed-in">';
+
+  /* on/off (protocol) or remove (added) */
+  h+='<div class="ed-grp"><div class="ed-l">Schedule</div><div class="ed-row2">';
+  if(c.sa){
+    h+='<button type="button" class="ed-b" data-edx="sarm" data-sa="'+saEsc(c.sa)+'">Remove from schedule</button>';
+  } else {
+    h+='<button type="button" class="ed-b on" data-edx="off" data-edn="'+nm+'">✓ On · tap to turn off</button>';
+  }
+  h+='</div></div>';
+
+  /* AM / PM */
+  if(c.b!=='BOTH'){
+    h+='<div class="ed-grp"><div class="ed-l">Block</div><div class="ed-row2">'+
+      '<button type="button" class="ed-b'+(blk==='AM'?' on':'')+'" data-edx="blk" data-edb="AM" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Morning</button>'+
+      '<button type="button" class="ed-b'+(blk==='PM'?' on':'')+'" data-edx="blk" data-edb="PM" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Night</button>'+
+      '</div></div>';
+  }
+
+  /* days */
+  var db=edDaysBox(c);
+  if(db) h+='<div class="ed-grp">'+db+'</div>';
+
+  /* dose / units / recon override */
+  h+='<div class="ed-grp"><div class="ed-l">Dose &amp; recon'+(o?' <span class="ed-tag">edited</span>':'')+'</div>'+
+    '<div class="ed-f"><label>Dose<input type="text" data-edf="d" value="'+saEsc(c.d||'')+'" placeholder="1 mg"></label>'+
+    '<label>Units<input type="text" data-edf="u" value="'+saEsc(c.u||'')+'" placeholder="10u"></label></div>'+
+    '<div class="ed-f one"><label>Recon<input type="text" data-edf="rec" value="'+saEsc(c.rec||'')+'" placeholder="3 mL BAC water"></label></div>'+
+    '<div class="ed-row2"><button type="button" class="ed-b pri" data-edx="save" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Save</button>'+
+    (o?'<button type="button" class="ed-b" data-edx="rst" data-edn="'+nm+'">Reset to protocol</button>':'')+'</div></div>';
+
+  h+='</div></div>';
+  return h;
+}
+function edPaint(){
+  if(!BLEDIT) return;
+  var host=document.getElementById('doses'); if(!host) return;
+  edAddMount();
+  var dn=document.getElementById('dosenote');
+  if(dn) dn.textContent=dn.textContent.replace('This is a read-only view of your schedule.','Edit mode \u00b7 tap a compound to change it. The client\u2019s link has no ?edit=1 and stays read-only.');
+  var drs=host.querySelectorAll('.drow'), list=edRows();
+  if(drs.length!==list.length) return;
+  for(var i=0;i<drs.length;i++){
+    var c=list[i], r=drs[i];
+    r.classList.add('ed-row'); r.setAttribute('data-ed',saEsc(c.n));
+    r.insertAdjacentHTML('beforeend','<span class="ed-cv">›</span>');
+    r.insertAdjacentHTML('afterend',edPanel(c));
+    if(edOpen[c.n]){ r.classList.add('exp'); var p=r.nextElementSibling; if(p&&p.classList.contains('ed-pan')) p.classList.add('open'); }
+  }
+}
+function edFields(pan){
+  var o={}; [].forEach.call(pan.querySelectorAll('[data-edf]'),function(i){ o[i.getAttribute('data-edf')]=String(i.value||'').trim(); }); return o;
+}
+
+/* ---- Add compound: from the dosing guide, or by hand ---- */
+function edAddMount(){
+  if(!BLEDIT) return;
+  var h=document.getElementById('ed-add');
+  if(h) return;
+  var anchor=document.getElementById('sa-list')||document.getElementById('dosenote');
+  if(!anchor||!anchor.parentNode) return;
+  h=document.createElement('div'); h.id='ed-add'; h.className='ed-add';
+  h.innerHTML='<button type="button" class="ed-add-b" id="ed-addbtn">+ Add compound</button><div class="ed-add-p" id="ed-addpan" hidden></div>';
+  anchor.parentNode.insertBefore(h,anchor.nextSibling);
+}
+var edNew=null;
+function edGuideList(){
+  var L=window.BL_DOSING||[], o=[];
+  for(var i=0;i<L.length;i++){ if(L[i]&&L[i].name) o.push({i:i,g:L[i]}); }
+  o.sort(function(a,b){ var r=String(a.g.name).localeCompare(String(b.g.name)); return r||String(a.g.vial||'').localeCompare(String(b.g.vial||'')); });
+  return o;
+}
+function edAddOpen(){
+  var pan=document.getElementById('ed-addpan'); if(!pan) return;
+  edNew={mode:'master',gi:-1,n:'',mg:'',d:'',u:'',rec:'',b:'AM',days:[]};
+  pan.hidden=false; edAddDraw();
+}
+function edAddDraw(){
+  var pan=document.getElementById('ed-addpan'); if(!pan||!edNew) return;
+  var m=edNew.mode==='master';
+  var h='<div class="ed-row2 ed-seg"><button type="button" class="ed-b'+(m?' on':'')+'" data-eda="m">From master list</button>'+
+        '<button type="button" class="ed-b'+(m?'':' on')+'" data-eda="x">Add manually</button></div>';
+  if(m){
+    h+='<label class="ed-sel">Compound<select data-eda="sel"><option value="-1">Choose\u2026</option>'+
+      edGuideList().map(function(r){ return '<option value="'+r.i+'"'+(r.i===edNew.gi?' selected':'')+'>'+saEsc(r.g.name+(r.g.vial?' \u00b7 '+r.g.vial:''))+'</option>'; }).join('')+'</select></label>';
+    if(edNew.gi<0){ pan.innerHTML=h; return; }
+    var g=(window.BL_DOSING||[])[edNew.gi]||{};
+    h+='<div class="ed-gd">'+['vial','bac','dose','units','timing','freq'].map(function(k){
+      return g[k]?('<span><i>'+k+'</i>'+saEsc(k==='units'?g[k]+'u':g[k])+'</span>'):''; }).join('')+'</div>';
+  } else {
+    h+='<div class="ed-f"><label>Name<input type="text" data-edn2="n" value="'+saEsc(edNew.n)+'" placeholder="Tesamorelin"></label>'+
+       '<label>Vial mg<input type="text" data-edn2="mg" value="'+saEsc(edNew.mg)+'" placeholder="10 mg"></label></div>';
+  }
+  h+='<div class="ed-f"><label>Dose<input type="text" data-edn2="d" value="'+saEsc(edNew.d)+'" placeholder="1 mg"></label>'+
+     '<label>Units<input type="text" data-edn2="u" value="'+saEsc(edNew.u)+'" placeholder="10u"></label></div>'+
+     '<div class="ed-f one"><label>Recon<input type="text" data-edn2="rec" value="'+saEsc(edNew.rec)+'" placeholder="3 mL BAC water"></label></div>'+
+     '<div class="ed-l">Days</div><div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-edn2d="'+i+'"'+(edNew.days.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div>'+
+     '<div class="ed-row2"><button type="button" class="ed-b'+(edNew.b==='AM'?' on':'')+'" data-edab="AM">Morning</button><button type="button" class="ed-b'+(edNew.b==='PM'?' on':'')+'" data-edab="PM">Night</button></div>'+
+     '<div class="ed-row2"><button type="button" class="ed-b" data-eda="cancel">Cancel</button><button type="button" class="ed-b pri" data-eda="save"'+((edNew.days.length&&String(edNew.n||'').trim())?'':' disabled')+'>Add to schedule</button></div>';
+  pan.innerHTML=h;
+}
+function edAddPick(i){
+  var g=(window.BL_DOSING||[])[i]; if(!g) return;
+  edNew.gi=i; edNew.n=g.name+(g.vial?' · '+g.vial:'');
+  edNew.d=g.dose||''; edNew.u=g.units?(String(g.units).replace(/u$/,'')+'u'):'';
+  edNew.rec=g.bac?(String(g.bac).replace(/\s*ml$/i,' mL')+' BAC water'):'';
+  edNew.b=/pm|night|bed|evening/i.test(g.timing||'')?'PM':'AM';
+  edNew.days=saGuideDays(g.freq)||[];
+  edAddDraw();
+}
+function edAddSave(){
+  if(!edNew||!edNew.days.length) return;
+  var nm=String(edNew.n||'').trim(); if(!nm) return;
+  if(edNew.mode!=='master'&&edNew.mg&&nm.indexOf(edNew.mg)<0) nm=nm+' · '+String(edNew.mg).trim();
+  var ex=saFind(nm);
+  saPut({id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    n:nm, d:edNew.d||'', u:edNew.u||'', rec:edNew.rec||'', b:edNew.b==='PM'?'PM':'AM', days:edNew.days.slice().sort()});
+  var pan=document.getElementById('ed-addpan'); if(pan) pan.hidden=true;
+  edNew=null; renderDoses();
+  try{ csToast(nm+' added · '+saDaysTxt(saFind(nm)?saFind(nm).days:[])); }catch(e){}
+}
+
+/* ---- one delegated listener for the whole editor ---- */
+if(BLEDIT){
+  document.documentElement.classList.add('bl-edit');
+
+  /* expand / collapse a dose row */
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('.ed-pan')||t.closest('.sa-rm')) return;
+    var r=t.closest('.drow.ed-row'); if(!r) return;
+    var n=r.getAttribute('data-ed'), p=r.nextElementSibling;
+    var now=!r.classList.contains('exp');
+    r.classList.toggle('exp',now);
+    if(p&&p.classList.contains('ed-pan')) p.classList.toggle('open',now);
+    /* key the memory off the live name so a re-render restores it */
+    [].forEach.call(document.querySelectorAll('.drow.ed-row'),function(x){ if(x.getAttribute('data-ed')===n&&x!==r){ x.classList.toggle('exp',now); var q=x.nextElementSibling; if(q&&q.classList.contains('ed-pan')) q.classList.toggle('open',now); } });
+    if(now) edOpen[n]=1; else delete edOpen[n];
+  });
+
+  /* panel buttons */
+  document.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('[data-edx]'); if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var x=b.getAttribute('data-edx'), n=b.getAttribute('data-edn'), sa=b.getAttribute('data-sa');
+    var pan=b.closest('.ed-pan');
+    if(x==='off'){ delete edOpen[n]; schTog(n,e); return; }
+    if(x==='sarm'){ delete edOpen[n]; saRemove(sa); renderDoses(); try{ csToast('Removed'); }catch(_){} return; }
+    if(x==='blk'){
+      var want=b.getAttribute('data-edb');
+      if(sa){ var it=saGet()[sa]; if(it&&!it.del){ saPut({id:sa,n:it.n,d:it.d,u:it.u,rec:it.rec,b:want,days:(it.days||[]).slice()}); renderDoses(); } return; }
+      /* schBlkSet toggles off when you tap the block it is already on, which
+         would drop it back to the protocol block. Only send a real change. */
+      var cur=null, i; for(i=0;i<ALL.length;i++){ if(ALL[i].n===n){ cur=schBlk(ALL[i]); break; } }
+      if(cur===want) return;
+      schBlkSet(n,want,e); return;
+    }
+    if(x==='save'){
+      if(!pan) return; var f=edFields(pan);
+      if(sa){ var it2=saGet()[sa]; if(it2&&!it2.del){ saPut({id:sa,n:it2.n,d:f.d||'',u:f.u||'',rec:f.rec||'',b:it2.b,days:(it2.days||[]).slice()}); } }
+      else ovSet(n,f);
+      renderDoses(); try{ csToast('Saved'); }catch(_){} return;
+    }
+    if(x==='rst'){ ovSet(n,null); renderDoses(); try{ csToast('Back to the protocol dose'); }catch(_){} return; }
+  });
+
+  /* days for an added compound */
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||t.getAttribute('data-sadd')==null) return;
+    var box=t.closest('[data-sad]'); if(!box) return;
+    var sa=box.getAttribute('data-sad'), it=saGet()[sa]; if(!it||it.del) return;
+    var days=[].map.call(box.querySelectorAll('input[data-sadd]:checked'),function(x){return +x.getAttribute('data-sadd');});
+    if(!days.length){ t.checked=true; try{ csToast('Keep at least one day'); }catch(_){} return; }
+    saPut({id:sa,n:it.n,d:it.d,u:it.u,rec:it.rec,b:it.b,days:days.sort()}); renderDoses();
+  });
+
+  /* add-compound panel */
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('#ed-addbtn')){ e.preventDefault(); var p=document.getElementById('ed-addpan');
+      if(p&&!p.hidden){ p.hidden=true; edNew=null; } else edAddOpen(); return; }
+    var b=t.closest('[data-eda],[data-edab]'); if(!b||!edNew) return;
+    e.preventDefault(); e.stopPropagation();
+    var ab=b.getAttribute('data-edab');
+    if(ab){ edNew.b=ab; edAddDraw(); return; }
+    var a=b.getAttribute('data-eda');
+    if(a==='m'||a==='x'){ edNew.mode=(a==='m')?'master':'manual'; edAddDraw(); return; }
+    if(a==='cancel'){ var p2=document.getElementById('ed-addpan'); if(p2) p2.hidden=true; edNew=null; return; }
+    if(a==='save'){ edAddSave(); return; }
+  });
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||!edNew) return;
+    if(t.getAttribute('data-eda')==='sel'){ var v=+t.value; if(v>=0) edAddPick(v); else { edNew.gi=-1; edAddDraw(); } return; }
+    var d=t.getAttribute('data-edn2d');
+    if(d!=null){ d=+d; var i=edNew.days.indexOf(d);
+      if(t.checked&&i<0) edNew.days.push(d); if(!t.checked&&i>=0) edNew.days.splice(i,1);
+      var s=document.querySelector('[data-eda="save"]'); if(s) s.disabled=!(edNew.days.length&&edNew.n); return; }
+  });
+  document.addEventListener('input',function(e){
+    var t=e.target; if(!t||!edNew) return; var k=t.getAttribute('data-edn2'); if(!k) return;
+    edNew[k]=t.value;
+    var s=document.querySelector('[data-eda="save"]'); if(s) s.disabled=!(edNew.days.length&&String(edNew.n||'').trim());
+  });
+
+  (function(){ var _rd=renderDoses; renderDoses=function(){ _rd.apply(this,arguments); try{ edPaint(); }catch(e){} }; })();
+  try{ renderDoses(); }catch(e){}
+}
+
 
 /* ======================================================================
    WORKOUT (opt-in MVP). Offline-first: every row has a client UUID and an
