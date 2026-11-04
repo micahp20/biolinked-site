@@ -3,6 +3,62 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Cache-Control" content="no-store">
+<script>
+/* ---- /mp-gold/ cache kill-switch -------------------------------------
+   Runs on every load. Two deliberate limits on scope:
+   - Only workers whose scope COVERS /mp-gold/ are unregistered: its own
+     ("/mp-gold/") and the site-wide one ("/"), whose fetch handler has no
+     path gate and so caches this page too. A worker scoped to another
+     folder, /mpauldino/ included, is left installed.
+   - Caches named mp-gold-* are dropped whole; in every OTHER cache only the
+     entries whose URL contains /mp-gold/ are deleted, so this does not wipe
+     the offline copies of the live portals on the same device.
+   A worker already controlling the page keeps serving it until a reload, so
+   when one is found the page reloads itself once, guarded by sessionStorage
+   so it can never loop. ------------------------------------------------- */
+(function(){
+  var hadController = false;
+  try{ hadController = !!(navigator.serviceWorker && navigator.serviceWorker.controller); }catch(e){}
+
+  function covers(scope){
+    var path='/';
+    try{ path = new URL(scope).pathname; }catch(e){ return false; }
+    return path === '/' || path.indexOf('/mp-gold/') === 0;
+  }
+  var jobs=[];
+  try{
+    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){
+          return covers(r.scope) ? r.unregister().catch(function(){}) : null;
+        }));
+      }).catch(function(){}));
+    }
+  }catch(e){}
+  try{
+    if(window.caches && caches.keys){
+      jobs.push(caches.keys().then(function(keys){
+        return Promise.all(keys.map(function(k){
+          if(k.indexOf('mp-gold-') === 0) return caches.delete(k).catch(function(){});
+          return caches.open(k).then(function(c){
+            return c.keys().then(function(reqs){
+              return Promise.all(reqs.map(function(q){
+                return q.url.indexOf('/mp-gold/') > -1 ? c.delete(q).catch(function(){}) : null;
+              }));
+            });
+          }).catch(function(){});
+        }));
+      }).catch(function(){}));
+    }
+  }catch(e){}
+
+  if(!hadController) return;
+  var KEY='mpgold-cachekill';
+  try{ if(sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY,'1'); }catch(e){ return; }
+  Promise.all(jobs).then(function(){ try{ location.reload(); }catch(e){} });
+})();
+</script>
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#0b0b0c" id="tc">
 <title>BioLinked</title>
@@ -1481,7 +1537,11 @@ button.bl-tile{cursor:pointer}button.bl-tile:focus-visible{outline:3px solid #CF
      than any shade of gold. Gold stays on the group counts (.cgrp-n),
      chevrons, eyebrows, card rules and buttons. Fill only -- no stroke.
      .li .nm, .cx-n and .gk .gk-name already inherit dark ink. */
-  html:root:not([data-theme="dark"]) .stk-a{color:#1a1a1a}
+  html:root:not([data-theme="dark"]) .stk-a{
+    color:#9a8030;
+    -webkit-text-fill-color:#9a8030;
+    text-shadow:.5px 0 0 rgba(0,0,0,.9),-.5px 0 0 rgba(0,0,0,.9),
+                0 .5px 0 rgba(0,0,0,.9),0 -.5px 0 rgba(0,0,0,.9)}
   html:root:not([data-theme="dark"]) .meds-tbl .md{color:#5f5327}
   /* dose / unit sub-text on those rows: held at the 5:1+ accent gold */
   html:root:not([data-theme="dark"]) .drow .uu,
@@ -5378,19 +5438,10 @@ function hideA2(save){
    matter: `reloaded` stops it ever looping, and `hadController` skips the
    reload on a first install, where a worker claiming the page is not an
    update. */
-if('serviceWorker' in navigator){
-  window.addEventListener('load',function(){
-    var hadController = !!navigator.serviceWorker.controller, reloaded = false;
-    navigator.serviceWorker.register('/mp-gold/sw.js',{scope:'/mp-gold/'}).then(function(reg){
-      if(reg && reg.update){ try{ reg.update(); }catch(e){} }
-    }).catch(function(){});
-    navigator.serviceWorker.addEventListener('controllerchange',function(){
-      if(reloaded || !hadController) return;
-      reloaded = true;
-      window.location.reload();
-    });
-  });
-}
+/* PREVIEW: no service worker is registered here on purpose. /mp-gold/ must
+   always show the latest pushed build, so it runs uncached; the kill-switch
+   in the document head also removes any worker a previous build installed.
+   The live /mpauldino/ page keeps its own worker. */
 
 CYCS=cycList(); cycSel=cycCurrent();
 renderCyc(); renderDue(); renderDays(); renderDoses(); renderAll(); renderCats();
