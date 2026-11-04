@@ -1391,9 +1391,6 @@ html body .drow.pm .uu{color:var(--pm)}
       <div class="days" id="daystrip"></div>
       <div id="doses"></div>
       <p class="note" id="dosenote"></p>
-      <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
-      <div id="cmplist"></div>
-      <p class="note">Every cycle is listed above. Tap a compound to expand its details here.</p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -2323,6 +2320,10 @@ function renderSubline(){
   e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks';
 }
 function renderAll(){
+  /* The ALL COMPOUNDS browser was removed from the Schedule view. Without
+     its host there is nothing to paint, and every caller -- schTog and
+     schBlkSet run it un-wrapped -- has to carry on to its next line. */
+  if(!document.getElementById('cmplist')) return;
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
   var past=idx.filter(function(x){return cmpArch(x.c)});
