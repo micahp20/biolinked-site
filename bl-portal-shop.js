@@ -140,10 +140,8 @@ function sync(){saveCart();renderShop();renderCart();renderBar();}
 
 /* ---------- in-app web view (site links open inside the app) ---------- */
 function ensureViews(){
-  var sc=$('scroll'); if($('v-web')) return;
-  var s=document.createElement('section');s.className='view bls-view';s.id='v-web';
-  s.innerHTML='<div class="pad" id="bls-web"><h1 class="scrn" id="bls-webt">BioLinked</h1><div class="bls-webwrap"><iframe id="bls-frame" title="BioLinked" loading="lazy" referrerpolicy="same-origin"></iframe></div></div>';
-  var last=sc.querySelector('.view:last-of-type'); if(last&&last.nextSibling) sc.insertBefore(s,last.nextSibling); else sc.appendChild(s);
+  /* The in-app web view is gone: site links now navigate for real. Any #v-web
+     a cached copy of this file injected earlier is removed in init(). */
 }
 function backBars(){
   document.querySelectorAll('#scroll > .view').forEach(function(v){
@@ -155,16 +153,18 @@ function backBars(){
 }
 var WEB_TITLES={'/':'BioLinked Home','/index/':'Peptide Index','/stacks-blends':'Stacks & Blends','/bl-tools-access.html':'BL Tools Access'};
 function inAppLinks(){
+  /* Site links used to be hijacked into an iframe, which is why Home opened a
+     nested "BioLinked Home" inside the protocol instead of leaving it. They
+     are restored to ordinary top-level navigation here, and any attribute a
+     cached copy of this file already stamped on them is undone. */
   document.querySelectorAll('a[href^="https://biolinkedsolutions.com"]').forEach(function(a){
-    if(a.__bls)return; a.__bls=1;
-    var u; try{u=new URL(a.getAttribute('href'));}catch(e){return;}
-    var path=(u.pathname||'/')+(u.search||'')+(u.hash||'');
-    a.removeAttribute('target'); a.setAttribute('data-inapp',path);
-    var ex=a.querySelector('.ext'); if(ex) ex.innerHTML='&#8250;';
-    a.addEventListener('click',function(e){e.preventDefault();try{if(typeof closeNav==='function')closeNav();}catch(x){}openWeb(path,WEB_TITLES[u.pathname]||(a.textContent||'BioLinked').trim());});
+    a.removeAttribute('data-inapp');
+    a.setAttribute('target','_blank');
+    a.setAttribute('rel','noopener');
+    var ex=a.querySelector('.ext'); if(ex) ex.innerHTML='&#8599;';
   });
 }
-function openWeb(path,title){ensureViews();$('bls-webt').textContent=title;var f=$('bls-frame');if(f.getAttribute('data-p')!==path){f.setAttribute('data-p',path);f.src=path;}window.go('web');}
+function openWeb(path){/* kept for callers in cached markup: navigate, never embed */window.location.href='https://biolinkedsolutions.com'+(path||'/');}
 
 /* ---------- the one Order entry: top (hamburger) menu ---------- */
 function navEntries(){
@@ -367,7 +367,7 @@ document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; va
 function init(){
   ensureLib(); ensureViews(); backBars(); navEntries(); inAppLinks(); ensureOverlay();
   /* remove leftovers from the earlier version if a cached copy injected them */
-  ['bls-dock','bls-paycta'].forEach(function(id){var x=$(id);if(x)x.remove();});
+  ['bls-dock','bls-paycta','v-web'].forEach(function(id){var x=$(id);if(x)x.remove();});
   document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-order,.snav[data-v="shop"]').forEach(function(x){x.remove();});
   try{history.replaceState({blv:'proto'},'');}catch(e){}
   renderShop(); renderCart(); renderBar(); loadCatalog();
