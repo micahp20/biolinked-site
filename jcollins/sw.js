@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'jcollins-v1-n1-cpath1-daypill1-homefix1';
+const CACHE = 'jcollins-v1-n1-cpath1-daypill1-homefix1-tile1';
 const ASSETS = [
   '/jcollins/',
   '/jcollins/index.html',
