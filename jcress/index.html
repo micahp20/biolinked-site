@@ -5273,6 +5273,14 @@ if(typeof nutInit==='function') nutInit();
      payload.ovr                dose / units / recon    OV_KEY   (new here)
    ====================================================================== */
 var BLEDIT=/(?:^|[?&])edit=1(?:&|$)/.test(location.search);
+/* Sticky edit mode: once this device opens ?edit=1, the plain /jcress/ link
+   stays editable ON THIS DEVICE ONLY (localStorage). The client never loads
+   ?edit=1 so they stay read-only. Open with ?edit=0 to turn it back off. */
+try{
+  if(/(?:^|[?&])edit=0(?:&|$)/.test(location.search)){ localStorage.removeItem('jcress-edit'); BLEDIT=false; }
+  else if(BLEDIT){ localStorage.setItem('jcress-edit','1'); }
+  else if(localStorage.getItem('jcress-edit')==='1'){ BLEDIT=true; }
+}catch(e){}
 
 /* ---- dose / units / recon override. Per compound name, newest edit wins,
         and a reset is a tombstone so a stale device cannot resurrect it. ---- */
