@@ -2066,10 +2066,11 @@ function cmpRow(c,i){
   var _blk=(typeof schBlk==='function'?schBlk(c):c.b); var ampm=(on&&c.b!=='BOTH')?('<span class="schblk"><button type="button" class="blkb'+(_blk==='AM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'AM\',event)">AM</button><button type="button" class="blkb'+(_blk==='PM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'PM\',event)">PM</button></span>'):'';
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+ampm+'</div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
+      '<div class="cx-ctl">'+btn+ampm+'</div>'+
       '<div class="cx-ab">'+c.about+'</div>'+
       '<div class="facts" style="margin:11px 0 0">'+
         '<div class="frow"><div class="fl">Recon</div><div class="fchips"><b>'+c.rec+'</b></div></div>'+
@@ -2300,9 +2301,21 @@ function cgOpenSet(){
   var o={}; var n=document.querySelectorAll('#cmplist .cgrp.on');
   for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
 }
+/* The controls now live inside the compound body, and every toggle re-renders
+   the list, so an open row has to survive that or it would shut under the
+   reader's finger. */
+function cxOpenSet(){
+  var o={}; var n=document.querySelectorAll('#cmplist .cx.on');
+  for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
+}
 function cgrpHTML(key,title,meta,rows,open,extra){
  if(!rows.length)return '';
- return '<section class="jc-cycle '+(extra||'')+'" id="cg-'+key+'"><header class="jc-cycle-head"><h2>'+esc(title)+'</h2>'+(meta?'<p>'+esc(meta)+'</p>':'')+'</header>'+rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</section>';
+ /* `open` was accepted and then ignored, and the markup said jc-cycle while
+    cgOpenSet looked for cgrp, so every cycle rendered expanded. Both are
+    wired up now: the head toggles the group and the current cycle opens. */
+ return '<section class="jc-cycle cgrp'+(open?' on':'')+' '+(extra||'')+'" id="cg-'+key+'">'+
+   '<header class="jc-cycle-head" onclick="cgTog(\''+key+'\')"><div class="cg-ht"><h2>'+esc(title)+'</h2>'+(meta?'<p>'+esc(meta)+'</p>':'')+'</div><span class="cg-cv">\u203a</span></header>'+
+   rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</section>';
 }
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
@@ -2328,7 +2341,7 @@ function renderAll(){
     var baseLbl=(typeof CYCBASE!=='undefined'&&CYCBASE)?CYCBASE
         :(declared?'Foundation \u00b7 every week, all year'
                   :'Ongoing \u00b7 runs through every cycle');
-    var was=cgOpenSet(), first=!document.querySelector('#cmplist .cgrp');
+    var was=cgOpenSet(), wasCx=cxOpenSet(), first=!document.querySelector('#cmplist .cgrp');
     function inCyc(x,n){return !cycIsBase(x.c)&&!cmpArch(x.c)&&cycNames(x.c).indexOf(n)>=0;}
     function openFor(id,def){ return first?def:!!was[id]; }
     if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',false),'');
@@ -2338,7 +2351,7 @@ function renderAll(){
       var isNow=cy.n===cycCurrent();
       var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
       var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
-      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,false),'');
+      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,isNow),'');
     }
     if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
     /* The count is what the client has switched on, not what the current
@@ -2351,6 +2364,7 @@ function renderAll(){
     if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
   document.getElementById('cmplist').innerHTML=h;
+  if(typeof wasCx!=='undefined'){ for(var _c in wasCx){ var _e=document.getElementById(_c); if(_e) _e.classList.add('on'); } }
   document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
@@ -6001,5 +6015,23 @@ try{ apD(); }catch(e){}
 
 
 #cmplist .pastgrp{opacity:1}
+/* ---- condensed schedule list (jcress prototype) ----------------------
+   The collapsed row is one line: name, timing, unit, chevron. The schedule
+   on/off pill and the AM/PM pair move into the body so they appear only
+   once the row is open. Cycle groups collapse to their header, with the
+   current cycle open on first paint. */
+#cmplist .cx-hd{min-height:44px;align-items:center}
+#cmplist .cx-t{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1}
+#cmplist .cx-n{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-s{flex:0 4 auto;min-width:0;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:2px 0 12px}
+#cmplist .cx-ctl .schbtn{margin-top:0}
+#cmplist .cx-ctl .schblk{margin-left:0}
+#cmplist .cgrp .cx{display:none}
+#cmplist .cgrp.on .cx{display:block}
+#cmplist .jc-cycle-head{display:flex;align-items:center;gap:10px;cursor:pointer}
+#cmplist .cg-ht{flex:1;min-width:0}
+#cmplist .cg-cv{flex:none;color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+#cmplist .cgrp.on .cg-cv{transform:rotate(90deg)}
 @media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:19px}#protoabout .jc-compound>summary{font-size:14px;padding:11px 13px}#protoabout .jc-description{padding:12px 13px 14px;font-size:13.5px}}
 </style>
