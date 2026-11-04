@@ -104,12 +104,19 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);
 .fld.dose{border-top:1px solid var(--line-soft);}
 .fld.dose .fld-v{font-size:17px;font-weight:700;color:var(--gold);white-space:nowrap;}
 
-.info-tip{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:var(--gold-dim);border:1px solid var(--gold-border);color:var(--gold);font-size:9px;font-weight:700;cursor:help;position:relative;margin-left:6px;line-height:1;outline:none;flex-shrink:0;vertical-align:middle;}
-.info-tip:hover,.info-tip:focus,.info-tip.is-open{background:var(--gold);color:var(--on-accent,#0b0b0c);border-color:var(--gold);}
-.info-tip-text{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 13px;border-radius:4px;font-size:11.5px;font-weight:400;line-height:1.55;text-transform:none;width:260px;text-align:left;opacity:0;pointer-events:none;transition:opacity 0.18s;z-index:200;box-shadow:0 4px 18px rgba(0,0,0,0.25);}
-.info-tip-text strong{color:var(--tc1,#e9c66c);font-weight:600;}
-.info-tip-text::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text);}
-.info-tip:hover .info-tip-text,.info-tip:focus .info-tip-text,.info-tip.is-open .info-tip-text{opacity:1;pointer-events:auto;}
+/* The compound header opens all of its information together. */
+.cmp-list{align-items:start;}
+.cmp-card-disclosure{width:100%;min-width:0;}
+html[data-theme] .cmp-card-disclosure > summary.cmp-row-name{display:flex;flex-wrap:nowrap;justify-content:space-between;gap:12px;min-height:44px;list-style:none;cursor:pointer;}
+.cmp-card-disclosure > summary::-webkit-details-marker{display:none;}
+.cmp-card-disclosure > summary::marker{content:'';}
+.cmp-summary-label{display:flex;align-items:center;flex-wrap:wrap;gap:5px;min-width:0;}
+html[data-theme] .cmp-card-disclosure:not([open]) > summary{border-bottom:0;border-radius:8px;}
+.cmp-card-disclosure > summary:focus-visible{outline:2px solid var(--gold);outline-offset:-3px;}
+.cmp-card-chevron{width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);flex-shrink:0;margin:0 3px 4px;color:var(--gold);}
+.cmp-card-disclosure[open] .cmp-card-chevron{transform:rotate(225deg);margin-bottom:0;}
+.cmp-about-body{padding:14px 16px;font-size:13px;font-weight:400;line-height:1.7;color:var(--muted);overflow-wrap:anywhere;border-bottom:1px solid var(--line,var(--border));}
+.cmp-about-body strong{color:var(--text);font-weight:600;}
 
 /* ---- year-at-a-glance (page-local) ---- */
 .year-band{background:linear-gradient(135deg,rgba(122,101,48,0.10),rgba(122,101,48,0.03)),var(--surface);border:1px solid var(--gold-border);border-left:3px solid var(--gold);border-radius:8px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:14px;}
@@ -261,7 +268,6 @@ html[data-theme] .price-bar .price-amount{font-family:'Cormorant Garamond',Georg
   .sec-divider-title{font-size:17px;}
   .cmp-list,.supplies-wrap,.year-grid{grid-template-columns:1fr;}
   .nr{grid-template-columns:1fr;gap:2px;}
-  .info-tip-text{width:230px;font-size:11px;}
   .cal-banner{flex-direction:column;align-items:stretch;}
   .cal-controls{flex-direction:column;align-items:stretch;}
   .cal-dl-btn,.cal-banner input[type=date]{width:100%;}
@@ -514,31 +520,40 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
 
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">Testosterone &middot; 250 mg/mL <span class="cmp-badge">All Year</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Testosterone replacement.</strong> The hormonal base layer &mdash; the background level everything else in the year is built on top of. Pre-mixed in oil, so nothing to reconstitute. Split across two injections a week to keep levels even rather than peaking once.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">Testosterone &middot; 250 mg/mL <span class="cmp-badge">All Year</span></span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Testosterone replacement.</strong> The hormonal base layer &mdash; the background level everything else in the year is built on top of. Pre-mixed in oil, so nothing to reconstitute. Split across two injections a week to keep levels even rather than peaking once.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Vial</span><span class="fld-v">10 mL &middot; pre-mixed</span></div>
             <div class="fld"><span class="fld-l">Route</span><span class="fld-v">SubQ or IM &middot; draw slowly</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon + Thu &middot; 180 mg/week</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">90 mg &middot; 36u</span></div>
           </div>
+          </details>
         </div>
 
         <div class="cmp-row">
-          <span class="cmp-row-name">HGH &middot; 24 IU <span class="cmp-badge">All Year</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Growth hormone.</strong> Run as a low, steady daily dose five days a week rather than a large intermittent one &mdash; the weekend break keeps the pattern closer to the body&apos;s own release. Works underneath the recovery and body-composition side of the program all year.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">HGH &middot; 24 IU <span class="cmp-badge">All Year</span></span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Growth hormone.</strong> Run as a low, steady daily dose five days a week rather than a large intermittent one &mdash; the weekend break keeps the pattern closer to the body&apos;s own release. Works underneath the recovery and body-composition side of the program all year.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon&ndash;Fri AM &middot; weekends off</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 IU &middot; 25u</span></div>
           </div>
+          </details>
         </div>
 
         <div class="cmp-row">
-          <span class="cmp-row-name">Retatrutide &middot; 30 mg <span class="cmp-badge">All Year</span> <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Triple agonist in the GLP-1 class.</strong> Works appetite regulation and glucose handling together &mdash; the fat-loss and body-composition lever of the foundation. Taken as a single weekly injection, keeping the same 2 mg a week.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">Retatrutide &middot; 30 mg <span class="cmp-badge">All Year</span></span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Triple agonist in the GLP-1 class.</strong> Works appetite regulation and glucose handling together &mdash; the fat-loss and body-composition lever of the foundation. Taken as a single weekly injection, keeping the same 2 mg a week.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Monday AM &middot; once weekly &middot; 2 mg/week</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">2 mg &middot; 20u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -549,28 +564,37 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">SS-31 &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondria-targeted peptide.</strong> Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species &mdash; the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">SS-31 &middot; 50 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Mitochondria-targeted peptide.</strong> Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species &mdash; the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~2.08 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">KLOW Blend &middot; 80 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Four-peptide repair blend</strong> &mdash; GHK-Cu, BPC-157, TB-500 and KPV in one vial. Covers skin and connective tissue, gut and soft-tissue repair, and the inflammatory side of recovery in a single shot. 80 mg in 3 mL is 26.67 mg/mL, so a 12.5u draw is about 3.33 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">KLOW Blend &middot; 80 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Four-peptide repair blend</strong> &mdash; GHK-Cu, BPC-157, TB-500 and KPV in one vial. Covers skin and connective tissue, gut and soft-tissue repair, and the inflammatory side of recovery in a single shot. 80 mg in 3 mL is 26.67 mg/mL, so a 12.5u draw is about 3.33 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~3.33 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">Glutathione &middot; 1500 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The body&apos;s master antioxidant.</strong> A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles &mdash; SS-31 works on where the damage is produced, glutathione on mopping it up.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">Glutathione &middot; 1500 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>The body&apos;s master antioxidant.</strong> A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles &mdash; SS-31 works on where the damage is produced, glutathione on mopping it up.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">125 mg &middot; ~42u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -581,20 +605,26 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">MOTS-C &middot; 40 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondrial-derived peptide.</strong> Signals through the AMPK pathway &mdash; the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">MOTS-C &middot; 40 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Mitochondrial-derived peptide.</strong> Signals through the AMPK pathway &mdash; the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~1.67 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">NAD+ &middot; 1000 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Cellular-energy cofactor.</strong> NAD+ is the molecule mitochondria need to turn fuel into usable energy, and levels fall with age. Run three days a week rather than daily &mdash; the dose is large and the flush is easier on a spaced cadence.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">NAD+ &middot; 1000 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Cellular-energy cofactor.</strong> NAD+ is the molecule mitochondria need to turn fuel into usable energy, and levels fall with age. Run three days a week rather than daily &mdash; the dose is large and the flush is easier on a spaced cadence.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">50 mg &middot; 25u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -605,28 +635,37 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">SS-31 &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondria-targeted peptide.</strong> Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species &mdash; the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">SS-31 &middot; 50 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Mitochondria-targeted peptide.</strong> Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species &mdash; the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~2.08 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>NNMT inhibitor.</strong> NNMT is an enzyme that builds up inside fat cells with age and suppresses fat oxidation &mdash; effectively a brake on mobilising stored fat. Blocking it removes the brake and raises cellular NAD+ in the same tissue. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">5-Amino-1MQ &middot; 50 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>NNMT inhibitor.</strong> NNMT is an enzyme that builds up inside fat cells with age and suppresses fat oxidation &mdash; effectively a brake on mobilising stored fat. Blocking it removes the brake and raises cellular NAD+ in the same tissue. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~2.08 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">Glutathione &middot; 1500 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The body&apos;s master antioxidant.</strong> A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles &mdash; SS-31 works on where the damage is produced, glutathione on mopping it up.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">Glutathione &middot; 1500 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>The body&apos;s master antioxidant.</strong> A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles &mdash; SS-31 works on where the damage is produced, glutathione on mopping it up.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">125 mg &middot; ~42u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -637,20 +676,26 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">MOTS-C &middot; 40 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondrial-derived peptide.</strong> Signals through the AMPK pathway &mdash; the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">MOTS-C &middot; 40 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Mitochondrial-derived peptide.</strong> Signals through the AMPK pathway &mdash; the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~1.67 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">KLOW Blend &middot; 80 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Four-peptide repair blend</strong> &mdash; GHK-Cu, BPC-157, TB-500 and KPV in one vial. Covers skin and connective tissue, gut and soft-tissue repair, and the inflammatory side of recovery in a single shot. 80 mg in 3 mL is 26.67 mg/mL, so a 12.5u draw is about 3.33 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">KLOW Blend &middot; 80 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Four-peptide repair blend</strong> &mdash; GHK-Cu, BPC-157, TB-500 and KPV in one vial. Covers skin and connective tissue, gut and soft-tissue repair, and the inflammatory side of recovery in a single shot. 80 mg in 3 mL is 26.67 mg/mL, so a 12.5u draw is about 3.33 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~3.33 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -661,28 +706,37 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">SS-31 &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondria-targeted peptide.</strong> Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species &mdash; the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">SS-31 &middot; 50 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Mitochondria-targeted peptide.</strong> Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species &mdash; the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~2.08 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">NAD+ &middot; 1000 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Cellular-energy cofactor.</strong> NAD+ is the molecule mitochondria need to turn fuel into usable energy, and levels fall with age. Run three days a week rather than daily &mdash; the dose is large and the flush is easier on a spaced cadence.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">NAD+ &middot; 1000 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Cellular-energy cofactor.</strong> NAD+ is the molecule mitochondria need to turn fuel into usable energy, and levels fall with age. Run three days a week rather than daily &mdash; the dose is large and the flush is easier on a spaced cadence.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">50 mg &middot; 25u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">Glutathione &middot; 1500 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>The body&apos;s master antioxidant.</strong> A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles &mdash; SS-31 works on where the damage is produced, glutathione on mopping it up.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">Glutathione &middot; 1500 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>The body&apos;s master antioxidant.</strong> A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles &mdash; SS-31 works on where the damage is produced, glutathione on mopping it up.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">5 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">125 mg &middot; ~42u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -693,20 +747,26 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
       <div class="cmp-list">
         <div class="cmp-row">
-          <span class="cmp-row-name">MOTS-C &middot; 40 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>Mitochondrial-derived peptide.</strong> Signals through the AMPK pathway &mdash; the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">MOTS-C &middot; 40 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>Mitochondrial-derived peptide.</strong> Signals through the AMPK pathway &mdash; the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~1.67 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
         <div class="cmp-row">
-          <span class="cmp-row-name">5-Amino-1MQ &middot; 50 mg <span class="info-tip" tabindex="0">?<span class="info-tip-text"><strong>NNMT inhibitor.</strong> NNMT is an enzyme that builds up inside fat cells with age and suppresses fat oxidation &mdash; effectively a brake on mobilising stored fat. Blocking it removes the brake and raises cellular NAD+ in the same tissue. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</span></span></span>
-          <div class="cmp-fields">
+          <details class="cmp-card-disclosure">
+            <summary class="cmp-row-name"><span class="cmp-summary-label">5-Amino-1MQ &middot; 50 mg</span><span class="cmp-card-chevron" aria-hidden="true"></span></summary>
+            <div class="cmp-about-body"><strong>NNMT inhibitor.</strong> NNMT is an enzyme that builds up inside fat cells with age and suppresses fat oxidation &mdash; effectively a brake on mobilising stored fat. Blocking it removes the brake and raises cellular NAD+ in the same tissue. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.</div>
+            <div class="cmp-fields">
             <div class="fld"><span class="fld-l">Recon</span><span class="fld-v">3 mL BAC water</span></div>
             <div class="fld"><span class="fld-l">Schedule</span><span class="fld-v">Mon / Wed / Fri AM &middot; fasted &middot; 8 weeks</span></div>
             <div class="fld dose"><span class="fld-l">Dose</span><span class="fld-v">~2.08 mg &middot; 12.5u</span></div>
           </div>
+          </details>
         </div>
       </div>
 
@@ -1008,12 +1068,6 @@ function switchTab(tab,btn){
   if(btn.scrollIntoView){btn.scrollIntoView({block:'nearest',inline:'nearest',behavior:'smooth'});}
 }
 
-/* Tap-to-open tooltips on touch devices — hover alone never fires there. */
-document.addEventListener('click',function(e){
-  var tip=e.target.closest ? e.target.closest('.info-tip') : null;
-  document.querySelectorAll('.info-tip.is-open').forEach(function(t){if(t!==tip)t.classList.remove('is-open');});
-  if(tip){tip.classList.toggle('is-open');}
-});
 
 /* 52-week calendar. Weeks 1-48 are six 8-week cycles; 49-52 run the
    foundation alone. Cycle compound + support compound per block below. */
