@@ -1393,7 +1393,7 @@ html body .drow.pm .uu{color:var(--pm)}
       <p class="note" id="dosenote"></p>
       <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
       <div id="cmplist"></div>
-      <p class="note">The compounds in whichever cycle you have selected above. Tap one to open its recon, draw, site and timing in place.</p>
+      <p class="note">Every cycle is listed above. Tap a compound to expand its details here.</p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -2280,41 +2280,18 @@ function stkIx(name,ev){
   else { sheet('indexlist'); }
 }
 function renderAbout(){
-  var host=document.getElementById('protoabout'); if(!host) return;
-  if(typeof CYCABOUT==='undefined'||!CYCABOUT||!cycOn()){ host.innerHTML=''; return; }
-  var h='';
-  for(var k=0;k<CYCS.length;k++){
-    var cy=CYCS[k], a=CYCABOUT[cy.n];
-    if(!a) continue;
-    var isNow=cy.n===cycCurrent();
-    var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
-    var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
-    /* The stack is driven off ALL, so it always matches whatever compounds
-       the cycle actually holds rather than a second hand-kept list. */
-    var mine=[];
-    for(var j=0;j<ALL.length;j++){ if(cycNames(ALL[j]).indexOf(cy.n)>=0) mine.push({c:ALL[j],i:j}); }
-    var stack='';
-    if(mine.length){
-      stack='<div class="abt-l">The stack</div><div class="stk">'+mine.map(function(x){
-        var nm=String(x.c.n).split(' \u00b7 ')[0];
-        return '<button type="button" class="stk-a" onclick="stkIx(\''+nm.replace(/'/g,"\\'")+'\',event)">'+
-          nm+'<span class="stk-cv">\u203a</span></button>';
-      }).join('')+'</div>';
-    }
-    h+='<div class="cgrp" id="cg-ab'+k+'">'+
-       '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
-         '<div><div class="cgrp-t">'+cycTitle(cy.n)+'</div>'+
-         (meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
-         '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
-       '</div>'+
-       '<div class="cgrp-bd"><div class="abt">'+
-         stack+
-         '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
-         '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
-         '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
-       '</div></div></div>';
-  }
-  host.innerHTML=h?('<div class="seclbl">About This Protocol</div>'+h):'';
+ var host=document.getElementById('protoabout'); if(!host) return;
+ if(!cycOn()){host.innerHTML='';return;}
+ host.innerHTML=CYCS.map(function(cy){
+ var a=(typeof CYCABOUT!=='undefined'&&CYCABOUT[cy.n])||{};
+ return '<section class="jc-cycle"><header class="jc-cycle-head"><h2>'+esc(cy.n)+'</h2>'+(cy.wk?'<p>'+esc(cy.wk)+'</p>':'')+'</header>'+
+ (a.t?'<p class="jc-intro">'+esc(a.t)+'</p>':'')+
+ ALL.filter(function(c){return cycNames(c).indexOf(cy.n)>=0;}).map(function(c){
+ return '<details class="jc-compound"><summary>'+esc(c.n)+'<span aria-hidden="true" class="jc-chevron"></span></summary><div class="jc-body"><div class="jc-description">'+c.about+'</div><dl class="jc-facts">'+
+ [['Recon',c.rec],['Schedule',c.c+' · '+(c.b==='BOTH'?'AM + PM':c.b)],['Dose / draw',[c.d,c.u].filter(Boolean).join(' · ')],['Site',c.site]].map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'</dl></div></details>';
+ }).join('')+
+ ((a.s||a.w)?'<details class="jc-notes"><summary>About this cycle</summary>'+(a.s?'<h3>Why these together</h3><p>'+esc(a.s)+'</p>':'')+(a.w?'<h3>Timing</h3><p>'+esc(a.w)+'</p>':'')+'</details>':'')+'</section>';
+ }).join('');
 }
 function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
 /* A group re-renders whenever the cycle toggle moves, so remember which ones
@@ -2324,13 +2301,8 @@ function cgOpenSet(){
   for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
 }
 function cgrpHTML(key,title,meta,rows,open,extra){
-  if(!rows.length) return '';
-  return '<div class="cgrp'+(open?' on':'')+(extra?' '+extra:'')+'" id="cg-'+key+'">'+
-    '<div class="cgrp-hd" onclick="cgTog(\''+key+'\')">'+
-      '<div><div class="cgrp-t">'+title+'</div>'+(meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
-      '<div class="cgrp-r"><span class="cgrp-n">'+rows.length+'</span><span class="cgrp-cv">\u203a</span></div>'+
-    '</div>'+
-    '<div class="cgrp-bd">'+rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</div></div>';
+ if(!rows.length)return '';
+ return '<section class="jc-cycle '+(extra||'')+'" id="cg-'+key+'"><header class="jc-cycle-head"><h2>'+esc(title)+'</h2>'+(meta?'<p>'+esc(meta)+'</p>':'')+'</header>'+rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</section>';
 }
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
@@ -5998,3 +5970,36 @@ try{ apD(); }catch(e){}
 })();</script>
 
 <link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=6"></script>
+<style id="jc-inline-cycles">
+#protoabout{margin-top:28px}
+.jc-cycle{margin:0 0 38px;min-width:0}
+.jc-cycle-head{border-bottom:2px solid var(--gold);padding:0 0 15px;margin:0 0 18px}
+.jc-cycle-head h2{font:750 24px/1.25 var(--sans);letter-spacing:-.4px;margin:0;color:var(--ink)}
+.jc-cycle-head p{font:650 14px/1.5 var(--sans);color:var(--gold);margin:7px 0 0}
+.jc-intro{font-size:16px;line-height:1.65;color:var(--ink2);margin:0 0 18px}
+.jc-compound{background:var(--card);border:1px solid var(--line);border-radius:17px;box-shadow:var(--shadow);margin:0 0 14px;overflow:hidden}
+.jc-compound>summary{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:23px 19px;min-height:80px;list-style:none;cursor:pointer;font:750 20px/1.35 var(--sans);color:var(--ink);overflow-wrap:anywhere}
+.jc-compound>summary::-webkit-details-marker{display:none}
+.jc-compound>summary:focus-visible,.jc-notes>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+.jc-chevron{width:11px;height:11px;border-right:3px solid var(--gold);border-bottom:3px solid var(--gold);transform:rotate(45deg);flex:none;margin:0 3px 6px}
+.jc-compound[open] .jc-chevron{transform:rotate(225deg);margin-bottom:0}
+.jc-body{border-top:1px solid var(--line)}
+.jc-description{padding:21px 19px;font-size:17px;line-height:1.75;color:var(--ink2);overflow-wrap:anywhere}
+.jc-facts{margin:0;padding:0 19px 10px;border-top:1px solid var(--line)}
+.jc-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:17px 0;border-bottom:1px solid var(--line)}
+.jc-facts>div:last-child{border:0}
+.jc-facts dt{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;font-weight:800;color:var(--muted);flex:none}
+.jc-facts dd{margin:0;text-align:right;font-size:16px;line-height:1.6;font-weight:650;overflow-wrap:anywhere;min-width:0}
+.jc-facts>div:nth-child(3) dd{color:var(--gold);font-size:19px;font-weight:800}
+.jc-notes{margin:18px 2px;font-size:16px;line-height:1.7;color:var(--ink2)}
+.jc-notes>summary{cursor:pointer;color:var(--gold);font-weight:650;padding:8px 0}
+.jc-notes h3{font-size:14px;margin:18px 0 6px}.jc-notes p{margin:0 0 14px}
+#cmplist .cx{border:1px solid var(--line);border-radius:17px;background:var(--card);margin:0 0 14px;box-shadow:var(--shadow);overflow:hidden}
+#cmplist .cx-hd{padding:20px 18px}#cmplist .cx-n{font:750 20px/1.35 var(--sans)}
+#cmplist .cx-s{font-size:15px;line-height:1.5;margin-top:7px}
+#cmplist .cx-r{flex-direction:column;gap:12px}#cmplist .cx-u{font-size:16px}
+#cmplist .cx-bd{padding:0 18px 20px}#cmplist .cx-ab{font-size:17px;line-height:1.75}
+#cmplist .frow{padding:15px 0}#cmplist .fchips b{font-size:16px;line-height:1.5}
+#cmplist .pastgrp{opacity:1}
+@media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:29px}#protoabout .jc-compound>summary{font-size:22px;padding:25px}#protoabout .jc-description{padding:25px;font-size:18px}}
+</style>
