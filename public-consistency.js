@@ -4,6 +4,7 @@
  if(!document.body.classList.contains('bl-consistent'))return;
  const root=document.documentElement,nav=document.querySelector('.bl-nav-inner');
  const existing=document.getElementById('ixThemeSwitch');
+ if(existing)existing.remove();
  const meta=document.querySelector('meta[name="theme-color"]');
  function preferred(){try{return localStorage.getItem('bl-theme')==='dark'?'dark':'light';}catch(_){return 'light';}}
  let button=null;
@@ -12,7 +13,7 @@
   if(meta)meta.content=dark?'#0b0b0c':'#eeeeec';
   if(button){button.setAttribute('aria-pressed',String(dark));button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=dark?'Switch to light mode':'Switch to dark mode';button.innerHTML='<span aria-hidden="true">'+(dark?'☀':'☾')+'</span><span class="site-theme-label">'+(dark?'Light':'Dark')+'</span>';}
  }
- if(!existing&&nav){
+ if(nav&&!nav.querySelector('.site-theme-button')){
   button=document.createElement('button');button.type='button';button.className='site-theme-button';
   nav.appendChild(button);button.addEventListener('click',function(){const next=root.getAttribute('data-theme')==='dark'?'light':'dark';apply(next);try{localStorage.setItem('bl-theme',next);}catch(_){}});
  }
