@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /erica/.
-const CACHE = 'erica-v1-template';
+const CACHE = 'erica-v2-cycle1-fatloss';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/erica/',
