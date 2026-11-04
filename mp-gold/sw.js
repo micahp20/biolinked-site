@@ -2,7 +2,7 @@
 // never stale. Scoped to /mp-gold/, the Gold Edition colour preview of
 // /mpauldino/. Its cache name is unique so it never collides with, or evicts,
 // the live /mpauldino/ page's own store.
-const CACHE = 'mp-gold-edition-v7-cmpgold-wte';
+const CACHE = 'mp-gold-edition-v8-cmpcharcoal';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mp-gold/',
