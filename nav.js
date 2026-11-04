@@ -22,8 +22,9 @@
 <nav class="bl-nav" id="bl-nav">
   <div class="bl-nav-inner">
     <a href="/" class="bl-nav-logo">
-      <span class="bl-nav-logo-main">BIO LINKED</span>
-      <span class="bl-nav-logo-sub">Peptide Solutions</span>
+      <svg class="bl-nav-mark" viewBox="0 0 512 512" aria-hidden="true"><polygon points="256,82 404,169 404,343 256,430 108,343 108,169"/><circle cx="256" cy="82" r="16"/><circle cx="404" cy="169" r="16"/><circle cx="404" cy="343" r="16"/><circle cx="256" cy="430" r="16"/><circle cx="108" cy="343" r="16"/><circle cx="108" cy="169" r="16"/><text x="256" y="266">BL</text></svg>
+      <span class="bl-nav-logo-copy"><span class="bl-nav-logo-main">BIO LINKED</span>
+      <span class="bl-nav-logo-sub">Peptide Solutions</span></span>
     </a>
     <div class="bl-nav-links">
       ${links.map(l=>`<a href="${l.href}" class="bl-nav-link${isActive(l.href)?' active':''}">${l.label}</a>`).join('')}
