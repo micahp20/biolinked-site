@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /rterry/.
-const CACHE = 'rterry-master-v3';
+const CACHE = 'rterry-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/rterry/',

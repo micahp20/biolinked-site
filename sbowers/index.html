@@ -2727,7 +2727,7 @@ function renderPay(){
       '</div>'+(invSum(o)?'<div class="os">'+invSum(o)+'</div>':'')+'</div><span class="pill '+pc+'">'+pl+'</span></div>'+
       o.items.map(function(it){return '<div class="irow'+(it.x?' xln':(it.amt===0?' freeln':''))+'"><span class="in">'+it.n+
         '</span><span class="iv">'+(it.x?money(it.was||0):(it.amt===0?'FREE':money(it.amt)))+'</span></div>'}).join('')+
-      '<div class="irow tot"><span class="in">'+(o.status==='due'?'<button type="button" class="invoice-pay-now" onclick="event.stopPropagation();openInv('+i+')">Pay now &rarr;</button>':o.status==='quote'?'Not billed yet':(o.status==='free'?'No charge':'Paid in full'))+
+      '<div class="irow tot"><span class="in">'+((o.status==='due'||o.status==='quote')?'<button type="button" class="invoice-pay-now" onclick="event.stopPropagation();openInv('+i+')">Pay now &rarr;</button>':(o.status==='free'?'No charge':'Paid in full'))+
       '</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o)+'</div>';
   }).join('');
   note.textContent='';
@@ -2742,7 +2742,7 @@ function openInv(i){
       '</span><span class="iv">'+(it.x?money(it.was||0):(it.amt===0?'FREE':money(it.amt)))+'</span></div>';
   }).join('')+'<div class="irow tot"><span class="in">Order total</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o);
   var pay=document.getElementById('i-pay');
-  pay.innerHTML = o.status==='due'
+  pay.innerHTML = (o.status==='due'||o.status==='quote')
     ? payButtons(o.total,'BioLinked \u2014 '+o.label.split(' \u00b7 ')[0])
     : '';
   sheet('inv');

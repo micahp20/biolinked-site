@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /scoffe/.
-const CACHE = 'scoffe-master-v3';
+const CACHE = 'scoffe-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/scoffe/',
