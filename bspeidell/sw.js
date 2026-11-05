@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bspeidell/.
-const CACHE = 'bspeidell-master-v3';
+const CACHE = 'bspeidell-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/bspeidell/',

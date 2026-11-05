@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /cgarofalo/.
-const CACHE = 'cgarofalo-master-v3';
+const CACHE = 'cgarofalo-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/cgarofalo/',

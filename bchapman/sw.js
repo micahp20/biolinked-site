@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bchapman/.
-const CACHE = 'bchapman-master-v3';
+const CACHE = 'bchapman-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/bchapman/',
