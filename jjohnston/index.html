@@ -4,8 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0c" id="tc">
-<title>Your BioLinked Protocol</title>
+<title>Jeremy · Your BioLinked Protocol</title>
+<meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Your BioLinked protocol, compound index, labs and invoices in one place.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BioLinked Solutions">
+<meta property="og:title" content="Your BioLinked Protocol">
+<meta property="og:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta property="og:image" content="https://biolinkedsolutions.com/og-image.png?v=4">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BioLinked — Peptide Solutions">
+<meta property="og:url" content="https://biolinkedsolutions.com/jjohnston/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your BioLinked Protocol">
+<meta name="twitter:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta name="twitter:image" content="https://biolinkedsolutions.com/og-image.png?v=4">
 <link rel="manifest" href="/jjohnston/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -19,15 +33,9 @@
      so no block below needs a dark-mode rule of its own. Gold stays the accent
      in both. Toggled by setting data-theme on <html>; persisted on-device. */
   :root{
-    /* ---- Colorado Buffaloes: black / gold / silver (mpauldino only) ------
-       The lighter of the two variants. CU gold #CFB87C is about 1.9:1 on
-       white and unusable as type there, so the accent darkens to #6f6130
-       (6.1:1 on card, 5.3:1 on the ground) and the real gold is kept for the
-       black variant, which is the default and where it belongs.
-       Silver is the SECONDARY: hairlines, the MEMBER sublabel, quiet marks.
-       Status amber is deliberately pushed orange -- at its old value it sat
-       3 degrees in hue from CU gold, so a "watch" lab pill and a gold accent
-       would have been the same colour. */
+    /* ---- Theme lifted verbatim from mpauldino so the two pages match.
+       Colorado: black / CU gold / silver. Gold darkens to #6f6130 in the light
+       variant because #CFB87C is unreadable as type on white. */
     --cu-gold:#CFB87C; --cu-gold-lt:#E2CE94; --cu-silver:#A2A4A3; --cu-black:#0b0b0c;
 
     --ink:#0b0b0c; --ink2:#43464a; --muted:#55585c; --faint:#6d7073;
@@ -51,13 +59,8 @@
     --sw:264px;
   }
   :root[data-theme="dark"]{
-    /* ---- Colorado Buffaloes, black-dominant -- the primary look ----------
-       Black ground, surfaces stepping up for depth, white type, and CU gold
-       #CFB87C leading with #E2CE94 for highlights. Gold fills take BLACK
-       type. Silver #A2A4A3 is present but secondary -- hairlines, the MEMBER
-       sublabel, quiet marks -- so both school colours read without the gold
-       having to compete.
-       Status amber is pushed orange here too, for the same reason as above. */
+    /* ---- Dark, lifted verbatim from mpauldino. This is the face both
+       pages actually show: the init below defaults to dark. */
     color-scheme:dark;
     --cu-gold:#CFB87C; --cu-gold-lt:#E2CE94; --cu-silver:#A2A4A3; --cu-black:#0b0b0c;
 
@@ -161,6 +164,13 @@
 
   /* Scroll area fills the frame and simply pads past the bar, so content can
      always be scrolled clear of it and nothing ends up trapped underneath. */
+  /* No -webkit-overflow-scrolling:touch. It is deprecated -- momentum has been
+     the default since iOS 13 -- and it puts the scroller on its own compositing
+     layer whose scroll extent iOS does not reliably recompute when content is
+     inserted afterwards. Everything in this view is written by innerHTML after
+     the scroller already exists, so a stale extent leaves the tail of the page
+     unreachable and unpainted: you scroll to what iOS thinks is the end and the
+     rest shows as background. */
   .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
     padding:calc(58px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 26px)}
   .scroll::-webkit-scrollbar{width:0}
@@ -239,6 +249,7 @@
   .pill.due{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-line)}
   .pill.paid{background:var(--ok-soft);color:var(--ok)}
   .pill.free{background:var(--gold-soft);color:var(--gold)}
+.pill.quote{background:var(--gold-soft);color:var(--gold);border:1px solid var(--amber-line)}
 
   /* ALL COMPOUNDS -- expand in place. Everything starts collapsed. */
   .cxwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;
@@ -255,6 +266,43 @@
   .cx-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
   .cx.on .cx-cv{transform:rotate(90deg)}
   .cx-bd{display:none;padding:0 14px 14px}
+  /* Collapsible groups: the per-cycle blocks in All Compounds and the
+     explainer on the Protocol tab. Both reuse the .cx idiom -- a header row
+     with a chevron that quarter-turns when open -- so there is nothing new
+     to learn visually and nothing new to theme. */
+  .cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+  .cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+  .cgrp-m{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+  .cgrp-n{font-size:13px;font-weight:800;color:var(--gold)}
+  .cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+  .cgrp.on .cgrp-cv{transform:rotate(90deg)}
+  .cgrp-bd{display:none;border-top:1px solid var(--line2)}
+  .cgrp.on .cgrp-bd{display:block}
+  .cgrp-bd .cx:last-child{border-bottom:none}
+  .cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+  .cgrp.pastgrp .cgrp-bd{opacity:.72}
+  .abt{padding:11px 13px 13px}
+  .abt-l{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+  .abt-l+.abt-p{margin-bottom:11px}
+  .abt-p{font-size:13px;line-height:1.55;color:var(--ink2)}
+  .abt-p:last-child{margin-bottom:0}
+  /* "The stack" -- just the compound names for whichever cycle card is open,
+     each one a link into the Index. Deliberately carries no strength, dose or
+     schedule: all of that lives on the Schedule tab, and repeating it here is
+     what made the section heavy. */
+  .stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+  .stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .stk-a:last-child{border-bottom:none}
+  .stk-a:active{background:var(--gold-soft)}
+  .stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
   .cx.on .cx-bd{display:block}
   .cx-ab{font-size:13px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
@@ -270,12 +318,6 @@
   .schbtn.on{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
   .schbtn:active{opacity:.75}
   /* cycle selector -- only drawn when a client has more than one cycle */
-  .cycrow{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px}
-  .cycrow::-webkit-scrollbar{height:0}
-  .cyc{flex:none;background:var(--card);border:1px solid var(--line);border-radius:10px;
-    padding:7px 11px;font:600 11.5px/1 var(--sans);color:var(--muted);cursor:pointer;
-    letter-spacing:.04em;white-space:nowrap;min-height:34px}
-  .cyc.on{background:var(--ink);border-color:var(--ink);color:#fff}
   .cx-arch{display:inline-block;margin-left:7px;font-family:var(--sans);font-size:13px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     border:1px solid var(--line2);border-radius:5px;padding:1px 5px;vertical-align:middle}
@@ -525,7 +567,7 @@
   .pill.hi{background:var(--warn-soft);color:var(--warn)} .pill.lo{background:var(--lo-soft);color:var(--lo)}
   .ltip{display:none;font-size:13px;line-height:1.55;color:var(--ink2);background:var(--cream);
     border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:9px}
-  .ltip.on{display:block}
+  .ltip.on{display:block}.ltip .ldef{margin:0 0 8px;padding:0 0 8px;border-bottom:1px solid rgba(0,0,0,.08)}.ltip .ldef b{color:var(--ink);font-weight:700}.ltip .ldt{font-weight:700;color:var(--gold);margin-bottom:3px;font-size:13px}.ltip .lyour{margin-top:2px}.ltip .ldef:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
   .ltip strong{color:var(--gold)}
   .banner{display:flex;align-items:flex-start;gap:8px;background:var(--warn-soft);color:var(--warn);
     border:1px solid var(--warn-line);border-radius:11px;padding:9px 12px;font-size:13px;font-weight:700;margin:4px 0 13px;line-height:1.45}
@@ -785,7 +827,14 @@
        growing to fit its content. Without it the column overflows the shell. */
     .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
       display:block;overflow-y:auto;overflow-x:hidden;
-      padding:0 0 26px}
+      /* The bottom tab bar is collapsed to height 0 on a phone, and it was the
+         thing that used to clear the home indicator -- it still carries
+         env(safe-area-inset-bottom) in its own padding. With it gone, nothing
+         reserved that space and 26px is less than the ~34px inset, so the last
+         line of the final card sat under the indicator with no scroll left to
+         reach it. .sheet and .tabs both add the inset; .scroll was the one that
+         did not. Zero effect where the inset is 0. */
+      padding:0 0 calc(26px + env(safe-area-inset-bottom))}
     .view.on{flex:none}
     /* last flex child -> always on the true visual bottom edge */
     .tabs{position:static;flex:0 0 auto;height:auto;
@@ -1226,10 +1275,50 @@ html body .drow .mt,html body .cx-s{font-family:"Outfit",system-ui,sans-serif;fo
 html body .drow .uu,html body .cx-u{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--gold)}
 html body .drow.pm .uu{color:var(--pm)}
 </style>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
-<link rel="stylesheet" href="/bl-connected-path.css?v=4">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=5">
+<link rel="stylesheet" href="/bl-connected-path.css?v=5">
+<style>
+/* ---- SCHEDULE EDIT MODE (?edit=1) — nothing below renders for the client ---- */
+html.bl-edit .drow.ed-row{cursor:pointer;border-bottom:none}
+html.bl-edit .drow.ed-row .ed-cv{margin-left:auto;flex:none;font-size:18px;line-height:1;color:var(--muted);transition:transform .16s ease}
+html.bl-edit .drow.ed-row.exp .ed-cv{transform:rotate(90deg)}
+html:is(.bl-edit,.bl-add) .ed-pan{display:none;border-bottom:1px solid var(--line2);background:rgba(127,127,127,.045)}
+html:is(.bl-edit,.bl-add) .ed-pan.open{display:block}
+html.bl-edit .dgrp>.ed-pan:last-child{border-bottom:none}
+html:is(.bl-edit,.bl-add) .ed-in{padding:12px 14px 14px;font-family:var(--sans)}
+html:is(.bl-edit,.bl-add) .ed-grp{margin-top:12px}
+html:is(.bl-edit,.bl-add) .ed-grp:first-child{margin-top:0}
+html:is(.bl-edit,.bl-add) .ed-l{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+html:is(.bl-edit,.bl-add) .ed-tag{font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--gold);text-transform:none}
+html:is(.bl-edit,.bl-add) .ed-row2{display:flex;gap:8px;margin-top:8px}
+html:is(.bl-edit,.bl-add) .ed-row2:first-child{margin-top:0}
+html:is(.bl-edit,.bl-add) .ed-b{flex:1;min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
+html:is(.bl-edit,.bl-add) .ed-b.on{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html:is(.bl-edit,.bl-add) .ed-b.pri{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html:is(.bl-edit,.bl-add) .ed-b:disabled{opacity:.45;cursor:default}
+html:is(.bl-edit,.bl-add) .ed-f{display:flex;gap:8px;margin-bottom:8px}
+html:is(.bl-edit,.bl-add) .ed-f.one{display:block}
+html:is(.bl-edit,.bl-add) .ed-f label{flex:1;display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+html:is(.bl-edit,.bl-add) .ed-f input{width:100%;box-sizing:border-box;margin-top:4px;min-height:42px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html:is(.bl-edit,.bl-add) .ed-pan .dp{margin-top:0;padding-top:0;border-top:none}
+html:is(.bl-edit,.bl-add) .ed-add{margin:14px 0 4px}
+html:is(.bl-edit,.bl-add) .ed-add-b{width:100%;min-height:48px;border-radius:12px;border:1px dashed #303639;background:transparent;color:#303639;font:inherit;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer}
+html:is(.bl-edit,.bl-add) .ed-add-p{margin-top:10px;padding:14px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;font-family:var(--sans);background:var(--card,#fff)}
+html:is(.bl-edit,.bl-add) .ed-add-p[hidden]{display:none}
+html:is(.bl-edit,.bl-add) .ed-seg{margin-bottom:12px}
+html:is(.bl-edit,.bl-add) .ed-sel{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+html:is(.bl-edit,.bl-add) .ed-sel select{width:100%;box-sizing:border-box;margin-top:4px;min-height:44px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html:is(.bl-edit,.bl-add) .ed-gd{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+html:is(.bl-edit,.bl-add) .ed-gd span{display:inline-flex;align-items:baseline;gap:5px;padding:5px 9px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:8px;font-size:12px}
+html:is(.bl-edit,.bl-add) .ed-gd i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+html:is(.bl-edit,.bl-add) .ed-add-p .dp-days{margin-bottom:10px}
+/* top chrome buttons charcoal instead of gold */
+html:root:not([data-theme="dark"]) .top .tgl,
+html:root:not([data-theme="dark"]) .top .navbtn,
+html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!important;color:#303639!important}
+</style>
 </head>
-<body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
+<body class="erica-tab-consistency"><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
   <nav class="side">
     <div class="side-top">
@@ -1238,10 +1327,10 @@ html body .drow.pm .uu{color:var(--pm)}
     </div>
     <div class="side-nav">
       <button class="snav on" data-v="proto" onclick="go('proto')"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v6h6"/><path d="M9 13h6M9 17h4"/></svg><span>Protocol</span></button>
-      <button class="snav" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><span>Schedule</span></button>
+      <button class="snav" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><span>Schedule</span></button><button class="snav" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg><span>Invoice</span></button>
       <button class="snav" data-v="nutr" onclick="go('nutr')"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M8.5 3c1.9 0 3.5 1.6 3.5 3.5V9H9.5C7.6 9 6 7.4 6 5.5S7.6 3 8.5 3z"/><path d="M15.5 6c1.4 0 2.5 1.1 2.5 2.5S16.9 11 15.5 11H13V8.5C13 7.1 14.1 6 15.5 6z"/><path d="M5 14h14l-1.2 6.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 14z"/></svg><span>Nutrition</span></button><button class="snav" data-v="work" onclick="go('work')"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg><span>Workout</span></button>
       <button class="snav" data-v="labs" onclick="go('labs')"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg><span>Labs</span></button>
-      <button class="snav" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg><span>Invoice</span></button>
+      
       <button class="snav" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg><span>More</span></button>
     </div>
     <div class="side-foot">
@@ -1265,7 +1354,6 @@ html body .drow.pm .uu{color:var(--pm)}
           <text class="lxbl" x="256" y="266">BL</text>
         </svg><span class="brand-copy">BIO LINKED<small>SOLUTIONS</small></span></div>
     <div class="who"><div class="wn">Jeremy Johnston</div><div class="wl">Member</div></div>
-    <button class="bl-aa" id="bl-aa" type="button" aria-pressed="false" aria-label="Bigger text" title="Bigger text">Aa</button>
     <button class="tgl" onclick="toggleTheme()" aria-label="Switch between light and dark">
       <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
       <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>
@@ -1281,14 +1369,14 @@ html body .drow.pm .uu{color:var(--pm)}
       <div><div class="nl">Protocol</div><div class="nd">Your welcome screen and overview</div></div></button>
     <button type="button" class="nav-item" onclick="go('sched')">
       <div><div class="nl">Schedule</div><div class="nd">Today's doses, timing and the week</div></div></button>
+    <button type="button" class="nav-item" onclick="go('pay')">
+      <div><div class="nl">Invoice</div><div class="nd">Invoices and balance</div></div></button>
     <button type="button" class="nav-item" onclick="go('nutr')">
       <div><div class="nl">Nutrition</div><div class="nd">Meal builder and macro targets</div></div></button>
     <button type="button" class="nav-item" onclick="go('work')">
       <div><div class="nl">Workout</div><div class="nd">Your weekly plan, sets and progress</div></div></button>
     <button type="button" class="nav-item" onclick="go('labs')">
       <div><div class="nl">Labs</div><div class="nd">Your bloodwork, explained</div></div></button>
-    <button type="button" class="nav-item" onclick="go('pay')">
-      <div><div class="nl">Invoice</div><div class="nd">Invoices and balance</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('indexlist')">
       <div><div class="nl">Dosing Guide</div><div class="nd">Water, dose and schedule for every vial</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
@@ -1314,7 +1402,7 @@ html body .drow.pm .uu{color:var(--pm)}
         <p class="lx-sub">A clearer view of your protocol and progress.</p>
         <button type="button" class="lx-cta" onclick="go('sched')">Explore my protocol &rarr;</button>
       </div>
-      <div class="seclbl">Your Program</div><div class="bl-tiles"><button type="button" onclick="go('labs')" class="bl-tile" id="bt-labs"><span><span class="t">Bloodwork</span><span class="s" id="bts-labs">&nbsp;</span></span><span class="o">Open &rarr;</span></button><div class="bl-tile" id="bt-dna"><span><span class="t">DNA</span><span class="s" id="bts-dna">&nbsp;</span></span><span class="o"></span></div><button type="button" onclick="go('work')" class="bl-tile" id="bt-work"><span><span class="t">Workout</span><span class="s" id="bts-work">&nbsp;</span></span><span class="o">Open &rarr;</span></button><button type="button" onclick="go('nutr')" class="bl-tile" id="bt-nutr"><span><span class="t">Nutrition</span><span class="s" id="bts-nutr">&nbsp;</span></span><span class="o">Open &rarr;</span></button></div>
+      <div class="seclbl">Your Program</div><div class="bl-tiles"><button type="button" onclick="go('labs')" class="bl-tile" id="bt-labs"><span><span class="t">Bloodwork</span><span class="s" id="bts-labs">&nbsp;</span></span><span class="o">Open &rarr;</span></button><div class="bl-tile" id="bt-dna"><span><span class="t">DNA</span><span class="s" id="bts-dna">&nbsp;</span></span><span class="o"></span></div><button type="button" onclick="go('work')" class="bl-tile" id="bt-work"><span><span class="t">Workout</span><span class="s" id="bts-work">&nbsp;</span></span><span class="o">Open &rarr;</span></button><button type="button" onclick="go('nutr')" class="bl-tile" id="bt-nutr"><span><span class="t">Nutrition</span><span class="s" id="bts-nutr">&nbsp;</span></span><span class="o">Open &rarr;</span></button></div><div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
         <div class="lx-card" role="button" tabindex="0" onclick="go('sched')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></div>
@@ -1328,25 +1416,16 @@ html body .drow.pm .uu{color:var(--pm)}
         <div class="lx-card" role="button" tabindex="0" onclick="go('more')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></div>
           <div><div class="lx-t">More</div><div class="lx-d">Compound index, dose calculator, and storage &amp; handling notes.</div></div></div>
       </div>
-      <div class="seclbl">What to Expect</div>
-      <ul class="lx-exp">
-        <li><b>Protocols run in cycles.</b> Some compounds are daily, others a few days a week &mdash; your Schedule tab always shows today&rsquo;s.</li>
-        <li><b>Reconstitute and store as noted</b> &mdash; keep peptides refrigerated once mixed.</li>
-        <li><b>Recheck your labs periodically</b> so your protocol can be adjusted. Your Labs tab tracks it.</li>
-      </ul>
+      
     </div></section>
     <section class="view" id="v-sched"><div class="pad">
       <h1 class="scrn" id="greet">Schedule</h1>
       <div class="cs-stat" id="csstat"></div>
       <p class="sub" id="subline"></p>
       <div id="duebar"></div>
-      <div id="cycbar"></div>
       <div class="days" id="daystrip"></div>
       <div id="doses"></div>
       <p class="note" id="dosenote"></p>
-      <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
-      <div id="cmplist"></div>
-      <p class="note">Everything Jeremy has taken or ordered &mdash; the active protocol, the gifts, and the prior Gorilla Stack. Tap a compound to open its recon, draw, site and timing in place.</p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -1742,22 +1821,23 @@ html body .drow.pm .uu{color:var(--pm)}
     <button class="x" onclick="hideA2(1)">&times;</button>
   </div>
   <nav class="tabs">
-    <button class="tab" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Schedule</button>
+    <button class="tab" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Schedule</button><button class="tab" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Invoice</button>
     <button class="tab" data-v="nutr" onclick="go('nutr')"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M8.5 3c1.9 0 3.5 1.6 3.5 3.5V9H9.5C7.6 9 6 7.4 6 5.5S7.6 3 8.5 3z"/><path d="M15.5 6c1.4 0 2.5 1.1 2.5 2.5S16.9 11 15.5 11H13V8.5C13 7.1 14.1 6 15.5 6z"/><path d="M5 14h14l-1.2 6.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 14z"/></svg>Nutrition</button><button class="tab" data-v="work" onclick="go('work')"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Workout</button>
     <button class="tab" data-v="labs" onclick="go('labs')"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Labs</button>
-    <button class="tab" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Invoice</button>
+    
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
 </div>
 <script>
 var CMP=[{"n": "Testosterone Cypionate · 250 mg/mL", "b": "AM", "cad": "MWF", "c": "Mon / Wed / Fri", "d": "60 mg", "u": "24u", "rec": "None — pre-mixed oil", "site": "SubQ · draw with 23G luer-lock, inject with insulin syringe", "about": "The hormonal base layer everything else sits on top of. 250 mg/mL pre-mixed oil, so there is nothing to reconstitute — 24 units is 0.24 mL, which is 60 mg a shot and 180 mg across the week. Three smaller shots keep levels even instead of peaking once. The oil is thick: draw with the 23G luer-lock in Supplies, then swap to an insulin needle to inject.", "tag": "Active", "days": [1, 3, 5]}, {"n": "NAD+ · 1000 mg", "b": "AM", "cad": "MWF", "c": "Mon / Wed / Fri", "d": "75 → 100 mg", "u": "37.5u", "rec": "5 mL BAC water", "site": "SubQ", "about": "The coenzyme your mitochondria run on. It is the currency cells spend on repair, DNA maintenance and energy production, and levels fall meaningfully with age. Most people notice it as clearer thinking and steadier afternoons rather than a jolt. 1000 mg in 5 mL is 200 mg/mL, so 37.5 units is 75 mg and 50 units is 100 mg.", "tag": "Active", "days": [1, 3, 5]}, {"n": "Retatrutide · 30 mg", "b": "AM", "cad": "WK", "c": "Mon", "d": "2 mg", "u": "20u", "rec": "3 mL BAC water", "site": "SubQ", "about": "Triple agonist — GLP-1 + GIP + glucagon. GLP-1 quiets appetite and slows gastric emptying, GIP helps insulin sensitivity, and the glucagon arm nudges energy expenditure up. The glucagon arm is what sets Reta apart: real fat loss plus a metabolic lift, not just appetite suppression. 30 mg in 3 mL is 10 mg/mL, so 20 units is 2 mg.", "tag": "Active", "days": [1]}];
-var INV=[{"label": "✔ Paid Order 3 · Test Cyp + Reta + CJC/Ipa $440.00 · paid in full", "summary": "Testosterone Cypionate × 1 + Retatrutide 30 mg × 4 + CJC-1295/Ipamorelin × 1 · $440.00 paid in full · tap to view", "status": "paid", "total": 440.0, "items": [{"n": "Testosterone Cypionate 250 mg/mL · 10 mL × 1 vial @ $150", "sub": "Hormone base — M / W / F AM, 24u · 60 mg per shot, 180 mg/week", "amt": 150.0}, {"n": "Retatrutide 30 mg × 4 vials @ $50", "sub": "Fat loss — Monday AM, 20u · 2 mg weekly. 15 doses/vial, 4 vials covers 52 weeks", "amt": 200.0}, {"n": "CJC-1295 / Ipamorelin 20 mg × 1 vial @ $90", "sub": "Reorder — GH axis, Mon–Fri PM pre-bed, 5u · 500 mcg", "amt": 90.0}]}, {"label": "✔ Paid Order 1 · Full Stack $345.00 · paid in full", "summary": "CJC-1295/Ipamorelin + NAD+ + MOTS-c + Retatrutide · 5 vials · tap to view", "status": "paid", "total": 345.0, "items": [{"n": "CJC-1295 / Ipamorelin 20 mg × 1 vial @ $90", "sub": "GH axis — lean tissue & recovery, Mon–Fri PM pre-bed", "amt": 90.0}, {"n": "NAD+ 1000 mg × 1 vial @ $75", "sub": "Cellular energy floor — M / W / F AM, push slowly", "amt": 75.0}, {"n": "MOTS-c 40 mg × 2 vials @ $50", "sub": "Mitochondrial energy & fat oxidation — Mon–Fri AM fasted", "amt": 100.0}, {"n": "Retatrutide 20 mg × 1 vial @ $80", "sub": "Triple agonist — once weekly, Monday AM fasted", "amt": 80.0}]}, {"label": "✔ Paid Order 2 · NAD+ Reorder $110.00 · paid in full", "summary": "NAD+ 1000 mg × 2 vials + bacteriostatic water · tap to view", "status": "paid", "total": 110.0, "items": [{"n": "NAD+ 1000 mg × 2 vials @ $50", "sub": "Cellular energy floor — M / W / F AM, 37.5u–50u · 75–100 mg, push slowly", "amt": 100.0}, {"n": "BAC Water × 1 bottle @ $10", "sub": "Bacteriostatic water for reconstitution — eBAC Water", "amt": 10.0}]}];
+var INV=[{"label": "✔ Paid Order 3 · Test Cyp + Reta + CJC/Ipa $440.00 · paid in full", "summary": "Testosterone Cypionate × 1 + Retatrutide 30 mg × 4 + CJC-1295/Ipamorelin × 1 · $440.00 paid in full", "status": "paid", "total": 440.0, "items": [{"n": "Testosterone Cypionate 250 mg/mL · 10 mL × 1 vial @ $150", "sub": "Hormone base — M / W / F AM, 24u · 60 mg per shot, 180 mg/week", "amt": 150.0}, {"n": "Retatrutide 30 mg × 4 vials @ $50", "sub": "Fat loss — Monday AM, 20u · 2 mg weekly. 15 doses/vial, 4 vials covers 52 weeks", "amt": 200.0}, {"n": "CJC-1295 / Ipamorelin 20 mg × 1 vial @ $90", "sub": "Reorder — GH axis, Mon–Fri PM pre-bed, 5u · 500 mcg", "amt": 90.0}]}, {"label": "✔ Paid Order 1 · Full Stack $345.00 · paid in full", "summary": "CJC-1295/Ipamorelin + NAD+ + MOTS-c + Retatrutide · 5 vials", "status": "paid", "total": 345.0, "items": [{"n": "CJC-1295 / Ipamorelin 20 mg × 1 vial @ $90", "sub": "GH axis — lean tissue & recovery, Mon–Fri PM pre-bed", "amt": 90.0}, {"n": "NAD+ 1000 mg × 1 vial @ $75", "sub": "Cellular energy floor — M / W / F AM, push slowly", "amt": 75.0}, {"n": "MOTS-c 40 mg × 2 vials @ $50", "sub": "Mitochondrial energy & fat oxidation — Mon–Fri AM fasted", "amt": 100.0}, {"n": "Retatrutide 20 mg × 1 vial @ $80", "sub": "Triple agonist — once weekly, Monday AM fasted", "amt": 80.0}]}, {"label": "✔ Paid Order 2 · NAD+ Reorder $110.00 · paid in full", "summary": "NAD+ 1000 mg × 2 vials + bacteriostatic water", "status": "paid", "total": 110.0, "items": [{"n": "NAD+ 1000 mg × 2 vials @ $50", "sub": "Cellular energy floor — M / W / F AM, 37.5u–50u · 75–100 mg, push slowly", "amt": 100.0}, {"n": "BAC Water × 1 bottle @ $10", "sub": "Bacteriostatic water for reconstitution — eBAC Water", "amt": 10.0}]}];
 var PAID=895.0,DUE=0.0;
 var IX=(window.BL_DOSING||[]); /* one source: /bl-dosing.js */
 var CATL={"fatloss": "Fat Loss", "muscle": "Muscle", "gh": "Growth Hormone", "healing": "Healing", "longevity": "Longevity", "cognition": "Cognition", "sleep": "Sleep", "energy": "Energy / NAD+", "immunity": "Immunity", "sexual": "Sexual Health", "hormones": "Hormones", "skin": "Skin & Cosmetic", "blend": "Blend", "bioregulator": "Bioregulator"};
 var NOTES=[{"eb": "Note 01 — The Daily Routine", "tt": "One Morning Block, Three Days A Week", "bd": "<ul class=\"tip-list\">\n            <li><strong>Everything is now a morning block.</strong> Mon / Wed / Fri, fasted: Testosterone, then NAD+. Retatrutide goes on Monday only, so Monday is the busy one at three shots.</li>\n            <li><strong>Nothing at night any more.</strong> The pre-bed shot is gone with CJC/Ipamorelin coming off the calendar — Tue, Thu and the weekend are completely clear.</li>\n            <li><strong>Batch them, don't spread them out.</strong> Draw and give them back to back in one sitting — different spots, same five minutes.</li>\n            <li><strong>NAD+ goes last</strong> so it gets its own slow minute instead of being rushed behind the others.</li>\n            <li><strong>Wait 30–45 min before eating</strong> after the morning block.</li>\n          </ul>"}, {"eb": "Note 02 — Testosterone", "tt": "The Base Layer, And Why It Is Three Shots", "bd": "<ul class=\"tip-list\">\n            <li><strong>Nothing to mix.</strong> It arrives pre-mixed in oil at 250 mg/mL. Room temperature, out of the light — no fridge, no BAC water.</li>\n            <li><strong>24 units is 0.24 mL — 60 mg.</strong> Three shots makes 180 mg across the week.</li>\n            <li><strong>Three smaller shots, not one big one.</strong> It keeps your level steady instead of spiking Monday and sagging by Friday, which is what the mood and energy swings on a once-weekly schedule come from.</li>\n            <li><strong>Two needles per shot.</strong> The oil is thick and will not pull through an insulin needle in any reasonable time. Draw with the 23G luer-lock, swap to the insulin needle, then inject — see Supplies.</li>\n            <li><strong>Rotate the site</strong> every shot. SubQ abdomen, a different quadrant each time.</li>\n            <li><strong>AM, with the rest of the block.</strong> Testosterone follows a daily rhythm, so keeping it to the morning keeps your bloodwork readable later.</li>\n          </ul>"}, {"eb": "Note 03 — NAD+", "tt": "Push It Slow", "bd": "<ul class=\"tip-list\">\n          <li><strong>NAD+ is the one you actually feel going in.</strong> A warm flush, chest or gut pressure, sometimes a brief anxious feeling if it is pushed fast. It is dose- and speed-dependent, not dangerous, and it passes in a minute or two.</li>\n          <li><strong>Your dose is a range &mdash; 75 to 100 mg, which is 37.5u to 50u on the syringe.</strong> Pick the number by how you&apos;re feeling that morning rather than treating either end as the one correct dose.</li>\n          <li><strong>Take 30&ndash;60 seconds on the plunger.</strong> That is the single biggest lever, and it matters more the closer you are to 50u. If a flush still lands strong, split the dose across two sites.</li>\n          <li><strong>Start at 75 mg (37.5u) and work up.</strong> On the mornings you want the bigger hit and the flush is sitting easy, take the full 100 mg (50u). Dropping back down is not a setback &mdash; that is what the range is for.</li>\n        </ul>"}, {"eb": "Note 04 — Week-by-Week", "tt": "What To Expect", "bd": "<ul class=\"tip-list\">\n            <li><strong>Weeks 1&ndash;2</strong> &mdash; energy first, from the NAD+. Retatrutide starts trimming appetite. Testosterone is still loading and you will not feel much of it yet.</li>\n            <li><strong>Weeks 3&ndash;5</strong> &mdash; the testosterone starts to show up: steadier drive and mood, better recovery between sessions. Fat loss from Reta becomes visible.</li>\n            <li><strong>Weeks 6&ndash;10+</strong> &mdash; the level is stable and the fat loss has had time to stack onto it. This is the window where the work shows.</li>\n            <li><strong>Run it to the vials.</strong> Four Reta vials cover about a year at one shot a week; the Test vial runs roughly three months at 180 mg/wk. Reassess when they are out.</li>\n            <li><strong>Worth a panel</strong> once you are 8&ndash;10 weeks in — morning, fasted — so there is a real number behind the dose rather than a guess.</li>\n          </ul>"}, {"eb": "Note 05 — Supplies", "tt": "What You Need On Hand", "bd": "<ul class=\"tip-list\">\n            <li><strong><a href=\"https://amazon.com/dp/B0F26CGRQC\" target=\"_blank\" rel=\"noopener\">23G 1 mL luer-lock syringes</a>.</strong> For <em>drawing</em> the testosterone only. The oil is too thick to pull through an insulin needle — draw with this, then swap to the insulin needle to inject. Never inject with the 23G.</li>\n            <li><strong>Insulin syringes — 31G, 5/16\", 1 mL (100 unit).</strong> What you actually inject with, for all three compounds. The 1 mL barrel matters: the NAD+ draw runs to 50 units.</li>\n            <li><strong>Bacteriostatic water.</strong> For the NAD+ only. Testosterone and Retatrutide need none — the Test is pre-mixed and the Reta is already reconstituted.</li>\n            <li><strong>Alcohol prep pads.</strong> Two per shot: one for the vial stopper, one for the skin.</li>\n            <li><strong>Sharps container.</strong> Hard-sided. Used syringes never go in household trash.</li>\n            <li><strong><a href=\"https://amazon.com/dp/B0FH62NMF8\" target=\"_blank\" rel=\"noopener\">Peptide Organizer / Cold Storage</a>.</strong> Keeps the reconstituted vials upright, dark and separated in the fridge, with room for the syringes.</li>\n          </ul>"}];
 var MINE=[{"name": "Testosterone Cypionate", "cat": "mine", "purpose": "Active", "vial": "250 mg/mL", "bac": "None — 10 mL oil vial, ready to draw", "dose": "60 mg", "units": "24"}, {"name": "CJC-1295 / Ipamorelin", "cat": "mine", "purpose": "Active", "vial": "20 mg", "bac": "2 mL BAC water", "dose": "500 mcg", "units": "5"}, {"name": "NAD+", "cat": "mine", "purpose": "Active", "vial": "1000 mg", "bac": "5 mL BAC water", "dose": "75 → 100 mg", "units": "37.5"}, {"name": "MOTS-c", "cat": "mine", "purpose": "Active", "vial": "40 mg", "bac": "3 mL BAC water per vial", "dose": "2 mg", "units": "15"}, {"name": "Retatrutide", "cat": "mine", "purpose": "Active", "vial": "30 mg", "bac": "3 mL BAC water", "dose": "2 mg", "units": "20"}];
 var ALL=[{"n": "Testosterone Cypionate · 250 mg/mL", "b": "AM", "cad": "MWF", "c": "Mon / Wed / Fri", "d": "60 mg", "u": "24u", "rec": "None — pre-mixed oil", "site": "SubQ · draw with 23G luer-lock, inject with insulin syringe", "about": "The hormonal base layer everything else sits on top of. 250 mg/mL pre-mixed oil, so there is nothing to reconstitute — 24 units is 0.24 mL, which is 60 mg a shot and 180 mg across the week. Three smaller shots keep levels even instead of peaking once. The oil is thick: draw with the 23G luer-lock in Supplies, then swap to an insulin needle to inject.", "tag": "Active", "days": [1, 3, 5]}, {"n": "NAD+ · 1000 mg", "b": "AM", "cad": "MWF", "c": "Mon / Wed / Fri", "d": "75 → 100 mg", "u": "37.5u", "rec": "5 mL BAC water", "site": "SubQ", "about": "The coenzyme your mitochondria run on. It is the currency cells spend on repair, DNA maintenance and energy production, and levels fall meaningfully with age. Most people notice it as clearer thinking and steadier afternoons rather than a jolt. 1000 mg in 5 mL is 200 mg/mL, so 37.5 units is 75 mg and 50 units is 100 mg.", "tag": "Active", "days": [1, 3, 5]}, {"n": "Retatrutide · 30 mg", "b": "AM", "cad": "WK", "c": "Mon", "d": "2 mg", "u": "20u", "rec": "3 mL BAC water", "site": "SubQ", "about": "Triple agonist — GLP-1 + GIP + glucagon. GLP-1 quiets appetite and slows gastric emptying, GIP helps insulin sensitivity, and the glucagon arm nudges energy expenditure up. The glucagon arm is what sets Reta apart: real fat loss plus a metabolic lift, not just appetite suppression. 30 mg in 3 mL is 10 mg/mL, so 20 units is 2 mg.", "tag": "Active", "days": [1]}, {"n": "CJC-1295 / Ipamorelin · 20 mg", "b": "PM", "cad": "MF", "c": "Mon-Fri", "d": "500 mcg", "u": "5u", "rec": "2 mL BAC water", "site": "SubQ", "about": "The classic GH blend. CJC-1295 is a GHRH analog that raises the growth-hormone baseline; Ipamorelin is a selective ghrelin-receptor agonist that adds a clean pulse without spiking cortisol or hunger. Two pathways into the same natural overnight GH release. 20 mg in 2 mL is 10 mg/mL, so a 5-unit draw is 500 mcg.", "tag": "Not scheduled", "days": [1, 2, 3, 4, 5]}, {"n": "MOTS-c · 40 mg", "b": "AM", "cad": "MF", "c": "Mon-Fri", "d": "2 mg", "u": "15u", "rec": "3 mL BAC water per vial", "site": "SubQ", "about": "A mitochondrial-derived peptide. It switches on AMPK — the same fuel-sensing pathway exercise activates — so cells burn substrate more efficiently and muscle takes up glucose better. 40 mg in 3 mL is 13.33 mg/mL, so a 15-unit draw is 2 mg.", "tag": "Not scheduled", "days": [1, 2, 3, 4, 5]}];
+var CYC=[];
 var LABS=null;
 var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1776,6 +1856,8 @@ function toggleTheme(){
   try{localStorage.setItem(KP+'theme',t)}catch(e){}
 }
 (function(){
+  /* Dark is the primary look now, so it is what an untouched device gets;
+     only an explicit stored 'light' switches away from it. */
   var t='light'; try{ if(localStorage.getItem(KP+'theme')==='dark') t='dark'; }catch(e){}
   applyTheme(t);
 })();
@@ -1852,13 +1934,127 @@ function renderLabs(){
         '<span class="qm">?</span><span class="ln">'+r.n+'</span>'+
         '<span class="lv'+(r.vc?' '+r.vc:'')+'">'+r.v+em+'</span></div>'+
         '<div class="lmeta">'+ref+pill+'</div>'+
-        '<div class="ltip" id="'+r.id+'">'+r.tip+'</div></div>');
+        '<div class="ltip" id="'+r.id+'">'+labTip(r)+'</div></div>');
     });
     o.push('</div>');
   });
   if(LABS.note!=null) o.push('<p class="note">'+LABS.note+'</p>');
   host.innerHTML=o.join('\n');
 }
+/* ---------- LAB DEFINITIONS (shared) ----------
+   Every "?" on a lab row opens a plain-language definition (what it measures,
+   why it matters, what high/low means) followed by the client's own note. */
+var LABDEFS=[
+[/(trig|tg).*hdl/i,'Triglyceride / HDL ratio','Compares blood fats (triglycerides) to "good" HDL cholesterol.','A quick read on insulin resistance and heart risk.','Higher points to insulin resistance and higher heart risk.','Low is good.',1],
+[/(total\s*)?chol(esterol)?\s*(total)?\s*[\/:]\s*hdl|total\s*\/\s*hdl|chol\s*:\s*hdl/i,'Cholesterol / HDL ratio','Total cholesterol divided by HDL ("good") cholesterol.','One number that sums up the balance of harmful vs protective cholesterol.','Higher means more heart risk.','Lower is better.',1],
+[/ldl\s*[\/:]\s*hdl/i,'LDL / HDL ratio','LDL ("bad") cholesterol divided by HDL ("good") cholesterol.','Shows the balance between cholesterol that builds plaque and cholesterol that clears it.','Higher means more heart risk.','Lower is better.',1],
+[/free\s*t3\s*:\s*free\s*t4/i,'Free T3 : Free T4','How much active thyroid hormone (T3) you make from the storage form (T4).','Shows how well your body converts thyroid hormone into its active form.','High can mean fast conversion or T3 medication.','Low can mean poor conversion (stress, low calories, illness).',1],
+[/non.?hdl/i,'Non-HDL cholesterol','All the cholesterol carried by plaque-forming particles (total minus HDL).','A better heart-risk number than LDL alone.','Higher means more heart risk.','Lower is better.'],
+[/remnant/i,'Remnant cholesterol','Cholesterol in triglyceride-rich particles left over after fat is digested.','These particles get into artery walls easily.','Higher adds heart risk.','Lower is better.'],
+[/vldl/i,'VLDL cholesterol','Cholesterol carried by the particles that move triglycerides around.','Tracks with triglycerides and diet.','High usually means high triglycerides (sugar, alcohol, insulin resistance).','Low is fine.'],
+[/ldl/i,'LDL cholesterol','The "bad" cholesterol that can build up in artery walls.','The main cholesterol target for heart and stroke risk.','High raises the risk of plaque and heart disease.','Low is generally good.'],
+[/hdl/i,'HDL cholesterol','The "good" cholesterol that carries extra cholesterol back to the liver.','Protects the arteries.','Very high is usually fine.','Low raises heart risk; exercise helps raise it.'],
+[/apo\s*b/i,'ApoB','A count of the particles that carry cholesterol into artery walls.','The single best blood test for plaque-building risk.','High means more plaque-forming particles.','Low is good.'],
+[/lipoprotein\s*\(?a/i,'Lipoprotein(a)','An inherited cholesterol particle that is extra sticky.','Mostly genetic; it sets a baseline heart risk that diet barely changes.','High means more inherited heart risk.','Low is good.'],
+[/triglycer/i,'Triglycerides','The main fat in your blood, from food and from extra sugar the liver turns into fat.','Tied to diet, alcohol, insulin resistance and heart risk.','High often follows sugar, refined carbs or alcohol.','Low is good.'],
+[/cholesterol/i,'Total cholesterol','All the cholesterol in your blood, good and bad together.','A starting point; LDL, HDL and ApoB tell the real story.','High can raise heart risk, depending on the mix.','Very low is uncommon and can follow poor nutrition.'],
+[/a1c|hba1c/i,'Hemoglobin A1c','Your average blood sugar over the last 2–3 months.','The main test for prediabetes and diabetes.','5.7–6.4% is prediabetes; 6.5%+ is diabetes range.','Low is usually fine.'],
+[/eag|estimated average glucose/i,'Estimated average glucose','Your A1c translated into an average blood sugar number.','Makes A1c easier to picture.','Higher means more sugar in the blood on average.','Low is usually fine.'],
+[/fructosamine/i,'Fructosamine','Average blood sugar over the last 2–3 weeks.','A shorter-term check than A1c.','High means blood sugar has been running high.','Low is usually fine.'],
+[/insulin/i,'Fasting insulin','How much insulin your body needs to keep blood sugar normal while fasting.','An early warning for insulin resistance, years before sugar rises.','High means your body is working hard to control sugar.','Low is usually good.'],
+[/glucose/i,'Glucose','Your blood sugar at the time of the draw (best when fasting).','Fuel for the body; checks for prediabetes and diabetes.','100–125 fasting is prediabetes range; 126+ is diabetes range.','Low can cause shakiness, sweating or fogginess.'],
+[/egfr|gfr/i,'eGFR','An estimate of how well your kidneys filter blood.','The main kidney-function number.','High is usually fine.','Below 60 for months suggests reduced kidney function.'],
+[/bun.*creat/i,'BUN / Creatinine ratio','Compares two kidney waste products.','Helps sort out hydration, diet and kidney causes.','High often means dehydration or a high-protein diet.','Low can follow low protein or liver issues.',1],
+[/creatinine/i,'Creatinine','A waste product from muscle that the kidneys clear.','Used to estimate kidney function.','High can mean reduced kidney filtering, dehydration, lots of muscle or creatine use.','Low can mean low muscle mass.'],
+[/^bun|urea/i,'BUN (blood urea nitrogen)','A waste product from breaking down protein, cleared by the kidneys.','A basic kidney and hydration check.','High often means dehydration or a high-protein diet.','Low can follow low protein intake.'],
+[/uric/i,'Uric acid','A waste product from breaking down purines (meat, seafood, alcohol, fructose).','Tied to gout, kidney stones and metabolic health.','High raises gout risk.','Low is usually fine.'],
+[/sodium/i,'Sodium','A salt that controls fluid balance and nerve signals.','Keeps fluid, blood pressure and nerves working.','High usually means dehydration.','Low can come from too much water, some medicines or hormone issues.'],
+[/potassium/i,'Potassium','A mineral that runs muscles and the heartbeat.','Small changes can affect heart rhythm.','High can affect heart rhythm; sometimes a sample handling issue.','Low can cause cramps and weakness.'],
+[/chloride/i,'Chloride','A salt that works with sodium to balance fluids and acid.','Part of fluid and acid–base balance.','High can mean dehydration.','Low can follow vomiting or fluid loss.'],
+[/co2|co&#8322;|co₂|bicarbonate|carbon dioxide/i,'CO2 (bicarbonate)','The body\'s main acid buffer in the blood.','Shows acid–base balance; also affected by altitude and breathing.','High can follow vomiting or dehydration.','Slightly low is common at altitude or with mild dehydration.'],
+[/anion/i,'Anion gap','A calculation from your salts that flags hidden acids in the blood.','A screen for acid–base problems.','High can mean extra acid (e.g. ketones, kidney issues).','Low is usually not a concern.'],
+[/calcium/i,'Calcium','A mineral for bones, muscles, nerves and heartbeat.','Tightly controlled by hormones.','High can point to parathyroid issues or too much vitamin D.','Low can follow low vitamin D or magnesium.'],
+[/magnesium/i,'Magnesium','A mineral used in hundreds of body processes, including sleep and muscle relaxation.','Supports sleep, muscle, heart rhythm and blood sugar.','High is rare, usually from supplements with weak kidneys.','Low can cause cramps, poor sleep and palpitations.'],
+[/thyroglobulin/i,'Thyroglobulin antibodies','Immune antibodies against a thyroid protein.','Another marker of autoimmune thyroid disease.','High suggests autoimmune thyroid activity.','Negative is normal.'],
+[/17-?oh/i,'17-OH progesterone','A building block the adrenal glands use to make hormones.','Checks adrenal hormone production.','High can point to an adrenal enzyme issue.','Low is usually fine.'],
+[/albumin\s*\/\s*glob|a\s*\/\s*g/i,'Albumin / Globulin ratio','Compares your two main blood proteins.','A general read on liver, nutrition and immune activity.','High is usually fine.','Low can mean inflammation or immune activity.',1],
+[/albumin/i,'Albumin','The main protein made by your liver.','Reflects nutrition, liver health and hydration.','High usually means dehydration.','Low can mean poor nutrition, inflammation or liver/kidney issues.'],
+[/globulin/i,'Globulin','Blood proteins that include antibodies.','Reflects immune activity and liver health.','High can mean inflammation or immune activity.','Low can mean a weaker antibody supply.'],
+[/protein/i,'Total protein','All the protein in your blood (albumin plus globulins).','A general nutrition, liver and immune check.','High can mean dehydration or inflammation.','Low can mean poor nutrition or liver/kidney issues.'],
+[/alk|alp/i,'Alkaline phosphatase','An enzyme from the liver, bile ducts and bones.','Flags liver, bile-duct or bone issues.','High can mean bile-duct, liver or bone activity.','Low can follow low zinc or magnesium.'],
+[/bilirubin/i,'Bilirubin','A yellow pigment from old red blood cells, cleared by the liver.','A liver and red-cell check.','Mildly high is often harmless (Gilbert\'s); higher can mean liver issues.','Low is fine.'],
+[/^alt|sgpt/i,'ALT','A liver enzyme that leaks into blood when liver cells are stressed.','The most liver-specific enzyme.','High can mean fatty liver, alcohol, medicines or hard workouts.','Low is fine.'],
+[/^ast|sgot/i,'AST','An enzyme from liver and muscle.','Read with ALT for liver health.','High can mean liver stress or recent intense exercise.','Low is fine.'],
+[/ggt/i,'GGT','A liver and bile-duct enzyme that is sensitive to alcohol.','An early marker of liver stress and alcohol use.','High often tracks with alcohol or fatty liver.','Low is fine.'],
+[/amylase/i,'Amylase','A digestive enzyme mostly from the pancreas.','Checks the pancreas.','High can mean pancreas irritation.','Low is usually not a concern.'],
+[/hematocrit/i,'Hematocrit','The share of your blood made of red cells.','Shows oxygen-carrying capacity and blood thickness.','High means thicker blood (testosterone, dehydration, altitude) and more clot risk.','Low can mean anemia, causing tiredness.'],
+[/hemoglobin|^hgb/i,'Hemoglobin','The protein in red cells that carries oxygen.','Core test for anemia and blood thickness.','High can mean thick blood (testosterone, dehydration, altitude).','Low means anemia: tiredness and shortness of breath.'],
+[/^rbc|red blood cell/i,'Red blood cells (RBC)','How many red blood cells you have.','They carry oxygen to every tissue.','High can mean thick blood (testosterone, altitude, dehydration).','Low can mean anemia.'],
+[/mchc/i,'MCHC','How concentrated the hemoglobin is inside red cells.','Helps classify anemia.','High is uncommon.','Low can point to iron deficiency.'],
+[/mch\b/i,'MCH','The average amount of hemoglobin in each red cell.','Helps classify anemia.','High can follow low B12 or folate.','Low can point to iron deficiency.'],
+[/mcv/i,'MCV','The average size of your red blood cells.','Helps find the cause of anemia.','High (large cells) can follow low B12/folate or alcohol.','Low (small cells) can point to iron deficiency.'],
+[/rdw/i,'RDW','How much your red cells vary in size.','An early clue to nutrient shortages.','High can mean mixed iron, B12 or folate shortages.','Low is fine.'],
+[/mpv/i,'MPV','The average size of your platelets.','Read alongside platelet count.','High means younger, larger platelets.','Low can follow lower platelet production.'],
+[/platelet/i,'Platelets','Cell pieces that help your blood clot.','Needed to stop bleeding.','High can follow inflammation or iron deficiency.','Low can mean easier bruising or bleeding.'],
+[/reticulocyte/i,'Reticulocyte count','Young red blood cells just released from bone marrow.','Shows how fast you are making new red cells.','High means the marrow is working hard (after blood loss).','Low can mean slow red-cell production.'],
+[/nucleated/i,'Nucleated RBC','Immature red cells that normally stay in the bone marrow.','Should be zero in adults.','Any present is flagged.','Zero is normal.'],
+[/neutrophil/i,'Neutrophils','The most common white cells; first responders to bacteria.','Part of your immune defense.','High can mean infection, stress or steroids.','Low can mean weaker defense against bacteria.'],
+[/lymph/i,'Lymphocytes','White cells that fight viruses and make antibodies.','Part of your immune defense.','High can follow a viral infection.','Low can follow stress, illness or steroids.'],
+[/monocyte/i,'Monocytes','White cells that clean up debris and fight infection.','Part of your immune defense.','High can follow recovery from infection or chronic inflammation.','Low is usually not a concern.'],
+[/eosinophil/i,'Eosinophils','White cells involved in allergies and parasites.','Track allergy activity.','High can mean allergies, asthma or parasites.','Low is usually fine.'],
+[/basophil/i,'Basophils','Rare white cells involved in allergic reactions.','Part of allergy and inflammation responses.','High can follow allergies or inflammation.','Low is normal.'],
+[/immature gran/i,'Immature granulocytes','Young white cells released early from the bone marrow.','Usually near zero.','High can mean infection or strong inflammation.','Zero is normal.'],
+[/wbc|white blood cell/i,'White blood cells (WBC)','Your total infection-fighting cells.','A general immune and infection check.','High can mean infection, inflammation or stress.','Low can mean a weaker immune defense.'],
+[/cbc|differential|absolute counts/i,'Complete blood count','A count of your red cells, white cells and platelets.','The basic blood health check.','Out-of-range parts are explained in each row.','Out-of-range parts are explained in each row.',1],
+[/bioavailable/i,'Bioavailable testosterone','Testosterone that is free or loosely bound and usable by tissues.','Closer to what your body can actually use than total testosterone.','High can mean too much testosterone (side effects, thick blood).','Low can mean low energy, drive and muscle.'],
+[/free\s*test|test(osterone)?,?\s*free/i,'Free testosterone','The small share of testosterone that is unbound and active.','The part that drives energy, libido and muscle.','High can bring acne, irritability and thick blood.','Low can mean low energy, drive, mood and muscle.'],
+[/test(osterone)?/i,'Total testosterone','All the testosterone in your blood, bound and free.','Main male hormone for energy, libido, muscle, mood and bone (also important in women at low levels).','High can bring acne, hair loss, irritability and thick blood.','Low can mean fatigue, low drive, weight gain and low mood.'],
+[/dht/i,'DHT','A strong hormone made from testosterone.','Drives body hair, prostate growth and scalp hair loss.','High can speed hair loss and prostate growth.','Low can lower libido.'],
+[/shbg/i,'SHBG','A protein that binds and locks up sex hormones.','Controls how much testosterone and estrogen are free to act.','High means less free testosterone.','Low means more free hormone; often seen with insulin resistance.'],
+[/estradiol|estrogen|e2/i,'Estradiol','The main estrogen.','Key for women\'s cycles; in men it supports bone, libido and mood in small amounts.','In men, high can cause water retention, moodiness and low drive.','Low can cause joint aches, low libido and poor bone health.'],
+[/progesterone/i,'Progesterone','A hormone that balances estrogen and supports sleep and calm.','Key for women\'s cycles and HRT.','High is expected after ovulation or on progesterone.','Low can mean poor sleep, anxiety or irregular cycles.'],
+[/fsh\s*&\s*lh/i,'FSH & LH','Brain signals that tell the testes or ovaries to make hormones.','Show whether hormone problems start in the brain or the glands.','High means the glands are not responding well.','Low means the brain signal is quiet (or suppressed by testosterone).',1],
+[/fsh/i,'FSH','A brain signal that drives sperm or egg development.','Shows fertility signaling.','High can mean the testes/ovaries are underperforming (or menopause).','Low can mean suppressed signaling (often from testosterone use).'],
+[/\blh\b/i,'LH','A brain signal that tells the testes or ovaries to make hormones.','Drives your own testosterone production.','High can mean the glands are not responding.','Low can mean suppressed signaling (often from testosterone use).'],
+[/prolactin/i,'Prolactin','A pituitary hormone best known for milk production.','Affects libido and hormone balance in both sexes.','High can lower libido and testosterone.','Low is usually fine.'],
+[/dhea/i,'DHEA-S','An adrenal hormone the body turns into testosterone and estrogen.','A marker of adrenal output and aging.','High can come from supplements or the adrenals.','Low often falls with age and stress.'],
+[/cortisol rhythm/i,'Cortisol rhythm','Your stress hormone measured at several times of day.','Should be highest in the morning and lowest at night.','High at night can mean tired-but-wired and poor sleep.','Low in the morning can mean dragging, low energy.',1],
+[/cortisol/i,'Cortisol','Your main stress hormone.','Controls energy, blood sugar and the stress response.','High can mean ongoing stress and poor sleep.','Low can mean fatigue and poor stress tolerance.'],
+[/growth hormone/i,'Growth hormone','Hormone that drives repair, muscle and fat burning.','Comes in pulses, so one random value is hard to read.','High can come from GH-boosting compounds.','Low on one random draw is common and not conclusive.'],
+[/igf/i,'IGF-1','The liver\'s response to growth hormone; a steady stand-in for GH.','Used to track growth-hormone status and GH-axis compounds.','High can mean too much GH effect.','Low can mean low growth-hormone output.'],
+[/hcg/i,'hCG','A hormone that mimics LH (used for fertility or with testosterone).','Usually checks for pregnancy or hCG use.','High means pregnancy or hCG use.','Low/undetectable is normal otherwise.'],
+[/psa,?\s*free/i,'PSA (free & total)','A protein made by the prostate, measured two ways.','A lower free share can raise concern; a higher free share is reassuring.','Higher total PSA needs follow-up.','A low free percentage needs follow-up.',1],
+[/psa/i,'PSA','A protein made by the prostate.','Screens prostate health; important to track on testosterone.','High can mean enlargement, inflammation or rarely cancer.','Low is good.'],
+[/ft4|free t4|t4,?\s*free|free thyroxine index/i,'Free T4','The storage form of thyroid hormone that is free to use.','Shows thyroid output.','High can mean overactive thyroid or too much medication.','Low can mean underactive thyroid.'],
+[/ft3|free t3|t3,?\s*free/i,'Free T3','The active thyroid hormone.','Drives metabolism, energy and temperature.','High can mean overactive thyroid.','Low can mean slow metabolism, tiredness, feeling cold.'],
+[/t3 uptake/i,'T3 uptake','An older test of thyroid-binding proteins.','Used with T4 to estimate free thyroid hormone.','High can follow overactive thyroid.','Low can follow estrogen or underactive thyroid.'],
+[/t3/i,'Total T3','All the active thyroid hormone, bound and free.','A broad read on thyroid activity.','High can mean overactive thyroid.','Low can mean slow thyroid or low calories.'],
+[/t4/i,'Total T4','All the storage thyroid hormone, bound and free.','A broad read on thyroid output.','High can mean overactive thyroid.','Low can mean underactive thyroid.'],
+[/tsh/i,'TSH','The brain signal that tells the thyroid how hard to work.','The main thyroid screening test.','High means the thyroid is underactive (sluggish).','Low means the thyroid is overactive or on high medication.'],
+[/tpo|thyroid peroxidase/i,'TPO antibodies','Immune antibodies against the thyroid.','Flags autoimmune thyroid disease (Hashimoto\'s).','High suggests the immune system is attacking the thyroid.','Low/negative is normal.'],
+[/crp/i,'hs-CRP','A sensitive marker of inflammation in the body.','Tracks body-wide inflammation and heart risk.','High means inflammation (injury, illness, poor sleep, excess fat).','Low is good.'],
+[/homocysteine/i,'Homocysteine','An amino acid that builds up when B vitamins run low.','Linked to heart and brain health.','High can mean low B12, folate or B6.','Low is good.'],
+[/ferritin/i,'Ferritin','Your stored iron.','The best test of iron reserves.','High can mean iron overload or inflammation.','Low means low iron stores: tiredness, hair loss.'],
+[/iron sat|saturation/i,'Iron saturation','How much of your iron carrier is filled with iron.','Shows usable iron.','High can mean iron overload.','Low can mean iron deficiency.'],
+[/tibc/i,'TIBC','How much iron your blood could carry.','Helps tell iron deficiency from other causes.','High often means low iron.','Low can follow inflammation or iron overload.'],
+[/uibc/i,'UIBC','Unused iron-carrying capacity.','Read with iron and TIBC.','High often means low iron.','Low can mean iron overload.'],
+[/iron/i,'Serum iron','The iron circulating in your blood right now.','Iron carries oxygen; read with ferritin.','High can mean overload or a recent supplement.','Low can mean iron deficiency.'],
+[/b12\s*&\s*folate/i,'Vitamin B12 & folate','Two B vitamins needed for red cells and nerves.','Low levels cause tiredness and large red cells.','High is usually from supplements.','Low can cause fatigue, tingling and anemia.',1],
+[/b12/i,'Vitamin B12','A vitamin for nerves, energy and red blood cells.','Low B12 causes fatigue and nerve symptoms.','High is usually from supplements.','Low can cause tiredness, tingling and brain fog.'],
+[/folate/i,'Folate','A B vitamin for red cells and DNA.','Needed for energy and healthy cells.','High is usually from supplements.','Low can cause anemia and fatigue.'],
+[/vitamin d/i,'Vitamin D','Your vitamin D stores.','Supports bone, immune health, mood and muscle.','Very high (over 100) can raise calcium.','Low is common and tied to low energy, mood and weak bones.'],
+[/food panel|igg/i,'IgG food panel','IgG antibodies to common foods.','Sometimes used to explore food sensitivities; not a true allergy test.','Higher classes suggest more exposure or sensitivity.','Low means little reaction.'],
+[/glutamate|dopamine/i,'Urine neurotransmitters','Brain-chemical breakdown products measured in urine.','An indirect, research-style look at stress and mood chemistry.','High can track with stress or stimulants.','Low can track with fatigue or low mood.']
+];
+function labDef(n){var s=String(n).replace(/<[^>]+>/g,'').trim();
+  function one(x){for(var i=0;i<LABDEFS.length;i++){if(LABDEFS[i][0].test(x))return LABDEFS[i];}return null;}
+  var d=one(s);if(d&&d[6])return[d];
+  var parts=s.split(/\s*(?:\/|&|:)\s*/),out=[];if(parts.length>1)parts.forEach(function(p){var e=one(p);if(e&&out.indexOf(e)<0)out.push(e);});
+  if(out.length)return out;return d?[d]:[];}
+function labTip(r){var ds=labDef(r.n),h='';
+  if(!ds.length){h='<div class="ldef"><b>What it is</b> A blood marker from your panel. <b>Why it matters</b> It is one piece of your overall health picture. Values outside the reference range are flagged and explained below.</div>';}
+  ds.forEach(function(d){h+='<div class="ldef"><div class="ldt">'+d[1]+'</div><b>What it measures</b> '+d[2]+'<br><b>Why it matters</b> '+d[3]+'<br><b>If high</b> '+d[4]+'<br><b>If low</b> '+d[5]+'</div>';});
+  return h+(r.tip?'<div class="lyour"><div class="ldt">Your result</div>'+r.tip+'</div>':'');}
 function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
 function sheet(n){var e=document.getElementById('s-'+n);e.scrollTop=0;e.classList.add('on');}
 function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});}
@@ -1956,8 +2152,9 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
-  /* Days only, no calendar dates -- a client rarely starts on the date shown.
-     Today is still marked, by weekday. */
+  /* Days only, no calendar dates: a client rarely starts on the date shown,
+     so a real date reads as a promise the schedule is not making. What matters
+     is which weekdays carry a draw. "Today" is still marked, by weekday. */
   var now=new Date();
   var h='';
   for(var i=0;i<7;i++){
@@ -1971,12 +2168,13 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
    Morning block and again in the Night block. */
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
 function renderDoses(){
-  /* Only what the client has on their schedule, and only what is due today. */
+  /* Only what the client has switched on, across whatever cycles, and only
+     what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
-      ' is clear — the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
+      ' is clear. Nothing is on your schedule for this day.</div></div>';
     document.getElementById('dosenote').textContent='';return;
   }
   var h='', total=0;
@@ -2000,44 +2198,86 @@ function renderDoses(){
 }
 
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
-   Every compound Jeremy has taken or ordered, alphabetical, expanding in place.
+   The selected cycle's compounds, alphabetical, expanding in place.
    Everything starts collapsed. No grouping and no sort toggle: one list. */
 function cmpArch(c){return !!(c.hist||/^\s*(archived|prior|past)\b/i.test(c.tag||''));}
-/* On hand but off the calendar -- kept in full in the A-Z list, just not
-   scheduled and not counted as active. Distinct from Past, which means done. */
-function cmpOff(c){return !cmpArch(c)&&/^\s*not scheduled\b/i.test(c.tag||'');}
 function cmpRow(c,i){
-  var arch=cmpArch(c), off=cmpOff(c), on=schOn(c);
+  /* i is any unique key, not just the ALL index: a compound that runs in more
+     than one cycle is rendered once per group and each copy needs its own id. */
+  var arch=cmpArch(c), on=schOn(c);
+  var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
   var nm=String(c.n).replace(/'/g,"\\'");
   var btn='<button type="button" class="schbtn'+(on?' on':'')+'" onclick="schTog(\''+nm+'\',event)">'+
     (on?'\u2713 On schedule':'+ Add to schedule')+'</button>';
   var _blk=(typeof schBlk==='function'?schBlk(c):c.b); var ampm=(on&&c.b!=='BOTH')?('<span class="schblk"><button type="button" class="blkb'+(_blk==='AM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'AM\',event)">AM</button><button type="button" class="blkb'+(_blk==='PM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'PM\',event)">PM</button></span>'):'';
-  var sub=(arch?'No longer running'
-          :(off?'On hand \u00b7 not on the current schedule'
-               :(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c));
-  return '<div class="cx'+(arch||off?' hist':'')+'" id="cx'+i+'">'+
+  return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':(off?'<span class="cx-arch">Not scheduled</span>':''))+'</div><div class="cx-s">'+sub+'</div>'+btn+ampm+'</div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
+      '<div class="cx-ctl">'+btn+ampm+'</div>'+
       '<div class="cx-ab">'+c.about+'</div>'+
       '<div class="facts" style="margin:11px 0 0">'+
         '<div class="frow"><div class="fl">Recon</div><div class="fchips"><b>'+c.rec+'</b></div></div>'+
-        '<div class="frow"><div class="fl">Draw</div><div class="fchips"><b>'+c.d+'</b><b>'+c.u+'</b></div></div>'+
+        '<div class="frow"><div class="fl">Draw</div><div class="fchips">'+(c.d?'<b>'+c.d+'</b>':'')+(c.u?'<b>'+c.u+'</b>':'')+'</div></div>'+
         '<div class="frow"><div class="fl">Site</div><div class="fchips"><b>'+c.site+'</b></div></div>'+
         '<div class="frow"><div class="fl">Timing</div><div class="fchips"><b>'+c.c+'</b><b>'+(c.b==='BOTH'?'AM + PM':c.b)+'</b></div></div>'+
       '</div>'+
     '</div></div>';
 }
 function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
-/* ===== CLIENT-CURATED SCHEDULE ========================================
+/* ===== CLIENT-CURATED SCHEDULE (multi-cycle) ===========================
    ALL is the prescribed protocol and never changes. On top of it sits a set
-   of which compounds belong on the day view, kept in localStorage under
-   this page's own key. Every read is guarded and falls back to the
-   prescribed default rather than breaking the page. */
+   of which compounds currently belong on the day view, kept in localStorage
+   under this client's own key. On a cycle page the sensible starting point
+   is the CURRENT cycle on and every later cycle off, so the client opens to
+   what they are actually running and switches the next cycle on when they
+   reach it. A compound that runs in more than one cycle is one entry keyed
+   by name, so both rendered copies always agree. Storage can be unavailable
+   or hold junk, so every read is guarded and falls back to the default. */
 var SCHKEY='biolinked-sched-jjohnston';
 var schState=null;
+/* Cycles are recommendations, not a plan of record: building someone six
+   cycles does not mean they are running six cycles. So the day view starts
+   with what has actually been bought -- the compounds on a paid order --
+   and every recommended compound waits until the client switches it on.
+   A protocol that is still all quotes starts empty.
+
+   This is only the starting point. Once there is saved or synced state,
+   that wins and none of this runs. */
+function schPaidNorm(s){
+  return String(s||'').toLowerCase()
+    .replace(/^\s*\d+\s*[x×]\s*/,'')   /* some invoices lead with "2x " */
+    .replace(/·/g,' ')
+    .replace(/[–—]/g,'-')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+var SCH_PAID_ALIAS={
+  'selank':'n-acetyl selank amidate',
+  'semax':'n-acetyl semax amidate',
+  'adamax':'n-acetyl adamax amidate',
+  'epithalon':'epitalon',
+  'fox04-dri':'foxo4-dri'
+};
+/* Longest base name wins, so "Selank" cannot claim a line that belongs to
+   "N-Acetyl Selank Amidate". */
+function schPaidMatch(itemName){
+  var it=schPaidNorm(itemName), best=null, bestLen=-1;
+  for(var i=0;i<ALL.length;i++){
+    var base=schPaidNorm(String(ALL[i].n).split('·')[0]);
+    if(!base) continue;
+    var hit=it.indexOf(base)===0;
+    if(!hit){
+      var al=SCH_PAID_ALIAS[base];
+      if(al && it.indexOf(al)===0) hit=true;
+      if(!hit){ var ia=SCH_PAID_ALIAS[it.split(' ')[0]]; if(ia && ia===base) hit=true; }
+    }
+    if(hit && base.length>bestLen){ best=ALL[i]; bestLen=base.length; }
+  }
+  return best;
+}
 function schDefault(){ var o={}; for(var i=0;i<CMP.length;i++) o[CMP[i].n]=1; return o; }
 function schLoad(){
   try{
@@ -2071,6 +2311,8 @@ function schTog(name,ev){
    carries ("Cycle 2 · future"), so no page needs new data: a page with
    fewer than two Cycle N tags has no selector and behaves exactly as before. */
 function cycName(c){return String(c.tag||'').split('\u00b7')[0].trim();}
+function cycGoal(n){ if(typeof INV==='undefined'||!INV) return ''; for(var i=0;i<INV.length;i++){ var P=String((INV[i]&&INV[i].label)||'').split(' \u00b7 '); if(P.length>=2 && P[0].trim()===n) return P[1].trim(); } return ''; }
+function cycTitle(n){ var g=cycGoal(n); return g?(n+' \u00b7 '+g):n; }
 /* A compound can run in several cycles (SS-31 in 1, 3 and 5), and a foundation
    compound runs in all of them. Pages that declare neither behave as before. */
 function cycNames(c){
@@ -2114,78 +2356,163 @@ function cycList(){
   });
   return out.length>1 ? out : [];
 }
-var CYCS=[], cycSel=null;
+var CYCS=[];
 function cycCurrent(){
   var L=cycOn(); if(!L) return null;
   for(var i=0;i<L.length;i++){ if(!L[i].future && !L[i].arch) return L[i].n; }
   return L[0].n;
 }
-/* Compounds driving the day strip. With no cycles this is CMP, untouched. */
 function cycOn(){return (typeof CYCS!=='undefined'&&CYCS&&CYCS.length)?CYCS:null;}
-function cycRows(){
-  if(!cycOn()) return CMP;
-  if(cycSel===cycCurrent()) return CMP;
-  return ALL.filter(function(c){return cycHas(c,cycSel) && !cmpArch(c)});
+var CYCABOUT={};
+/* Every cycle is listed on the Protocol tab, each its own collapsible card,
+   so the whole plan can be read from the homepage without going hunting.
+   This no longer tracks the Schedule tab's selector -- there is nothing to
+   follow when all five are on screen -- so a cycle switch over there leaves
+   whatever the reader has open here alone. */
+var STK_IX_ALIAS={"N-Acetyl Semax Amidate": "Semax or NA Semax Amidate", "N-Acetyl Selank Amidate": "Selank or NA Selank Amidate", "N-Acetyl Adamax Amidate": "Adamax", "MOTS-c": "MOTS-C", "Kisspeptin-10": "Kisspeptin"};
+/* Jump straight to the compound's Index entry where the catalog has one.
+   Names differ between a protocol card and the catalog in a handful of cases,
+   so a small alias map covers those; anything unmatched opens the Index list
+   rather than failing silently. */
+function stkIxFind(name){
+  if(typeof IX==='undefined'||!IX) return -1;
+  var norm=function(x){return String(x).toLowerCase().replace(/[^a-z0-9]/g,'');};
+  var base=String(name).split(/\s+[·—–-]\s+/)[0].trim();
+  var SHARED={
+    'hgh':'Somatropin (HGH)','hghsomatropin':'Somatropin (HGH)','hghhumangrowthhormone':'Somatropin (HGH)','humangrowthhormone':'Somatropin (HGH)','somatropin':'Somatropin (HGH)',
+    'trt':'Testosterone','trttestosteronecypionate':'Testosterone','testosteronecypionate':'Testosterone','testosteroneenanthate':'Testosterone',
+    'cjc1295ipamorelin':'Ipamorelin / CJC-1295 No DAC','ipamorelincjc1295':'Ipamorelin / CJC-1295 No DAC','cjc1295wdac':'CJC-1295 No DAC','cjc1295withdac':'CJC-1295 No DAC',
+    'nacetylsemaxamidate':'Semax or NA Semax Amidate','nasemaxamidate':'Semax or NA Semax Amidate','semax':'Semax or NA Semax Amidate',
+    'nacetylselankamidate':'Selank or NA Selank Amidate','naselankamidate':'Selank or NA Selank Amidate','selank':'Selank or NA Selank Amidate',
+    'nacetyladamaxamidate':'Adamax','naadamaxamidate':'Adamax',
+    'epithalon':'Epitalon',
+    'fox04dri':'FOXO4-DRI',
+    'kisspeptin10':'Kisspeptin',
+    'pt141bremelanotide':'PT-141',
+    'klowblend':'KLOW Blend (GHK-Cu, BPC-157, TB-500, KPV)',
+    'glowblend':'GLOW Blend (GHK-Cu, BPC-157, TB-500)',
+    'wolverinestack':'Wolverine 2.0','wolverine':'Wolverine 2.0',
+    'bpc157tb500':'BPC-157 / TB-500 5mg/5mg Blend','bpc157tb500blend':'BPC-157 / TB-500 5mg/5mg Blend',
+    'melanotan':'Melanotan 2'
+  };
+  var pageAlias=(typeof STK_IX_ALIAS!=='undefined'&&STK_IX_ALIAS)||{};
+  var target=pageAlias[name]||pageAlias[base]||SHARED[norm(base)]||base;
+  var want=norm(target); var i;
+  for(i=0;i<IX.length;i++){ if(norm(IX[i].name)===want) return i; }
+  var bestI=-1,bestLen=1e9;
+  for(i=0;i<IX.length;i++){ var n2=norm(IX[i].name);
+    if(n2 && (n2.indexOf(want)>-1 || want.indexOf(n2)>-1) && n2.length<bestLen){ bestLen=n2.length; bestI=i; } }
+  return bestI;
 }
-function pickCyc(n){ cycSel=n; renderCyc(); renderDoses(); renderAll(); renderSubline(); }
-function renderCyc(){
-  var host=document.getElementById('cycbar');
-  if(!host) return;
-  if(!cycOn()){ host.innerHTML=''; return; }
-  host.innerHTML='<div class="cycrow">'+CYCS.map(function(c){
-    var lbl=c.n+(c.n===cycCurrent()?' \u00b7 Current':(c.future?' \u00b7 Upcoming':(c.arch?' \u00b7 Past':'')))
-            +(c.wk?' \u00b7 '+c.wk:'');
-    return '<button type="button" class="cyc'+(c.n===cycSel?' on':'')+
-      '" onclick="pickCyc(\''+c.n.replace(/'/g,"\\'")+'\')">'+lbl+'</button>';
-  }).join('')+'</div>'+
-  (cycSel!==cycCurrent()
-    ? '<div class="banner" style="margin-top:8px"><span class="d"></span>This is '+cycSel+
-      ', not your current schedule. '+(function(){for(var i=0;i<CYCS.length;i++){if(CYCS[i].n===cycSel)return CYCS[i].future?'It starts when the cycle before it finishes.':'It has already run.';}return '';})()+'</div>'
-    : '');
+function stkIx(name,ev){
+  if(ev&&ev.stopPropagation) ev.stopPropagation();
+  var i=stkIxFind(name);
+  if(i>=0){ sheet('indexlist'); openIx(i); }
+  else { sheet('indexlist'); }
+}
+function cmpOff(c){return !cmpArch(c)&&/^\s*not scheduled\b/i.test(c.tag||'');}
+function aboutCompound(c){
+ var sch=[c.c,c.b==='BOTH'?'AM + PM':c.b].filter(Boolean).join(' · ');
+ return '<details class="jc-compound"><summary>'+esc(c.n)+(cmpOff(c)?' <span class="cx-arch">Not scheduled</span>':'')+'<span aria-hidden="true" class="jc-chevron"></span></summary><div class="jc-body">'+(c.about?'<div class="jc-description">'+c.about+'</div>':'')+'<dl class="jc-facts">'+
+ [['Status',cmpOff(c)?'On hand \u00b7 not on the current schedule':''],['Recon',c.rec],['Schedule',cmpOff(c)?'':sch],['Dose / draw',[c.d,c.u].filter(Boolean).join(' · ')],['Site',c.site]].filter(function(r){return r[1];}).map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'</dl></div></details>';
+}
+function renderAbout(){
+ var host=document.getElementById('protoabout'); if(!host) return;
+ var about=(typeof CYCABOUT!=='undefined'&&CYCABOUT)||{}, list=(typeof ALL!=='undefined'&&ALL)||[], shown={};
+ /* A page with no cycle plan still has its compounds and its notes, so fall
+    back to CYCABOUT's own keys and list whatever no cycle claimed. */
+ var cycs=cycOn()||Object.keys(about).map(function(n){return {n:n};});
+ var h=cycs.map(function(cy){
+ var a=about[cy.n]||{};
+ var rows=list.filter(function(c){return cycNames(c).indexOf(cy.n)>=0;});
+ rows.forEach(function(c){shown[c.n]=1;});
+ return '<section class="jc-cycle"><header class="jc-cycle-head"><h2>'+esc(cy.n)+'</h2>'+(cy.wk?'<p>'+esc(cy.wk)+'</p>':'')+'</header>'+
+ (a.t?'<p class="jc-intro">'+esc(a.t)+'</p>':'')+
+ rows.map(aboutCompound).join('')+
+ ((a.s||a.w)?'<details class="jc-notes"><summary>About this cycle</summary>'+(a.s?'<h3>Why these together</h3><p>'+esc(a.s)+'</p>':'')+(a.w?'<h3>Timing</h3><p>'+esc(a.w)+'</p>':'')+'</details>':'')+'</section>';
+ }).join('');
+ var rest=list.filter(function(c){return !shown[c.n];});
+ if(rest.length){
+ var lbl=cycs.length?((typeof CYCBASE!=='undefined'&&CYCBASE)||'Also in your protocol'):'Your compounds';
+ h+='<section class="jc-cycle"><header class="jc-cycle-head"><h2>'+esc(lbl)+'</h2></header>'+rest.map(aboutCompound).join('')+'</section>';
+ }
+ host.innerHTML=h||'<div class="empty"><div class="t">Your protocol is on its way</div><div class="d">Your compounds and schedule will show here as soon as they are ready.</div></div>';
+}
+function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
+/* A group re-renders whenever the cycle toggle moves, so remember which ones
+   the reader had open and put them back. */
+function cgOpenSet(){
+  var o={}; var n=document.querySelectorAll('#cmplist .cgrp.on');
+  for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
+}
+/* The controls now live inside the compound body, and every toggle re-renders
+   the list, so an open row has to survive that or it would shut under the
+   reader's finger. */
+function cxOpenSet(){
+  var o={}; var n=document.querySelectorAll('#cmplist .cx.on');
+  for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
+}
+function cgrpHTML(key,title,meta,rows,open,extra){
+ if(!rows.length)return '';
+ /* `open` was accepted and then ignored, and the markup said jc-cycle while
+    cgOpenSet looked for cgrp, so every cycle rendered expanded. Both are
+    wired up now: the head toggles the group and the current cycle opens. */
+ return '<section class="jc-cycle cgrp'+(open?' on':'')+' '+(extra||'')+'" id="cg-'+key+'">'+
+   '<header class="jc-cycle-head" onclick="cgTog(\''+key+'\')"><div class="cg-ht"><h2>'+esc(title)+'</h2>'+(meta?'<p>'+esc(meta)+'</p>':'')+'</div><span class="cg-cv">\u203a</span></header>'+
+   rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</section>';
 }
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
   var n=schRows().length;
-  e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks'+
-    (cycOn()&&cycSel!==cycCurrent()?' \u00b7 '+cycSel:'');
+  e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks';
 }
 function renderAll(){
+  /* The ALL COMPOUNDS browser was removed from the Schedule view. Without
+     its host there is nothing to paint, and every caller -- schTog and
+     schBlkSet run it un-wrapped -- has to carry on to its next line. */
+  if(!document.getElementById('cmplist')) return;
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
   var past=idx.filter(function(x){return cmpArch(x.c)});
   var h='', live;
   if(cycOn()){
-    /* The foundation never pauses, so it is shown as its own group above
-       whichever cycle is being viewed rather than mixed in with it. */
+    /* Every cycle is listed, not just the selected one, so the whole plan
+       reads top to bottom in one pass. Each cycle is its own collapsible
+       group with the current one open and the rest shut, so five cycles do
+       not turn into a mile of scroll. Membership is tested against the
+       compound's OWN cycle names rather than cycHas(), because cycHas() is
+       true for a foundation compound in every cycle and that would emit the
+       same DOM id several times over. */
     var found=idx.filter(function(x){return cycIsBase(x.c)&&!cmpArch(x.c)});
-    var cyc=idx.filter(function(x){return !cycIsBase(x.c)&&cycHas(x.c,cycSel)&&!cmpArch(x.c)});
     var declared=false;
     for(var q=0;q<ALL.length;q++){ if(ALL[q].found) declared=true; }
-    live=found.concat(cyc);
-    var sel=null;
-    for(var i=0;i<CYCS.length;i++){ if(CYCS[i].n===cycSel) sel=CYCS[i]; }
-    var isNow=cycSel===cycCurrent();
     var baseLbl=(typeof CYCBASE!=='undefined'&&CYCBASE)?CYCBASE
         :(declared?'Foundation \u00b7 every week, all year'
                   :'Ongoing \u00b7 runs through every cycle');
-    if(found.length) h+='<div class="cxsub found">'+baseLbl+'</div>'+
-      '<div class="cxwrap">'+found.map(function(x){return cmpRow(x.c,'f'+x.i)}).join('')+'</div>';
-    h+='<div class="cxsub'+(isNow?' now':'')+'">'+(isNow?'Current cycle \u00b7 ':'')+cycSel+
-       (sel&&sel.wk?' \u00b7 '+sel.wk:'')+
-       (isNow?'':(sel&&sel.arch?' \u00b7 already run':' \u00b7 not running yet'))+'</div>';
-    h+=cyc.length
-      ? '<div class="cxwrap">'+cyc.map(function(x){return cmpRow(x.c,'c'+x.i)}).join('')+'</div>'
-      : '<div class="cxwrap"><div class="cx"><div class="cx-hd"><div class="cx-t">'+
-        '<div class="cx-s">Foundation only \u2014 no extra compounds this cycle.</div></div></div></div></div>';
+    var was=cgOpenSet(), wasCx=cxOpenSet(), first=!document.querySelector('#cmplist .cgrp');
+    function inCyc(x,n){return !cycIsBase(x.c)&&!cmpArch(x.c)&&cycNames(x.c).indexOf(n)>=0;}
+    function openFor(id,def){ return first?def:!!was[id]; }
+    if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',false),'');
+    for(var k=0;k<CYCS.length;k++){
+      var cy=CYCS[k];
+      var rows=idx.filter(function(x){return inCyc(x,cy.n)});
+      var isNow=cy.n===cycCurrent();
+      var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
+      var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
+      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,isNow),'');
+    }
+    if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
+    /* The count is what the client has switched on, not what the current
+       cycle happens to hold -- those diverge the moment anything is curated. */
+    live=idx.filter(function(x){return schOn(x.c)});
   } else {
     /* One list, A-Z. A compound that is finished stays in place with a quiet
        "Past" tag rather than being moved into a section of its own. */
-    live=idx.filter(function(x){return schOn(x.c)});
-    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,'a'+x.i)}).join('')+'</div>';
+    live=idx.filter(function(x){return !cmpArch(x.c)});
+    if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
-  if(cycOn()&&past.length) h+='<div class="cxsub">Past \u00b7 no longer running</div>'+
-    '<div class="cxwrap past">'+past.map(function(x){return cmpRow(x.c,'p'+x.i)}).join('')+'</div>';
   document.getElementById('cmplist').innerHTML=h;
+  if(typeof wasCx!=='undefined'){ for(var _c in wasCx){ var _e=document.getElementById(_c); if(_e) _e.classList.add('on'); } }
   document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
@@ -2320,9 +2647,14 @@ function renderSupply(){
   host.innerHTML=h;
 }
 
+/* Summaries are written for the page, not the tap: the card is already tappable. */
+function invTail(s){return String(s||'').replace(/\s*\u00b7\s*tap to view\b/gi,'').trim();}
+function invSum(o){return invTail(o&&o.summary);}
 function renderPay(){
   var dueO=INV.filter(function(o){return o.status==='due'});
   var dueT=dueO.reduce(function(a,o){return a+o.total},0);
+  var quoteO=INV.filter(function(o){return o.status==='quote'});
+  var quoteT=quoteO.reduce(function(a,o){return a+o.total},0);
   var sum=document.getElementById('paysum'), hero=document.getElementById('payhero'),
       list=document.getElementById('paylist'), note=document.getElementById('paynote');
   if(!INV.length){
@@ -2333,31 +2665,36 @@ function renderPay(){
     note.textContent='';
     return;
   }
-  sum.textContent='Paid to date '+money(PAID)+' · Quoted '+money(DUE);
+  sum.textContent=(DUE===0&&PAID===0&&quoteO.length)
+    ? (quoteO.length+' cycles quoted \u00b7 '+money(quoteT)+' total · nothing billed yet')
+    : 'Paid to date '+money(PAID)+' · Quoted '+money(DUE);
   hero.innerHTML = dueT>0 ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(dueT)+
-    '</div><div class="o">'+dueO.map(function(o){return o.label}).join(', ')+
+    '</div><div class="o">'+dueO.map(function(o){return invTail(o.label)}).join(', ')+
     '</div><div class="np">'+dueO.length+' quoted order'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
     payButtons(dueT,'BioLinked \u2014 quoted')+'</div>')
-    : ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(0)+
-       '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>');
+    : (quoteO.length ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(quoteT)+
+       '</div><div class="o">'+quoteO.map(function(o){return o.label.split(' \u00b7 ')[0]+' \u00b7 '+o.label.split(' \u00b7 ')[1]}).join(', ')+
+       '</div></div>')
+       : ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(0)+
+       '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>'));
   list.innerHTML=INV.map(function(o,i){
-    var pc=o.status==='due'?'due':(o.status==='free'?'free':'paid');
-    var pl=o.status==='due'?'Quoted':(o.status==='free'?'Free':'Paid');
-    return '<div class="ocard" onclick="openInv('+i+')"><div class="ohd"><div><div class="ot">'+o.label+
-      '</div><div class="os">'+o.summary+'</div></div><span class="pill '+pc+'">'+pl+'</span></div>'+
+    var pc=o.status==='due'?'due':(o.status==='free'?'free':(o.status==='quote'?'quote':'paid'));
+    var pl=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
+    return '<div class="ocard" onclick="openInv('+i+')"><div class="ohd"><div><div class="ot">'+invTail(o.label)+
+      '</div>'+(invSum(o)?'<div class="os">'+invSum(o)+'</div>':'')+'</div><span class="pill '+pc+'">'+pl+'</span></div>'+
       o.items.map(function(it){return '<div class="irow'+(it.amt===0?' freeln':'')+'"><span class="in">'+it.n+
         '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>'}).join('')+
-      '<div class="irow tot"><span class="in">'+(o.status==='due'?'Quoted':(o.status==='free'?'No charge':'Paid in full'))+
+      '<div class="irow tot"><span class="in">'+(o.status==='due'?'<button type="button" class="invoice-pay-now" onclick="event.stopPropagation();openInv('+i+')">Pay now &rarr;</button>':o.status==='quote'?'Not billed yet':(o.status==='free'?'No charge':'Paid in full'))+
       '</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o)+'</div>';
   }).join('');
-  note.textContent='Tap an order for its full breakdown. Figures are copied from your protocol page — nothing is charged in the app.';
+  note.textContent='';
 }
 function openInv(i){
   var o=INV[i]; if(!o) return;
-  document.getElementById('i-name').textContent=o.label;
-  document.getElementById('i-sum').textContent=o.summary;
-  document.getElementById('i-tag').textContent=o.status==='due'?'Quoted':(o.status==='free'?'Free':'Paid');
+  document.getElementById('i-name').textContent=invTail(o.label);
+  document.getElementById('i-sum').textContent=invSum(o);
+  document.getElementById('i-tag').textContent=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
   document.getElementById('i-items').innerHTML=o.items.map(function(it){
     return '<div class="irow"><span class="in"><b>'+it.n+'</b>'+(it.sub?'<br><span style="color:var(--muted);font-size:13px">'+it.sub+'</span>':'')+
       '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>';
@@ -2384,8 +2721,8 @@ function openInv(i){
    front-end only. Nothing a client uses to work out a draw is missing.
    ------------------------------------------------------------------------ */
 (function(){
-  /* The picker is Jeremy's OWN compounds -- his active protocol, his gifts and
-     everything in his prior orders -- not the generic catalog. Shaped like
+  /* The picker is the client's OWN compounds -- the active protocol, gifts and
+     everything in prior orders -- not the generic catalog. Shaped like
      CHEAT_SHEET_DATA so buildLib() reads it without modification. */
   window.CHEAT_SHEET_DATA = MINE;
   var el = function(id){ return document.getElementById(id); };
@@ -2612,10 +2949,17 @@ function openInv(i){
     var c = LIB[+v]; if(!c) return;
     nameField.hidden = true;
     nameEl.value = c.name;
-    vialEl.value = (c.vial != null) ? String(c.vial) : '';   /* never keep the last compound's numbers */
+    /* Vial box stays in the vial's own unit. The library number is scaled
+       into the dose unit, and writing that into the box draws 0 units. */
+    var rawVialAmt = parseAmt(c.rawVial);
+    if(rawVialAmt){
+      var shown = rawVialAmt.n;
+      if(rawVialAmt.u === 'mcg') shown = rawVialAmt.n / 1000;
+      vialEl.value = String(shown);
+    } else vialEl.value = (c.vial != null) ? String(c.vial) : '';   /* never keep the last compound's numbers */
     bacEl.value  = (c.bac  != null) ? String(c.bac)  : '';
     doseEl.value = (c.dose != null) ? String(c.dose) : '';
-    setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
+    setVialUnit((rawVialAmt && rawVialAmt.u === 'iu') || c.unit === 'iu' ? 'iu' : 'mg');
     curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
     syncUnitButtons();
@@ -4656,8 +5000,8 @@ if('serviceWorker' in navigator){
   });
 }
 
-CYCS=cycList(); cycSel=cycCurrent();
-renderCyc(); /* ======================================================================
+CYCS=cycList();
+/* ======================================================================
    CLOUD SYNC  (schedule / nutrition / calculator)
 
    No key and no login: the page knows its own slug and calls two RPCs.
@@ -4737,7 +5081,11 @@ function csRead(kind){
 function csHasLocal(kind){
   var p=csRead(kind);
   if(!p) return false;
-  if(kind==='schedule')  return p.on && Object.keys(p.on).length>0;
+  if(kind==='schedule'){
+    /* schGet() synthesises the default when nothing is saved, so ask
+       storage directly: only real curation should be lifted up. */
+    try{ return !!localStorage.getItem(SCHKEY); }catch(e){ return false; }
+  }
   if(kind==='nutrition') return p.plan!=null || p.targets!=null;
   if(kind==='calculator') return (p.saved&&p.saved.length) || (p.inputs&&Object.keys(p.inputs).length);
   return false;
@@ -4831,7 +5179,7 @@ try{
   window.addEventListener('offline', function(){ csStat('offline'); });
 }catch(e){}
 
-renderDue(); renderDays(); renderDoses(); renderAll(); renderCats(); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
+renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats();
 
 /* Every local write also queues the matching cloud write. The originals
    still run first, so the cache is correct even if the network is not. */
@@ -4909,7 +5257,7 @@ function saRender(){
   if(!host){ var dn=document.getElementById('dosenote'); if(!dn) return; host=document.createElement('div'); host.id='sa-list'; host.className='sa-list'; dn.parentNode.insertBefore(host,dn.nextSibling); }
   var l=saLive();
   if(!l.length){ host.innerHTML=''; return; }
-  host.innerHTML='<div class="seclbl">Added From Calculator<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
+  host.innerHTML='<div class="seclbl">Added Compounds<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
     return '<div class="lrow2"><div><div>'+saEsc(it.n)+'</div><div class="sm">'+saEsc([it.d,it.u,saDaysTxt(it.days),it.b==='PM'?'Night':'Morning'].filter(Boolean).join(' · '))+'</div></div><button type="button" class="sa-rm" data-sa="'+saEsc(it.id)+'">Remove</button></div>';
   }).join('');
 }
@@ -5013,9 +5361,9 @@ function dpRefresh(){ try{ renderDoses(); if(typeof renderDue==='function') rend
 })();
 try{ renderAll(); dpRefresh(); }catch(e){}
 try{ csPull(); }catch(e){}
-/* The views are written into the scroller after it exists, so read its layout
-   back on the next frame and let iOS measure the extent against the content
-   that is actually there. */
+/* Everything above writes into the scroller after it exists. Read its layout
+   back on the next frame so the scroll extent is measured against the content
+   that is actually there, not whatever it was at first paint. */
 function scrollRemeasure(){
   var sc=document.getElementById('scroll'); if(!sc) return;
   if(window.requestAnimationFrame) requestAnimationFrame(function(){ void sc.scrollHeight; });
@@ -5023,8 +5371,301 @@ function scrollRemeasure(){
 }
 scrollRemeasure();
 window.addEventListener('load',scrollRemeasure);
-window.addEventListener('orientationchange',scrollRemeasure);
+window.addEventListener('orientationchange',scrollRemeasure); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
 if(typeof nutInit==='function') nutInit();
+
+/* ======================================================================
+   SCHEDULE EDIT MODE  (?edit=1)
+   The client's link carries no flag, so they keep the clean read-only day
+   view untouched. With ?edit=1 every dose row becomes tap-to-expand and an
+   "Add compound" control appears under the list.
+
+   Nothing here writes the protocol. ALL, the prices and the invoice text are
+   read-only; every edit is an override layer, and all four stores ride the
+   existing 'schedule' sync kind so they survive reload and follow the client
+   across devices:
+     payload.on / payload.blk   on/off + AM/PM          SCHKEY
+     payload.days               weekdays                DP_KEY   (existing)
+     payload.add                added compounds         SA_KEY   (existing)
+     payload.ovr                dose / units / recon    OV_KEY   (new here)
+   ====================================================================== */
+var BLEDIT=/(?:^|[?&])edit=1(?:&|$)/.test(location.search);
+/* Sticky edit mode: once this device opens ?edit=1, the plain page link
+   stays editable ON THIS DEVICE ONLY (localStorage). The client never loads
+   ?edit=1 so they stay read-only. Open with ?edit=0 to turn it back off. */
+try{
+  if(/(?:^|[?&])edit=0(?:&|$)/.test(location.search)){ localStorage.removeItem('jjohnston-edit'); BLEDIT=false; }
+  else if(BLEDIT){ localStorage.setItem('jjohnston-edit','1'); }
+  else if(localStorage.getItem('jjohnston-edit')==='1'){ BLEDIT=true; }
+}catch(e){}
+
+/* ---- dose / units / recon override. Per compound name, newest edit wins,
+        and a reset is a tombstone so a stale device cannot resurrect it. ---- */
+var OV_KEY=SCHKEY+'-ovr', ovState=null;
+function ovGet(){ if(!ovState){ try{ ovState=JSON.parse(localStorage.getItem(OV_KEY)||'null'); }catch(e){ ovState=null; } if(!ovState||typeof ovState!=='object'||Array.isArray(ovState)) ovState={}; } return ovState; }
+function ovStore(){ try{ localStorage.setItem(OV_KEY,JSON.stringify(ovGet())); }catch(e){} }
+function ovOwn(n){ var r=ovGet()[n]; return (r&&!r.del&&(r.d||r.u||r.rec))?r:null; }
+function ovSet(n,f){
+  var s=ovGet(), p=s[n], keep=!!(f&&(f.d||f.u||f.rec));
+  s[n]=keep?{d:f.d||'',u:f.u||'',rec:f.rec||'',updated_at:saStamp(p)}:{del:true,updated_at:saStamp(p)};
+  ovStore(); try{ if(!csApplying) csQueue('schedule'); }catch(e){}
+}
+function ovMerge(remote){
+  var s=ovGet(), ahead=false, k; remote=(remote&&typeof remote==='object')?remote:{};
+  for(k in remote){ var r=remote[k], l=s[k]; if(!r||!r.updated_at) continue; if(!l||Date.parse(r.updated_at)>Date.parse(l.updated_at||0)) s[k]=r; }
+  for(k in s){ var R=remote[k]; if(!R||Date.parse(s[k].updated_at||0)>Date.parse(R.updated_at||0)) ahead=true; }
+  ovStore(); return ahead;
+}
+/* The override applies for everyone, not just edit mode: once it is set the
+   client should see the dose they were actually told to draw. */
+(function(){
+  var _sr=schRows; schRows=function(){
+    return _sr.apply(this,arguments).map(function(c){
+      if(!c||!c.n) return c; var o=ovOwn(c.n); if(!o) return c;
+      var x={},k; for(k in c) x[k]=c[k];
+      if(o.d) x.d=o.d; if(o.u) x.u=o.u; if(o.rec) x.rec=o.rec; x.ovr=1; return x;
+    });
+  };
+  /* saRow drops recon and the blurb; the panel wants both */
+  var _saRow=saRow; saRow=function(it){ var r=_saRow.apply(this,arguments); if(it&&it.rec) r.rec=it.rec; if(it&&it.mg) r.mg=it.mg; return r; };
+  var _cr=csRead; csRead=function(k){ var p=_cr.apply(this,arguments); if(k==='schedule'&&p) p.ovr=ovGet(); return p; };
+  var _ch=csHasLocal; csHasLocal=function(k){ if(k==='schedule'){ for(var x in ovGet()) return true; } return _ch.apply(this,arguments); };
+  var _ca=csApply; csApply=function(k,p){ _ca.apply(this,arguments);
+    if(k==='schedule'&&p){ var ahead=ovMerge(p.ovr); try{ renderDoses(); }catch(e){} if(ahead){ try{ csQueue('schedule'); }catch(e){} } } };
+})();
+
+/* ---- which compound each .drow is. Must rebuild the exact order renderDoses
+        drew (Morning then Night) and match by position, never by name. ---- */
+var edOpen={};
+function edRows(){
+  var _c=(typeof cycCurrent==='function')?cycCurrent():null, list=[];
+  var rows=schRows().filter(function(c){ return due(c,sel)&&(c.sa||!_c||(typeof cycHas==='function'?cycHas(c,_c):true)); });
+  ['AM','PM'].forEach(function(g){ rows.forEach(function(c){ if(inBlock(c,g)) list.push(c); }); });
+  return list;
+}
+function edDaysBox(c){
+  /* an added compound keeps its days in its own record, so it cannot use the
+     protocol day picker (which resolves names against ALL) */
+  if(!c.sa) return dpProto(c).length?dpHTML(c):'';
+  var cur=c.days||[];
+  return '<div class="dp" data-sad="'+saEsc(c.sa)+'"><div class="dp-h"><b>Your days</b><span class="dp-t">Added compound</span></div>'+
+    '<div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-sadd="'+i+'"'+(cur.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div></div>';
+}
+function edPanel(c){
+  var nm=saEsc(c.n), js=String(c.n).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var blk=(typeof schBlk==='function'?schBlk(c):c.b), o=ovOwn(c.n);
+  var h='<div class="ed-pan" data-edp="'+nm+'"><div class="ed-in">';
+
+  /* on/off (protocol) or remove (added) */
+  h+='<div class="ed-grp"><div class="ed-l">Schedule</div><div class="ed-row2">';
+  if(c.sa){
+    h+='<button type="button" class="ed-b" data-edx="sarm" data-sa="'+saEsc(c.sa)+'">Remove from schedule</button>';
+  } else {
+    h+='<button type="button" class="ed-b on" data-edx="off" data-edn="'+nm+'">✓ On · tap to turn off</button>';
+  }
+  h+='</div></div>';
+
+  /* AM / PM */
+  if(c.b!=='BOTH'){
+    h+='<div class="ed-grp"><div class="ed-l">Block</div><div class="ed-row2">'+
+      '<button type="button" class="ed-b'+(blk==='AM'?' on':'')+'" data-edx="blk" data-edb="AM" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Morning</button>'+
+      '<button type="button" class="ed-b'+(blk==='PM'?' on':'')+'" data-edx="blk" data-edb="PM" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Night</button>'+
+      '</div></div>';
+  }
+
+  /* days */
+  var db=edDaysBox(c);
+  if(db) h+='<div class="ed-grp">'+db+'</div>';
+
+  /* dose / units / recon override */
+  h+='<div class="ed-grp"><div class="ed-l">Dose &amp; recon'+(o?' <span class="ed-tag">edited</span>':'')+'</div>'+
+    '<div class="ed-f"><label>Dose<input type="text" data-edf="d" value="'+saEsc(c.d||'')+'" placeholder="1 mg"></label>'+
+    '<label>Units<input type="text" data-edf="u" value="'+saEsc(c.u||'')+'" placeholder="10u"></label></div>'+
+    '<div class="ed-f one"><label>Recon<input type="text" data-edf="rec" value="'+saEsc(c.rec||'')+'" placeholder="3 mL BAC water"></label></div>'+
+    '<div class="ed-row2"><button type="button" class="ed-b pri" data-edx="save" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Save</button>'+
+    (o?'<button type="button" class="ed-b" data-edx="rst" data-edn="'+nm+'">Reset to protocol</button>':'')+'</div></div>';
+
+  h+='</div></div>';
+  return h;
+}
+function edPaint(){
+  edAddMount();
+  if(!BLEDIT) return;
+  var host=document.getElementById('doses'); if(!host) return;
+  edAddMount();
+  var dn=document.getElementById('dosenote');
+  if(dn) dn.textContent=dn.textContent.replace('This is a read-only view of your schedule.','');
+  var drs=host.querySelectorAll('.drow'), list=edRows();
+  if(drs.length!==list.length) return;
+  for(var i=0;i<drs.length;i++){
+    var c=list[i], r=drs[i];
+    r.classList.add('ed-row'); r.setAttribute('data-ed',saEsc(c.n));
+    r.insertAdjacentHTML('beforeend','<span class="ed-cv">›</span>');
+    r.insertAdjacentHTML('afterend',edPanel(c));
+    if(edOpen[c.n]){ r.classList.add('exp'); var p=r.nextElementSibling; if(p&&p.classList.contains('ed-pan')) p.classList.add('open'); }
+  }
+}
+function edFields(pan){
+  var o={}; [].forEach.call(pan.querySelectorAll('[data-edf]'),function(i){ o[i.getAttribute('data-edf')]=String(i.value||'').trim(); }); return o;
+}
+
+/* ---- Add compound: from the dosing guide, or by hand ---- */
+function edAddMount(){
+  var h=document.getElementById('ed-add');
+  if(h) return;
+  var anchor=document.getElementById('sa-list')||document.getElementById('dosenote');
+  if(!anchor||!anchor.parentNode) return;
+  h=document.createElement('div'); h.id='ed-add'; h.className='ed-add';
+  h.innerHTML='<button type="button" class="ed-add-b" id="ed-addbtn">+ Add compound</button><div class="ed-add-p" id="ed-addpan" hidden></div>';
+  anchor.parentNode.insertBefore(h,anchor.nextSibling);
+}
+var edNew=null;
+function edGuideList(){
+  var L=window.BL_DOSING||[], o=[];
+  for(var i=0;i<L.length;i++){ if(L[i]&&L[i].name) o.push({i:i,g:L[i]}); }
+  o.sort(function(a,b){ var r=String(a.g.name).localeCompare(String(b.g.name)); return r||String(a.g.vial||'').localeCompare(String(b.g.vial||'')); });
+  return o;
+}
+function edAddOpen(){
+  var pan=document.getElementById('ed-addpan'); if(!pan) return;
+  edNew={mode:'master',gi:-1,n:'',mg:'',d:'',u:'',rec:'',b:'AM',days:[]};
+  pan.hidden=false; edAddDraw();
+}
+function edAddDraw(){
+  var pan=document.getElementById('ed-addpan'); if(!pan||!edNew) return;
+  var m=edNew.mode==='master';
+  var h='<div class="ed-row2 ed-seg"><button type="button" class="ed-b'+(m?' on':'')+'" data-eda="m">From master list</button>'+
+        '<button type="button" class="ed-b'+(m?'':' on')+'" data-eda="x">Add manually</button></div>';
+  if(m){
+    h+='<label class="ed-sel">Compound<select data-eda="sel"><option value="-1">Choose\u2026</option>'+
+      edGuideList().map(function(r){ return '<option value="'+r.i+'"'+(r.i===edNew.gi?' selected':'')+'>'+saEsc(r.g.name+(r.g.vial?' \u00b7 '+r.g.vial:''))+'</option>'; }).join('')+'</select></label>';
+    if(edNew.gi<0){ pan.innerHTML=h; return; }
+    var g=(window.BL_DOSING||[])[edNew.gi]||{};
+    h+='<div class="ed-gd">'+['vial','bac','dose','units','timing','freq'].map(function(k){
+      return g[k]?('<span><i>'+k+'</i>'+saEsc(k==='units'?g[k]+'u':g[k])+'</span>'):''; }).join('')+'</div>';
+  } else {
+    h+='<div class="ed-f"><label>Name<input type="text" data-edn2="n" value="'+saEsc(edNew.n)+'" placeholder="Tesamorelin"></label>'+
+       '<label>Vial mg<input type="text" data-edn2="mg" value="'+saEsc(edNew.mg)+'" placeholder="10 mg"></label></div>';
+  }
+  h+='<div class="ed-f"><label>Dose<input type="text" data-edn2="d" value="'+saEsc(edNew.d)+'" placeholder="1 mg"></label>'+
+     '<label>Units<input type="text" data-edn2="u" value="'+saEsc(edNew.u)+'" placeholder="10u"></label></div>'+
+     '<div class="ed-f one"><label>Recon<input type="text" data-edn2="rec" value="'+saEsc(edNew.rec)+'" placeholder="3 mL BAC water"></label></div>'+
+     '<div class="ed-l">Days</div><div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-edn2d="'+i+'"'+(edNew.days.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div>'+
+     '<div class="ed-row2"><button type="button" class="ed-b'+(edNew.b==='AM'?' on':'')+'" data-edab="AM">Morning</button><button type="button" class="ed-b'+(edNew.b==='PM'?' on':'')+'" data-edab="PM">Night</button></div>'+
+     '<div class="ed-row2"><button type="button" class="ed-b" data-eda="cancel">Cancel</button><button type="button" class="ed-b pri" data-eda="save"'+((edNew.days.length&&String(edNew.n||'').trim())?'':' disabled')+'>Add to schedule</button></div>';
+  pan.innerHTML=h;
+}
+function edAddPick(i){
+  var g=(window.BL_DOSING||[])[i]; if(!g) return;
+  edNew.gi=i; edNew.n=g.name+(g.vial?' · '+g.vial:'');
+  edNew.d=g.dose||''; edNew.u=g.units?(String(g.units).replace(/u$/,'')+'u'):'';
+  edNew.rec=g.bac?(String(g.bac).replace(/\s*ml$/i,' mL')+' BAC water'):'';
+  edNew.b=/pm|night|bed|evening/i.test(g.timing||'')?'PM':'AM';
+  edNew.days=saGuideDays(g.freq)||[];
+  edAddDraw();
+}
+function edAddSave(){
+  if(!edNew||!edNew.days.length) return;
+  var nm=String(edNew.n||'').trim(); if(!nm) return;
+  if(edNew.mode!=='master'&&edNew.mg&&nm.indexOf(edNew.mg)<0) nm=nm+' · '+String(edNew.mg).trim();
+  var ex=saFind(nm);
+  saPut({id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    n:nm, d:edNew.d||'', u:edNew.u||'', rec:edNew.rec||'', b:edNew.b==='PM'?'PM':'AM', days:edNew.days.slice().sort()});
+  var pan=document.getElementById('ed-addpan'); if(pan) pan.hidden=true;
+  edNew=null; renderDoses();
+  try{ csToast(nm+' added · '+saDaysTxt(saFind(nm)?saFind(nm).days:[])); }catch(e){}
+}
+
+/* ---- one delegated listener for the whole editor ---- */
+// Add-compound controls are available on the normal client link.
+{
+  document.documentElement.classList.add('bl-add');
+  if(BLEDIT) document.documentElement.classList.add('bl-edit');
+
+  /* expand / collapse a dose row */
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('.ed-pan')||t.closest('.sa-rm')) return;
+    var r=t.closest('.drow.ed-row'); if(!r) return;
+    var n=r.getAttribute('data-ed'), p=r.nextElementSibling;
+    var now=!r.classList.contains('exp');
+    r.classList.toggle('exp',now);
+    if(p&&p.classList.contains('ed-pan')) p.classList.toggle('open',now);
+    /* key the memory off the live name so a re-render restores it */
+    [].forEach.call(document.querySelectorAll('.drow.ed-row'),function(x){ if(x.getAttribute('data-ed')===n&&x!==r){ x.classList.toggle('exp',now); var q=x.nextElementSibling; if(q&&q.classList.contains('ed-pan')) q.classList.toggle('open',now); } });
+    if(now) edOpen[n]=1; else delete edOpen[n];
+  });
+
+  /* panel buttons */
+  document.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('[data-edx]'); if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var x=b.getAttribute('data-edx'), n=b.getAttribute('data-edn'), sa=b.getAttribute('data-sa');
+    var pan=b.closest('.ed-pan');
+    if(x==='off'){ delete edOpen[n]; schTog(n,e); return; }
+    if(x==='sarm'){ delete edOpen[n]; saRemove(sa); renderDoses(); try{ csToast('Removed'); }catch(_){} return; }
+    if(x==='blk'){
+      var want=b.getAttribute('data-edb');
+      if(sa){ var it=saGet()[sa]; if(it&&!it.del){ saPut({id:sa,n:it.n,d:it.d,u:it.u,rec:it.rec,b:want,days:(it.days||[]).slice()}); renderDoses(); } return; }
+      /* schBlkSet toggles off when you tap the block it is already on, which
+         would drop it back to the protocol block. Only send a real change. */
+      var cur=null, i; for(i=0;i<ALL.length;i++){ if(ALL[i].n===n){ cur=schBlk(ALL[i]); break; } }
+      if(cur===want) return;
+      schBlkSet(n,want,e); return;
+    }
+    if(x==='save'){
+      if(!pan) return; var f=edFields(pan);
+      if(sa){ var it2=saGet()[sa]; if(it2&&!it2.del){ saPut({id:sa,n:it2.n,d:f.d||'',u:f.u||'',rec:f.rec||'',b:it2.b,days:(it2.days||[]).slice()}); } }
+      else ovSet(n,f);
+      renderDoses(); try{ csToast('Saved'); }catch(_){} return;
+    }
+    if(x==='rst'){ ovSet(n,null); renderDoses(); try{ csToast('Back to the protocol dose'); }catch(_){} return; }
+  });
+
+  /* days for an added compound */
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||t.getAttribute('data-sadd')==null) return;
+    var box=t.closest('[data-sad]'); if(!box) return;
+    var sa=box.getAttribute('data-sad'), it=saGet()[sa]; if(!it||it.del) return;
+    var days=[].map.call(box.querySelectorAll('input[data-sadd]:checked'),function(x){return +x.getAttribute('data-sadd');});
+    if(!days.length){ t.checked=true; try{ csToast('Keep at least one day'); }catch(_){} return; }
+    saPut({id:sa,n:it.n,d:it.d,u:it.u,rec:it.rec,b:it.b,days:days.sort()}); renderDoses();
+  });
+
+  /* add-compound panel */
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('#ed-addbtn')){ e.preventDefault(); var p=document.getElementById('ed-addpan');
+      if(p&&!p.hidden){ p.hidden=true; edNew=null; } else edAddOpen(); return; }
+    // Only action buttons cancel clicks. The compound select must retain its
+    // native click so the mobile picker can open.
+    var b=t.closest('button[data-eda],button[data-edab]'); if(!b||!edNew) return;
+    e.preventDefault(); e.stopPropagation();
+    var ab=b.getAttribute('data-edab');
+    if(ab){ edNew.b=ab; edAddDraw(); return; }
+    var a=b.getAttribute('data-eda');
+    if(a==='m'||a==='x'){ edNew.mode=(a==='m')?'master':'manual'; edAddDraw(); return; }
+    if(a==='cancel'){ var p2=document.getElementById('ed-addpan'); if(p2) p2.hidden=true; edNew=null; return; }
+    if(a==='save'){ edAddSave(); return; }
+  });
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||!edNew) return;
+    if(t.getAttribute('data-eda')==='sel'){ var v=+t.value; if(v>=0) edAddPick(v); else { edNew.gi=-1; edAddDraw(); } return; }
+    var d=t.getAttribute('data-edn2d');
+    if(d!=null){ d=+d; var i=edNew.days.indexOf(d);
+      if(t.checked&&i<0) edNew.days.push(d); if(!t.checked&&i>=0) edNew.days.splice(i,1);
+      var s=document.querySelector('[data-eda="save"]'); if(s) s.disabled=!(edNew.days.length&&edNew.n); return; }
+  });
+  document.addEventListener('input',function(e){
+    var t=e.target; if(!t||!edNew) return; var k=t.getAttribute('data-edn2'); if(!k) return;
+    edNew[k]=t.value;
+    var s=document.querySelector('[data-eda="save"]'); if(s) s.disabled=!(edNew.days.length&&String(edNew.n||'').trim());
+  });
+
+  (function(){ var _rd=renderDoses; renderDoses=function(){ _rd.apply(this,arguments); try{ edPaint(); }catch(e){} }; })();
+  try{ renderDoses(); }catch(e){}
+}
+
 
 /* ======================================================================
    WORKOUT (opt-in MVP). Offline-first: every row has a client UUID and an
@@ -5280,12 +5921,7 @@ function home(){
   h+='<p class="wk-note">For research use only. Not medical advice.</p>';
   return h;
 }
-function settings(){
-  var u=(S.profile&&S.profile.data.ui)||{};
-  return '<div class="wk-card"><div class="wk-eb">Easy reading</div>'+
-   '<div class="wk-tog"><span>Bigger text</span><button class="wk-sw'+(u.big?' on':'')+'" role="switch" aria-checked="'+!!u.big+'" aria-label="Bigger text" data-wkui="big"></button></div>'+
-   '<div class="wk-tog"><span>High contrast</span><button class="wk-sw'+(u.hc?' on':'')+'" role="switch" aria-checked="'+!!u.hc+'" aria-label="High contrast" data-wkui="hc"></button></div></div>';
-}
+function settings(){ return ''; }
 function feel(){
   return '<div class="wk-card gold"><div class="wk-eb">Quick check</div><h2>How do you feel today?</h2><p class="wk-mut">One tap. We will adjust today\'s workout to match.</p></div>'+
    '<div class="wk-feel">'+
@@ -5345,7 +5981,7 @@ function doneView(){ var s=S.sessions[ui.last]; var dn=setsFor(ui.last).filter(f
   var vol=dn.reduce(function(a,r){return a+(+r.data.w||0)*(+r.data.r||0);},0), mins=s?Math.max(1,Math.round((new Date(s.data.fin)-new Date(s.data.start))/6e4)):0;
   if(!full) return '<div class="wk-card"><div class="wk-eb">Saved, not counted</div><h2>'+n+' of '+c.total+' sets</h2><p class="wk-mut">This session is saved in your history. Workouts count toward your week and streak only when every set is done.</p></div><button class="wk-btn" data-wkgo="home">Done</button><div style="height:.6em"></div><button class="wk-btn sec" data-wkundo="'+ui.last+'">Reopen and keep going</button>';
   return '<div class="wk-card gold wk-cele"><div class="wk-conf" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="wk-eb">Workout complete</div><h2>Nice work.</h2><p class="wk-mut">'+(s?esc(s.data.t)+' · ':'')+n+' of '+c.total+' sets · '+mins+' min'+(vol?' · '+vol.toLocaleString()+' lb lifted':'')+'.</p><p class="wk-mut">This one counts toward your week and streak.</p></div><button class="wk-btn" data-wkgo="home">Done</button><div style="height:.6em"></div><button class="wk-btn sec" data-wkundo="'+ui.last+'">Undo · not finished yet</button>'; }
-function applyUi(){ var u=(S.profile&&S.profile.data.ui)||{}; var v=document.getElementById('v-work'); if(v){ v.classList.toggle('wk-big',!!u.big); v.classList.toggle('wk-hc',!!u.hc); }
+function applyUi(){ var u=Object.assign({},(S.profile&&S.profile.data.ui)||{},{big:false,hc:false}); var v=document.getElementById('v-work'); if(v){ v.classList.toggle('wk-big',!!u.big); v.classList.toggle('wk-hc',!!u.hc); }
   try{ document.dispatchEvent(new CustomEvent('wk-prefs',{detail:u})); }catch(e){} }
 function render(){
   var host=document.getElementById('wkbody'); if(!host) return;
@@ -5392,14 +6028,17 @@ document.addEventListener('change',function(ev){ var el=ev.target; if(!el||!el.d
   var ex=setsFor(ui.sid).filter(function(r){return r.data.ex===it.ex&&r.data.n===n;})[0];
   var base=ex?JSON.parse(JSON.stringify(ex.data)):(function(){ var b=defSet(it,n); delete b.guess; b.sid=ui.sid; b.ex=it.ex; b.n=n; return b; })();
   var w=parseFloat(el.value); if(!(w>=0&&w<=1000)){ el.setCustomValidity('Enter 0 to 1000 lb'); el.reportValidity(); return; } el.setCustomValidity('');
-  base.w=Math.round(w*2)/2; base.at=nowIso(); put('set',ex?ex.id:uuid(),base); render(); });
+  base.w=Math.round(w*2)/2; base.at=nowIso(); put('set',ex?ex.id:uuid(),base);
+  // Keep the focused row mounted: rendering on blur removes the Done button
+  // between pointer-down and click, swallowing the tap on phones.
+  el.value=base.w; });
 window.__wk={buildPlan:buildPlan,streak:streak,counted:counted,demo:demo}; /* test hook */
 try{ window.addEventListener('online',function(){ push(); }); }catch(e){}
 /* phone Back during a workout: pause (keep sets), never finish */
 try{ window.addEventListener('popstate',function(){ if(ui.view==='session'||ui.view==='feel'){ stopTimer(); ui.view='home'; ui.confirm=false; render(); } }); }catch(e){}
 load(); if(window.BL_DEMO) demoSeed(); applyUi(); render(); pull();
 /* shared with the Nutrition tab: one Bigger text / High contrast setting */
-window.wkPrefs={get:function(){ return S.profile?(S.profile.data.ui||{}):null; },
+window.wkPrefs={get:function(){ return S.profile?Object.assign({},S.profile.data.ui||{},{big:false,hc:false}):null; },
   set:function(k,v){ if(!S.profile) return false; var pd=JSON.parse(JSON.stringify(S.profile.data)); pd.ui=pd.ui||{}; pd.ui[k]=v; put('profile','me',pd); applyUi(); render(); return true; }};
 window.wkDebug={state:function(){return S;},push:push,pull:pull};
 })();
@@ -5563,8 +6202,6 @@ function render(){
      '<div class="n2-water"><button class="n2-btn sec" id="n2-wminus" aria-label="Remove 8 ounces" '+(wz?'':'disabled')+' style="flex:0 0 30%">− 8 oz</button><button class="n2-btn" id="n2-wplus">+ 8 oz</button></div>'+
      '<div class="n2-step"><span class="n2-mut" style="flex:1">Daily goal</span><button class="n2-ib" data-n2wg="-8" aria-label="Lower water goal">−</button><b style="flex:0 0 4.5em">'+wg+' oz</b><button class="n2-ib" data-n2wg="8" aria-label="Raise water goal">+</button></div></div>';
   h+=trend(tg);
-  var u=prefs();
-  h+='<div class="n2-card"><div class="n2-eb">Easy reading · same setting as Workout</div><div class="n2-tog"><span>Bigger text</span><button class="n2-sw'+(u.big?' on':'')+'" role="switch" aria-checked="'+!!u.big+'" aria-label="Bigger text" data-n2ui="big"></button></div><div class="n2-tog"><span>High contrast</span><button class="n2-sw'+(u.hc?' on':'')+'" role="switch" aria-checked="'+!!u.hc+'" aria-label="High contrast" data-n2ui="hc"></button></div></div>';
   h+='<p class="n2-note">For research use only. Not medical advice.</p>';
   h+='<div class="n2-sec">Your targets &amp; meal plan</div>';
   if(ui.toast) h+='<div class="n2-toast" role="status"><span>Removed '+esc(ui.toast.name)+'</span><button id="n2-undo">Undo</button></div>';
@@ -5681,16 +6318,8 @@ window.n2Debug={state:function(){return S;},push:push,pull:pull,targets:targets,
 
 
 </script>
-<script>(function(){function $(s,r){return (r||document).querySelector(s);}
-try{ var aa=$('#bl-aa'); var big=localStorage.getItem(KP+'big')==='1';
-  function setBig(v){ document.documentElement.classList.toggle('bl-big',v); aa.setAttribute('aria-pressed',v?'true':'false'); try{localStorage.setItem(KP+'big',v?'1':'0');}catch(e){} }
-  setBig(big); aa.addEventListener('click',function(){ setBig(!document.documentElement.classList.contains('bl-big')); }); }catch(e){}})();</script>
-<script>/* P0 sync: theme + Aa text size ride on the synced workout profile (wk_push), localStorage stays the offline cache */
-(function(){ function sync(){ var u=window.wkPrefs&&wkPrefs.get(); if(!u) return; try{ if(u.theme&&u.theme!==document.documentElement.getAttribute('data-theme')){ applyTheme(u.theme); localStorage.setItem(KP+'theme',u.theme); } if(u.aa!=null){ document.documentElement.classList.toggle('bl-big',!!u.aa); localStorage.setItem(KP+'big',u.aa?'1':'0'); } }catch(e){} }
-document.addEventListener('wk-prefs',sync);
-var tt=window.toggleTheme; if(tt) window.toggleTheme=function(){ tt.apply(this,arguments); try{ wkPrefs.set('theme',document.documentElement.getAttribute('data-theme')); }catch(e){} };
-var aa=document.getElementById('bl-aa'); if(aa) aa.addEventListener('click',function(){ setTimeout(function(){ try{ wkPrefs.set('aa',document.documentElement.classList.contains('bl-big')); }catch(e){} },0); });
-sync(); })();</script>
+
+
 <script id="bl-tiles-js">(function(){
 function set(id,s,na){ var e=document.getElementById(id); if(e) e.textContent=s; if(na){ var o=e&&e.parentNode.parentNode.querySelector('.o'); if(o){ o.textContent='Not on file yet'; o.className='o na'; } } }
 function labs(){ try{ if(typeof LABS!=='undefined'&&LABS){ var dv=document.createElement('div'); dv.innerHTML=String(LABS.sub||''); var s=dv.textContent.trim(); if(LABS.score) s+=(s?' · ':'')+'score '+LABS.score; set('bts-labs',s||'On file'); return; } }catch(e){}
@@ -5722,75 +6351,60 @@ setTimeout(all,2500);
 <script id="p0-shell-js">(function(){var L={sched:'Today',nutr:'Food',work:'Train',labs:'Labs',more:'More'};
 document.querySelectorAll('.tabs .tab').forEach(function(b){var v=b.getAttribute('data-v');if(!L[v])return;var n=b.lastChild;if(n&&n.nodeType===3)n.nodeValue=L[v];else b.appendChild(document.createTextNode(L[v]));b.setAttribute('aria-label',L[v]);});
 var w=window.innerWidth;window.addEventListener('resize',function(){if(window.innerWidth!==w){w=window.innerWidth;try{closeNav();}catch(e){}}});})();</script>
-<style id="bl-tp-css">
-:root{--bl-ts:1}
-html:root .scroll,html:root .sheet{zoom:var(--bl-ts,1)!important}
-html.bl-bold .scroll *,html.bl-bold .sheet *{font-weight:700!important}
-.bl-tp{position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 60px);right:10px;width:min(300px,calc(100vw - 20px));background:var(--card,#fff);color:var(--ink,#111);border:1px solid var(--line,#ddd);border-radius:16px;box-shadow:0 12px 34px rgba(0,0,0,.22);padding:14px 16px 16px;font:400 14px/1.35 "Outfit",system-ui,sans-serif}
-.bl-tp[hidden]{display:none}
-.bl-tp h4{margin:0 0 10px;font:600 11px/1 "Outfit",system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#777)}
-.bl-tp .r{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
-.bl-tp .lb{font-weight:500}
-.bl-tp .pct{font-weight:700;color:var(--gold,#a07a2c);min-width:44px;text-align:right}
-.bl-tp .sl{display:flex;align-items:center;gap:8px;margin:0 0 14px}
-.bl-tp .sl span{color:var(--muted,#777);font-family:var(--serif,Georgia),serif}
-.bl-tp input[type=range]{flex:1;accent-color:var(--gold,#a07a2c);height:28px}
-.bl-tp .sw{position:relative;width:46px;height:28px;border-radius:14px;border:1px solid var(--line,#ccc);background:var(--line2,#e5e5e5);cursor:pointer;flex:none;padding:0}
-.bl-tp .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
-.bl-tp .sw[aria-checked=true]{background:var(--gold,#a07a2c);border-color:var(--gold,#a07a2c)}
-.bl-tp .sw[aria-checked=true]::after{left:21px}
-.bl-tp .seg{display:flex;border:1px solid var(--line,#ccc);border-radius:12px;overflow:hidden}
-.bl-tp .seg button{flex:1;padding:9px 4px;border:0;background:transparent;color:var(--ink,#111);font:500 13.5px/1 "Outfit",system-ui,sans-serif;cursor:pointer}
-.bl-tp .seg button+button{border-left:1px solid var(--line,#ccc)}
-.bl-tp .seg button[aria-pressed=true]{background:var(--gold,#a07a2c);color:var(--on-gold,#fff);font-weight:700}
-.bl-tp .rs{margin-top:12px;background:none;border:0;padding:4px 0;color:var(--muted,#777);font:500 12.5px "Outfit",system-ui,sans-serif;text-decoration:underline;cursor:pointer}
-html body .drow .uu{white-space:nowrap}
-html body .drow .mt .bl-mg{font-weight:700;color:var(--ink,#111)}
-</style>
-<script id="bl-tp-js">(function(){
-var P=(typeof KP!=='undefined'?KP:'bl-'), R=document.documentElement;
-function g(k,d){ try{ var v=localStorage.getItem(P+k); return v==null?d:v; }catch(e){ return d; } }
-function s(k,v){ try{ localStorage.setItem(P+k,String(v)); }catch(e){} }
-var ts=+g('ts',''); if(!(ts>=85&&ts<=140)) ts=(g('big','0')==='1')?112:100;
-var bold=g('bold','0')==='1', dm=g('dose','both'); if(['units','mg','both'].indexOf(dm)<0) dm='both';
-function apT(){ R.style.setProperty('--bl-ts',(ts/100).toFixed(2)); R.classList.toggle('bl-bold',bold); R.classList.remove('bl-big'); }
-apT();
-var MG=/^\s*([~≈]?\s*[\d.,]+\s*(?:mg|mcg|µg|ug|g|iu|IU|mL|ml)\b[^·]*?)\s*$/;
-function apD(){ var h=document.getElementById('doses'); if(!h) return;
-  [].forEach.call(h.querySelectorAll('.drow'),function(r){ var uu=r.querySelector('.uu'), mt=r.querySelector('.mt'); if(!uu||!mt) return;
-    if(r.dataset.u==null){ r.dataset.u=uu.textContent; var parts=mt.textContent.split(' \u00b7 '); var m=parts.length&&MG.exec(parts[0]);
-      r.dataset.mg=m?m[1].trim():''; r.dataset.rest=(m?parts.slice(1):parts).join(' \u00b7 '); }
-    var u=r.dataset.u, mg=r.dataset.mg, rest=r.dataset.rest; if(!mg){ return; }
-    function esc(x){ return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
-    if(dm==='mg'){ uu.textContent=mg; mt.textContent=rest; }
-    else if(dm==='units'){ uu.textContent=u||mg; mt.textContent=u?rest:mg+(rest?' \u00b7 '+rest:''); }
-    else { uu.textContent=u||mg; mt.innerHTML='<span class="bl-mg">'+esc(mg)+'</span>'+(rest?' \u00b7 '+esc(rest):''); }
-  }); }
-if(typeof window.renderDoses==='function'){ var _rd=window.renderDoses; window.renderDoses=function(){ var r=_rd.apply(this,arguments); try{ apD(); }catch(e){} return r; }; }
-var old=document.getElementById('bl-aa'); if(!old) return;
-var aa=old.cloneNode(true); old.parentNode.replaceChild(aa,old);
-aa.setAttribute('aria-label','Text & dose display'); aa.title='Text & dose display'; aa.setAttribute('aria-haspopup','dialog'); aa.setAttribute('aria-expanded','false'); aa.setAttribute('aria-pressed','false');
-var pn=document.createElement('div'); pn.className='bl-tp'; pn.id='bl-tp'; pn.hidden=true; pn.setAttribute('role','dialog'); pn.setAttribute('aria-label','Text & dose display');
-pn.innerHTML='<h4>Text size</h4><div class="sl"><span style="font-size:12px">A</span><input type="range" id="bl-tp-ts" min="85" max="140" step="5" aria-label="Text size"><span style="font-size:19px">A</span><b class="pct" id="bl-tp-pct"></b></div>'+
- '<div class="r"><span class="lb">Bold text</span><button type="button" class="sw" id="bl-tp-bold" role="switch" aria-label="Bold text"></button></div>'+
- '<h4>Show doses as</h4><div class="seg" id="bl-tp-dose"><button type="button" data-m="units">Units</button><button type="button" data-m="mg">mg</button><button type="button" data-m="both">Both</button></div>'+
- '<button type="button" class="rs" id="bl-tp-rs">Reset to default</button>';
-document.body.appendChild(pn);
-var sl=pn.querySelector('#bl-tp-ts'), pc=pn.querySelector('#bl-tp-pct'), bb=pn.querySelector('#bl-tp-bold');
-function ui(){ sl.value=ts; pc.textContent=ts+'%'; bb.setAttribute('aria-checked',bold?'true':'false');
-  [].forEach.call(pn.querySelectorAll('#bl-tp-dose button'),function(b){ b.setAttribute('aria-pressed',b.dataset.m===dm?'true':'false'); });
-  aa.setAttribute('aria-pressed',(ts!==100||bold)?'true':'false'); }
-ui();
-sl.addEventListener('input',function(){ ts=+sl.value; s('ts',ts); apT(); ui(); });
-bb.addEventListener('click',function(){ bold=!bold; s('bold',bold?1:0); apT(); ui(); });
-pn.querySelector('#bl-tp-dose').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; dm=b.dataset.m; s('dose',dm); apD(); ui(); });
-pn.querySelector('#bl-tp-rs').addEventListener('click',function(){ ts=100; bold=false; dm='both'; s('ts',100); s('bold',0); s('dose','both'); apT(); apD(); ui(); });
-function tog(v){ pn.hidden=!v; aa.setAttribute('aria-expanded',v?'true':'false'); }
-aa.addEventListener('click',function(e){ e.stopPropagation(); tog(pn.hidden); });
-document.addEventListener('click',function(e){ if(!pn.hidden&&!pn.contains(e.target)&&e.target!==aa) tog(false); });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') tog(false); });
-window.addEventListener('storage',function(e){ if(!e.key||e.key.indexOf(P)!==0) return; ts=+g('ts',100)||100; bold=g('bold','0')==='1'; dm=g('dose','both'); apT(); apD(); ui(); });
-try{ apD(); }catch(e){}
-})();</script>
 
-<link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=6"></script>
+
+
+<link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=7"></script>
+<style id="jc-inline-cycles">
+#protoabout{margin-top:28px}
+.jc-cycle{margin:0 0 22px;min-width:0}
+.jc-cycle-head{border-bottom:2px solid var(--gold);padding:0 0 10px;margin:0 0 12px}
+.jc-cycle-head h2{font:700 16px/1.3 var(--sans);letter-spacing:-.3px;margin:0;color:var(--ink)}
+.jc-cycle-head p{display:none}
+.jc-intro{font-size:13.5px;line-height:1.6;color:var(--ink2);margin:0 0 18px}
+.jc-compound{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:0 0 8px;overflow:hidden}
+.jc-compound>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;min-height:0;list-style:none;cursor:pointer;font:700 14px/1.35 var(--sans);color:var(--ink);overflow-wrap:anywhere}
+.jc-compound>summary::-webkit-details-marker{display:none}
+.jc-compound>summary:focus-visible,.jc-notes>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+.jc-chevron{width:8px;height:8px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);flex:none;margin:0 3px 6px}
+.jc-compound[open] .jc-chevron{transform:rotate(225deg);margin-bottom:0}
+.jc-body{border-top:1px solid var(--line)}
+.jc-description{padding:12px 13px 14px;font-size:13.5px;line-height:1.65;color:var(--ink2);overflow-wrap:anywhere}
+.jc-facts{margin:0;padding:0 13px 6px;border-top:1px solid var(--line)}
+.jc-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.jc-facts>div:last-child{border:0}
+.jc-facts dt{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:800;color:var(--muted);flex:none}
+.jc-facts dd{margin:0;text-align:right;font-size:13px;line-height:1.55;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.jc-facts>div:nth-child(3) dd{color:var(--gold);font-size:14px;font-weight:800}
+.jc-notes{margin:12px 2px;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+.jc-notes>summary{cursor:pointer;color:var(--gold);font-weight:650;padding:8px 0}
+.jc-notes h3{font-size:12.5px;margin:12px 0 5px}.jc-notes p{margin:0 0 14px}
+
+
+
+
+
+
+#cmplist .pastgrp{opacity:1}
+/* ---- condensed schedule list ----------------------
+   The collapsed row is one line: name, timing, unit, chevron. The schedule
+   on/off pill and the AM/PM pair move into the body so they appear only
+   once the row is open. Cycle groups collapse to their header, with the
+   current cycle open on first paint. */
+#cmplist .cx-hd{min-height:44px;align-items:center}
+#cmplist .cx-t{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1}
+#cmplist .cx-n{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-s{flex:0 4 auto;min-width:0;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:2px 0 12px}
+#cmplist .cx-ctl .schbtn{margin-top:0}
+#cmplist .cx-ctl .schblk{margin-left:0}
+#cmplist .cgrp .cx{display:none}
+#cmplist .cgrp.on .cx{display:block}
+#cmplist .jc-cycle-head{display:flex;align-items:center;gap:10px;cursor:pointer}
+#cmplist .cg-ht{flex:1;min-width:0}
+#cmplist .cg-cv{flex:none;color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+#cmplist .cgrp.on .cg-cv{transform:rotate(90deg)}
+@media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:16px}#protoabout .jc-compound>summary{font-size:14px;padding:11px 13px}#protoabout .jc-description{padding:12px 13px 14px;font-size:13.5px}}
+</style>
+
+<link rel="stylesheet" href="/erica/protocol-theme.css?v=7">
