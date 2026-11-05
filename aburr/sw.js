@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /aburr/.
-const CACHE = 'aburr-master-v4';
+const CACHE = 'aburr-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/aburr/',

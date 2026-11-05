@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /atrujillo/.
-const CACHE = 'atrujillo-master-v4';
+const CACHE = 'atrujillo-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/atrujillo/',

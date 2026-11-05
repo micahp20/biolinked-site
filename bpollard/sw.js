@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bpollard/.
-const CACHE = 'bpollard-master-v4';
+const CACHE = 'bpollard-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/bpollard/',
