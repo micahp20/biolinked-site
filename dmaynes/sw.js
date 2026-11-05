@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dmaynes/.
-const CACHE = 'dmaynes-master-v4';
+const CACHE = 'dmaynes-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/dmaynes/',

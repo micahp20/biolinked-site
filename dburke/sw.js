@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dburke/.
-const CACHE = 'dburke-master-v4';
+const CACHE = 'dburke-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/dburke/',

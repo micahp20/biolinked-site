@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ddavis/.
-const CACHE = 'ddavis-master-v4';
+const CACHE = 'ddavis-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/ddavis/',
