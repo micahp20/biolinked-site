@@ -5419,7 +5419,7 @@ function dpMerge(remote){
 }
 function dpNote(c){
   var p=dpProto(c), own=dpOwn(c.n), cur=own||p;
-  if(!p.length) return {t:'', n:''};
+  if(!p.length) return {t:'Set your days', n:'', own:!!own, cur:cur};
   var same=cur.length===p.length&&cur.every(function(d){return p.indexOf(d)>=0;});
   var t='Protocol: '+p.length+' day'+(p.length===1?'':'s')+'/week';
   var n=same?'':(cur.length<p.length?'You have '+cur.length+' of '+p.length+' days picked. Your protocol calls for '+p.length+' a week.':
@@ -5538,7 +5538,10 @@ function edRows(){
 function edDaysBox(c){
   /* an added compound keeps its days in its own record, so it cannot use the
      protocol day picker (which resolves names against ALL) */
-  if(!c.sa) return dpProto(c).length?dpHTML(c):'';
+  /* Always offer the picker for a protocol compound. It used to be hidden
+     whenever the compound had no cadence pattern to derive days from, which
+     is exactly the case where the builder most needs to set them. */
+  if(!c.sa) return dpHTML(c);
   var cur=c.days||[];
   return '<div class="dp" data-sad="'+saEsc(c.sa)+'"><div class="dp-h"><b>Your days</b><span class="dp-t">Added compound</span></div>'+
     '<div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-sadd="'+i+'"'+(cur.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div></div>';
@@ -5553,7 +5556,12 @@ function edPanel(c){
   if(c.sa){
     h+='<button type="button" class="ed-b" data-edx="sarm" data-sa="'+saEsc(c.sa)+'">Remove from schedule</button>';
   } else {
-    h+='<button type="button" class="ed-b on" data-edx="off" data-edn="'+nm+'">✓ On · tap to turn off</button>';
+    /* Was a ✓ On / tap-to-turn-off toggle. A row only reaches this list when
+       it is already on, so the state half said nothing; Remove is the action
+       that was actually wanted, and it matches what an added compound shows.
+       It is not destructive - ALL is never written - so the compound can be
+       switched back on from the Compounds tab. */
+    h+='<button type="button" class="ed-b" data-edx="prm" data-edn="'+nm+'">Remove from schedule</button>';
   }
   h+='</div></div>';
 
@@ -5695,6 +5703,10 @@ function edAddSave(){
     var x=b.getAttribute('data-edx'), n=b.getAttribute('data-edn'), sa=b.getAttribute('data-sa');
     var pan=b.closest('.ed-pan');
     if(x==='off'){ delete edOpen[n]; schTog(n,e); return; }
+    /* Remove for a protocol compound. schTog flips the schedule flag that
+       already rides payload.on, so it survives reload and syncs across
+       devices exactly as the on/off toggle did. */
+    if(x==='prm'){ delete edOpen[n]; schTog(n,e); try{ csToast('Removed from the schedule'); }catch(_){} return; }
     if(x==='sarm'){ delete edOpen[n]; saRemove(sa); renderDoses(); try{ csToast('Removed'); }catch(_){} return; }
     if(x==='blk'){
       var want=b.getAttribute('data-edb');

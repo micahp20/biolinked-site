@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ttomlinson/.
-const CACHE = 'ttomlinson-v9';
+const CACHE = 'ttomlinson-v11';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/ttomlinson/',

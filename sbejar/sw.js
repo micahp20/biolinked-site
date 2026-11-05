@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /sbejar/.
-const CACHE = 'sbejar-master-sched1-v6';
+const CACHE = 'sbejar-master-sched1-v8';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/sbejar/',
