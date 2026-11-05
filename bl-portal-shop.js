@@ -174,14 +174,15 @@ function navEntries(){
     var sb=document.createElement('button');sb.type='button';sb.className='snav bls-snorder';
     sb.onclick=function(){openShop();};
     sb.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 4h2l2.4 11.2a1 1 0 001 .8h9.2a1 1 0 001-.8L20 8H6"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span>Order</span>';
-    var pay=sn.querySelector('[data-v="pay"]'); if(pay&&pay.nextSibling) sn.insertBefore(sb,pay.nextSibling); else sn.appendChild(sb);
+    var more=sn.querySelector('[data-v="more"]'); if(more) sn.insertBefore(sb,more); else sn.appendChild(sb);
   }
   var nm=$('navmenu');
   if(nm&&!nm.querySelector('.bls-navorder')){
     var a=document.createElement('button');a.type='button';a.className='nav-item bls-navorder';
     a.onclick=function(){try{closeNav();}catch(e){}openShop();};
     a.innerHTML='<div><div class="nl">Order</div><div class="nd">Pre-built cycles and the full product line</div></div>';
-    var h=nm.querySelector('.nh'); if(h&&h.nextSibling) nm.insertBefore(a,h.nextSibling); else nm.insertBefore(a,nm.firstChild);
+    var nt=[].slice.call(nm.querySelectorAll('.nav-item')).filter(function(b){return /sheet\(['"]notes['"]\)/.test(b.getAttribute('onclick')||'');})[0];
+    if(nt&&nt.nextSibling) nm.insertBefore(a,nt.nextSibling); else if(nt) nm.appendChild(a); else { var h=nm.querySelector('.nh'); if(h&&h.nextSibling) nm.insertBefore(a,h.nextSibling); else nm.insertBefore(a,nm.firstChild); }
   }
 }
 
