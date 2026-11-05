@@ -343,7 +343,7 @@ html[data-theme] body{padding:0;background:var(--bg);font-size:14px;line-height:
 
 <link rel="stylesheet" href="/bl-pl-skin.css?v=3" id="bl-pl-skin">
 <link rel="stylesheet" href="/public-gold.css?v=6">
-<script src="/public-nav.js?v=3" defer></script>
+<script src="/public-nav.js?v=4" defer></script>
 </head>
 <body class="bls bl-public-gold bl-consistent bl-analyzer bl-protocol-public">
 
@@ -358,12 +358,12 @@ html[data-theme] body{padding:0;background:var(--bg);font-size:14px;line-height:
     <p class="bls-eyebrow">Bio Linked Peptide Solutions</p>
     <h1 class="bls-h1">Stack Analyzer</h1>
     <p class="bls-lede">Build a stack of up to eight compounds and get a full analysis &mdash; pair compatibility, scheduling conflicts, overlap flags and a protocol read.</p>
-    <p class="bls-sub">&#9888; Research reference only &mdash; not for human use &middot; not medical advice</p>
+    <p class="bls-sub">For research use only. Not medical advice.</p>
   </div>
 </header>
 <div class="app">
   <div class="col-l">
-    <div class="disc-bar">⚠ <strong>Research use only.</strong> Not medical advice. Always consult a licensed healthcare professional before beginning any protocol.</div>
+    <div class="disc-bar">⚠ <strong>For research use only.</strong> Not medical advice.</div>
 
     <div class="panel">
       <div class="panel-head"><h2>Build Your Stack</h2><p>Add up to 8 compounds to analyze</p></div>
@@ -920,7 +920,7 @@ async function analyzeStack(){
   // clamp
   score=Math.max(5,Math.min(99,score));
   const scoreColor=score>=80?'var(--green)':score>=60?'var(--gold)':score>=40?'var(--amber)':'var(--red)';
-  const scoreLabel=score>=80?'Strong Synergy':score>=60?'Good Stack':score>=40?'Proceed with Caution':'Conflicts Detected';
+  const scoreLabel=score>=80?'Strong Synergy':score>=60?'Good Stack':score>=40?'Proceed with Caution':(avoidCount>0?'Conflicts Detected':'Needs Optimization');
   const goalLabel=document.getElementById('goal-select').selectedOptions[0].textContent;
   const expLabel=document.getElementById('exp-select').selectedOptions[0].textContent;
   const riskLabel=document.getElementById('risk-select').selectedOptions[0].textContent;
@@ -1000,7 +1000,7 @@ async function analyzeStack(){
   obsEl.innerHTML=`<div class="panel-head"><h2>Protocol Observations</h2><p>Context, risk flags, and stack-level insight</p></div>
   <div class="panel-body">
     ${allObs.map(o=>`<div class="finding f-${o.type}"><span class="f-icon">${o.icon}</span><div><div class="f-title">${o.title}</div><div class="f-body">${o.body}</div></div></div>`).join('')}
-    <div style="margin-top:10px;background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:5px;padding:10px 13px;font-size:10px;color:var(--red);line-height:1.6">⚠ <strong>Research Reference Only.</strong> This analysis is educational and not medical advice. Always consult a licensed healthcare professional before beginning any peptide protocol.</div>
+    <div style="margin-top:10px;background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:5px;padding:10px 13px;font-size:10px;color:var(--red);line-height:1.6">⚠ <strong>For research use only.</strong> Not medical advice.</div>
   </div>`;
   col.appendChild(obsEl);
 
@@ -1054,7 +1054,12 @@ Respond in this EXACT JSON format (raw JSON, no markdown, no backticks):
 
 Rules: 4–7 findings. At least 1 good + 1 watch/danger. Lead with danger if conflicts exist. Calibrate to experience: ${exp}. Only reference compounds from: ${names.join(', ')}.`;
 
-    const res=await fetch('https://bio-linked-tools.netlify.app/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const ac=new AbortController();
+    const to=setTimeout(()=>ac.abort(),45000);
+    let res;
+    try{
+      res=await fetch('https://bio-linked-tools.netlify.app/.netlify/functions/claude',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]}),signal:ac.signal});
+    }finally{clearTimeout(to);}
     clearInterval(stepInterval);
     for(let i=1;i<=4;i++){const s=document.getElementById(`s${i}`);if(s){s.classList.remove('active');s.classList.add('done');if(s.querySelector('span'))s.querySelector('span').textContent='✓';}}
     await new Promise(r=>setTimeout(r,350));
@@ -1076,10 +1081,16 @@ Rules: 4–7 findings. At least 1 good + 1 watch/danger. Lead with danger if con
       ${protHTML?`<div class="ai-protocol-box"><div class="ai-prot-title">📋 Protocol Guidance</div><div class="ai-prot-text">${protHTML}</div></div>`:''}`;
   }catch(err){
     clearInterval(stepInterval);
-    document.getElementById('ai-loading').style.display='none';
+    const loadEl=document.getElementById('ai-loading'); if(loadEl) loadEl.style.display='none';
     const aiContent=document.getElementById('ai-content');
-    aiContent.classList.add('show');
-    aiContent.innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:6px;padding:12px 15px;font-size:11px;color:var(--red);line-height:1.65"><strong>⚠ AI analysis unavailable.</strong> Your compatibility scores, scheduling guide, and observations above are still accurate. Error: ${err.message}</div>`;
+    if(aiContent){
+      aiContent.classList.add('show');
+      const detail=(err&&err.name==='AbortError')?'AI analysis timed out.':('AI analysis unavailable. Error: '+(err&&err.message?err.message:'unknown'));
+      aiContent.innerHTML=`<div style="background:var(--red-bg);border:1px solid var(--red-bdr);border-radius:6px;padding:12px 15px;font-size:11px;color:var(--red);line-height:1.65"><strong>⚠ ${detail}</strong> Your compatibility scores, scheduling guide, and observations above are still accurate.</div>`;
+    }
+  }finally{
+    isAnalyzing=false;
+    if(btn){btn.disabled=false;btn.textContent='⚗️ Analyze Stack with AI';}
   }
 
   // EXPORT
@@ -1096,8 +1107,6 @@ Rules: 4–7 findings. At least 1 good + 1 watch/danger. Lead with danger if con
   col.appendChild(exportEl);
   document.getElementById('report-box').textContent=makeReportText(lastReport);
 
-  isAnalyzing=false;
-  btn.disabled=false;btn.textContent='⚗️ Analyze Stack with AI';
   setTimeout(()=>col.scrollIntoView({behavior:'smooth',block:'start'}),200);
 }
 
@@ -1137,7 +1146,7 @@ loadSaved();
         <a href="/cheat-sheet">Cheat Sheet</a><a href="/biomarker-landing">Biomarker Analysis</a>
         <a href="/stack-analyzer">Stack Analyzer</a><a href="/peptide-tracker">Tracker</a>
       </nav>
-      <p class="bls-foot-disc" style="margin-top:18px">For educational and research purposes only. Not medical advice. All compounds referenced are for research use. Consult a qualified healthcare provider before beginning any protocol.</p>
+      <p class="bls-foot-disc" style="margin-top:18px">For research use only. Not medical advice.</p>
     </div>
   </div>
 </footer>
