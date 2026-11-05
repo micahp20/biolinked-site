@@ -2,7 +2,7 @@
 <html lang="en" data-public-gold>
 <head>
 <script id="public-theme-init">(function(){var t='light';try{if(localStorage.getItem('bl-theme')==='dark')t='dark';}catch(e){}document.documentElement.setAttribute('data-theme',t);})();</script>
-<script id="intake-pay-init">(function(){var paid=false;try{var p=new URLSearchParams(location.search);if(p.get('intake_paid')==='1'){paid=true;sessionStorage.setItem('bl_intake_paid','1');var sid=p.get('session_id')||'';if(sid)sessionStorage.setItem('bl_intake_session_id',sid.slice(0,180));p.delete('intake_paid');p.delete('session_id');var q=p.toString();history.replaceState(null,'',location.pathname+(q?'?'+q:'')+location.hash);}else if(sessionStorage.getItem('bl_intake_paid')==='1'){paid=true;}}catch(e){}if(paid)document.documentElement.classList.add('intake-unlocked');})();</script>
+<script id="intake-pay-init">(function(){var paid=false,promo=false;try{var p=new URLSearchParams(location.search);if(p.get('intake_paid')==='1'){paid=true;sessionStorage.setItem('bl_intake_paid','1');sessionStorage.removeItem('bl_intake_promo');var sid=p.get('session_id')||'';if(sid)sessionStorage.setItem('bl_intake_session_id',sid.slice(0,180));p.delete('intake_paid');p.delete('session_id');var q=p.toString();history.replaceState(null,'',location.pathname+(q?'?'+q:'')+location.hash);}else if(sessionStorage.getItem('bl_intake_paid')==='1'){paid=true;sessionStorage.removeItem('bl_intake_promo');}else if(sessionStorage.getItem('bl_intake_promo')==='1211'){promo=true;sessionStorage.removeItem('bl_intake_session_id');}}catch(e){}if(paid||promo)document.documentElement.classList.add('intake-unlocked');if(promo)document.documentElement.classList.add('intake-promo');})();</script>
 
 <meta charset="UTF-8">
 <link rel="icon" href="/favicon.ico?v=6" sizes="any">
@@ -290,6 +290,23 @@ html[data-theme="dark"] .pt-bar i::before,html[data-theme="dark"] .pt-sets i::be
 html[data-theme="dark"] .pt-chip.watch{background:#CFB87C;color:#0b0b0c;border-color:#CFB87C}
 html[data-theme="dark"] .pt-sub,html[data-theme="dark"] .pt-cap,html[data-theme="dark"] .pt-meal,html[data-theme="dark"] .cover-tease-note{color:#c9c9c9}
 .cover-actions{text-align:center}
+.cover-promo{max-width:420px;margin:18px auto 0;text-align:left}
+.cover-promo-label{display:block;margin:0 0 8px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#171819}
+.cover-promo-row{display:flex;gap:8px;align-items:stretch}
+#intakePromo{flex:1;min-width:0;width:auto;min-height:48px;margin:0;padding:12px 14px;border:1.5px solid #8a7840;border-radius:10px;background:#fff;color:#171819;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:600}
+#intakePromoApply{flex:none;min-height:48px;padding:12px 18px;border:1.5px solid #8a7840;border-radius:10px;background:transparent;color:#171819;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer}
+#intakePromoApply:hover{background:rgba(138,120,64,.08);color:#171819}
+.cover-promo-msg{min-height:1.35em;margin:8px 0 0;font-size:13px;line-height:1.45;color:#171819}
+.cover-promo-msg.is-error{color:#7a241c}
+html[data-theme="dark"] .cover-promo-label{color:#f4f4f3}
+html[data-theme="dark"] #intakePromo{background:#0b0b0c;color:#f4f4f3;border-color:#CFB87C}
+html[data-theme="dark"] #intakePromoApply{background:#0b0b0c;color:#CFB87C;border-color:#CFB87C}
+html[data-theme="dark"] #intakePromoApply:hover{background:#141416;color:#E2CE94}
+html[data-theme="dark"] .cover-promo-msg{color:#f4f4f3}
+html[data-theme="dark"] .cover-promo-msg.is-error{color:#ffb4ab}
+.paid-note-promo{display:none !important}
+html.intake-promo .paid-note-stripe{display:none !important}
+html.intake-promo .paid-note-promo{display:block !important}
 a.intake-pay{display:inline-flex;align-items:center;justify-content:center;min-width:min(100%,420px);min-height:52px;padding:14px 28px;background:transparent;color:#171819;border:1.5px solid #8a7840;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;letter-spacing:.01em;text-align:center;text-decoration:none}
 a.intake-pay:hover{background:rgba(138,120,64,.08);color:#171819}
 html[data-theme="dark"] a.intake-pay{background:#0b0b0c;color:#CFB87C;border-color:#CFB87C}
@@ -312,6 +329,9 @@ html[data-theme="dark"] a.intake-pay:hover{background:#141416;color:#E2CE94}
   .cover-deposit>.cover-price{font-size:36px}
   .cover-teasers{grid-template-columns:1fr 1fr}
   a.intake-pay{width:100%}
+  .cover-promo{max-width:none}
+  .cover-promo-row{flex-direction:column}
+  #intakePromoApply{width:100%}
 }
 @media(max-width:560px){
   .cover-teasers{grid-template-columns:1fr}
@@ -390,6 +410,14 @@ html[data-theme="dark"] a.intake-pay:hover{background:#141416;color:#E2CE94}
       <p>A seriousness deposit. It keeps this intake for clients who are ready to begin. Move forward on a BioLinked stack or protocol and you get <strong>$20 credited</strong> toward that purchase.</p>
     </div>
     <div class="cover-actions"><a class="intake-pay" href="https://buy.stripe.com/fZubJ16cQ9bd8tgcSp7Vm03">Unlock Your Protocol Intake — $19.99</a></div>
+    <form class="cover-promo" id="intakePromoForm" autocomplete="off" method="post" action="#" onsubmit="event.preventDefault()">
+      <label class="cover-promo-label" for="intakePromo">Promo code</label>
+      <div class="cover-promo-row">
+        <input id="intakePromo" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="32" aria-describedby="intakePromoMsg">
+        <button type="submit" id="intakePromoApply">Apply</button>
+      </div>
+      <p id="intakePromoMsg" class="cover-promo-msg" role="status" aria-live="polite"></p>
+    </form>
     <p class="cover-secure">Secure checkout by Stripe. Payment returns you here and the intake opens.</p>
     <p class="cover-disc">For research use only. Not medical advice.</p>
   </div>
@@ -427,7 +455,8 @@ html[data-theme="dark"] a.intake-pay:hover{background:#141416;color:#E2CE94}
 
 <div class="header">
   <div class="header-logo">Bio Linked Peptide Solutions</div>
-  <div class="paid-note"><p class="paid-note-title">Intake fee received — $19.99</p><p>Move forward on a BioLinked stack or protocol and you get <strong>$20 credited</strong> toward that purchase.</p></div>
+  <div class="paid-note paid-note-stripe"><p class="paid-note-title">Intake fee received — $19.99</p><p>Move forward on a BioLinked stack or protocol and you get <strong>$20 credited</strong> toward that purchase.</p></div>
+  <div class="paid-note paid-note-promo"><p class="paid-note-title">Promo code applied</p><p>The intake fee is waived. No payment was collected, and this waiver does not add a credit toward a stack or protocol.</p></div>
   <h1>Client <em>Intake Form</em></h1>
   <div class="header-sub">New Client Consultation · Personalized Protocol Assessment</div>
   <div class="header-legal-note">⚠ This form is for research consultation and protocol planning purposes only. All information is kept strictly confidential. Completing this form does not create a physician-patient relationship and does not constitute medical advice of any kind.</div>
@@ -558,6 +587,9 @@ html[data-theme="dark"] a.intake-pay:hover{background:#141416;color:#E2CE94}
 <script>
 const TOTAL=7;let cur=1;
 (function(){if(!document.documentElement.classList.contains('intake-unlocked'))return;var app=document.getElementById('intakeApp');if(app)app.removeAttribute('inert');})();
+function intakeFeeMode(){var paid=false,promo='';try{paid=sessionStorage.getItem('bl_intake_paid')==='1';promo=sessionStorage.getItem('bl_intake_promo')||'';}catch(e){}if(paid)return 'paid';if(promo==='1211')return 'promo';return '';}
+function appendIntakeFee(data){var mode=intakeFeeMode();if(mode==='paid'){data.append('Intake Fee Paid','Yes');data.append('Intake Fee Amount','19.99');data.append('Intake Fee Currency','USD');try{var stripeSession=sessionStorage.getItem('bl_intake_session_id')||'';if(stripeSession)data.append('Stripe Checkout Session',stripeSession);}catch(e){}return true;}if(mode==='promo'){data.append('Intake Fee Paid','Waived');data.append('Intake Fee Status','Promo');data.append('Intake Fee Amount','0');data.append('Intake Fee Currency','USD');data.append('Intake Promo Code','1211');data.append('Intake Promo Discount','100%');return true;}return false;}
+(function(){var form=document.getElementById('intakePromoForm'),input=document.getElementById('intakePromo'),msg=document.getElementById('intakePromoMsg');if(!form||!input||!msg)return;function say(text){msg.textContent=text;msg.classList.toggle('is-error',!!text);if(text)input.setAttribute('aria-invalid','true');else input.removeAttribute('aria-invalid');}input.addEventListener('input',function(){if(input.getAttribute('aria-invalid')==='true')say('');});input.addEventListener('keydown',function(ev){if(ev.key==='Enter'){ev.preventDefault();if(typeof form.requestSubmit==='function')form.requestSubmit();else form.dispatchEvent(new Event('submit',{cancelable:true,bubbles:true}));}});form.addEventListener('submit',function(ev){ev.preventDefault();var code=(input.value||'').trim();if(!code){say('Enter a promo code.');input.focus();return;}if(code!=='1211'){say('That code is not valid.');input.focus();return;}try{sessionStorage.setItem('bl_intake_promo','1211');sessionStorage.removeItem('bl_intake_session_id');}catch(e){}document.documentElement.classList.add('intake-promo');document.documentElement.classList.add('intake-unlocked');var app=document.getElementById('intakeApp');if(app)app.removeAttribute('inert');say('');var first=document.getElementById('gc1');if(first)first.focus();window.scrollTo(0,0);});})();
 function toggleGateCheck(row){const cb=row.querySelector('input[type="checkbox"]');setTimeout(()=>{row.style.borderColor=cb.checked?'var(--gold-border)':'';row.style.background=cb.checked?'var(--gold-dim)':'';updateGateBtn();},0);}
 function updateGateBtn(){const cbs=document.querySelectorAll('#gateChecks input[type="checkbox"]');const all=Array.from(cbs).every(cb=>cb.checked);const btn=document.getElementById('gateBtn');btn.classList.toggle('ready',all);btn.disabled=!all;}
 function enterSite(){const gate=document.getElementById('legalGate');gate.style.transition='opacity 0.35s ease';gate.style.opacity='0';setTimeout(()=>gate.style.display='none',360);}
@@ -610,7 +642,7 @@ function sc(btn,groupId){document.getElementById(groupId).querySelectorAll('.sbt
 function ccToggle(row){const cb=row.querySelector('input[type="checkbox"]');setTimeout(()=>row.classList.toggle('checked',cb.checked),0);}
 (function(){const d=new Date();const fmt=(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0')+'/'+d.getFullYear();const el=document.getElementById('sigDate');if(el)el.value=fmt;})();
 async function submitForm(){
-  if(!document.documentElement.classList.contains('intake-unlocked')){alert('The $19.99 protocol intake fee is required before this form can be submitted.');return;}
+  if(!document.documentElement.classList.contains('intake-unlocked')||!intakeFeeMode()){alert('The $19.99 protocol intake fee is required before this form can be submitted.');return;}
   for(var i=1;i<=TOTAL;i++){ if(!requireSection(i)){ goTo(i); return; } }
   const consentCbs=document.querySelectorAll('.consent-cb');
   const allConsent=Array.from(consentCbs).every(cb=>cb.checked);
@@ -665,10 +697,7 @@ async function submitForm(){
   data.append('Signature Date',document.getElementById('sigDate')?.value||'');
   data.append('Consent Confirmed','Yes — all 8 consent statements acknowledged');
   data.append('Submission Timestamp',new Date().toISOString());
-  data.append('Intake Fee Paid','Yes');
-  data.append('Intake Fee Amount','19.99');
-  data.append('Intake Fee Currency','USD');
-  try{var stripeSession=sessionStorage.getItem('bl_intake_session_id')||'';if(stripeSession)data.append('Stripe Checkout Session',stripeSession);}catch(e){}
+  if(!appendIntakeFee(data)){alert('The $19.99 protocol intake fee is required before this form can be submitted.');return;}
   data.append('_gotcha',document.getElementById('hpField')?.value||'');
   const SB='https://bfjydzealeethhcpdfxl.supabase.co', ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ', AH={apikey:ANON,Authorization:'Bearer '+ANON};
   const subBtn=document.querySelector('#sec7 .nbtn.primary'); if(subBtn){subBtn.disabled=true;}
@@ -799,6 +828,15 @@ html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-publi
 html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public .pt-days span.on{background:#CFB87C !important;color:#0b0b0c !important;border-color:#CFB87C !important}
 html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public .pt-chip.watch{background:#CFB87C !important;color:#0b0b0c !important;border-color:#CFB87C !important}
 html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public .pt-bar i::before,html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public .pt-sets i::before{background:#CFB87C !important}
+html:root body.bl-public-gold.bl-consistent.bl-protocol-public .cover-promo-label{color:#171819 !important}
+html:root body.bl-public-gold.bl-consistent.bl-protocol-public #intakePromo{background:#fff !important;color:#171819 !important;border:1.5px solid #8a7840 !important;border-radius:10px !important;font-size:16px !important;min-height:48px !important}
+html:root body.bl-public-gold.bl-consistent.bl-protocol-public #intakePromoApply{background:transparent !important;color:#171819 !important;border:1.5px solid #8a7840 !important;border-radius:10px !important;font-family:'Montserrat',sans-serif !important;font-size:14px !important;font-weight:700 !important;min-height:48px !important;box-shadow:none !important;text-transform:none !important}
+html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public .cover-promo-label{color:#f4f4f3 !important}
+html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public #intakePromo{background:#0b0b0c !important;color:#f4f4f3 !important;border-color:#CFB87C !important}
+html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public #intakePromoApply{background:#0b0b0c !important;color:#CFB87C !important;border-color:#CFB87C !important}
+html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public #intakePromoApply:hover{background:#141416 !important;color:#E2CE94 !important}
+html:root body.bl-public-gold.bl-consistent.bl-protocol-public .cover-promo-msg.is-error{color:#7a241c !important}
+html:root[data-theme="dark"] body.bl-public-gold.bl-consistent.bl-protocol-public .cover-promo-msg.is-error{color:#ffb4ab !important}
 </style>
 </body>
 </html>
