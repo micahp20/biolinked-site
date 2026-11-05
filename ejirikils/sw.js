@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ejirikils/.
-const CACHE = 'ejirikils-master-v3';
+const CACHE = 'ejirikils-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/ejirikils/',

@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /cpeters/.
-const CACHE = 'cpeters-master-v3';
+const CACHE = 'cpeters-master-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/cpeters/',
