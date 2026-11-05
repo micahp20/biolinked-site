@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /skingsford/.
-const CACHE = 'skingsford-master-v4';
+const CACHE = 'skingsford-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/skingsford/',

@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /sbowers/.
-const CACHE = 'sbowers-master-v4';
+const CACHE = 'sbowers-master-sched1';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/sbowers/',
