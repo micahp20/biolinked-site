@@ -5725,6 +5725,36 @@ function edAddSave(){
   });
 
   (function(){ var _rd=renderDoses; renderDoses=function(){ _rd.apply(this,arguments); try{ edPaint(); }catch(e){} }; })();
+
+  /* ---- read-only detail expand: tap a day-view row. Edit mode keeps its own. ---- */
+  var dxOpen={};
+  function dxPanel(c){
+    var clean=function(v){ return c.sa?saEsc(v):v; }, blk=(typeof schBlk==='function'?schBlk(c):c.b);
+    var rows=[['Dose',c.d],['Units',c.u],['Recon',c.rec],['Days',c.c],['Time',blk==='BOTH'?'Morning + Night':(blk==='PM'?'Night':'Morning')],['Site',c.site]].filter(function(r){ return r[1]; });
+    return '<div class="dx-pan"><dl class="dx-facts">'+rows.map(function(r){ return '<div><dt>'+r[0]+'</dt><dd>'+clean(r[1])+'</dd></div>'; }).join('')+'</dl>'+(c.about?'<div class="dx-about">'+c.about+'</div>':'')+'</div>';
+  }
+  function dxPaint(){
+    if(BLEDIT) return;
+    var host=document.getElementById('doses'); if(!host) return;
+    var drs=host.querySelectorAll('.drow'), list=edRows(); if(drs.length!==list.length) return;
+    for(var i=0;i<drs.length;i++){
+      var c=list[i], r=drs[i], on=!!dxOpen[c.n];
+      r.classList.add('dx-row'); r.classList.toggle('exp',on);
+      r.setAttribute('data-dx',c.n); r.setAttribute('role','button'); r.setAttribute('tabindex','0'); r.setAttribute('aria-expanded',on?'true':'false');
+      r.insertAdjacentHTML('beforeend','<span class="dx-cv" aria-hidden="true">›</span>');
+      r.insertAdjacentHTML('afterend',dxPanel(c));
+      if(on) r.nextElementSibling.classList.add('open');
+    }
+  }
+  function dxTog(r){
+    var n=r.getAttribute('data-dx'), on=!dxOpen[n]; if(on) dxOpen[n]=1; else delete dxOpen[n];
+    [].forEach.call(document.querySelectorAll('#doses .drow.dx-row'),function(x){ if(x.getAttribute('data-dx')!==n) return;
+      x.classList.toggle('exp',on); x.setAttribute('aria-expanded',on?'true':'false'); var p=x.nextElementSibling; if(p&&p.classList.contains('dx-pan')) p.classList.toggle('open',on); });
+  }
+  document.addEventListener('click',function(e){ var t=e.target; if(!t.closest||t.closest('button,a,input,select')) return; var r=t.closest('#doses .drow.dx-row'); if(r) dxTog(r); });
+  document.addEventListener('keydown',function(e){ if(e.key!=='Enter'&&e.key!==' ') return; var t=e.target; if(t&&t.classList&&t.classList.contains('dx-row')){ e.preventDefault(); dxTog(t); } });
+  (function(){ var _rd=renderDoses; renderDoses=function(){ _rd.apply(this,arguments); try{ dxPaint(); }catch(e){} }; })();
+  try{ dxPaint(); }catch(e){}
   try{ renderDoses(); }catch(e){}
 }
 
@@ -6469,4 +6499,4 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 @media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:16px}#protoabout .jc-compound>summary{font-size:14px;padding:11px 13px}#protoabout .jc-description{padding:12px 13px 14px;font-size:13.5px}}
 </style>
 
-<link rel="stylesheet" href="/erica/protocol-theme.css?v=8">
+<link rel="stylesheet" href="/erica/protocol-theme.css?v=9">
