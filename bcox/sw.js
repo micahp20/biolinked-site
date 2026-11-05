@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bcox/.
-const CACHE = 'bcox-master-sched1-v8';
+const CACHE = 'bcox-master-sched1-v9';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/bcox/',

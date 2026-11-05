@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jenriquez/.
-const CACHE = 'jenriquez-master-sched2-v8';
+const CACHE = 'jenriquez-master-sched2-v9';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/jenriquez/',
