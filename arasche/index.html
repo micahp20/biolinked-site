@@ -5339,8 +5339,35 @@ function saRender(){
     u=String(u).replace(/\s+/g,'').replace(/^(\d+(\.\d+)?)u?$/,'$1u'); if(!/[1-9]/.test(u)) u='';
     return {n:name, d:dose?(dose+' '+(du?du.value:'mg')):'', u:u};
   }
+  /* Numbers typed under "Custom" have no name yet. Ask here, with the full
+     list, rather than sending them back to a dropdown that would overwrite
+     what they typed. */
+  var after=null;
+  function ask(next){
+    after=next; cur=null; pan.hidden=false;
+    var src=document.getElementById('pc-compound'), seen={}, o='<option value="">Choose a compound</option>';
+    if(src) [].forEach.call(src.options,function(x){ if(x.value==='__custom__') return; var n=String(x.text).split(' \u2014 ')[0]; if(seen[n]) return; seen[n]=1; o+='<option>'+saEsc(n)+'</option>'; });
+    pan.innerHTML='<p class="sa-t">Which compound is this?</p><p class="sa-s">Your numbers stay as you entered them.</p>'+
+      '<select class="pc-select" id="sa-pick" aria-label="Compound">'+o+'<option value="__other__">Other: type a name</option></select>'+
+      '<input class="pc-input" id="sa-other" type="text" placeholder="Compound name" autocomplete="off" aria-label="Compound name" hidden style="margin-top:8px">'+
+      '<div class="sa-row"><button type="button" class="sa-b" data-q="cancel">Cancel</button><button type="button" class="sa-b pri" data-q="ok" disabled>Continue</button></div>';
+  }
+  function asked(){ var p=document.getElementById('sa-pick'), t=document.getElementById('sa-other'); if(!p) return ''; return p.value==='__other__'?(t?t.value.trim():''):p.value; }
+  function askSync(){ var p=document.getElementById('sa-pick'), t=document.getElementById('sa-other'), k=pan.querySelector('[data-q="ok"]'); if(!p||!k) return; if(t) t.hidden=p.value!=='__other__'; k.disabled=!asked(); }
+  pan.addEventListener('change',askSync); pan.addEventListener('input',askSync);
+  pan.addEventListener('click',function(e){ var t=e.target.closest('[data-q]'); if(!t) return;
+    if(t.getAttribute('data-q')==='cancel'){ pan.hidden=true; return; }
+    var n=asked(); if(!n) return; var f=document.getElementById('pc-name');
+    if(f){ f.value=n; f.dispatchEvent(new Event('input',{bubbles:true})); }
+    pan.hidden=true; var go=after; after=null; if(go) go();
+  });
+  add.parentNode.addEventListener('click',function(e){
+    if(e.target!==add) return;
+    if(!(parseFloat(val('pc-vial'))>0&&parseFloat(val('pc-bac'))>0&&parseFloat(val('pc-dose'))>0)){ e.stopPropagation(); cur=null; pan.hidden=false; pan.innerHTML='<p class="sa-s">Enter the vial size, BAC water and dose first.</p>'; return; }
+    if(!compound().n){ e.stopPropagation(); ask(function(){ add.click(); }); }
+  },true);
   function open(){
-    var c=compound(); if(!c.n){ pan.hidden=false; pan.innerHTML='<p class="sa-s">Pick a compound first.</p>'; return; }
+    var c=compound(); if(!c.n){ ask(open); return; }
     var ex=saFind(c.n), g=saGuide(c.n);
     var days=ex?ex.days.slice():saGuideDays(g&&g.freq);
     cur={id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)), n:c.n, d:c.d, u:c.u, b:ex?ex.b:(/pm|night|bed/i.test(g&&g.timing||'')?'PM':'AM'), days:days};
@@ -6468,4 +6495,4 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 @media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:16px}#protoabout .jc-compound>summary{font-size:14px;padding:11px 13px}#protoabout .jc-description{padding:12px 13px 14px;font-size:13.5px}}
 </style>
 
-<link rel="stylesheet" href="/erica/protocol-theme.css?v=7">
+<link rel="stylesheet" href="/erica/protocol-theme.css?v=8">
