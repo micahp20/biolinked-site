@@ -1,7 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
-// never stale. Scoped to /dholm/, which is now the real page: the app layout
-// was promoted here from the /dholm/app/ pilot.
-const CACHE = 'dholm-vipa-mf-labdefs1-tapfix1-wk1-dna1-sch1-days1-font1-tp1-plskin2-ff25-shop1-g1-ord2-o3-o4-ipad1-ctl20-ctl21-cpath1-daypill1-homefix1-navfix1-tile1';
+// never stale. Scoped to /dholm/.
+const CACHE = 'dholm-master-v2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/dholm/',
@@ -16,11 +15,10 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Prune only this page's own caches, including the retired pilot's, so an
-// installed copy of /dholm/app/ does not keep serving from its old store.
+// Prune only this page's own caches.
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => (k.startsWith('dholm-') || k.startsWith('dholm-app-')) && k !== CACHE)
+    keys.filter(k => k.startsWith('dholm-') && k !== CACHE)
         .map(k => caches.delete(k))
   )));
   self.clients.claim();
