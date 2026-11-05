@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dbarron/.
-const CACHE = 'dbarron-master-v2';
+const CACHE = 'dbarron-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/dbarron/',
