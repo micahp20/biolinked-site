@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /shinds/.
-const CACHE = 'shinds-master-v2';
+const CACHE = 'shinds-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/shinds/',

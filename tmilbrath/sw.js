@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /tmilbrath/.
-const CACHE = 'tmilbrath-master-v2';
+const CACHE = 'tmilbrath-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/tmilbrath/',

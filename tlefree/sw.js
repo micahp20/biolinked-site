@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /tlefree/.
-const CACHE = 'tlefree-master-v2';
+const CACHE = 'tlefree-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/tlefree/',
