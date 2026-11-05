@@ -1,34 +1,34 @@
-// BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-// Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'tvigil-v1007 1002(0))-cyctitle-cg2-labdefs1-tapfix1-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1-ord2-o3-o4-ipad1-cpath1-daypill1-homefix1-tile1';
+// BioLinked client protocol service worker — network-first so the protocol is
+// never stale. Scoped to /tvigil/.
+const CACHE = 'tvigil-master-v2';
 const ASSETS = [
+  '/compound-library.js?v=2',
   '/tvigil/',
   '/tvigil/index.html',
   '/tvigil/manifest.json',
-  '/icon-180.png',
   '/icon-192.png',
-  '/icon-512.png',
-  '/favicon.png'
+  '/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
   self.skipWaiting();
 });
 
+// Prune only this page's own caches.
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k !== CACHE).map(k => caches.delete(k))
+    keys.filter(k => k.startsWith('tvigil-') && k !== CACHE)
+        .map(k => caches.delete(k))
   )));
   self.clients.claim();
 });
 
-// Network-first: always try fresh content first so clients see the latest protocol updates.
-// Falls back to cache only if the network is unavailable (offline support preserved).
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
+  if (!url.pathname.startsWith('/tvigil/') && !url.pathname.startsWith('/icon-')) return;
   e.respondWith(
     fetch(e.request).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
