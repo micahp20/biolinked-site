@@ -2283,7 +2283,11 @@ function schDefault(){
   try{
     if(typeof INV==='undefined' || !INV) return o;
     for(var i=0;i<INV.length;i++){
-      if(INV[i].status!=='paid') continue;
+      /* "free" counts the same as "paid" here. The gate exists so an unbought
+         quote never lands in someone's schedule, and a free line is the
+         opposite case: a client-supplied vial or a gift is already in their
+         hand, just never billed. "due" and "quote" stay off. */
+      if(INV[i].status!=='paid' && INV[i].status!=='free') continue;
       var items=INV[i].items||[];
       for(var j=0;j<items.length;j++){
         var c=schPaidMatch(items[j].n);
