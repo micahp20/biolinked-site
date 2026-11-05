@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mderby/.
-const CACHE = 'mderby-master-sched1-v2';
+const CACHE = 'mderby-master-sched1-v4';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mderby/',
