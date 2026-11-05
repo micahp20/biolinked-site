@@ -1,7 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
-// never stale. Scoped to /mberto/, which is now the real page: the app layout
-// was promoted here from the /mberto/app/ pilot.
-const CACHE = 'mberto-v1006 1002(0))-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1-ord2-o3-o4-ipad1-cpath1-daypill1-homefix1-tile1';
+// never stale. Scoped to /mberto/.
+const CACHE = 'mberto-master-v2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mberto/',
@@ -16,11 +15,10 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Prune only this page's own caches, including the retired pilot's, so an
-// installed copy of /mberto/app/ does not keep serving from its old store.
+// Prune only this page's own caches.
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => (k.startsWith('dcoone-') || k.startsWith('dcoone-app-')) && k !== CACHE)
+    keys.filter(k => k.startsWith('mberto-') && k !== CACHE)
         .map(k => caches.delete(k))
   )));
   self.clients.claim();

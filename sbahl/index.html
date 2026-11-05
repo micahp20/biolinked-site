@@ -4,8 +4,22 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b0b0c" id="tc">
-<title>Your BioLinked Protocol</title>
+<title>Stephen · Your BioLinked Protocol</title>
+<meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Your BioLinked protocol, compound index, labs and invoices in one place.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="BioLinked Solutions">
+<meta property="og:title" content="Your BioLinked Protocol">
+<meta property="og:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta property="og:image" content="https://biolinkedsolutions.com/og-image.png?v=4">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="BioLinked — Peptide Solutions">
+<meta property="og:url" content="https://biolinkedsolutions.com/sbahl/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Your BioLinked Protocol">
+<meta name="twitter:description" content="Personalized peptide protocol — saved for quick reference.">
+<meta name="twitter:image" content="https://biolinkedsolutions.com/og-image.png?v=4">
 <link rel="manifest" href="/sbahl/manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -19,15 +33,9 @@
      so no block below needs a dark-mode rule of its own. Gold stays the accent
      in both. Toggled by setting data-theme on <html>; persisted on-device. */
   :root{
-    /* ---- Colorado Buffaloes: black / gold / silver (mpauldino only) ------
-       The lighter of the two variants. CU gold #CFB87C is about 1.9:1 on
-       white and unusable as type there, so the accent darkens to #6f6130
-       (6.1:1 on card, 5.3:1 on the ground) and the real gold is kept for the
-       black variant, which is the default and where it belongs.
-       Silver is the SECONDARY: hairlines, the MEMBER sublabel, quiet marks.
-       Status amber is deliberately pushed orange -- at its old value it sat
-       3 degrees in hue from CU gold, so a "watch" lab pill and a gold accent
-       would have been the same colour. */
+    /* ---- Theme lifted verbatim from mpauldino so the two pages match.
+       Colorado: black / CU gold / silver. Gold darkens to #6f6130 in the light
+       variant because #CFB87C is unreadable as type on white. */
     --cu-gold:#CFB87C; --cu-gold-lt:#E2CE94; --cu-silver:#A2A4A3; --cu-black:#0b0b0c;
 
     --ink:#0b0b0c; --ink2:#43464a; --muted:#55585c; --faint:#6d7073;
@@ -51,13 +59,8 @@
     --sw:264px;
   }
   :root[data-theme="dark"]{
-    /* ---- Colorado Buffaloes, black-dominant -- the primary look ----------
-       Black ground, surfaces stepping up for depth, white type, and CU gold
-       #CFB87C leading with #E2CE94 for highlights. Gold fills take BLACK
-       type. Silver #A2A4A3 is present but secondary -- hairlines, the MEMBER
-       sublabel, quiet marks -- so both school colours read without the gold
-       having to compete.
-       Status amber is pushed orange here too, for the same reason as above. */
+    /* ---- Dark, lifted verbatim from mpauldino. This is the face both
+       pages actually show: the init below defaults to dark. */
     color-scheme:dark;
     --cu-gold:#CFB87C; --cu-gold-lt:#E2CE94; --cu-silver:#A2A4A3; --cu-black:#0b0b0c;
 
@@ -161,6 +164,13 @@
 
   /* Scroll area fills the frame and simply pads past the bar, so content can
      always be scrolled clear of it and nothing ends up trapped underneath. */
+  /* No -webkit-overflow-scrolling:touch. It is deprecated -- momentum has been
+     the default since iOS 13 -- and it puts the scroller on its own compositing
+     layer whose scroll extent iOS does not reliably recompute when content is
+     inserted afterwards. Everything in this view is written by innerHTML after
+     the scroller already exists, so a stale extent leaves the tail of the page
+     unreachable and unpainted: you scroll to what iOS thinks is the end and the
+     rest shows as background. */
   .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
     padding:calc(58px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 26px)}
   .scroll::-webkit-scrollbar{width:0}
@@ -239,6 +249,7 @@
   .pill.due{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-line)}
   .pill.paid{background:var(--ok-soft);color:var(--ok)}
   .pill.free{background:var(--gold-soft);color:var(--gold)}
+.pill.quote{background:var(--gold-soft);color:var(--gold);border:1px solid var(--amber-line)}
 
   /* ALL COMPOUNDS -- expand in place. Everything starts collapsed. */
   .cxwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;
@@ -255,6 +266,43 @@
   .cx-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
   .cx.on .cx-cv{transform:rotate(90deg)}
   .cx-bd{display:none;padding:0 14px 14px}
+  /* Collapsible groups: the per-cycle blocks in All Compounds and the
+     explainer on the Protocol tab. Both reuse the .cx idiom -- a header row
+     with a chevron that quarter-turns when open -- so there is nothing new
+     to learn visually and nothing new to theme. */
+  .cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+  .cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+  .cgrp-m{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+  .cgrp-n{font-size:13px;font-weight:800;color:var(--gold)}
+  .cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+  .cgrp.on .cgrp-cv{transform:rotate(90deg)}
+  .cgrp-bd{display:none;border-top:1px solid var(--line2)}
+  .cgrp.on .cgrp-bd{display:block}
+  .cgrp-bd .cx:last-child{border-bottom:none}
+  .cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+  .cgrp.pastgrp .cgrp-bd{opacity:.72}
+  .abt{padding:11px 13px 13px}
+  .abt-l{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+  .abt-l+.abt-p{margin-bottom:11px}
+  .abt-p{font-size:13px;line-height:1.55;color:var(--ink2)}
+  .abt-p:last-child{margin-bottom:0}
+  /* "The stack" -- just the compound names for whichever cycle card is open,
+     each one a link into the Index. Deliberately carries no strength, dose or
+     schedule: all of that lives on the Schedule tab, and repeating it here is
+     what made the section heavy. */
+  .stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+  .stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .stk-a:last-child{border-bottom:none}
+  .stk-a:active{background:var(--gold-soft)}
+  .stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
   .cx.on .cx-bd{display:block}
   .cx-ab{font-size:13px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
@@ -779,7 +827,14 @@
        growing to fit its content. Without it the column overflows the shell. */
     .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
       display:block;overflow-y:auto;overflow-x:hidden;
-      padding:0 0 26px}
+      /* The bottom tab bar is collapsed to height 0 on a phone, and it was the
+         thing that used to clear the home indicator -- it still carries
+         env(safe-area-inset-bottom) in its own padding. With it gone, nothing
+         reserved that space and 26px is less than the ~34px inset, so the last
+         line of the final card sat under the indicator with no scroll left to
+         reach it. .sheet and .tabs both add the inset; .scroll was the one that
+         did not. Zero effect where the inset is 0. */
+      padding:0 0 calc(26px + env(safe-area-inset-bottom))}
     .view.on{flex:none}
     /* last flex child -> always on the true visual bottom edge */
     .tabs{position:static;flex:0 0 auto;height:auto;
@@ -902,37 +957,6 @@
   .xp{padding:0 16px;margin:0 0 6px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
   .xp:empty{display:none}
   #x-edu[hidden]{display:none}
-
-  /* About card + cycle-grouped list, same rules as the reference page. */
-.cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
-    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
-.cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
-    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
-.cgrp-m{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
-.cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
-.cgrp-n{font-size:13px;font-weight:800;color:var(--gold)}
-.cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
-.cgrp.on .cgrp-cv{transform:rotate(90deg)}
-.cgrp-bd{display:none;border-top:1px solid var(--line2)}
-.cgrp.on .cgrp-bd{display:block}
-.cgrp-bd .cx:last-child{border-bottom:none}
-.cgrp.pastgrp .cgrp-t{color:var(--ink2)}
-.cgrp.pastgrp .cgrp-bd{opacity:.72}
-.abt{padding:11px 13px 13px}
-.abt-l{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
-    font-weight:800;margin:0 0 3px}
-.abt-l+.abt-p{margin-bottom:11px}
-.abt-p{font-size:13px;line-height:1.55;color:var(--ink2)}
-.abt-p:last-child{margin-bottom:0}
-.stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
-.stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
-    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
-    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
-    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.stk-a:last-child{border-bottom:none}
-.stk-a:active{background:var(--gold-soft)}
-.stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
   /* cloud-sync status: a quiet word beside the subline, and one toast */
   .cs-stat{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.13em;
     text-transform:uppercase;color:var(--faint);margin:0 0 2px;min-height:12px;
@@ -1251,10 +1275,50 @@ html body .drow .mt,html body .cx-s{font-family:"Outfit",system-ui,sans-serif;fo
 html body .drow .uu,html body .cx-u{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--gold)}
 html body .drow.pm .uu{color:var(--pm)}
 </style>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
-<link rel="stylesheet" href="/bl-connected-path.css?v=4">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=5">
+<link rel="stylesheet" href="/bl-connected-path.css?v=5">
+<style>
+/* ---- SCHEDULE EDIT MODE (?edit=1) — nothing below renders for the client ---- */
+html.bl-edit .drow.ed-row{cursor:pointer;border-bottom:none}
+html.bl-edit .drow.ed-row .ed-cv{margin-left:auto;flex:none;font-size:18px;line-height:1;color:var(--muted);transition:transform .16s ease}
+html.bl-edit .drow.ed-row.exp .ed-cv{transform:rotate(90deg)}
+html:is(.bl-edit,.bl-add) .ed-pan{display:none;border-bottom:1px solid var(--line2);background:rgba(127,127,127,.045)}
+html:is(.bl-edit,.bl-add) .ed-pan.open{display:block}
+html.bl-edit .dgrp>.ed-pan:last-child{border-bottom:none}
+html:is(.bl-edit,.bl-add) .ed-in{padding:12px 14px 14px;font-family:var(--sans)}
+html:is(.bl-edit,.bl-add) .ed-grp{margin-top:12px}
+html:is(.bl-edit,.bl-add) .ed-grp:first-child{margin-top:0}
+html:is(.bl-edit,.bl-add) .ed-l{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+html:is(.bl-edit,.bl-add) .ed-tag{font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--gold);text-transform:none}
+html:is(.bl-edit,.bl-add) .ed-row2{display:flex;gap:8px;margin-top:8px}
+html:is(.bl-edit,.bl-add) .ed-row2:first-child{margin-top:0}
+html:is(.bl-edit,.bl-add) .ed-b{flex:1;min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
+html:is(.bl-edit,.bl-add) .ed-b.on{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html:is(.bl-edit,.bl-add) .ed-b.pri{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html:is(.bl-edit,.bl-add) .ed-b:disabled{opacity:.45;cursor:default}
+html:is(.bl-edit,.bl-add) .ed-f{display:flex;gap:8px;margin-bottom:8px}
+html:is(.bl-edit,.bl-add) .ed-f.one{display:block}
+html:is(.bl-edit,.bl-add) .ed-f label{flex:1;display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+html:is(.bl-edit,.bl-add) .ed-f input{width:100%;box-sizing:border-box;margin-top:4px;min-height:42px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html:is(.bl-edit,.bl-add) .ed-pan .dp{margin-top:0;padding-top:0;border-top:none}
+html:is(.bl-edit,.bl-add) .ed-add{margin:14px 0 4px}
+html:is(.bl-edit,.bl-add) .ed-add-b{width:100%;min-height:48px;border-radius:12px;border:1px dashed #303639;background:transparent;color:#303639;font:inherit;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer}
+html:is(.bl-edit,.bl-add) .ed-add-p{margin-top:10px;padding:14px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;font-family:var(--sans);background:var(--card,#fff)}
+html:is(.bl-edit,.bl-add) .ed-add-p[hidden]{display:none}
+html:is(.bl-edit,.bl-add) .ed-seg{margin-bottom:12px}
+html:is(.bl-edit,.bl-add) .ed-sel{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+html:is(.bl-edit,.bl-add) .ed-sel select{width:100%;box-sizing:border-box;margin-top:4px;min-height:44px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html:is(.bl-edit,.bl-add) .ed-gd{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+html:is(.bl-edit,.bl-add) .ed-gd span{display:inline-flex;align-items:baseline;gap:5px;padding:5px 9px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:8px;font-size:12px}
+html:is(.bl-edit,.bl-add) .ed-gd i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+html:is(.bl-edit,.bl-add) .ed-add-p .dp-days{margin-bottom:10px}
+/* top chrome buttons charcoal instead of gold */
+html:root:not([data-theme="dark"]) .top .tgl,
+html:root:not([data-theme="dark"]) .top .navbtn,
+html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!important;color:#303639!important}
+</style>
 </head>
-<body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
+<body class="erica-tab-consistency"><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
   <nav class="side">
     <div class="side-top">
@@ -1263,10 +1327,10 @@ html body .drow.pm .uu{color:var(--pm)}
     </div>
     <div class="side-nav">
       <button class="snav on" data-v="proto" onclick="go('proto')"><svg viewBox="0 0 24 24"><path d="M6 3h9l5 5v13a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v6h6"/><path d="M9 13h6M9 17h4"/></svg><span>Protocol</span></button>
-      <button class="snav" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><span>Schedule</span></button>
+      <button class="snav" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg><span>Schedule</span></button><button class="snav" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg><span>Invoice</span></button>
       <button class="snav" data-v="nutr" onclick="go('nutr')"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M8.5 3c1.9 0 3.5 1.6 3.5 3.5V9H9.5C7.6 9 6 7.4 6 5.5S7.6 3 8.5 3z"/><path d="M15.5 6c1.4 0 2.5 1.1 2.5 2.5S16.9 11 15.5 11H13V8.5C13 7.1 14.1 6 15.5 6z"/><path d="M5 14h14l-1.2 6.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 14z"/></svg><span>Nutrition</span></button><button class="snav" data-v="work" onclick="go('work')"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg><span>Workout</span></button>
       <button class="snav" data-v="labs" onclick="go('labs')"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg><span>Labs</span></button>
-      <button class="snav" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg><span>Invoice</span></button>
+      
       <button class="snav" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg><span>More</span></button>
     </div>
     <div class="side-foot">
@@ -1290,7 +1354,6 @@ html body .drow.pm .uu{color:var(--pm)}
           <text class="lxbl" x="256" y="266">BL</text>
         </svg><span class="brand-copy">BIO LINKED<small>SOLUTIONS</small></span></div>
     <div class="who"><div class="wn">Stephen Bahl</div><div class="wl">Member</div></div>
-    <button class="bl-aa" id="bl-aa" type="button" aria-pressed="false" aria-label="Bigger text" title="Bigger text">Aa</button>
     <button class="tgl" onclick="toggleTheme()" aria-label="Switch between light and dark">
       <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>
       <svg class="moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 019.5 4a8.5 8.5 0 1010.5 10.5z"/></svg>
@@ -1306,14 +1369,14 @@ html body .drow.pm .uu{color:var(--pm)}
       <div><div class="nl">Protocol</div><div class="nd">Your welcome screen and overview</div></div></button>
     <button type="button" class="nav-item" onclick="go('sched')">
       <div><div class="nl">Schedule</div><div class="nd">Today's doses, timing and the week</div></div></button>
+    <button type="button" class="nav-item" onclick="go('pay')">
+      <div><div class="nl">Invoice</div><div class="nd">Invoices and balance</div></div></button>
     <button type="button" class="nav-item" onclick="go('nutr')">
       <div><div class="nl">Nutrition</div><div class="nd">Meal builder and macro targets</div></div></button>
     <button type="button" class="nav-item" onclick="go('work')">
       <div><div class="nl">Workout</div><div class="nd">Your weekly plan, sets and progress</div></div></button>
     <button type="button" class="nav-item" onclick="go('labs')">
       <div><div class="nl">Labs</div><div class="nd">Your bloodwork, explained</div></div></button>
-    <button type="button" class="nav-item" onclick="go('pay')">
-      <div><div class="nl">Invoice</div><div class="nd">Invoices and balance</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('indexlist')">
       <div><div class="nl">Dosing Guide</div><div class="nd">Water, dose and schedule for every vial</div></div></button>
     <button type="button" class="nav-item" onclick="closeNav();sheet('calc')">
@@ -1353,12 +1416,7 @@ html body .drow.pm .uu{color:var(--pm)}
         <div class="lx-card" role="button" tabindex="0" onclick="go('more')" style="cursor:pointer"><div class="lx-ico"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg></div>
           <div><div class="lx-t">More</div><div class="lx-d">Compound index, dose calculator, and storage &amp; handling notes.</div></div></div>
       </div>
-      <div class="seclbl">What to Expect</div>
-      <ul class="lx-exp">
-        <li><b>Protocols run in cycles.</b> Some compounds are daily, others a few days a week &mdash; your Schedule tab always shows today&rsquo;s.</li>
-        <li><b>Reconstitute and store as noted</b> &mdash; keep peptides refrigerated once mixed.</li>
-        <li><b>Recheck your labs periodically</b> so your protocol can be adjusted. Your Labs tab tracks it.</li>
-      </ul>
+      
     </div></section>
     <section class="view" id="v-sched"><div class="pad">
       <h1 class="scrn" id="greet">Schedule</h1>
@@ -1368,9 +1426,6 @@ html body .drow.pm .uu{color:var(--pm)}
       <div class="days" id="daystrip"></div>
       <div id="doses"></div>
       <p class="note" id="dosenote"></p>
-      <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
-      <div id="cmplist"></div>
-      <p class="note">Everything Stephen has taken or ordered &mdash; the active protocol, the gifts, and the prior Gorilla Stack. Tap a compound to open its recon, draw, site and timing in place.</p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -1766,24 +1821,24 @@ html body .drow.pm .uu{color:var(--pm)}
     <button class="x" onclick="hideA2(1)">&times;</button>
   </div>
   <nav class="tabs">
-    <button class="tab" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Schedule</button>
+    <button class="tab" data-v="sched" onclick="go('sched')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>Schedule</button><button class="tab" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Invoice</button>
     <button class="tab" data-v="nutr" onclick="go('nutr')"><svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M8.5 3c1.9 0 3.5 1.6 3.5 3.5V9H9.5C7.6 9 6 7.4 6 5.5S7.6 3 8.5 3z"/><path d="M15.5 6c1.4 0 2.5 1.1 2.5 2.5S16.9 11 15.5 11H13V8.5C13 7.1 14.1 6 15.5 6z"/><path d="M5 14h14l-1.2 6.2a1 1 0 01-1 .8H7.2a1 1 0 01-1-.8L5 14z"/></svg>Nutrition</button><button class="tab" data-v="work" onclick="go('work')"><svg viewBox="0 0 24 24"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12"/></svg>Workout</button>
     <button class="tab" data-v="labs" onclick="go('labs')"><svg viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Labs</button>
-    <button class="tab" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Invoice</button>
+    
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
 </div>
 <script>
 var CMP=[{"n":"Testosterone · 250 mg/mL","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"50 mg","u":"20u","rec":"","site":"SubQ","about":"Testosterone replacement. The hormonal base layer — the background level everything else in the year is built on top of. Pre-mixed in oil, so nothing to reconstitute. Split across three injections a week to keep levels even rather than peaking once.","tag":"Year-round foundation","days":[1,3,5],"found":true},{"n":"HGH · 24 IU","b":"AM","cad":"MF","c":"Mon-Fri","d":"2 iu","u":"25u","rec":"3 mL BAC water","site":"SubQ","about":"Growth hormone. Run as a low, steady daily dose five days a week rather than a large intermittent one — the weekend break keeps the pattern closer to the body's own release. Works underneath the recovery and body-composition side of the program all year.","tag":"Year-round foundation","days":[1,2,3,4,5],"found":true},{"n":"Retatrutide · 30 mg","b":"AM","cad":"WK","c":"Mon","d":"2 mg","u":"20u","rec":"3 mL BAC water","site":"SubQ","about":"Triple agonist in the GLP-1 class. Works appetite regulation and glucose handling together — the fat-loss and body-composition lever of the foundation. Taken as a single weekly injection, keeping the same 2 mg a week.","tag":"Year-round foundation","days":[1],"found":true},{"n":"SS-31 · 50 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~2.08 mg","u":"12.5u","rec":"3 mL BAC water","site":"SubQ","about":"Mitochondria-targeted peptide. Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species — the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.","tag":"Cycle 1 · Cycle 3 · Cycle 5","days":[1,3,5],"cy":["Cycle 1","Cycle 3","Cycle 5"]},{"n":"KLOW Blend · 80 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~3.33 mg","u":"12.5u","rec":"3 mL BAC water","site":"SubQ","about":"Four-peptide repair blend — GHK-Cu, BPC-157, TB-500 and KPV in one vial. Covers skin and connective tissue, gut and soft-tissue repair, and the inflammatory side of recovery in a single shot. 80 mg in 3 mL is 26.67 mg/mL, so a 12.5u draw is about 3.33 mg.","tag":"Cycle 1 · Cycle 4","days":[1,3,5],"cy":["Cycle 1","Cycle 4"]},{"n":"Glutathione · 1500 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"125 mg","u":"42u","rec":"5 mL BAC water","site":"SubQ","about":"The body's master antioxidant. A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles — SS-31 works on where the damage is produced, glutathione on mopping it up.","tag":"Cycle 1 · Cycle 3 · Cycle 5","days":[1,3,5],"cy":["Cycle 1","Cycle 3","Cycle 5"]},{"n":"CJC-1295 / Ipamorelin · 10 mg","b":"PM","cad":"MF","c":"Mon-Fri","d":"500 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"","tag":"Active","days":[1,2,3,4,5]},{"n":"Tadalafil · 5 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"5 mg AM fasted","u":"1 tab","rec":"","site":"Oral · fasted","about":"Low daily dose taken every weekday morning on an empty stomach. Oral tablet, nothing to reconstitute.","tag":"Active","days":[1,2,3,4,5]},{"n":"Armodafinil · 250 mg","b":"AM","cad":"PRN","c":"As needed","d":"125 mg (½ tab)","u":"½ tab","rec":"","site":"Oral","about":"Heavy days only, as needed. Split each 250 mg tablet in half as instructed.","tag":"As needed · heavy days","days":[]}];
-var INV=[{"label":"12-Month Protocol","summary":"52 weeks · 9 compounds · 52 vials · $200 month 1 paid · $2,200 balance · tap to view","status":"due","total":2200.0,"items":[{"n":"Testosterone Cypionate 250 mg/mL × 4 vials @ $85","amt":340.0},{"n":"HGH 24 IU × 22 vials @ $36","amt":792.0},{"n":"Retatrutide 30 mg × 4 vials @ $65","amt":260.0},{"n":"SS-31 50 mg × 3 vials @ $105","amt":315.0},{"n":"KLOW Blend 80 mg × 4 vials @ $40","amt":160.0},{"n":"MOTS-c 40 mg × 3 vials @ $70","amt":210.0},{"n":"Glutathione 1500 mg × 6 vials @ $25.50","amt":153.0},{"n":"NAD+ 1000 mg × 4 vials @ $25","amt":100.0},{"n":"5-Amino-1MQ 50 mg × 2 vials @ $35","amt":70.0},{"n":"Month 1 payment","sub":"first month paid 10/20","amt":-200.0}]},{"label":"Order · Oral Add-ons","summary":"October 2026 · 2 compounds · tap to view","status":"paid","total":200.0,"items":[{"n":"Tadalafil 5 mg × 300 tablets","sub":"Mon–Fri AM fasted","amt":100.0},{"n":"Armodafinil 250 mg × 100 tablets","sub":"As needed, heavy days only — split in half","amt":100.0}]}];
+var INV=[{"label":"12-Month Protocol","summary":"52 weeks · 9 compounds · 52 vials · $200 month 1 paid · $2,200 balance","status":"due","total":2200.0,"items":[{"n":"Testosterone Cypionate 250 mg/mL × 4 vials @ $85","amt":340.0},{"n":"HGH 24 IU × 22 vials @ $36","amt":792.0},{"n":"Retatrutide 30 mg × 4 vials @ $65","amt":260.0},{"n":"SS-31 50 mg × 3 vials @ $105","amt":315.0},{"n":"KLOW Blend 80 mg × 4 vials @ $40","amt":160.0},{"n":"MOTS-c 40 mg × 3 vials @ $70","amt":210.0},{"n":"Glutathione 1500 mg × 6 vials @ $25.50","amt":153.0},{"n":"NAD+ 1000 mg × 4 vials @ $25","amt":100.0},{"n":"5-Amino-1MQ 50 mg × 2 vials @ $35","amt":70.0},{"n":"Month 1 payment","sub":"first month paid 10/20","amt":-200.0}]},{"label":"Order · Oral Add-ons","summary":"October 2026 · 2 compounds","status":"paid","total":200.0,"items":[{"n":"Tadalafil 5 mg × 300 tablets","sub":"Mon–Fri AM fasted","amt":100.0},{"n":"Armodafinil 250 mg × 100 tablets","sub":"As needed, heavy days only — split in half","amt":100.0}]}];
 var PAID=400.0,DUE=2200.0;
 var IX=(window.BL_DOSING||[]); /* one source: /bl-dosing.js */
 var CATL={"fatloss": "Fat Loss", "muscle": "Muscle", "gh": "Growth Hormone", "healing": "Healing", "longevity": "Longevity", "cognition": "Cognition", "sleep": "Sleep", "energy": "Energy / NAD+", "immunity": "Immunity", "sexual": "Sexual Health", "hormones": "Hormones", "skin": "Skin & Cosmetic", "blend": "Blend", "bioregulator": "Bioregulator"};
 var NOTES=[];
 var MINE=[{"name":"Testosterone","cat":"mine","purpose":"Active","vial":"250 mg/mL","bac":"","dose":"60 mg","units":"24"},{"name":"HGH","cat":"mine","purpose":"Active","vial":"24 IU","bac":"3 mL BAC water","dose":"2 iu","units":"25"},{"name":"Retatrutide","cat":"mine","purpose":"Active","vial":"30 mg","bac":"3 mL BAC water","dose":"2 mg","units":"20"},{"name":"SS-31","cat":"mine","purpose":"Active","vial":"50 mg","bac":"3 mL BAC water","dose":"~2.08 mg","units":"12.5"},{"name":"KLOW Blend","cat":"mine","purpose":"Active","vial":"80 mg","bac":"3 mL BAC water","dose":"~3.33 mg","units":"12.5"},{"name":"Glutathione","cat":"mine","purpose":"Active","vial":"1500 mg","bac":"5 mL BAC water","dose":"125 mg","units":"42"},{"name":"MOTS-C","cat":"mine","purpose":"Active","vial":"40 mg","bac":"3 mL BAC water","dose":"~1.67 mg","units":"12.5"},{"name":"NAD+","cat":"mine","purpose":"Active","vial":"1000 mg","bac":"5 mL BAC water","dose":"75 mg","units":"37.5"},{"name":"5-Amino-1MQ","cat":"mine","purpose":"Active","vial":"50 mg","bac":"3 mL BAC water","dose":"~2.08 mg","units":"12.5"}];
 var ALL=[{"n":"Testosterone · 250 mg/mL","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"50 mg","u":"20u","rec":"","site":"SubQ","about":"Testosterone replacement. The hormonal base layer — the background level everything else in the year is built on top of. Pre-mixed in oil, so nothing to reconstitute. Split across three injections a week to keep levels even rather than peaking once.","tag":"Year-round foundation","days":[1,3,5],"found":true},{"n":"HGH · 24 IU","b":"AM","cad":"MF","c":"Mon-Fri","d":"2 iu","u":"25u","rec":"3 mL BAC water","site":"SubQ","about":"Growth hormone. Run as a low, steady daily dose five days a week rather than a large intermittent one — the weekend break keeps the pattern closer to the body's own release. Works underneath the recovery and body-composition side of the program all year.","tag":"Year-round foundation","days":[1,2,3,4,5],"found":true},{"n":"Retatrutide · 30 mg","b":"AM","cad":"WK","c":"Mon","d":"2 mg","u":"20u","rec":"3 mL BAC water","site":"SubQ","about":"Triple agonist in the GLP-1 class. Works appetite regulation and glucose handling together — the fat-loss and body-composition lever of the foundation. Taken as a single weekly injection, keeping the same 2 mg a week.","tag":"Year-round foundation","days":[1],"found":true},{"n":"SS-31 · 50 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~2.08 mg","u":"12.5u","rec":"3 mL BAC water","site":"SubQ","about":"Mitochondria-targeted peptide. Binds cardiolipin in the inner mitochondrial membrane and is studied for how the cell handles reactive oxygen species — the wear-and-tear side of energy production. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.","tag":"Cycle 1 · Cycle 3 · Cycle 5","days":[1,3,5],"cy":["Cycle 1","Cycle 3","Cycle 5"]},{"n":"KLOW Blend · 80 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~3.33 mg","u":"12.5u","rec":"3 mL BAC water","site":"SubQ","about":"Four-peptide repair blend — GHK-Cu, BPC-157, TB-500 and KPV in one vial. Covers skin and connective tissue, gut and soft-tissue repair, and the inflammatory side of recovery in a single shot. 80 mg in 3 mL is 26.67 mg/mL, so a 12.5u draw is about 3.33 mg.","tag":"Cycle 1 · Cycle 4","days":[1,3,5],"cy":["Cycle 1","Cycle 4"]},{"n":"Glutathione · 1500 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"125 mg","u":"42u","rec":"5 mL BAC water","site":"SubQ","about":"The body's master antioxidant. A three-amino-acid peptide the liver uses to neutralise oxidative stress and clear metabolic waste. Sits naturally under the mitochondrial cycles — SS-31 works on where the damage is produced, glutathione on mopping it up.","tag":"Cycle 1 · Cycle 3 · Cycle 5","days":[1,3,5],"cy":["Cycle 1","Cycle 3","Cycle 5"]},{"n":"MOTS-C · 40 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~1.67 mg","u":"12.5u","rec":"3 mL BAC water","site":"SubQ","about":"Mitochondrial-derived peptide. Signals through the AMPK pathway — the switch the body flips during exercise and fasting to shift toward burning fuel rather than storing it. 40 mg in 3 mL is 13.33 mg/mL, so a 12.5u draw is about 1.67 mg.","tag":"Cycle 2 · Cycle 4 · Cycle 6","days":[1,3,5],"cy":["Cycle 2","Cycle 4","Cycle 6"]},{"n":"NAD+ · 1000 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"75 mg","u":"37.5u","rec":"5 mL BAC water","site":"SubQ","about":"Cellular-energy cofactor. NAD+ is the molecule mitochondria need to turn fuel into usable energy, and levels fall with age. Run three days a week rather than daily — the dose is large and the flush is easier on a spaced cadence. 1000 mg in 5 mL is 200 mg/mL, so a 37.5u draw is 75 mg.","tag":"Cycle 2 · Cycle 5","days":[1,3,5],"cy":["Cycle 2","Cycle 5"]},{"n":"5-Amino-1MQ · 50 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~2.08 mg","u":"12.5u","rec":"3 mL BAC water","site":"SubQ","about":"NNMT inhibitor. NNMT is an enzyme that builds up inside fat cells with age and suppresses fat oxidation — effectively a brake on mobilising stored fat. Blocking it removes the brake and raises cellular NAD+ in the same tissue. 50 mg in 3 mL is 16.67 mg/mL, so a 12.5u draw is about 2.08 mg.","tag":"Cycle 3 · Cycle 6","days":[1,3,5],"cy":["Cycle 3","Cycle 6"]},{"n":"CJC-1295 / Ipamorelin · 10 mg","b":"PM","cad":"MF","c":"Mon-Fri","d":"500 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"","tag":"Active","days":[1,2,3,4,5]},{"n":"Tadalafil · 5 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"5 mg AM fasted","u":"1 tab","rec":"","site":"Oral · fasted","about":"Low daily dose taken every weekday morning on an empty stomach. Oral tablet, nothing to reconstitute.","tag":"Active","days":[1,2,3,4,5]},{"n":"Armodafinil · 250 mg","b":"AM","cad":"PRN","c":"As needed","d":"125 mg (½ tab)","u":"½ tab","rec":"","site":"Oral","about":"Heavy days only, as needed. Split each 250 mg tablet in half as instructed.","tag":"As needed · heavy days","days":[]}];
-var LABS={"sub":"21 markers across 5 panels","l":"Overall Score","score":"75","outof":"/100","g":"Good","c":null,"domains":null,"bannerattr":"","banner":"Tap any marker for what it means in plain language.","secs":[{"t":"Hormone Panel","rows":[{"id":"bw0_0","n":"Total Testosterone","vc":"normal","v":"&mdash;","u":null,"ref":"ref 700–1100 ng/dL","pc":"normal","p":null,"tip":"<strong>Total Testosterone.</strong> Sum of bound + free + bioavailable T. The headline number, but on its own it can read fine while the usable fractions are low."},{"id":"bw0_1","n":"Free Testosterone","vc":"normal","v":"&mdash;","u":null,"ref":"ref 150–224 pg/mL","pc":"normal","p":null,"tip":"<strong>Free Testosterone.</strong> The fraction not bound to SHBG or albumin &mdash; the part tissue can actually use for energy, drive, muscle and recovery."},{"id":"bw0_2","n":"Bioavailable Testosterone","vc":"normal","v":"&mdash;","u":null,"ref":"ref 245–575 ng/dL","pc":"normal","p":null,"tip":"<strong>Bioavailable Testosterone.</strong> Free T plus the loosely albumin-bound portion &mdash; everything the body can reach on demand."},{"id":"bw0_3","n":"SHBG","vc":"normal","v":"&mdash;","u":null,"ref":"ref 20–40 nmol/L","pc":"normal","p":null,"tip":"<strong>Sex Hormone Binding Globulin.</strong> The carrier protein that locks testosterone up. High SHBG means a good total number can still leave you short on what is usable."},{"id":"bw0_4","n":"Estradiol","vc":"normal","v":"&mdash;","u":null,"ref":"ref 20–40 pg/mL","pc":"normal","p":null,"tip":"<strong>Estradiol (E2).</strong> Converted from testosterone by aromatase. Needed for bone, mood and libido &mdash; the goal is balanced, not minimised."},{"id":"bw0_5","n":"DHEA-S","vc":"normal","v":"&mdash;","u":null,"ref":"ref 350–500 mcg/dL","pc":"normal","p":null,"tip":"<strong>DHEA-Sulfate.</strong> An adrenal precursor hormone that feeds into both testosterone and estrogen. It falls steadily with age and tracks stress load."},{"id":"bw0_6","n":"PSA","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 1.5 ng/mL","pc":"normal","p":null,"tip":"<strong>Prostate Specific Antigen.</strong> The prostate safety baseline taken before and during testosterone therapy so any change is visible against a known starting point."}]},{"t":"Metabolic + Lipids","rows":[{"id":"bw1_0","n":"Hemoglobin A1c","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 5.3 %","pc":"normal","p":null,"tip":"<strong>A1c.</strong> Average blood sugar over roughly three months. The single best read on where glucose control actually sits, because it cannot be gamed by one clean morning."},{"id":"bw1_1","n":"Fasting Glucose","vc":"normal","v":"&mdash;","u":null,"ref":"ref 70–85 mg/dL","pc":"normal","p":null,"tip":"<strong>Fasting Glucose.</strong> Blood sugar after an overnight fast &mdash; the morning snapshot that sits beside A1c's three-month average."},{"id":"bw1_2","n":"LDL Cholesterol","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 100 mg/dL","pc":"normal","p":null,"tip":"<strong>LDL.</strong> The cholesterol fraction that deposits into artery walls. Lower is generally better, and it is one of the more responsive markers to body composition change."},{"id":"bw1_3","n":"HDL Cholesterol","vc":"normal","v":"&mdash;","u":null,"ref":"ref > 60 mg/dL","pc":"normal","p":null,"tip":"<strong>HDL.</strong> Carries cholesterol back to the liver for clearance. Higher is protective, and it tends to rise with training volume."},{"id":"bw1_4","n":"Triglycerides","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 90 mg/dL","pc":"normal","p":null,"tip":"<strong>Triglycerides.</strong> Circulating fat, strongly driven by refined carbohydrate and alcohol. One of the fastest markers to move once intake changes."},{"id":"bw1_5","n":"Total / HDL Ratio","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 3.5","pc":"normal","p":null,"tip":"<strong>Total / HDL Ratio.</strong> A composite cardiovascular read that often tells you more than either number alone."}]},{"t":"Hematology","rows":[{"id":"bw2_0","n":"Hematocrit","vc":"normal","v":"&mdash;","u":null,"ref":"ref 40–50 %","pc":"normal","p":null,"tip":"<strong>Hematocrit.</strong> The share of blood made up of red cells. The key safety marker on testosterone therapy, because T raises red cell production and thickens blood."},{"id":"bw2_1","n":"Ferritin","vc":"normal","v":"&mdash;","u":null,"ref":"ref 30–120 ng/mL","pc":"normal","p":null,"tip":"<strong>Ferritin.</strong> Stored iron, and also an acute-phase reactant &mdash; it rises with inflammation as well as with iron load, so it is read next to hs-CRP."},{"id":"bw2_2","n":"MCV","vc":"normal","v":"&mdash;","u":null,"ref":"ref 82–92 fL","pc":"normal","p":null,"tip":"<strong>Mean Corpuscular Volume.</strong> Average red blood cell size. Elevated MCV with normal iron is a common alcohol signature rather than a disease marker."}]},{"t":"Liver · Kidney · Thyroid","rows":[{"id":"bw3_0","n":"TSH","vc":"normal","v":"&mdash;","u":null,"ref":"ref 0.5–2.0 mIU/L","pc":"normal","p":null,"tip":"<strong>Thyroid Stimulating Hormone.</strong> The pituitary's instruction to the thyroid. It rises when the thyroid is underperforming, so it moves before the thyroid hormones themselves do."},{"id":"bw3_1","n":"Creatinine","vc":"normal","v":"&mdash;","u":null,"ref":"ref 0.7–1.2 mg/dL","pc":"normal","p":null,"tip":"<strong>Creatinine.</strong> A muscle breakdown product cleared by the kidneys. Reads high in people carrying more muscle or supplementing creatine, so it is interpreted in context."},{"id":"bw3_2","n":"BUN","vc":"normal","v":"&mdash;","u":null,"ref":"ref 7–20 mg/dL","pc":"normal","p":null,"tip":"<strong>Blood Urea Nitrogen.</strong> A protein-metabolism waste product, also cleared renally. Read beside creatinine to separate hydration effects from kidney function."}]},{"t":"Other Markers","rows":[{"id":"bw4_0","n":"hs-CRP","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 1.0 mg/L","pc":"normal","p":null,"tip":"<strong>High-sensitivity C-Reactive Protein.</strong> A general inflammation marker sensitive enough to pick up the low-grade kind that compounds cardiovascular risk over years."},{"id":"bw4_1","n":"Magnesium","vc":"normal","v":"&mdash;","u":null,"ref":"ref 2.0–2.6 mg/dL","pc":"normal","p":null,"tip":"<strong>Serum Magnesium.</strong> A cofactor in hundreds of enzyme reactions, including the ones behind sleep quality, muscle function and glucose handling. Usually the easiest marker on the page to correct."}]}],"note":null};
 var CYC=[{"n":"Cycle 1","wk":"Weeks 1–8","st":"current"},{"n":"Cycle 2","wk":"Weeks 9–16","st":"future"},{"n":"Cycle 3","wk":"Weeks 17–24","st":"future"},{"n":"Cycle 4","wk":"Weeks 25–32","st":"future"},{"n":"Cycle 5","wk":"Weeks 33–40","st":"future"},{"n":"Cycle 6","wk":"Weeks 41–48","st":"future"},{"n":"Close","wk":"Weeks 49–52","st":"future"}];
+var LABS={"sub":"21 markers across 5 panels","l":"Overall Score","score":"75","outof":"/100","g":"Good","c":null,"domains":null,"bannerattr":"","banner":"Tap any marker for what it means in plain language.","secs":[{"t":"Hormone Panel","rows":[{"id":"bw0_0","n":"Total Testosterone","vc":"normal","v":"&mdash;","u":null,"ref":"ref 700–1100 ng/dL","pc":"normal","p":null,"tip":"<strong>Total Testosterone.</strong> Sum of bound + free + bioavailable T. The headline number, but on its own it can read fine while the usable fractions are low."},{"id":"bw0_1","n":"Free Testosterone","vc":"normal","v":"&mdash;","u":null,"ref":"ref 150–224 pg/mL","pc":"normal","p":null,"tip":"<strong>Free Testosterone.</strong> The fraction not bound to SHBG or albumin &mdash; the part tissue can actually use for energy, drive, muscle and recovery."},{"id":"bw0_2","n":"Bioavailable Testosterone","vc":"normal","v":"&mdash;","u":null,"ref":"ref 245–575 ng/dL","pc":"normal","p":null,"tip":"<strong>Bioavailable Testosterone.</strong> Free T plus the loosely albumin-bound portion &mdash; everything the body can reach on demand."},{"id":"bw0_3","n":"SHBG","vc":"normal","v":"&mdash;","u":null,"ref":"ref 20–40 nmol/L","pc":"normal","p":null,"tip":"<strong>Sex Hormone Binding Globulin.</strong> The carrier protein that locks testosterone up. High SHBG means a good total number can still leave you short on what is usable."},{"id":"bw0_4","n":"Estradiol","vc":"normal","v":"&mdash;","u":null,"ref":"ref 20–40 pg/mL","pc":"normal","p":null,"tip":"<strong>Estradiol (E2).</strong> Converted from testosterone by aromatase. Needed for bone, mood and libido &mdash; the goal is balanced, not minimised."},{"id":"bw0_5","n":"DHEA-S","vc":"normal","v":"&mdash;","u":null,"ref":"ref 350–500 mcg/dL","pc":"normal","p":null,"tip":"<strong>DHEA-Sulfate.</strong> An adrenal precursor hormone that feeds into both testosterone and estrogen. It falls steadily with age and tracks stress load."},{"id":"bw0_6","n":"PSA","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 1.5 ng/mL","pc":"normal","p":null,"tip":"<strong>Prostate Specific Antigen.</strong> The prostate safety baseline taken before and during testosterone therapy so any change is visible against a known starting point."}]},{"t":"Metabolic + Lipids","rows":[{"id":"bw1_0","n":"Hemoglobin A1c","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 5.3 %","pc":"normal","p":null,"tip":"<strong>A1c.</strong> Average blood sugar over roughly three months. The single best read on where glucose control actually sits, because it cannot be gamed by one clean morning."},{"id":"bw1_1","n":"Fasting Glucose","vc":"normal","v":"&mdash;","u":null,"ref":"ref 70–85 mg/dL","pc":"normal","p":null,"tip":"<strong>Fasting Glucose.</strong> Blood sugar after an overnight fast &mdash; the morning snapshot that sits beside A1c's three-month average."},{"id":"bw1_2","n":"LDL Cholesterol","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 100 mg/dL","pc":"normal","p":null,"tip":"<strong>LDL.</strong> The cholesterol fraction that deposits into artery walls. Lower is generally better, and it is one of the more responsive markers to body composition change."},{"id":"bw1_3","n":"HDL Cholesterol","vc":"normal","v":"&mdash;","u":null,"ref":"ref > 60 mg/dL","pc":"normal","p":null,"tip":"<strong>HDL.</strong> Carries cholesterol back to the liver for clearance. Higher is protective, and it tends to rise with training volume."},{"id":"bw1_4","n":"Triglycerides","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 90 mg/dL","pc":"normal","p":null,"tip":"<strong>Triglycerides.</strong> Circulating fat, strongly driven by refined carbohydrate and alcohol. One of the fastest markers to move once intake changes."},{"id":"bw1_5","n":"Total / HDL Ratio","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 3.5","pc":"normal","p":null,"tip":"<strong>Total / HDL Ratio.</strong> A composite cardiovascular read that often tells you more than either number alone."}]},{"t":"Hematology","rows":[{"id":"bw2_0","n":"Hematocrit","vc":"normal","v":"&mdash;","u":null,"ref":"ref 40–50 %","pc":"normal","p":null,"tip":"<strong>Hematocrit.</strong> The share of blood made up of red cells. The key safety marker on testosterone therapy, because T raises red cell production and thickens blood."},{"id":"bw2_1","n":"Ferritin","vc":"normal","v":"&mdash;","u":null,"ref":"ref 30–120 ng/mL","pc":"normal","p":null,"tip":"<strong>Ferritin.</strong> Stored iron, and also an acute-phase reactant &mdash; it rises with inflammation as well as with iron load, so it is read next to hs-CRP."},{"id":"bw2_2","n":"MCV","vc":"normal","v":"&mdash;","u":null,"ref":"ref 82–92 fL","pc":"normal","p":null,"tip":"<strong>Mean Corpuscular Volume.</strong> Average red blood cell size. Elevated MCV with normal iron is a common alcohol signature rather than a disease marker."}]},{"t":"Liver · Kidney · Thyroid","rows":[{"id":"bw3_0","n":"TSH","vc":"normal","v":"&mdash;","u":null,"ref":"ref 0.5–2.0 mIU/L","pc":"normal","p":null,"tip":"<strong>Thyroid Stimulating Hormone.</strong> The pituitary's instruction to the thyroid. It rises when the thyroid is underperforming, so it moves before the thyroid hormones themselves do."},{"id":"bw3_1","n":"Creatinine","vc":"normal","v":"&mdash;","u":null,"ref":"ref 0.7–1.2 mg/dL","pc":"normal","p":null,"tip":"<strong>Creatinine.</strong> A muscle breakdown product cleared by the kidneys. Reads high in people carrying more muscle or supplementing creatine, so it is interpreted in context."},{"id":"bw3_2","n":"BUN","vc":"normal","v":"&mdash;","u":null,"ref":"ref 7–20 mg/dL","pc":"normal","p":null,"tip":"<strong>Blood Urea Nitrogen.</strong> A protein-metabolism waste product, also cleared renally. Read beside creatinine to separate hydration effects from kidney function."}]},{"t":"Other Markers","rows":[{"id":"bw4_0","n":"hs-CRP","vc":"normal","v":"&mdash;","u":null,"ref":"ref < 1.0 mg/L","pc":"normal","p":null,"tip":"<strong>High-sensitivity C-Reactive Protein.</strong> A general inflammation marker sensitive enough to pick up the low-grade kind that compounds cardiovascular risk over years."},{"id":"bw4_1","n":"Magnesium","vc":"normal","v":"&mdash;","u":null,"ref":"ref 2.0–2.6 mg/dL","pc":"normal","p":null,"tip":"<strong>Serum Magnesium.</strong> A cofactor in hundreds of enzyme reactions, including the ones behind sleep quality, muscle function and glucose handling. Usually the easiest marker on the page to correct."}]}],"note":null};
 var DW=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 var FULL=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 var sel=new Date().getDay();
@@ -1801,6 +1856,8 @@ function toggleTheme(){
   try{localStorage.setItem(KP+'theme',t)}catch(e){}
 }
 (function(){
+  /* Dark is the primary look now, so it is what an untouched device gets;
+     only an explicit stored 'light' switches away from it. */
   var t='light'; try{ if(localStorage.getItem(KP+'theme')==='dark') t='dark'; }catch(e){}
   applyTheme(t);
 })();
@@ -2095,8 +2152,9 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
-  /* Days only, no calendar dates -- a client rarely starts on the date shown.
-     Today is still marked, by weekday. */
+  /* Days only, no calendar dates: a client rarely starts on the date shown,
+     so a real date reads as a promise the schedule is not making. What matters
+     is which weekdays carry a draw. "Today" is still marked, by weekday. */
   var now=new Date();
   var h='';
   for(var i=0;i<7;i++){
@@ -2110,12 +2168,13 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
    Morning block and again in the Night block. */
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
 function renderDoses(){
-  /* Only what the client has on their schedule, and only what is due today. */
+  /* Only what the client has switched on, across whatever cycles, and only
+     what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
-      ' is clear — the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
+      ' is clear. Nothing is on your schedule for this day.</div></div>';
     document.getElementById('dosenote').textContent='';return;
   }
   var h='', total=0;
@@ -2139,39 +2198,44 @@ function renderDoses(){
 }
 
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
-   Every compound Stephen has taken or ordered, alphabetical, expanding in place.
+   The selected cycle's compounds, alphabetical, expanding in place.
    Everything starts collapsed. No grouping and no sort toggle: one list. */
 function cmpArch(c){return !!(c.hist||/^\s*(archived|prior|past)\b/i.test(c.tag||''));}
 function cmpRow(c,i){
-  /* i is a scoped string key, not the bare ALL index: a compound can render
-     in more than one section and each copy needs its own id. */
+  /* i is any unique key, not just the ALL index: a compound that runs in more
+     than one cycle is rendered once per group and each copy needs its own id. */
   var arch=cmpArch(c), on=schOn(c);
-  var sub=(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c;
+  var sub=(arch?'No longer running':(c.b==='BOTH'?'AM + PM':c.b)+' \u00b7 '+c.c);
   var nm=String(c.n).replace(/'/g,"\\'");
   var btn='<button type="button" class="schbtn'+(on?' on':'')+'" onclick="schTog(\''+nm+'\',event)">'+
     (on?'\u2713 On schedule':'+ Add to schedule')+'</button>';
   var _blk=(typeof schBlk==='function'?schBlk(c):c.b); var ampm=(on&&c.b!=='BOTH')?('<span class="schblk"><button type="button" class="blkb'+(_blk==='AM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'AM\',event)">AM</button><button type="button" class="blkb'+(_blk==='PM'?' on':'')+'" onclick="schBlkSet(\''+nm+'\',\'PM\',event)">PM</button></span>'):'';
   return '<div class="cx'+(arch?' hist':'')+'" id="cx'+i+'">'+
     '<div class="cx-hd" onclick="cxTog(\''+i+'\')">'+
-      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div>'+btn+ampm+'</div>'+
+      '<div class="cx-t"><div class="cx-n">'+c.n+(arch?'<span class="cx-arch">Past</span>':'')+'</div><div class="cx-s">'+sub+'</div></div>'+
       '<div class="cx-r"><span class="cx-u">'+c.u+'</span><span class="cx-cv">\u203a</span></div>'+
     '</div>'+
     '<div class="cx-bd">'+
+      '<div class="cx-ctl">'+btn+ampm+'</div>'+
       '<div class="cx-ab">'+c.about+'</div>'+
       '<div class="facts" style="margin:11px 0 0">'+
         '<div class="frow"><div class="fl">Recon</div><div class="fchips"><b>'+c.rec+'</b></div></div>'+
-        '<div class="frow"><div class="fl">Draw</div><div class="fchips"><b>'+c.d+'</b><b>'+c.u+'</b></div></div>'+
+        '<div class="frow"><div class="fl">Draw</div><div class="fchips">'+(c.d?'<b>'+c.d+'</b>':'')+(c.u?'<b>'+c.u+'</b>':'')+'</div></div>'+
         '<div class="frow"><div class="fl">Site</div><div class="fchips"><b>'+c.site+'</b></div></div>'+
         '<div class="frow"><div class="fl">Timing</div><div class="fchips"><b>'+c.c+'</b><b>'+(c.b==='BOTH'?'AM + PM':c.b)+'</b></div></div>'+
       '</div>'+
     '</div></div>';
 }
 function cxTog(i){var e=document.getElementById('cx'+i); if(e) e.classList.toggle('on');}
-/* ===== CLIENT-CURATED SCHEDULE ========================================
+/* ===== CLIENT-CURATED SCHEDULE (multi-cycle) ===========================
    ALL is the prescribed protocol and never changes. On top of it sits a set
-   of which compounds belong on the day view, kept in localStorage under
-   this page's own key. Every read is guarded and falls back to the
-   prescribed default rather than breaking the page. */
+   of which compounds currently belong on the day view, kept in localStorage
+   under this client's own key. On a cycle page the sensible starting point
+   is the CURRENT cycle on and every later cycle off, so the client opens to
+   what they are actually running and switches the next cycle on when they
+   reach it. A compound that runs in more than one cycle is one entry keyed
+   by name, so both rendered copies always agree. Storage can be unavailable
+   or hold junk, so every read is guarded and falls back to the default. */
 var SCHKEY='biolinked-sched-sbahl-2';
 var schState=null;
 /* Cycles are recommendations, not a plan of record: building someone six
@@ -2319,13 +2383,11 @@ function cycCurrent(){
 }
 function cycOn(){return (typeof CYCS!=='undefined'&&CYCS&&CYCS.length)?CYCS:null;}
 var CYCABOUT={"Cycle 1": {"t": "Mitochondrial output, and the repair work that keeps the foundation sustainable.", "s": "SS-31 works inside the mitochondria themselves, steadying how efficiently cells turn fuel into energy. Glutathione handles the oxidative load that comes with running them harder. KLOW carries GHK-Cu, BPC-157, TB-500 and KPV in one vial, covering skin, soft tissue and inflammation in a single draw.", "w": "All three in the morning, Mon/Wed/Fri, alongside the foundation."}, "Cycle 2": {"t": "Cellular energy — the metabolic half of the rotation.", "s": "MOTS-c signals through AMPK, the switch that tells a cell to burn fuel rather than store it, so it works with the GLP-1 in your foundation rather than repeating it. NAD+ supplies the cofactor those same pathways run on; raising one without the other tends to stall.", "w": "Both in the morning, Mon/Wed/Fri. NAD+ is the one to push slowly — given too fast it flushes."}, "Cycle 3": {"t": "The mitochondrial pair again, this time with a metabolic lever attached.", "s": "SS-31 and Glutathione repeat because they do maintenance, not a one-off fix. 5-Amino-1MQ is the addition: it blocks NNMT, the enzyme that otherwise spends NAD+ to no purpose, so the cell keeps more of what it already makes.", "w": "Morning, Mon/Wed/Fri — the same slot as the first cycle, so nothing about the week has to change."}, "Cycle 4": {"t": "Metabolic signalling paired with repair.", "s": "MOTS-c drives the AMPK side while KLOW covers tissue, skin and inflammation. The pairing is deliberate: the metabolic compounds ask more of the body, and the repair blend is what keeps up with the asking.", "w": "Both in the morning, Mon/Wed/Fri."}, "Cycle 5": {"t": "Mitochondrial support with the cofactor added back.", "s": "SS-31 and Glutathione pair up again, this time with NAD+ instead of a metabolic lever. SS-31 protects the machinery, Glutathione clears what it produces, NAD+ fuels it — three points on one pathway rather than three separate ideas.", "w": "Morning, Mon/Wed/Fri. NAD+ slow, as before."}, "Cycle 6": {"t": "The metabolic close — both levers on the same pathway at once.", "s": "MOTS-c raises AMPK activity and 5-Amino-1MQ stops NNMT draining the NAD+ that supports it. Running them together is the point: each one covers the other's limit.", "w": "Morning, Mon/Wed/Fri."}};
-/* ----------------------------------------------------------------------
-   About this protocol, and the cycle-grouped compound list.
-
-   Both read off ALL at render time rather than a second hand-kept list, so
-   neither can drift from the schedule. Doses, recon and days stay in the
-   Schedule tab; these cards are the why, not the how much.
-   ---------------------------------------------------------------------- */
+/* Every cycle is listed on the Protocol tab, each its own collapsible card,
+   so the whole plan can be read from the homepage without going hunting.
+   This no longer tracks the Schedule tab's selector -- there is nothing to
+   follow when all five are on screen -- so a cycle switch over there leaves
+   whatever the reader has open here alone. */
 var STK_IX_ALIAS={
   "N-Acetyl Semax Amidate":"Semax or NA Semax Amidate",
   "N-Acetyl Selank Amidate":"Selank or NA Selank Amidate",
@@ -2347,9 +2409,9 @@ var STK_IX_ALIAS={
   "FOX04-DRI":"FOXO4-DRI"
 };
 /* Jump straight to the compound's Index entry where the catalog has one.
-   Anything unmatched - a blend with no single entry, or testosterone, which
-   the catalog does not carry - opens the Index list rather than failing
-   silently. */
+   Names differ between a protocol card and the catalog in a handful of cases,
+   so a small alias map covers those; anything unmatched opens the Index list
+   rather than failing silently. */
 function stkIxFind(name){
   if(typeof IX==='undefined'||!IX) return -1;
   var norm=function(x){return String(x).toLowerCase().replace(/[^a-z0-9]/g,'');};
@@ -2386,6 +2448,33 @@ function stkIx(name,ev){
   if(i>=0){ sheet('indexlist'); openIx(i); }
   else { sheet('indexlist'); }
 }
+function aboutCompound(c){
+ var sch=[c.c,c.b==='BOTH'?'AM + PM':c.b].filter(Boolean).join(' · ');
+ return '<details class="jc-compound"><summary>'+esc(c.n)+'<span aria-hidden="true" class="jc-chevron"></span></summary><div class="jc-body">'+(c.about?'<div class="jc-description">'+c.about+'</div>':'')+'<dl class="jc-facts">'+
+ [['Recon',c.rec],['Schedule',sch],['Dose / draw',[c.d,c.u].filter(Boolean).join(' · ')],['Site',c.site]].filter(function(r){return r[1];}).map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'</dl></div></details>';
+}
+function renderAbout(){
+ var host=document.getElementById('protoabout'); if(!host) return;
+ var about=(typeof CYCABOUT!=='undefined'&&CYCABOUT)||{}, list=(typeof ALL!=='undefined'&&ALL)||[], shown={};
+ /* A page with no cycle plan still has its compounds and its notes, so fall
+    back to CYCABOUT's own keys and list whatever no cycle claimed. */
+ var cycs=cycOn()||Object.keys(about).map(function(n){return {n:n};});
+ var h=cycs.map(function(cy){
+ var a=about[cy.n]||{};
+ var rows=list.filter(function(c){return cycNames(c).indexOf(cy.n)>=0;});
+ rows.forEach(function(c){shown[c.n]=1;});
+ return '<section class="jc-cycle"><header class="jc-cycle-head"><h2>'+esc(cy.n)+'</h2>'+(cy.wk?'<p>'+esc(cy.wk)+'</p>':'')+'</header>'+
+ (a.t?'<p class="jc-intro">'+esc(a.t)+'</p>':'')+
+ rows.map(aboutCompound).join('')+
+ ((a.s||a.w)?'<details class="jc-notes"><summary>About this cycle</summary>'+(a.s?'<h3>Why these together</h3><p>'+esc(a.s)+'</p>':'')+(a.w?'<h3>Timing</h3><p>'+esc(a.w)+'</p>':'')+'</details>':'')+'</section>';
+ }).join('');
+ var rest=list.filter(function(c){return !shown[c.n];});
+ if(rest.length){
+ var lbl=cycs.length?((typeof CYCBASE!=='undefined'&&CYCBASE)||'Also in your protocol'):'Your compounds';
+ h+='<section class="jc-cycle"><header class="jc-cycle-head"><h2>'+esc(lbl)+'</h2></header>'+rest.map(aboutCompound).join('')+'</section>';
+ }
+ host.innerHTML=h||'<div class="empty"><div class="t">Your protocol is on its way</div><div class="d">Your compounds and schedule will show here as soon as they are ready.</div></div>';
+}
 function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
 /* A group re-renders whenever the cycle toggle moves, so remember which ones
    the reader had open and put them back. */
@@ -2393,59 +2482,32 @@ function cgOpenSet(){
   var o={}; var n=document.querySelectorAll('#cmplist .cgrp.on');
   for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
 }
+/* The controls now live inside the compound body, and every toggle re-renders
+   the list, so an open row has to survive that or it would shut under the
+   reader's finger. */
+function cxOpenSet(){
+  var o={}; var n=document.querySelectorAll('#cmplist .cx.on');
+  for(var i=0;i<n.length;i++) o[n[i].id]=1; return o;
+}
 function cgrpHTML(key,title,meta,rows,open,extra){
-  if(!rows.length) return '';
-  return '<div class="cgrp'+(open?' on':'')+(extra?' '+extra:'')+'" id="cg-'+key+'">'+
-    '<div class="cgrp-hd" onclick="cgTog(\''+key+'\')">'+
-      '<div><div class="cgrp-t">'+title+'</div>'+(meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
-      '<div class="cgrp-r"><span class="cgrp-n">'+rows.length+'</span><span class="cgrp-cv">\u203a</span></div>'+
-    '</div>'+
-    '<div class="cgrp-bd">'+rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</div></div>';
+ if(!rows.length)return '';
+ /* `open` was accepted and then ignored, and the markup said jc-cycle while
+    cgOpenSet looked for cgrp, so every cycle rendered expanded. Both are
+    wired up now: the head toggles the group and the current cycle opens. */
+ return '<section class="jc-cycle cgrp'+(open?' on':'')+' '+(extra||'')+'" id="cg-'+key+'">'+
+   '<header class="jc-cycle-head" onclick="cgTog(\''+key+'\')"><div class="cg-ht"><h2>'+esc(title)+'</h2>'+(meta?'<p>'+esc(meta)+'</p>':'')+'</div><span class="cg-cv">\u203a</span></header>'+
+   rows.map(function(x){return cmpRow(x.c,key+'_'+x.i)}).join('')+'</section>';
 }
-function renderAbout(){
-  var host=document.getElementById('protoabout'); if(!host) return;
-  if(typeof CYCABOUT==='undefined'||!CYCABOUT||!cycOn()){ host.innerHTML=''; return; }
-  var h='';
-  for(var k=0;k<CYCS.length;k++){
-    var cy=CYCS[k], a=CYCABOUT[cy.n];
-    /* A cycle with no copy - a closing block that holds no compounds, say -
-       simply gets no card rather than an empty one. */
-    if(!a) continue;
-    var isNow=cy.n===cycCurrent();
-    var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
-    var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
-    var mine=[];
-    for(var j=0;j<ALL.length;j++){ if(cycNames(ALL[j]).indexOf(cy.n)>=0) mine.push({c:ALL[j],i:j}); }
-    var stack='';
-    if(mine.length){
-      stack='<div class="abt-l">The stack</div><div class="stk">'+mine.map(function(x){
-        var nm=String(x.c.n).split(' \u00b7 ')[0];
-        return '<button type="button" class="stk-a" onclick="stkIx(\''+nm.replace(/'/g,"\\'")+'\',event)">'+
-          nm+'<span class="stk-cv">\u203a</span></button>';
-      }).join('')+'</div>';
-    }
-    h+='<div class="cgrp" id="cg-ab'+k+'">'+
-       '<div class="cgrp-hd" onclick="cgTog(\'ab'+k+'\')">'+
-         '<div><div class="cgrp-t">'+cycTitle(cy.n)+'</div>'+
-         (meta?'<div class="cgrp-m">'+meta+'</div>':'')+'</div>'+
-         '<div class="cgrp-r"><span class="cgrp-cv">\u203a</span></div>'+
-       '</div>'+
-       '<div class="cgrp-bd"><div class="abt">'+
-         stack+
-         '<div class="abt-l">What it targets</div><div class="abt-p">'+a.t+'</div>'+
-         '<div class="abt-l">Why these together</div><div class="abt-p">'+a.s+'</div>'+
-         '<div class="abt-l">Timing</div><div class="abt-p">'+a.w+'</div>'+
-       '</div></div></div>';
-  }
-  host.innerHTML=h?('<div class="seclbl">About This Protocol</div>'+h):'';
-}
-
 function renderSubline(){
   var e=document.getElementById('subline'); if(!e) return;
   var n=schRows().length;
   e.textContent=n+' active compound'+(n===1?'':'s')+' \u00b7 AM and PM blocks';
 }
 function renderAll(){
+  /* The ALL COMPOUNDS browser was removed from the Schedule view. Without
+     its host there is nothing to paint, and every caller -- schTog and
+     schBlkSet run it un-wrapped -- has to carry on to its next line. */
+  if(!document.getElementById('cmplist')) return;
   var idx=ALL.map(function(c,i){return {c:c,i:i}});
   idx.sort(function(x,y){return x.c.n.localeCompare(y.c.n,undefined,{numeric:true,sensitivity:'base'})});
   var past=idx.filter(function(x){return cmpArch(x.c)});
@@ -2464,7 +2526,7 @@ function renderAll(){
     var baseLbl=(typeof CYCBASE!=='undefined'&&CYCBASE)?CYCBASE
         :(declared?'Foundation \u00b7 every week, all year'
                   :'Ongoing \u00b7 runs through every cycle');
-    var was=cgOpenSet(), first=!document.querySelector('#cmplist .cgrp');
+    var was=cgOpenSet(), wasCx=cxOpenSet(), first=!document.querySelector('#cmplist .cgrp');
     function inCyc(x,n){return !cycIsBase(x.c)&&!cmpArch(x.c)&&cycNames(x.c).indexOf(n)>=0;}
     function openFor(id,def){ return first?def:!!was[id]; }
     if(found.length) h+=cgrpHTML('f',baseLbl,'runs through every cycle',found,openFor('cg-f',false),'');
@@ -2474,7 +2536,7 @@ function renderAll(){
       var isNow=cy.n===cycCurrent();
       var state=isNow?'current':(cy.future?'upcoming':(cy.arch?'already run':''));
       var meta=(cy.wk?cy.wk:'')+((cy.wk&&state)?' \u00b7 ':'')+state;
-      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,false),'');
+      h+=cgrpHTML('c'+k,cy.n,meta,rows,openFor('cg-c'+k,isNow),'');
     }
     if(past.length) h+=cgrpHTML('p','Not scheduled','kept for reference',past,openFor('cg-p',false),'pastgrp');
     /* The count is what the client has switched on, not what the current
@@ -2487,6 +2549,7 @@ function renderAll(){
     if(idx.length) h+='<div class="cxwrap">'+idx.map(function(x){return cmpRow(x.c,x.i)}).join('')+'</div>';
   }
   document.getElementById('cmplist').innerHTML=h;
+  if(typeof wasCx!=='undefined'){ for(var _c in wasCx){ var _e=document.getElementById(_c); if(_e) _e.classList.add('on'); } }
   document.getElementById('allcount').textContent=ALL.length+' PRESCRIBED \u00b7 '+live.length+' ON SCHEDULE';
 }
 /* ---------- INDEX (client-facing compound library) ---------- */
@@ -2621,9 +2684,14 @@ function renderSupply(){
   host.innerHTML=h;
 }
 
+/* Summaries are written for the page, not the tap: the card is already tappable. */
+function invTail(s){return String(s||'').replace(/\s*\u00b7\s*tap to view\b/gi,'').trim();}
+function invSum(o){return invTail(o&&o.summary);}
 function renderPay(){
   var dueO=INV.filter(function(o){return o.status==='due'});
   var dueT=dueO.reduce(function(a,o){return a+o.total},0);
+  var quoteO=INV.filter(function(o){return o.status==='quote'});
+  var quoteT=quoteO.reduce(function(a,o){return a+o.total},0);
   var sum=document.getElementById('paysum'), hero=document.getElementById('payhero'),
       list=document.getElementById('paylist'), note=document.getElementById('paynote');
   if(!INV.length){
@@ -2634,31 +2702,36 @@ function renderPay(){
     note.textContent='';
     return;
   }
-  sum.textContent='Paid to date '+money(PAID)+' · Quoted '+money(DUE);
+  sum.textContent=(DUE===0&&PAID===0&&quoteO.length)
+    ? (quoteO.length+' cycles quoted \u00b7 '+money(quoteT)+' total · nothing billed yet')
+    : 'Paid to date '+money(PAID)+' · Quoted '+money(DUE);
   hero.innerHTML = dueT>0 ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(dueT)+
-    '</div><div class="o">'+dueO.map(function(o){return o.label}).join(', ')+
+    '</div><div class="o">'+dueO.map(function(o){return invTail(o.label)}).join(', ')+
     '</div><div class="np">'+dueO.length+' quoted order'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
     payButtons(dueT,'BioLinked \u2014 quoted')+'</div>')
-    : ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(0)+
-       '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>');
+    : (quoteO.length ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(quoteT)+
+       '</div><div class="o">'+quoteO.map(function(o){return o.label.split(' \u00b7 ')[0]+' \u00b7 '+o.label.split(' \u00b7 ')[1]}).join(', ')+
+       '</div></div>')
+       : ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(0)+
+       '</div><div class="o">Everything on file is settled</div><div class="np">'+money(PAID)+' paid to date</div></div>'));
   list.innerHTML=INV.map(function(o,i){
-    var pc=o.status==='due'?'due':(o.status==='free'?'free':'paid');
-    var pl=o.status==='due'?'Quoted':(o.status==='free'?'Free':'Paid');
-    return '<div class="ocard" onclick="openInv('+i+')"><div class="ohd"><div><div class="ot">'+o.label+
-      '</div><div class="os">'+o.summary+'</div></div><span class="pill '+pc+'">'+pl+'</span></div>'+
+    var pc=o.status==='due'?'due':(o.status==='free'?'free':(o.status==='quote'?'quote':'paid'));
+    var pl=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
+    return '<div class="ocard" onclick="openInv('+i+')"><div class="ohd"><div><div class="ot">'+invTail(o.label)+
+      '</div>'+(invSum(o)?'<div class="os">'+invSum(o)+'</div>':'')+'</div><span class="pill '+pc+'">'+pl+'</span></div>'+
       o.items.map(function(it){return '<div class="irow'+(it.amt===0?' freeln':'')+'"><span class="in">'+it.n+
         '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>'}).join('')+
-      '<div class="irow tot"><span class="in">'+(o.status==='due'?'Quoted':(o.status==='free'?'No charge':'Paid in full'))+
+      '<div class="irow tot"><span class="in">'+(o.status==='due'?'<button type="button" class="invoice-pay-now" onclick="event.stopPropagation();openInv('+i+')">Pay now &rarr;</button>':o.status==='quote'?'Not billed yet':(o.status==='free'?'No charge':'Paid in full'))+
       '</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o)+'</div>';
   }).join('');
-  note.textContent='Tap an order for its full breakdown. Figures are copied from your protocol page — nothing is charged in the app.';
+  note.textContent='';
 }
 function openInv(i){
   var o=INV[i]; if(!o) return;
-  document.getElementById('i-name').textContent=o.label;
-  document.getElementById('i-sum').textContent=o.summary;
-  document.getElementById('i-tag').textContent=o.status==='due'?'Quoted':(o.status==='free'?'Free':'Paid');
+  document.getElementById('i-name').textContent=invTail(o.label);
+  document.getElementById('i-sum').textContent=invSum(o);
+  document.getElementById('i-tag').textContent=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
   document.getElementById('i-items').innerHTML=o.items.map(function(it){
     return '<div class="irow"><span class="in"><b>'+it.n+'</b>'+(it.sub?'<br><span style="color:var(--muted);font-size:13px">'+it.sub+'</span>':'')+
       '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>';
@@ -2685,8 +2758,8 @@ function openInv(i){
    front-end only. Nothing a client uses to work out a draw is missing.
    ------------------------------------------------------------------------ */
 (function(){
-  /* The picker is Stephen's OWN compounds -- his active protocol, his gifts and
-     everything in his prior orders -- not the generic catalog. Shaped like
+  /* The picker is the client's OWN compounds -- the active protocol, gifts and
+     everything in prior orders -- not the generic catalog. Shaped like
      CHEAT_SHEET_DATA so buildLib() reads it without modification. */
   window.CHEAT_SHEET_DATA = MINE;
   var el = function(id){ return document.getElementById(id); };
@@ -2913,10 +2986,17 @@ function openInv(i){
     var c = LIB[+v]; if(!c) return;
     nameField.hidden = true;
     nameEl.value = c.name;
-    vialEl.value = (c.vial != null) ? String(c.vial) : '';   /* never keep the last compound's numbers */
+    /* Vial box stays in the vial's own unit. The library number is scaled
+       into the dose unit, and writing that into the box draws 0 units. */
+    var rawVialAmt = parseAmt(c.rawVial);
+    if(rawVialAmt){
+      var shown = rawVialAmt.n;
+      if(rawVialAmt.u === 'mcg') shown = rawVialAmt.n / 1000;
+      vialEl.value = String(shown);
+    } else vialEl.value = (c.vial != null) ? String(c.vial) : '';   /* never keep the last compound's numbers */
     bacEl.value  = (c.bac  != null) ? String(c.bac)  : '';
     doseEl.value = (c.dose != null) ? String(c.dose) : '';
-    setVialUnit(c.unit === 'iu' ? 'iu' : 'mg');
+    setVialUnit((rawVialAmt && rawVialAmt.u === 'iu') || c.unit === 'iu' ? 'iu' : 'mg');
     curUnit = (c.unit === 'iu') ? 'iu' : (c.doseUnit || c.unit || 'mg');
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
     syncUnitButtons();
@@ -5136,7 +5216,7 @@ try{
   window.addEventListener('offline', function(){ csStat('offline'); });
 }catch(e){}
 
-renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats(); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
+renderDue(); renderDays(); renderDoses(); renderAll(); renderAbout(); renderCats();
 
 /* Every local write also queues the matching cloud write. The originals
    still run first, so the cache is correct even if the network is not. */
@@ -5214,7 +5294,7 @@ function saRender(){
   if(!host){ var dn=document.getElementById('dosenote'); if(!dn) return; host=document.createElement('div'); host.id='sa-list'; host.className='sa-list'; dn.parentNode.insertBefore(host,dn.nextSibling); }
   var l=saLive();
   if(!l.length){ host.innerHTML=''; return; }
-  host.innerHTML='<div class="seclbl">Added From Calculator<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
+  host.innerHTML='<div class="seclbl">Added Compounds<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
     return '<div class="lrow2"><div><div>'+saEsc(it.n)+'</div><div class="sm">'+saEsc([it.d,it.u,saDaysTxt(it.days),it.b==='PM'?'Night':'Morning'].filter(Boolean).join(' · '))+'</div></div><button type="button" class="sa-rm" data-sa="'+saEsc(it.id)+'">Remove</button></div>';
   }).join('');
 }
@@ -5318,9 +5398,9 @@ function dpRefresh(){ try{ renderDoses(); if(typeof renderDue==='function') rend
 })();
 try{ renderAll(); dpRefresh(); }catch(e){}
 try{ csPull(); }catch(e){}
-/* The views are written into the scroller after it exists, so read its layout
-   back on the next frame and let iOS measure the extent against the content
-   that is actually there. */
+/* Everything above writes into the scroller after it exists. Read its layout
+   back on the next frame so the scroll extent is measured against the content
+   that is actually there, not whatever it was at first paint. */
 function scrollRemeasure(){
   var sc=document.getElementById('scroll'); if(!sc) return;
   if(window.requestAnimationFrame) requestAnimationFrame(function(){ void sc.scrollHeight; });
@@ -5328,8 +5408,301 @@ function scrollRemeasure(){
 }
 scrollRemeasure();
 window.addEventListener('load',scrollRemeasure);
-window.addEventListener('orientationchange',scrollRemeasure);
+window.addEventListener('orientationchange',scrollRemeasure); renderIx(); renderPay(); renderSupply(); renderLabs(); renderSubline();
 if(typeof nutInit==='function') nutInit();
+
+/* ======================================================================
+   SCHEDULE EDIT MODE  (?edit=1)
+   The client's link carries no flag, so they keep the clean read-only day
+   view untouched. With ?edit=1 every dose row becomes tap-to-expand and an
+   "Add compound" control appears under the list.
+
+   Nothing here writes the protocol. ALL, the prices and the invoice text are
+   read-only; every edit is an override layer, and all four stores ride the
+   existing 'schedule' sync kind so they survive reload and follow the client
+   across devices:
+     payload.on / payload.blk   on/off + AM/PM          SCHKEY
+     payload.days               weekdays                DP_KEY   (existing)
+     payload.add                added compounds         SA_KEY   (existing)
+     payload.ovr                dose / units / recon    OV_KEY   (new here)
+   ====================================================================== */
+var BLEDIT=/(?:^|[?&])edit=1(?:&|$)/.test(location.search);
+/* Sticky edit mode: once this device opens ?edit=1, the plain page link
+   stays editable ON THIS DEVICE ONLY (localStorage). The client never loads
+   ?edit=1 so they stay read-only. Open with ?edit=0 to turn it back off. */
+try{
+  if(/(?:^|[?&])edit=0(?:&|$)/.test(location.search)){ localStorage.removeItem('sbahl-edit'); BLEDIT=false; }
+  else if(BLEDIT){ localStorage.setItem('sbahl-edit','1'); }
+  else if(localStorage.getItem('sbahl-edit')==='1'){ BLEDIT=true; }
+}catch(e){}
+
+/* ---- dose / units / recon override. Per compound name, newest edit wins,
+        and a reset is a tombstone so a stale device cannot resurrect it. ---- */
+var OV_KEY=SCHKEY+'-ovr', ovState=null;
+function ovGet(){ if(!ovState){ try{ ovState=JSON.parse(localStorage.getItem(OV_KEY)||'null'); }catch(e){ ovState=null; } if(!ovState||typeof ovState!=='object'||Array.isArray(ovState)) ovState={}; } return ovState; }
+function ovStore(){ try{ localStorage.setItem(OV_KEY,JSON.stringify(ovGet())); }catch(e){} }
+function ovOwn(n){ var r=ovGet()[n]; return (r&&!r.del&&(r.d||r.u||r.rec))?r:null; }
+function ovSet(n,f){
+  var s=ovGet(), p=s[n], keep=!!(f&&(f.d||f.u||f.rec));
+  s[n]=keep?{d:f.d||'',u:f.u||'',rec:f.rec||'',updated_at:saStamp(p)}:{del:true,updated_at:saStamp(p)};
+  ovStore(); try{ if(!csApplying) csQueue('schedule'); }catch(e){}
+}
+function ovMerge(remote){
+  var s=ovGet(), ahead=false, k; remote=(remote&&typeof remote==='object')?remote:{};
+  for(k in remote){ var r=remote[k], l=s[k]; if(!r||!r.updated_at) continue; if(!l||Date.parse(r.updated_at)>Date.parse(l.updated_at||0)) s[k]=r; }
+  for(k in s){ var R=remote[k]; if(!R||Date.parse(s[k].updated_at||0)>Date.parse(R.updated_at||0)) ahead=true; }
+  ovStore(); return ahead;
+}
+/* The override applies for everyone, not just edit mode: once it is set the
+   client should see the dose they were actually told to draw. */
+(function(){
+  var _sr=schRows; schRows=function(){
+    return _sr.apply(this,arguments).map(function(c){
+      if(!c||!c.n) return c; var o=ovOwn(c.n); if(!o) return c;
+      var x={},k; for(k in c) x[k]=c[k];
+      if(o.d) x.d=o.d; if(o.u) x.u=o.u; if(o.rec) x.rec=o.rec; x.ovr=1; return x;
+    });
+  };
+  /* saRow drops recon and the blurb; the panel wants both */
+  var _saRow=saRow; saRow=function(it){ var r=_saRow.apply(this,arguments); if(it&&it.rec) r.rec=it.rec; if(it&&it.mg) r.mg=it.mg; return r; };
+  var _cr=csRead; csRead=function(k){ var p=_cr.apply(this,arguments); if(k==='schedule'&&p) p.ovr=ovGet(); return p; };
+  var _ch=csHasLocal; csHasLocal=function(k){ if(k==='schedule'){ for(var x in ovGet()) return true; } return _ch.apply(this,arguments); };
+  var _ca=csApply; csApply=function(k,p){ _ca.apply(this,arguments);
+    if(k==='schedule'&&p){ var ahead=ovMerge(p.ovr); try{ renderDoses(); }catch(e){} if(ahead){ try{ csQueue('schedule'); }catch(e){} } } };
+})();
+
+/* ---- which compound each .drow is. Must rebuild the exact order renderDoses
+        drew (Morning then Night) and match by position, never by name. ---- */
+var edOpen={};
+function edRows(){
+  var _c=(typeof cycCurrent==='function')?cycCurrent():null, list=[];
+  var rows=schRows().filter(function(c){ return due(c,sel)&&(c.sa||!_c||(typeof cycHas==='function'?cycHas(c,_c):true)); });
+  ['AM','PM'].forEach(function(g){ rows.forEach(function(c){ if(inBlock(c,g)) list.push(c); }); });
+  return list;
+}
+function edDaysBox(c){
+  /* an added compound keeps its days in its own record, so it cannot use the
+     protocol day picker (which resolves names against ALL) */
+  if(!c.sa) return dpProto(c).length?dpHTML(c):'';
+  var cur=c.days||[];
+  return '<div class="dp" data-sad="'+saEsc(c.sa)+'"><div class="dp-h"><b>Your days</b><span class="dp-t">Added compound</span></div>'+
+    '<div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-sadd="'+i+'"'+(cur.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div></div>';
+}
+function edPanel(c){
+  var nm=saEsc(c.n), js=String(c.n).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var blk=(typeof schBlk==='function'?schBlk(c):c.b), o=ovOwn(c.n);
+  var h='<div class="ed-pan" data-edp="'+nm+'"><div class="ed-in">';
+
+  /* on/off (protocol) or remove (added) */
+  h+='<div class="ed-grp"><div class="ed-l">Schedule</div><div class="ed-row2">';
+  if(c.sa){
+    h+='<button type="button" class="ed-b" data-edx="sarm" data-sa="'+saEsc(c.sa)+'">Remove from schedule</button>';
+  } else {
+    h+='<button type="button" class="ed-b on" data-edx="off" data-edn="'+nm+'">✓ On · tap to turn off</button>';
+  }
+  h+='</div></div>';
+
+  /* AM / PM */
+  if(c.b!=='BOTH'){
+    h+='<div class="ed-grp"><div class="ed-l">Block</div><div class="ed-row2">'+
+      '<button type="button" class="ed-b'+(blk==='AM'?' on':'')+'" data-edx="blk" data-edb="AM" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Morning</button>'+
+      '<button type="button" class="ed-b'+(blk==='PM'?' on':'')+'" data-edx="blk" data-edb="PM" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Night</button>'+
+      '</div></div>';
+  }
+
+  /* days */
+  var db=edDaysBox(c);
+  if(db) h+='<div class="ed-grp">'+db+'</div>';
+
+  /* dose / units / recon override */
+  h+='<div class="ed-grp"><div class="ed-l">Dose &amp; recon'+(o?' <span class="ed-tag">edited</span>':'')+'</div>'+
+    '<div class="ed-f"><label>Dose<input type="text" data-edf="d" value="'+saEsc(c.d||'')+'" placeholder="1 mg"></label>'+
+    '<label>Units<input type="text" data-edf="u" value="'+saEsc(c.u||'')+'" placeholder="10u"></label></div>'+
+    '<div class="ed-f one"><label>Recon<input type="text" data-edf="rec" value="'+saEsc(c.rec||'')+'" placeholder="3 mL BAC water"></label></div>'+
+    '<div class="ed-row2"><button type="button" class="ed-b pri" data-edx="save" data-edn="'+nm+'"'+(c.sa?' data-sa="'+saEsc(c.sa)+'"':'')+'>Save</button>'+
+    (o?'<button type="button" class="ed-b" data-edx="rst" data-edn="'+nm+'">Reset to protocol</button>':'')+'</div></div>';
+
+  h+='</div></div>';
+  return h;
+}
+function edPaint(){
+  edAddMount();
+  if(!BLEDIT) return;
+  var host=document.getElementById('doses'); if(!host) return;
+  edAddMount();
+  var dn=document.getElementById('dosenote');
+  if(dn) dn.textContent=dn.textContent.replace('This is a read-only view of your schedule.','');
+  var drs=host.querySelectorAll('.drow'), list=edRows();
+  if(drs.length!==list.length) return;
+  for(var i=0;i<drs.length;i++){
+    var c=list[i], r=drs[i];
+    r.classList.add('ed-row'); r.setAttribute('data-ed',saEsc(c.n));
+    r.insertAdjacentHTML('beforeend','<span class="ed-cv">›</span>');
+    r.insertAdjacentHTML('afterend',edPanel(c));
+    if(edOpen[c.n]){ r.classList.add('exp'); var p=r.nextElementSibling; if(p&&p.classList.contains('ed-pan')) p.classList.add('open'); }
+  }
+}
+function edFields(pan){
+  var o={}; [].forEach.call(pan.querySelectorAll('[data-edf]'),function(i){ o[i.getAttribute('data-edf')]=String(i.value||'').trim(); }); return o;
+}
+
+/* ---- Add compound: from the dosing guide, or by hand ---- */
+function edAddMount(){
+  var h=document.getElementById('ed-add');
+  if(h) return;
+  var anchor=document.getElementById('sa-list')||document.getElementById('dosenote');
+  if(!anchor||!anchor.parentNode) return;
+  h=document.createElement('div'); h.id='ed-add'; h.className='ed-add';
+  h.innerHTML='<button type="button" class="ed-add-b" id="ed-addbtn">+ Add compound</button><div class="ed-add-p" id="ed-addpan" hidden></div>';
+  anchor.parentNode.insertBefore(h,anchor.nextSibling);
+}
+var edNew=null;
+function edGuideList(){
+  var L=window.BL_DOSING||[], o=[];
+  for(var i=0;i<L.length;i++){ if(L[i]&&L[i].name) o.push({i:i,g:L[i]}); }
+  o.sort(function(a,b){ var r=String(a.g.name).localeCompare(String(b.g.name)); return r||String(a.g.vial||'').localeCompare(String(b.g.vial||'')); });
+  return o;
+}
+function edAddOpen(){
+  var pan=document.getElementById('ed-addpan'); if(!pan) return;
+  edNew={mode:'master',gi:-1,n:'',mg:'',d:'',u:'',rec:'',b:'AM',days:[]};
+  pan.hidden=false; edAddDraw();
+}
+function edAddDraw(){
+  var pan=document.getElementById('ed-addpan'); if(!pan||!edNew) return;
+  var m=edNew.mode==='master';
+  var h='<div class="ed-row2 ed-seg"><button type="button" class="ed-b'+(m?' on':'')+'" data-eda="m">From master list</button>'+
+        '<button type="button" class="ed-b'+(m?'':' on')+'" data-eda="x">Add manually</button></div>';
+  if(m){
+    h+='<label class="ed-sel">Compound<select data-eda="sel"><option value="-1">Choose\u2026</option>'+
+      edGuideList().map(function(r){ return '<option value="'+r.i+'"'+(r.i===edNew.gi?' selected':'')+'>'+saEsc(r.g.name+(r.g.vial?' \u00b7 '+r.g.vial:''))+'</option>'; }).join('')+'</select></label>';
+    if(edNew.gi<0){ pan.innerHTML=h; return; }
+    var g=(window.BL_DOSING||[])[edNew.gi]||{};
+    h+='<div class="ed-gd">'+['vial','bac','dose','units','timing','freq'].map(function(k){
+      return g[k]?('<span><i>'+k+'</i>'+saEsc(k==='units'?g[k]+'u':g[k])+'</span>'):''; }).join('')+'</div>';
+  } else {
+    h+='<div class="ed-f"><label>Name<input type="text" data-edn2="n" value="'+saEsc(edNew.n)+'" placeholder="Tesamorelin"></label>'+
+       '<label>Vial mg<input type="text" data-edn2="mg" value="'+saEsc(edNew.mg)+'" placeholder="10 mg"></label></div>';
+  }
+  h+='<div class="ed-f"><label>Dose<input type="text" data-edn2="d" value="'+saEsc(edNew.d)+'" placeholder="1 mg"></label>'+
+     '<label>Units<input type="text" data-edn2="u" value="'+saEsc(edNew.u)+'" placeholder="10u"></label></div>'+
+     '<div class="ed-f one"><label>Recon<input type="text" data-edn2="rec" value="'+saEsc(edNew.rec)+'" placeholder="3 mL BAC water"></label></div>'+
+     '<div class="ed-l">Days</div><div class="dp-days">'+SA_ORD.map(function(i){ return '<label class="dp-d"><input type="checkbox" data-edn2d="'+i+'"'+(edNew.days.indexOf(i)>=0?' checked':'')+'>'+SA_DN[i]+'</label>'; }).join('')+'</div>'+
+     '<div class="ed-row2"><button type="button" class="ed-b'+(edNew.b==='AM'?' on':'')+'" data-edab="AM">Morning</button><button type="button" class="ed-b'+(edNew.b==='PM'?' on':'')+'" data-edab="PM">Night</button></div>'+
+     '<div class="ed-row2"><button type="button" class="ed-b" data-eda="cancel">Cancel</button><button type="button" class="ed-b pri" data-eda="save"'+((edNew.days.length&&String(edNew.n||'').trim())?'':' disabled')+'>Add to schedule</button></div>';
+  pan.innerHTML=h;
+}
+function edAddPick(i){
+  var g=(window.BL_DOSING||[])[i]; if(!g) return;
+  edNew.gi=i; edNew.n=g.name+(g.vial?' · '+g.vial:'');
+  edNew.d=g.dose||''; edNew.u=g.units?(String(g.units).replace(/u$/,'')+'u'):'';
+  edNew.rec=g.bac?(String(g.bac).replace(/\s*ml$/i,' mL')+' BAC water'):'';
+  edNew.b=/pm|night|bed|evening/i.test(g.timing||'')?'PM':'AM';
+  edNew.days=saGuideDays(g.freq)||[];
+  edAddDraw();
+}
+function edAddSave(){
+  if(!edNew||!edNew.days.length) return;
+  var nm=String(edNew.n||'').trim(); if(!nm) return;
+  if(edNew.mode!=='master'&&edNew.mg&&nm.indexOf(edNew.mg)<0) nm=nm+' · '+String(edNew.mg).trim();
+  var ex=saFind(nm);
+  saPut({id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    n:nm, d:edNew.d||'', u:edNew.u||'', rec:edNew.rec||'', b:edNew.b==='PM'?'PM':'AM', days:edNew.days.slice().sort()});
+  var pan=document.getElementById('ed-addpan'); if(pan) pan.hidden=true;
+  edNew=null; renderDoses();
+  try{ csToast(nm+' added · '+saDaysTxt(saFind(nm)?saFind(nm).days:[])); }catch(e){}
+}
+
+/* ---- one delegated listener for the whole editor ---- */
+// Add-compound controls are available on the normal client link.
+{
+  document.documentElement.classList.add('bl-add');
+  if(BLEDIT) document.documentElement.classList.add('bl-edit');
+
+  /* expand / collapse a dose row */
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('.ed-pan')||t.closest('.sa-rm')) return;
+    var r=t.closest('.drow.ed-row'); if(!r) return;
+    var n=r.getAttribute('data-ed'), p=r.nextElementSibling;
+    var now=!r.classList.contains('exp');
+    r.classList.toggle('exp',now);
+    if(p&&p.classList.contains('ed-pan')) p.classList.toggle('open',now);
+    /* key the memory off the live name so a re-render restores it */
+    [].forEach.call(document.querySelectorAll('.drow.ed-row'),function(x){ if(x.getAttribute('data-ed')===n&&x!==r){ x.classList.toggle('exp',now); var q=x.nextElementSibling; if(q&&q.classList.contains('ed-pan')) q.classList.toggle('open',now); } });
+    if(now) edOpen[n]=1; else delete edOpen[n];
+  });
+
+  /* panel buttons */
+  document.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('[data-edx]'); if(!b) return;
+    e.preventDefault(); e.stopPropagation();
+    var x=b.getAttribute('data-edx'), n=b.getAttribute('data-edn'), sa=b.getAttribute('data-sa');
+    var pan=b.closest('.ed-pan');
+    if(x==='off'){ delete edOpen[n]; schTog(n,e); return; }
+    if(x==='sarm'){ delete edOpen[n]; saRemove(sa); renderDoses(); try{ csToast('Removed'); }catch(_){} return; }
+    if(x==='blk'){
+      var want=b.getAttribute('data-edb');
+      if(sa){ var it=saGet()[sa]; if(it&&!it.del){ saPut({id:sa,n:it.n,d:it.d,u:it.u,rec:it.rec,b:want,days:(it.days||[]).slice()}); renderDoses(); } return; }
+      /* schBlkSet toggles off when you tap the block it is already on, which
+         would drop it back to the protocol block. Only send a real change. */
+      var cur=null, i; for(i=0;i<ALL.length;i++){ if(ALL[i].n===n){ cur=schBlk(ALL[i]); break; } }
+      if(cur===want) return;
+      schBlkSet(n,want,e); return;
+    }
+    if(x==='save'){
+      if(!pan) return; var f=edFields(pan);
+      if(sa){ var it2=saGet()[sa]; if(it2&&!it2.del){ saPut({id:sa,n:it2.n,d:f.d||'',u:f.u||'',rec:f.rec||'',b:it2.b,days:(it2.days||[]).slice()}); } }
+      else ovSet(n,f);
+      renderDoses(); try{ csToast('Saved'); }catch(_){} return;
+    }
+    if(x==='rst'){ ovSet(n,null); renderDoses(); try{ csToast('Back to the protocol dose'); }catch(_){} return; }
+  });
+
+  /* days for an added compound */
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||t.getAttribute('data-sadd')==null) return;
+    var box=t.closest('[data-sad]'); if(!box) return;
+    var sa=box.getAttribute('data-sad'), it=saGet()[sa]; if(!it||it.del) return;
+    var days=[].map.call(box.querySelectorAll('input[data-sadd]:checked'),function(x){return +x.getAttribute('data-sadd');});
+    if(!days.length){ t.checked=true; try{ csToast('Keep at least one day'); }catch(_){} return; }
+    saPut({id:sa,n:it.n,d:it.d,u:it.u,rec:it.rec,b:it.b,days:days.sort()}); renderDoses();
+  });
+
+  /* add-compound panel */
+  document.addEventListener('click',function(e){
+    var t=e.target; if(!t||!t.closest) return;
+    if(t.closest('#ed-addbtn')){ e.preventDefault(); var p=document.getElementById('ed-addpan');
+      if(p&&!p.hidden){ p.hidden=true; edNew=null; } else edAddOpen(); return; }
+    // Only action buttons cancel clicks. The compound select must retain its
+    // native click so the mobile picker can open.
+    var b=t.closest('button[data-eda],button[data-edab]'); if(!b||!edNew) return;
+    e.preventDefault(); e.stopPropagation();
+    var ab=b.getAttribute('data-edab');
+    if(ab){ edNew.b=ab; edAddDraw(); return; }
+    var a=b.getAttribute('data-eda');
+    if(a==='m'||a==='x'){ edNew.mode=(a==='m')?'master':'manual'; edAddDraw(); return; }
+    if(a==='cancel'){ var p2=document.getElementById('ed-addpan'); if(p2) p2.hidden=true; edNew=null; return; }
+    if(a==='save'){ edAddSave(); return; }
+  });
+  document.addEventListener('change',function(e){
+    var t=e.target; if(!t||!edNew) return;
+    if(t.getAttribute('data-eda')==='sel'){ var v=+t.value; if(v>=0) edAddPick(v); else { edNew.gi=-1; edAddDraw(); } return; }
+    var d=t.getAttribute('data-edn2d');
+    if(d!=null){ d=+d; var i=edNew.days.indexOf(d);
+      if(t.checked&&i<0) edNew.days.push(d); if(!t.checked&&i>=0) edNew.days.splice(i,1);
+      var s=document.querySelector('[data-eda="save"]'); if(s) s.disabled=!(edNew.days.length&&edNew.n); return; }
+  });
+  document.addEventListener('input',function(e){
+    var t=e.target; if(!t||!edNew) return; var k=t.getAttribute('data-edn2'); if(!k) return;
+    edNew[k]=t.value;
+    var s=document.querySelector('[data-eda="save"]'); if(s) s.disabled=!(edNew.days.length&&String(edNew.n||'').trim());
+  });
+
+  (function(){ var _rd=renderDoses; renderDoses=function(){ _rd.apply(this,arguments); try{ edPaint(); }catch(e){} }; })();
+  try{ renderDoses(); }catch(e){}
+}
+
 
 /* ======================================================================
    WORKOUT (opt-in MVP). Offline-first: every row has a client UUID and an
@@ -5585,12 +5958,7 @@ function home(){
   h+='<p class="wk-note">For research use only. Not medical advice.</p>';
   return h;
 }
-function settings(){
-  var u=(S.profile&&S.profile.data.ui)||{};
-  return '<div class="wk-card"><div class="wk-eb">Easy reading</div>'+
-   '<div class="wk-tog"><span>Bigger text</span><button class="wk-sw'+(u.big?' on':'')+'" role="switch" aria-checked="'+!!u.big+'" aria-label="Bigger text" data-wkui="big"></button></div>'+
-   '<div class="wk-tog"><span>High contrast</span><button class="wk-sw'+(u.hc?' on':'')+'" role="switch" aria-checked="'+!!u.hc+'" aria-label="High contrast" data-wkui="hc"></button></div></div>';
-}
+function settings(){ return ''; }
 function feel(){
   return '<div class="wk-card gold"><div class="wk-eb">Quick check</div><h2>How do you feel today?</h2><p class="wk-mut">One tap. We will adjust today\'s workout to match.</p></div>'+
    '<div class="wk-feel">'+
@@ -5650,7 +6018,7 @@ function doneView(){ var s=S.sessions[ui.last]; var dn=setsFor(ui.last).filter(f
   var vol=dn.reduce(function(a,r){return a+(+r.data.w||0)*(+r.data.r||0);},0), mins=s?Math.max(1,Math.round((new Date(s.data.fin)-new Date(s.data.start))/6e4)):0;
   if(!full) return '<div class="wk-card"><div class="wk-eb">Saved, not counted</div><h2>'+n+' of '+c.total+' sets</h2><p class="wk-mut">This session is saved in your history. Workouts count toward your week and streak only when every set is done.</p></div><button class="wk-btn" data-wkgo="home">Done</button><div style="height:.6em"></div><button class="wk-btn sec" data-wkundo="'+ui.last+'">Reopen and keep going</button>';
   return '<div class="wk-card gold wk-cele"><div class="wk-conf" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="wk-eb">Workout complete</div><h2>Nice work.</h2><p class="wk-mut">'+(s?esc(s.data.t)+' · ':'')+n+' of '+c.total+' sets · '+mins+' min'+(vol?' · '+vol.toLocaleString()+' lb lifted':'')+'.</p><p class="wk-mut">This one counts toward your week and streak.</p></div><button class="wk-btn" data-wkgo="home">Done</button><div style="height:.6em"></div><button class="wk-btn sec" data-wkundo="'+ui.last+'">Undo · not finished yet</button>'; }
-function applyUi(){ var u=(S.profile&&S.profile.data.ui)||{}; var v=document.getElementById('v-work'); if(v){ v.classList.toggle('wk-big',!!u.big); v.classList.toggle('wk-hc',!!u.hc); }
+function applyUi(){ var u=Object.assign({},(S.profile&&S.profile.data.ui)||{},{big:false,hc:false}); var v=document.getElementById('v-work'); if(v){ v.classList.toggle('wk-big',!!u.big); v.classList.toggle('wk-hc',!!u.hc); }
   try{ document.dispatchEvent(new CustomEvent('wk-prefs',{detail:u})); }catch(e){} }
 function render(){
   var host=document.getElementById('wkbody'); if(!host) return;
@@ -5697,14 +6065,17 @@ document.addEventListener('change',function(ev){ var el=ev.target; if(!el||!el.d
   var ex=setsFor(ui.sid).filter(function(r){return r.data.ex===it.ex&&r.data.n===n;})[0];
   var base=ex?JSON.parse(JSON.stringify(ex.data)):(function(){ var b=defSet(it,n); delete b.guess; b.sid=ui.sid; b.ex=it.ex; b.n=n; return b; })();
   var w=parseFloat(el.value); if(!(w>=0&&w<=1000)){ el.setCustomValidity('Enter 0 to 1000 lb'); el.reportValidity(); return; } el.setCustomValidity('');
-  base.w=Math.round(w*2)/2; base.at=nowIso(); put('set',ex?ex.id:uuid(),base); render(); });
+  base.w=Math.round(w*2)/2; base.at=nowIso(); put('set',ex?ex.id:uuid(),base);
+  // Keep the focused row mounted: rendering on blur removes the Done button
+  // between pointer-down and click, swallowing the tap on phones.
+  el.value=base.w; });
 window.__wk={buildPlan:buildPlan,streak:streak,counted:counted,demo:demo}; /* test hook */
 try{ window.addEventListener('online',function(){ push(); }); }catch(e){}
 /* phone Back during a workout: pause (keep sets), never finish */
 try{ window.addEventListener('popstate',function(){ if(ui.view==='session'||ui.view==='feel'){ stopTimer(); ui.view='home'; ui.confirm=false; render(); } }); }catch(e){}
 load(); if(window.BL_DEMO) demoSeed(); applyUi(); render(); pull();
 /* shared with the Nutrition tab: one Bigger text / High contrast setting */
-window.wkPrefs={get:function(){ return S.profile?(S.profile.data.ui||{}):null; },
+window.wkPrefs={get:function(){ return S.profile?Object.assign({},S.profile.data.ui||{},{big:false,hc:false}):null; },
   set:function(k,v){ if(!S.profile) return false; var pd=JSON.parse(JSON.stringify(S.profile.data)); pd.ui=pd.ui||{}; pd.ui[k]=v; put('profile','me',pd); applyUi(); render(); return true; }};
 window.wkDebug={state:function(){return S;},push:push,pull:pull};
 })();
@@ -5868,8 +6239,6 @@ function render(){
      '<div class="n2-water"><button class="n2-btn sec" id="n2-wminus" aria-label="Remove 8 ounces" '+(wz?'':'disabled')+' style="flex:0 0 30%">− 8 oz</button><button class="n2-btn" id="n2-wplus">+ 8 oz</button></div>'+
      '<div class="n2-step"><span class="n2-mut" style="flex:1">Daily goal</span><button class="n2-ib" data-n2wg="-8" aria-label="Lower water goal">−</button><b style="flex:0 0 4.5em">'+wg+' oz</b><button class="n2-ib" data-n2wg="8" aria-label="Raise water goal">+</button></div></div>';
   h+=trend(tg);
-  var u=prefs();
-  h+='<div class="n2-card"><div class="n2-eb">Easy reading · same setting as Workout</div><div class="n2-tog"><span>Bigger text</span><button class="n2-sw'+(u.big?' on':'')+'" role="switch" aria-checked="'+!!u.big+'" aria-label="Bigger text" data-n2ui="big"></button></div><div class="n2-tog"><span>High contrast</span><button class="n2-sw'+(u.hc?' on':'')+'" role="switch" aria-checked="'+!!u.hc+'" aria-label="High contrast" data-n2ui="hc"></button></div></div>';
   h+='<p class="n2-note">For research use only. Not medical advice.</p>';
   h+='<div class="n2-sec">Your targets &amp; meal plan</div>';
   if(ui.toast) h+='<div class="n2-toast" role="status"><span>Removed '+esc(ui.toast.name)+'</span><button id="n2-undo">Undo</button></div>';
@@ -5986,16 +6355,8 @@ window.n2Debug={state:function(){return S;},push:push,pull:pull,targets:targets,
 
 
 </script>
-<script>(function(){function $(s,r){return (r||document).querySelector(s);}
-try{ var aa=$('#bl-aa'); var big=localStorage.getItem(KP+'big')==='1';
-  function setBig(v){ document.documentElement.classList.toggle('bl-big',v); aa.setAttribute('aria-pressed',v?'true':'false'); try{localStorage.setItem(KP+'big',v?'1':'0');}catch(e){} }
-  setBig(big); aa.addEventListener('click',function(){ setBig(!document.documentElement.classList.contains('bl-big')); }); }catch(e){}})();</script>
-<script>/* P0 sync: theme + Aa text size ride on the synced workout profile (wk_push), localStorage stays the offline cache */
-(function(){ function sync(){ var u=window.wkPrefs&&wkPrefs.get(); if(!u) return; try{ if(u.theme&&u.theme!==document.documentElement.getAttribute('data-theme')){ applyTheme(u.theme); localStorage.setItem(KP+'theme',u.theme); } if(u.aa!=null){ document.documentElement.classList.toggle('bl-big',!!u.aa); localStorage.setItem(KP+'big',u.aa?'1':'0'); } }catch(e){} }
-document.addEventListener('wk-prefs',sync);
-var tt=window.toggleTheme; if(tt) window.toggleTheme=function(){ tt.apply(this,arguments); try{ wkPrefs.set('theme',document.documentElement.getAttribute('data-theme')); }catch(e){} };
-var aa=document.getElementById('bl-aa'); if(aa) aa.addEventListener('click',function(){ setTimeout(function(){ try{ wkPrefs.set('aa',document.documentElement.classList.contains('bl-big')); }catch(e){} },0); });
-sync(); })();</script>
+
+
 <script id="bl-tiles-js">(function(){
 function set(id,s,na){ var e=document.getElementById(id); if(e) e.textContent=s; if(na){ var o=e&&e.parentNode.parentNode.querySelector('.o'); if(o){ o.textContent='Not on file yet'; o.className='o na'; } } }
 function labs(){ try{ if(typeof LABS!=='undefined'&&LABS){ var dv=document.createElement('div'); dv.innerHTML=String(LABS.sub||''); var s=dv.textContent.trim(); if(LABS.score) s+=(s?' · ':'')+'score '+LABS.score; set('bts-labs',s||'On file'); return; } }catch(e){}
@@ -6027,75 +6388,60 @@ setTimeout(all,2500);
 <script id="p0-shell-js">(function(){var L={sched:'Today',nutr:'Food',work:'Train',labs:'Labs',more:'More'};
 document.querySelectorAll('.tabs .tab').forEach(function(b){var v=b.getAttribute('data-v');if(!L[v])return;var n=b.lastChild;if(n&&n.nodeType===3)n.nodeValue=L[v];else b.appendChild(document.createTextNode(L[v]));b.setAttribute('aria-label',L[v]);});
 var w=window.innerWidth;window.addEventListener('resize',function(){if(window.innerWidth!==w){w=window.innerWidth;try{closeNav();}catch(e){}}});})();</script>
-<style id="bl-tp-css">
-:root{--bl-ts:1}
-html:root .scroll,html:root .sheet{zoom:var(--bl-ts,1)!important}
-html.bl-bold .scroll *,html.bl-bold .sheet *{font-weight:700!important}
-.bl-tp{position:fixed;z-index:9999;top:calc(env(safe-area-inset-top,0px) + 60px);right:10px;width:min(300px,calc(100vw - 20px));background:var(--card,#fff);color:var(--ink,#111);border:1px solid var(--line,#ddd);border-radius:16px;box-shadow:0 12px 34px rgba(0,0,0,.22);padding:14px 16px 16px;font:400 14px/1.35 "Outfit",system-ui,sans-serif}
-.bl-tp[hidden]{display:none}
-.bl-tp h4{margin:0 0 10px;font:600 11px/1 "Outfit",system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--muted,#777)}
-.bl-tp .r{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px}
-.bl-tp .lb{font-weight:500}
-.bl-tp .pct{font-weight:700;color:var(--gold,#a07a2c);min-width:44px;text-align:right}
-.bl-tp .sl{display:flex;align-items:center;gap:8px;margin:0 0 14px}
-.bl-tp .sl span{color:var(--muted,#777);font-family:var(--serif,Georgia),serif}
-.bl-tp input[type=range]{flex:1;accent-color:var(--gold,#a07a2c);height:28px}
-.bl-tp .sw{position:relative;width:46px;height:28px;border-radius:14px;border:1px solid var(--line,#ccc);background:var(--line2,#e5e5e5);cursor:pointer;flex:none;padding:0}
-.bl-tp .sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s}
-.bl-tp .sw[aria-checked=true]{background:var(--gold,#a07a2c);border-color:var(--gold,#a07a2c)}
-.bl-tp .sw[aria-checked=true]::after{left:21px}
-.bl-tp .seg{display:flex;border:1px solid var(--line,#ccc);border-radius:12px;overflow:hidden}
-.bl-tp .seg button{flex:1;padding:9px 4px;border:0;background:transparent;color:var(--ink,#111);font:500 13.5px/1 "Outfit",system-ui,sans-serif;cursor:pointer}
-.bl-tp .seg button+button{border-left:1px solid var(--line,#ccc)}
-.bl-tp .seg button[aria-pressed=true]{background:var(--gold,#a07a2c);color:var(--on-gold,#fff);font-weight:700}
-.bl-tp .rs{margin-top:12px;background:none;border:0;padding:4px 0;color:var(--muted,#777);font:500 12.5px "Outfit",system-ui,sans-serif;text-decoration:underline;cursor:pointer}
-html body .drow .uu{white-space:nowrap}
-html body .drow .mt .bl-mg{font-weight:700;color:var(--ink,#111)}
-</style>
-<script id="bl-tp-js">(function(){
-var P=(typeof KP!=='undefined'?KP:'bl-'), R=document.documentElement;
-function g(k,d){ try{ var v=localStorage.getItem(P+k); return v==null?d:v; }catch(e){ return d; } }
-function s(k,v){ try{ localStorage.setItem(P+k,String(v)); }catch(e){} }
-var ts=+g('ts',''); if(!(ts>=85&&ts<=140)) ts=(g('big','0')==='1')?112:100;
-var bold=g('bold','0')==='1', dm=g('dose','both'); if(['units','mg','both'].indexOf(dm)<0) dm='both';
-function apT(){ R.style.setProperty('--bl-ts',(ts/100).toFixed(2)); R.classList.toggle('bl-bold',bold); R.classList.remove('bl-big'); }
-apT();
-var MG=/^\s*([~≈]?\s*[\d.,]+\s*(?:mg|mcg|µg|ug|g|iu|IU|mL|ml)\b[^·]*?)\s*$/;
-function apD(){ var h=document.getElementById('doses'); if(!h) return;
-  [].forEach.call(h.querySelectorAll('.drow'),function(r){ var uu=r.querySelector('.uu'), mt=r.querySelector('.mt'); if(!uu||!mt) return;
-    if(r.dataset.u==null){ r.dataset.u=uu.textContent; var parts=mt.textContent.split(' \u00b7 '); var m=parts.length&&MG.exec(parts[0]);
-      r.dataset.mg=m?m[1].trim():''; r.dataset.rest=(m?parts.slice(1):parts).join(' \u00b7 '); }
-    var u=r.dataset.u, mg=r.dataset.mg, rest=r.dataset.rest; if(!mg){ return; }
-    function esc(x){ return String(x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
-    if(dm==='mg'){ uu.textContent=mg; mt.textContent=rest; }
-    else if(dm==='units'){ uu.textContent=u||mg; mt.textContent=u?rest:mg+(rest?' \u00b7 '+rest:''); }
-    else { uu.textContent=u||mg; mt.innerHTML='<span class="bl-mg">'+esc(mg)+'</span>'+(rest?' \u00b7 '+esc(rest):''); }
-  }); }
-if(typeof window.renderDoses==='function'){ var _rd=window.renderDoses; window.renderDoses=function(){ var r=_rd.apply(this,arguments); try{ apD(); }catch(e){} return r; }; }
-var old=document.getElementById('bl-aa'); if(!old) return;
-var aa=old.cloneNode(true); old.parentNode.replaceChild(aa,old);
-aa.setAttribute('aria-label','Text & dose display'); aa.title='Text & dose display'; aa.setAttribute('aria-haspopup','dialog'); aa.setAttribute('aria-expanded','false'); aa.setAttribute('aria-pressed','false');
-var pn=document.createElement('div'); pn.className='bl-tp'; pn.id='bl-tp'; pn.hidden=true; pn.setAttribute('role','dialog'); pn.setAttribute('aria-label','Text & dose display');
-pn.innerHTML='<h4>Text size</h4><div class="sl"><span style="font-size:12px">A</span><input type="range" id="bl-tp-ts" min="85" max="140" step="5" aria-label="Text size"><span style="font-size:19px">A</span><b class="pct" id="bl-tp-pct"></b></div>'+
- '<div class="r"><span class="lb">Bold text</span><button type="button" class="sw" id="bl-tp-bold" role="switch" aria-label="Bold text"></button></div>'+
- '<h4>Show doses as</h4><div class="seg" id="bl-tp-dose"><button type="button" data-m="units">Units</button><button type="button" data-m="mg">mg</button><button type="button" data-m="both">Both</button></div>'+
- '<button type="button" class="rs" id="bl-tp-rs">Reset to default</button>';
-document.body.appendChild(pn);
-var sl=pn.querySelector('#bl-tp-ts'), pc=pn.querySelector('#bl-tp-pct'), bb=pn.querySelector('#bl-tp-bold');
-function ui(){ sl.value=ts; pc.textContent=ts+'%'; bb.setAttribute('aria-checked',bold?'true':'false');
-  [].forEach.call(pn.querySelectorAll('#bl-tp-dose button'),function(b){ b.setAttribute('aria-pressed',b.dataset.m===dm?'true':'false'); });
-  aa.setAttribute('aria-pressed',(ts!==100||bold)?'true':'false'); }
-ui();
-sl.addEventListener('input',function(){ ts=+sl.value; s('ts',ts); apT(); ui(); });
-bb.addEventListener('click',function(){ bold=!bold; s('bold',bold?1:0); apT(); ui(); });
-pn.querySelector('#bl-tp-dose').addEventListener('click',function(e){ var b=e.target.closest('button'); if(!b) return; dm=b.dataset.m; s('dose',dm); apD(); ui(); });
-pn.querySelector('#bl-tp-rs').addEventListener('click',function(){ ts=100; bold=false; dm='both'; s('ts',100); s('bold',0); s('dose','both'); apT(); apD(); ui(); });
-function tog(v){ pn.hidden=!v; aa.setAttribute('aria-expanded',v?'true':'false'); }
-aa.addEventListener('click',function(e){ e.stopPropagation(); tog(pn.hidden); });
-document.addEventListener('click',function(e){ if(!pn.hidden&&!pn.contains(e.target)&&e.target!==aa) tog(false); });
-document.addEventListener('keydown',function(e){ if(e.key==='Escape') tog(false); });
-window.addEventListener('storage',function(e){ if(!e.key||e.key.indexOf(P)!==0) return; ts=+g('ts',100)||100; bold=g('bold','0')==='1'; dm=g('dose','both'); apT(); apD(); ui(); });
-try{ apD(); }catch(e){}
-})();</script>
 
-<link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=6"></script>
+
+
+<link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=7"></script>
+<style id="jc-inline-cycles">
+#protoabout{margin-top:28px}
+.jc-cycle{margin:0 0 22px;min-width:0}
+.jc-cycle-head{border-bottom:2px solid var(--gold);padding:0 0 10px;margin:0 0 12px}
+.jc-cycle-head h2{font:700 16px/1.3 var(--sans);letter-spacing:-.3px;margin:0;color:var(--ink)}
+.jc-cycle-head p{display:none}
+.jc-intro{font-size:13.5px;line-height:1.6;color:var(--ink2);margin:0 0 18px}
+.jc-compound{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:0 0 8px;overflow:hidden}
+.jc-compound>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;min-height:0;list-style:none;cursor:pointer;font:700 14px/1.35 var(--sans);color:var(--ink);overflow-wrap:anywhere}
+.jc-compound>summary::-webkit-details-marker{display:none}
+.jc-compound>summary:focus-visible,.jc-notes>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+.jc-chevron{width:8px;height:8px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);flex:none;margin:0 3px 6px}
+.jc-compound[open] .jc-chevron{transform:rotate(225deg);margin-bottom:0}
+.jc-body{border-top:1px solid var(--line)}
+.jc-description{padding:12px 13px 14px;font-size:13.5px;line-height:1.65;color:var(--ink2);overflow-wrap:anywhere}
+.jc-facts{margin:0;padding:0 13px 6px;border-top:1px solid var(--line)}
+.jc-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.jc-facts>div:last-child{border:0}
+.jc-facts dt{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:800;color:var(--muted);flex:none}
+.jc-facts dd{margin:0;text-align:right;font-size:13px;line-height:1.55;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.jc-facts>div:nth-child(3) dd{color:var(--gold);font-size:14px;font-weight:800}
+.jc-notes{margin:12px 2px;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+.jc-notes>summary{cursor:pointer;color:var(--gold);font-weight:650;padding:8px 0}
+.jc-notes h3{font-size:12.5px;margin:12px 0 5px}.jc-notes p{margin:0 0 14px}
+
+
+
+
+
+
+#cmplist .pastgrp{opacity:1}
+/* ---- condensed schedule list ----------------------
+   The collapsed row is one line: name, timing, unit, chevron. The schedule
+   on/off pill and the AM/PM pair move into the body so they appear only
+   once the row is open. Cycle groups collapse to their header, with the
+   current cycle open on first paint. */
+#cmplist .cx-hd{min-height:44px;align-items:center}
+#cmplist .cx-t{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1}
+#cmplist .cx-n{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-s{flex:0 4 auto;min-width:0;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:2px 0 12px}
+#cmplist .cx-ctl .schbtn{margin-top:0}
+#cmplist .cx-ctl .schblk{margin-left:0}
+#cmplist .cgrp .cx{display:none}
+#cmplist .cgrp.on .cx{display:block}
+#cmplist .jc-cycle-head{display:flex;align-items:center;gap:10px;cursor:pointer}
+#cmplist .cg-ht{flex:1;min-width:0}
+#cmplist .cg-cv{flex:none;color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+#cmplist .cgrp.on .cg-cv{transform:rotate(90deg)}
+@media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:16px}#protoabout .jc-compound>summary{font-size:14px;padding:11px 13px}#protoabout .jc-description{padding:12px 13px 14px;font-size:13.5px}}
+</style>
+
+<link rel="stylesheet" href="/erica/protocol-theme.css?v=7">
