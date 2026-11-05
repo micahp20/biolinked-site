@@ -5339,16 +5339,12 @@ function saGuideDays(f){
   return [];
 }
 function saGuide(name){ var L=window.BL_DOSING||[]; for(var i=0;i<L.length;i++){ if(L[i].name===name) return L[i]; } return null; }
-/* Schedule tab: a short list of everything the client added, removable on any day */
-function saRender(){
-  var host=document.getElementById('sa-list');
-  if(!host){ var dn=document.getElementById('dosenote'); if(!dn) return; host=document.createElement('div'); host.id='sa-list'; host.className='sa-list'; dn.parentNode.insertBefore(host,dn.nextSibling); }
-  var l=saLive();
-  if(!l.length){ host.innerHTML=''; return; }
-  host.innerHTML='<div class="seclbl">Added From Calculator<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
-    return '<div class="lrow2"><div><div>'+saEsc(it.n)+'</div><div class="sm">'+saEsc([it.d,it.u,saDaysTxt(it.days),it.b==='PM'?'Night':'Morning'].filter(Boolean).join(' · '))+'</div></div><button type="button" class="sa-rm" data-sa="'+saEsc(it.id)+'">Remove</button></div>';
-  }).join('');
-}
+/* Every added compound already appears in its own day card, with the same
+   expand and the same Remove. The grey list that used to repeat them all
+   under the schedule was a second copy of that, so it is gone; this keeps
+   the name because several call sites and the cloud-sync path call it, and
+   clears any list a previously-cached page already drew. */
+function saRender(){ var host=document.getElementById('sa-list'); if(host&&host.parentNode) host.parentNode.removeChild(host); }
 /* Calculator: "+ Add to my schedule" with Mon–Sun day boxes */
 (function(){
   var add=document.getElementById('pc-addbtn'); if(!add) return;

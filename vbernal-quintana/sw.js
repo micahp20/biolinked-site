@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /vbernal-quintana/.
-const CACHE = 'vbernal-quintana-master-sched1';
+const CACHE = 'vbernal-quintana-master-sched1-v2';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/vbernal-quintana/',

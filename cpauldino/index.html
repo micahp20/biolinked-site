@@ -1603,7 +1603,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       <div class="lx-hero">
         <h1 class="lx-title">Welcome back, Mama P</h1>
         <p class="lx-sub">A clearer view of your protocol and progress.</p>
-        <button type="button" class="lx-cta" onclick="go('sched')">Explore my protocol &rarr;</button>
+        <button type="button" class="lx-cta" onclick="goCycles()">Explore my protocol &darr;</button>
       </div>
       <div class="seclbl">Your Program</div><div class="bl-tiles"><button type="button" onclick="go('labs')" class="bl-tile" id="bt-labs"><span><span class="t">Bloodwork</span><span class="s" id="bts-labs">&nbsp;</span></span><span class="o">Open &rarr;</span></button><div class="bl-tile" id="bt-dna"><span><span class="t">DNA</span><span class="s" id="bts-dna">&nbsp;</span></span><span class="o"></span></div><button type="button" onclick="go('work')" class="bl-tile" id="bt-work"><span><span class="t">Workout</span><span class="s" id="bts-work">&nbsp;</span></span><span class="o">Open &rarr;</span></button><button type="button" onclick="go('nutr')" class="bl-tile" id="bt-nutr"><span><span class="t">Nutrition</span><span class="s" id="bts-nutr">&nbsp;</span></span><span class="o">Open &rarr;</span></button></div><div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
@@ -5984,6 +5984,18 @@ var ABOUT_GROUPS=[
   {tag:'Daily \u00b7 PM', meta:'evening block'},
   {tag:'Past', meta:'kept for reference'}
 ];
+/* The hero button used to jump to the Schedule tab. It now walks the reader
+   down the page they are already on, to their cycles. #protoabout always
+   renders something -- the cycle cards, an "also in your protocol" group, or
+   the empty state -- so there is always somewhere sensible to land. */
+function goCycles(){
+  var host=document.getElementById('protoabout');
+  if(!host) return go('sched');
+  var sc=document.getElementById('scroll');
+  if(!sc||!sc.scrollTo){ try{ host.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){ host.scrollIntoView(); } return; }
+  var top=host.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-12;
+  try{ sc.scrollTo({top:Math.max(0,top),behavior:'smooth'}); }catch(e){ sc.scrollTop=Math.max(0,top); }
+}
 function renderAbout(){
   var host=document.getElementById('protoabout'); if(!host) return;
   var src=(typeof ALL!=='undefined'&&ALL)?ALL:[];

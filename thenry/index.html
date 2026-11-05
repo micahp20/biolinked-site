@@ -1400,7 +1400,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       <div class="lx-hero">
         <h1 class="lx-title">Welcome back, Tayla</h1>
         <p class="lx-sub">A clearer view of your protocol and progress.</p>
-        <button type="button" class="lx-cta" onclick="go('sched')">Explore my protocol &rarr;</button>
+        <button type="button" class="lx-cta" onclick="goCycles()">Explore my protocol &darr;</button>
       </div>
       <div class="seclbl">Your Program</div><div class="bl-tiles"><button type="button" onclick="go('labs')" class="bl-tile" id="bt-labs"><span><span class="t">Bloodwork</span><span class="s" id="bts-labs">&nbsp;</span></span><span class="o">Open &rarr;</span></button><div class="bl-tile" id="bt-dna"><span><span class="t">DNA</span><span class="s" id="bts-dna">&nbsp;</span></span><span class="o"></span></div><button type="button" onclick="go('work')" class="bl-tile" id="bt-work"><span><span class="t">Workout</span><span class="s" id="bts-work">&nbsp;</span></span><span class="o">Open &rarr;</span></button><button type="button" onclick="go('nutr')" class="bl-tile" id="bt-nutr"><span><span class="t">Nutrition</span><span class="s" id="bts-nutr">&nbsp;</span></span><span class="o">Open &rarr;</span></button></div><div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
@@ -2414,6 +2414,18 @@ function aboutCompound(c){
  var sch=[c.c,c.b==='BOTH'?'AM + PM':c.b].filter(Boolean).join(' · ');
  return '<details class="jc-compound"><summary>'+esc(c.n)+'<span aria-hidden="true" class="jc-chevron"></span></summary><div class="jc-body">'+(c.about?'<div class="jc-description">'+c.about+'</div>':'')+'<dl class="jc-facts">'+
  [['Recon',c.rec],['Schedule',sch],['Dose / draw',[c.d,c.u].filter(Boolean).join(' · ')],['Site',c.site]].filter(function(r){return r[1];}).map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'</dl></div></details>';
+}
+/* The hero button used to jump to the Schedule tab. It now walks the reader
+   down the page they are already on, to their cycles. #protoabout always
+   renders something -- the cycle cards, an "also in your protocol" group, or
+   the empty state -- so there is always somewhere sensible to land. */
+function goCycles(){
+  var host=document.getElementById('protoabout');
+  if(!host) return go('sched');
+  var sc=document.getElementById('scroll');
+  if(!sc||!sc.scrollTo){ try{ host.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){ host.scrollIntoView(); } return; }
+  var top=host.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-12;
+  try{ sc.scrollTo({top:Math.max(0,top),behavior:'smooth'}); }catch(e){ sc.scrollTop=Math.max(0,top); }
 }
 function renderAbout(){
  var host=document.getElementById('protoabout'); if(!host) return;
@@ -5250,16 +5262,12 @@ function saGuideDays(f){
   return [];
 }
 function saGuide(name){ var L=window.BL_DOSING||[]; for(var i=0;i<L.length;i++){ if(L[i].name===name) return L[i]; } return null; }
-/* Schedule tab: a short list of everything the client added, removable on any day */
-function saRender(){
-  var host=document.getElementById('sa-list');
-  if(!host){ var dn=document.getElementById('dosenote'); if(!dn) return; host=document.createElement('div'); host.id='sa-list'; host.className='sa-list'; dn.parentNode.insertBefore(host,dn.nextSibling); }
-  var l=saLive();
-  if(!l.length){ host.innerHTML=''; return; }
-  host.innerHTML='<div class="seclbl">Added Compounds<span class="cnt">'+l.length+'</span></div>'+l.map(function(it){
-    return '<div class="lrow2"><div><div>'+saEsc(it.n)+'</div><div class="sm">'+saEsc([it.d,it.u,saDaysTxt(it.days),it.b==='PM'?'Night':'Morning'].filter(Boolean).join(' · '))+'</div></div><button type="button" class="sa-rm" data-sa="'+saEsc(it.id)+'">Remove</button></div>';
-  }).join('');
-}
+/* Every added compound already appears in its own day card, with the same
+   expand and the same Remove. The grey list that used to repeat them all
+   under the schedule was a second copy of that, so it is gone; this keeps
+   the name because several call sites and the cloud-sync path call it, and
+   clears any list a previously-cached page already drew. */
+function saRender(){ var host=document.getElementById('sa-list'); if(host&&host.parentNode) host.parentNode.removeChild(host); }
 /* Calculator: "+ Add to my schedule" with Mon–Sun day boxes */
 (function(){
   var add=document.getElementById('pc-addbtn'); if(!add) return;
