@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jliuzzi/.
-const CACHE = 'jliuzzi-master-v2';
+const CACHE = 'jliuzzi-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/jliuzzi/',

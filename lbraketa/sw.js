@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /lbraketa/.
-const CACHE = 'lbraketa-master-v2';
+const CACHE = 'lbraketa-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/lbraketa/',

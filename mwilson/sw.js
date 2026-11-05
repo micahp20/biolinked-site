@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mwilson/.
-const CACHE = 'mwilson-master-v2';
+const CACHE = 'mwilson-master-v3';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mwilson/',
