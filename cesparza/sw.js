@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /cesparza/.
-const CACHE = 'cesparza-master-sched1-v4';
+const CACHE = 'cesparza-master-sched1-v6';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/cesparza/',

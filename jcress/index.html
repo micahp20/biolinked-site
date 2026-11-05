@@ -2445,18 +2445,19 @@ function goCycles(){
   to=Math.max(0,Math.min(to,sc.scrollHeight-sc.clientHeight));
   var from=sc.scrollTop, d=to-from;
   if(Math.abs(d)<2) return;
-  /* Animated by hand on purpose. scrollTo({behavior:'smooth'}) is a silent
-     no-op on this container in some browsers -- it reports support, returns
-     cleanly and never moves -- while assigning scrollTop works everywhere. */
+  /* Stepped on a timer on purpose, and not with the two obvious tools.
+     scrollTo({behavior:'smooth'}) is a silent no-op on this container in some
+     browsers -- it reports support, returns cleanly and never moves -- and
+     requestAnimationFrame does not fire at all in some embedded webviews.
+     Assigning scrollTop on a timer is the one approach that works in both. */
   var reduce=false; try{ reduce=matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
-  if(reduce||!window.requestAnimationFrame){ sc.scrollTop=to; return; }
-  var t0=0;
-  requestAnimationFrame(function step(ts){
-    if(!t0) t0=ts;
-    var p=Math.min(1,(ts-t0)/420);
+  if(reduce){ sc.scrollTop=to; return; }
+  var t0=Date.now();
+  (function step(){
+    var p=Math.min(1,(Date.now()-t0)/420);
     sc.scrollTop=from+d*(p<0.5?2*p*p:1-Math.pow(-2*p+2,2)/2);
-    if(p<1) requestAnimationFrame(step);
-  });
+    if(p<1) setTimeout(step,16);
+  })();
 }
 function renderAbout(){
  var host=document.getElementById('protoabout'); if(!host) return;
