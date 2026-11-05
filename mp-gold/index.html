@@ -3,65 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Cache-Control" content="no-store">
-<script>
-/* ---- /mp-gold/ cache kill-switch -------------------------------------
-   Runs on every load. Two deliberate limits on scope:
-   - Only workers whose scope COVERS /mp-gold/ are unregistered: its own
-     ("/mp-gold/") and the site-wide one ("/"), whose fetch handler has no
-     path gate and so caches this page too. A worker scoped to another
-     folder, /mpauldino/ included, is left installed.
-   - Caches named mp-gold-* are dropped whole; in every OTHER cache only the
-     entries whose URL contains /mp-gold/ are deleted, so this does not wipe
-     the offline copies of the live portals on the same device.
-   A worker already controlling the page keeps serving it until a reload, so
-   when one is found the page reloads itself once, guarded by sessionStorage
-   so it can never loop. ------------------------------------------------- */
-(function(){
-  var hadController = false;
-  try{ hadController = !!(navigator.serviceWorker && navigator.serviceWorker.controller); }catch(e){}
-
-  function covers(scope){
-    var path='/';
-    try{ path = new URL(scope).pathname; }catch(e){ return false; }
-    return path === '/' || path.indexOf('/mp-gold/') === 0;
-  }
-  var jobs=[];
-  try{
-    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
-      jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){
-        return Promise.all(rs.map(function(r){
-          return covers(r.scope) ? r.unregister().catch(function(){}) : null;
-        }));
-      }).catch(function(){}));
-    }
-  }catch(e){}
-  try{
-    if(window.caches && caches.keys){
-      jobs.push(caches.keys().then(function(keys){
-        return Promise.all(keys.map(function(k){
-          if(k.indexOf('mp-gold-') === 0) return caches.delete(k).catch(function(){});
-          return caches.open(k).then(function(c){
-            return c.keys().then(function(reqs){
-              return Promise.all(reqs.map(function(q){
-                return q.url.indexOf('/mp-gold/') > -1 ? c.delete(q).catch(function(){}) : null;
-              }));
-            });
-          }).catch(function(){});
-        }));
-      }).catch(function(){}));
-    }
-  }catch(e){}
-
-  if(!hadController) return;
-  var KEY='mpgold-cachekill';
-  try{ if(sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY,'1'); }catch(e){ return; }
-  Promise.all(jobs).then(function(){ try{ location.reload(); }catch(e){} });
-})();
-</script>
-<meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#303639" id="tc">
+<meta name="theme-color" content="#0b0b0c" id="tc">
 <title>BioLinked</title>
+<meta name="robots" content="noindex,nofollow">
 <meta name="description" content="Your BioLinked protocol, compound index, labs and invoices in one place.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="BioLinked Solutions">
@@ -89,15 +33,9 @@
      so no block below needs a dark-mode rule of its own. Gold stays the accent
      in both. Toggled by setting data-theme on <html>; persisted on-device. */
   :root{
-    /* ---- Colorado Buffaloes: black / gold / silver (mpauldino only) ------
-       The lighter of the two variants. CU gold #CFB87C is about 1.9:1 on
-       white and unusable as type there, so the accent darkens to #6f6130
-       (6.1:1 on card, 5.3:1 on the ground) and the real gold is kept for the
-       black variant, which is the default and where it belongs.
-       Silver is the SECONDARY: hairlines, the MEMBER sublabel, quiet marks.
-       Status amber is deliberately pushed orange -- at its old value it sat
-       3 degrees in hue from CU gold, so a "watch" lab pill and a gold accent
-       would have been the same colour. */
+    /* ---- Theme lifted verbatim from mpauldino so the two pages match.
+       Colorado: black / CU gold / silver. Gold darkens to #6f6130 in the light
+       variant because #CFB87C is unreadable as type on white. */
     --cu-gold:#CFB87C; --cu-gold-lt:#E2CE94; --cu-silver:#A2A4A3; --cu-black:#0b0b0c;
 
     --ink:#0b0b0c; --ink2:#43464a; --muted:#55585c; --faint:#6d7073;
@@ -121,13 +59,8 @@
     --sw:264px;
   }
   :root[data-theme="dark"]{
-    /* ---- Colorado Buffaloes, black-dominant -- the primary look ----------
-       Black ground, surfaces stepping up for depth, white type, and CU gold
-       #CFB87C leading with #E2CE94 for highlights. Gold fills take BLACK
-       type. Silver #A2A4A3 is present but secondary -- hairlines, the MEMBER
-       sublabel, quiet marks -- so both school colours read without the gold
-       having to compete.
-       Status amber is pushed orange here too, for the same reason as above. */
+    /* ---- Dark, lifted verbatim from mpauldino. This is the face both
+       pages actually show: the init below defaults to dark. */
     color-scheme:dark;
     --cu-gold:#CFB87C; --cu-gold-lt:#E2CE94; --cu-silver:#A2A4A3; --cu-black:#0b0b0c;
 
@@ -191,7 +124,7 @@
   .brand small{display:block;font-family:var(--sans);letter-spacing:2px;font-size:13px;color:var(--muted);font-weight:700;margin-top:1px}
   .who{margin-left:auto;text-align:right}
   .who .wn{font-size:13px;font-weight:800;color:var(--ink);line-height:1.1}
-  .who .wl{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;color:var(--cu-silver);font-weight:800;margin-top:2px}
+  .who .wl{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold);font-weight:800;margin-top:2px}
   .tgl{flex:none;width:34px;height:34px;border-radius:11px;background:var(--cream);border:1px solid var(--line);
     display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);padding:0;
     transition:background .2s,transform .14s}
@@ -231,6 +164,13 @@
 
   /* Scroll area fills the frame and simply pads past the bar, so content can
      always be scrolled clear of it and nothing ends up trapped underneath. */
+  /* No -webkit-overflow-scrolling:touch. It is deprecated -- momentum has been
+     the default since iOS 13 -- and it puts the scroller on its own compositing
+     layer whose scroll extent iOS does not reliably recompute when content is
+     inserted afterwards. Everything in this view is written by innerHTML after
+     the scroller already exists, so a stale extent leaves the tail of the page
+     unreachable and unpainted: you scroll to what iOS thinks is the end and the
+     rest shows as background. */
   .scroll{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
     padding:calc(58px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 26px)}
   .scroll::-webkit-scrollbar{width:0}
@@ -277,12 +217,12 @@
   .days{display:flex;gap:6px;margin:2px -16px 14px;padding:0 16px;overflow-x:auto}
   .days::-webkit-scrollbar{height:0}
   .day{flex:1 0 auto;min-width:44px;background:var(--card);border:1px solid var(--line);border-radius:13px;
-    padding:9px 0 8px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
-  .day .dw{font-size:13px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--faint)}
-  .day .dn{font-family:var(--serif);font-size:17px;color:var(--ink);margin-top:2px;line-height:1}
+    padding:13px 0 12px;text-align:center;cursor:pointer;box-shadow:var(--shadow)}
+  .day .dw{font-family:var(--serif);font-size:15px;font-weight:400;letter-spacing:.2px;
+    text-transform:none;color:var(--ink);line-height:1}
   .day.on{background:var(--gold);border-color:var(--gold)}
-  .day.on .dw,.day.on .dn{color:var(--on-gold)}
-  .day.today:not(.on) .dn{color:var(--gold)}
+  .day.on .dw{color:var(--on-gold)}
+  .day.today:not(.on) .dw{color:var(--gold)}
 
   /* Dose rows are READ-ONLY -- no check-off control, no stored state. */
   .dgrp{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:12px}
@@ -309,6 +249,7 @@
   .pill.due{background:var(--amber-soft);color:var(--amber);border:1px solid var(--amber-line)}
   .pill.paid{background:var(--ok-soft);color:var(--ok)}
   .pill.free{background:var(--gold-soft);color:var(--gold)}
+.pill.quote{background:var(--gold-soft);color:var(--gold);border:1px solid var(--amber-line)}
 
   /* ALL COMPOUNDS -- expand in place. Everything starts collapsed. */
   .cxwrap{background:var(--card);border:1px solid var(--line);border-radius:16px;
@@ -325,17 +266,58 @@
   .cx-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
   .cx.on .cx-cv{transform:rotate(90deg)}
   .cx-bd{display:none;padding:0 14px 14px}
+  /* Collapsible groups: the per-cycle blocks in All Compounds and the
+     explainer on the Protocol tab. Both reuse the .cx idiom -- a header row
+     with a chevron that quarter-turns when open -- so there is nothing new
+     to learn visually and nothing new to theme. */
+  .cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+  .cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+  .cgrp-m{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+  .cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+  .cgrp-n{font-size:13px;font-weight:800;color:var(--gold)}
+  .cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+  .cgrp.on .cgrp-cv{transform:rotate(90deg)}
+  .cgrp-bd{display:none;border-top:1px solid var(--line2)}
+  .cgrp.on .cgrp-bd{display:block}
+  .cgrp-bd .cx:last-child{border-bottom:none}
+  .cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+  .cgrp.pastgrp .cgrp-bd{opacity:.72}
+  .abt{padding:11px 13px 13px}
+  .abt-l{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+  .abt-l+.abt-p{margin-bottom:11px}
+  .abt-p{font-size:13px;line-height:1.55;color:var(--ink2)}
+  .abt-p:last-child{margin-bottom:0}
+  /* "The stack" -- just the compound names for whichever cycle card is open,
+     each one a link into the Index. Deliberately carries no strength, dose or
+     schedule: all of that lives on the Schedule tab, and repeating it here is
+     what made the section heavy. */
+  .stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+  .stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .stk-a:last-child{border-bottom:none}
+  .stk-a:active{background:var(--gold-soft)}
+  .stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
   .cx.on .cx-bd{display:block}
   .cx-ab{font-size:13px;line-height:1.55;color:var(--ink2);padding-top:2px}
   .cx .facts{background:var(--cream)}
   .cx.hist .cx-n{color:var(--ink2)}
+  /* One-tap control deciding whether a compound reaches the day view. Its own
+     tap target inside the row header; the click never reaches the header, so
+     it cannot open the Recon/Draw detail by accident. */
+  .schbtn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;border-radius:999px;
+    padding:6px 11px;font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:.5px;
+    text-transform:uppercase;cursor:pointer;touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+    border:1px solid var(--line);background:var(--cream);color:var(--muted)}
+  .schbtn.on{background:var(--gold);border-color:var(--gold);color:var(--on-gold)}
+  .schbtn:active{opacity:.75}
   /* cycle selector -- only drawn when a client has more than one cycle */
-  .cycrow{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px}
-  .cycrow::-webkit-scrollbar{height:0}
-  .cyc{flex:none;background:var(--card);border:1px solid var(--line);border-radius:10px;
-    padding:7px 11px;font:600 11.5px/1 var(--sans);color:var(--muted);cursor:pointer;
-    letter-spacing:.04em;white-space:nowrap;min-height:34px}
-  .cyc.on{background:var(--ink);border-color:var(--ink);color:#fff}
   .cx-arch{display:inline-block;margin-left:7px;font-family:var(--sans);font-size:13px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
     border:1px solid var(--line2);border-radius:5px;padding:1px 5px;vertical-align:middle}
@@ -407,23 +389,6 @@
   .frow .fl{font-size:13px;color:var(--muted);margin-bottom:6px}
   .fchips{display:flex;gap:7px;flex-wrap:wrap}
   .fchips b{font-weight:600;font-size:13px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:5px 10px;color:var(--ink)}
-  .meds-sub{font-size:13px;color:var(--muted);margin:-3px 2px 9px;line-height:1.4}
-  .meds-tbl{overflow:hidden}
-  .meds-tbl .mh{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(58px,auto) minmax(0,1.55fr);gap:9px;padding:9px 14px;font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:800;border-bottom:1px solid var(--line)}
-  .meds-tbl .mr{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(58px,auto) minmax(0,1.55fr);gap:9px;align-items:baseline;padding:11px 14px}
-  .meds-tbl .mr + .mr{border-top:1px solid var(--line2)}
-  .meds-tbl .mi{font-size:13px;font-weight:600;color:var(--ink);line-height:1.25}
-  .meds-tbl .md{font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;line-height:1.25}
-  .meds-tbl .mf{font-size:13px;color:var(--ink2);line-height:1.45}
-  .meds-tbl .note-row{display:block}
-  .meds-tbl .note-row .mf{font-size:13px;color:var(--ink2)}
-  .meds-tbl button.mr{width:100%;text-align:left;background:none;border:0;border-radius:0;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
-  .meds-tbl button.mr .mf{position:relative;padding-right:16px}
-  .meds-tbl button.mr .mchev{position:absolute;right:0;top:0;color:var(--faint);font-size:14px;line-height:1.45}
-  .meds-tbl button.mr:active{background:var(--gold-soft)}
-  @media(hover:hover){.meds-tbl button.mr:hover{background:var(--gold-soft)}}
-  .blkb{border:1px solid var(--line,#ddd);background:none;color:var(--muted,#888);border-radius:7px;padding:4px 10px;font-size:13px;font-weight:700;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
-  .blkb.on{background:var(--gold,#9a7b2f);border-color:var(--gold,#9a7b2f);color:#fff}
 
   /* NOTES & TIPS */
   .nt-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);
@@ -464,7 +429,7 @@
   .pc-card.accent{border-top:3px solid var(--gold)}
   .pc-label{display:flex;align-items:center;gap:6px;font-family:var(--sans);font-size:13px;
     font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
-  .pc-field{margin-bottom:20px;position:relative}
+  .pc-field{margin-bottom:20px}
   .pc-field:last-child{margin-bottom:0}
   .pc-field[hidden]{display:none !important}
   .pc-input,.pc-select{width:100%;box-sizing:border-box;min-height:46px;padding:12px 13px;
@@ -476,23 +441,23 @@
     background-position:calc(100% - 19px) calc(50% + 2px),calc(100% - 14px) calc(50% + 2px);
     background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:38px}
   .pc-unit{font-size:13px;font-weight:600;color:var(--muted);margin-left:auto;letter-spacing:.04em}
-  .pc-dose-row{display:flex;gap:8px;align-items:stretch;position:relative}
+  .pc-dose-row{display:flex;gap:8px;align-items:stretch}
   .pc-dose-row .pc-input{flex:1 1 auto;min-width:0}
   .pc-unit-sel{flex:0 0 auto;width:82px;padding:0 10px;border:1px solid var(--line);border-radius:12px;
     background:var(--cream);color:var(--ink);font-family:var(--sans);font-size:14px;font-weight:700;
-    cursor:pointer;-webkit-appearance:menulist;appearance:menulist;position:relative;z-index:2}
+    cursor:pointer;-webkit-appearance:menulist;appearance:menulist}
 
   .pc-headline{background:var(--card);
     border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);
     padding:16px 18px;margin-bottom:14px;text-align:center}
   .pc-hl-eyebrow{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
-  .pc-hl-main{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--ink);line-height:1.3;letter-spacing:0}
-  .pc-hl-main b{color:var(--gold);font-weight:800}
-  .pc-hl-sub{font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:5px}
+  .pc-hl-main{font-family:var(--serif);font-size:24px;font-weight:600;color:var(--ink);line-height:1.15;letter-spacing:-.2px}
+  .pc-hl-main b{color:var(--gold);font-weight:600}
+  .pc-hl-sub{font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:6px}
 
   .pc-syr-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px}
   .pc-syr-title{font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted)}
-  .pc-syr-read{font-family:var(--sans);font-size:13px;font-weight:700;color:var(--gold)}
+  .pc-syr-read{font-family:var(--serif);font-size:16px;color:var(--gold)}
   .pc-syr{position:relative;width:100%;height:76px;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
   .pc-syr.dragging{cursor:grabbing}
   .pc-syr svg{display:block;width:100%;height:100%;overflow:visible}
@@ -509,14 +474,11 @@
   .pc-stat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 13px;box-shadow:var(--shadow)}
   .pc-stat-l{display:flex;align-items:center;gap:5px;font-family:var(--sans);font-size:13px;
     font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
-  .pc-stat-v{font-family:var(--sans);font-size:15px;font-weight:700;color:var(--ink);line-height:1.2;font-variant-numeric:tabular-nums}
+  .pc-stat-v{font-family:var(--serif);font-size:21px;font-weight:600;color:var(--ink);line-height:1.15}
   .pc-stat-v em{font-family:var(--sans);font-style:normal;font-size:13px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-left:4px}
   .pc-warn{background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:11px;
     padding:10px 13px;font-family:var(--sans);font-size:13px;font-weight:700;color:var(--amber);margin-top:13px;line-height:1.5}
   .pc-warn[hidden]{display:none !important}
-  /* Reserve the calculator warning's space so show/hide never shifts layout. */
-  #pc-warn{min-height:40px}
-  #pc-warn[hidden]{display:block !important;visibility:hidden;margin-top:13px}
   .pc-note{font-family:var(--sans);font-size:13px;color:var(--amber);background:var(--amber-soft);
     border:1px solid var(--amber-line);border-radius:11px;padding:9px 12px;margin-top:8px;line-height:1.5}
   .pc-note[hidden]{display:none !important}
@@ -546,7 +508,7 @@
   .pc-ico:active{border-color:var(--gold);color:var(--gold)}
   .pc-ico.del:active{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
   .pc-mini{position:relative;height:11px;background:var(--barrel);border-radius:4px;margin:10px 0 9px;overflow:hidden}
-  .pc-mini-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#E2CE94,#8a7840);border-radius:4px}
+  .pc-mini-fill{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#C9A84C,#7A6530);border-radius:4px}
   .pc-item-stats{display:flex;flex-wrap:wrap;gap:6px}
   .pc-chip{font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:.4px;
     text-transform:uppercase;padding:4px 9px;border-radius:7px;background:var(--gold-soft);
@@ -556,7 +518,7 @@
   .pc-empty[hidden]{display:none !important}
 
   @media(max-width:420px){
-    .pc-hl-main{font-size:15px}
+    .pc-hl-main{font-size:24px}
     .pc-grid{grid-template-columns:1fr}
   }
 
@@ -611,20 +573,13 @@
     border:1px solid var(--warn-line);border-radius:11px;padding:9px 12px;font-size:13px;font-weight:700;margin:4px 0 13px;line-height:1.45}
   .banner .d{width:6px;height:6px;border-radius:50%;background:var(--warn);flex:none;margin-top:4px}
 
-  .a2hs{margin:14px 16px 0;background:var(--gold-soft);border:1px solid var(--line);
-    border-radius:14px;padding:12px 13px;display:none;align-items:flex-start;gap:10px}
+  .a2hs{position:fixed;left:12px;right:12px;bottom:calc(var(--tabh) + 14px + env(safe-area-inset-bottom));z-index:95;
+    background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 8px 28px rgba(40,34,20,.16);
+    padding:13px 14px;display:none;align-items:flex-start;gap:11px;max-width:376px;margin:0 auto}
   .a2hs.on{display:flex}
   .a2hs .tx{font-size:13px;line-height:1.5;color:var(--ink2);flex:1}
-  .a2hs .tx b{color:var(--ink);font-weight:600}
-  .a2hs .a2hs-ios,.a2hs .a2hs-keep{display:block;margin-top:6px}
-  .a2hs .a2hs-keep{color:var(--muted);font-size:13px}
-  /* display:block on a class outranks the UA stylesheet's [hidden]{display:none},
-     so without this the iOS Share-sheet line showed on Android too. Same
-     specificity as the rule above and placed after it, so it wins outright. */
-  .a2hs [hidden]{display:none}
-  .a2hs .a2hs-shr{font-size:14px}
-  .a2hs .x{background:none;border:none;color:var(--faint);font-size:20px;line-height:1;cursor:pointer;
-    padding:0 2px;flex:none;min-width:28px;min-height:28px}
+  .a2hs .tx b{color:var(--ink)}
+  .a2hs .x{background:none;border:none;color:var(--faint);font-size:19px;line-height:1;cursor:pointer;padding:0 2px;flex:none}
   /* ===== DESKTOP SIDEBAR =====
      Hidden by default; only the >=768px block turns it on, so the phone path
      never sees it. */
@@ -738,19 +693,19 @@
   .nut-unit{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;}
   .nut-range{width:100%;accent-color:var(--gold);}
   .nut-range-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
-  .nut-range-val{font-family:var(--sans);font-size:15px;font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;}
-  .nut-cal-big{font-family:var(--sans);font-size:26px;font-weight:800;color:var(--ink);line-height:1.05;letter-spacing:-.01em;font-variant-numeric:tabular-nums;}
+  .nut-range-val{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--gold);}
+  .nut-cal-big{font-family:var(--serif);font-size:52px;font-weight:700;color:var(--ink);line-height:1;}
   .nut-cal-lbl{font-size:13px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;}
   .nut-cal-sub{font-size:13px;color:var(--muted);margin-top:6px;letter-spacing:0.04em;}
   .nut-split{display:flex;gap:18px;align-items:center;flex-wrap:wrap;}
   .nut-donut{flex-shrink:0;}
-  .nut-donut-n{font-family:var(--sans);font-size:16px;font-weight:800;fill:var(--ink);}
+  .nut-donut-n{font-family:var(--serif);font-size:23px;font-weight:700;fill:var(--ink);}
   .nut-donut-l{font-size:7px;font-weight:700;letter-spacing:0.16em;fill:var(--muted);}
   .nut-macros{flex:1;min-width:190px;}
   .nut-macro{margin-bottom:11px;}
   .nut-macro-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;margin-bottom:4px;}
   .nut-macro-name{font-weight:700;letter-spacing:0.08em;text-transform:uppercase;font-size:13px;}
-  .nut-macro-g{font-family:var(--sans);font-size:14px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .nut-macro-g{font-family:var(--serif);font-size:19px;font-weight:700;color:var(--ink);}
   .nut-macro-pct{font-size:13px;color:var(--muted);margin-left:6px;}
   .nut-macro-track{height:7px;border-radius:99px;background:var(--line2);overflow:hidden;}
   .nut-macro-fill{height:100%;border-radius:99px;transition:width .25s;}
@@ -762,7 +717,7 @@
   .nut-macro.f .nut-macro-fill{background:var(--amber);}
   .nut-pm{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
   .nut-pm-cell{background:var(--cream);border:1px solid var(--line);border-radius:6px;padding:10px 8px;text-align:center;}
-  .nut-pm-v{font-family:var(--sans);font-size:14px;font-weight:800;color:var(--ink);line-height:1.15;font-variant-numeric:tabular-nums;}
+  .nut-pm-v{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--ink);line-height:1.1;}
   .nut-pm-l{font-size:13px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
   .nut-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);
   color:var(--on-gold);border:1px solid var(--gold);border-radius:6px;padding:14px 20px;cursor:pointer;
@@ -861,7 +816,7 @@
      closed sheets so they can never create page-level overflow.
      ======================================================================= */
   @media(max-width:767px){
-    html,body{height:100%;margin:0;overflow:hidden;background:var(--bg)}
+    html,body{height:100%;margin:0;overflow:hidden}
     body{display:block;min-height:0;background:var(--bg)}
     .device{position:fixed;inset:0;width:100%;max-width:none;
       height:100vh;height:100dvh;max-height:none;
@@ -872,7 +827,14 @@
        growing to fit its content. Without it the column overflows the shell. */
     .scroll{position:static;inset:auto;flex:1 1 auto;min-height:0;height:auto;
       display:block;overflow-y:auto;overflow-x:hidden;
-      padding:0 0 26px}
+      /* The bottom tab bar is collapsed to height 0 on a phone, and it was the
+         thing that used to clear the home indicator -- it still carries
+         env(safe-area-inset-bottom) in its own padding. With it gone, nothing
+         reserved that space and 26px is less than the ~34px inset, so the last
+         line of the final card sat under the indicator with no scroll left to
+         reach it. .sheet and .tabs both add the inset; .scroll was the one that
+         did not. Zero effect where the inset is 0. */
+      padding:0 0 calc(26px + env(safe-area-inset-bottom))}
     .view.on{flex:none}
     /* last flex child -> always on the true visual bottom edge */
     .tabs{position:static;flex:0 0 auto;height:auto;
@@ -884,6 +846,7 @@
       padding:calc(56px + env(safe-area-inset-top)) 0 calc(var(--tabh) + env(safe-area-inset-bottom) + 24px)}
     .navscrim{position:absolute}
     .navmenu{position:absolute}
+    .a2hs{position:absolute}
     .nut-toast{position:absolute}
   }
   /* =======================================================================
@@ -908,7 +871,7 @@
     .side-who{margin-top:14px}
     .side-who .wn{font-size:13px;font-weight:800;color:var(--ink)}
     .side-who .wl{font-size:13px;letter-spacing:1.3px;text-transform:uppercase;
-      color:var(--cu-silver);font-weight:800;margin-top:2px}
+      color:var(--gold);font-weight:800;margin-top:2px}
     .side-nav{flex:1 1 auto;min-height:0;overflow-y:auto;padding-top:14px;display:flex;
       flex-direction:column;gap:3px}
     .snav{display:flex;align-items:center;gap:11px;width:100%;padding:11px 12px;border:none;
@@ -954,22 +917,20 @@
     .cats{margin-left:0;margin-right:0;padding-left:0;padding-right:0}
   }
 
-  /* ===== HAMBURGER-ONLY NAV (phone) =================================
-     .tabs stays a flex child of the shell. Collapsing it to zero height
-     keeps the flex column intact, so .scroll keeps flex:1 1 auto with
-     min-height:0 and still sizes to the viewport. display:none would
-     pull it out of flow, which is what previously cost .scroll its flex
-     sizing and froze the page. --tabh drops to 0 so any bottom padding
-     that reserved room for the bar collapses with it.
-     Desktop (>=768px) already hides .tabs and uses the sidebar. ======= */
+  /* ===== HAMBURGER-ONLY NAV (phone) — mpauldino is the reference =======
+     .tabs stays a flex child and collapses to zero height. display:none
+     would pull it out of flow, which is what cost .scroll its flex sizing
+     and froze the page on the first attempt. --tabh drops to 0 so bottom
+     padding that reserved room for the bar collapses with it, and the
+     scroller's flex sizing is restated so it cannot be lost again.
+     Desktop (>=768px) already hides .tabs and uses the sidebar. ========= */
   @media(max-width:767px){
     .tabs{height:0 !important;min-height:0 !important;padding:0 !important;
       margin:0 !important;border:0 !important;overflow:hidden !important;
       visibility:hidden !important;flex:0 0 auto !important}
     :root{--tabh:0px}
-    /* belt and braces: restate the scroller's flex sizing at the same
-       specificity, so it cannot be lost again by a later rule. */
     .scroll{flex:1 1 auto !important;min-height:0 !important;overflow-y:auto !important}
+    body{background:var(--bg)}
     /* The cap has to be the SMALL viewport. 100vh on iOS Safari is the
        toolbar-hidden height, so a panel sized against it hangs below the
        visible area whenever the toolbars are showing -- and because the
@@ -996,169 +957,44 @@
   .xp{padding:0 16px;margin:0 0 6px;font-size:13.5px;line-height:1.7;color:var(--ink2)}
   .xp:empty{display:none}
   #x-edu[hidden]{display:none}
-
-/* ====== GRONK SCHEDULE (prototype, mpauldino only) ==========================
-   Every selector is scoped under .gk so the Cormorant/Outfit faces stay
-   inside the Schedule view and never reach the chrome, Labs, Pay, Nutrition
-   or Notes. The ivory/champagne COLOURS are no longer confined here - the
-   same seven values now sit on :root and tint the whole page, which is what
-   closed the gray seam under the header. Edit them there, not here.
-   The dose and the days are fixed by the protocol and render read-only, so
-   there are no stepper or day-chip styles here to find. ------------------- */
-.gk{
-  --ivory:#eeeeec; --paper:#ffffff; --gk-ink:#0b0b0c; --ink-soft:#43464a;
-  --gk-line:#d6d6d3; --gk-gold:#6f6130; --gold-deep:#1b1d20; --gold-soft:#f1ecdd;
-  --gold-line:#ddd2b6; --gk-shadow:0 8px 24px rgba(11,11,12,.07); --gk-radius:18px;
-  font-family:"Outfit",system-ui,sans-serif; color:var(--gk-ink);
-  background:radial-gradient(1200px 500px at 50% -10%,#fff 0%,transparent 60%),var(--ivory);
-  margin:-16px; padding:22px 16px 28px;
-}
-.gk *{box-sizing:border-box}
-.gk button,.gk input{font-family:inherit}
-.gk h1.gk-h{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;line-height:1;margin:0 0 6px;color:var(--gk-ink)}
-.gk .gk-sub{color:var(--ink-soft);font-size:13px;font-weight:300;margin:0 0 16px}
-.gk .cycle{background:var(--cu-black);color:#ffffff;border-radius:22px;padding:16px 16px 14px;margin-bottom:16px}
-.gk .cycle-kicker{letter-spacing:.22em;font-size:13px;color:var(--cu-gold-lt);font-weight:500}
-.gk .cycle h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;margin:4px 0 2px;color:#ffffff}
-.gk .cycle p{margin:0;color:#c7ccd1;font-size:13px;font-weight:300}
-.gk .bar{height:4px;background:#d6d6d3;border-radius:99px;margin:14px 0 8px;overflow:hidden}
-.gk .bar>i{display:block;height:100%;background:linear-gradient(90deg,#CFB87C,#E2CE94)}
-/* Silver is the secondary: quiet marks like this one carry it so both
-   school colours are present without the gold having to compete. */
-.gk .cycle-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--cu-silver)}
-.gk .gk-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:4px 0 18px}
-.gk .day{border:1px solid var(--gk-line);background:var(--paper);border-radius:14px;padding:8px 0 7px;text-align:center;cursor:pointer;color:var(--ink-soft)}
-.gk .day b{display:block;font-size:13px;letter-spacing:.12em;font-weight:500}
-.gk .day span{display:block;margin-top:3px;font-size:14px;color:var(--gk-ink);font-weight:500}
-.gk .day.on{background:var(--gold-deep);border-color:var(--gold-deep);color:#ffffff}
-.gk .day.on span{color:#fff}
-.gk .block-head{display:flex;justify-content:space-between;align-items:baseline;margin:8px 2px 8px}
-.gk .block-head h3{margin:0;letter-spacing:.2em;font-size:13px;font-weight:500;color:var(--ink-soft)}
-.gk .block-head em{font-style:normal;font-size:13px;color:var(--gk-gold);letter-spacing:.08em}
-.gk .med-sub{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:800;margin:14px 2px 7px}
-.gk .med-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:4px}
-.gk .med-row{display:flex;align-items:stretch;width:100%}
-.gk .med-row + .med-row{border-top:1px solid var(--line2)}
-.gk .med-tap{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0;text-align:left;background:none;border:0;border-radius:0;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;padding:9px 13px}
-.gk .med-tap:active{background:var(--gold-soft)}
-@media(hover:hover){.gk .med-tap:hover{background:var(--gold-soft)}}
-.gk .med-rm{flex:0 0 auto;align-self:center;background:none;border:0;border-left:1px solid var(--line2);color:var(--faint);font-size:13px;letter-spacing:.04em;cursor:pointer;padding:6px 11px;margin:5px 0;white-space:nowrap}
-.gk .med-rm:active{color:var(--gold)}
-.gk .med-nm{font-size:13px;font-weight:500;color:var(--ink2);line-height:1.3}
-.gk .med-ds{font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;margin-left:auto;line-height:1.3}
-.gk .med-cv{color:var(--faint);font-size:13px;line-height:1.3;margin-left:2px}
-.gk .block-head-meds{margin-top:20px;border-top:1px solid var(--gk-line);padding-top:14px}
-.gk .med-note{font-size:13px;color:var(--muted);line-height:1.45;padding:9px 13px;border:1px solid var(--line);border-radius:14px;margin-bottom:4px}
-.gk .gk-card{background:var(--paper);border:1px solid #e7e7e4;border-radius:var(--gk-radius);box-shadow:var(--gk-shadow);padding:9px 13px;margin-bottom:6px}
-.gk .gk-row{display:flex;gap:11px;align-items:center}
-.gk .dose-mark{min-width:46px;font-family:"Cormorant Garamond",Georgia,serif;font-size:15px;color:var(--gold-deep);line-height:1}
-.gk .dose-mark small{display:block;font-family:"Outfit",sans-serif;font-size:13px;letter-spacing:.08em;color:var(--ink-soft);margin-top:3px}
-.gk .dose-mark{min-width:54px}
-.gk .dose-mark .dose-pull{display:block;font-family:"Outfit",sans-serif;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--gold-deep);margin-top:5px;white-space:nowrap}
-.gk .gk-name{font-size:13px;font-weight:500}
-/* Collapsed "not on schedule" toggle at the foot of the schedule. */
-.gk .gk-offtog{display:flex;align-items:center;gap:8px;width:100%;margin-top:22px;
-  background:none;border:none;border-top:1px solid var(--gk-line);padding:13px 2px 4px;
-  font-family:"Outfit",sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
-  font-weight:600;color:var(--ink-soft);cursor:pointer}
-.gk .gk-offtog .gk-offcv{margin-left:auto;font-size:15px;line-height:1;color:var(--gk-gold);transition:transform .2s}
-.gk .gk-offtog.on .gk-offcv{transform:rotate(90deg)}
-.gk .gk-offwrap[hidden]{display:none}
-.gk .gk-offwrap{margin-top:12px}
-.gk .gk-meta{margin-top:3px;color:var(--ink-soft);font-size:13px;font-weight:300}
-.gk .edit{margin-left:auto;border:1px solid var(--gk-line);background:#fff;color:var(--ink-soft);border-radius:999px;padding:5px 10px;font-size:13px;cursor:pointer}
-.gk .edit.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
-.gk .panel{margin-top:14px;padding-top:12px;border-top:1px solid var(--gk-line)}
-.gk .gk-label{letter-spacing:.16em;font-size:13px;color:var(--ink-soft);margin-bottom:8px}
-.gk .range{margin-left:auto;font-size:13px;color:var(--ink-soft);text-align:right;font-weight:300}
-/* Read-only dose: same weight as the old stepper readout, without controls. */
-.gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}.dose-adj{display:flex;align-items:center;gap:14px}.dstep{min-width:42px;font-size:19px;font-weight:600;line-height:1}.draw-in{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:10px;font:inherit;background:transparent;color:inherit}.draw-in:focus{outline:none;border-color:var(--gold,#8a7335)}
-.gk .fixed-dose small{display:block;font-family:"Outfit",sans-serif;font-size:13px;letter-spacing:.12em;color:var(--ink-soft)}
-/* Shown only when there is no key, or the key was refused. */
-.gk .gk-note{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:14px;
-  padding:11px 13px;font-size:13px;line-height:1.45;color:var(--ink-soft);margin:0 0 14px}
-.gk .gk-note b{color:var(--gk-ink);font-weight:500}
-/* Editable days: the one thing on this panel the client actually sets. */
-.gk .days-edit{display:flex;gap:5px;margin:12px 0}
-.gk .chip{flex:1;border:1px solid var(--gk-line);background:var(--paper);border-radius:9px;
-  font-size:13px;padding:7px 0;cursor:pointer;color:var(--ink-soft)}
-.gk .chip.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
-.gk .actions{display:flex;gap:8px;align-items:center}
-.gk .ghost{border:1px solid var(--gk-line);background:transparent;color:var(--ink-soft);border-radius:12px;padding:8px 10px;font-size:13px;cursor:pointer}
-.gk .gk-empty{border:1px dashed var(--gold-line);border-radius:16px;padding:16px;color:var(--ink-soft);font-size:13px;font-weight:300}
-.gk .viewbar{display:flex;gap:8px;margin:0 0 14px}
-.gk .viewbar button{border:1px solid var(--gk-line);background:transparent;border-radius:999px;padding:7px 12px;font-size:13px;color:var(--ink-soft);cursor:pointer}
-.gk .viewbar button.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
-.gk-toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--cu-black);color:#ffffff;border-radius:999px;padding:10px 14px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:80;font-family:"Outfit",system-ui,sans-serif}
-.gk-toast.show{opacity:1}
-
-/* ===== GRONK SCHEDULE -- BLACK VARIANT ================================
-   The Schedule view carries its own palette, so without this it would stay
-   on the light surfaces while the rest of the page went black.
-   One thing cannot simply be re-tinted: selected states fill with
-   var(--gk-ink), which is black in the light variant and WHITE here, so left
-   alone they would be white type on white. They fill with CU gold and take
-   black type instead, which is the look anyway.
-   ====================================================================== */
-:root[data-theme="dark"] .gk{
-  --ivory:#0b0b0c; --paper:#1e1f22; --gk-ink:#ffffff; --ink-soft:#c7ccd1;
-  --gk-line:#2e2f31; --gk-gold:#CFB87C; --gold-deep:#E2CE94; --gold-soft:#1f1d18;
-  --gold-line:#403a2b; --gk-shadow:0 8px 24px rgba(0,0,0,.55);
-  background:radial-gradient(1200px 500px at 50% -10%,rgba(207,184,124,.07) 0%,transparent 60%),var(--ivory);
-}
-/* The clock card has to lift off a black page rather than sink into it. */
-:root[data-theme="dark"] .gk .cycle{background:#17181a;border:1px solid #35332c}
-:root[data-theme="dark"] .gk .bar{background:#35332c}
-:root[data-theme="dark"] .gk .gk-card{border-color:#2e2f31}
-:root[data-theme="dark"] .gk .edit,
-:root[data-theme="dark"] .gk .chip{background:#25262a}
-/* Gold fill, black type -- reads on either variant */
-:root[data-theme="dark"] .gk .day.on,
-:root[data-theme="dark"] .gk .chip.on,
-:root[data-theme="dark"] .gk .edit.on,
-:root[data-theme="dark"] .gk .viewbar button.on{background:var(--cu-gold);border-color:var(--cu-gold-lt);color:#0b0b0c}
-:root[data-theme="dark"] .gk .day.on span{color:#0b0b0c}
-:root[data-theme="dark"] .gk .viewbar button{border-color:#3c3f3e}
-:root[data-theme="dark"] .gk-toast{background:#25262a;color:#ffffff;border:1px solid #3c3b36}
-:root[data-theme="dark"] .cyc.on{background:var(--cu-gold);border-color:var(--cu-gold-lt);color:#0b0b0c}
-
-  /* About-this-protocol card + stack list, same rules as the
-     multi-cycle pages so this page reads identically. */
-.cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
-    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
-.cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
-    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
-.cgrp-m{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
-.cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
-.cgrp-n{font-size:13px;font-weight:800;color:var(--gold)}
-.cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
-.cgrp.on .cgrp-cv{transform:rotate(90deg)}
-.cgrp-bd{display:none;border-top:1px solid var(--line2)}
-.cgrp.on .cgrp-bd{display:block}
-.cgrp-bd .cx:last-child{border-bottom:none}
-.cgrp.pastgrp .cgrp-t{color:var(--ink2)}
-.cgrp.pastgrp .cgrp-bd{opacity:.72}
-.abt{padding:11px 13px 13px}
-.abt-l{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
-    font-weight:800;margin:0 0 3px}
-.abt-l+.abt-p{margin-bottom:11px}
-.abt-p{font-size:13px;line-height:1.55;color:var(--ink2)}
-.abt-p:last-child{margin-bottom:0}
-.stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
-.stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
-    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
-    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
-    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.stk-a:last-child{border-bottom:none}
-.stk-a:active{background:var(--gold-soft)}
-.stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
-.gk-viewonly #gkAddBtn,.gk-viewonly #gkMedAddBtn,.gk-viewonly #pc-schedbtn,.gk-viewonly .gk .edit,.gk-viewonly [data-gkremove],.gk-viewonly [data-gkmedremove],.gk-viewonly [data-gkrestore],.gk-viewonly [data-gkmedrestore],.gk-viewonly .gk-offtog,.gk-viewonly .gk-offwrap{display:none!important}.gk-view-badge{display:inline-block;margin:6px 0 0 0;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold,#8a7335);border:1px solid var(--gold,#8a7335);border-radius:999px;padding:3px 10px}</style>
+  /* cloud-sync status: a quiet word beside the subline, and one toast */
+  .cs-stat{font-family:var(--sans);font-size:13px;font-weight:700;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--faint);margin:0 0 2px;min-height:12px;
+    opacity:0;transition:opacity .18s}
+  .cs-stat.on{opacity:1}
+  .cs-stat.saved{color:var(--gold)}
+  .cs-stat.offline,.cs-stat.error{color:var(--muted)}
+  .cs-toast{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));
+    transform:translate(-50%,8px);max-width:min(88vw,340px);z-index:80;
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    box-shadow:var(--shadow);padding:10px 14px;font-family:var(--sans);font-size:13px;
+    color:var(--ink2);text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+  .cs-toast.on{opacity:1;transform:translate(-50%,0)}
+  /* ---- Supply tab -------------------------------------------------- */
+  .sup-note{font-size:13px;color:var(--ink2);line-height:1.6;margin:0 0 14px}
+  .sup-grp{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:18px 2px 8px}
+  .sup-row{display:flex;align-items:flex-start;gap:12px;padding:13px 14px;background:var(--card);
+    border:1px solid var(--line);border-radius:14px;margin-bottom:9px}
+  .sup-main{flex:1 1 auto;min-width:0}
+  .sup-nm{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--ink);line-height:1.25}
+  .sup-dt{font-size:13px;color:var(--muted);line-height:1.5;margin-top:3px}
+  .sup-meta{font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:var(--faint);
+    font-weight:700;margin-top:6px}
+  .sup-buy{flex:0 0 auto;align-self:center;display:inline-flex;align-items:center;gap:5px;
+    padding:9px 13px;min-height:38px;border-radius:999px;background:var(--gold-soft);
+    border:1px solid var(--gold-border,var(--line));color:var(--gold);font-family:var(--sans);
+    font-size:13px;font-weight:700;letter-spacing:.03em;text-decoration:none;white-space:nowrap;
+    -webkit-tap-highlight-color:transparent;transition:transform .14s}
+  .sup-buy:active{transform:scale(.95)}
+  .sup-row.why{border-color:var(--gold-border,var(--line))}
+  .sup-why{font-size:13px;color:var(--gold);font-weight:600;margin-top:6px}
+.schblk{display:inline-flex;gap:5px;margin-left:8px;vertical-align:middle}
+.blkb{border:1px solid var(--line,#ddd);background:none;color:var(--muted,#888);border-radius:7px;padding:4px 10px;font-size:13px;font-weight:700;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
+.blkb.on{background:var(--gold,#9a7b2f);border-color:var(--gold,#9a7b2f);color:#fff}
+</style>
 <script src="/bl-dosing.js?v=1"></script>
 <script src="/compound-library.js?v=3"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <style id="wk-css">
 #v-work{--wkf:1}
 #v-work.wk-big{--wkf:1.25}
@@ -1397,176 +1233,342 @@ button.bl-tile{cursor:pointer}button.bl-tile:focus-visible{outline:3px solid #CF
 .bl-tile .t{display:block;font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;font-weight:700;line-height:1}
 .bl-tile .s{display:block;color:#c9c9c9;font-size:13px;margin-top:5px;line-height:1.35}
 .bl-tile .o{color:#CFB87C;font-size:13px;font-weight:700}.bl-tile .o.na{color:#8d8d8d;font-weight:600}</style>
-<style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
-<style id="mp-gold-edition">
-  /* ===== GOLD EDITION -- LIGHT BASE, DARK TEXT, GOLD ACCENT (/mp-gold/) =====
-     Colour only -- no layout, markup, copy or JS changes. Scoped to the light
-     theme; dark is untouched.
-
-     Surfaces stay light: #ededed for the header, hero and former black
-     controls, #ffffff for cards, over the #f5f5f5 ground. No black anywhere.
-
-     Type is dark for readability; gold is reserved for accents.
-       #1a1a1a  headings, titles, wordmark      14.9-17.4:1
-       #43464a  body copy                        8.1-9.5:1
-       #6a6a66  muted labels                     4.6-5.4:1
-       #6f6130  GOLD ACCENT as text              5.2-6.1:1
-                (eyebrows, section labels, Open, button text, BL mark)
-       #8a7840  GOLD borders and rules only      3.7-4.3:1  (>=3:1 non-text)
-     #8a7840 is never used as text: at 3.71:1 on #ededed it misses the 4.5
-     text floor while clearing the 3:1 non-text one. #CFB87C is absent as a
-     foreground entirely -- 1.66:1 on #ededed.
-
-     bl-client-skin.css paints ~24 controls with `background:var(--pl-black)
-     !important; color:var(--pl-champ)!important`. Re-pointing those two
-     variables turns all of them light-with-gold at once, since a variable is
-     resolved where it is used. This block sits on
-     `html:root:not([data-theme="dark"])` (0,2,1) and loads after that sheet,
-     so it wins on source order. */
-  html:root:not([data-theme="dark"]){
-    /* type: dark again */
-    --ink:#1a1a1a; --ink2:#43464a; --muted:#6a6a66; --faint:#6a6a66;
-    /* gold stays the accent */
-    --gold:#6f6130; --gold2:#6f6130; --pm:#6f6130; --on-gold:#1a1a1a;
-    /* the two variables bl-client-skin's controls resolve */
-    --pl-black:#ededed; --pl-champ:#6f6130; --pl-champ-hi:#6f6130;
-    /* formerly-black surfaces, kept light */
-    --cu-black:#ededed; --cu-gold:#8a7840; --cu-gold-lt:#6f6130;
-    --topbg:#ededed;
-    --tip-bg:#ededed; --tip-tx:#1a1a1a; --tip-strong:#6f6130; --tip-line:#d9d9d9;
-    --barrel:#ededed; --syr-stroke:#43464a;
-    --deep1:#ededed; --deep2:#ededed; --deep-tx:#1a1a1a; --deep-ac:#6f6130; --deep-sb:#6a6a66;
-  }
-
-  /* ---- header: light grey, dark wordmark, gold rule and gold chrome ---- */
-  html:root:not([data-theme="dark"]) .top{background:#ededed;border-bottom:2px solid #8a7840}
-  html:root:not([data-theme="dark"]) .top .brand{color:#1a1a1a}
-  html:root:not([data-theme="dark"]) .top .brand small{color:#6a6a66}
-  html:root:not([data-theme="dark"]) .top .who .wn{color:#1a1a1a}
-  html:root:not([data-theme="dark"]) .top .who .wl{color:#6a6a66}
-  html:root:not([data-theme="dark"]) .top .tgl,
-  html:root:not([data-theme="dark"]) .top .navbtn,
-  html:root:not([data-theme="dark"]) .top .bl-aa{
-    background:#ffffff;border-color:#8a7840;color:#6f6130}
-  html:root:not([data-theme="dark"]) .top .navbtn.on,
-  html:root:not([data-theme="dark"]) .top .bl-aa[aria-pressed="true"]{
-    background:#ededed!important;color:#6f6130!important;border-color:#8a7840!important}
-
-  /* ---- hero: light grey, gold mark and eyebrow, charcoal title ---- */
-  html:root:not([data-theme="dark"]) .lx-hero{
-    background:#ededed!important;
-    background-color:#ededed!important;
-    background-image:none!important;
-    border-color:#dcdcd8!important}
-  html:root:not([data-theme="dark"]) .lx-eyebrow{color:#6f6130}
-  html:root:not([data-theme="dark"]) .lx-title{color:#1a1a1a}
-  html:root:not([data-theme="dark"]) .lx-sub{color:#43464a}
-  html:root:not([data-theme="dark"]) .lx-mark .lxbl{fill:#6f6130}
-  html:root:not([data-theme="dark"]) .lx-mark .lxhx{stroke:#6f6130}
-  html:root:not([data-theme="dark"]) .lx-mark .lxnd{fill:#8a7840}
-  html:root:not([data-theme="dark"]) .lx-hero .lx-cta{
-    background:#ffffff!important;color:#6f6130!important;border:1px solid #8a7840!important}
-
-  /* ---- program tiles: white, gold top rule, dark type, gold "Open" ---- */
-  html:root:not([data-theme="dark"]) .bl-tile{
-    background:#ffffff!important;background-image:none!important;
-    border:1px solid #dcdcd8;border-top:3px solid #8a7840;color:#43464a}
-  html:root:not([data-theme="dark"]) .bl-tile .t{color:#1a1a1a}
-  html:root:not([data-theme="dark"]) .bl-tile .s{color:#43464a}
-  html:root:not([data-theme="dark"]) .bl-tile .o{color:#6f6130}
-  html:root:not([data-theme="dark"]) .bl-tile .o.na{color:#6a6a66}
-
-  /* ---- section eyebrows stay gold (they are accents, not body copy), so
-          they are set explicitly rather than following --faint ---- */
-  html:root:not([data-theme="dark"]) .seclbl{color:#6f6130}
-
-  /* ---- the two gold-gradient fills the shared sheet does not cover ---- */
-  html:root:not([data-theme="dark"]) .tab.on,
-  html:root:not([data-theme="dark"]) .btn{
-    background:#ededed!important;background-image:none!important;
-    color:#6f6130!important;border-color:#8a7840!important}
-
-  /* ---- shop module: /bl-portal-shop.css loads AFTER this block, so these
-          need !important plus the higher specificity to land ---- */
-  html:root:not([data-theme="dark"]) .bls-btn,
-  html:root:not([data-theme="dark"]) .bls-stp,
-  html:root:not([data-theme="dark"]) .bls-order,
-  html:root:not([data-theme="dark"]) .bls-ob,
-  html:root:not([data-theme="dark"]) .bls-cbar,
-  html:root:not([data-theme="dark"]) .bls-add,
-  html:root:not([data-theme="dark"]) .bls-chip.on,
-  html:root:not([data-theme="dark"]) .bls-i,
-  html:root:not([data-theme="dark"]) .bls-iclose,
-  html:root:not([data-theme="dark"]) .bls-pay input:checked+span{
-    background:#ededed!important;background-image:none!important;
-    color:#6f6130!important;border-color:#8a7840!important}
-  html:root:not([data-theme="dark"]) .bls-cbar{border-top:2px solid #8a7840!important}
-  html:root:not([data-theme="dark"]) .bls-ov{
-    --ink:#1a1a1a; --ink2:#1a1a1a; --muted:#43464a; --faint:#6a6a66;
-    --gold:#6f6130; --ac:#6f6130}
-  html:root:not([data-theme="dark"]) .bls-ibox{color:#1a1a1a!important;border-color:#8a7840!important}
-  html:root:not([data-theme="dark"]) .bls-isec p{color:#43464a!important}
-
-  /* ---- iPad/desktop sidebar: was black glass with cream type ---- */
-  html:root:not([data-theme="dark"]) .side{
-    background:#ededed!important;background-image:none!important;
-    border-right:1px solid #dcdcd8!important}
-  html:root:not([data-theme="dark"]) .side-top,
-  html:root:not([data-theme="dark"]) .side-foot{border-color:#d9d9d9!important}
-  html:root:not([data-theme="dark"]) .side-brand,
-  html:root:not([data-theme="dark"]) .side-who .wn{color:#1a1a1a!important}
-  html:root:not([data-theme="dark"]) .side-brand small,
-  html:root:not([data-theme="dark"]) .side-links a{color:#43464a!important}
-  html:root:not([data-theme="dark"]) .side-who .wl,
-  html:root:not([data-theme="dark"]) .side-links a:hover{color:#6f6130!important}
-  html:root:not([data-theme="dark"]) .snav{color:#43464a!important}
-  html:root:not([data-theme="dark"]) .snav:hover{background:#ffffff!important;color:#1a1a1a!important}
-  html:root:not([data-theme="dark"]) .snav.on{
-    background:#ffffff!important;background-image:none!important;
-    color:#1a1a1a!important;border-color:#8a7840!important;
-    box-shadow:inset 3px 0 0 #8a7840!important}
-  html:root:not([data-theme="dark"]) .snav.on svg,
-  html:root:not([data-theme="dark"]) .snav:hover svg{stroke:#6f6130!important}
-
-  /* ---- compound-row names: deepest legible gold ------------------------
-     .stk-a renders the compound names in the About This Protocol accordion
-     ("TRT (Testosterone Cypionate)", "HGH (Somatropin)", "HCG" ...) in serif
-     Cormorant, across the Year-round / Oral / Night block / Past groups.
-     These are reading text, not accents, so they take the same charcoal as
-     the group titles beside them (.cgrp-t resolves --ink to #1a1a1a) rather
-     than any shade of gold. Gold stays on the group counts (.cgrp-n),
-     chevrons, eyebrows, card rules and buttons. Fill only -- no stroke.
-     .li .nm, .cx-n and .gk .gk-name already inherit dark ink. */
-  html:root:not([data-theme="dark"]) .stk-a{
-    color:#3a3a3a;
-    text-shadow:.5px 0 0 #8a7840,-.5px 0 0 #8a7840,
-                0 .5px 0 #8a7840,0 -.5px 0 #8a7840}
-  html:root:not([data-theme="dark"]) .meds-tbl .md{color:#5f5327}
-  /* dose / unit sub-text on those rows: held at the 5:1+ accent gold */
-  html:root:not([data-theme="dark"]) .drow .uu,
-  html:root:not([data-theme="dark"]) .drow.pm .uu,
-  html:root:not([data-theme="dark"]) .li .pr{color:#6f6130}
-
-  /* ---- repair: the --cu-black re-point turned these surfaces light but
-     left their type pale, which the earlier sweep missed because it matched
-     literal hex values and these resolve through a var(). On #ededed the old
-     values measured #ffffff 1.17:1, #c7ccd1 1.21:1, #A2A4A3 1.90:1. ---- */
-  html:root:not([data-theme="dark"]) .gk .cycle,
-  html:root:not([data-theme="dark"]) .gk .cycle h2{color:#1a1a1a}
-  html:root:not([data-theme="dark"]) .gk .cycle p{color:#43464a}
-  html:root:not([data-theme="dark"]) .gk .cycle-meta{color:#6a6a66}
-  html:root:not([data-theme="dark"]) .gk .cycle-kicker{color:#6f6130}
-  html:root:not([data-theme="dark"]) .gk-toast{color:#1a1a1a}
-
-  /* ---- the last black fills: .gk scopes its own --gk-ink:#0b0b0c, so these
-     three controls stayed dark after the site-wide pass. ---- */
-  html:root:not([data-theme="dark"]) .gk .edit.on,
-  html:root:not([data-theme="dark"]) .gk .chip.on,
-  html:root:not([data-theme="dark"]) .gk .viewbar button.on{
-    background:#ededed;border-color:#8a7840;color:#6f6130}
+<style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style><style id="schadd-css">
+.pc-sch{background:transparent!important;border:1.5px solid var(--acc,#c9a96e)!important;color:var(--ink,inherit)!important;margin-top:8px}
+.sa-pan{margin-top:10px;padding:14px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;font-family:var(--sans)}
+.sa-pan[hidden]{display:none}
+.sa-t{font-size:14px;font-weight:600;margin:0 0 2px}.sa-s{font-size:12.5px;opacity:.7;margin:0 0 10px}
+.sa-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:10px}
+.sa-d{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;padding:8px 0;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:10px;cursor:pointer;min-height:44px;justify-content:center}
+.sa-d input{width:18px;height:18px;margin:0;accent-color:var(--acc,#c9a96e)}
+.sa-row{display:flex;gap:8px;margin-bottom:10px}
+.sa-b{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:13.5px;cursor:pointer}
+.sa-b.on{background:var(--acc,#c9a96e);color:#111;border-color:transparent}
+.sa-b.pri{background:var(--acc,#c9a96e);color:#111;border-color:transparent;font-weight:600}
+.sa-b:disabled{opacity:.45;cursor:default}
+.sa-rm{margin-left:auto;align-self:center;min-height:36px;padding:0 12px;border-radius:9px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font-size:12px;cursor:pointer;font-family:var(--sans)}
+.drow.sa-own{align-items:center}
+.sa-tag{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.6;margin-left:6px}
+.sa-list .lrow2{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line,rgba(127,127,127,.18));font-size:13.5px}
+.sa-list .lrow2 .sm{font-size:12px;opacity:.7}
+</style><style id="schdays-css">
+.dp{margin-top:12px;padding-top:12px;border-top:1px solid var(--line,rgba(127,127,127,.2));font-family:var(--sans)}
+.dp-h{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;margin-bottom:8px}.dp-h b{font-weight:600}.dp-t{opacity:.7}
+.dp-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dp-d{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:44px;font-size:12px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:10px;cursor:pointer}
+.dp-d input{width:18px;height:18px;margin:0;accent-color:var(--acc,#c9a96e)}
+.dp-n{font-size:12px;margin-top:8px;opacity:.8}.dp-n:empty{display:none}
+.dp-r{margin-top:8px;min-height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:12.5px;cursor:pointer}
+.dp-r[hidden]{display:none}
+</style><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;family=Outfit:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style id="bl-font1">
+/* font1: typography matched to mpauldino (Outfit text, Cormorant headings, bold gold pull). Type only. */
+.view,.sheet{font-family:"Outfit",system-ui,sans-serif}
+.view button,.view input,.view select,.sheet button,.sheet input,.sheet select{font-family:inherit}
+html body h1.scrn{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;line-height:1;letter-spacing:0}
+html body .sub{font-size:13px;font-weight:300}
+html body .seclbl{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:500;letter-spacing:.2em}
+html body .seclbl .cnt{font-weight:400;letter-spacing:.08em}
+html body .day .dw{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:500;letter-spacing:.12em}
+html body .drow .nm,html body .cx-n,html body .sup-nm{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:500;line-height:1.3}
+html body .drow .mt,html body .cx-s{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:300}
+html body .drow .uu,html body .cx-u{font-family:"Outfit",system-ui,sans-serif;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--gold)}
+html body .drow.pm .uu{color:var(--pm)}
 </style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=5">
+<link rel="stylesheet" href="/bl-connected-path.css?v=5">
+<style>
+/* ---- SCHEDULE EDIT MODE (?edit=1) — nothing below renders for the client ---- */
+html.bl-edit .drow.ed-row{cursor:pointer;border-bottom:none}
+html.bl-edit .drow.ed-row .ed-cv{margin-left:auto;flex:none;font-size:18px;line-height:1;color:var(--muted);transition:transform .16s ease}
+html.bl-edit .drow.ed-row.exp .ed-cv{transform:rotate(90deg)}
+html:is(.bl-edit,.bl-add) .ed-pan{display:none;border-bottom:1px solid var(--line2);background:rgba(127,127,127,.045)}
+html:is(.bl-edit,.bl-add) .ed-pan.open{display:block}
+html.bl-edit .dgrp>.ed-pan:last-child{border-bottom:none}
+html:is(.bl-edit,.bl-add) .ed-in{padding:12px 14px 14px;font-family:var(--sans)}
+html:is(.bl-edit,.bl-add) .ed-grp{margin-top:12px}
+html:is(.bl-edit,.bl-add) .ed-grp:first-child{margin-top:0}
+html:is(.bl-edit,.bl-add) .ed-l{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+html:is(.bl-edit,.bl-add) .ed-tag{font-size:10px;font-weight:600;letter-spacing:.04em;color:var(--gold);text-transform:none}
+html:is(.bl-edit,.bl-add) .ed-row2{display:flex;gap:8px;margin-top:8px}
+html:is(.bl-edit,.bl-add) .ed-row2:first-child{margin-top:0}
+html:is(.bl-edit,.bl-add) .ed-b{flex:1;min-height:44px;padding:0 10px;border-radius:10px;border:1px solid var(--line,rgba(127,127,127,.3));background:transparent;color:inherit;font:inherit;font-size:13px;cursor:pointer}
+html:is(.bl-edit,.bl-add) .ed-b.on{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html:is(.bl-edit,.bl-add) .ed-b.pri{background:#303639;color:#fff;border-color:transparent;font-weight:600}
+html:is(.bl-edit,.bl-add) .ed-b:disabled{opacity:.45;cursor:default}
+html:is(.bl-edit,.bl-add) .ed-f{display:flex;gap:8px;margin-bottom:8px}
+html:is(.bl-edit,.bl-add) .ed-f.one{display:block}
+html:is(.bl-edit,.bl-add) .ed-f label{flex:1;display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+html:is(.bl-edit,.bl-add) .ed-f input{width:100%;box-sizing:border-box;margin-top:4px;min-height:42px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html:is(.bl-edit,.bl-add) .ed-pan .dp{margin-top:0;padding-top:0;border-top:none}
+html:is(.bl-edit,.bl-add) .ed-add{margin:14px 0 4px}
+html:is(.bl-edit,.bl-add) .ed-add-b{width:100%;min-height:48px;border-radius:12px;border:1px dashed #303639;background:transparent;color:#303639;font:inherit;font-family:var(--sans);font-size:14px;font-weight:600;cursor:pointer}
+html:is(.bl-edit,.bl-add) .ed-add-p{margin-top:10px;padding:14px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:14px;font-family:var(--sans);background:var(--card,#fff)}
+html:is(.bl-edit,.bl-add) .ed-add-p[hidden]{display:none}
+html:is(.bl-edit,.bl-add) .ed-seg{margin-bottom:12px}
+html:is(.bl-edit,.bl-add) .ed-sel{display:block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+html:is(.bl-edit,.bl-add) .ed-sel select{width:100%;box-sizing:border-box;margin-top:4px;min-height:44px;padding:0 10px;border:1px solid var(--line,rgba(127,127,127,.3));border-radius:10px;background:var(--card,#fff);color:inherit;font:inherit;font-size:14px;text-transform:none;letter-spacing:0}
+html:is(.bl-edit,.bl-add) .ed-gd{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+html:is(.bl-edit,.bl-add) .ed-gd span{display:inline-flex;align-items:baseline;gap:5px;padding:5px 9px;border:1px solid var(--line,rgba(127,127,127,.25));border-radius:8px;font-size:12px}
+html:is(.bl-edit,.bl-add) .ed-gd i{font-style:normal;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+html:is(.bl-edit,.bl-add) .ed-add-p .dp-days{margin-bottom:10px}
+/* top chrome buttons charcoal instead of gold */
+html:root:not([data-theme="dark"]) .top .tgl,
+html:root:not([data-theme="dark"]) .top .navbtn,
+html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!important;color:#303639!important}
+</style>
+<style id="locked-schedule-css">
+  .cycrow{display:flex;gap:6px;overflow-x:auto;margin:0 -16px 10px;padding:0 16px 2px}
+  .cycrow::-webkit-scrollbar{height:0}
+  .cyc{flex:none;background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:7px 11px;font:600 11.5px/1 var(--sans);color:var(--muted);cursor:pointer;
+    letter-spacing:.04em;white-space:nowrap;min-height:34px}
+  .cyc.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .meds-sub{font-size:13px;color:var(--muted);margin:-3px 2px 9px;line-height:1.4}
+  .meds-tbl{overflow:hidden}
+  .meds-tbl .mh{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(58px,auto) minmax(0,1.55fr);gap:9px;padding:9px 14px;font-size:13px;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-weight:800;border-bottom:1px solid var(--line)}
+  .meds-tbl .mr{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(58px,auto) minmax(0,1.55fr);gap:9px;align-items:baseline;padding:11px 14px}
+  .meds-tbl .mr + .mr{border-top:1px solid var(--line2)}
+  .meds-tbl .mi{font-size:13px;font-weight:600;color:var(--ink);line-height:1.25}
+  .meds-tbl .md{font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;line-height:1.25}
+  .meds-tbl .mf{font-size:13px;color:var(--ink2);line-height:1.45}
+  .meds-tbl .note-row{display:block}
+  .meds-tbl .note-row .mf{font-size:13px;color:var(--ink2)}
+  .meds-tbl button.mr{width:100%;text-align:left;background:none;border:0;border-radius:0;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none}
+  .meds-tbl button.mr .mf{position:relative;padding-right:16px}
+  .meds-tbl button.mr .mchev{position:absolute;right:0;top:0;color:var(--faint);font-size:14px;line-height:1.45}
+  .meds-tbl button.mr:active{background:var(--gold-soft)}
+  @media(hover:hover){.meds-tbl button.mr:hover{background:var(--gold-soft)}}
+  .a2hs{margin:14px 16px 0;background:var(--gold-soft);border:1px solid var(--line);
+    border-radius:14px;padding:12px 13px;display:none;align-items:flex-start;gap:10px}
+  .a2hs.on{display:flex}
+  .a2hs .tx{font-size:13px;line-height:1.5;color:var(--ink2);flex:1}
+  .a2hs .tx b{color:var(--ink);font-weight:600}
+  .a2hs .a2hs-ios,.a2hs .a2hs-keep{display:block;margin-top:6px}
+  .a2hs .a2hs-keep{color:var(--muted);font-size:13px}
+  .a2hs [hidden]{display:none}
+  .a2hs .a2hs-shr{font-size:14px}
+  .a2hs .x{background:none;border:none;color:var(--faint);font-size:20px;line-height:1;cursor:pointer;
+    padding:0 2px;flex:none;min-width:28px;min-height:28px}
+    .a2hs{display:none}
+/* ====== GRONK SCHEDULE (prototype, mpauldino only) ==========================
+   Every selector is scoped under .gk so the Cormorant/Outfit faces stay
+   inside the Schedule view and never reach the chrome, Labs, Pay, Nutrition
+   or Notes. The ivory/champagne COLOURS are no longer confined here - the
+   same seven values now sit on :root and tint the whole page, which is what
+   closed the gray seam under the header. Edit them there, not here.
+   The dose and the days are fixed by the protocol and render read-only, so
+   there are no stepper or day-chip styles here to find. ------------------- */
+.gk{
+  --ivory:#eeeeec; --paper:#ffffff; --gk-ink:#0b0b0c; --ink-soft:#43464a;
+  --gk-line:#d6d6d3; --gk-gold:#6f6130; --gold-deep:#1b1d20; --gold-soft:#f1ecdd;
+  --gold-line:#ddd2b6; --gk-shadow:0 8px 24px rgba(11,11,12,.07); --gk-radius:18px;
+  font-family:"Outfit",system-ui,sans-serif; color:var(--gk-ink);
+  background:radial-gradient(1200px 500px at 50% -10%,#fff 0%,transparent 60%),var(--ivory);
+  margin:-16px; padding:22px 16px 28px;
+}
+.gk *{box-sizing:border-box}
+.gk button,.gk input{font-family:inherit}
+.gk h1.gk-h{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;line-height:1;margin:0 0 6px;color:var(--gk-ink)}
+.gk .gk-sub{color:var(--ink-soft);font-size:13px;font-weight:300;margin:0 0 16px}
+.gk .cycle{background:var(--cu-black);color:#ffffff;border-radius:22px;padding:16px 16px 14px;margin-bottom:16px}
+.gk .cycle-kicker{letter-spacing:.22em;font-size:13px;color:var(--cu-gold-lt);font-weight:500}
+.gk .cycle h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:26px;margin:4px 0 2px;color:#ffffff}
+.gk .cycle p{margin:0;color:#c7ccd1;font-size:13px;font-weight:300}
+.gk .bar{height:4px;background:#d6d6d3;border-radius:99px;margin:14px 0 8px;overflow:hidden}
+.gk .bar>i{display:block;height:100%;background:linear-gradient(90deg,#CFB87C,#E2CE94)}
+/* Silver is the secondary: quiet marks like this one carry it so both
+   school colours are present without the gold having to compete. */
+.gk .cycle-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--cu-silver)}
+.gk .gk-days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:4px 0 18px}
+.gk .day{border:1px solid var(--gk-line);background:var(--paper);border-radius:14px;padding:8px 0 7px;text-align:center;cursor:pointer;color:var(--ink-soft)}
+.gk .day b{display:block;font-size:13px;letter-spacing:.12em;font-weight:500}
+.gk .day span{display:block;margin-top:3px;font-size:14px;color:var(--gk-ink);font-weight:500}
+.gk .day.on{background:var(--gold-deep);border-color:var(--gold-deep);color:#ffffff}
+.gk .day.on span{color:#fff}
+.gk .block-head{display:flex;justify-content:space-between;align-items:baseline;margin:8px 2px 8px}
+.gk .block-head h3{margin:0;letter-spacing:.2em;font-size:13px;font-weight:500;color:var(--ink-soft)}
+.gk .block-head em{font-style:normal;font-size:13px;color:var(--gk-gold);letter-spacing:.08em}
+.gk .med-sub{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);font-weight:800;margin:14px 2px 7px}
+.gk .med-list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:4px}
+.gk .med-row{display:flex;align-items:stretch;width:100%}
+.gk .med-row + .med-row{border-top:1px solid var(--line2)}
+.gk .med-tap{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0;text-align:left;background:none;border:0;border-radius:0;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;padding:9px 13px}
+.gk .med-tap:active{background:var(--gold-soft)}
+@media(hover:hover){.gk .med-tap:hover{background:var(--gold-soft)}}
+.gk .med-rm{flex:0 0 auto;align-self:center;background:none;border:0;border-left:1px solid var(--line2);color:var(--faint);font-size:13px;letter-spacing:.04em;cursor:pointer;padding:6px 11px;margin:5px 0;white-space:nowrap}
+.gk .med-rm:active{color:var(--gold)}
+.gk .med-nm{font-size:13px;font-weight:500;color:var(--ink2);line-height:1.3}
+.gk .med-ds{font-size:13px;font-weight:700;color:var(--gold);white-space:nowrap;margin-left:auto;line-height:1.3}
+.gk .med-cv{color:var(--faint);font-size:13px;line-height:1.3;margin-left:2px}
+.gk .block-head-meds{margin-top:20px;border-top:1px solid var(--gk-line);padding-top:14px}
+.gk .med-note{font-size:13px;color:var(--muted);line-height:1.45;padding:9px 13px;border:1px solid var(--line);border-radius:14px;margin-bottom:4px}
+.gk .gk-card{background:var(--paper);border:1px solid #e7e7e4;border-radius:var(--gk-radius);box-shadow:var(--gk-shadow);padding:9px 13px;margin-bottom:6px}
+.gk .gk-row{display:flex;gap:11px;align-items:center}
+.gk .dose-mark{min-width:46px;font-family:"Cormorant Garamond",Georgia,serif;font-size:15px;color:var(--gold-deep);line-height:1}
+.gk .dose-mark small{display:block;font-family:"Outfit",sans-serif;font-size:13px;letter-spacing:.08em;color:var(--ink-soft);margin-top:3px}
+.gk .dose-mark{min-width:54px}
+.gk .dose-mark .dose-pull{display:block;font-family:"Outfit",sans-serif;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--gold-deep);margin-top:5px;white-space:nowrap}
+.gk .gk-name{font-size:13px;font-weight:500}
+/* Collapsed "not on schedule" toggle at the foot of the schedule. */
+.gk .gk-offtog{display:flex;align-items:center;gap:8px;width:100%;margin-top:22px;
+  background:none;border:none;border-top:1px solid var(--gk-line);padding:13px 2px 4px;
+  font-family:"Outfit",sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:600;color:var(--ink-soft);cursor:pointer}
+.gk .gk-offtog .gk-offcv{margin-left:auto;font-size:15px;line-height:1;color:var(--gk-gold);transition:transform .2s}
+.gk .gk-offtog.on .gk-offcv{transform:rotate(90deg)}
+.gk .gk-offwrap[hidden]{display:none}
+.gk .gk-offwrap{margin-top:12px}
+.gk .gk-meta{margin-top:3px;color:var(--ink-soft);font-size:13px;font-weight:300}
+.gk .edit{margin-left:auto;border:1px solid var(--gk-line);background:#fff;color:var(--ink-soft);border-radius:999px;padding:5px 10px;font-size:13px;cursor:pointer}
+.gk .edit.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
+.gk .panel{margin-top:14px;padding-top:12px;border-top:1px solid var(--gk-line)}
+.gk .gk-label{letter-spacing:.16em;font-size:13px;color:var(--ink-soft);margin-bottom:8px}
+.gk .range{margin-left:auto;font-size:13px;color:var(--ink-soft);text-align:right;font-weight:300}
+/* Read-only dose: same weight as the old stepper readout, without controls. */
+.gk .fixed-dose{font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:var(--gold-deep);line-height:1}.dose-adj{display:flex;align-items:center;gap:14px}.dstep{min-width:42px;font-size:19px;font-weight:600;line-height:1}.draw-in{width:100%;box-sizing:border-box;padding:11px 13px;border:1px solid var(--line,rgba(0,0,0,.18));border-radius:10px;font:inherit;background:transparent;color:inherit}.draw-in:focus{outline:none;border-color:var(--gold,#8a7335)}
+.gk .fixed-dose small{display:block;font-family:"Outfit",sans-serif;font-size:13px;letter-spacing:.12em;color:var(--ink-soft)}
+/* Shown only when there is no key, or the key was refused. */
+.gk .gk-note{border:1px solid var(--gold-line);background:var(--gold-soft);border-radius:14px;
+  padding:11px 13px;font-size:13px;line-height:1.45;color:var(--ink-soft);margin:0 0 14px}
+.gk .gk-note b{color:var(--gk-ink);font-weight:500}
+/* Editable days: the one thing on this panel the client actually sets. */
+.gk .days-edit{display:flex;gap:5px;margin:12px 0}
+.gk .chip{flex:1;border:1px solid var(--gk-line);background:var(--paper);border-radius:9px;
+  font-size:13px;padding:7px 0;cursor:pointer;color:var(--ink-soft)}
+.gk .chip.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
+.gk .actions{display:flex;gap:8px;align-items:center}
+.gk .ghost{border:1px solid var(--gk-line);background:transparent;color:var(--ink-soft);border-radius:12px;padding:8px 10px;font-size:13px;cursor:pointer}
+.gk .gk-empty{border:1px dashed var(--gold-line);border-radius:16px;padding:16px;color:var(--ink-soft);font-size:13px;font-weight:300}
+.gk .viewbar{display:flex;gap:8px;margin:0 0 14px}
+.gk .viewbar button{border:1px solid var(--gk-line);background:transparent;border-radius:999px;padding:7px 12px;font-size:13px;color:var(--ink-soft);cursor:pointer}
+.gk .viewbar button.on{background:var(--gk-ink);color:#ffffff;border-color:var(--gk-ink)}
+.gk-toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:var(--cu-black);color:#ffffff;border-radius:999px;padding:10px 14px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:80;font-family:"Outfit",system-ui,sans-serif}
+.gk-toast.show{opacity:1}
+
+/* ===== GRONK SCHEDULE -- BLACK VARIANT ================================
+   The Schedule view carries its own palette, so without this it would stay
+   on the light surfaces while the rest of the page went black.
+   One thing cannot simply be re-tinted: selected states fill with
+   var(--gk-ink), which is black in the light variant and WHITE here, so left
+   alone they would be white type on white. They fill with CU gold and take
+   black type instead, which is the look anyway.
+   ====================================================================== */
+:root[data-theme="dark"] .gk{
+  --ivory:#0b0b0c; --paper:#1e1f22; --gk-ink:#ffffff; --ink-soft:#c7ccd1;
+  --gk-line:#2e2f31; --gk-gold:#CFB87C; --gold-deep:#E2CE94; --gold-soft:#1f1d18;
+  --gold-line:#403a2b; --gk-shadow:0 8px 24px rgba(0,0,0,.55);
+  background:radial-gradient(1200px 500px at 50% -10%,rgba(207,184,124,.07) 0%,transparent 60%),var(--ivory);
+}
+/* The clock card has to lift off a black page rather than sink into it. */
+:root[data-theme="dark"] .gk .cycle{background:#17181a;border:1px solid #35332c}
+:root[data-theme="dark"] .gk .bar{background:#35332c}
+:root[data-theme="dark"] .gk .gk-card{border-color:#2e2f31}
+:root[data-theme="dark"] .gk .edit,
+:root[data-theme="dark"] .gk .chip{background:#25262a}
+/* Gold fill, black type -- reads on either variant */
+:root[data-theme="dark"] .gk .day.on,
+:root[data-theme="dark"] .gk .chip.on,
+:root[data-theme="dark"] .gk .edit.on,
+:root[data-theme="dark"] .gk .viewbar button.on{background:var(--cu-gold);border-color:var(--cu-gold-lt);color:#0b0b0c}
+:root[data-theme="dark"] .gk .day.on span{color:#0b0b0c}
+:root[data-theme="dark"] .gk .viewbar button{border-color:#3c3f3e}
+:root[data-theme="dark"] .gk-toast{background:#25262a;color:#ffffff;border:1px solid #3c3b36}
+:root[data-theme="dark"] .cyc.on{background:var(--cu-gold);border-color:var(--cu-gold-lt);color:#0b0b0c}
+
+  /* About-this-protocol card + stack list, same rules as the
+     multi-cycle pages so this page reads identically. */
+.cgrp{border:1px solid var(--line);border-radius:15px;background:var(--card);
+    box-shadow:var(--shadow);margin:0 0 9px;overflow:hidden}
+.cgrp-hd{display:flex;align-items:center;gap:10px;padding:11px 13px;cursor:pointer;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.cgrp-t{font-family:var(--serif);font-size:14.5px;line-height:1.18;color:var(--ink)}
+.cgrp-m{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.35}
+.cgrp-r{margin-left:auto;display:flex;align-items:center;gap:9px;flex:none}
+.cgrp-n{font-size:13px;font-weight:800;color:var(--gold)}
+.cgrp-cv{color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+.cgrp.on .cgrp-cv{transform:rotate(90deg)}
+.cgrp-bd{display:none;border-top:1px solid var(--line2)}
+.cgrp.on .cgrp-bd{display:block}
+.cgrp-bd .cx:last-child{border-bottom:none}
+.cgrp.pastgrp .cgrp-t{color:var(--ink2)}
+.cgrp.pastgrp .cgrp-bd{opacity:.72}
+.abt{padding:11px 13px 13px}
+.abt-l{font-size:13px;letter-spacing:1.1px;text-transform:uppercase;color:var(--faint);
+    font-weight:800;margin:0 0 3px}
+.abt-l+.abt-p{margin-bottom:11px}
+.abt-p{font-size:13px;line-height:1.55;color:var(--ink2)}
+.abt-p:last-child{margin-bottom:0}
+.stk{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 13px;background:var(--cream)}
+.stk-a{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;
+    border:none;border-bottom:1px solid var(--line2);background:transparent;cursor:pointer;
+    font-family:var(--serif);font-size:14px;line-height:1.2;color:var(--gold);text-align:left;
+    touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.stk-a:last-child{border-bottom:none}
+.stk-a:active{background:var(--gold-soft)}
+.stk-cv{margin-left:auto;flex:none;color:var(--faint);font-size:15px;line-height:1}
+.gk-viewonly #gkAddBtn,.gk-viewonly #gkMedAddBtn,.gk-viewonly #pc-schedbtn,.gk-viewonly .gk .edit,.gk-viewonly [data-gkremove],.gk-viewonly [data-gkmedremove],.gk-viewonly [data-gkrestore],.gk-viewonly [data-gkmedrestore],.gk-viewonly .gk-offtog,.gk-viewonly .gk-offwrap{display:none!important}.gk-view-badge{display:inline-block;margin:6px 0 0 0;font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold,#8a7335);border:1px solid var(--gold,#8a7335);border-radius:999px;padding:3px 10px}</style>
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
+<style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
+<script>
+/* ---- /mp-gold/ cache kill-switch -------------------------------------
+   Runs on every load. Two deliberate limits on scope:
+   - Only workers whose scope COVERS /mp-gold/ are unregistered: its own
+     ("/mp-gold/") and the site-wide one ("/"), whose fetch handler has no
+     path gate and so caches this page too. A worker scoped to another
+     folder, /mpauldino/ included, is left installed.
+   - Caches named mp-gold-* are dropped whole; in every OTHER cache only the
+     entries whose URL contains /mp-gold/ are deleted, so this does not wipe
+     the offline copies of the live portals on the same device.
+   A worker already controlling the page keeps serving it until a reload, so
+   when one is found the page reloads itself once, guarded by sessionStorage
+   so it can never loop. ------------------------------------------------- */
+(function(){
+  var hadController = false;
+  try{ hadController = !!(navigator.serviceWorker && navigator.serviceWorker.controller); }catch(e){}
+
+  function covers(scope){
+    var path='/';
+    try{ path = new URL(scope).pathname; }catch(e){ return false; }
+    return path === '/' || path.indexOf('/mp-gold/') === 0;
+  }
+  var jobs=[];
+  try{
+    if(navigator.serviceWorker && navigator.serviceWorker.getRegistrations){
+      jobs.push(navigator.serviceWorker.getRegistrations().then(function(rs){
+        return Promise.all(rs.map(function(r){
+          return covers(r.scope) ? r.unregister().catch(function(){}) : null;
+        }));
+      }).catch(function(){}));
+    }
+  }catch(e){}
+  try{
+    if(window.caches && caches.keys){
+      jobs.push(caches.keys().then(function(keys){
+        return Promise.all(keys.map(function(k){
+          if(k.indexOf('mp-gold-') === 0) return caches.delete(k).catch(function(){});
+          return caches.open(k).then(function(c){
+            return c.keys().then(function(reqs){
+              return Promise.all(reqs.map(function(q){
+                return q.url.indexOf('/mp-gold/') > -1 ? c.delete(q).catch(function(){}) : null;
+              }));
+            });
+          }).catch(function(){});
+        }));
+      }).catch(function(){}));
+    }
+  }catch(e){}
+
+  if(!hadController) return;
+  var KEY='mpgold-cachekill';
+  try{ if(sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY,'1'); }catch(e){ return; }
+  Promise.all(jobs).then(function(){ try{ location.reload(); }catch(e){} });
+})();
+</script>
 </head>
-<body><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
+<body class="erica-tab-consistency"><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
   <nav class="side">
     <div class="side-top">
@@ -2208,12 +2210,7 @@ button.bl-tile{cursor:pointer}button.bl-tile:focus-visible{outline:3px solid #CF
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; More</div><div class="ttl">Notes &amp; Tips</div></div>
     <div class="pad"><h1 class="scrn">Notes &amp; Tips</h1><p class="sub">Storage and handling, technique, and what to expect</p>
       <div id="notelist"></div>
-      <div class="seclbl">What to Expect</div>
-      <ul class="lx-exp">
-        <li><b>Protocols run in cycles.</b> Some compounds are daily, others a few days a week &mdash; your Schedule tab always shows today&rsquo;s.</li>
-        <li><b>Reconstitute and store as noted</b> &mdash; keep peptides refrigerated once mixed.</li>
-        <li><b>Recheck your labs periodically</b> so your protocol can be adjusted. Your Labs tab tracks it.</li>
-      </ul>
+      
       <p class="note">Tap a card to open it. For research use only. Not medical advice.</p>
     </div>
   </div>
@@ -5473,7 +5470,7 @@ window.addEventListener('orientationchange',scrollRemeasure); renderIx(); render
    so the control and its data are both gone rather than sitting there
    implying a notification that will not arrive.
    ========================================================================= */
-var GK_STORAGE = "biolinked-sched-mpauldino";
+var GK_STORAGE = "biolinked-sched-mp-gold";
 var GK_DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 var GK_SHORT = ["S","M","T","W","T","F","S"];
 /* CYCLE ASSUMPTION - his page defines no cycle clock, so this start date is
@@ -6992,4 +6989,57 @@ window.addEventListener('storage',function(e){ if(!e.key||e.key.indexOf(P)!==0) 
 try{ apD(); }catch(e){}
 })();</script>
 
-<link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=6"></script>
+<link rel="stylesheet" href="/bl-portal-shop.css?v=5"><script src="/bl-portal-shop.js?v=7"></script>
+<style id="jc-inline-cycles">
+#protoabout{margin-top:28px}
+.jc-cycle{margin:0 0 22px;min-width:0}
+.jc-cycle-head{border-bottom:2px solid var(--gold);padding:0 0 10px;margin:0 0 12px}
+.jc-cycle-head h2{font:700 16px/1.3 var(--sans);letter-spacing:-.3px;margin:0;color:var(--ink)}
+.jc-cycle-head p{display:none}
+.jc-intro{font-size:13.5px;line-height:1.6;color:var(--ink2);margin:0 0 18px}
+.jc-compound{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin:0 0 8px;overflow:hidden}
+.jc-compound>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 13px;min-height:0;list-style:none;cursor:pointer;font:700 14px/1.35 var(--sans);color:var(--ink);overflow-wrap:anywhere}
+.jc-compound>summary::-webkit-details-marker{display:none}
+.jc-compound>summary:focus-visible,.jc-notes>summary:focus-visible{outline:2px solid var(--gold);outline-offset:-4px}
+.jc-chevron{width:8px;height:8px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(45deg);flex:none;margin:0 3px 6px}
+.jc-compound[open] .jc-chevron{transform:rotate(225deg);margin-bottom:0}
+.jc-body{border-top:1px solid var(--line)}
+.jc-description{padding:12px 13px 14px;font-size:13.5px;line-height:1.65;color:var(--ink2);overflow-wrap:anywhere}
+.jc-facts{margin:0;padding:0 13px 6px;border-top:1px solid var(--line)}
+.jc-facts>div{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.jc-facts>div:last-child{border:0}
+.jc-facts dt{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;font-weight:800;color:var(--muted);flex:none}
+.jc-facts dd{margin:0;text-align:right;font-size:13px;line-height:1.55;font-weight:600;overflow-wrap:anywhere;min-width:0}
+.jc-facts>div:nth-child(3) dd{color:var(--gold);font-size:14px;font-weight:800}
+.jc-notes{margin:12px 2px;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+.jc-notes>summary{cursor:pointer;color:var(--gold);font-weight:650;padding:8px 0}
+.jc-notes h3{font-size:12.5px;margin:12px 0 5px}.jc-notes p{margin:0 0 14px}
+
+
+
+
+
+
+#cmplist .pastgrp{opacity:1}
+/* ---- condensed schedule list ----------------------
+   The collapsed row is one line: name, timing, unit, chevron. The schedule
+   on/off pill and the AM/PM pair move into the body so they appear only
+   once the row is open. Cycle groups collapse to their header, with the
+   current cycle open on first paint. */
+#cmplist .cx-hd{min-height:44px;align-items:center}
+#cmplist .cx-t{display:flex;align-items:baseline;gap:8px;min-width:0;flex:1}
+#cmplist .cx-n{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-s{flex:0 4 auto;min-width:0;margin-top:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#cmplist .cx-ctl{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:2px 0 12px}
+#cmplist .cx-ctl .schbtn{margin-top:0}
+#cmplist .cx-ctl .schblk{margin-left:0}
+#cmplist .cgrp .cx{display:none}
+#cmplist .cgrp.on .cx{display:block}
+#cmplist .jc-cycle-head{display:flex;align-items:center;gap:10px;cursor:pointer}
+#cmplist .cg-ht{flex:1;min-width:0}
+#cmplist .cg-cv{flex:none;color:var(--faint);font-size:17px;line-height:1;transition:transform .2s}
+#cmplist .cgrp.on .cg-cv{transform:rotate(90deg)}
+@media(min-width:900px){#protoabout .jc-cycle-head h2{font-size:16px}#protoabout .jc-compound>summary{font-size:14px;padding:11px 13px}#protoabout .jc-description{padding:12px 13px 14px;font-size:13.5px}}
+</style>
+
+<link rel="stylesheet" href="/erica/protocol-theme.css?v=7">
