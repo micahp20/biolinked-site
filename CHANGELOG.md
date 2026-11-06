@@ -77,3 +77,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-06 — Preserve calculator edits and schedule choices
 - Audited current portal controls and applicable older layouts. Fixed calculator saved units/counts, edit/reopen persistence, invalid-capacity saves, empty schedules and recon context; preserved all per-client protocol/billing data and namespaces.
 - Updated only each affected portal and its scoped cache version. Mock DOM/model checks passed across all modified pages, advanced schedule variants and both pilots. No production record writes; rendered/live verification remains incomplete. See tools/tests/protocol-controls-audit-2026-11-06.md and PROJECT_STATUS.md.
+
+## 2026-11-06 — Align personal portal with shared client design
+- Applied shared visual tokens to the existing mpauldino/ schedule without replacing its supplement-aware engine; added vitamins/supplements navigation and consistent display/app naming.
+- Preserved all existing protocol, supplement, lab, billing, notes and storage data. Mock-DOM flows and syntax/data-preservation checks passed; rendered browser verification remains unavailable. See PROJECT_STATUS.md for deployment evidence and limits.
