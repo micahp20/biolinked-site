@@ -53,3 +53,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Extended the accepted cycle manager only to arasche/, preserving its identity and existing clinical/billing data.
 - Added plain compound definitions and role-based cycle explanations across 146 current and legacy protocol pages; retained operational notes under an expandable heading. Qualified unproven research combinations and kept dosing facts separate.
 - Verified per-page data preservation, all changed inline/worker syntax, standard rendering and the second pilot's model. Scoped cache updates included; no inventory or live schedule-state mutations. See PROJECT_STATUS.md for verification limits and release baseline.
+
+## 2026-11-06 — New client quote portal
+- Added mmenkveld/ with its own identity, scoped PWA/cache and storage keys, and registered it on share/.
+- Used the requested two-line quote without excluded charges; unconfirmed dosing remains visibly pending. Kept quote/inventory/payment states separate and cleared inherited client data.
+- Syntax, data-isolation and quote checks passed. See PROJECT_STATUS.md for missing instructions and publishing state.
