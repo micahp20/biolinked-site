@@ -58,3 +58,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Added mmenkveld/ with its own identity, scoped PWA/cache and storage keys, and registered it on share/.
 - Used the requested two-line quote without excluded charges; unconfirmed dosing remains visibly pending. Kept quote/inventory/payment states separate and cleared inherited client data.
 - Syntax, data-isolation and quote checks passed. See PROJECT_STATUS.md for missing instructions and publishing state.
+
+## 2026-11-06 — Confirm weekday-evening schedule
+- Updated CJC/IPA days/time on mmenkveld/ from pending to the owner's confirmed weekdays/evenings. Other unconfirmed dosing remains pending; billing and inventory unchanged.

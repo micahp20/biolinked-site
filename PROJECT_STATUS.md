@@ -99,3 +99,7 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Cleared inherited health notes, compound/invoice/cycle data and demographic measurements. Quotes remain inactive and unbilled; no paid flag, sales entry, inventory deduction or external message was created.
 - Paths: mmenkveld/index.html, manifest.json, sw.js and share/index.html. Inline JS syntax, quote arithmetic, item count, absence of excluded charges, old-client identity removal, storage keys, schedule defaults, and recon/day fields passed. Shipping/BAC excluded as requested.
 - Baseline main 91c38f2493a8512786a8afd9499b710ff6816489. Publishing reviewable quote/protocol with clearly pending instructions; dependent dosing fields must be completed when the owner replies. This does not represent finalized dosing instructions. Deployment checked separately.
+
+## Pending protocol instruction clarification — 2026-11-06 UTC
+- Owner confirmed CJC/IPA weekday evenings on mmenkveld/. Updated its protocol days/time and notes; recon and dose remain explicitly pending. Preserved quote, payment and inactive schedule defaults; no inventory action.
+- Verified invoice data unchanged and weekday array. Saved to main via GitHub API; deployment is a separate check.
