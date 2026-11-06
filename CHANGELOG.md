@@ -28,3 +28,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Main paths and commit/PR evidence.
 - Checks actually performed and any limits.
 - Commit/remote branch/merge/deployment status; link PROJECT_STATUS.md for remaining work.
+
+## 2026-11-05 — Owner workflow preferences (2026-11-06 UTC)
+- Saved in AGENTS.md: include each new protocol in /share/ and confirm proposed inventory deductions with the owner first.
+- Documentation-only changes saved on main; no application behavior or inventory changes. See PROJECT_STATUS.md for scope and verification limits.
