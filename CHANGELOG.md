@@ -81,3 +81,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-06 — Align personal portal with shared client design
 - Applied shared visual tokens to the existing mpauldino/ schedule without replacing its supplement-aware engine; added vitamins/supplements navigation and consistent display/app naming.
 - Preserved all existing protocol, supplement, lab, billing, notes and storage data. Mock-DOM flows and syntax/data-preservation checks passed; rendered browser verification remains unavailable. See PROJECT_STATUS.md for deployment evidence and limits.
+
+## 2026-11-06 — Reduce personal protocol text size
+- Responded to phone screenshot feedback by shrinking mpauldino/ Schedule and welcome typography, supplement rows and card spacing. Clinical data and scripts unchanged; bumped only the local stylesheet/cache versions. See PROJECT_STATUS.md for verification limits.
