@@ -1,7 +1,10 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mmoritz/.
-const CACHE = 'mmoritz-schedule-pilot-v1';
+const CACHE = 'mmoritz-schedule-pilot-v1-context-v1';
 const ASSETS = [
+  '/protocol-copy.js?v=1',
+  '/protocol-context.js?v=1',
+  '/protocol-context.css?v=1',
   '/mmoritz/schedule-pilot.js?v=1',
   '/mmoritz/schedule-pilot.css?v=1',
   '/compound-library.js?v=2',

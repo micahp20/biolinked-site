@@ -1,7 +1,10 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /thenry/.
-const CACHE = 'thenry-master-sched1-v8';
+const CACHE = 'thenry-master-sched1-v8-context-v1';
 const ASSETS = [
+  '/protocol-copy.js?v=1',
+  '/protocol-context.js?v=1',
+  '/protocol-context.css?v=1',
   '/compound-library.js?v=2',
   '/thenry/',
   '/thenry/index.html',

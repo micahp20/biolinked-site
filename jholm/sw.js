@@ -1,7 +1,10 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jholm/.
-const CACHE = 'jholm-paid-in-full-20261106';
+const CACHE = 'jholm-paid-in-full-20261106-context-v1';
 const ASSETS = [
+  '/protocol-copy.js?v=1',
+  '/protocol-context.js?v=1',
+  '/protocol-context.css?v=1',
   '/compound-library.js?v=2',
   '/jholm/',
   '/jholm/index.html',

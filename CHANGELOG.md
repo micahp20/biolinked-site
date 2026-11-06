@@ -48,3 +48,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-05 — Correct protocol to match selected quote (2026-11-06 UTC)
 - Removed obsolete compounds from the nprince/ protocol and notes, corrected the selected vial strength and corresponding syringe conversion without changing the existing dose/timing, and preserved the quote.
 - Verified rendered cards, data invariants, dose arithmetic and inline script syntax. No inventory movement; scoped cache refreshed.
+
+## 2026-11-06 — Client explanations and second cycle pilot
+- Extended the accepted cycle manager only to arasche/, preserving its identity and existing clinical/billing data.
+- Added plain compound definitions and role-based cycle explanations across 146 current and legacy protocol pages; retained operational notes under an expandable heading. Qualified unproven research combinations and kept dosing facts separate.
+- Verified per-page data preservation, all changed inline/worker syntax, standard rendering and the second pilot's model. Scoped cache updates included; no inventory or live schedule-state mutations. See PROJECT_STATUS.md for verification limits and release baseline.

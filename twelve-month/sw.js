@@ -1,7 +1,10 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'twelve-month-v42-navfix1';
+const CACHE = 'twelve-month-v42-navfix1-context-v1';
 const ASSETS = [
+  '/protocol-copy.js?v=1',
+  '/protocol-context.js?v=1',
+  '/protocol-context.css?v=1',
   '/twelve-month/',
   '/twelve-month/index.html',
   '/twelve-month/manifest.json',
