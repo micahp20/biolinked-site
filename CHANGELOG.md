@@ -32,3 +32,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-05 — Owner workflow preferences (2026-11-06 UTC)
 - Saved in AGENTS.md: include each new protocol in /share/ and confirm proposed inventory deductions with the owner first.
 - Documentation-only changes saved on main; no application behavior or inventory changes. See PROJECT_STATUS.md for scope and verification limits.
+
+## 2026-11-05 — Single-portal schedule pilot (2026-11-06 UTC)
+- Added current-cycle controls, transition preview, Undo/history, foundation-only phase, unique compound count and client editing/pause/restore on the existing mmoritz/ portal.
+- Personal additions and ongoing compounds persist between cycles; cycle state uses existing versioned schedule sync. Preserved billing and scoped offline caching.
+- Syntax, browser smoke and model checks passed; full device regression coverage remains limited. Deployment explicitly authorized for this portal only; see PROJECT_STATUS.md for release verification and rollout limits.
