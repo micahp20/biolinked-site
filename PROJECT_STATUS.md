@@ -103,3 +103,7 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Pending protocol instruction clarification — 2026-11-06 UTC
 - Owner confirmed CJC/IPA weekday evenings on mmenkveld/. Updated its protocol days/time and notes; recon and dose remain explicitly pending. Preserved quote, payment and inactive schedule defaults; no inventory action.
 - Verified invoice data unchanged and weekday array. Saved to main via GitHub API; deployment is a separate check.
+
+## Existing quote quantity revision — 2026-11-06 UTC
+- Owner reduced mmenkveld/ quantities to two of each selected blend. Updated quote summary, line amounts, due total and quantity note; retained quote status and excluded shipping/BAC. Clinical fields and Share entry unchanged; no inventory action.
+- Checked line-item sum and clinical-data equality. Saved to main through GitHub API; publishing status checked separately.

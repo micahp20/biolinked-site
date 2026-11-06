@@ -61,3 +61,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-06 — Confirm weekday-evening schedule
 - Updated CJC/IPA days/time on mmenkveld/ from pending to the owner's confirmed weekdays/evenings. Other unconfirmed dosing remains pending; billing and inventory unchanged.
+
+## 2026-11-06 — Quote quantity reduction
+- Updated mmenkveld/ to the owner's revised two-vials-per-blend quantities, preserving unit pricing, schedules and pending instructions. Quote arithmetic verified; no inventory changes. Scoped cache refreshed.
