@@ -1,0 +1,30 @@
+# Changelog
+
+Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
+
+## 2026-11-05 — Permanent project memory setup
+- Added root AGENTS.md with mandatory session startup, dependency protection, existing design/functionality requirements, verification rules and honest publishing reports.
+- Added PROJECT_STATUS.md with source-backed recovery, project structure, outstanding questions and next-session instructions.
+- Added this changelog; future significant website changes must update both status and history.
+- Documentation-only branch docs/project-memory-2026-11-05; no website code changes, merge into main or deployment requested. See the branch commit and draft PR for actual delivery evidence.
+
+## 2026-11-05 — Recovered: intake and public tools
+- Added full-waiver promo-code flow to both intake entry points with separate zero-paid metadata; preserved paid Stripe path and legal gate. PR #123; 0bd7f71.
+- Changed paid intake to $19.99, described the $20 stack credit and added four portal preview cards. PR #120; 78b9080. This supersedes the earlier $49.99 cover.
+- Recorded republish attempts for stale intake output despite Pages build success. PRs #121–122; 6a6dd65 and e50f654. Live resolution not independently verified in this setup.
+- Added pay-first cover and package benefits; removed Intake from public navigation/footer; added Stack Analyzer timeout and button recovery. PRs #117–119; 34abdf3, 5929646 and 9dfe329.
+- Recorded client quote/profile/billing-display and client-supplied schedule corrections in main; individual details remain in the source/commit history.
+- Fixed a client free-invoice schedule initialization and isolated client service-worker cache cleanup. PR #116; 2b958d4.
+
+## 2026-11-04 — Recovered: portal layout and shared controls
+- Migrated client portals to the shared layout while retaining individual content, billing, special states and storage identity. Examples: 19157b1, 03d47e3, 13d877a and following migration commits.
+- Added quote payment buttons, calculator compound-name recovery and read-only schedule expansion, followed by preservation-gated client batches. 73b90fc, 89b714c, f76e27f and batch commits.
+- Added/corrected a client portal with shared Erica stylesheet reference and client-only cache cleanup. PRs #114–115; 981d821 and a9dd6f0.
+- Additional client quotes, invoice status changes and protocol corrections were committed; consult history for exact data and authority. No financial or clinical action is inferred from a commit alone.
+
+## Future entry template
+### YYYY-MM-DD — Short business outcome
+- Request and resulting behavior.
+- Main paths and commit/PR evidence.
+- Checks actually performed and any limits.
+- Commit/remote branch/merge/deployment status; link PROJECT_STATUS.md for remaining work.
