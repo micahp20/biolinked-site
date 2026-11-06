@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mmoritz/.
-const CACHE = 'mmoritz-cycle6-klow-reta60-20261106';
+const CACHE = 'mmoritz-simple-invoice-20261106';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/mmoritz/',
