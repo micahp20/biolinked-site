@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'rhurst-v1006 1002(0))-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1-ord2-o3-o4-ipad1-reta30-w2-inv2-context-v1';
+const CACHE = 'rhurst-v1006 1002(0))-wk1-dna1-sch1-days1-font1-tp1-plskin2-shop1-g1-ord2-o3-o4-ipad1-reta30-w2-inv2-context-v1-controls-v1';
 const ASSETS = [
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',

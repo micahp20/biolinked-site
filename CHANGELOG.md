@@ -73,3 +73,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-06 — Mobile operations presentation
 - Added scoped phone cards, bottom tabs, sortable lists and touch-friendly forms to profit-loss.html using the established public typography/palette. Accounting scripts preserved exactly; no production record changes.
 - Syntax and DOM interaction checks passed; visual Chromium verification remains blocked by sandbox permissions. See PROJECT_STATUS.md for limits and the ongoing protocol control audit.
+
+## 2026-11-06 — Preserve calculator edits and schedule choices
+- Audited current portal controls and applicable older layouts. Fixed calculator saved units/counts, edit/reopen persistence, invalid-capacity saves, empty schedules and recon context; preserved all per-client protocol/billing data and namespaces.
+- Updated only each affected portal and its scoped cache version. Mock DOM/model checks passed across all modified pages, advanced schedule variants and both pilots. No production record writes; rendered/live verification remains incomplete. See tools/tests/protocol-controls-audit-2026-11-06.md and PROJECT_STATUS.md.

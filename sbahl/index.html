@@ -2315,7 +2315,7 @@ function schBlkLoad(){ try{ var raw=localStorage.getItem(SCHKEY); if(raw){ var p
 function schBlkGet(){ if(!schBlkState) schBlkState=schBlkLoad(); return schBlkState; }
 function schBlk(c){ var b=schBlkGet()[c.n]; return (b==='AM'||b==='PM'||b==='BOTH')?b:c.b; }
 function schBlkSet(name,blk,ev){ if(ev&&ev.stopPropagation) ev.stopPropagation(); var st=schBlkGet(); if(st[name]===blk){ delete st[name]; } else { st[name]=blk; } schSave(); if(typeof renderDoses==='function')renderDoses(); if(typeof renderAll==='function')renderAll(); if(typeof renderSubline==='function')renderSubline(); }
-function schEff(){ var st=schGet()||{}; for(var _k in st){ if(st[_k]) return st; } return (typeof schDefault==='function')?schDefault():st; }
+function schEff(){ return schGet()||{}; }
 function schOn(c){ return !!schEff()[c.n]; }
 function schRows(){ return ALL.filter(schOn); }
 function schTog(name,ev){
@@ -2890,7 +2890,7 @@ function openInv(i){
     var msgs = [];
     if(!(num(bacEl.value, 0) > 0)) msgs.push('Enter a BAC water volume to get a concentration.');
     if(curU >= maxU - 0.01 && doseV > 0 && c > 0 && (doseV / c) * 100 > maxU)
-      msgs.push('That dose needs ' + fmt((doseV / c) * 100, 1) + ' units &mdash; more than this syringe holds. Use a larger syringe or more BAC water.');
+      msgs.push('That dose needs ' + fmt((doseV / c) * 100, 1) + ' units &mdash; more than this syringe holds. Check the entries or use an appropriate syringe; increasing BAC water increases the draw volume.');
     var wEl = el('pc-warn');
     if(msgs.length){ wEl.innerHTML = msgs.join('<br>'); wEl.hidden = false; } else { wEl.hidden = true; }
   }
@@ -2932,7 +2932,7 @@ function openInv(i){
     e.preventDefault();
   }
 
-  function onUp(){ dragging = false; bar.classList.remove('dragging'); }
+  function onUp(){ dragging = false; bar.classList.remove('dragging'); calcWrite(); }
 
   function onKey(e){
     var step = (e.shiftKey ? 5 : 1) * (maxU <= 50 ? 0.5 : 1);
@@ -3061,7 +3061,7 @@ function openInv(i){
      Same flow as the protocol page: pick or type a compound, tap Add to
      put it in My Compounds, search filters that list, the pencil loads one
      back into the calculator and the cross removes it. Device-local. */
-  var saved = [];
+  var saved = [], editing = null;
 
   /* ---------- Calculator state ----------
      The saved list and the inputs persist together under one per-slug key,
@@ -3076,7 +3076,7 @@ function openInv(i){
   function calcPayload(){
     var inp={};
     calcInputIds.forEach(function(id){ var e=el(id); if(e) inp[id]=e.value; });
-    return {v:1, kind:'calculator', inputs:inp, saved:saved};
+    return {v:1, kind:'calculator', inputs:inp, saved:saved, vialUnit:vialUnit, unit:curUnit, editing:editing?saved.indexOf(editing):-1};
   }
   function calcWrite(){
     try{ localStorage.setItem(CALCKEY, JSON.stringify(calcPayload())); }catch(_){}
@@ -3109,6 +3109,16 @@ function openInv(i){
       }
       e.value=v;
     });
+
+    /* Restore calculation units as well as visible inputs. */
+    var choice=LIB[+cmpEl.value], source=choice?parseAmt(choice.rawVial):null;
+    setVialUnit(p.vialUnit || ((source&&source.u==='iu')||p.inputs['pc-doseunit']==='iu'?'iu':'mg'));
+    var requested=p.unit || p.inputs['pc-doseunit'] || 'mg';
+    curUnit=vialUnit==='iu'?'iu':(requested==='mcg'?'mcg':'mg');
+    syncUnitButtons(); maxU=parseFloat(syrEl.value)||100; drawTicks();
+    nameField.hidden=cmpEl.value!=='__custom__';
+    editing=Number.isInteger(p.editing)&&saved[p.editing]?saved[p.editing]:null;
+    addBtn.textContent=editing?'Save changes':'+ Add to My List';
   }
   function load(){ saved = calcRead().saved; }
   function store(){ calcWrite(); }
@@ -3119,14 +3129,26 @@ function openInv(i){
   function esc(s){ return String(s==null?'':s).replace(/[<>&"]/g, function(c){
     return ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'})[c]; }); }
 
+  function calcValid(){
+    var vial=num(vialEl.value,0), bac=num(bacEl.value,0), dose=toVial(num(doseEl.value,0));
+    var message='';
+    if(!(vial>0&&bac>0&&dose>0)) message='Enter a vial size, BAC water volume and dose greater than zero.';
+    else if(dose>vial) message='The dose exceeds the vial amount. Check your entries.';
+    else if(dose/(vial/bac)*100>maxU+0.000001) message='The full dose exceeds this syringe capacity. Check the entries or choose an appropriate syringe before saving.';
+    if(message){var warning=el('pc-warn');warning.textContent=message;warning.hidden=false;return false;}
+    return true;
+  }
   function addCurrent(){
-    var c = conc(), vial = num(vialEl.value,0), bac = num(bacEl.value,0), dose = num(doseEl.value,0);
-    if(!(vial > 0 && bac > 0 && dose > 0)) return;
-    var nm = (nameEl.value||'').trim() || 'Untitled';
-    saved.unshift({name:nm, vial:vial, bac:bac, dose:dose, unit:curUnit, vialUnit:vialUnit, max:maxU,
-                   units:Math.round(curU*10)/10, volume:Math.round((curU/100)*1000)/1000,
-                   doses:Math.floor(vial/dose), conc:Math.round(c*100)/100});
-    persist();
+    if(!calcValid()) return;
+    var c=conc(), vial=num(vialEl.value,0), bac=num(bacEl.value,0), dose=num(doseEl.value,0);
+    var nm=(nameEl.value||'').trim();
+    if(!nm){var warning=el('pc-warn');warning.textContent='Enter a compound name before saving.';warning.hidden=false;return;}
+    var item={name:nm,vial:vial,bac:bac,dose:dose,unit:curUnit,vialUnit:vialUnit,max:maxU,
+      units:Math.round(curU*10)/10,volume:Math.round((curU/100)*1000)/1000,
+      doses:Math.floor(vial/toVial(dose)),conc:Math.round(c*100)/100};
+    var i=editing?saved.indexOf(editing):-1;
+    if(i>=0)saved[i]=item;else saved.unshift(item);
+    editing=null;addBtn.textContent='+ Add to My List';searchEl.value='';persist();
   }
 
   function renderList(){
@@ -3140,9 +3162,12 @@ function openInv(i){
     listEl.innerHTML = rows.map(function(r){
       var it = r.it, pct = Math.max(0, Math.min(100, (it.units / it.max) * 100));
       var uu = it.unit === 'iu' ? 'IU' : it.unit;
+      var vu=it.vialUnit==='iu'||it.unit==='iu'?'IU':'mg';
+      var doseV=it.unit==='mcg'?it.dose/1000:it.dose;
+      var doseCount=doseV>0?Math.floor(it.vial/doseV):0;
       return '<div class="pc-item">' +
         '<div class="pc-item-top"><div><div class="pc-item-name">' + esc(it.name) + '</div>' +
-        '<div class="pc-item-sub">' + esc(it.vial) + ' ' + esc(uu) + ' in ' + esc(it.bac) + ' mL &middot; ' + esc(it.max) + 'u syringe</div></div>' +
+        '<div class="pc-item-sub">' + esc(it.vial) + ' ' + esc(vu) + ' in ' + esc(it.bac) + ' mL &middot; ' + esc(it.max) + 'u syringe</div></div>' +
         '<div class="pc-item-acts">' +
         '<button class="pc-ico" type="button" data-edit="' + r.i + '" aria-label="Edit ' + esc(it.name) + '">&#9998;</button>' +
         '<button class="pc-ico del" type="button" data-del="' + r.i + '" aria-label="Remove ' + esc(it.name) + '">&times;</button>' +
@@ -3152,7 +3177,7 @@ function openInv(i){
         '<span class="pc-chip">' + esc(it.units) + ' u</span>' +
         '<span class="pc-chip">' + esc(it.dose) + ' ' + esc(uu) + '</span>' +
         '<span class="pc-chip">' + esc(it.volume) + ' mL</span>' +
-        '<span class="pc-chip">' + esc(it.doses) + ' doses/vial</span>' +
+        '<span class="pc-chip">' + esc(doseCount) + ' doses/vial</span>' +
         '</div></div>';
     }).join('');
   }
@@ -3166,7 +3191,7 @@ function openInv(i){
     if(vialUnit !== 'iu' && curUnit === 'iu') curUnit = 'mg';
     syncUnitButtons();
     syrEl.value = String(it.max); maxU = it.max; drawTicks();
-    saved.splice(i,1); persist(); fromDose();
+    editing=it;addBtn.textContent='Save changes';calcWrite();fromDose();
     cmpEl.scrollIntoView({block:'center', behavior:'smooth'});
   }
 
@@ -3180,12 +3205,12 @@ function openInv(i){
     addBtn = el('pc-addbtn'); searchEl = el('pc-search'); listEl = el('pc-list');
     savedHead = el('pc-saved-head'); countEl = el('pc-saved-count'); emptyEl = el('pc-empty');
     LIB = buildLib(); fillCompoundSelect();
-    cmpEl.addEventListener('change', applyCompound);
+    cmpEl.addEventListener('change', function(){editing=null;addBtn.textContent='+ Add to My List';applyCompound();});
     addBtn.addEventListener('click', addCurrent);
     searchEl.addEventListener('input', renderList);
     listEl.addEventListener('click', function(e){
       var d = e.target.closest('[data-del]'), ed = e.target.closest('[data-edit]');
-      if(d){ saved.splice(+d.getAttribute('data-del'),1); persist(); }
+      if(d){ var removed=saved.splice(+d.getAttribute('data-del'),1)[0];if(removed===editing){editing=null;addBtn.textContent='+ Add to My List';}persist(); }
       else if(ed){ editItem(+ed.getAttribute('data-edit')); }
     });
     load(); renderList(); calcApply(calcRead());
@@ -3218,7 +3243,8 @@ function openInv(i){
       bar.addEventListener('touchmove',  function(e){ onMove(e.touches[0]); }, {passive:false});
       bar.addEventListener('touchend', onUp);
     }
-    bar.addEventListener('keydown', onKey);
+    bar.addEventListener('keydown', function(e){onKey(e);calcWrite();});
+    document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('#pc-schbtn,#pc-schedbtn,#sa-confirm');if(b&&!calcValid()){e.preventDefault();e.stopImmediatePropagation();}},true);
     fromDose();
   }
   initCalc();
@@ -5266,7 +5292,7 @@ function saStamp(p){ var q=p&&p.updated_at?Date.parse(p.updated_at)+1:0; return 
 function saLive(){ var s=saGet(),o=[]; for(var k in s){ if(s[k]&&!s[k].del) o.push(s[k]); } o.sort(function(a,b){return String(a.n).localeCompare(String(b.n));}); return o; }
 function saDaysTxt(d){ d=(d||[]).slice().sort(); if(d.length===7) return 'Daily'; if(d.join()==='1,2,3,4,5') return 'Mon–Fri';
   return SA_ORD.filter(function(i){return d.indexOf(i)>=0;}).map(function(i){return SA_DN[i];}).join(' / '); }
-function saRow(it){ return {n:it.n,d:it.d||'',u:it.u||'',b:it.b==='PM'?'PM':'AM',days:it.days||[],c:saDaysTxt(it.days),sa:it.id}; }
+function saRow(it){ return {n:it.n,d:it.d||'',u:it.u||'',b:it.b==='PM'?'PM':'AM',days:it.days||[],c:saDaysTxt(it.days),rec:it.rec||'',sa:it.id}; }
 function saEsc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
 function saCommit(){ saStore(); try{ if(!csApplying) csQueue('schedule'); }catch(e){} saRender(); }
 function saPut(it){ var s=saGet(); var prev=s[it.id]; it.updated_at=saStamp(prev); s[it.id]=it; saCommit(); }
@@ -5336,7 +5362,7 @@ function saRender(){ var host=document.getElementById('sa-list'); if(host&&host.
     var du=document.getElementById('pc-doseunit'), dose=val('pc-dose');
     var u=(document.getElementById('pc-units')||{}).textContent||'';
     u=String(u).replace(/\s+/g,'').replace(/^(\d+(\.\d+)?)u?$/,'$1u'); if(!/[1-9]/.test(u)) u='';
-    return {n:name, d:dose?(dose+' '+(du?du.value:'mg')):'', u:u};
+    return {n:name, d:dose?(dose+' '+(du?du.value:'mg')):'', u:u, rec:val('pc-bac')+' mL BAC water'};
   }
   /* Numbers typed under "Custom" have no name yet. Ask here, with the full
      list, rather than sending them back to a dropdown that would overwrite
@@ -5369,7 +5395,7 @@ function saRender(){ var host=document.getElementById('sa-list'); if(host&&host.
     var c=compound(); if(!c.n){ ask(open); return; }
     var ex=saFind(c.n), g=saGuide(c.n);
     var days=ex?ex.days.slice():saGuideDays(g&&g.freq);
-    cur={id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)), n:c.n, d:c.d, u:c.u, b:ex?ex.b:(/pm|night|bed/i.test(g&&g.timing||'')?'PM':'AM'), days:days};
+    cur={id:ex?ex.id:('sa-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)), n:c.n, d:c.d, u:c.u, rec:c.rec, b:ex?ex.b:(/pm|night|bed/i.test(g&&g.timing||'')?'PM':'AM'), days:days};
     var note=g&&g.freq?('Dosing guide: '+saEsc(g.freq)+'. Change the days to suit you.'):'No schedule on file in the dosing guide. Pick your days.';
     pan.hidden=false;
     pan.innerHTML='<p class="sa-t">'+(ex?'Update ':'Add ')+saEsc(c.n)+'</p><p class="sa-s">'+saEsc([c.d,c.u].filter(Boolean).join(' · '))+(c.d?' · ':'')+note+'</p>'+
@@ -5386,7 +5412,7 @@ function saRender(){ var host=document.getElementById('sa-list'); if(host&&host.
     var x=t.getAttribute('data-x');
     if(x==='cancel'){ pan.hidden=true; return; }
     if(x==='rm'){ saRemove(cur.id); renderDoses(); pan.hidden=true; try{ csToast('Removed from your schedule'); }catch(_){} return; }
-    if(x==='save'&&cur.days.length){ cur.days.sort(); saPut({id:cur.id,n:cur.n,d:cur.d,u:cur.u,b:cur.b,days:cur.days.slice()}); renderDoses(); pan.hidden=true;
+    if(x==='save'&&cur.days.length){ cur.days.sort(); saPut({id:cur.id,n:cur.n,d:cur.d,u:cur.u,rec:cur.rec,b:cur.b,days:cur.days.slice()}); renderDoses(); pan.hidden=true;
       try{ csToast(cur.n+' is on your schedule · '+saDaysTxt(cur.days)); }catch(_){} }
   });
   btn.addEventListener('click',function(){ if(!pan.hidden){ pan.hidden=true; return; } open(); });

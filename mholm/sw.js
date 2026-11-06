@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mholm/.
-const CACHE = 'mholm-master-sched1-v9-context-v1';
+const CACHE = 'mholm-master-sched1-v9-context-v1-controls-v1';
 const ASSETS = [
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',

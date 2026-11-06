@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dholm/.
-const CACHE = 'dholm-paid500-20261106-context-v1';
+const CACHE = 'dholm-paid500-20261106-context-v1-controls-v1';
 const ASSETS = [
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',
