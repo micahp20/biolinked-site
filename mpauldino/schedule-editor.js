@@ -5,7 +5,8 @@
  var units=['mg','mcg','iu','g','tab','cap','mL'];
  var days=[1,2,3,4,5,6,0], dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
- function editable(){return typeof GK_VIEWONLY==='undefined'||!GK_VIEWONLY;}
+ function editable(){return true;}
+ document.documentElement.classList.remove('gk-viewonly');
  function find(id){return gkState.compounds.find(function(c){return c.id===id;});}
  function focusRow(id){var b=Array.from(document.querySelectorAll('[data-pe-open]')).find(function(el){return el.getAttribute('data-pe-open')===id;});if(b){b.focus();b.scrollIntoView({block:'nearest'});}}
  function fields(c){return {dose:c.dose,unit:c.unit,draw:c.draw||'',recon:c.recon||'',runWeeks:c.runWeeks==null?'':c.runWeeks,days:(c.days||[]).slice(),block:c.block==='PM'?'PM':'AM'};}
@@ -19,9 +20,14 @@
  '<fieldset class="pe-time"><legend>Timing</legend><div>'+['AM','PM'].map(function(b){return '<button type="button" data-pe-time="'+b+'" aria-pressed="'+(d.block===b)+'">'+(b==='AM'?'Morning':'Night')+'</button>';}).join('')+'</div></fieldset>';
  }
  gkArchiveView=function(items){return items.map(function(c){return '<article class="gk-card"><div class="gk-row"><div><div class="gk-name">'+esc(c.name)+'</div><div class="gk-meta">'+esc(gkFmt(c.dose)+' '+c.unit+' · '+gkDayText(c.days))+'</div></div><button class="edit" data-gkrestore="'+esc(c.id)+'">Add back</button></div></article>';}).join('');};
- function panel(c){var d=draft(c);return '<div class="pe-panel" id="pe-panel-'+esc(c.id)+'" data-pe-id="'+esc(c.id)+'"><div class="pe-about"><div class="pe-label">What this compound is</div><p>'+definition(c)+'</p></div>'+
- (editable()?form(d)+'<p class="pe-error" role="alert" hidden></p><div class="pe-actions"><button type="button" class="pe-save" data-pe-action="save">Save changes</button><button type="button" data-pe-action="cancel">Cancel</button></div><button type="button" class="pe-remove" data-pe-action="remove">Remove from schedule</button>':'<p class="pe-help">Unlock editing to change your dose, days or timing.</p><button type="button" data-pe-action="unlock">Unlock editing</button>')+'</div>';}
- gkCard=function(c){var open=gkState.open===c.id;return '<article class="gk-card pe-card"><button type="button" class="pe-head" data-pe-open="'+esc(c.id)+'" aria-expanded="'+open+'" aria-controls="pe-panel-'+esc(c.id)+'"><span class="dose-mark">'+esc(gkFmt(c.dose))+'<small>'+esc(c.unit)+'</small>'+(c.draw&&c.draw!=='—'?'<span class="dose-pull">'+esc(c.draw)+'</span>':'')+'</span><span class="pe-title"><span class="gk-name">'+esc(c.name)+'</span><span class="gk-meta">'+esc(c.vial)+' · '+esc(gkDayText(c.days))+' · '+(c.block==='PM'?'Night':'Morning')+esc((c.foundation?' · year-round':'')+gkRunNote(c))+'</span></span><span class="pe-chevron" aria-hidden="true">⌄</span></button>'+(open?panel(c):'')+'</article>';};
+ function panel(c){var d=draft(c);return '<div class="ed-pan open pe-panel" id="pe-panel-'+esc(c.id)+'" data-pe-id="'+esc(c.id)+'"><div class="pe-about"><div class="pe-label">What this compound is</div><p>'+definition(c)+'</p></div>'+
+ form(d)+'<p class="pe-error" role="alert" hidden></p><div class="pe-actions"><button type="button" class="pe-save" data-pe-action="save">Save changes</button><button type="button" data-pe-action="cancel">Cancel</button></div><button type="button" class="pe-remove" data-pe-action="remove">Remove from schedule</button>'+'</div>';}
+ gkCard=function(c){var open=gkState.open===c.id, name=c.name;
+  if(/^\s*\d/.test(c.vial||'')&&name.toLowerCase().indexOf(String(c.vial).toLowerCase())<0)name+=' · '+c.vial;
+  return '<div class="pe-item"><button type="button" class="drow pe-head'+(c.block==='PM'?' pm':'')+'" data-pe-open="'+esc(c.id)+'" aria-expanded="'+open+'" aria-controls="pe-panel-'+esc(c.id)+'"><span class="uu">'+esc(c.draw&&c.draw!=='—'?c.draw:gkFmt(c.dose)+' '+c.unit)+'</span><span class="pe-title"><span class="nm">'+esc(name)+'</span><span class="mt">'+esc(gkFmt(c.dose)+' '+c.unit+' · '+gkDayText(c.days))+'</span></span><span class="pe-chevron" aria-hidden="true">⌄</span></button>'+(open?panel(c):'')+'</div>';
+ };
+ gkDayView=function(rows){var html='';['AM','PM'].forEach(function(block){var list=rows.filter(function(c){return c.block===block;});html+='<div class="seclbl">'+(block==='AM'?'Morning':'Night')+'<span class="cnt">'+list.length+' COMPOUND'+(list.length===1?'':'S')+'</span></div><div class="dgrp">'+(list.length?list.map(gkCard).join(''):'<p class="pe-no-doses">Nothing scheduled '+(block==='AM'?'this morning':'tonight')+'.</p>')+'</div>';});return html+gkMedsSection();};
+
  function drawFrom(d,c){
   var m=String(c.vial||'').match(/^\s*(\d+(?:\.\d+)?)\s*(mg|mcg|iu)\s*\/\s*m[lL]/i), concentration, vu;
   if(m){concentration=Number(m[1]);vu=m[2].toLowerCase();}
@@ -56,7 +62,7 @@
    (d.mode==='master'?'<label class="pe-field"><span>Compound and vial strength</span><select id="pe-master"><option value="">Choose a compound…</option>'+(window.BL_DOSING||[]).map(function(g,i){return {g:g,i:i};}).sort(function(a,b){return (a.g.name+' '+a.g.vial).localeCompare(b.g.name+' '+b.g.vial);}).map(function(x){return '<option value="'+x.i+'"'+(d.guide===x.i?' selected':'')+'>'+esc(x.g.name+' · '+x.g.vial)+'</option>';}).join('')+'</select></label>':control('Compound name','name',d.name)+control('Vial strength / form','vial',d.vial))+
    (d.mode==='master'&&d.guide==null?'':(d.mode==='master'?'<div class="pe-about"><p>'+definition(d)+'</p><p class="pe-help">Master guide: '+esc(d.guideText)+'. Review the fields and choose your days before adding.</p></div>':'')+form(d)+'<p class="pe-error" role="alert" hidden></p><div class="pe-actions"><button type="button" class="pe-save" data-pe-action="add">Add to schedule</button><button type="button" data-pe-action="close-add">Cancel</button></div>');
  }
- function openAdd(){if(!editable()){blUnlock();return;}addDraft={mode:'master',guide:null,name:'',vial:'',dose:'',unit:'mg',draw:'',recon:'',runWeeks:'',days:[],block:'AM'};addView();sheet('pe-add');}
+ function openAdd(){addDraft={mode:'master',guide:null,name:'',vial:'',dose:'',unit:'mg',draw:'',recon:'',runWeeks:'',days:[],block:'AM'};addView();sheet('pe-add');}
  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#gkAddBtn')){e.preventDefault();e.stopImmediatePropagation();openAdd();}},true);
  document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('button');if(!b)return;
@@ -65,7 +71,6 @@
   var host=b.closest('[data-pe-id]')||b.closest('#pe-add-host'), d=host?(host.id==='pe-add-host'?addDraft:drafts[host.getAttribute('data-pe-id')]):null;
   if(b.hasAttribute('data-pe-time')&&d&&editable()){d.block=b.getAttribute('data-pe-time');host.querySelectorAll('[data-pe-time]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});return;}
   var action=b.getAttribute('data-pe-action');if(!action)return;
-  if(action==='unlock'){blUnlock();return;}
   if(action==='close-add'){addDraft=null;closeSheet();return;}
   if(!host||!d||!editable())return;
   var c=host.id==='pe-add-host'?null:find(host.getAttribute('data-pe-id'));
@@ -94,3 +99,4 @@
  document.addEventListener('input',function(e){if(e.target.hasAttribute&&e.target.hasAttribute('data-pe-field'))e.target.dispatchEvent(new Event('change',{bubbles:true}));});
  gkRender();
 })();
+

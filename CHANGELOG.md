@@ -88,3 +88,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-06 — Personal schedule editing pilot
 - Made mpauldino/ compound rows expand to a definition and staged dose/day/timing editor with remove/restore. Master-list and manual additions use the same editor. Kept the compact styling and supplement tools.
 - Preserved static client data and existing permissions/save path; added optional recon metadata without database changes. DOM/model tests, read-only save-contract validation and syntax checks passed. Rendered/live browser checks remain unverified. See PROJECT_STATUS.md and tools/tests/personal-schedule-editor-2026-11-06.md.
+
+## 2026-11-06 — Correct personal layout and remove unlock; repair saved schedule controls
+- Replaced the personal Protocol/Schedule layouts with shared card/list structures and removed its frontend unlock requirement while preserving supplement tools and backend authorization.
+- Fixed default/added editing/removal on nprince/ and calculator-to-schedule context on both pages. Native Chromium flows passed, including a saved manual-entry fixture, phone/desktop light/dark layouts, and reload/removal persistence. Fixed banner interception and hidden-sheet horizontal scrolling found during browser review.
+- Static clinical/billing/identity data preserved; no inventory or production state writes. See PROJECT_STATUS.md and tools/tests/schedule-controls-repair-2026-11-06.md.

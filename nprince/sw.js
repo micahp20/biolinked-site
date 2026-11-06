@@ -1,7 +1,9 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /nprince/.
-const CACHE = 'nprince-two-compound-protocol-v12-context-v1-controls-v1';
+const CACHE = 'nprince-two-compound-protocol-v12-context-v1-controls-v1-controls-repair-v1';
 const ASSETS = [
+  '/client-schedule-controls.css?v=1',
+  '/nprince/schedule-controls.js?v=1',
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',
   '/protocol-context.css?v=1',

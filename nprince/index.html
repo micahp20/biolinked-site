@@ -2057,7 +2057,7 @@ function labTip(r){var ds=labDef(r.n),h='';
   return h+(r.tip?'<div class="lyour"><div class="ldt">Your result</div>'+r.tip+'</div>':'');}
 function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
 function sheet(n){var e=document.getElementById('s-'+n);e.scrollTop=0;e.classList.add('on');}
-function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});}
+function closeSheet(){var active=document.activeElement;if(active&&active.closest&&active.closest('.sheet')&&active.blur)active.blur();document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});var frame=document.querySelector('.device');if(frame)frame.scrollLeft=0;var scroll=document.getElementById('scroll');if(scroll)scroll.scrollLeft=0;}
 /* ---------- PAYMENT HAND-OFF ----------
    These only hand the client to their own payment app with the amount and a
    note pre-filled; nothing is charged in here. Venmo cannot lock the amount,
@@ -2799,6 +2799,7 @@ function openInv(i){
   function doseLabelUnit(){ return curUnit === 'iu' ? 'IU' : curUnit; }
 
   function syncUnitButtons(){
+    var customUnit=el('pc-vialunit');if(customUnit){customUnit.value=vialUnit;customUnit.closest('.pc-field').hidden=!!cmpEl&&cmpEl.value!=='__custom__';}
     var sel = el('pc-doseunit');
     if(!sel) return;
     [].forEach.call(sel.options, function(o){
@@ -2985,7 +2986,7 @@ function openInv(i){
   function applyCompound(){
     var v = cmpEl.value;
     if(v === '__custom__'){
-      nameField.hidden = false; srcNote.hidden = true;
+      nameField.hidden = false; srcNote.hidden = true;syncUnitButtons();
       return paint();
     }
     var c = LIB[+v]; if(!c) return;
@@ -3050,7 +3051,7 @@ function openInv(i){
      the old key is carried over once. */
   var CALCKEY = KP+'calc-v1';
   var CALC_OLD = KP+'calc-legacy';
-  var calcInputIds = ['pc-compound','pc-name','pc-vial','pc-bac','pc-dose','pc-doseunit','pc-syringe'];
+  var calcInputIds = ['pc-compound','pc-name','pc-vial','pc-bac','pc-dose','pc-doseunit','pc-syringe','pc-vialunit'];
   function calcPayload(){
     var inp={};
     calcInputIds.forEach(function(id){ var e=el(id); if(e) inp[id]=e.value; });
@@ -3176,6 +3177,8 @@ function openInv(i){
   function initCalc(){
     nameEl = el('pc-name'); vialEl = el('pc-vial'); bacEl = el('pc-bac');
     doseEl = el('pc-dose'); syrEl = el('pc-syringe');
+    var vialType=document.createElement('div');vialType.className='pc-field';vialType.innerHTML='<label class="pc-label" for="pc-vialunit">Custom vial unit</label><select class="pc-select" id="pc-vialunit"><option value="mg">mg</option><option value="iu">IU</option></select>';vialEl.closest('.pc-field').insertAdjacentElement('beforebegin',vialType);
+    el('pc-vialunit').addEventListener('change',function(){setVialUnit(this.value);fromDose();calcWrite();});
     bar = el('pc-syr'); svg = el('pc-svg'); fill = el('pc-fill');
     plunger = el('pc-plunger'); ticksG = el('pc-ticks');
     if(!bar) return;
@@ -5331,6 +5334,8 @@ function saRender(){ var host=document.getElementById('sa-list'); if(host&&host.
     var du=document.getElementById('pc-doseunit'), dose=val('pc-dose');
     var u=(document.getElementById('pc-units')||{}).textContent||'';
     u=String(u).replace(/\s+/g,'').replace(/^(\d+(\.\d+)?)u?$/,'$1u'); if(!/[1-9]/.test(u)) u='';
+    var slot=document.querySelector('[data-unitslot="vial"]'), strength=val('pc-vial')+' '+(slot?slot.textContent.trim():'mg');
+    if(name.toLowerCase().indexOf(strength.toLowerCase())<0)name+=' · '+strength;
     return {n:name, d:dose?(dose+' '+(du?du.value:'mg')):'', u:u, rec:val('pc-bac')+' mL BAC water'};
   }
   /* Numbers typed under "Custom" have no name yet. Ask here, with the full
@@ -5471,15 +5476,7 @@ if(typeof nutInit==='function') nutInit();
      payload.add                added compounds         SA_KEY   (existing)
      payload.ovr                dose / units / recon    OV_KEY   (new here)
    ====================================================================== */
-var BLEDIT=/(?:^|[?&])edit=1(?:&|$)/.test(location.search);
-/* Sticky edit mode: once this device opens ?edit=1, the plain page link
-   stays editable ON THIS DEVICE ONLY (localStorage). The client never loads
-   ?edit=1 so they stay read-only. Open with ?edit=0 to turn it back off. */
-try{
-  if(/(?:^|[?&])edit=0(?:&|$)/.test(location.search)){ localStorage.removeItem('nprince-edit'); BLEDIT=false; }
-  else if(BLEDIT){ localStorage.setItem('nprince-edit','1'); }
-  else if(localStorage.getItem('nprince-edit')==='1'){ BLEDIT=true; }
-}catch(e){}
+var BLEDIT=true; /* Default and added rows use the same editable schedule. */
 
 /* ---- dose / units / recon override. Per compound name, newest edit wins,
         and a reset is a tombstone so a stale device cannot resurrect it. ---- */
@@ -6537,3 +6534,7 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 
 <script src="/protocol-copy.js?v=1"></script>
 <script src="/protocol-context.js?v=1"></script>
+
+
+<link rel="stylesheet" href="/client-schedule-controls.css?v=1">
+<script src="/nprince/schedule-controls.js?v=1"></script>

@@ -1,10 +1,11 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mpauldino/, which is now the real page: the app layout
 // was promoted here from the /mpauldino/app/ pilot.
-const CACHE = 'mpauldino-master-locked-v7-context-v1-controls-v1-consistency-v2-editor-v1';
+const CACHE = 'mpauldino-master-locked-v7-context-v1-controls-v1-consistency-v2-editor-v1-controls-repair-v1';
 const ASSETS = [
-  '/mpauldino/schedule-editor.js?v=1',
-  '/mpauldino/schedule-editor.css?v=1',
+  '/client-schedule-controls.css?v=1',
+  '/mpauldino/protocol-layout.js?v=1',
+  '/mpauldino/schedule-editor.js?v=2',
   '/mpauldino/protocol-consistency.css?v=2',
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',
@@ -47,5 +48,6 @@ self.addEventListener('fetch', e => {
     }).catch(() => caches.match(e.request).then(r => r || caches.match('/mpauldino/index.html')))
   );
 });
+
 
 

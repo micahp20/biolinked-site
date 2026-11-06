@@ -2235,9 +2235,9 @@ var BL_KEY=(function(){
   }
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
 })();
-function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } function blUnlock(){ var k=prompt('Enter your passcode to unlock editing:'); if(!k) return; k=k.trim(); var REAL='fyZDECQVBvyHcithQAsWqVoote0Gs_MhJkUfrP8QeB0'; if(k==='1211'||k===REAL){ try{ localStorage.setItem(KP+'mkey',REAL); localStorage.setItem(KP+'unlocked','1'); }catch(e){} location.reload(); } else { alert('Wrong passcode. Try again.'); } } function blLock(){ try{ localStorage.removeItem(KP+'unlocked'); }catch(e){} location.reload(); } /* Block pinch / double-tap zoom so the layout (esp. the Calculator) stays put. */ (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); var it=e.target&&e.target.closest&&e.target.closest('button,a,input,select,textarea,label,summary,[role=\'button\'],[onclick],[data-saday],[data-gkday],[data-maday]'); if(n-lt<=320&&!it){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
+function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_KEY=null; } /* Block pinch / double-tap zoom so the layout (esp. the Calculator) stays put. */ (function(){ try{ document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gesturechange',function(e){e.preventDefault();},{passive:false}); document.addEventListener('gestureend',function(e){e.preventDefault();},{passive:false}); var lt=0; document.addEventListener('touchend',function(e){ var n=Date.now(); var it=e.target&&e.target.closest&&e.target.closest('button,a,input,select,textarea,label,summary,[role=\'button\'],[onclick],[data-saday],[data-gkday],[data-maday]'); if(n-lt<=320&&!it){ e.preventDefault(); } lt=n; },{passive:false}); }catch(e){} })();
 /* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
-var GK_VIEWONLY=!(function(){try{return localStorage.getItem(KP+'unlocked')==='1';}catch(e){return false;}})();
+var GK_VIEWONLY=false; /* Schedule editing is available by default. */
 
 function blRpc(fn,body,signal){
   var opt={
@@ -2483,7 +2483,7 @@ function labTip(r){var ds=labDef(r.n),h='';
   return h+(r.tip?'<div class="lyour"><div class="ldt">Your result</div>'+r.tip+'</div>':'');}
 function tt(id){var e=document.getElementById(id); if(e) e.classList.toggle('on');}
 function sheet(n){var e=document.getElementById('s-'+n);e.scrollTop=0;e.classList.add('on');}
-function closeSheet(){document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});}
+function closeSheet(){var active=document.activeElement;if(active&&active.closest&&active.closest('.sheet')&&active.blur)active.blur();document.querySelectorAll('.sheet').forEach(function(s){s.classList.remove('on')});var frame=document.querySelector('.device');if(frame)frame.scrollLeft=0;var scroll=document.getElementById('scroll');if(scroll)scroll.scrollLeft=0;}
 /* ---------- PAYMENT HAND-OFF ----------
    These only hand the client to their own payment app with the amount and a
    note pre-filled; nothing is charged in here. Venmo cannot lock the amount,
@@ -2938,6 +2938,7 @@ function openInv(i){
   function doseLabelUnit(){ return curUnit === 'iu' ? 'IU' : curUnit; }
 
   function syncUnitButtons(){
+    var customUnit=el('pc-vialunit');if(customUnit){customUnit.value=vialUnit;customUnit.closest('.pc-field').hidden=!!cmpEl&&cmpEl.value!=='__custom__';}
     var sel = el('pc-doseunit');
     if(!sel) return;
     [].forEach.call(sel.options, function(o){
@@ -3126,7 +3127,7 @@ function openInv(i){
   function applyCompound(){
     var v = cmpEl.value;
     if(v === '__custom__'){
-      nameField.hidden = false; srcNote.hidden = true;
+      nameField.hidden = false; srcNote.hidden = true;syncUnitButtons();
       return paint();
     }
     var c = LIB[+v]; if(!c) return;
@@ -3184,7 +3185,7 @@ function openInv(i){
      the old key is carried over once. */
   var CALCKEY = KP+'calc-v1';
   var CALC_OLD = 'dh-app-calc-list-v1';
-  var calcInputIds = ['pc-compound','pc-name','pc-vial','pc-bac','pc-dose','pc-doseunit','pc-syringe'];
+  var calcInputIds = ['pc-compound','pc-name','pc-vial','pc-bac','pc-dose','pc-doseunit','pc-syringe','pc-vialunit'];
   function calcPayload(){
     var inp={};
     calcInputIds.forEach(function(id){ var e=el(id); if(e) inp[id]=e.value; });
@@ -3308,6 +3309,8 @@ function openInv(i){
   function initCalc(){
     nameEl = el('pc-name'); vialEl = el('pc-vial'); bacEl = el('pc-bac');
     doseEl = el('pc-dose'); syrEl = el('pc-syringe');
+    var vialType=document.createElement('div');vialType.className='pc-field';vialType.innerHTML='<label class="pc-label" for="pc-vialunit">Custom vial unit</label><select class="pc-select" id="pc-vialunit"><option value="mg">mg</option><option value="iu">IU</option></select>';vialEl.closest('.pc-field').insertAdjacentElement('beforebegin',vialType);
+    el('pc-vialunit').addEventListener('change',function(){setVialUnit(this.value);fromDose();calcWrite();});
     bar = el('pc-syr'); svg = el('pc-svg'); fill = el('pc-fill');
     plunger = el('pc-plunger'); ticksG = el('pc-ticks');
     if(!bar) return;
@@ -3404,7 +3407,7 @@ function openInv(i){
     var vial=(((el('pc-vial')&&el('pc-vial').value)||'')+'').trim()||'Custom';
     var cmp={
       id:'calc-'+Date.now().toString(36),
-      name:name, vial:vial, dose:doseNum,
+      name:name, vial:vial+' '+((document.querySelector('[data-unitslot="vial"]')||{}).textContent||'mg').trim(), recon:((el('pc-bac')&&el('pc-bac').value)||'')+' mL BAC water', dose:doseNum,
       step:(doseNum/4)||0.25, unit:unit, draw:saDraw(),
       block:saBlock, days:saDays.slice().sort(function(a,b){return a-b;}),
       foundation:false, active:true, runWeeks:saOngoing?null:weeks
@@ -5699,7 +5702,7 @@ function gkRender(){
   if(!document.getElementById("gkList")) return;
   gkArchiveIfDue();
   gkEnsureMeds();
-  (function(){var _gr=document.getElementById('gkGreet');if(!_gr)return;var _o=document.getElementById('gkViewBadge');if(_o)_o.parentNode.removeChild(_o);var _b=document.createElement('span');_b.id='gkViewBadge';_b.className='gk-view-badge';_b.style.cursor='pointer';_b.setAttribute('role','button');if(GK_VIEWONLY){document.documentElement.classList.add('gk-viewonly');_b.textContent='● View only · tap to unlock';_b.onclick=blUnlock;}else{document.documentElement.classList.remove('gk-viewonly');_b.textContent='✎ Editing · tap to lock';_b.onclick=blLock;}if(_gr.nextSibling)_gr.parentNode.insertBefore(_b,_gr.nextSibling);else _gr.parentNode.appendChild(_b);})();
+  /* No lock/unlock badge: schedule controls are always available. */
   var h=new Date().getHours();
   document.getElementById("gkGreet").textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+", "+gkSeed.member;
   var strip=document.getElementById("gkDayStrip");
@@ -7059,5 +7062,8 @@ try{ apD(); }catch(e){}
 <link rel="stylesheet" href="/mpauldino/protocol-consistency.css?v=2">
 
 
-<link rel="stylesheet" href="/mpauldino/schedule-editor.css?v=1">
-<script src="/mpauldino/schedule-editor.js?v=1"></script>
+<link rel="stylesheet" href="/client-schedule-controls.css?v=1">
+<script src="/mpauldino/schedule-editor.js?v=2"></script>
+
+
+<script src="/mpauldino/protocol-layout.js?v=1"></script>
