@@ -65,3 +65,7 @@ These requirements are recovered from source and merged task records, not a comp
 - Report separately: committed (SHA), saved remotely (branch), merged (yes/no), deployed (verified/not deployed/unknown).
 - Deployment verification requires the hosting run's branch/SHA and result plus a read-only check of the relevant live behavior/content when possible. Past Pages runs reported success while older intake content was still served (PRs #121–122). If live verification is unavailable, say so.
 - Finish with a short business-language summary of the outcome, checks, remaining issues and publishing status.
+
+## Owner workflow preferences — confirmed 2026-11-06
+- Whenever a new client protocol is created, add its correct name and URL to https://biolinkedsolutions.com/share/ as part of the same task. Inspect the current Share page implementation first, avoid duplicate entries, preserve its existing access behavior, and verify the new protocol link.
+- Before deducting inventory, show the owner the proposed items and quantities and obtain confirmation. Read-only inventory checks are allowed; do not infer permission to deduct from creating a protocol or marking an invoice paid.
