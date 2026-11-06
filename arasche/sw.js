@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /arasche/.
-const CACHE = 'arasche-paid-in-full-20261106';
+const CACHE = 'arasche-cycle6-klow-reta60-20261106';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/arasche/',
