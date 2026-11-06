@@ -68,3 +68,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-06 — Complete client dosing and schedule
 - Completed mmenkveld/ dosing from the owner's instructions, checked the existing CJC/IPA master guide, expanded plain-language explanations and enabled the requested schedule defaults/calculator entries.
 - Verified syntax, dose arithmetic and daily schedule membership. Quote retained; inventory unchanged. Synced-state confirmation follows deployment.
+
+
+## 2026-11-06 — Mobile operations presentation
+- Added scoped phone cards, bottom tabs, sortable lists and touch-friendly forms to profit-loss.html using the established public typography/palette. Accounting scripts preserved exactly; no production record changes.
+- Syntax and DOM interaction checks passed; visual Chromium verification remains blocked by sandbox permissions. See PROJECT_STATUS.md for limits and the ongoing protocol control audit.
