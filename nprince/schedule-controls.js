@@ -1,6 +1,7 @@
 /* Staged schedule controls for both protocol defaults and client-added rows. */
 (function(){
  'use strict';var drafts={},openKey=null;
+ var banner=document.getElementById('a2hs'),scrollHost=document.getElementById('scroll');if(banner&&scrollHost&&banner.parentElement!==scrollHost)scrollHost.insertBefore(banner,scrollHost.firstChild);
  function key(c){return c.sa?'added:'+c.sa:'protocol:'+c.n;}
  function current(k){return schRows().find(function(c){return key(c)===k;});}
  function values(c){return {d:c.d||'',u:c.u||'',rec:c.rec||'',days:c.sa?(c.days||[]).slice():(dpOwn(c.n)||dpProto(c)).slice(),b:c.sa?c.b:schBlk(c)};}

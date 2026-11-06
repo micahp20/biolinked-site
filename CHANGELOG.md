@@ -93,3 +93,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Replaced the personal Protocol/Schedule layouts with shared card/list structures and removed its frontend unlock requirement while preserving supplement tools and backend authorization.
 - Fixed default/added editing/removal on nprince/ and calculator-to-schedule context on both pages. Native Chromium flows passed, including a saved manual-entry fixture, phone/desktop light/dark layouts, and reload/removal persistence. Fixed banner interception and hidden-sheet horizontal scrolling found during browser review.
 - Static clinical/billing/identity data preserved; no inventory or production state writes. See PROJECT_STATUS.md and tools/tests/schedule-controls-repair-2026-11-06.md.
+
+## 2026-11-06 — Complete older banner mount correction
+- Moved nprince/ installation help into the scroll flow and bumped its script/cache versions. The complete real-browser Schedule/Calculator regression passed again. See PROJECT_STATUS.md for evidence and limits.
