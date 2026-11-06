@@ -5527,6 +5527,7 @@ function gkPayload(){
       var o={ id:c.id, dose:c.dose, days:c.days, block:c.block, draw:c.draw, unit:c.unit, step:c.step,
               active:!!c.active, archivedOn:c.archivedOn||null };
       if(c.runWeeks!==undefined) o.runWeeks=c.runWeeks;
+      if(typeof c.recon==='string') o.recon=c.recon;
       /* Compounds added from the Calculator are not in the page's seed, so the
          full definition travels with the payload or another device never sees it. */
       if(/^(calc|man)-/.test(c.id)){ o.name=c.name; o.vial=c.vial; o.unit=c.unit;
@@ -5632,6 +5633,7 @@ function gkHydrate(p){
     if(typeof v.active==='boolean')  c.active=v.active;
     if(v.runWeeks!==undefined)       c.runWeeks=v.runWeeks;
     if(typeof v.draw==='string' && v.draw && v.draw!=='—') c.draw=v.draw;
+    if(typeof v.recon==='string') c.recon=v.recon;
     if(typeof v.unit==='string' && v.unit) c.unit=v.unit;
     if(typeof v.step==='number' && v.step>0) c.step=v.step;
     c.archivedOn = v.archivedOn || null;
@@ -5649,7 +5651,7 @@ function gkHydrate(p){
     gkState.compounds.push({
       id:v.id, name:v.name, vial:v.vial||"Custom",
       dose:typeof v.dose==='number'?v.dose:0, step:typeof v.step==='number'?v.step:0.25,
-      unit:v.unit||"mg", draw:v.draw||"—", block:(v.block==='PM'?'PM':'AM'),
+      unit:v.unit||"mg", draw:v.draw||"—", recon:typeof v.recon==='string'?v.recon:'', block:(v.block==='PM'?'PM':'AM'),
       days:(Array.isArray(v.days)&&v.days.length)?v.days.slice():[],
       foundation:!!v.foundation, active:v.active!==false,
       runWeeks:(v.runWeeks===undefined?null:v.runWeeks)
@@ -7055,3 +7057,7 @@ try{ apD(); }catch(e){}
 
 
 <link rel="stylesheet" href="/mpauldino/protocol-consistency.css?v=2">
+
+
+<link rel="stylesheet" href="/mpauldino/schedule-editor.css?v=1">
+<script src="/mpauldino/schedule-editor.js?v=1"></script>

@@ -84,3 +84,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-06 — Reduce personal protocol text size
 - Responded to phone screenshot feedback by shrinking mpauldino/ Schedule and welcome typography, supplement rows and card spacing. Clinical data and scripts unchanged; bumped only the local stylesheet/cache versions. See PROJECT_STATUS.md for verification limits.
+
+## 2026-11-06 — Personal schedule editing pilot
+- Made mpauldino/ compound rows expand to a definition and staged dose/day/timing editor with remove/restore. Master-list and manual additions use the same editor. Kept the compact styling and supplement tools.
+- Preserved static client data and existing permissions/save path; added optional recon metadata without database changes. DOM/model tests, read-only save-contract validation and syntax checks passed. Rendered/live browser checks remain unverified. See PROJECT_STATUS.md and tools/tests/personal-schedule-editor-2026-11-06.md.
