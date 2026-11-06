@@ -53,3 +53,9 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Application tests: not needed for documentation-only changes; no runtime test or live behavior validation claimed.
 - Delivery method: GitHub API tree/commit and non-publishing branch, not a local git push.
 - Merge: intentionally not performed. Production deployment: not requested or initiated. A later session must verify its own current branch, commit and deployment state rather than relying on this historical record.
+
+## Owner workflow preferences saved — 2026-11-06 UTC
+- Added permanent AGENTS.md instructions to include every new protocol in /share/ and ask before inventory deductions.
+- Scope: documentation only; no Share page, client page or inventory changes in this preference-saving task.
+- AGENTS.md saved directly on main under the owner's current request. Earlier documentation-setup branch restrictions above describe that historical setup.
+- Checked existing instructions, status and changelog; content-only documentation checks apply. Main documentation commits may trigger Pages; no live behavior change is claimed.
