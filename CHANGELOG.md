@@ -44,3 +44,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-05 — Quote add-on (2026-11-06 UTC)
 - Added requested Cagrilintide add-on to nprince/ quote. Existing protocol entry and quote-only state retained; no inventory or scheduling changes. Verified arithmetic and updated scoped cache.
+
+## 2026-11-05 — Correct protocol to match selected quote (2026-11-06 UTC)
+- Removed obsolete compounds from the nprince/ protocol and notes, corrected the selected vial strength and corresponding syringe conversion without changing the existing dose/timing, and preserved the quote.
+- Verified rendered cards, data invariants, dose arithmetic and inline script syntax. No inventory movement; scoped cache refreshed.

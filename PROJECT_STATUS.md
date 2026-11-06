@@ -80,3 +80,8 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Existing quote add-on — 2026-11-06 UTC
 - Added the requested Cagrilintide line to the existing nprince/ quote and retained its existing protocol entry. Preserved quote status, shipping, BAC allocation, dosing, and schedule state; no inventory movement.
 - Paths: nprince/index.html and scoped service-worker cache. Verified exact line-item sum; committed through GitHub API on main under the owner's update request. Deployment result must be checked separately.
+
+## Protocol/quote alignment correction — 2026-11-06 UTC
+- Owner identified the nprince/ protocol still showing the earlier multi-compound recommendation after the quote was narrowed. Corrected the protocol list and cycle/handling notes to the two selected compounds and updated the changed vial-strength draw conversion, preserving the existing dose/timing and quote data.
+- Paths: nprince/index.html and scoped service worker. Checks passed: all inline JS syntax; actual aboutCompound/renderAbout output contains exactly two selected cards; removed items absent from client notes/overview; concentration arithmetic; unchanged quote total/status and inactive schedule defaults.
+- No inventory, paid status or live schedule-state changes. Source baseline: f2fbe2133cb5c59f49f3f9c2f42fbddeccc53478. Saved through GitHub API on main; deployment must be verified separately from source.
