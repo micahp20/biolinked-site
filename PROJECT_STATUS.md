@@ -66,3 +66,9 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Source baseline on main: 782dcdb00af88095755ae0c789e7e83793a78b6d. Publishing as one GitHub API commit on main, not a local git push or separate merge. Earlier no-deployment wording describes the historical documentation setup, not this explicitly authorized pilot deployment.
 - Checks: all inline and pilot JavaScript syntax passed. Headless Chromium smoke verified initial phone view, Cycle 2 preview/transition and mocked schedule sync with no page errors. Model checks passed preview/cancel, advance/Undo, ongoing foundation, personal additions, pause/restore, synced hydration, Cycle 6 KLOW, foundation-only, completion history, empty schedule and unchanged protocol data. Full follow-up browser coverage was limited by the execution sandbox; do not claim complete device regression coverage.
 - Release validation pending: inspect the main Pages run for this exact commit and read live assets if reachable. Report deployment and live-verification status separately. Wider rollout remains unapproved.
+
+### Pilot release result — 2026-11-06 UTC
+- Feature commit e7010bcc30d30ed4760c710abc130ae63889d7a4 is saved directly on main via GitHub API (no local push or PR merge).
+- GitHub Pages run 42157523372 completed successfully for that exact main SHA; build and deployment reported success. https://github.com/micahp20/biolinked-site/actions/runs/42157523372
+- Remote pilot asset was fetched back and verified. The web-reading tool could not access the production domain, so independent live-page retrieval remains unavailable; do not claim a live-browser test.
+- Scope remains the existing mmoritz/ portal only. No wider rollout or production schedule-state migration was performed. Test sync used a mock, with no live member-state writes.
