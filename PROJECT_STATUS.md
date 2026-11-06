@@ -112,3 +112,10 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Updated mmenkveld/ with owner-confirmed CJC/IPA recon/dose and clearer compound/cycle explanations. Checked the existing shared master dosing guide before applying the values. The second blend follows the owner's client-specific dose rather than replacing the shared guide.
 - Added both selected compounds to protocol defaults and calculator entries at the owner's explicit request, independently of quote/payment status. No inventory action or billing change. Existing schedule state is to be updated after deployment while preserving unrelated client edits.
 - Paths: mmenkveld/index.html and scoped worker. All inline syntax, dose conversion, weekday membership/shot counts, calculator entries, absence of pending clinical fields and unchanged quote status/total passed. Saved through GitHub API on main; deployment and synced-state verification are separate release checks.
+
+## Claude handoff import — 2026-11-05 America/Denver
+- Received the owner's operating handoff and prepared BIOLINKED-CODEX-HANDOFF.md with website conventions only; excluded private client, health, financial, vendor, account and access-code details from public git history.
+- Added AGENTS.md startup guidance. Preserved newer inventory-confirmation and Share-listing requirements; flagged historical cycle-rule contradictions rather than implementing them.
+- Baseline: main f570f45cca0b976d05c898325c8ef85a6b6e768a. Scope: four Markdown files only. No application, backend, inventory or configuration changes.
+- Checked the source handoff and all three current memory files; reviewed the proposed text for private data. Runtime tests are unnecessary for this scope. Remote read-back and a docs-only diff are the delivery checks.
+- Saved via GitHub API on docs/claude-handoff-2026-11-05 with a draft PR; no merge or publishing-branch update is part of this import. Until merged, future sessions must select/read the PR branch explicitly.
