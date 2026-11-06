@@ -69,3 +69,6 @@ These requirements are recovered from source and merged task records, not a comp
 ## Owner workflow preferences — confirmed 2026-11-06
 - Whenever a new client protocol is created, add its correct name and URL to https://biolinkedsolutions.com/share/ as part of the same task. Inspect the current Share page implementation first, avoid duplicate entries, preserve its existing access behavior, and verify the new protocol link.
 - Before deducting inventory, show the owner the proposed items and quantities and obtain confirmation. Read-only inventory checks are allowed; do not infer permission to deduct from creating a protocol or marking an invoice paid.
+
+## Claude operating handoff
+- Read BIOLINKED-CODEX-HANDOFF.md for additional recovered website conventions. It is a public-safe summary, not a clinical/catalog authority; newer owner instructions and these protection rules take precedence.

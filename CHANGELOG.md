@@ -68,3 +68,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-06 — Complete client dosing and schedule
 - Completed mmenkveld/ dosing from the owner's instructions, checked the existing CJC/IPA master guide, expanded plain-language explanations and enabled the requested schedule defaults/calculator entries.
 - Verified syntax, dose arithmetic and daily schedule membership. Quote retained; inventory unchanged. Synced-state confirmation follows deployment.
+
+## 2026-11-05 — Claude website handoff import
+- Added a public-safe website handoff and linked it from AGENTS.md; retained newer owner requirements and excluded private operating details.
+- Documentation-only draft PR on docs/claude-handoff-2026-11-05. No application changes, inventory actions, merge or deployment; see PROJECT_STATUS.md for scope and checks.
