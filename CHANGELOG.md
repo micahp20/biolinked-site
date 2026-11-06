@@ -41,3 +41,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-05 — Existing portal quote revision (2026-11-06 UTC)
 - Reduced the nprince/ quote to the selected compound, one BAC water vial and shipping; retained quote status and updated the scoped cache.
 - Verified line-item arithmetic. No inventory or clinical/schedule changes; release verification is separate from saved source.
+
+## 2026-11-05 — Quote add-on (2026-11-06 UTC)
+- Added requested Cagrilintide add-on to nprince/ quote. Existing protocol entry and quote-only state retained; no inventory or scheduling changes. Verified arithmetic and updated scoped cache.

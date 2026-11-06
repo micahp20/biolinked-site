@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /nprince/.
-const CACHE = 'nprince-reta60-quote-v10';
+const CACHE = 'nprince-reta60-cag10-quote-v11';
 const ASSETS = [
   '/compound-library.js?v=2',
   '/nprince/',

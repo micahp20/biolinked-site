@@ -76,3 +76,7 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Quote-only revision — 2026-11-06 UTC
 - Owner requested a single-item quote on existing nprince/ portal; revised quote line items and total, retaining quote status. No inventory, paid ledger, dosing, schedule or historical clinical data changes.
 - Paths: nprince/index.html and nprince/sw.js. Arithmetic and preserved-data checks passed; publishing directly to main via GitHub API under the website update request. See the corresponding main commit/Pages run for release result; live deployment not yet verified at this entry.
+
+## Existing quote add-on — 2026-11-06 UTC
+- Added the requested Cagrilintide line to the existing nprince/ quote and retained its existing protocol entry. Preserved quote status, shipping, BAC allocation, dosing, and schedule state; no inventory movement.
+- Paths: nprince/index.html and scoped service-worker cache. Verified exact line-item sum; committed through GitHub API on main under the owner's update request. Deployment result must be checked separately.
