@@ -37,3 +37,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Added current-cycle controls, transition preview, Undo/history, foundation-only phase, unique compound count and client editing/pause/restore on the existing mmoritz/ portal.
 - Personal additions and ongoing compounds persist between cycles; cycle state uses existing versioned schedule sync. Preserved billing and scoped offline caching.
 - Syntax, browser smoke and model checks passed; full device regression coverage remains limited. Deployment explicitly authorized for this portal only; see PROJECT_STATUS.md for release verification and rollout limits.
+
+## 2026-11-05 — Existing portal quote revision (2026-11-06 UTC)
+- Reduced the nprince/ quote to the selected compound, one BAC water vial and shipping; retained quote status and updated the scoped cache.
+- Verified line-item arithmetic. No inventory or clinical/schedule changes; release verification is separate from saved source.

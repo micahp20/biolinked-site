@@ -72,3 +72,7 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - GitHub Pages run 42157523372 completed successfully for that exact main SHA; build and deployment reported success. https://github.com/micahp20/biolinked-site/actions/runs/42157523372
 - Remote pilot asset was fetched back and verified. The web-reading tool could not access the production domain, so independent live-page retrieval remains unavailable; do not claim a live-browser test.
 - Scope remains the existing mmoritz/ portal only. No wider rollout or production schedule-state migration was performed. Test sync used a mock, with no live member-state writes.
+
+## Quote-only revision — 2026-11-06 UTC
+- Owner requested a single-item quote on existing nprince/ portal; revised quote line items and total, retaining quote status. No inventory, paid ledger, dosing, schedule or historical clinical data changes.
+- Paths: nprince/index.html and nprince/sw.js. Arithmetic and preserved-data checks passed; publishing directly to main via GitHub API under the website update request. See the corresponding main commit/Pages run for release result; live deployment not yet verified at this entry.
