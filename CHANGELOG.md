@@ -64,3 +64,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-06 — Quote quantity reduction
 - Updated mmenkveld/ to the owner's revised two-vials-per-blend quantities, preserving unit pricing, schedules and pending instructions. Quote arithmetic verified; no inventory changes. Scoped cache refreshed.
+
+## 2026-11-06 — Complete client dosing and schedule
+- Completed mmenkveld/ dosing from the owner's instructions, checked the existing CJC/IPA master guide, expanded plain-language explanations and enabled the requested schedule defaults/calculator entries.
+- Verified syntax, dose arithmetic and daily schedule membership. Quote retained; inventory unchanged. Synced-state confirmation follows deployment.

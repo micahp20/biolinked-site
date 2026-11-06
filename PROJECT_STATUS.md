@@ -107,3 +107,8 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Existing quote quantity revision — 2026-11-06 UTC
 - Owner reduced mmenkveld/ quantities to two of each selected blend. Updated quote summary, line amounts, due total and quantity note; retained quote status and excluded shipping/BAC. Clinical fields and Share entry unchanged; no inventory action.
 - Checked line-item sum and clinical-data equality. Saved to main through GitHub API; publishing status checked separately.
+
+## Confirm dosing and enable requested schedule — 2026-11-06 UTC
+- Updated mmenkveld/ with owner-confirmed CJC/IPA recon/dose and clearer compound/cycle explanations. Checked the existing shared master dosing guide before applying the values. The second blend follows the owner's client-specific dose rather than replacing the shared guide.
+- Added both selected compounds to protocol defaults and calculator entries at the owner's explicit request, independently of quote/payment status. No inventory action or billing change. Existing schedule state is to be updated after deployment while preserving unrelated client edits.
+- Paths: mmenkveld/index.html and scoped worker. All inline syntax, dose conversion, weekday membership/shot counts, calculator entries, absence of pending clinical fields and unchanged quote status/total passed. Saved through GitHub API on main; deployment and synced-state verification are separate release checks.
