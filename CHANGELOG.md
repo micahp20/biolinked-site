@@ -109,4 +109,4 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Educational Labs review on one existing portal
 - Added a qualitative Labs walkthrough for the existing jdelorenzo portal from the supplied screenshot panel. Twenty-five markers are grouped, each with the source-app badge separate from an educational label. There is no overall numeric or letter score. Collection date is shown as not provided. The review date is November 7, 2026.
 - Protocol, dosing, calculator, invoices, and paid state on that portal were left as already published. Other clients, inventory, and the ledger were not edited. The portal cache name was refreshed so an installed copy can pick up the page.
-- Local blocked-network browser checks passed at desktop and phone size. See PROJECT_STATUS.md for the branch, checks, and publishing state.
+- Local blocked-network browser checks passed at desktop and phone size. Opened as PR #129 on cursor/joe-labs-review-c89a. Not merged in this session. See PROJECT_STATUS.md.
