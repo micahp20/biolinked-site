@@ -128,7 +128,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-07 — Review-only Cycle 1 request on an existing portal
 - Added a pending clinician-review item list to the existing jcress portal. Published cycles, doses, calculator entries, invoices, and paid states were left in place. Supplied profile details that conflict with the page were not written into Nutrition or the existing cycle text. No quote, price, shipping, BAC line, or inventory action.
-- See PROJECT_STATUS.md for the identity limitation, paths, and publishing state.
+- See PROJECT_STATUS.md for the identity limitation, paths, and publishing state. Branch cursor/jcress-cycle1-request-8977 at d87d4d5febcb41d29275f710825d7a499eae206b was pushed. The pull request was not opened: GitHub returned "must be a collaborator." Not merged and not deployed.
 
 ## 2026-11-07 — Complete quoted compound Protocol descriptions
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
