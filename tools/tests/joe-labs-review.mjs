@@ -12,25 +12,61 @@ const ROOT = new URL('../../', import.meta.url);
 const SHOTS = '/opt/cursor/artifacts/joe-labs-scorecard';
 mkdirSync(SHOTS, { recursive: true });
 
-const SCORED = {
-  'jd-tt': ['868', 'In-range', 3],
-  'jd-egfr': ['69.52', 'In-range', 3],
-  'jd-apob': ['61.9', 'Optimal', 4],
-  'jd-hdl': ['47.0', 'In-range', 3],
-  'jd-tc': ['145', 'Optimal', 4],
-  'jd-tg': ['139', 'In-range', 3],
-  'jd-crp': ['1.21', 'In-range', 3],
-  'jd-ua': ['6.87', 'Out-of-range High', 1],
-  'jd-vd': ['47.0', 'In-range', 3]
-};
+const POINTS = { optimal: 4, average: 3, out: 1 };
+const STATUS = { optimal: 'Optimal', average: 'Average', out: 'Out-of-range' };
+const SOURCE = [
+  ['jd-e2', '44.6', 'out', 'hormones'],
+  ['jd-ft', '198.93', 'average', 'hormones'],
+  ['jd-cort', '13.2', 'optimal', 'hormones'],
+  ['jd-shbg', '33.6', 'optimal', 'hormones'],
+  ['jd-tt', '868', 'optimal', 'hormones'],
+  ['jd-tsh', '1.27', 'optimal', 'liver'],
+  ['jd-cr', '1.24', 'out', 'liver'],
+  ['jd-alp', '42.4', 'average', 'liver'],
+  ['jd-egfr', '69.52', 'average', 'liver'],
+  ['jd-ggt', '24.9', 'optimal', 'liver'],
+  ['jd-alb', '4.36', 'unscored', 'liver'],
+  ['jd-tghdl', '2.95', 'out', 'metabolic'],
+  ['jd-ua', '6.87', 'average', 'metabolic'],
+  ['jd-tg', '139', 'average', 'metabolic'],
+  ['jd-fru', '230', 'optimal', 'metabolic'],
+  ['jd-ldlapob', '1.13', 'out', 'metabolic'],
+  ['jd-rem', '27.79', 'out', 'metabolic'],
+  ['jd-hdl', '47.0', 'average', 'metabolic'],
+  ['jd-tc', '145', 'average', 'metabolic'],
+  ['jd-crp', '1.21', 'average', 'metabolic'],
+  ['jd-ldl', '70.2', 'average', 'metabolic'],
+  ['jd-tchdl', '3.08', 'average', 'metabolic'],
+  ['jd-apob', '61.9', 'optimal', 'metabolic'],
+  ['jd-vd', '47.0', 'average', 'iron'],
+  ['jd-fer', '180', 'optimal', 'iron']
+];
+
+function scale(rows) {
+  const scored = rows.filter((row) => row[2] !== 'unscored');
+  const sum = scored.reduce((total, row) => total + POINTS[row[2]], 0);
+  const max = scored.length * 4;
+  return { n: rows.length, scored: scored.length, sum, max, score: Math.round(sum / max * 100) };
+}
 
 function assertMath() {
-  const pts = Object.values(SCORED).map((row) => row[2]);
-  const sum = pts.reduce((a, b) => a + b, 0);
-  const avg = sum / pts.length;
-  const score = Math.round(avg / 4 * 100);
-  if (pts.length !== 9 || sum !== 27 || score !== 75) {
-    throw new Error('score math ' + JSON.stringify({ pts: pts.length, sum, avg, score }));
+  if (SOURCE.length !== 25) throw new Error('marker count ' + SOURCE.length);
+  const ids = SOURCE.map((row) => row[0]);
+  if (new Set(ids).size !== 25) throw new Error('duplicate ids');
+  const badges = { optimal: 0, average: 0, out: 0, unscored: 0 };
+  SOURCE.forEach((row) => { badges[row[2]] += 1; });
+  if (badges.optimal !== 8 || badges.average !== 11 || badges.out !== 5 || badges.unscored !== 1) {
+    throw new Error('badge counts ' + JSON.stringify(badges));
+  }
+  const all = scale(SOURCE);
+  const hormones = scale(SOURCE.filter((row) => row[3] === 'hormones'));
+  const liver = scale(SOURCE.filter((row) => row[3] === 'liver'));
+  const metabolic = scale(SOURCE.filter((row) => row[3] === 'metabolic'));
+  const iron = scale(SOURCE.filter((row) => row[3] === 'iron'));
+  const expect = { all: 73, hormones: 80, liver: 75, metabolic: 67, iron: 88, sum: 70, scored: 24 };
+  const got = { all: all.score, hormones: hormones.score, liver: liver.score, metabolic: metabolic.score, iron: iron.score, sum: all.sum, scored: all.scored };
+  if (JSON.stringify(got) !== JSON.stringify(expect) || all.max !== 96 || metabolic.sum !== 32 || metabolic.max !== 48 || hormones.sum !== 16 || liver.sum !== 15 || iron.sum !== 7) {
+    throw new Error('score math ' + JSON.stringify({ got, all, hormones, liver, metabolic, iron }));
   }
 }
 
@@ -160,16 +196,18 @@ async function main() {
       const score = document.querySelector('#labsbody .score');
       if (!score) problems.push('missing score card');
       const num = score ? (score.querySelector('.n') || {}).textContent || '' : '';
-      if (!num.includes('75') || !num.includes('/100')) problems.push('score text ' + num);
+      if (!num.includes('73') || !num.includes('/100')) problems.push('score text ' + num);
       const grade = score ? (score.querySelector('.g') || {}).textContent || '' : '';
-      if (!/9 of 25 scored/.test(grade)) problems.push('grade ' + grade);
+      if (grade !== 'Provisional · Kidney and Hormone Follow-up') problems.push('grade ' + grade);
       const chips = Array.from(document.querySelectorAll('#labsbody .dchip')).map((el) => el.textContent.replace(/\\s+/g, ' ').trim());
-      if (chips.length !== 4 || chips.some((c) => !c.startsWith('75'))) problems.push('chips ' + chips.join(' || '));
+      const chipWant = ['80', '75', '67', '88'];
+      if (chips.length !== 4 || chipWant.some((n, i) => !chips[i].startsWith(n))) problems.push('chips ' + chips.join(' || '));
       const rows = Array.from(document.querySelectorAll('#labsbody .lrow'));
       if (rows.length !== 25) problems.push('rows ' + rows.length);
       if (/No bloodwork on file/i.test(text)) problems.push('empty state showing');
       const refs = Array.from(document.querySelectorAll('#labsbody .lref')).map((el) => el.textContent.trim());
-      if (refs.length !== 25 || refs.some((r) => r !== 'Not provided')) problems.push('ranges ' + refs.filter((r) => r !== 'Not provided').slice(0, 3).join(','));
+      if (refs.length !== 25 || refs.some((r) => r !== 'Not shown in supplied screenshots')) problems.push('ranges ' + refs.filter((r) => r !== 'Not shown in supplied screenshots').slice(0, 2).join(','));
+      if (/\\bHigh\\b|\\bLow\\b|Out-of-range High/.test(text)) problems.push('directional out-of-range label');
       const byId = {};
       rows.forEach((row) => {
         const tip = row.querySelector('.ltip');
@@ -185,23 +223,26 @@ async function main() {
       if (document.documentElement.getAttribute('data-theme') !== ${JSON.stringify(theme)}) problems.push('theme');
       const rule = text.includes('Each marker scores 4 if optimal');
       if (!rule) problems.push('rubric text missing');
+      if (!/not a verified laboratory in-range/.test(text)) problems.push('average mapping missing');
+      const ratio = document.getElementById('jd-ldlapob');
+      if (!ratio || !/particle-size/.test(ratio.textContent)) problems.push('ldl apob explanation');
       return { problems, byId, chips };
     })()`);
-    Object.keys(SCORED).forEach((id) => {
-      const got = report.byId[id];
-      if (!got) { report.problems.push('missing ' + id); return; }
-      if (!got.value.includes(SCORED[id][0]) || got.status !== SCORED[id][1]) report.problems.push(id + ' ' + JSON.stringify(got));
+    SOURCE.forEach((row) => {
+      const got = report.byId[row[0]];
+      const status = row[2] === 'unscored' ? 'Unscored' : STATUS[row[2]];
+      if (!got) { report.problems.push('missing ' + row[0]); return; }
+      if (!got.value.includes(row[1]) || got.status !== status) report.problems.push(row[0] + ' ' + JSON.stringify(got));
     });
     const unscored = Object.values(report.byId).filter((row) => row.status === 'Unscored').length;
-    const scoredN = Object.values(report.byId).filter((row) => row.status !== 'Unscored').length;
-    if (unscored !== 16 || scoredN !== 9) report.problems.push('split ' + scoredN + '/' + unscored);
+    if (unscored !== 1 || Object.keys(report.byId).length !== 25) report.problems.push('split ' + Object.keys(report.byId).length + '/' + unscored);
     await evaluate(`(() => { const sc=document.getElementById('scroll'); if(sc) sc.scrollTop=0; if(typeof go==='function') go('labs'); })()`);
     await delay(150);
     await shot(name + '-top');
     await evaluate(`(() => { const el=document.getElementById('jd-cr'); if(el) el.scrollIntoView({block:'center'}); })()`);
     await delay(100);
     const opened = await evaluate(`(() => { if (typeof tt==='function') tt('jd-cr'); const tip=document.getElementById('jd-cr'); return {on: !!(tip && tip.classList.contains('on')), text: tip ? tip.innerText : ''}; })()`);
-    if (!opened.on || !/urine ACR/.test(opened.text)) report.problems.push('creatinine detail');
+    if (!opened.on || !/out of range/.test(opened.text)) report.problems.push('creatinine detail');
     await shot(name + '-row');
     if (name === 'desktop-light') {
       await evaluate(`typeof go==='function' && go('pay')`);

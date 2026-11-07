@@ -112,7 +112,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Local blocked-network browser checks passed at desktop and phone size. Opened as PR #129 on cursor/joe-labs-review-c89a. Not merged in this session. See PROJECT_STATUS.md.
 
 ## 2026-11-07 — Joe Labs uses the shared score card
-- Replaced the separate source-app and educational-read cards on jdelorenzo with the existing portal Labs score card, domain chips, and lean rows. Nine of 25 markers are scored with the educational rubric; the rest stay unscored. Protocol and the paid invoice were not changed.
+- Replaced the separate source-app and educational-read cards on jdelorenzo with the existing portal Labs score card, domain chips, and lean rows. The displayed tally is a provisional source-app rating, 73/100 from 24 of 25 markers. Albumin stays unscored because its badge was cropped. Protocol and the paid invoice were not changed.
 - See PROJECT_STATUS.md for the score basis, checks, and pull-request state.
 
 
