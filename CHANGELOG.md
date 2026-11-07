@@ -104,4 +104,4 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Existing portal invoices marked paid
 - Marked the current nprince and mmenkveld invoices paid in full on the static pages after the owner confirmed payment and that inventory and profit-and-loss were already recorded.
 - Preserved the published line amounts, including the mmenkveld exclusion of shipping and BAC water. Left protocol, dosing, and calculator code unchanged. Refreshed only each portal's scoped cache name. No database, ledger, inventory, charge, or message action in this change.
-- See PROJECT_STATUS.md for checks and publishing status.
+- See PROJECT_STATUS.md for checks and publishing status. Merged in PR #127 at 5852295ae1ea7719b71339146bee147ad849449f. Pages run 42380385622 succeeded for that SHA, and a blocked-network live read of both invoice pages matched the paid state.
