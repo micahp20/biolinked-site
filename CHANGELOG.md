@@ -115,3 +115,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Additional quote on an existing protocol
 - Added the requested separate quote to bdelorenzo/ while retaining the paid order, protocol and schedule. Updated the displayed quote balance and only that portal's cache version. No inventory or ledger action.
 - Source/data-preservation, arithmetic, syntax and isolated invoice-renderer checks passed; rendered browser check was blocked by the Chromium sandbox. Saved on main in a8f72ce and 1152834. See PROJECT_STATUS.md for release status and verification limits.
+
+
+## 2026-11-07 — Remember standard quote charges
+- Saved the owner's recurring shipping and one-BAC-water pricing rule in AGENTS.md and applied it once to the existing additional quote on bdelorenzo/. Preserved the earlier paid order and all protocol/schedule data; no inventory or ledger changes.
+- Arithmetic, isolated renderer and source-preservation checks passed. Saved to main; see PROJECT_STATUS.md for commit references and publishing limits.
