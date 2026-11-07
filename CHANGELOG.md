@@ -120,3 +120,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Remember standard quote charges
 - Saved the owner's recurring shipping and one-BAC-water pricing rule in AGENTS.md and applied it once to the existing additional quote on bdelorenzo/. Preserved the earlier paid order and all protocol/schedule data; no inventory or ledger changes.
 - Arithmetic, isolated renderer and source-preservation checks passed. Saved to main; see PROJECT_STATUS.md for commit references and publishing limits.
+
+
+## 2026-11-07 — Complete quoted compound Protocol descriptions
+- Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
+- Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
