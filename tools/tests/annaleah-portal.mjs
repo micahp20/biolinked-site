@@ -1,15 +1,15 @@
 /**
- * jcress Cycle 1 request draft. Local static server.
+ * Annaleah portal draft. Local static server.
  * Every Supabase/member-sync call and every non-GET is failed before the network.
- * Run: node tools/tests/jcress-cycle1-request.mjs
+ * Run: node tools/tests/annaleah-portal.mjs
  */
 import { spawn } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
 
-const PORT = 8781;
+const PORT = 8784;
 const ROOT = new URL('../../', import.meta.url);
-const SHOTS = '/opt/cursor/artifacts/jcress-cycle1-request';
+const SHOTS = '/opt/cursor/artifacts/annaleah-portal';
 mkdirSync(SHOTS, { recursive: true });
 
 const GUARD = `(() => {
@@ -71,13 +71,13 @@ async function main() {
   const server = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: ROOT.pathname, stdio: 'ignore' });
   const chrome = spawn('/usr/bin/google-chrome', [
     '--headless=new', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage',
-    '--remote-debugging-port=9341', '--user-data-dir=/tmp/chrome-jcress-c1-' + Date.now(),
+    '--remote-debugging-port=9344', '--user-data-dir=/tmp/chrome-annaleah-' + Date.now(),
     '--window-size=1280,900', 'about:blank'
   ], { stdio: 'ignore' });
   let ver = null;
   for (let i = 0; i < 40 && !ver; i++) {
     await delay(250);
-    try { ver = await fetch('http://127.0.0.1:9341/json/version').then((r) => r.json()); } catch (e) {}
+    try { ver = await fetch('http://127.0.0.1:9344/json/version').then((r) => r.json()); } catch (e) {}
   }
   if (!ver) throw new Error('Chrome did not open');
   const ws = new WebSocket(ver.webSocketDebuggerUrl);
@@ -123,111 +123,111 @@ async function main() {
   const reports = [];
   for (const [name, w, h, mobile, theme] of views) {
     await s('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
-    await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/jcress/' });
-    await delay(1200);
-    await evaluate(`localStorage.setItem('jcress-app-theme', ${JSON.stringify(theme)})`);
+    await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/annaleah/' });
+    await delay(700);
+    await evaluate(`localStorage.setItem('annaleah-app-theme', ${JSON.stringify(theme)})`);
     await s('Page.reload', { ignoreCache: true });
     await delay(1600);
     const report = await evaluate(`(() => {
       const problems = [];
-      const box = document.getElementById('c1req');
+      const box = document.getElementById('alref');
       const text = box ? box.innerText : '';
-      const title = document.getElementById('c1req-title');
-      if (!title || title.textContent !== 'Cycle 1 request — pending clinician review') problems.push('title');
-      if (!/Jamie Cress/.test(document.body.innerText)) problems.push('name missing');
-      if (!/not an approved care plan/i.test(text)) problems.push('care-plan label');
-      if (!/weight maintenance/.test(text)) problems.push('goal');
-      if (!/were not written into Nutrition/.test(text)) problems.push('identity hold');
-      if (!/age 32/.test(text) || !/5 ft 8/.test(text) || !/158–163 lb/.test(text)) problems.push('supplied profile');
-      if (!/late forties/.test(text) || !/135-to-115/.test(text)) problems.push('existing profile report');
-      const want = ['Retatrutide', 'Tesamorelin', 'MOTS-c', 'NAD+', 'KPV', 'Cagrilintide'];
-      want.forEach((n) => { if (!text.includes(n)) problems.push('missing ' + n); });
-      if (!/30 mg label · quantity 1/.test(text)) problems.push('reta qty');
-      if (!/20 mg label · quantity 2/.test(text)) problems.push('tesa qty');
-      if (!/40 mg label · quantity 1/.test(text)) problems.push('mots qty');
-      if (!/1000 mg label · quantity 2/.test(text)) problems.push('nad qty');
-      if (!/10 mg label · quantity 2/.test(text)) problems.push('kpv qty');
-      if (!/10 mg label · quantity 1/.test(text)) problems.push('cagri qty');
-      if (/\\$|BAC|shipping|\\bunits\\b|\\bmL\\b|SubQ|titrat|Monday|reconstitut|synerg/i.test(text)) problems.push('forbidden wording');
-      if (!/down to 2\\.5/.test(text) || !/No unit was supplied/.test(text)) problems.push('tirz unit');
-      if (!/April 30, 2026/.test(text) || !/April 30, 2027/.test(text) || !/two refills/.test(text)) problems.push('rx context');
-      if (!/not treated as proof of what is being taken now/.test(text)) problems.push('rx inference');
-      if (document.documentElement.getAttribute('data-theme') !== ${JSON.stringify(theme)}) problems.push('theme');
+      const title = document.getElementById('alref-title');
+      if (!title || title.textContent !== 'Master Cycle 1 — supplied prescriber reference') problems.push('title');
       const who = document.querySelector('.who .wn');
-      if (!who || who.textContent.trim() !== 'Jamie Cress') problems.push('header identity');
-      if (!(typeof PAID === 'number' && PAID === 959.99 && DUE === 0)) problems.push('paid constants');
-      const inv = (typeof INV === 'undefined' ? [] : INV).map((row) => row.status + '|' + row.total + '|' + row.label);
-      const invWant = [
-        'paid|150|Cycle 1 · Fat Loss',
-        'quote|150|Cycle 2 · Cognitive Enhancement · Quote',
-        'paid|135|Cycle 3 · Recovery & Healing',
-        'quote|295|Cycle 4 · Longevity & Anti-Aging · Quote',
-        'quote|140|Cycle 5 · Sexual Health & Hormonal Balance · Quote',
-        'quote|260|Cycle 6 · Sleep & Stress Relief · Quote',
-        'paid|674.99|Add-On · Reta / Cartalax / KPV / Wolverine'
+      if (!who || who.textContent.trim() !== 'Annaleah') problems.push('header ' + (who && who.textContent));
+      if (/Jamie|Cress|Paul/.test(document.body.innerText)) problems.push('other client name visible');
+      const need = [
+        'start 0.5 mg (titrate slow)',
+        '5u',
+        'Mon + Thu AM, 1 mg/wk, hold >=4 wks',
+        'Start slow: 0.5mg Mon+Thu=1mg/wk, hold >=4 wks; step up only if appetite control fades & nausea quiet',
+        'start 0.5 mg, titrate slow',
+        'Mon + Thu, AM',
+        '1 mg',
+        '10u',
+        'daily AM',
+        'daily, AM',
+        '20mg only (10mg retired); one 20mg = 2x the 10mg',
+        '~1.33 mg',
+        'M/W/F',
+        '50 mg',
+        '25u',
+        'M/W/F, push slowly',
+        '500 mcg',
+        'Blank in the supplied reference',
+        'Not specified in supplied reference',
+        'titrate',
+        'Cagrilintide is absent',
+        'Weight maintenance',
+        '158–163 lb',
+        'early September'
       ];
-      if (JSON.stringify(inv) !== JSON.stringify(invWant)) problems.push('invoice map');
-      const c1 = (typeof ALL === 'undefined' ? [] : ALL).filter((c) => (c.cy || []).indexOf('Cycle 1 · Fat Loss') >= 0).map((c) => c.n + '|' + c.d + '|' + c.u);
-      if (JSON.stringify(c1) !== JSON.stringify(['Retatrutide · 30 mg|1 → 3 mg|10 → 30u','MOTS-c · 40 mg|1.6 mg|12u','NAD+ · 1000 mg|50 mg|25u'])) problems.push('cycle1 doses changed');
-      const kpv = (typeof ALL === 'undefined' ? [] : ALL).filter((c) => /^KPV/.test(c.n)).map((c) => c.d + '|' + c.u + '|' + (c.cy || []).join(','));
-      if (JSON.stringify(kpv) !== JSON.stringify(['1 mg|20u|Cycle 3 · Recovery & Healing'])) problems.push('kpv dose changed');
-      const added = (typeof ALL === 'undefined' ? [] : ALL).filter((c) => /tesamorelin|cagrilintide/i.test(c.n));
-      const addedMine = (typeof MINE === 'undefined' ? [] : MINE).filter((c) => /tesamorelin|cagrilintide/i.test(c.name));
-      if (added.length || addedMine.length) problems.push('new products entered protocol data');
-      if (!(typeof nutState === 'object' && nutState.age === 30 && nutState.weightLb === 180 && nutState.heightIn === 70 && nutState.sex === 'male')) problems.push('nutrition overwritten');
+      need.forEach((s) => { if (!text.includes(s)) problems.push('missing ' + s); });
+      if ((text.match(/Not specified in supplied reference/g) || []).length < 2) problems.push('timing count');
+      if (/\\$\\d|Paid|FREE/.test(text)) problems.push('money in reference');
+      if (document.documentElement.getAttribute('data-theme') !== ${JSON.stringify(theme)}) problems.push('theme');
+      if (!(PAID === 0 && DUE === 0 && INV.length === 0 && ALL.length === 0 && MINE.length === 0)) problems.push('data arrays');
+      if (CS_SLUG !== 'annaleah' || SCHKEY !== 'biolinked-sched-annaleah' || KP !== 'annaleah-app-') problems.push('identity keys');
+      if (nutState.age !== 32 || nutState.heightIn !== 68 || nutState.weightLb !== null || nutState.sex !== '' || nutState.goal !== 'maintain') problems.push('nut state');
+      const sexOn = document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="sex"].on').length;
+      if (sexOn !== 0) problems.push('sex selected');
+      if (document.getElementById('nut-w').value !== '') problems.push('weight filled');
+      if (document.getElementById('nut-age').value !== '32') problems.push('age field');
+      if (document.getElementById('nut-ft').value !== '5' || document.getElementById('nut-in').value !== '8') problems.push('height field');
+      const cal = (document.getElementById('nut-cal-sub') || {}).textContent || '';
+      if (!/No single calorie target/.test(cal)) problems.push('calorie calculated');
+      const keys = Object.keys(localStorage);
+      if (keys.some((k) => /jcress|pcress|dh-app|Jamie|Cress/.test(k))) problems.push('foreign storage ' + keys.join(','));
       const scroll = document.getElementById('scroll');
       if (scroll && scroll.scrollWidth - scroll.clientWidth > 2) problems.push('overflow');
-      const cs = getComputedStyle(box);
-      const bg = cs.backgroundColor;
-      const border = cs.borderTopColor;
-      return { problems, bg, border, items: box.querySelectorAll('.c1req-items li').length };
+      const labs = (document.getElementById('v-labs') || {}).innerText || '';
+      if (!/No bloodwork on file/.test(labs) || /Worth drawing|the cut/.test(labs)) problems.push('labs');
+      return { problems };
     })()`);
-    if (report.items !== 6) report.problems.push('item rows ' + report.items);
     await evaluate(`(() => {
       const sc = document.getElementById('scroll');
-      const el = document.getElementById('c1req');
-      const to = el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 70;
-      sc.scrollTop = Math.max(0, to);
+      const el = document.getElementById('alref');
+      sc.scrollTop = Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 88);
     })()`);
-    await delay(200);
+    await delay(180);
     await shot(name);
     if (name === 'desktop-light') {
       await evaluate(`typeof go==='function' && go('pay')`);
-      await delay(300);
+      await delay(250);
       const pay = await evaluate(`(() => {
         const text = (document.getElementById('v-pay') || {}).innerText || '';
         const problems = [];
-        if (!/Paid/.test(text)) problems.push('paid label missing');
-        if (/Tesamorelin|Cagrilintide|Cycle 1 request/.test(text)) problems.push('request leaked into invoice');
-        if (typeof PAID !== 'number' || PAID !== 959.99 || DUE !== 0) problems.push('totals moved');
-        return { problems, head: text.slice(0, 240) };
+        if (!/Quote pending/.test(text) || !/Pending/.test(text)) problems.push('quote label');
+        if (/\\$|Paid|FREE/.test(text)) problems.push('priced or paid invoice');
+        if (!/Retatrutide 30 mg/.test(text) || !/Cagrilintide 10 mg/.test(text) || !/Qty 2/.test(text)) problems.push('lines');
+        if (document.querySelector('#v-pay .invoice-pay-now, #v-pay .paybtn')) problems.push('pay button');
+        return { problems, head: text.slice(0, 300) };
       })()`);
       report.problems.push(...pay.problems);
       await shot('desktop-light-invoice');
       await evaluate(`typeof go==='function' && go('sched'); if (typeof pickDay==='function') pickDay(1);`);
-      await delay(300);
+      await delay(250);
       const sched = await evaluate(`(() => {
         const text = (document.getElementById('v-sched') || {}).innerText || '';
         const problems = [];
-        if (/Tesamorelin|Cagrilintide|Cycle 1 request/.test(text)) problems.push('request leaked into schedule');
-        if (!/Retatrutide/.test(text)) problems.push('existing schedule missing reta');
+        if (!/Nothing scheduled/.test(text)) problems.push('schedule not empty');
+        if (/Retatrutide|Tesamorelin|Cagrilintide|KPV|5u|500 mcg/.test(text)) problems.push('schedule activated');
         return problems;
       })()`);
       report.problems.push(...sched);
       await shot('desktop-light-schedule');
-      await evaluate(`typeof go==='function' && go('proto')`);
     }
     if (name === 'phone-light') {
       await evaluate(`(() => {
         const sc = document.getElementById('scroll');
-        const el = document.querySelector('#c1req .c1req-items');
-        const to = el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 70;
-        sc.scrollTop = Math.max(0, to);
+        const el = document.querySelectorAll('#alref .alref-card')[4];
+        sc.scrollTop = Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 88);
       })()`);
       await delay(150);
-      await shot('phone-light-items');
+      await shot('phone-light-addons');
     }
-    reports.push({ name, problems: report.problems, bg: report.bg, border: report.border });
+    reports.push({ name, problems: report.problems });
     console.log((report.problems.length ? 'FAIL ' : 'PASS ') + name + ' ' + report.problems.join(' | '));
   }
   const net = await evaluate(`window.__netlog || []`);
@@ -235,7 +235,7 @@ async function main() {
   if (continued.some((row) => row.method !== 'GET')) blockers.push('continued non-GET');
   if (continued.some((row) => /supabase/i.test(row.url))) blockers.push('continued supabase');
   if (!(net || []).some((row) => row.method === 'POST' && /supabase|get_state/i.test(row.url))) blockers.push('member sync was not attempted');
-  writeFileSync('/tmp/jcress-c1-results.json', JSON.stringify({ reports, blockers, blocked: (net || []).length, continued: continued.length }, null, 2));
+  writeFileSync('/tmp/annaleah-results.json', JSON.stringify({ reports, blockers, blocked: (net || []).length, continued: continued.length }, null, 2));
   console.log(JSON.stringify({ blockers, blocked: (net || []).length, continued: continued.length }, null, 2));
   ws.close();
   chrome.kill('SIGKILL');
