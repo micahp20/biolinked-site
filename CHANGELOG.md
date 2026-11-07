@@ -126,6 +126,10 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Arithmetic, isolated renderer and source-preservation checks passed. Saved to main; see PROJECT_STATUS.md for commit references and publishing limits.
 
 
+## 2026-11-07 — Annaleah portal from the supplied master sheets
+- Removed the earlier pending section from the jcress portal so Jamie’s page matches the published baseline. Added a separate /annaleah/ portal for Annaleah, with no surname and no copied Jamie billing, protocol history, labs, or storage identity.
+- The new page transcribes the supplied Cycle 1 reference and two add-on rows, including source dose, draw, timing, and prescriber notes. The schedule is not activated. The invoice is quote pending, without prices or a paid flag. Branch cursor/jcress-cycle1-request-8977 at 9af4d3b395746e8a9764236b8d9dbb18f8491b77. The pull request was not opened: GitHub returned "must be a collaborator." Not merged and not deployed. See PROJECT_STATUS.md.
+
 ## 2026-11-07 — Complete quoted compound Protocol descriptions
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
