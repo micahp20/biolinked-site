@@ -100,3 +100,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-06 — Complete older banner mount correction
 - Moved nprince/ installation help into the scroll flow and bumped its script/cache versions. The complete real-browser Schedule/Calculator regression passed again. See PROJECT_STATUS.md for evidence and limits.
+
+## 2026-11-07 — Existing portal invoices marked paid
+- Marked the current nprince and mmenkveld invoices paid in full on the static pages after the owner confirmed payment and that inventory and profit-and-loss were already recorded.
+- Preserved the published line amounts, including the mmenkveld exclusion of shipping and BAC water. Left protocol, dosing, and calculator code unchanged. Refreshed only each portal's scoped cache name. No database, ledger, inventory, charge, or message action in this change.
+- See PROJECT_STATUS.md for checks and publishing status.
