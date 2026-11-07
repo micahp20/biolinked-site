@@ -96,7 +96,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-06 — Calculator add buttons show a result or a reason
 - Add to My List, Add to my schedule, and Add compound now bring the new row or a plain-language error into view, with a toast, on every calculator protocol page. Incomplete draws and a missing weekday no longer fail silently. The install banner no longer covers the buttons. Doses, weekday overrides, invoices, and saved lists are unchanged.
-- Shared script calc-feedback.js on 143 pages; 142 portal cache names updated. Browser evidence is in PROJECT_STATUS.md. One legacy phone case did not receive a headless click. An early nprince sync write from an unblocked local test was reversed.
+- Shared script calc-feedback.js on 143 pages; 142 portal cache names updated. Browser evidence is in PROJECT_STATUS.md. One legacy phone case did not receive a headless click. Test rows written to the nprince member sync during local checks were removed or tombstoned.
 
 ## 2026-11-06 — Complete older banner mount correction
 - Moved nprince/ installation help into the scroll flow and bumped its script/cache versions. The complete real-browser Schedule/Calculator regression passed again. See PROJECT_STATUS.md for evidence and limits.
