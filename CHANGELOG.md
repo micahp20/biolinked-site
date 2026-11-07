@@ -110,3 +110,8 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Added a qualitative Labs walkthrough for the existing jdelorenzo portal from the supplied screenshot panel. Twenty-five markers are grouped, each with the source-app badge separate from an educational label. There is no overall numeric or letter score. Collection date is shown as not provided. The review date is November 7, 2026.
 - Protocol, dosing, calculator, invoices, and paid state on that portal were left as already published. Other clients, inventory, and the ledger were not edited. The portal cache name was refreshed so an installed copy can pick up the page.
 - Local blocked-network browser checks passed at desktop and phone size. Opened as PR #129 on cursor/joe-labs-review-c89a. Not merged in this session. See PROJECT_STATUS.md.
+
+
+## 2026-11-07 — Additional quote on an existing protocol
+- Added the requested separate quote to bdelorenzo/ while retaining the paid order, protocol and schedule. Updated the displayed quote balance and only that portal's cache version. No inventory or ledger action.
+- Source/data-preservation, arithmetic, syntax and isolated invoice-renderer checks passed; rendered browser check was blocked by the Chromium sandbox. Saved on main in a8f72ce and 1152834. See PROJECT_STATUS.md for release status and verification limits.
