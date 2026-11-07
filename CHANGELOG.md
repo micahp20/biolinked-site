@@ -126,6 +126,10 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Arithmetic, isolated renderer and source-preservation checks passed. Saved to main; see PROJECT_STATUS.md for commit references and publishing limits.
 
 
+## 2026-11-07 — Review-only Cycle 1 request on an existing portal
+- Added a pending clinician-review item list to the existing jcress portal. Published cycles, doses, calculator entries, invoices, and paid states were left in place. Supplied profile details that conflict with the page were not written into Nutrition or the existing cycle text. No quote, price, shipping, BAC line, or inventory action.
+- See PROJECT_STATUS.md for the identity limitation, paths, and publishing state.
+
 ## 2026-11-07 — Complete quoted compound Protocol descriptions
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
