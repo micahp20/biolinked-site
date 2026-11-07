@@ -1,6 +1,6 @@
 # Bio Linked Solutions — project status
 
-Last reviewed: 2026-11-05 (America/Denver).
+Last reviewed: 2026-11-07 (America/Denver).
 Repository: https://github.com/micahp20/biolinked-site
 Production domain recorded in CNAME: https://biolinkedsolutions.com
 Inspected main baseline: 0bd7f7117ee38a5e3693f35b0125705df589277b.
@@ -194,6 +194,12 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Verified arithmetic in cents, quote status, display renderer including both fee lines, paid-record equality and exact source equality outside invoice/totals. Syntax was checked on the preceding invoice-only version; this follow-up changes JSON values and strings only. Browser preview remained blocked by the previously recorded sandbox restriction.
 - Saved remotely on main: permanent rule 07e250f689f9bcc617a30d02f464ecdbd93432b8; quote f3475d80803a154c3464bf20ccb7e49b96eaf1f9; cache 01767af76fb2ff847abeba987604c3d1f1b22afb. No separate merge. Pages publishing and live verification checked separately; live HTTP attempt could not connect to proxy and the additional-network retry was cancelled by the user.
 
+## Joe Labs score card — 2026-11-07
+- Owner rejected the separate source-app / educational-read cards and asked for the existing portal Labs pattern: overall score, domain chips, and lean rows. Branched from current main. mpauldino was inspected only; its values and scores were not copied, and that page was not edited.
+- jdelorenzo Labs uses the shared score-card renderer. All 25 transcribed results remain. The score is a provisional source-app tally: 8 optimal, 11 average, 5 out of range, albumin unscored. 70 points over 24 markers is 73/100. Average is not treated as a verified laboratory in-range result. Protocol, dosing, calculator, invoices, and the paid $610 / zero quote balance were not edited.
+- Paths: jdelorenzo/labs-review.js, the qualitative-renderer removal in jdelorenzo/index.html, jdelorenzo/sw.js cache suffix, tools/tests/joe-labs-review.mjs.
+- Checks: node --check on the data script and worker. Headless Chrome at desktop and phone, light and dark, with Supabase and every non-GET blocked in the page. Score math is 70/96 rounded to 73, with 25 rows and albumin unscored. The paid invoice view stayed $610 and $0. No production client-state write.
+- Publishing: pull request only. Not merged in this session. Live site still shows the prior Labs presentation until a later publish.
 
 ## Complete protocol entries for quoted additions — 2026-11-07
 - Owner identified that the prior bdelorenzo/ update changed only the invoice. Added separate quoted compound entries and plain-language descriptions to the actual Protocol data (ALL), preserving the existing active GHK entry and the rest of CMP/MINE, billing, clinical history and saved schedule state.

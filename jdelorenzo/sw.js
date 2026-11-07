@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jdelorenzo/.
-const CACHE = 'jdelorenzo-master-sched1-v8-context-v1-controls-v1-calcact1-labs1';
+const CACHE = 'jdelorenzo-master-sched1-v8-context-v1-controls-v1-calcact1-labs3';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
@@ -9,7 +9,7 @@ const ASSETS = [
   '/compound-library.js?v=2',
   '/jdelorenzo/',
   '/jdelorenzo/index.html',
-  '/jdelorenzo/labs-review.js?v=1',
+  '/jdelorenzo/labs-review.js?v=3',
   '/jdelorenzo/manifest.json',
   '/icon-192.png',
   '/icon-512.png'

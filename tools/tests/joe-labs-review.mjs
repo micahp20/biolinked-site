@@ -1,58 +1,72 @@
 /**
- * Joe Labs review: render check with every Supabase / member-sync call and
- * every non-GET request blocked. Local fixtures only. Does not write
- * production client state, send mail, or charge anything.
- *
+ * Joe Labs score card. Local static server. Every Supabase/member-sync call
+ * and every non-GET is blocked before the network.
  * Run: node tools/tests/joe-labs-review.mjs
  */
 import { spawn } from 'node:child_process';
-import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
 
-const PORT = 8771;
+const PORT = 8773;
 const ROOT = new URL('../../', import.meta.url);
-const SHOTS = '/opt/cursor/artifacts/joe-labs';
+const SHOTS = '/opt/cursor/artifacts/joe-labs-scorecard';
 mkdirSync(SHOTS, { recursive: true });
 
-const MARKERS = [
-  ['tsh', 'TSH', '1.27', 'uIU/mL', 'OPTIMAL', 'Favorable'],
-  ['creatinine', 'Creatinine', '1.24', 'mg/dL', 'OUT OF RANGE', 'Needs clinician follow-up'],
-  ['alp', 'ALP', '42.4', 'U/L', 'AVERAGE', 'Intermediate'],
-  ['egfr', 'eGFR', '69.52', 'mL/min/1.73m2', 'AVERAGE', 'Needs clinician follow-up'],
-  ['ggt', 'GGT', '24.9', 'U/L', 'OPTIMAL', 'Favorable'],
-  ['tghdl', 'Triglyceride / HDL ratio', '2.95', 'ratio', 'OUT OF RANGE', 'Intermediate'],
-  ['uric', 'Uric acid', '6.87', 'mg/dL', 'AVERAGE', 'Intermediate'],
-  ['tg', 'Triglycerides', '139', 'mg/dL', 'AVERAGE', 'Intermediate'],
-  ['vitd', 'Vitamin D', '47.0', 'ng/mL', 'AVERAGE', 'Favorable'],
-  ['fructosamine', 'Fructosamine', '230', 'umol/L', 'OPTIMAL', 'Favorable'],
-  ['albumin', 'Albumin', '4.36', 'g/dL', 'Not readable', 'Favorable'],
-  ['ferritin', 'Ferritin', '180', 'ng/mL', 'OPTIMAL', 'Favorable'],
-  ['ldlapob', 'LDL / ApoB ratio', '1.13', 'ratio', 'OUT OF RANGE', 'Not a clinical target'],
-  ['remnant', 'Remnant cholesterol', '27.79', 'mg/dL', 'OUT OF RANGE', 'Intermediate'],
-  ['hdl', 'HDL', '47.0', 'mg/dL', 'AVERAGE', 'Intermediate'],
-  ['tc', 'Total cholesterol', '145', 'mg/dL', 'AVERAGE', 'Favorable'],
-  ['hscrp', 'hsCRP', '1.21', 'mg/L', 'AVERAGE', 'Intermediate'],
-  ['ldl', 'LDL', '70.2', 'mg/dL', 'AVERAGE', 'Favorable'],
-  ['tchdl', 'Total cholesterol / HDL ratio', '3.08', 'ratio', 'AVERAGE', 'Favorable'],
-  ['apob', 'ApoB', '61.9', 'mg/dL', 'OPTIMAL', 'Favorable'],
-  ['e2', 'Estradiol', '44.6', 'pg/mL', 'OUT OF RANGE', 'Needs clinician follow-up'],
-  ['freet', 'Free testosterone', '198.93', 'pg/mL', 'AVERAGE', 'Insufficient context'],
-  ['cortisol', 'Cortisol', '13.2', 'ug/dL', 'OPTIMAL', 'Insufficient context'],
-  ['shbg', 'SHBG', '33.6', 'nmol/L', 'OPTIMAL', 'Favorable'],
-  ['totalt', 'Total testosterone', '868', 'ng/dL', 'OPTIMAL', 'Not low — review timing']
+const POINTS = { optimal: 4, average: 3, out: 1 };
+const STATUS = { optimal: 'Optimal', average: 'Average', out: 'Out-of-range' };
+const SOURCE = [
+  ['jd-e2', '44.6', 'out', 'hormones'],
+  ['jd-ft', '198.93', 'average', 'hormones'],
+  ['jd-cort', '13.2', 'optimal', 'hormones'],
+  ['jd-shbg', '33.6', 'optimal', 'hormones'],
+  ['jd-tt', '868', 'optimal', 'hormones'],
+  ['jd-tsh', '1.27', 'optimal', 'liver'],
+  ['jd-cr', '1.24', 'out', 'liver'],
+  ['jd-alp', '42.4', 'average', 'liver'],
+  ['jd-egfr', '69.52', 'average', 'liver'],
+  ['jd-ggt', '24.9', 'optimal', 'liver'],
+  ['jd-alb', '4.36', 'unscored', 'liver'],
+  ['jd-tghdl', '2.95', 'out', 'metabolic'],
+  ['jd-ua', '6.87', 'average', 'metabolic'],
+  ['jd-tg', '139', 'average', 'metabolic'],
+  ['jd-fru', '230', 'optimal', 'metabolic'],
+  ['jd-ldlapob', '1.13', 'out', 'metabolic'],
+  ['jd-rem', '27.79', 'out', 'metabolic'],
+  ['jd-hdl', '47.0', 'average', 'metabolic'],
+  ['jd-tc', '145', 'average', 'metabolic'],
+  ['jd-crp', '1.21', 'average', 'metabolic'],
+  ['jd-ldl', '70.2', 'average', 'metabolic'],
+  ['jd-tchdl', '3.08', 'average', 'metabolic'],
+  ['jd-apob', '61.9', 'optimal', 'metabolic'],
+  ['jd-vd', '47.0', 'average', 'iron'],
+  ['jd-fer', '180', 'optimal', 'iron']
 ];
 
+function scale(rows) {
+  const scored = rows.filter((row) => row[2] !== 'unscored');
+  const sum = scored.reduce((total, row) => total + POINTS[row[2]], 0);
+  const max = scored.length * 4;
+  return { n: rows.length, scored: scored.length, sum, max, score: Math.round(sum / max * 100) };
+}
+
 function assertMath() {
-  const round2 = (n) => Math.round(n * 100) / 100;
-  const checks = [
-    [round2(139 / 47), 2.96, '139/47'],
-    [round2(145 / 47), 3.09, '145/47'],
-    [round2(70.2 / 61.9), 1.13, '70.2/61.9'],
-    [round2(145 - 47 - 70.2), 27.8, 'remnant'],
-    [145 - 47, 98, 'non-HDL']
-  ];
-  for (const [got, want, name] of checks) {
-    if (got !== want) throw new Error(name + ' expected ' + want + ' got ' + got);
+  if (SOURCE.length !== 25) throw new Error('marker count ' + SOURCE.length);
+  const ids = SOURCE.map((row) => row[0]);
+  if (new Set(ids).size !== 25) throw new Error('duplicate ids');
+  const badges = { optimal: 0, average: 0, out: 0, unscored: 0 };
+  SOURCE.forEach((row) => { badges[row[2]] += 1; });
+  if (badges.optimal !== 8 || badges.average !== 11 || badges.out !== 5 || badges.unscored !== 1) {
+    throw new Error('badge counts ' + JSON.stringify(badges));
+  }
+  const all = scale(SOURCE);
+  const hormones = scale(SOURCE.filter((row) => row[3] === 'hormones'));
+  const liver = scale(SOURCE.filter((row) => row[3] === 'liver'));
+  const metabolic = scale(SOURCE.filter((row) => row[3] === 'metabolic'));
+  const iron = scale(SOURCE.filter((row) => row[3] === 'iron'));
+  const expect = { all: 73, hormones: 80, liver: 75, metabolic: 67, iron: 88, sum: 70, scored: 24 };
+  const got = { all: all.score, hormones: hormones.score, liver: liver.score, metabolic: metabolic.score, iron: iron.score, sum: all.sum, scored: all.scored };
+  if (JSON.stringify(got) !== JSON.stringify(expect) || all.max !== 96 || metabolic.sum !== 32 || metabolic.max !== 48 || hormones.sum !== 16 || liver.sum !== 15 || iron.sum !== 7) {
+    throw new Error('score math ' + JSON.stringify({ got, all, hormones, liver, metabolic, iron }));
   }
 }
 
@@ -61,49 +75,29 @@ const GUARD = `(() => {
     const m = String(method || 'GET').toUpperCase();
     const u = String(url || '');
     if (m !== 'GET') return true;
-    if (/supabase/i.test(u)) return true;
-    if (/save_state|get_state|member[_-]?sync/i.test(u)) return true;
+    if (/supabase|save_state|get_state|member[_-]?sync|wk_get|nut_get/i.test(u)) return true;
     return false;
   };
   const log = (method, url) => {
-    const row = { method: String(method || '').toUpperCase(), url: String(url || '') };
-    (window.__netlog = window.__netlog || []).push(row);
+    (window.__netlog = window.__netlog || []).push({ method: String(method || '').toUpperCase(), url: String(url || '') });
   };
   const orig = window.fetch;
   window.fetch = function (input, init) {
     const url = typeof input === 'string' ? input : (input && input.url) || '';
     const method = (init && init.method) || (input && input.method) || 'GET';
-    if (bad(url, method)) {
-      log(method, url);
-      return Promise.reject(new TypeError('blocked by test'));
-    }
+    if (bad(url, method)) { log(method, url); return Promise.reject(new TypeError('blocked')); }
     return orig.apply(this, arguments);
   };
   const open = XMLHttpRequest.prototype.open;
   const send = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.open = function (method, url) {
-    this.__bls = { method: method, url: url };
-    return open.apply(this, arguments);
-  };
+  XMLHttpRequest.prototype.open = function (method, url) { this.__bls = { method, url }; return open.apply(this, arguments); };
   XMLHttpRequest.prototype.send = function () {
     const meta = this.__bls || { method: 'GET', url: '' };
-    if (bad(meta.url, meta.method)) {
-      log(meta.method, meta.url);
-      throw new Error('blocked by test');
-    }
+    if (bad(meta.url, meta.method)) { log(meta.method, meta.url); throw new Error('blocked'); }
     return send.apply(this, arguments);
   };
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon = function (url) {
-      log('BEACON', url);
-      return false;
-    };
-  }
-  if (navigator.serviceWorker && navigator.serviceWorker.register) {
-    navigator.serviceWorker.register = function () {
-      return Promise.reject(new Error('service worker blocked in test'));
-    };
-  }
+  if (navigator.sendBeacon) navigator.sendBeacon = function (url) { log('BEACON', url); return false; };
+  if (navigator.serviceWorker) navigator.serviceWorker.register = function () { return Promise.reject(new Error('sw blocked')); };
 })();`;
 
 function cdp(ws) {
@@ -113,13 +107,11 @@ function cdp(ws) {
   ws.addEventListener('message', (ev) => {
     const msg = JSON.parse(ev.data);
     if (msg.id && pending.has(msg.id)) {
-      const { resolve, reject } = pending.get(msg.id);
+      const box = pending.get(msg.id);
       pending.delete(msg.id);
-      if (msg.error) reject(new Error(JSON.stringify(msg.error)));
-      else resolve(msg);
-    } else if (msg.method && sessions.has(msg.sessionId || '')) {
-      sessions.get(msg.sessionId || '')(msg);
-    }
+      if (msg.error) box.reject(new Error(JSON.stringify(msg.error)));
+      else box.resolve(msg);
+    } else if (msg.method && sessions.has(msg.sessionId || '')) sessions.get(msg.sessionId || '')(msg);
   });
   function send(method, params = {}, sessionId) {
     const id = ++seq;
@@ -133,78 +125,51 @@ function cdp(ws) {
   return { send, sessions };
 }
 
-async function evaluate(s, expression) {
-  const r = await s('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
-  if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails).slice(0, 800));
-  return r.result.value;
-}
-
-async function shot(s, name) {
-  const img = await s('Page.captureScreenshot', { format: 'png' });
-  writeFileSync(SHOTS + '/' + name + '.png', Buffer.from(img.data, 'base64'));
-}
-
 async function main() {
   assertMath();
-  const server = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], {
-    cwd: ROOT.pathname,
-    stdio: 'ignore'
-  });
+  const server = spawn('python3', ['-m', 'http.server', String(PORT), '--bind', '127.0.0.1'], { cwd: ROOT.pathname, stdio: 'ignore' });
   const chrome = spawn('/usr/bin/google-chrome', [
-    '--headless=new',
-    '--disable-gpu',
-    '--no-sandbox',
-    '--disable-dev-shm-usage',
-    '--remote-debugging-port=9334',
-    '--user-data-dir=/tmp/chrome-joe-labs-' + Date.now(),
-    '--window-size=1280,900',
-    'about:blank'
+    '--headless=new', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage',
+    '--remote-debugging-port=9337', '--user-data-dir=/tmp/chrome-joe-score-' + Date.now(),
+    '--window-size=1280,900', 'about:blank'
   ], { stdio: 'ignore' });
   let ver = null;
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 40 && !ver; i++) {
     await delay(250);
-    try {
-      ver = await fetch('http://127.0.0.1:9334/json/version').then((r) => r.json());
-      break;
-    } catch (e) { /* chrome still starting */ }
+    try { ver = await fetch('http://127.0.0.1:9337/json/version').then((r) => r.json()); } catch (e) {}
   }
-  if (!ver) throw new Error('Chrome DevTools did not open');
+  if (!ver) throw new Error('Chrome did not open');
   const ws = new WebSocket(ver.webSocketDebuggerUrl);
-  await new Promise((res, rej) => {
-    ws.addEventListener('open', res);
-    ws.addEventListener('error', rej);
-  });
+  await new Promise((res, rej) => { ws.addEventListener('open', res); ws.addEventListener('error', rej); });
   const { send, sessions } = cdp(ws);
   const target = await send('Target.createTarget', { url: 'about:blank' });
   const attached = await send('Target.attachToTarget', { targetId: target.result.targetId, flatten: true });
   const session = attached.result.sessionId;
   const continued = [];
-  const cdpBlocked = [];
-  const finished = [];
   sessions.set(session, (msg) => {
-    if (msg.method === 'Fetch.requestPaused') {
-      const req = msg.params.request;
-      const method = String(req.method || 'GET').toUpperCase();
-      const url = req.url || '';
-      const block = method !== 'GET' || /supabase/i.test(url) || /save_state|get_state|member[_-]?sync/i.test(url);
-      if (block) {
-        cdpBlocked.push({ method, url });
-        send('Fetch.failRequest', { requestId: msg.params.requestId, errorReason: 'BlockedByClient' }, session);
-      } else {
-        continued.push({ method, url });
-        send('Fetch.continueRequest', { requestId: msg.params.requestId }, session);
-      }
-    }
-    if (msg.method === 'Network.responseReceived' || msg.method === 'Network.loadingFinished') {
-      const url = (msg.params.response && msg.params.response.url) || msg.params.url || '';
-      if (/supabase/i.test(url)) finished.push(url);
-    }
+    if (msg.method !== 'Fetch.requestPaused') return;
+    const req = msg.params.request;
+    const method = String(req.method || 'GET').toUpperCase();
+    const url = req.url || '';
+    const block = method !== 'GET' || /supabase|save_state|get_state|member[_-]?sync|wk_get|nut_get/i.test(url);
+    if (block) send('Fetch.failRequest', { requestId: msg.params.requestId, errorReason: 'BlockedByClient' }, session);
+    else { continued.push({ method, url }); send('Fetch.continueRequest', { requestId: msg.params.requestId }, session); }
   });
   const s = (method, params) => send(method, params || {}, session).then((r) => r.result);
+  async function evaluate(expression) {
+    const r = await s('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+    if (r.exceptionDetails) throw new Error(JSON.stringify(r.exceptionDetails).slice(0, 700));
+    return r.result.value;
+  }
+  async function shot(name) {
+    const img = await s('Page.captureScreenshot', { format: 'png' });
+    writeFileSync(SHOTS + '/' + name + '.png', Buffer.from(img.data, 'base64'));
+  }
   await s('Page.enable');
   await s('Runtime.enable');
   await s('Network.enable');
-  await s('Network.setBlockedURLs', { urls: ['*supabase.co*', '*supabase.in*'] });
+  await s('Network.setBlockedURLs', { urls: ['*supabase.co*'] });
+  await s('Network.setCacheDisabled', { cacheDisabled: true });
   await s('Fetch.enable', { patterns: [{ urlPattern: '*', requestStage: 'Request' }] });
   await s('Page.addScriptToEvaluateOnNewDocument', { source: GUARD });
 
@@ -217,173 +182,90 @@ async function main() {
   const reports = [];
   for (const [name, w, h, mobile, theme] of views) {
     await s('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
-    await s('Network.setCacheDisabled', { cacheDisabled: true });
-    await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/jdelorenzo/?labsreview=1' });
-    await delay(1600);
-    await evaluate(s, `(() => { localStorage.setItem('jdelorenzo-app-theme', ${JSON.stringify(theme)}); })()`);
+    await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/jdelorenzo/?score=1' });
+    await delay(1500);
+    await evaluate(`localStorage.setItem('jdelorenzo-app-theme', ${JSON.stringify(theme)})`);
     await s('Page.reload', { ignoreCache: true });
-    await delay(1800);
-    const report = await evaluate(s, `(() => {
+    await delay(1700);
+    const report = await evaluate(`(() => {
+      if (typeof go === 'function') go('labs');
       const problems = [];
       const host = document.getElementById('labsbody');
-      if (typeof go === 'function') go('labs');
-      const themeNow = document.documentElement.getAttribute('data-theme');
-      const cards = Array.from(document.querySelectorAll('#labsbody .qcard'));
-      const rows = cards.map((card) => ({
-        id: card.getAttribute('data-marker'),
-        name: (card.querySelector('.qname') || {}).textContent || '',
-        value: (card.querySelector('.qnum') || {}).textContent || '',
-        unit: (card.querySelector('.qval em') || {}).textContent || '',
-        source: (card.querySelector('.qsrc') || {}).textContent || '',
-        read: (card.querySelector('.qread') || {}).textContent || '',
-        sourceLabel: (card.querySelector('.qfield .k') || {}).textContent || '',
-        readLabel: card.querySelectorAll('.qfield .k')[1] ? card.querySelectorAll('.qfield .k')[1].textContent : '',
-        change: (card.querySelector('.qchg') || {}).textContent || ''
-      }));
       const text = host ? host.innerText : '';
-      const ranks = Array.from(document.querySelectorAll('.qtop-ranks li')).map((li) => li.textContent.trim());
-      const count = host ? host.getAttribute('data-marker-count') : '';
-      if (count !== '25' || cards.length !== 25) problems.push('count ' + count + '/' + cards.length);
-      if (themeNow !== ${JSON.stringify(theme)}) problems.push('theme ' + themeNow);
-      if (/No bloodwork on file/i.test(text)) problems.push('empty state still showing');
-      const low = text.toLowerCase();
-      if (/\\b\\d+\\s*\\/\\s*100\\b|overall score|all healthy/.test(low)) problems.push('score or clearance language');
-      const must = [
-        'Collection date:',
-        'not provided',
-        'November 7, 2026',
-        'not a draw date',
-        'not a percentage',
-        '2.96',
-        '3.09',
-        '2.95',
-        '3.08',
-        'approximately consistent',
-        'not exact rounding',
-        '27.79',
-        '27.8',
-        'method unconfirmed',
-        'not a particle-size diagnosis',
-        'not proof of optimal therapy',
-        'Not low',
-        'Insufficient context',
-        'urine albumin-to-creatinine ratio',
-        'Not medical advice',
-        '98 mg/dL',
-        'Comparison date not provided',
-        'Not readable'
-      ];
-      must.forEach((bit) => { if (!low.includes(bit.toLowerCase())) problems.push('missing ' + bit); });
-      if ((low.match(/insufficient context/g) || []).length < 2) problems.push('free T and cortisol context');
-      if (/optimal therapy/.test(text) && !/not proof of optimal therapy/.test(text)) problems.push('optimal therapy claim');
-      if (/free T3|thyroid antibodies/i.test(text)) problems.push('routine thyroid add-ons');
-      if (/2026 ACC|ACC\\/AHA dyslipidemia|once in a lifetime/i.test(text)) problems.push('unverified 2026 guideline');
+      if (document.querySelector('.qcard')) problems.push('old card UI still present');
+      const score = document.querySelector('#labsbody .score');
+      if (!score) problems.push('missing score card');
+      const num = score ? (score.querySelector('.n') || {}).textContent || '' : '';
+      if (!num.includes('73') || !num.includes('/100')) problems.push('score text ' + num);
+      const grade = score ? (score.querySelector('.g') || {}).textContent || '' : '';
+      if (grade !== 'Provisional · Kidney and Hormone Follow-up') problems.push('grade ' + grade);
+      const chips = Array.from(document.querySelectorAll('#labsbody .dchip')).map((el) => el.textContent.replace(/\\s+/g, ' ').trim());
+      const chipWant = ['80', '75', '67', '88'];
+      if (chips.length !== 4 || chipWant.some((n, i) => !chips[i].startsWith(n))) problems.push('chips ' + chips.join(' || '));
+      const rows = Array.from(document.querySelectorAll('#labsbody .lrow'));
+      if (rows.length !== 25) problems.push('rows ' + rows.length);
+      if (/No bloodwork on file/i.test(text)) problems.push('empty state showing');
+      const refs = Array.from(document.querySelectorAll('#labsbody .lref')).map((el) => el.textContent.trim());
+      if (refs.length !== 25 || refs.some((r) => r !== 'Not shown in supplied screenshots')) problems.push('ranges ' + refs.filter((r) => r !== 'Not shown in supplied screenshots').slice(0, 2).join(','));
+      if (/\\bHigh\\b|\\bLow\\b|Out-of-range High/.test(text)) problems.push('directional out-of-range label');
+      const byId = {};
+      rows.forEach((row) => {
+        const tip = row.querySelector('.ltip');
+        const id = tip ? tip.id : '';
+        byId[id] = {
+          value: ((row.querySelector('.lv') || {}).textContent || '').replace(/\\s+/g, ''),
+          status: ((row.querySelector('.pill') || {}).textContent || '').trim()
+        };
+      });
       const scroll = document.getElementById('scroll');
-      const overflow = scroll ? scroll.scrollWidth - scroll.clientWidth : 999;
-      if (overflow > 2) problems.push('horizontal overflow ' + overflow);
-      const inv = typeof INV === 'undefined' ? null : INV;
-      const paidOk = typeof PAID !== 'undefined' && PAID === 610 && typeof DUE !== 'undefined' && DUE === 0 && Array.isArray(inv) && inv.every((row) => row.status === 'paid');
-      if (!paidOk) problems.push('invoice data changed');
-      const doses = (typeof CMP === 'undefined' ? [] : CMP).map((c) => c.n + '|' + c.d + '|' + c.u);
-      if (doses.length !== 8 || !/2\\.5 mg/.test(doses[0] || '')) problems.push('protocol doses changed');
-      const tile = (document.getElementById('bts-labs') || {}).textContent || '';
-      if (/No bloodwork/i.test(tile) || /score/i.test(tile)) problems.push('home tile ' + tile);
-      const net = window.__netlog || [];
-      const badNet = net.filter((row) => row.method === 'GET' && !/supabase|save_state|get_state/i.test(row.url));
-      return { problems, rows, ranks, tile, overflow, themeNow, netCount: net.length, badNet, doses, textLen: text.length };
+      if (scroll && scroll.scrollWidth - scroll.clientWidth > 2) problems.push('overflow');
+      if (!(typeof PAID !== 'undefined' && PAID === 610 && DUE === 0)) problems.push('invoice constants');
+      if (document.documentElement.getAttribute('data-theme') !== ${JSON.stringify(theme)}) problems.push('theme');
+      const rule = text.includes('Each marker scores 4 if optimal');
+      if (!rule) problems.push('rubric text missing');
+      if (!/not a verified laboratory in-range/.test(text)) problems.push('average mapping missing');
+      const ratio = document.getElementById('jd-ldlapob');
+      if (!ratio || !/particle-size/.test(ratio.textContent)) problems.push('ldl apob explanation');
+      return { problems, byId, chips };
     })()`);
-
-    const expectedRanks = [
-      'Repeat creatinine and eGFR, and add a urine albumin-to-creatinine ratio (ACR). Creatinine is 1.24 mg/dL (source app: out of range) and eGFR is 69.52 (KDIGO category G2, mildly decreased). G2 without kidney damage is not a CKD diagnosis. Review muscle mass, creatine, cooked meat, hard training, and hydration. The undated creatinine increase and eGFR drop are a reason to repeat the tests.',
-      'Estradiol is 44.6 pg/mL (source app: out of range). A clinician should review symptoms, timing, and the assay. ADLM recommends a sensitive mass-spectrometry method for men. Do not change any medication, peptide, or dose from this number.'
-    ];
-    if (JSON.stringify(report.ranks) !== JSON.stringify(expectedRanks)) report.problems.push('top ranks mismatch');
-    MARKERS.forEach((m, i) => {
-      const row = report.rows[i];
-      if (!row) { report.problems.push('missing row ' + m[0]); return; }
-      const got = [row.id, row.name, row.value, row.unit, row.source, row.read];
-      if (JSON.stringify(got) !== JSON.stringify(m)) report.problems.push('marker ' + m[0] + ' ' + JSON.stringify(got));
-      if (row.sourceLabel !== 'Source app' || row.readLabel !== 'Our read') report.problems.push('labels ' + m[0]);
-      if (!/Comparison date not provided/.test(row.change)) report.problems.push('change ' + m[0]);
+    SOURCE.forEach((row) => {
+      const got = report.byId[row[0]];
+      const status = row[2] === 'unscored' ? 'Unscored' : STATUS[row[2]];
+      if (!got) { report.problems.push('missing ' + row[0]); return; }
+      if (!got.value.includes(row[1]) || got.status !== status) report.problems.push(row[0] + ' ' + JSON.stringify(got));
     });
-
-    await evaluate(s, `(() => {
-      const sc = document.getElementById('scroll');
-      if (sc) sc.scrollTop = 0;
-      if (typeof go === 'function') go('labs');
-    })()`);
-    await delay(200);
-    await shot(s, name + '-top');
-    await evaluate(s, `(() => {
-      const el = document.getElementById('lab-sec-thyroid');
-      if (el) el.scrollIntoView({ block: 'start' });
-    })()`);
+    const unscored = Object.values(report.byId).filter((row) => row.status === 'Unscored').length;
+    if (unscored !== 1 || Object.keys(report.byId).length !== 25) report.problems.push('split ' + Object.keys(report.byId).length + '/' + unscored);
+    await evaluate(`(() => { const sc=document.getElementById('scroll'); if(sc) sc.scrollTop=0; if(typeof go==='function') go('labs'); })()`);
     await delay(150);
-    await shot(s, name + '-markers');
-    const openId = name.startsWith('phone') ? 'lab-e2' : 'lab-creatinine';
-    const opened = await evaluate(s, `(() => {
-      const card = document.getElementById(${JSON.stringify(openId)});
-      const summary = card && card.querySelector('summary');
-      if (summary) summary.click();
-      const detail = card && card.querySelector('details');
-      if (card) card.scrollIntoView({ block: 'center' });
-      const open = !!(detail && detail.open);
-      const detailText = card ? card.innerText : '';
-      return { open, hasFollow: /Needs clinician follow-up/.test(detailText), len: detailText.length };
-    })()`);
-    if (!opened.open || !opened.hasFollow) report.problems.push('detail did not open');
-    await delay(150);
-    await shot(s, name + '-detail');
-
+    await shot(name + '-top');
+    await evaluate(`(() => { const el=document.getElementById('jd-cr'); if(el) el.scrollIntoView({block:'center'}); })()`);
+    await delay(100);
+    const opened = await evaluate(`(() => { if (typeof tt==='function') tt('jd-cr'); const tip=document.getElementById('jd-cr'); return {on: !!(tip && tip.classList.contains('on')), text: tip ? tip.innerText : ''}; })()`);
+    if (!opened.on || !/out of range/.test(opened.text)) report.problems.push('creatinine detail');
+    await shot(name + '-row');
     if (name === 'desktop-light') {
-      await evaluate(s, `typeof go==='function' && go('pay')`);
-      await delay(200);
-      const pay = await evaluate(s, `(() => {
-        const t = (document.getElementById('v-pay') || {}).innerText || '';
-        return { paid: /Paid/.test(t), dueZero: /\\$0\\.00|0 due|paid in full/i.test(t), snippet: t.slice(0, 280) };
-      })()`);
-      if (!pay.paid) report.problems.push('invoice view lost paid state ' + pay.snippet);
-      await shot(s, 'desktop-light-invoice');
-      await evaluate(s, `typeof go==='function' && go('labs')`);
+      await evaluate(`typeof go==='function' && go('pay')`);
+      await delay(250);
+      const pay = await evaluate(`((document.getElementById('v-pay')||{}).innerText||'')`);
+      if (!/Paid to date \$610\.00/.test(pay) || !/Quoted \$0\.00/.test(pay)) report.problems.push('invoice view');
+      await shot('desktop-light-invoice');
     }
-    reports.push({ name, problems: report.problems, tile: report.tile, overflow: report.overflow, netCount: report.netCount, opened });
+    reports.push({ name, problems: report.problems });
     console.log((report.problems.length ? 'FAIL ' : 'PASS ') + name + ' ' + report.problems.join(' | '));
   }
-
-  await delay(400);
-  const net = await evaluate(s, `window.__netlog || []`);
-  const nonGetContinued = continued.filter((row) => row.method !== 'GET');
-  const supabaseContinued = continued.filter((row) => /supabase|save_state|get_state/i.test(row.url));
-  const pageNonBlocked = (net || []).filter((row) => row.method === 'GET' && !/supabase|save_state|get_state/i.test(row.url));
-  const supabaseAttempts = (net || []).filter((row) => /supabase|get_state|save_state/i.test(row.url));
+  const net = await evaluate(`window.__netlog || []`);
   const blockers = [];
-  if (nonGetContinued.length) blockers.push('continued non-GET ' + nonGetContinued.length);
-  if (supabaseContinued.length) blockers.push('continued supabase ' + supabaseContinued.length);
-  if (finished.length) blockers.push('finished supabase ' + finished.length);
-  if (pageNonBlocked.length) blockers.push('page guard blocked a plain GET');
-  if (!supabaseAttempts.some((row) => row.method === 'POST')) blockers.push('no Supabase POST was attempted, so the write block was not proven');
-  if (!supabaseAttempts.some((row) => row.method === 'GET')) blockers.push('no Supabase GET was attempted, so that block was not proven');
-  if (supabaseAttempts.some((row) => row.method !== 'GET' && row.method !== 'POST' && row.method !== 'BEACON')) blockers.push('unexpected blocked method');
-
-  const out = {
-    reports,
-    blockers,
-    pageBlocked: (net || []).length,
-    cdpBlocked: cdpBlocked.length,
-    continuedGets: continued.length,
-    sampleBlocked: (net || []).slice(0, 8),
-    sampleCdp: cdpBlocked.slice(0, 8)
-  };
-  writeFileSync('/tmp/joe-labs-results.json', JSON.stringify(out, null, 2));
-  console.log(JSON.stringify({ blockers, pageBlocked: out.pageBlocked, cdpBlocked: out.cdpBlocked, continuedGets: out.continuedGets }, null, 2));
+  if (continued.some((row) => row.method !== 'GET')) blockers.push('continued non-GET');
+  if (continued.some((row) => /supabase/i.test(row.url))) blockers.push('continued supabase');
+  if (!(net || []).some((row) => row.method === 'POST' && /supabase|get_state/i.test(row.url))) blockers.push('member sync was not attempted');
+  if (!(net || []).some((row) => row.method === 'GET' && /supabase/i.test(row.url))) blockers.push('supabase GET was not attempted');
+  writeFileSync('/tmp/joe-score-results.json', JSON.stringify({ reports, blockers, blocked: (net || []).length }, null, 2));
+  console.log(JSON.stringify({ blockers, blocked: (net || []).length }, null, 2));
   ws.close();
   chrome.kill('SIGKILL');
   server.kill('SIGKILL');
-  const failedViews = reports.filter((r) => r.problems.length);
-  if (failedViews.length || blockers.length) process.exit(1);
+  if (reports.some((r) => r.problems.length) || blockers.length) process.exit(1);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+main().catch((err) => { console.error(err); process.exit(1); });
