@@ -69,3 +69,8 @@ These requirements are recovered from source and merged task records, not a comp
 ## Owner workflow preferences — confirmed 2026-11-06
 - Whenever a new client protocol is created, add its correct name and URL to https://biolinkedsolutions.com/share/ as part of the same task. Inspect the current Share page implementation first, avoid duplicate entries, preserve its existing access behavior, and verify the new protocol link.
 - Before deducting inventory, show the owner the proposed items and quantities and obtain confirmation. Read-only inventory checks are allowed; do not infer permission to deduct from creating a protocol or marking an invoice paid.
+
+## Standard quote and order charges — owner confirmed 2026-11-07
+- Always include one Shipping line at $9.99 and one BAC water at $4.99 on each new quote/order, unless the owner explicitly overrides that charge for the specific request.
+- Include both charges in the displayed total and quote summary balances. Apply each once per order, not once per compound, and avoid duplicate lines when updating an existing quote.
+- Preserve historical paid invoices; do not retroactively change settled orders. Quoted charges do not authorize inventory deductions or a sale/ledger entry.
