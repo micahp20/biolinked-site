@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /annaleah/.
-const CACHE = 'annaleah-c1-ref-v1';
+const CACHE = 'annaleah-c1-layout-v2';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',

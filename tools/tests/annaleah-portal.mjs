@@ -130,24 +130,21 @@ async function main() {
     await delay(1600);
     const report = await evaluate(`(() => {
       const problems = [];
-      const box = document.getElementById('alref');
-      const text = box ? box.innerText : '';
-      const title = document.getElementById('alref-title');
-      if (!title || title.textContent !== 'Master Cycle 1 — supplied prescriber reference') problems.push('title');
+      if (document.getElementById('alref')) problems.push('custom reference block');
+      const box = document.getElementById('protoabout');
+      const text = box ? box.textContent : '';
+      const head = box ? box.querySelector('.jc-cycle-head h2') : null;
+      if (!head || head.textContent !== 'Cycle 1 · Fat Loss') problems.push('cycle head ' + (head && head.textContent));
+      if (!box || !box.querySelector('.jc-compound')) problems.push('missing Jamie compound card');
+      if (/prescriber|supplied reference|not an active schedule|Master Cycle 1|Why these together|About this plan/i.test(text)) problems.push('rejected wording');
       const who = document.querySelector('.who .wn');
       if (!who || who.textContent.trim() !== 'Annaleah') problems.push('header ' + (who && who.textContent));
       if (/Jamie|Cress|Paul/.test(document.body.innerText)) problems.push('other client name visible');
       const need = [
         'start 0.5 mg (titrate slow)',
         '5u',
-        'Mon + Thu AM, 1 mg/wk, hold >=4 wks',
-        'Start slow: 0.5mg Mon+Thu=1mg/wk, hold >=4 wks; step up only if appetite control fades & nausea quiet',
-        'start 0.5 mg, titrate slow',
-        'Mon + Thu, AM',
-        '1 mg',
-        '10u',
-        'daily AM',
-        'daily, AM',
+        'Mon + Thu, 1 mg/wk, hold >=4 wks',
+        'step up only if appetite control fades & nausea quiet',
         '20mg only (10mg retired); one 20mg = 2x the 10mg',
         '~1.33 mg',
         'M/W/F',
@@ -155,24 +152,26 @@ async function main() {
         '25u',
         'M/W/F, push slowly',
         '500 mcg',
-        'Blank in the supplied reference',
-        'Not specified in supplied reference',
-        'titrate',
-        'Cagrilintide is absent',
-        'Weight maintenance',
-        '158–163 lb',
-        'early September'
+        'Timing not provided',
+        '10u',
+        'titrate'
       ];
       need.forEach((s) => { if (!text.includes(s)) problems.push('missing ' + s); });
-      if ((text.match(/Not specified in supplied reference/g) || []).length < 2) problems.push('timing count');
-      if (/\\$\\d|Paid|FREE/.test(text)) problems.push('money in reference');
+      if ((text.match(/Timing not provided/g) || []).length < 2) problems.push('blank timing count');
+      if (/1 → 3 mg|10 → 30u|Semax|Wolverine|Sixty|60 mg vial/.test(text)) problems.push('Jamie protocol copied');
+      const kpv = ALL.find((c) => c.n.indexOf('KPV') === 0);
+      const cag = ALL.find((c) => c.n.indexOf('Cagrilintide') === 0);
+      if (!kpv || kpv.u || (kpv.days && kpv.days.length) || kpv.c !== 'Timing not provided') problems.push('kpv invented timing');
+      if (!cag || cag.u !== '10u' || (cag.days && cag.days.length) || cag.c !== 'Timing not provided') problems.push('cagri timing');
+      if (CYC.length !== 1 || CYC[0].n !== 'Cycle 1 · Fat Loss') problems.push('extra cycles');
       if (document.documentElement.getAttribute('data-theme') !== ${JSON.stringify(theme)}) problems.push('theme');
-      if (!(PAID === 0 && DUE === 0 && INV.length === 0 && ALL.length === 0 && MINE.length === 0)) problems.push('data arrays');
+      if (!(PAID === 0 && DUE === 0 && INV.length === 1 && INV[0].status === 'quote' && INV[0].total == null && ALL.length === 6)) problems.push('invoice data');
       if (CS_SLUG !== 'annaleah' || SCHKEY !== 'biolinked-sched-annaleah' || KP !== 'annaleah-app-') problems.push('identity keys');
       if (nutState.age !== 32 || nutState.heightIn !== 68 || nutState.weightLb !== null || nutState.sex !== '' || nutState.goal !== 'maintain') problems.push('nut state');
       const sexOn = document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="sex"].on').length;
       if (sexOn !== 0) problems.push('sex selected');
-      if (document.getElementById('nut-w').value !== '') problems.push('weight filled');
+      const weight = document.getElementById('nut-w');
+      if (!weight || weight.value !== '' || weight.placeholder !== '158–163') problems.push('weight filled');
       if (document.getElementById('nut-age').value !== '32') problems.push('age field');
       if (document.getElementById('nut-ft').value !== '5' || document.getElementById('nut-in').value !== '8') problems.push('height field');
       const cal = (document.getElementById('nut-cal-sub') || {}).textContent || '';
@@ -183,12 +182,21 @@ async function main() {
       if (scroll && scroll.scrollWidth - scroll.clientWidth > 2) problems.push('overflow');
       const labs = (document.getElementById('v-labs') || {}).innerText || '';
       if (!/No bloodwork on file/.test(labs) || /Worth drawing|the cut/.test(labs)) problems.push('labs');
-      return { problems };
+      const card = document.querySelector('.jc-compound');
+      const h2 = document.querySelector('.jc-cycle-head h2');
+      const title = document.querySelector('.lx-title');
+      const styleOf = (el) => {
+        if (!el) return null;
+        const cs = getComputedStyle(el);
+        return { font: cs.fontFamily, size: cs.fontSize, radius: cs.borderRadius, bg: cs.backgroundColor, color: cs.color };
+      };
+      return { problems, style: { card: styleOf(card), h2: styleOf(h2), title: styleOf(title) } };
     })()`);
     await evaluate(`(() => {
+      if (typeof go==='function') go('proto');
       const sc = document.getElementById('scroll');
-      const el = document.getElementById('alref');
-      sc.scrollTop = Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 88);
+      const el = document.getElementById('protoabout');
+      if (sc && el) sc.scrollTop = Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 12);
     })()`);
     await delay(180);
     await shot(name);
@@ -200,7 +208,7 @@ async function main() {
         const problems = [];
         if (!/Quote pending/.test(text) || !/Pending/.test(text)) problems.push('quote label');
         if (/\\$|Paid|FREE/.test(text)) problems.push('priced or paid invoice');
-        if (!/Retatrutide 30 mg/.test(text) || !/Cagrilintide 10 mg/.test(text) || !/Qty 2/.test(text)) problems.push('lines');
+        if (!/1× Retatrutide 30 mg/.test(text) || !/1× Cagrilintide 10 mg/.test(text) || !/2× Tesamorelin 20 mg/.test(text) || !/2× KPV 10 mg/.test(text)) problems.push('lines ' + text.slice(0, 180));
         if (document.querySelector('#v-pay .invoice-pay-now, #v-pay .paybtn')) problems.push('pay button');
         return { problems, head: text.slice(0, 300) };
       })()`);
@@ -221,7 +229,8 @@ async function main() {
     if (name === 'phone-light') {
       await evaluate(`(() => {
         const sc = document.getElementById('scroll');
-        const el = document.querySelectorAll('#alref .alref-card')[4];
+        const cards = document.querySelectorAll('#protoabout .jc-compound');
+        const el = cards[cards.length - 1];
         sc.scrollTop = Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 88);
       })()`);
       await delay(150);
@@ -231,6 +240,57 @@ async function main() {
     console.log((report.problems.length ? 'FAIL ' : 'PASS ') + name + ' ' + report.problems.join(' | '));
   }
   const net = await evaluate(`window.__netlog || []`);
+  const parity = { problems: [] };
+  async function cycleShot(slug, file, theme) {
+    await s('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/' + slug + '/' });
+    await delay(800);
+    await evaluate(`localStorage.setItem(${JSON.stringify(slug + '-app-theme')}, ${JSON.stringify(theme || 'light')})`);
+    await s('Page.reload', { ignoreCache: true });
+    await delay(1600);
+    const style = await evaluate(`(() => {
+      if (typeof go==='function') go('proto');
+      const sc = document.getElementById('scroll');
+      const el = document.getElementById('protoabout');
+      if (sc && el) sc.scrollTop = Math.max(0, el.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 12);
+      const card = document.querySelector('.jc-compound');
+      const h2 = document.querySelector('.jc-cycle-head h2');
+      const title = document.querySelector('.lx-title');
+      const grab = (el) => {
+        if (!el) return null;
+        const cs = getComputedStyle(el);
+        return { font: cs.fontFamily, size: cs.fontSize, radius: cs.borderRadius, weight: cs.fontWeight, lh: cs.lineHeight };
+      };
+      return { card: grab(card), h2: grab(h2), title: grab(title), who: (document.querySelector('.who .wn')||{}).textContent || '' };
+    })()`);
+    await delay(120);
+    await shot(file);
+    return style;
+  }
+  const annaleahStyle = await cycleShot('annaleah', 'annaleah-cycles', 'light');
+  const jamieStyle = await cycleShot('jcress', 'jcress-cycles', 'light');
+  ['card', 'h2', 'title'].forEach((key) => {
+    if (JSON.stringify(annaleahStyle[key]) !== JSON.stringify(jamieStyle[key])) {
+      parity.problems.push(key + ' ' + JSON.stringify({ annaleah: annaleahStyle[key], jamie: jamieStyle[key] }));
+    }
+  });
+  if (annaleahStyle.who.trim() !== 'Annaleah' || jamieStyle.who.trim() !== 'Jamie Cress') parity.problems.push('names ' + annaleahStyle.who + ' / ' + jamieStyle.who);
+  await s('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+  await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/annaleah/' });
+  await delay(500);
+  await evaluate(`localStorage.setItem('annaleah-app-theme','light')`);
+  await s('Page.reload', { ignoreCache: true });
+  await delay(1400);
+  await evaluate(`(() => { if (typeof go==='function') go('proto'); const sc=document.getElementById('scroll'); const el=document.getElementById('protoabout'); if(sc&&el) sc.scrollTop=Math.max(0, el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-8); })()`);
+  await shot('annaleah-cycles-phone');
+  await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/jcress/' });
+  await delay(500);
+  await evaluate(`localStorage.setItem('jcress-app-theme','light')`);
+  await s('Page.reload', { ignoreCache: true });
+  await delay(1400);
+  await evaluate(`(() => { if (typeof go==='function') go('proto'); const sc=document.getElementById('scroll'); const el=document.getElementById('protoabout'); if(sc&&el) sc.scrollTop=Math.max(0, el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-8); })()`);
+  await shot('jcress-cycles-phone');
+  console.log(parity.problems.length ? 'FAIL parity ' + parity.problems.join(' | ') : 'PASS parity');
   const blockers = [];
   if (continued.some((row) => row.method !== 'GET')) blockers.push('continued non-GET');
   if (continued.some((row) => /supabase/i.test(row.url))) blockers.push('continued supabase');
@@ -240,7 +300,7 @@ async function main() {
   ws.close();
   chrome.kill('SIGKILL');
   server.kill('SIGKILL');
-  if (reports.some((r) => r.problems.length) || blockers.length) process.exit(1);
+  if (reports.some((r) => r.problems.length) || blockers.length || parity.problems.length) process.exit(1);
 }
 
 main().catch((err) => { console.error(err); process.exit(1); });
