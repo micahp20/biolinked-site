@@ -94,5 +94,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Fixed default/added editing/removal on nprince/ and calculator-to-schedule context on both pages. Native Chromium flows passed, including a saved manual-entry fixture, phone/desktop light/dark layouts, and reload/removal persistence. Fixed banner interception and hidden-sheet horizontal scrolling found during browser review.
 - Static clinical/billing/identity data preserved; no inventory or production state writes. See PROJECT_STATUS.md and tools/tests/schedule-controls-repair-2026-11-06.md.
 
+## 2026-11-06 — Calculator add buttons show a result or a reason
+- Add to My List, Add to my schedule, and Add compound now bring the new row or a plain-language error into view, with a toast, on every calculator protocol page. Incomplete draws and a missing weekday no longer fail silently. The install banner no longer covers the buttons. Doses, weekday overrides, invoices, and saved lists are unchanged.
+- Shared script calc-feedback.js on 143 pages; 142 portal cache names updated. Browser evidence is in PROJECT_STATUS.md. One legacy phone case did not receive a headless click. An early nprince sync write from an unblocked local test was reversed.
+
 ## 2026-11-06 — Complete older banner mount correction
 - Moved nprince/ installation help into the scroll flow and bumped its script/cache versions. The complete real-browser Schedule/Calculator regression passed again. See PROJECT_STATUS.md for evidence and limits.
