@@ -2,6 +2,11 @@
 
 Last reviewed: 2026-11-08 (America/Denver).
 
+## Becky Order 2 vial strengths — 2026-11-08
+- Owner confirmed GHK-Cu 50 mg and AHK 100 mg for the bdelorenzo Order 2 quote. Item labels and the order summary now show those strengths. Two vials each. Total remains 134.98. Status remains quote. Paid Order 1 is unchanged.
+- Removed only the “vial strength … not confirmed” wording on the two Order 2 quote cards. Timing is still not confirmed. Recon, draw, and schedule fields were not edited. Inventory was not written; the bookkeeping pull is a separate task.
+- Branch cursor/becky-order2-strengths-8977 from main 223687c6. Not merged. Not deployed. The sitewide plan-date removal remains a separate branch and was not included here.
+
 ## mpauldino labs update — 2026-11-08
 - Started from main 99df49a7. Only mpauldino bloodwork changed. The published plan-date controls, compact layout, and invoice summary cleanup stay in place. Protocol, invoices, payments, and other clients were not edited.
 - The current panel is the supplied Quest report collected 11/02/2026 08:49 and reported 11/05/2026 17:14, with no time zone added. Values and ranges are the ones printed on that report. The raw report and its contact fields are not in the repository.
