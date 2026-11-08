@@ -146,6 +146,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Becky Order 2 labels show confirmed vial strengths
+- Order 2 item labels now name GHK-Cu 50 mg and AHK-Cu 100 mg, two vials each. The $134.98 total, quote status, shipping, and BAC line are unchanged. The stale “vial strength is not confirmed” sentence was removed only on those two quote cards. Timing stays pending. No new recon, dose, schedule, inventory, or other-client change.
+
 ## 2026-11-08 — Current labs replaced on one portal
 - Replaced the current bloodwork summary on mpauldino with the supplied Nov 2026 panel. The page uses the existing score card, domain chips, and tap-to-read rows. The score is the documented 4 / 3 / 1 custom wellness tally, labeled as not a diagnosis. Earlier results already stored on the page stay in a separate history section. No other client, protocol, invoice, payment, or stock data was edited.
 
