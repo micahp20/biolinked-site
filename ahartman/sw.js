@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ahartman/.
-const CACHE = 'ahartman-master-sched1-v8-context-v1-controls-v1-calcact1-addon2';
+const CACHE = 'ahartman-master-sched1-v8-context-v1-controls-v1-calcact1-addon2-paid';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',

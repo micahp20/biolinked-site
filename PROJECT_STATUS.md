@@ -2,6 +2,17 @@
 
 Last reviewed: 2026-11-08 (America/Denver).
 
+## Paid add-on invoices — 2026-11-08
+- Started from main 223687c6. Only the latest invoice on mhartman, ahartman, and bdelorenzo changed, plus each portal’s cache name.
+- Matt: Add-On Order · KLOW + Wolverine was quote 249.99 with PAID 1794.0 and DUE 249.99. It is now paid. PAID 2043.99. DUE 0. Line amounts unchanged: KLOW 80 mg × 2 at $60, Wolverine 10 mg × 4 at $30, BAC 30 mL included, shipping $9.99. Marker recorded by bookkeeping: MHARTMAN-ADDON-KLOW-WOLVERINE-PAID-PULL-20261108. This change did not write the ledger or stock.
+- Ameris: Add-On Order · Retatrutide was quote 100.00 with PAID 1400.0 and DUE 100.0. It is now paid. PAID 1500.0. DUE 0. The line remains Retatrutide 30 mg × 2 at $50. Marker: AHARTMAN-ADDON-RETA30-PAID-PULL-20261108. This change did not write the ledger or stock.
+- Becky: Order 2 was quote 134.98 with PAID 230.0 and DUE 134.98. It is now paid. PAID 364.98. DUE 0. Confirmed strengths are on the labels: GHK-Cu 50 mg × 2 at $25 and AHK-Cu 100 mg × 2 at $35, plus shipping $9.99 and BAC water $4.99. Recon, draw, and timing were not changed. The “vial strength is not confirmed” sentence was removed only on those two cards. Marker recorded by the parent: BDELORENZO-ORDER2-PAID-PULL-20261108. This change did not write the ledger or stock.
+- Earlier orders on each page were compared and are unchanged. No other client was edited. Pay now no longer renders because none of these three portals has a remaining quote.
+- Checks: line cents match the header totals. Headless Chrome loaded all three invoice views with Supabase and every non-GET blocked before the network.
+- Branch cursor/paid-addon-invoices-8977. Not merged. Not deployed. The plan-date removal audit is a separate branch and was not included.
+
+
+
 ## mpauldino labs update — 2026-11-08
 - Started from main 99df49a7. Only mpauldino bloodwork changed. The published plan-date controls, compact layout, and invoice summary cleanup stay in place. Protocol, invoices, payments, and other clients were not edited.
 - The current panel is the supplied Quest report collected 11/02/2026 08:49 and reported 11/05/2026 17:14, with no time zone added. Values and ranges are the ones printed on that report. The raw report and its contact fields are not in the repository.
