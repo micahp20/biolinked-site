@@ -233,4 +233,9 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Started from main 81cea7a1. Removed only the top Quoted summary card on /annaleah/. The detailed invoice still shows every line price, $434.96, Pay now, and the payment sheet. Protocol content, prices, and math are unchanged. Other client pages were not edited. AGENTS.md now says new client invoices should not add that second summary card.
 - Paths: annaleah/index.html, annaleah/sw.js cache suffix, tools/tests/annaleah-portal.mjs, AGENTS.md.
 - Checks: headless Chrome desktop and phone, light and dark, with Supabase and every non-GET blocked. The invoice view has no top quote card and one detailed card. Pay now still opens the payment sheet. No production write.
-- Publishing: committed 72bf412b82454c50d0c1af4c2ed186a27755ac8a and pushed to cursor/annaleah-invoice-hero-8977. The pull-request tool refused once: GitHub returned "must be a collaborator" (Validation Failed, resource Issue, code custom). Not merged. Not deployed. Open from https://github.com/micahp20/biolinked-site/pull/new/cursor/annaleah-invoice-hero-8977
+- Publishing: committed 72bf412b82454c50d0c1af4c2ed186a27755ac8a and pushed to cursor/annaleah-invoice-hero-8977. The owner later merged that branch as PR #134.
+
+## Annaleah invoice item summary removed — 2026-11-07
+- Started from main db190bb7. Removed only the repeated product-and-shipping paragraph under the cycle heading on /annaleah/, and the same paragraph in the payment sheet. Heading, quote badge, priced rows, $434.96, and Pay now stay. Prices and protocol content were not edited. Other client pages were not edited.
+- Paths: annaleah/index.html, annaleah/sw.js cache suffix, tools/tests/annaleah-portal.mjs, AGENTS.md.
+- Publishing: committed d66c05de84e4786fa06f868062d0f8cebee66079 and pushed to cursor/annaleah-invoice-summary-8977. The pull-request tool refused once: GitHub returned "must be a collaborator" (Validation Failed, resource Issue, code custom). Not merged. Not deployed. Open from https://github.com/micahp20/biolinked-site/pull/new/cursor/annaleah-invoice-summary-8977
