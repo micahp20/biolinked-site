@@ -167,7 +167,7 @@ async function main() {
     if (scored.length !== 50) problems.push('scored ' + scored.length);
     if (INV.length !== 0 || PAID !== 0 || DUE !== 0) problems.push('invoice changed');
     if (!CMP[0] || !CMP[0].n.includes('Testosterone Cypionate')) problems.push('protocol changed');
-    if (!document.querySelector('script[src="/portal-plan-controls.js?v=1"]')) problems.push('plan controls missing');
+    if (!document.querySelector('script[src="/portal-plan-controls.js?v=2"]')) problems.push('plan controls missing');
     if (document.querySelector('#labsbody .ldef')) problems.push('speculative definition shown');
     const card = [...document.querySelectorAll('#labsbody .score')].find((n) => /custom wellness score/i.test(n.innerText));
     const close = [...document.querySelectorAll('button')].find((b) => (b.getAttribute('aria-label') || b.textContent || '').trim() === '×' || b.textContent === '×');
