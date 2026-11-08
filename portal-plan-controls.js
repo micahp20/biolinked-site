@@ -189,7 +189,42 @@
       place(row, cycleForName(name, null), name);
     });
     paintNote();
+    paintRemoved();
     stripInvoice();
+  }
+
+  function paintRemoved() {
+    var old = document.getElementById('blp-removed');
+    if (old) old.remove();
+    var host = document.getElementById('doses');
+    if (!host) return;
+    var data = load();
+    var keys = Object.keys(data.items).filter(function (k) { return data.items[k] && data.items[k].removed; });
+    if (!keys.length) return;
+    var box = document.createElement('div');
+    box.id = 'blp-removed';
+    box.className = 'blp-ctl';
+    var note = document.createElement('p');
+    note.className = 'blp-note';
+    note.textContent = 'Removed on this device. Restore puts a compound back. The invoice and catalog stay as they are.';
+    box.appendChild(note);
+    keys.forEach(function (k) {
+      var name = k.split('\u001f').slice(1).join('\u001f') || k;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'blp-btn';
+      btn.setAttribute('data-blp-act', 'restore');
+      btn.textContent = 'Restore ' + name;
+      btn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var parts = k.split('\u001f');
+        writeRec(parts[0], parts.slice(1).join('\u001f'), false);
+        refresh();
+      });
+      box.appendChild(btn);
+    });
+    host.appendChild(box);
   }
 
   function stripInvoice() {

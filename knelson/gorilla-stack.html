@@ -1147,16 +1147,14 @@ document.getElementById('bl-mobile-btn').addEventListener('click',function(){
       </div>
 
       <div class="trk-intro">
-        <strong>How it works:</strong> set your Cycle 1 start date below. The tracker automatically shifts through all 16 weeks and adjusts what's scheduled on each day (including the week 11&ndash;12 5-Amino ramp and the week 13&ndash;16 HGH taper). Tap any circle to mark a shot taken. All progress saves to your device.
+        <strong>How it works:</strong> a cycle start date is not recorded on this page, so the timeline stays off unless one was already saved on this device. Tap any circle to mark a shot taken. All progress saves on this device.
       </div>
 
       <div class="trk-start">
-        <label for="cycleStart">Cycle Start Date</label>
-        <input type="date" id="cycleStart" onchange="setCycleStart(this.value)">
         <span class="trk-saved" id="trkSaved">✓ Saved</span>
       </div>
 
-      <div class="trk-dates" id="trkDates"><em>Set your start date above to see the full program timeline.</em></div>
+      <div class="trk-dates" id="trkDates"><em>A start date is not recorded on this page, so the timeline stays off. Dose checkmarks still save on this device.</em></div>
 
       <div class="trk-cal-banner">
         <div>
@@ -1267,7 +1265,7 @@ var currentWeek=1, state={}, cycleStartDate=null;
 // ============ STATE ============
 function loadState(){
   try{var s=localStorage.getItem('kn_state');if(s)state=JSON.parse(s);}catch(e){}
-  try{var d=localStorage.getItem('kn_start');if(d){cycleStartDate=new Date(d+'T00:00:00');document.getElementById('cycleStart').value=d;}}catch(e){}
+  try{var d=localStorage.getItem('kn_start');if(d){cycleStartDate=new Date(d+'T00:00:00');}}catch(e){}
   updateDateLabels();
 }
 function saveState(){
@@ -1287,7 +1285,7 @@ function fmtDate(d){if(!d)return '—';var m=['Jan','Feb','Mar','Apr','May','Jun
 function weekStartDate(w){if(!cycleStartDate)return null;return addDays(cycleStartDate,(w-1)*7);}
 function updateDateLabels(){
   var el=document.getElementById('trkDates');
-  if(!cycleStartDate){el.innerHTML='<em>Set your start date above to see the full program timeline.</em>';return;}
+  if(!cycleStartDate){el.innerHTML='<em>A start date is not recorded on this page, so the timeline stays off. Dose checkmarks still save on this device.</em>';return;}
   var s=weekStartDate(1), e=addDays(s,16*7-1);
   var taperStart=weekStartDate(13), taperEnd=addDays(taperStart,4*7-1);
   el.innerHTML='<strong>Main Cycle:</strong> '+fmtDate(s)+' → '+fmtDate(addDays(s,12*7-1))+' &nbsp;·&nbsp; <strong>HGH Taper:</strong> '+fmtDate(taperStart)+' → '+fmtDate(taperEnd);
@@ -1403,8 +1401,8 @@ function updateStats(){
 
 // ============ ICS ============
 function downloadICS(){
-  var v=document.getElementById('cycleStart').value;
-  if(!v){alert('Please set your Cycle Start Date first, then download the calendar.');return;}
+  var v=''; try{ v=localStorage.getItem('kn_start')||''; }catch(e){}
+  if(!v){return;}
   var p=v.split('-');
   var start=new Date(parseInt(p[0]),parseInt(p[1])-1,parseInt(p[2]));
   function pad(n){return n<10?'0'+n:String(n);}

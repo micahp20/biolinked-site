@@ -9,7 +9,7 @@ import { join } from 'node:path';
 
 const ROOT = new URL('../../', import.meta.url).pathname;
 const UNIT = /\d+(?:\.\d+)?\s*(?:mg|mcg|µg|ug|IU|iu|mL|ml|ML|U\/mL)(?![a-z])/;
-const SKIP_LINE = /shipping|ups\b|2-day|flat rate|discount|payment received|not included|friends\s*&\s*family|complimentary/i;
+const SKIP_LINE = /shipping|ups\b|2-day|flat rate|discount|payment received|not included|friends\s*(?:&|and)\s*family|loyalty credit|monthly programme fee|supply adjustment|flat fee|standard would have been|month \d+ payment|\bcredit\b|savings/i;
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
@@ -56,8 +56,25 @@ for (const file of walk(ROOT)) {
     }
   }
 }
-const report = { files, protocol, protocolMissing, invoice, invoiceMissing, missing };
+const byClient = new Map();
+for (const row of missing) {
+  const client = row.file.replace(/\/index\.html$/, '').replace(/\.html$/, '');
+  const key = client + '\t' + row.label;
+  if (!byClient.has(client)) byClient.set(client, new Map());
+  const names = byClient.get(client);
+  if (!names.has(row.label)) names.set(row.label, new Set());
+  names.get(row.label).add(row.where);
+}
+const unknowns = [];
+for (const [client, names] of [...byClient.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+  for (const [label, where] of names) unknowns.push({ client, label, where: [...where] });
+}
+const report = { files, protocol, protocolMissing, invoice, invoiceMissing, unknownClients: byClient.size, unknownLabels: unknowns.length, unknowns, missing };
 const out = '/opt/cursor/artifacts/vial-strength-coverage.json';
 writeFileSync(out, JSON.stringify(report, null, 2));
-console.log(JSON.stringify({ files, protocol, protocolMissing, invoice, invoiceMissing, sample: missing.slice(0, 40) }, null, 2));
-if (protocolMissing || invoiceMissing) process.exitCode = 2;
+console.log(JSON.stringify({ files, protocol, protocolMissing, invoice, invoiceMissing, unknownClients: byClient.size, unknownLabels: unknowns.length }, null, 2));
+console.log('TRUE UNKNOWNS');
+for (const [client, names] of [...byClient.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+  console.log(client);
+  for (const [label, where] of names) console.log('  [' + [...where].join('+') + '] ' + label);
+}

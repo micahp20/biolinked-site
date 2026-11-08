@@ -72,6 +72,7 @@ const CHECK = `(() => {
   if (planDates.length) problems.push('plan date inputs ' + planDates.length);
   if (/Plan dates/.test(document.body.innerText)) problems.push('plan dates text');
   if (typeof go === 'function') go('sched');
+  if (typeof pickDay === 'function') { try { pickDay(1); } catch (e) {} }
   const row = document.querySelector('#doses .drow.dx-row') || document.querySelector('#doses .drow.ed-row');
   let expand = row ? (row.classList.contains('ed-row') ? 'ed' : 'dx') : 'no-row';
   if (row) {
@@ -95,6 +96,24 @@ const CHECK = `(() => {
       if (pan.classList.contains('open')) {
         ask.click();
         if (!pan.classList.contains('open')) problems.push('remove swallowed the row');
+        const confirm = pan.querySelector('[data-blp-act="confirm"]');
+        if (confirm) {
+          confirm.click();
+          const slug = (typeof CS_SLUG === 'string' && CS_SLUG) ? CS_SLUG : 'portal';
+          const key = 'biolinked-planwin-' + slug;
+          const stored = JSON.parse(localStorage.getItem(key) || '{"items":{}}');
+          const removed = Object.values(stored.items || {}).some((r) => r && r.removed === true);
+          if (!removed) problems.push('remove did not persist');
+          if (before !== JSON.stringify(typeof ALL === 'undefined' ? null : ALL)) problems.push('remove changed ALL');
+          if (inv !== JSON.stringify(typeof INV === 'undefined' ? null : INV)) problems.push('remove changed INV');
+          const restore = document.querySelector('[data-blp-act="restore"]');
+          if (!restore) problems.push('restore missing');
+          else restore.click();
+          const after = JSON.parse(localStorage.getItem(key) || '{"items":{}}');
+          if (Object.values(after.items || {}).some((r) => r && r.removed === true)) problems.push('restore did not clear');
+          if (before !== JSON.stringify(typeof ALL === 'undefined' ? null : ALL)) problems.push('restore changed ALL');
+          if (inv !== JSON.stringify(typeof INV === 'undefined' ? null : INV)) problems.push('restore changed INV');
+        }
       }
     }
     if (before !== JSON.stringify(typeof ALL === 'undefined' ? null : ALL)) problems.push('ALL changed');
@@ -131,7 +150,12 @@ const CHECK = `(() => {
     [vial, bac, dose].forEach((el) => el.dispatchEvent(new Event('input', { bubbles: true })));
     btn.click();
     const list = document.getElementById('pc-list');
-    const ok = !!(list && list.textContent.includes('ZZ Fixture Peptide'));
+    let foundKey = '';
+    for (let i = 0; i < localStorage.length; i++) {
+      const storageKey = localStorage.key(i);
+      if ((localStorage.getItem(storageKey) || '').includes('ZZ Fixture Peptide')) foundKey = storageKey;
+    }
+    const ok = !!(list && list.textContent.includes('ZZ Fixture Peptide') && foundKey && foundKey.indexOf('planwin') === -1);
     const del = list && [...list.querySelectorAll('[data-del]')].find((b) => (b.getAttribute('aria-label') || '').includes('ZZ Fixture'));
     if (del) del.click();
     if (!ok) problems.push('add to list failed');
