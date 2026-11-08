@@ -146,6 +146,11 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Plan dates removed from every portal
+- Removed start, end, save, cancel, clear, and Plan dates from the shared portal controls. Remove and restore remain on the device. A previously saved start or end date no longer hides a compound. Schedule rows expand again because the control is inside the detail panel instead of between the row and the panel.
+- Augustus Rasche’s Monday schedule and protocol card were checked on a computer and a phone. The shared script is now version 2 so installed copies do not keep the old date controls.
+- A label scan of 149 portal pages found 59 protocol names and 80 invoice lines that still do not show a vial strength with units. Those were left blank for a later source check. No strength was guessed.
+
 ## 2026-11-08 — Three latest add-on invoices marked paid
 - Matt Hartman’s KLOW + Wolverine add-on, Ameris Hartman’s Retatrutide add-on, and Becky Delorenzo’s Order 2 are marked paid on the static pages. Earlier orders, line amounts, and clinical directions were not changed. Inventory and the ledger were not written from this change. Becky’s Order 2 labels now use the confirmed GHK-Cu 50 mg and AHK-Cu 100 mg strengths.
 

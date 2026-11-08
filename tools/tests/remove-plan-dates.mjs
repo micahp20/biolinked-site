@@ -67,30 +67,35 @@ const GUARD = `(() => {
 
 const CHECK = `(() => {
   const problems = [];
-  const dateN = document.querySelectorAll('input[type="date"]').length;
-  if (dateN) problems.push('date inputs ' + dateN);
+  const dateEls = [...document.querySelectorAll('input[type="date"]')];
+  const planDates = dateEls.filter((el) => el.closest('#protoabout, #doses, .blp-ctl, .jc-compound, .dx-pan, .ed-pan'));
+  if (planDates.length) problems.push('plan date inputs ' + planDates.length);
   if (/Plan dates/.test(document.body.innerText)) problems.push('plan dates text');
   if (typeof go === 'function') go('sched');
-  const row = document.querySelector('#doses .drow.dx-row');
-  let expand = 'no-dx-row';
+  const row = document.querySelector('#doses .drow.dx-row') || document.querySelector('#doses .drow.ed-row');
+  let expand = row ? (row.classList.contains('ed-row') ? 'ed' : 'dx') : 'no-row';
   if (row) {
     const before = JSON.stringify(typeof ALL === 'undefined' ? null : ALL);
     const inv = JSON.stringify(typeof INV === 'undefined' ? null : INV);
     row.click();
     const pan = row.nextElementSibling;
-    const open1 = !!(pan && pan.classList.contains('dx-pan') && pan.classList.contains('open'));
+    const isPan = !!(pan && (pan.classList.contains('dx-pan') || pan.classList.contains('ed-pan')));
+    const open1 = !!(isPan && pan.classList.contains('open'));
     row.click();
-    const shut = !!(pan && pan.classList.contains('dx-pan') && !pan.classList.contains('open'));
+    const shut = !!(isPan && !pan.classList.contains('open'));
     row.focus();
     row.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
     const open2 = !!(pan && pan.classList.contains('open'));
     row.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
     const shut2 = !!(pan && !pan.classList.contains('open'));
-    if (!open1 || !shut || !open2 || !shut2) problems.push('schedule toggle ' + [open1, shut, open2, shut2].join(','));
+    if (!open1 || !shut || !open2 || !shut2) problems.push('schedule toggle ' + [open1, shut, open2, shut2, pan && pan.className].join(','));
     const ask = pan && pan.querySelector('[data-blp-act="ask"]');
-    if (ask) {
-      ask.click();
-      if (pan.classList.contains('open') === false) problems.push('remove swallowed the row');
+    if (ask && pan) {
+      if (!pan.classList.contains('open')) row.click();
+      if (pan.classList.contains('open')) {
+        ask.click();
+        if (!pan.classList.contains('open')) problems.push('remove swallowed the row');
+      }
     }
     if (before !== JSON.stringify(typeof ALL === 'undefined' ? null : ALL)) problems.push('ALL changed');
     if (inv !== JSON.stringify(typeof INV === 'undefined' ? null : INV)) problems.push('INV changed');
@@ -224,17 +229,23 @@ async function main() {
       try {
         await open(urlPath, w, h);
         const result = await evaluate(CHECK);
-        if (result.problems.length) failures.push(label + ' ' + rel + ': ' + result.problems.join('; '));
+        if (result.problems.length) {
+          const line = label + ' ' + rel + ': ' + result.problems.join('; ');
+          failures.push(line);
+          writeFileSync(SHOTS + '/sweep-progress.txt', failures.join('\n') + '\n');
+        }
       } catch (err) {
         failures.push(label + ' ' + rel + ': ' + String(err).slice(0, 180));
       }
     }
   }
-  await sweep(1280, 900, 'pc');
-  await sweep(390, 844, 'phone');
+  if (!process.env.AUGUST_ONLY) {
+    await sweep(1280, 900, 'pc');
+    await sweep(390, 844, 'phone');
+  }
 
   await open('/arasche/', 1280, 900);
-  await evaluate(`localStorage.setItem('arasche-app-a2hs','1'); localStorage.setItem('biolinked-planwin-arasche', JSON.stringify({v:1,items:{['Cycle 1\\u001fRetatrutide · 60 mg']:{start:'2099-01-01',removed:false}}})); true`);
+  await evaluate(`localStorage.setItem('arasche-app-a2hs','1'); localStorage.removeItem('arasche-edit'); localStorage.setItem('biolinked-planwin-arasche', JSON.stringify({v:1,items:{['Cycle 1\\u001fRetatrutide · 60 mg']:{start:'2099-01-01',removed:false}}})); true`);
   await s('Page.reload', { ignoreCache: true });
   await delay(900);
   const august = await evaluate(`(() => {
@@ -248,11 +259,18 @@ async function main() {
     const stored = JSON.parse(localStorage.getItem('biolinked-planwin-arasche') || '{}');
     const leftover = Object.values(stored.items || {}).some(r => r && (r.start || r.end));
     if (leftover) problems.push('old dates kept');
-    const row = [...document.querySelectorAll('#doses .drow.dx-row')].find(r => (r.getAttribute('data-dx') || '').includes('Retatrutide')) || document.querySelector('#doses .drow.dx-row');
+    const rows = [...document.querySelectorAll('#doses .drow')];
+    const row = rows.find(r => (r.getAttribute('data-dx') || r.textContent || '').includes('Retatrutide')) || rows.find(r => r.classList.contains('dx-row')) || null;
+    if (!row) {
+      problems.push('no schedule row ' + rows.map(r => (r.querySelector('.nm') || {}).textContent || r.className).join('|'));
+      return { problems, open: false };
+    }
     row.scrollIntoView({ block: 'center' });
     row.click();
     const pan = row.nextElementSibling;
-    if (!pan || !pan.classList.contains('open')) problems.push('pc row did not open');
+    const opened = !!(pan && (pan.classList.contains('dx-pan') || pan.classList.contains('ed-pan')) && pan.classList.contains('open'));
+    if (!opened) problems.push('pc row did not open ' + (pan && pan.className));
+    if (document.querySelector('input[type="date"]') || /Plan dates/.test(document.body.innerText)) problems.push('dates visible after open');
     return { problems, open: !!(pan && pan.classList.contains('open')) };
   })()`);
   august.problems.forEach((p) => failures.push('augustus pc ' + p));
@@ -261,7 +279,7 @@ async function main() {
   await shot('augustus-pc-protocol');
 
   await open('/arasche/', 390, 844);
-  await evaluate(`localStorage.setItem('arasche-app-a2hs','1'); go('sched'); const row = document.querySelector('#doses .drow.dx-row'); if (row) { row.scrollIntoView({ block: 'center' }); row.click(); } return true;`);
+  await evaluate(`(() => { localStorage.setItem('arasche-app-a2hs','1'); localStorage.removeItem('arasche-edit'); go('sched'); if (typeof pickDay === 'function') pickDay(1); const row = document.querySelector('#doses .drow.dx-row') || document.querySelector('#doses .drow'); if (row) { row.scrollIntoView({ block: 'center' }); row.click(); } return true; })()`);
   await delay(200);
   await shot('augustus-phone-schedule');
   await evaluate(`(() => { go('proto'); const card = document.querySelector('#protoabout details.jc-compound'); if (card) { card.open = true; card.scrollIntoView({ block: 'start' }); } return true; })()`);

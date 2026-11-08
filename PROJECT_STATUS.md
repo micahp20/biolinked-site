@@ -2,6 +2,18 @@
 
 Last reviewed: 2026-11-08 (America/Denver).
 
+## Plan dates removed — 2026-11-08
+- Branch cursor/remove-plan-dates-8977, merged with main 04d5a46c so the published labs page and the three paid invoices stay intact. Matt remains paid 2043.99 due 0, Ameris paid 1500 due 0, Becky paid 364.98 due 0.
+- Shared portal-plan-controls.js no longer renders a start date, an end date, or Plan dates. Remove and restore stay. Saved dates are dropped unless the record is a removal, and a removal is the only thing that hides a compound. The script and stylesheet URLs are version 2.
+- Augustus’s schedule uses the existing edit panel. The old date block was inserted between the row and that panel, so the row click did not open it. The control now sits inside the panel. Computer and phone screenshots show Monday rows open with dose and recon, and the protocol card open with Remove from my plan and no date fields.
+- Coverage: 149 portal and template pages, 144 of them with an invoice renderer. Headless Chrome checked each at desktop and phone width with Supabase and every non-GET blocked. No page still showed the words Plan dates. Schedule open, close, and keyboard reopen passed where a row exists. Add to My List was exercised where the calculator fields exist and did not change the catalog or invoice. Labs score on mpauldino remained 78 with no plan date field.
+- The sweep’s “remove swallowed the row” notes were a test mistake: the panel had already been closed by the keyboard check. The assertion was corrected. It was not rerun across all 149 pages after that correction.
+- Five older pages still have a date field that is not the injected plan control: kwells.html has a tracker cycle start and a calendar preview, jsanders.html has a tracker cycle start, and gorilla-stack-2, renewal-year, and twelve-month have a start date used only to download a calendar file. Those were not removed in this pass.
+- Vial-strength scan of this branch: 1,176 protocol labels, 59 without a unit; 1,110 invoice lines, 80 without a unit. Becky’s Order 2 GHK-Cu 50 mg and AHK-Cu 100 mg are present. Her BAC water line still says one bottle with no mL, so it stays on the unresolved list. The full list is /opt/cursor/artifacts/vial-strength-coverage.json. Nothing was filled in without a source.
+- Not merged. Not deployed. The live site still serves portal-plan-controls.js?v=1 until this branch is published.
+
+
+
 ## Paid add-on invoices — 2026-11-08
 - Started from main 223687c6. Only the latest invoice on mhartman, ahartman, and bdelorenzo changed, plus each portal’s cache name.
 - Matt: Add-On Order · KLOW + Wolverine was quote 249.99 with PAID 1794.0 and DUE 249.99. It is now paid. PAID 2043.99. DUE 0. Line amounts unchanged: KLOW 80 mg × 2 at $60, Wolverine 10 mg × 4 at $30, BAC 30 mL included, shipping $9.99. Marker recorded by bookkeeping: MHARTMAN-ADDON-KLOW-WOLVERINE-PAID-PULL-20261108. This change did not write the ledger or stock.
