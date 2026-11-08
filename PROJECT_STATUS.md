@@ -1,6 +1,14 @@
 # Bio Linked Solutions — project status
 
 Last reviewed: 2026-11-08 (America/Denver).
+
+## mpauldino labs update — 2026-11-08
+- Started from main 99df49a7. Only mpauldino bloodwork changed. The published plan-date controls, compact layout, and invoice summary cleanup stay in place. Protocol, invoices, payments, and other clients were not edited.
+- The current panel is the supplied Quest report collected 11/02/2026 08:49 and reported 11/05/2026 17:14, with no time zone added. Values and ranges are the ones printed on that report. The raw report and its contact fields are not in the repository.
+- The score is a custom wellness score, not a diagnosis: 4 for a printed or already-used optimal cutoff, 3 inside the laboratory range without that cutoff, 1 outside the laboratory range. Duplicate albumin, calculated eAG, the unreported BUN/creatinine ratio, and differential percentages without a printed range are shown and not scored. The arithmetic is in mpauldino/labs-nov2026.js and tools/tests/mpauldino-labs-nov2026.mjs. Two laboratory flags and the repeat-with-a-clinician note are on the page.
+- Checks on 2026-11-08: node confirmed 50 scored results, 156 points, score 78. Headless Chrome at phone and desktop, light and dark, with Supabase and every non-GET blocked before the network. The labs card, flag rows, and formula rendered. Invoice totals stayed at zero on this page and the existing protocol list was still present. No account, payment, or inventory write.
+- Publishing: branch cursor/mpauldino-labs-nov2026-8977. Not merged. Not deployed.
+
 Repository: https://github.com/micahp20/biolinked-site
 Production domain recorded in CNAME: https://biolinkedsolutions.com
 Inspected main baseline: 0bd7f7117ee38a5e3693f35b0125705df589277b.
