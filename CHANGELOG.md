@@ -133,6 +133,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Annaleah uses the same cycle cards as Jamie
 - Rebuilt /annaleah/ from current main so the protocol, invoice, and navigation use the existing Jamie components. Removed the separate reference page and its extra headings. Source dose and timing stay in the cycle cards. Blank timing is not given a weekday. The quote stays unpaid and unpriced. Jamie and Paul were not edited. Branch cursor/annaleah-layout-match-8977 at 2f0407f8cb0a26de765b82fa6c01c2f3a14251de. The owner merged that branch as PR #132.
 
+## 2026-11-07 — Annaleah invoice drops the repeated item list
+- Removed the compound-and-shipping paragraph under the cycle heading on Annaleah’s invoice card and in the payment sheet. The heading, quote badge, priced rows, $434.96 total, and Pay now stay. Future new-client invoices should not repeat that list. Existing client pages were not edited.
+
 ## 2026-11-07 — Annaleah invoice drops the extra quote summary
 - Removed only the standalone Quoted summary card above Annaleah’s detailed invoice. Line prices, the $434.96 total, Pay now, and the payment sheet stay. A note for future new-client invoices is in AGENTS.md. Existing client pages were not edited.
 
@@ -142,6 +145,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Complete quoted compound Protocol descriptions
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
+
+## 2026-11-08 — Main merged into the portal plan branch
+- Merged origin/main fe4939ef (PR #135, Annaleah’s source-level invoice summary removal and cache v5) into cursor/portal-plan-controls-8977 with a merge commit. Kept that Annaleah cleanup and the sitewide plan-date and invoice-summary script. No invoice amounts, paid states, or clinical text were changed in the conflict resolution.
 
 ## 2026-11-08 — Plan dates on every portal, duplicate invoice summaries removed
 - Every client portal, including paid and historical invoices, now hides the repeated compound-and-price paragraph under the order heading and in the payment sheet. Order names, Paid/Quote badges, priced rows, totals, and the one-line paid/quoted balance stay. Invoice JSON is unchanged.
