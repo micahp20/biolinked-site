@@ -146,6 +146,12 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Plan dates removed from every portal
+- Removed start, end, save, cancel, clear, and Plan dates from the shared portal controls and from the remaining client protocol pages, including the older tracker and calendar pages. Remove and restore remain on the device. A previously saved start or end date no longer hides a compound. A calendar file is created only when that device already has a saved start date. No start date was invented.
+- Schedule rows expand again because the control is inside the detail panel. If removal unmounts the row, the schedule keeps a restore button. Add to My List stays in the calculator store.
+- Same-client records were copied onto invoice labels that were missing a vial strength, including Becky’s Order 2 BAC water at 10 mL. The $4.99 amount, paid totals, doses, and earlier orders were not changed. Compounds with no same-client strength stay unlabeled. The short list is in PROJECT_STATUS.md.
+- Augustus Rasche’s Monday schedule and protocol card were checked on a computer and a phone. All 149 portal pages were rechecked at desktop and phone width with the network guard. The shared script is version 2. Not merged and not deployed.
+
 ## 2026-11-08 — Three latest add-on invoices marked paid
 - Matt Hartman’s KLOW + Wolverine add-on, Ameris Hartman’s Retatrutide add-on, and Becky Delorenzo’s Order 2 are marked paid on the static pages. Earlier orders, line amounts, and clinical directions were not changed. Inventory and the ledger were not written from this change. Becky’s Order 2 labels now use the confirmed GHK-Cu 50 mg and AHK-Cu 100 mg strengths.
 

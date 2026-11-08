@@ -804,8 +804,7 @@
       </div>
 
       <div class="cycle-start-row">
-        <label>Cycle Start Date</label>
-        <input type="date" id="cycleStartDate" onchange="setCycleStart(this.value)">
+        <p>A cycle start date is not recorded on this page, so the week counter stays manual. Dose checkmarks still save on this device.</p>
         <span class="save-badge" id="saveBadge">Saved ✓</span>
       </div>
 
@@ -813,7 +812,7 @@
         <div class="tracker-stat">
           <div class="ts-label">Cycle Progress</div>
           <div class="ts-value" id="statWeek">—</div>
-          <div class="ts-sub" id="statDay">Set start date above</div>
+          <div class="ts-sub" id="statDay">Week count stays manual</div>
         </div>
         <div class="tracker-stat">
           <div class="ts-label">Doses Taken</div>
@@ -947,8 +946,7 @@
       <div class="cal-setup-body">
         <div class="cal-fields">
           <div class="cal-field">
-            <label>Cycle Start Date</label>
-            <input type="date" id="calStart" oninput="updatePreview()"/>
+            <p>A cycle start date is not recorded on this page, so a calendar file is not created. The weekly schedule on this page stays as written.</p>
           </div>
           <div class="cal-field">
             <label>Morning Injection Time</label>
@@ -1044,7 +1042,7 @@
           ✓ Calendar file downloaded! Open it on your iPhone to import all events.
         </div>
         <div id="calErr" style="display:none;margin-top:1rem;padding:1rem 1.25rem;background:rgba(224,92,92,0.1);border:1px solid rgba(224,92,92,0.3);border-radius:2px;text-align:center;font-size:13px;color:#c04040;font-weight:500;">
-          Please enter your cycle start date first.
+          A cycle start date is not recorded on this page, so a calendar file is not created.
         </div>
       </div>
     </div>
@@ -1144,7 +1142,7 @@ function loadState() {
     const s = localStorage.getItem('kristinProtocolState');
     if (s) state = JSON.parse(s);
     const d = localStorage.getItem('kristinCycleStart');
-    if (d) { cycleStartDate = new Date(d); document.getElementById('cycleStartDate').value = d; }
+    if (d) cycleStartDate = new Date(d);
   } catch(e) {}
   updateStats();
 }
@@ -1301,7 +1299,8 @@ function switchTab(tab, event) {
 }
 
 function downloadiOS() {
-  const startVal = document.getElementById('cycleStartDate').value || '';
+  let startVal = '';
+  try { startVal = localStorage.getItem('kristinCycleStart') || ''; } catch (e) {}
   const stateJSON = JSON.stringify(state);
 
   const trackerHTML = `<!DOCTYPE html>
@@ -1473,7 +1472,8 @@ ls();render();upd();
 function updatePreview() { /* preview is static visual — no dynamic update needed */ }
 
 function downloadCal() {
-  const startVal = document.getElementById('calStart').value;
+  const startEl = document.getElementById('calStart');
+  const startVal = startEl ? startEl.value : '';
   const amVal    = document.getElementById('calAM').value || '07:00';
 
   if (!startVal) {
@@ -1688,5 +1688,5 @@ addEventListener('load',w);setTimeout(w,600);addEventListener('resize',w);})();
 
 <script src="/protocol-copy.js?v=1"></script>
 <script src="/protocol-context.js?v=1"></script>
-<link rel="stylesheet" href="/portal-plan-controls.css?v=1">
-<script src="/portal-plan-controls.js?v=1"></script>
+<link rel="stylesheet" href="/portal-plan-controls.css?v=2">
+<script src="/portal-plan-controls.js?v=2"></script>

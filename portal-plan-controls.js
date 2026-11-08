@@ -1,6 +1,6 @@
-/* Client plan window: start/end dates and remove/restore.
-   Stored on this device under the page slug. Does not edit catalog data,
-   invoice amounts, or the dose text. */
+/* Per-client remove and restore for protocol and schedule rows.
+   Stored on this device. Does not edit catalog data, invoice amounts,
+   or dose text. Saved start and end dates are ignored and are not shown. */
 (function () {
   'use strict';
   if (window.__blPlanControls) return;
@@ -11,31 +11,29 @@
   }
   function storeKey() { return 'biolinked-planwin-' + slug(); }
   function load() {
+    var data = { v: 1, items: {} };
     try {
       var raw = JSON.parse(localStorage.getItem(storeKey()) || 'null');
-      if (raw && raw.items && typeof raw.items === 'object') return raw;
+      if (raw && raw.items && typeof raw.items === 'object') data.items = raw.items;
     } catch (e) {}
-    return { v: 1, items: {} };
+    var changed = false;
+    Object.keys(data.items).forEach(function (k) {
+      var rec = data.items[k];
+      if (!rec || !rec.removed) { delete data.items[k]; changed = true; return; }
+      if (rec.start || rec.end || Object.keys(rec).length !== 1) {
+        data.items[k] = { removed: true };
+        changed = true;
+      }
+    });
+    if (changed) save(data);
+    return data;
   }
   function save(data) {
     try { localStorage.setItem(storeKey(), JSON.stringify(data)); } catch (e) {}
   }
-  function pad(n) { return (n < 10 ? '0' : '') + n; }
-  function todayStr() {
-    var d = new Date();
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  }
-  function validDate(s) { return /^\d{4}-\d{2}-\d{2}$/.test(s || ''); }
   function itemKey(cycle, name) { return String(cycle || 'plan') + '\u001f' + String(name || ''); }
   function recOf(cycle, name) { return load().items[itemKey(cycle, name)] || null; }
-  function hiddenNow(rec) {
-    if (!rec) return false;
-    if (rec.removed) return true;
-    var t = todayStr();
-    if (rec.start && t < rec.start) return true;
-    if (rec.end && t > rec.end) return true;
-    return false;
-  }
+  function removedNow(rec) { return !!(rec && rec.removed); }
   function findCompound(name) {
     var lists = [];
     if (typeof ALL !== 'undefined' && ALL) lists.push(ALL);
@@ -64,7 +62,7 @@
     due = function (c, day) {
       if (c && typeof c === 'object' && c.n) {
         var cycle = (c.cy && c.cy[0]) || (typeof cycCurrent === 'function' ? cycCurrent() : '') || 'plan';
-        if (hiddenNow(recOf(cycle, c.n))) return false;
+        if (removedNow(recOf(cycle, c.n))) return false;
       }
       return dueOrig.apply(this, arguments);
     };
@@ -74,26 +72,13 @@
   function paintNote() {
     var n = document.getElementById('dosenote');
     if (!n) return;
-    n.textContent = n.textContent.replace(
-      'This is a read-only view of your schedule.',
-      'Dates and removal apply to your plan on this device.'
-    );
+    n.textContent = n.textContent
+      .replace('This is a read-only view of your schedule.', 'Remove and restore apply to your plan on this device.')
+      .replace('Dates and removal apply to your plan on this device.', 'Remove and restore apply to your plan on this device.');
   }
 
-  function field(label, cls, value) {
-    return '<label class="blp-lab">' + label +
-      '<input class="blp-date ' + cls + '" type="date" value="' + (value || '') + '"></label>';
-  }
-  function controlHTML(rec, draft) {
-    var d = draft || rec || {};
+  function controlHTML(rec) {
     return '<div class="blp-ctl" data-blp="1">' +
-      '<div class="blp-row">' + field('Start', 'blp-start', d.start) + field('End', 'blp-end', d.end) + '</div>' +
-      '<p class="blp-err" hidden>End date must be on or after the start date.</p>' +
-      '<div class="blp-actions">' +
-        '<button type="button" class="blp-btn" data-blp-act="save">Save dates</button>' +
-        '<button type="button" class="blp-btn" data-blp-act="cancel">Cancel</button>' +
-        '<button type="button" class="blp-btn" data-blp-act="clear">Clear</button>' +
-      '</div>' +
       '<div class="blp-actions">' +
         (rec && rec.removed
           ? '<button type="button" class="blp-btn" data-blp-act="restore">Restore to my plan</button>'
@@ -109,21 +94,11 @@
       '</div>';
   }
 
-  function readDraft(box) {
-    return {
-      start: (box.querySelector('.blp-start') || {}).value || '',
-      end: (box.querySelector('.blp-end') || {}).value || ''
-    };
-  }
-  function showErr(box, on) {
-    var e = box.querySelector('.blp-err');
-    if (e) e.hidden = !on;
-  }
-  function writeRec(cycle, name, rec) {
+  function writeRec(cycle, name, removed) {
     var data = load();
     var k = itemKey(cycle, name);
-    if (!rec || (!rec.start && !rec.end && !rec.removed)) delete data.items[k];
-    else data.items[k] = rec;
+    if (removed) data.items[k] = { removed: true };
+    else delete data.items[k];
     save(data);
   }
   function refresh() {
@@ -140,57 +115,20 @@
       ev.preventDefault();
       ev.stopPropagation();
       var act = btn.getAttribute('data-blp-act');
-      var saved = recOf(cycle, name) || {};
       if (act === 'ask') { box.querySelector('.blp-confirm').hidden = false; return; }
       if (act === 'abort') { box.querySelector('.blp-confirm').hidden = true; return; }
-      if (act === 'cancel') {
-        var parent = box.parentNode;
-        var holder = document.createElement('div');
-        holder.innerHTML = controlHTML(saved);
-        var next = holder.firstChild;
-        next.setAttribute('data-blp-key', itemKey(cycle, name));
-        parent.replaceChild(next, box);
-        bind(next, cycle, name);
-        return;
-      }
-      if (act === 'clear') {
-        var start = box.querySelector('.blp-start');
-        var end = box.querySelector('.blp-end');
-        if (start) start.value = '';
-        if (end) end.value = '';
-        showErr(box, false);
-        writeRec(cycle, name, saved.removed ? { removed: true } : null);
-        refresh();
-        return;
-      }
-      if (act === 'save') {
-        var draft = readDraft(box);
-        if (draft.start && !validDate(draft.start)) return;
-        if (draft.end && !validDate(draft.end)) return;
-        if (draft.start && draft.end && draft.end < draft.start) { showErr(box, true); return; }
-        showErr(box, false);
-        writeRec(cycle, name, { start: draft.start, end: draft.end, removed: !!saved.removed });
-        refresh();
-        return;
-      }
-      if (act === 'confirm') {
-        writeRec(cycle, name, { start: saved.start || '', end: saved.end || '', removed: true });
-        refresh();
-        return;
-      }
-      if (act === 'restore') {
-        writeRec(cycle, name, (saved.start || saved.end) ? { start: saved.start || '', end: saved.end || '', removed: false } : null);
-        refresh();
-      }
+      if (act === 'confirm') { writeRec(cycle, name, true); refresh(); return; }
+      if (act === 'restore') { writeRec(cycle, name, false); refresh(); }
     });
   }
 
   function place(host, cycle, name) {
     if (!host || !name) return;
     var key = itemKey(cycle, name);
-    var existing = host.querySelector('.blp-ctl');
+    var existing = host.querySelector(':scope > .blp-ctl');
+    if (!existing) existing = host.querySelector('.blp-ctl');
     if (existing && existing.contains(document.activeElement)) {
-      var wantRemoved = (recOf(cycle, name) && recOf(cycle, name).removed) ? '1' : '0';
+      var wantRemoved = removedNow(recOf(cycle, name)) ? '1' : '0';
       if (existing.getAttribute('data-blp-removed') === wantRemoved) return;
     }
     if (existing) existing.remove();
@@ -198,15 +136,31 @@
     wrap.innerHTML = controlHTML(recOf(cycle, name));
     var box = wrap.firstChild;
     box.setAttribute('data-blp-key', key);
-    box.setAttribute('data-blp-removed', (recOf(cycle, name) && recOf(cycle, name).removed) ? '1' : '0');
+    box.setAttribute('data-blp-removed', removedNow(recOf(cycle, name)) ? '1' : '0');
     host.appendChild(box);
     bind(box, cycle, name);
-    var card = host.closest('.jc-compound, .drow, .dx-pan');
-    var rec = recOf(cycle, name);
-    if (card && card.classList) card.classList.toggle('blp-off', !!(rec && rec.removed));
+    var card = host.closest('.jc-compound, .drow, .dx-pan, .cx');
+    if (card && card.classList) card.classList.toggle('blp-off', removedNow(recOf(cycle, name)));
+  }
+
+  function repairExpanders() {
+    document.querySelectorAll('#doses .blp-sched').forEach(function (n) { n.remove(); });
+    document.querySelectorAll('#doses .drow').forEach(function (row) {
+      var sib = row.nextElementSibling;
+      if (sib && (sib.classList.contains('dx-pan') || sib.classList.contains('ed-pan'))) return;
+      var pan = sib;
+      while (pan && !pan.classList.contains('drow')) {
+        if (pan.classList.contains('dx-pan') || pan.classList.contains('ed-pan')) {
+          row.insertAdjacentElement('afterend', pan);
+          return;
+        }
+        pan = pan.nextElementSibling;
+      }
+    });
   }
 
   function mountAll() {
+    repairExpanders();
     document.querySelectorAll('#protoabout .jc-compound').forEach(function (card) {
       var body = card.querySelector('.jc-body') || card;
       var nameEl = card.querySelector('summary');
@@ -220,36 +174,57 @@
       var name = nameEl ? nameEl.textContent.replace(/\s+/g, ' ').trim() : '';
       place(body, cycleForName(name, card), name);
     });
-    document.querySelectorAll('#doses .drow').forEach(function (row) {
-      var name = row.getAttribute('data-dx') || ((row.querySelector('.nm') || {}).textContent || '').replace(/\s+/g, ' ').trim();
-      if (!name) return;
-      var compound = findCompound(name);
-      var cycle = (compound && compound.cy && compound.cy[0]) || cycleForName(name, null);
-      if (!hiddenNow(recOf(cycle, name))) return;
-      var next = row.nextElementSibling;
-      if (next && (next.classList.contains('dx-pan') || next.classList.contains('blp-sched'))) next.remove();
-      row.remove();
-    });
-    document.querySelectorAll('#doses .dx-pan').forEach(function (pan) {
+    document.querySelectorAll('#doses .dx-pan, #doses .ed-pan').forEach(function (pan) {
       var row = pan.previousElementSibling;
-      var name = row && row.getAttribute('data-dx');
+      var name = row && (row.getAttribute('data-dx') || row.getAttribute('data-ed') || ((row.querySelector('.nm') || {}).textContent || '').replace(/\s+/g, ' ').trim());
       if (!name) return;
       place(pan, cycleForName(name, null), name);
     });
     document.querySelectorAll('#doses .drow').forEach(function (row) {
       var next = row.nextElementSibling;
-      if (next && (next.classList.contains('dx-pan') || next.classList.contains('blp-sched'))) return;
-      var nameEl = row.querySelector('.nm');
-      var name = nameEl ? nameEl.textContent.replace(/\s+/g, ' ').trim() : '';
+      if (next && (next.classList.contains('dx-pan') || next.classList.contains('ed-pan'))) return;
+      if (row.querySelector('.blp-ctl')) return;
+      var name = row.getAttribute('data-dx') || ((row.querySelector('.nm') || {}).textContent || '').replace(/\s+/g, ' ').trim();
       if (!name) return;
-      var det = document.createElement('details');
-      det.className = 'blp-sched';
-      det.innerHTML = '<summary>Plan dates</summary><div class="blp-sched-body"></div>';
-      row.insertAdjacentElement('afterend', det);
-      place(det.querySelector('.blp-sched-body'), cycleForName(name, null), name);
+      place(row, cycleForName(name, null), name);
     });
     paintNote();
+    paintRemoved();
     stripInvoice();
+  }
+
+  function paintRemoved() {
+    var old = document.getElementById('blp-removed');
+    if (old) old.remove();
+    var host = document.getElementById('doses');
+    if (!host) return;
+    var data = load();
+    var keys = Object.keys(data.items).filter(function (k) { return data.items[k] && data.items[k].removed; });
+    if (!keys.length) return;
+    var box = document.createElement('div');
+    box.id = 'blp-removed';
+    box.className = 'blp-ctl';
+    var note = document.createElement('p');
+    note.className = 'blp-note';
+    note.textContent = 'Removed on this device. Restore puts a compound back. The invoice and catalog stay as they are.';
+    box.appendChild(note);
+    keys.forEach(function (k) {
+      var name = k.split('\u001f').slice(1).join('\u001f') || k;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'blp-btn';
+      btn.setAttribute('data-blp-act', 'restore');
+      btn.textContent = 'Restore ' + name;
+      btn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        var parts = k.split('\u001f');
+        writeRec(parts[0], parts.slice(1).join('\u001f'), false);
+        refresh();
+      });
+      box.appendChild(btn);
+    });
+    host.appendChild(box);
   }
 
   function stripInvoice() {
@@ -292,8 +267,7 @@
   window.BLPlan = {
     key: itemKey,
     load: load,
-    today: todayStr,
-    hidden: hiddenNow,
+    removed: removedNow,
     mount: mountAll
   };
 })();

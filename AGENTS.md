@@ -74,6 +74,7 @@ These requirements are recovered from source and merged task records, not a comp
 - Always include one Shipping line at $9.99 and one BAC water at $4.99 on each new quote/order, unless the owner explicitly overrides that charge for the specific request.
 - Include both charges in the displayed invoice total. Apply each once per order, not once per compound, and avoid duplicate lines when updating an existing quote.
 - On client invoices, do not add a second top Quoted summary card above the detailed invoice, and do not repeat the product list in a paragraph under the invoice heading, including paid history. The heading, status badge, itemized rows, and total are enough. Leave existing client pages as they are unless that page is the one being edited.
+- Do not put start dates, end dates, or a Plan dates control on protocol or schedule cards. A client may remove and restore a compound on that device only. Saved dates must not hide a compound. Do not invent a dose or write a client-added compound into the catalog, invoice, or another client's record.
 - Preserve historical paid invoices; do not retroactively change settled orders. Quoted charges do not authorize inventory deductions or a sale/ledger entry.
 
 ## Protocol additions must be complete — owner correction 2026-11-07
