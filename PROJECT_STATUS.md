@@ -1,6 +1,6 @@
 # Bio Linked Solutions — project status
 
-Last reviewed: 2026-11-07 (America/Denver).
+Last reviewed: 2026-11-08 (America/Denver).
 Repository: https://github.com/micahp20/biolinked-site
 Production domain recorded in CNAME: https://biolinkedsolutions.com
 Inspected main baseline: 0bd7f7117ee38a5e3693f35b0125705df589277b.
@@ -234,3 +234,12 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Paths: annaleah/index.html, annaleah/sw.js cache suffix, tools/tests/annaleah-portal.mjs, AGENTS.md.
 - Checks: headless Chrome desktop and phone, light and dark, with Supabase and every non-GET blocked. The invoice view has no top quote card and one detailed card. Pay now still opens the payment sheet. No production write.
 - Publishing: committed 72bf412b82454c50d0c1af4c2ed186a27755ac8a and pushed to cursor/annaleah-invoice-hero-8977. The pull-request tool refused once: GitHub returned "must be a collaborator" (Validation Failed, resource Issue, code custom). Not merged. Not deployed. Open from https://github.com/micahp20/biolinked-site/pull/new/cursor/annaleah-invoice-hero-8977
+
+## Portal plan dates and invoice summary strip — 2026-11-08
+- Started from main db190bb7 (PR #134). Shared portal-plan-controls.js and portal-plan-controls.css load on 149 portal and template pages. All 144 pages that render an invoice, including paid and historical orders and the legacy builders, load that script. The public homepage, the peptide index, the shop, and _app-prototype-reference.html do not.
+- The script removes the top Quoted card, the paragraph under each order heading, and the same paragraph in the payment sheet. It does not edit invoice JSON. Order names, status badges, priced rows, totals, and the one-line paid or quoted balance remain.
+- Each expanded protocol card and schedule row can save a start date, an end date, clear them, or remove and restore the compound on this device. The key is the client slug plus the cycle name plus the compound name. An end date before the start date is rejected. Cancel puts the last saved dates back. A removed compound or a date window outside today leaves the schedule only. The catalog, invoice amounts, ledger, and inventory are not written.
+- Phone layout at 480px and below tightens the protocol title, Explore button, program cards, and Back/Home to a 44px tap height. Desktop sizes stay. Colors are unchanged.
+- dcoone/index.html is the future client template and is included, so a page built from it loads the same script. Five pages load the script and have no invoice renderer: gorilla-stack-2, renewal-year, twelve-month, kwells.html, and jsanders.html. The legacy mpauldino/hb page has no cycle cards; its invoice strip is covered, and schedule rows get a Plan dates disclosure.
+- Checks on 2026-11-08, headless Chrome, Supabase and every non-GET blocked before the network: paid mmccarthy orders still show The Rebuild at $164.99 and The Prime Stack at $1,384.94 with Paid badges and line prices, and the repeated summary paragraphs are gone. Annaleah still shows the unpaid $434.96 quote and Pay now. dbejar’s paid $380 order keeps its name and drops its summary paragraph. An in-memory hb fixture confirmed the older builder’s paragraph is removed and was then discarded. Date save, invalid range, cancel, reload, remove, restore, clear, two-cycle keys, and mmccarthy/annaleah storage isolation passed. Invoice and protocol arrays were unchanged in the page. Layout checks at 360, 390, 430, and desktop, light and dark, found no horizontal overflow. The older Add compound calculator bug was not retested and is not claimed fixed. No ledger, payment, or stock write.
+- Publishing: branch cursor/portal-plan-controls-8977. Not merged. Not deployed. Live site unchanged until this branch is reviewed and published.
