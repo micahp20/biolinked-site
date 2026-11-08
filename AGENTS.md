@@ -72,7 +72,8 @@ These requirements are recovered from source and merged task records, not a comp
 
 ## Standard quote and order charges — owner confirmed 2026-11-07
 - Always include one Shipping line at $9.99 and one BAC water at $4.99 on each new quote/order, unless the owner explicitly overrides that charge for the specific request.
-- Include both charges in the displayed total and quote summary balances. Apply each once per order, not once per compound, and avoid duplicate lines when updating an existing quote.
+- Include both charges in the displayed invoice total. Apply each once per order, not once per compound, and avoid duplicate lines when updating an existing quote.
+- On a new client invoice, do not add a second top Quoted summary card above the detailed invoice. The detailed card already shows the lines, total, and payment action. Leave existing client pages as they are unless that page is the one being edited.
 - Preserve historical paid invoices; do not retroactively change settled orders. Quoted charges do not authorize inventory deductions or a sale/ledger entry.
 
 ## Protocol additions must be complete — owner correction 2026-11-07
