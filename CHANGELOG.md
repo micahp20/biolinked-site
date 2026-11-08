@@ -146,6 +146,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Three latest add-on invoices marked paid
+- Matt Hartman’s KLOW + Wolverine add-on, Ameris Hartman’s Retatrutide add-on, and Becky Delorenzo’s Order 2 are marked paid on the static pages. Earlier orders, line amounts, and clinical directions were not changed. Inventory and the ledger were not written from this change. Becky’s Order 2 labels now use the confirmed GHK-Cu 50 mg and AHK-Cu 100 mg strengths.
+
 ## 2026-11-08 — Current labs replaced on one portal
 - Replaced the current bloodwork summary on mpauldino with the supplied Nov 2026 panel. The page uses the existing score card, domain chips, and tap-to-read rows. The score is the documented 4 / 3 / 1 custom wellness tally, labeled as not a diagnosis. Earlier results already stored on the page stay in a separate history section. No other client, protocol, invoice, payment, or stock data was edited.
 
