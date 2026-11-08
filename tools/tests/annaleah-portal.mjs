@@ -217,6 +217,8 @@ async function main() {
         if (!document.querySelector('#v-pay .invoice-pay-now')) problems.push('pay now missing');
         if (document.querySelectorAll('#payhero .bal').length !== 0) problems.push('top quote card');
         if (document.querySelectorAll('#paylist .ocard').length !== 1) problems.push('invoice card count');
+        if (document.querySelector('#paylist .os')) problems.push('summary paragraph');
+        if (!/Cycle 1 · Fat Loss/.test(text) || !/QUOTE/.test(text)) problems.push('heading');
         return { problems, head: text.slice(0, 300) };
       })()`);
       report.problems.push(...pay.problems);
@@ -257,6 +259,8 @@ async function main() {
         if (!zelle || zelle.text.indexOf('720-938-0698') < 0) problems.push('zelle ' + JSON.stringify(zelle));
         const body = (document.getElementById('i-items') || {}).innerText || '';
         if (!/\\$434\\.96/.test(body) || !/\\$14\\.97/.test(body) || !/2-Day UPS/.test(body)) problems.push('modal lines');
+        if ((document.getElementById('i-sum') || {}).textContent) problems.push('modal summary');
+        if (!/Cycle 1 · Fat Loss/.test((document.getElementById('i-name') || {}).textContent || '')) problems.push('modal title');
         return { problems, rows };
       })()`);
       report.problems.push(...modal.problems);
@@ -289,9 +293,11 @@ async function main() {
       await delay(200);
       const phoneInvoice = await evaluate(`(() => {
         const problems = [];
+        const text = (document.getElementById('v-pay') || {}).innerText || '';
         if (document.querySelectorAll('#payhero .bal').length !== 0) problems.push('phone top quote card');
         if (document.querySelectorAll('#paylist .ocard').length !== 1) problems.push('phone invoice cards');
-        const text = (document.getElementById('v-pay') || {}).innerText || '';
+        if (document.querySelector('#paylist .os')) problems.push('phone summary');
+        if (!/Cycle 1 · Fat Loss/.test(text) || !/QUOTE/.test(text)) problems.push('phone heading');
         if (!/\\$434\\.96/.test(text) || !/\\$14\\.97/.test(text) || !/\\$9\\.99/.test(text)) problems.push('phone lines');
         if (!document.querySelector('#v-pay .invoice-pay-now')) problems.push('phone pay now');
         return problems;

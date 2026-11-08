@@ -133,6 +133,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Annaleah uses the same cycle cards as Jamie
 - Rebuilt /annaleah/ from current main so the protocol, invoice, and navigation use the existing Jamie components. Removed the separate reference page and its extra headings. Source dose and timing stay in the cycle cards. Blank timing is not given a weekday. The quote stays unpaid and unpriced. Jamie and Paul were not edited. Branch cursor/annaleah-layout-match-8977 at 2f0407f8cb0a26de765b82fa6c01c2f3a14251de. The owner merged that branch as PR #132.
 
+## 2026-11-07 — Annaleah invoice drops the repeated item list
+- Removed the compound-and-shipping paragraph under the cycle heading on Annaleah’s invoice card and in the payment sheet. The heading, quote badge, priced rows, $434.96 total, and Pay now stay. Future new-client invoices should not repeat that list. Existing client pages were not edited.
+
 ## 2026-11-07 — Annaleah invoice drops the extra quote summary
 - Removed only the standalone Quoted summary card above Annaleah’s detailed invoice. Line prices, the $434.96 total, Pay now, and the payment sheet stay. A note for future new-client invoices is in AGENTS.md. Existing client pages were not edited.
 
