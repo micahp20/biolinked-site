@@ -146,6 +146,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Current labs replaced on one portal
+- Replaced the current bloodwork summary on mpauldino with the supplied Nov 2026 panel. The page uses the existing score card, domain chips, and tap-to-read rows. The score is the documented 4 / 3 / 1 custom wellness tally, labeled as not a diagnosis. Earlier results already stored on the page stay in a separate history section. No other client, protocol, invoice, payment, or stock data was edited.
+
 ## 2026-11-08 — Main merged into the portal plan branch
 - Merged origin/main fe4939ef (PR #135, Annaleah’s source-level invoice summary removal and cache v5) into cursor/portal-plan-controls-8977 with a merge commit. Kept that Annaleah cleanup and the sitewide plan-date and invoice-summary script. No invoice amounts, paid states, or clinical text were changed in the conflict resolution.
 
