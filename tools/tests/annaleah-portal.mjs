@@ -165,7 +165,12 @@ async function main() {
       if (!cag || cag.u !== '10u' || (cag.days && cag.days.length) || cag.c !== 'Timing not provided') problems.push('cagri timing');
       if (CYC.length !== 1 || CYC[0].n !== 'Cycle 1 · Fat Loss') problems.push('extra cycles');
       if (document.documentElement.getAttribute('data-theme') !== ${JSON.stringify(theme)}) problems.push('theme');
-      if (!(PAID === 0 && DUE === 0 && INV.length === 1 && INV[0].status === 'quote' && INV[0].total == null && ALL.length === 6)) problems.push('invoice data');
+      if (!(PAID === 0 && DUE === 0 && INV.length === 1 && INV[0].status === 'quote' && INV[0].total === 434.96 && ALL.length === 6)) problems.push('invoice data');
+      const defs = box.querySelectorAll('.bl-compound-definition').length;
+      const roles = box.querySelectorAll('.bl-compound-role').length;
+      if (defs !== 6 || roles !== 6) problems.push('explanations ' + defs + '/' + roles);
+      if (!/Role in this plan/.test(text)) problems.push('role label');
+      if (!/does not by itself establish the benefit of injections/.test(text)) problems.push('nad limit');
       if (CS_SLUG !== 'annaleah' || SCHKEY !== 'biolinked-sched-annaleah' || KP !== 'annaleah-app-') problems.push('identity keys');
       if (nutState.age !== 32 || nutState.heightIn !== 68 || nutState.weightLb !== null || nutState.sex !== '' || nutState.goal !== 'maintain') problems.push('nut state');
       const sexOn = document.querySelectorAll('#v-nutr .nut-seg-btn[data-grp="sex"].on').length;
@@ -206,14 +211,57 @@ async function main() {
       const pay = await evaluate(`(() => {
         const text = (document.getElementById('v-pay') || {}).innerText || '';
         const problems = [];
-        if (!/Quote pending/.test(text) || !/Pending/.test(text)) problems.push('quote label');
-        if (/\\$|Paid|FREE/.test(text)) problems.push('priced or paid invoice');
-        if (!/1× Retatrutide 30 mg/.test(text) || !/1× Cagrilintide 10 mg/.test(text) || !/2× Tesamorelin 20 mg/.test(text) || !/2× KPV 10 mg/.test(text)) problems.push('lines ' + text.slice(0, 180));
-        if (document.querySelector('#v-pay .invoice-pay-now, #v-pay .paybtn')) problems.push('pay button');
+        if (!/\\$434\\.96/.test(text)) problems.push('total ' + text.slice(0, 220));
+        if (!/\\$50\\.00/.test(text) || !/\\$120\\.00/.test(text) || !/\\$100\\.00/.test(text) || !/\\$40\\.00/.test(text) || !/\\$14\\.97/.test(text) || !/\\$9\\.99/.test(text)) problems.push('line prices');
+        if (/Pending|FREE|Paid in full/.test(text)) problems.push('wrong commercial state');
+        if (!document.querySelector('#v-pay .invoice-pay-now')) problems.push('pay now missing');
         return { problems, head: text.slice(0, 300) };
       })()`);
       report.problems.push(...pay.problems);
       await shot('desktop-light-invoice');
+      await evaluate(`(() => {
+        if (typeof go==='function') go('proto');
+        const card = document.querySelector('#protoabout details.jc-compound');
+        if (card) card.open = true;
+        const sc = document.getElementById('scroll');
+        if (sc && card) sc.scrollTop = Math.max(0, card.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - 12);
+      })()`);
+      await delay(200);
+      await shot('annaleah-expanded');
+      const modal = await evaluate(`(() => {
+        const problems = [];
+        const sheet = document.getElementById('s-inv');
+        function links() {
+          return Array.from(document.querySelectorAll('#i-pay a, #i-pay button')).map((el) => ({
+            cls: el.className,
+            href: el.getAttribute('href') || '',
+            note: el.getAttribute('data-note') || '',
+            text: (el.textContent || '').replace(/\\s+/g, ' ').trim()
+          }));
+        }
+        openInv(0);
+        if (!sheet.classList.contains('on')) problems.push('modal did not open');
+        let rows = links();
+        closeSheet();
+        if (sheet.classList.contains('on')) problems.push('modal did not close');
+        openInv(0);
+        if (!sheet.classList.contains('on')) problems.push('modal did not reopen');
+        rows = links();
+        const venmo = rows.find((r) => r.cls.indexOf('vm') >= 0);
+        const cash = rows.find((r) => r.cls.indexOf('ca') >= 0);
+        const zelle = rows.find((r) => r.cls.indexOf('zl') >= 0);
+        if (!venmo || venmo.href !== 'https://venmo.com/u/Micahp20' || venmo.note !== 'BioLinked — Annaleah — Cycle 1') problems.push('venmo ' + JSON.stringify(venmo));
+        if (!cash || cash.href !== 'https://cash.app/$micahpauldino/434.96') problems.push('cash ' + JSON.stringify(cash));
+        if (!zelle || zelle.text.indexOf('720-938-0698') < 0) problems.push('zelle ' + JSON.stringify(zelle));
+        const body = (document.getElementById('i-items') || {}).innerText || '';
+        if (!/\\$434\\.96/.test(body) || !/\\$14\\.97/.test(body) || !/2-Day UPS/.test(body)) problems.push('modal lines');
+        return { problems, rows };
+      })()`);
+      report.problems.push(...modal.problems);
+      await evaluate(`(() => { const s=document.getElementById('s-inv'); const b=document.querySelector('#i-pay'); if(s&&b) s.scrollTop=Math.max(0,b.offsetTop-24); })()`);
+      await delay(150);
+      await shot('annaleah-pay-modal');
+      await evaluate(`typeof closeSheet==='function' && closeSheet()`);
       await evaluate(`typeof go==='function' && go('sched'); if (typeof pickDay==='function') pickDay(1);`);
       await delay(250);
       const sched = await evaluate(`(() => {
@@ -235,6 +283,20 @@ async function main() {
       })()`);
       await delay(150);
       await shot('phone-light-addons');
+      await evaluate(`(() => { if (typeof go==='function') go('pay'); if (typeof openInv==='function') openInv(0); })()`);
+      await delay(200);
+      const phonePay = await evaluate(`(() => {
+        const problems = [];
+        const sheet = document.getElementById('s-inv');
+        if (!sheet || !sheet.classList.contains('on')) problems.push('phone modal');
+        const cash = document.querySelector('#i-pay a.ca');
+        if (!cash || cash.getAttribute('href') !== 'https://cash.app/$micahpauldino/434.96') problems.push('phone cash');
+        if (!/\\$434\\.96/.test((document.getElementById('i-items')||{}).innerText||'')) problems.push('phone total');
+        return problems;
+      })()`);
+      report.problems.push(...phonePay);
+      await shot('phone-pay-modal');
+      await evaluate(`typeof closeSheet==='function' && closeSheet()`);
     }
     reports.push({ name, problems: report.problems });
     console.log((report.problems.length ? 'FAIL ' : 'PASS ') + name + ' ' + report.problems.join(' | '));
@@ -290,6 +352,17 @@ async function main() {
   await delay(1400);
   await evaluate(`(() => { if (typeof go==='function') go('proto'); const sc=document.getElementById('scroll'); const el=document.getElementById('protoabout'); if(sc&&el) sc.scrollTop=Math.max(0, el.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-8); })()`);
   await shot('jcress-cycles-phone');
+  await s('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+  await s('Page.navigate', { url: 'http://127.0.0.1:' + PORT + '/jcress/' });
+  await delay(500);
+  await evaluate(`localStorage.setItem('jcress-app-theme','light')`);
+  await s('Page.reload', { ignoreCache: true });
+  await delay(1400);
+  await evaluate(`(() => { if (typeof go==='function') go('proto'); const card=document.querySelector('#protoabout details.jc-compound'); if(card) card.open=true; const sc=document.getElementById('scroll'); if(sc&&card) sc.scrollTop=Math.max(0, card.getBoundingClientRect().top-sc.getBoundingClientRect().top+sc.scrollTop-12); })()`);
+  await shot('jcress-expanded');
+  await evaluate(`typeof go==='function' && go('pay')`);
+  await delay(200);
+  await shot('jcress-invoice');
   console.log(parity.problems.length ? 'FAIL parity ' + parity.problems.join(' | ') : 'PASS parity');
   const blockers = [];
   if (continued.some((row) => row.method !== 'GET')) blockers.push('continued non-GET');
