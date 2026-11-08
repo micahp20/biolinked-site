@@ -145,3 +145,12 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-07 — Complete quoted compound Protocol descriptions
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
+
+## 2026-11-08 — Main merged into the portal plan branch
+- Merged origin/main fe4939ef (PR #135, Annaleah’s source-level invoice summary removal and cache v5) into cursor/portal-plan-controls-8977 with a merge commit. Kept that Annaleah cleanup and the sitewide plan-date and invoice-summary script. No invoice amounts, paid states, or clinical text were changed in the conflict resolution.
+
+## 2026-11-08 — Plan dates on every portal, duplicate invoice summaries removed
+- Every client portal, including paid and historical invoices, now hides the repeated compound-and-price paragraph under the order heading and in the payment sheet. Order names, Paid/Quote badges, priced rows, totals, and the one-line paid/quoted balance stay. Invoice JSON is unchanged.
+- Expanded protocol and schedule compounds can take a start date, an end date, and remove/restore. That choice is stored on the device for that client and cycle. It does not change the catalog, the invoice, the ledger, or inventory.
+- Phone headings, program cards, and Back/Home are tightened. Gold, black, and gray stay as they are.
+- See PROJECT_STATUS.md for the page count, the pages left out, the checks, and the unpublished branch.
