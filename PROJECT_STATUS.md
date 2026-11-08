@@ -238,4 +238,4 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Annaleah invoice item summary removed — 2026-11-07
 - Started from main db190bb7. Removed only the repeated product-and-shipping paragraph under the cycle heading on /annaleah/, and the same paragraph in the payment sheet. Heading, quote badge, priced rows, $434.96, and Pay now stay. Prices and protocol content were not edited. Other client pages were not edited.
 - Paths: annaleah/index.html, annaleah/sw.js cache suffix, tools/tests/annaleah-portal.mjs, AGENTS.md.
-- Checks follow this commit. Not merged until the pull request is merged.
+- Publishing: committed d66c05de84e4786fa06f868062d0f8cebee66079 and pushed to cursor/annaleah-invoice-summary-8977. The pull-request tool refused once: GitHub returned "must be a collaborator" (Validation Failed, resource Issue, code custom). Not merged. Not deployed. Open from https://github.com/micahp20/biolinked-site/pull/new/cursor/annaleah-invoice-summary-8977
