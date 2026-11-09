@@ -2,6 +2,14 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-09 — mpauldino labs scoring expanded to earlier draws
+- Scored 13 markers that had been displayed but excluded: the differential percentages and calculated average glucose from the November 2026 panel, and seven hormone, vitamin and lipid-ratio results carried over from earlier draws. Added a small Vitamins domain. Removed the now-empty earlier-results section; the not-scored section keeps only an unreported ratio and a duplicate analyte.
+- Each carried-over marker names its draw date in its own note, so the mixed timepoints are transparent. One out-of-range marker is explained as the expected effect of ongoing therapy and a monitoring point while still scoring 1 under the existing rule.
+- Score recomputed by the file's own tally from 95 to 94 of 100 as the scored count grew from 50 to 63. Paths: mpauldino/labs-nov2026.js, mpauldino/sw.js and tools/tests/mpauldino-labs-nov2026.mjs. No protocol, invoice, paid/due, ledger or stock change.
+- Commits 8f799a46 and 489f49a3 on main. The first Pages run built the artifact but its deploy job timed out and published nothing; the second commit forced a fresh run that succeeded.
+- Checks: node --check on both scripts, the labs file executed with its in-file guard passing, and the harness's pure-JavaScript assertions. The harness's headless-Chrome half could not run in this environment. Deployed and verified live byte-identical to origin. Two scoring decisions are left open for the owner; see PROJECT_STATUS.md.
+- Also recorded in PROJECT_STATUS.md: two of four Pages deploys on this date failed in the hosting platform's publish step while the builds themselves succeeded.
+
 ## 2026-11-09 — mpauldino labs re-graded on functional ranges
 - Re-graded the November 2026 panel scoring on one portal: 33 in-range markers promoted from the in-range helper to the optimal helper, five markers held and the two laboratory flags left as they were, per owner instruction. Score recomputed by the file's own tally from 78 to 95 of 100.
 - Paths: mpauldino/labs-nov2026.js, mpauldino/sw.js and tools/tests/mpauldino-labs-nov2026.mjs. No protocol, invoice, paid/due, ledger or stock change.
