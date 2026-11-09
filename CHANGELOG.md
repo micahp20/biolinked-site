@@ -2,6 +2,12 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-09 — jsanders and kwells moved into current-layout client portals
+- With the owner's approval, the two standalone legacy protocol pages became folder portals at /jsanders/ and /kwells/. Each was built from dcoone/index.html and has its own manifest.json and a scoped sw.js.
+- Compounds, vial strengths, doses, draw units, BAC volumes, schedules, timing and invoice lines were copied by hand from the old pages. A script then checked each one against the old page text. Original explanations, reconstitution steps, weekly schedules, storage and monitoring notes are kept in each compound's notes and on the Notes cards.
+- Neither old page stated a payment, so PAID and DUE are 0 and each invoice is a Quote.
+- jsanders.html and kwells.html now redirect to the new folders. Both Share entries now point to the folder URLs. See PROJECT_STATUS.md for values that need owner review.
+
 ## 2026-11-09 — rhurst and dbejar moved to the current portal layout
 - Root cause: the Nov 4 fleet migration to the master layout (pilot 98c5474 plus batches 19e9c89–8c807c8) never included rhurst or dbejar. Later sitewide passes (#136, #140, #141) only added shared scripts and styles to every page, so asset-tag checks passed while these two pages kept the older shell.
 - Rebuilt both from dcoone/index.html, the current template, the same way the fleet pages were. The client data lines were carried over exactly: compounds, notes, invoices, PAID/DUE, labs, storage keys and slug. The dbejar cycle explainer keeps its own groupings, which are copied from that page's existing CYCABOUT member lists. Its schedule behavior did not change.
