@@ -2,6 +2,12 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-09 — rhurst and dbejar moved to the current portal layout
+- Root cause: the Nov 4 fleet migration to the master layout (pilot 98c5474 plus batches 19e9c89–8c807c8) never included rhurst or dbejar. Later sitewide passes (#136, #140, #141) only added shared scripts and styles to every page, so asset-tag checks passed while these two pages kept the older shell.
+- Rebuilt both from dcoone/index.html, the current template, the same way the fleet pages were. The client data lines were carried over exactly: compounds, notes, invoices, PAID/DUE, labs, storage keys and slug. The dbejar cycle explainer keeps its own groupings, which are copied from that page's existing CYCABOUT member lists. Its schedule behavior did not change.
+- sw.js for each page now uses the scoped fleet worker with a new cache name, so installed phones pick up the new layout.
+- Not converted: jsanders.html and kwells.html are standalone legacy documents that the converter gate rejects (no extractable compounds or invoices). mp-gold, sample, workout-demo and the hub pages are not client protocols. See PROJECT_STATUS.md.
+
 ## 2026-11-09 — Mike McCarthy add-on is paid and on the protocol
 - Marked the $219.98 Wolverine + KLOW + Cartalax quote paid on mmccarthy. Paid to date is $1,769.91 and the quoted balance is $0.00. Earlier paid orders were not rewritten. The unsold optional add-on block is off the invoice and the protocol.
 - The Wolverine card is the standard 10 mg BPC-157/TB-500 vial, with the original saved 1 mg / 20 unit / 2 mL directions. KLOW 80 mg is an active Prime Stack card using the directions already on that page. Cartalax 20 mg stays 1 mg daily for a 20-day course. No ledger or stock write.
