@@ -2,6 +2,15 @@
 
 Last reviewed: 2026-11-08 (America/Denver).
 
+## Mike McCarthy add-on quote — 2026-11-08
+- New unpaid quote on mmccarthy only. Paid Order 1 stays $164.99 and the Prime Stack stays paid $1,384.94. Paid to date stays $1,549.93. Quoted balance is $219.98. No paid status, ledger, or stock change.
+- Quote rows: standard Wolverine, BPC-157 / TB-500 · 10 mg, 2 vials at $30 ($60); KLOW Blend · 80 mg, 2 vials at $60 ($120); Cartalax · 20 mg, 1 vial at $25 ($25); BAC water · 10 mL, 1 bottle at $4.99; Shipping · 2-Day UPS $9.99. Total $219.98.
+- The active Wolverine card was not relabeled and its dose was not changed. It still says Wolverine 2.0 · 20 mg, 1 mg, 10 units, 2 mL. The first saved protocol was BPC-157 / TB-500 · 10 mg, 1 mg, 20 units, 2 mL. A later edit renamed that card to Wolverine 2.0 and changed the draw to 10 units. The ledger lookup found no sale of either Wolverine product, so neither draw was rewritten. Cartalax stays 1 mg, 10 units, 2 mL, daily 20-day course. KLOW stays the existing optional card, 4 mg, 15 units, 3 mL.
+- The Prime Stack BAC line still reads “BAC Water 3 mL × 17 vials” at $24.95. That amount matches five bottles at $4.99. The paid line was not rewritten.
+- Checks: invoice cents match the header. Desktop and phone loaded the invoice, opened a Monday schedule row, and opened a protocol card, with Supabase and every non-GET blocked. No date field. Not merged. Not deployed.
+
+
+
 ## Vial labels filled from the catalog where the source was single — 2026-11-08
 - Started from main aadab7eb. Labels only. Doses, recon, timing, prices, paid totals, and the plan-date controls were compared and left as they were. No ledger or stock write.
 - A single catalog size was added only where the page had no size and the same client had no contrary size. Matt Hartman’s Wolverine stays the 10 mg BPC/TB blend. Known 30 mL BAC lines stay 30 mL. Known 60 mg tirzepatide stays 60 mg. Historical Tesamorelin 10 mg stays 10 mg. Jamie Cress’s unsized Wolverine line was named Wolverine 2.0 · 20 mg because that is the product already recorded on his page. Mama P’s oxytocin card is labeled 10 mg because her recon already says 10 mg in 10 mL; the 0.05 mg / 5-unit dose is unchanged.
