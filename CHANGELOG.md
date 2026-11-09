@@ -147,7 +147,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
 ## 2026-11-08 — Mike McCarthy add-on quote
-- Added one unpaid quote on mmccarthy for standard Wolverine (BPC-157 / TB-500 10 mg) × 2 at $30, KLOW 80 mg × 2 at $60, Cartalax 20 mg × 1 at $25, one 10 mL BAC bottle at $4.99, and 2-Day UPS at $9.99. Total $219.98. Paid orders and the existing Wolverine 2.0 dose were not changed. The two saved Wolverine instructions disagree, and no sale confirms either, so the draw was left as it is. See PROJECT_STATUS.md.
+- Added one unpaid quote on mmccarthy for standard Wolverine (BPC-157 / TB-500 10 mg) × 2 at $30, KLOW 80 mg × 2 at $60, Cartalax 20 mg × 1 at $25, one 10 mL BAC bottle at $4.99, and 2-Day UPS at $9.99. Total $219.98. Paid orders stay as written. The current protocol title dropped the “2.0” and still shows 20 mg, 1 mg, 10 units, and 2 mL. The description text was not edited. See PROJECT_STATUS.md.
 
 ## 2026-11-08 — Vial labels filled where the catalog had one size
 - Added a vial size to protocol and invoice labels that had none, only when the catalog lists one size for that exact product and the same client’s page does not already record a different size. Doses, recon, timing, prices, and paid history were not changed.
