@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mpauldino/, which is now the real page: the app layout
 // was promoted here from the /mpauldino/app/ pilot.
-const CACHE = 'mpauldino-master-locked-v7-context-v1-controls-v1-consistency-v2-editor-v1-controls-repair-v1-calcact1-labs-nov2026-rescore3';
+const CACHE = 'mpauldino-master-locked-v7-context-v1-controls-v1-consistency-v2-editor-v1-controls-repair-v1-calcact1-labs-nov2026-rescore4';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/client-schedule-controls.css?v=1',
