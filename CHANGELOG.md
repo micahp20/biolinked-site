@@ -2,6 +2,11 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-09 — Mike McCarthy add-on is paid and on the protocol
+- Marked the $219.98 Wolverine + KLOW + Cartalax quote paid on mmccarthy. Paid to date is $1,769.91 and the quoted balance is $0.00. Earlier paid orders were not rewritten. The unsold optional add-on block is off the invoice and the protocol.
+- The Wolverine card is the standard 10 mg BPC-157/TB-500 vial, with the original saved 1 mg / 20 unit / 2 mL directions. KLOW 80 mg is an active Prime Stack card using the directions already on that page. Cartalax 20 mg stays 1 mg daily for a 20-day course. No ledger or stock write.
+- Commit ddfd6050 is on branch cursor/mmccarthy-paid-addon-472b. Pull request creation was rejected because the GitHub identity is not a collaborator. Not merged. Not deployed. See PROJECT_STATUS.md.
+
 ## 2026-11-09 — mpauldino labs scoring expanded to earlier draws
 - Scored 13 markers that had been displayed but excluded: the differential percentages and calculated average glucose from the November 2026 panel, and seven hormone, vitamin and lipid-ratio results carried over from earlier draws. Added a small Vitamins domain. Removed the now-empty earlier-results section; the not-scored section keeps only an unreported ratio and a duplicate analyte.
 - Each carried-over marker names its draw date in its own note, so the mixed timepoints are transparent. One out-of-range marker is explained as the expected effect of ongoing therapy and a monitoring point while still scoring 1 under the existing rule.
