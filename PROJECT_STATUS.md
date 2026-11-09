@@ -2,6 +2,17 @@
 
 Last reviewed: 2026-11-09 (America/Denver).
 
+## Mike McCarthy add-on marked paid — 2026-11-09
+- Owner request: the latest quoted add-on is paid, the unsold optional add-on block comes off the page, and the protocol matches what was purchased. Inventory and the ledger were already recorded. This change writes no database, stock, or ledger row.
+- Started from origin/main d971f076. Only mmccarthy/index.html, mmccarthy/sw.js, and these two memory files change.
+- The $219.98 quote is now ✔ Paid Add-on · Wolverine + KLOW + Cartalax. Lines are unchanged: Wolverine BPC-157/TB-500 10 mg × 2 at $30, KLOW 80 mg × 2 at $60, Cartalax 20 mg × 1 at $25, BAC water 10 mL × 1 at $4.99, 2-Day UPS $9.99. Paid to date is $1,769.91. Quoted is $0.00. Pay now is gone. Order 1 stays $164.99 and the Prime Stack stays $1,384.94, including the Prime Stack BAC line “BAC Water 3 mL × 17 vials” at $24.95.
+- The Prime Stack optional block is gone: IGF-1 LR3, KLOW, AOD-9604, 5-Amino-1MQ, N-Acetyl Adamax, the extra BAC line, the add-ons subtotal, and the with-all-add-ons total. Those unsold protocol cards are gone with it.
+- Wolverine’s protocol card is Wolverine · BPC-157/TB-500 10 mg. Dose 1 mg, draw 20 units, recon 2 mL BAC water per vial, nightly, daily, SubQ. Those draw figures are the ones saved on the first mmccarthy page (b8278e25), not a new calculation. The description paragraph is the one already on the card.
+- KLOW · 80 mg is an active Cycle 2 card: 4 mg, 15 units, 3 mL BAC water per vial · 26.7 mg/mL, Monday / Wednesday / Friday evening, SubQ. Those figures were already on the optional card. Cartalax · 20 mg was already active and is unchanged: 1 mg, 10 units, 2 mL BAC water per vial, daily 20-day course, night. No dose was left blank for lack of a source.
+- Monday’s day list is still the Rebuild cycle: GHK-Cu 10 units in the morning, Wolverine 20 units and Cartalax 10 units at night. KLOW is one of the 8 active compounds and stays on the Prime Stack card. The day list does not show Prime Stack compounds. No start or end date field. No internal cost on the page.
+- Checks on 2026-11-09: line cents match the headers. Inline scripts passed node --check. Headless Chrome at 1440 and 390, light and dark, with Supabase and every non-GET blocked. Leaked requests: 0. Console exceptions: 0. Opened the paid add-on, the Wolverine and KLOW and Cartalax cards, and the Monday Wolverine row.
+- Branch cursor/mmccarthy-paid-addon-472b. Not merged. Not deployed.
+
 ## mpauldino labs scoring expanded to the earlier draws — 2026-11-09
 - Owner-requested expansion on mpauldino only, following the same day's re-grade. Paths: mpauldino/labs-nov2026.js, mpauldino/sw.js, tools/tests/mpauldino-labs-nov2026.mjs. No protocol, schedule, invoice, paid/due, ledger or stock change; mpauldino/index.html was not touched.
 - Thirteen markers moved from the unscored and earlier buckets into scored groups: the five differential percentages and the calculated average glucose from the 11/02/2026 panel, plus estradiol, morning cortisol, DHEA-S, IGF-1, random growth hormone, 25-hydroxy vitamin D and the triglyceride / HDL ratio carried over from earlier draws. A one-marker Vitamins group was added so the Metabolic group stays glycemic rather than mixing a nutrient marker into glucose and A1c.
