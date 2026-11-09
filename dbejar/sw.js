@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'dbejar-vq-wk1-dna1-sch1-days1-dom1-font1-tp1-plskin2-shop1-g1-ord2-o3-o4-ipad1-klow60-tesa-c3paid-c3n-bac3-context-v1-controls-v1-calcact1';
+const CACHE = 'dbejar-vq-wk1-dna1-sch1-days1-dom1-font1-tp1-plskin2-shop1-g1-ord2-o3-o4-ipad1-klow60-tesa-c3paid-c3n-bac3-context-v1-controls-v1-calcact1-paid944';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
