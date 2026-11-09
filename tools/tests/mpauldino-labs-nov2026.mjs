@@ -19,10 +19,10 @@ const data = window.MP_LABS;
 const rows = data.secs.flatMap((s) => s.rows);
 const scored = rows.filter((r) => r.pts != null);
 const pts = scored.reduce((sum, r) => sum + r.pts, 0);
-if (data.score !== '95' || scored.length !== 50 || pts !== 189) {
+if (data.score !== '94' || scored.length !== 63 || pts !== 237) {
   throw new Error('score math ' + data.score + ' ' + scored.length + ' ' + pts);
 }
-if (scored.filter((r) => r.pts === 4).length !== 43 || scored.filter((r) => r.pts === 3).length !== 5 || scored.filter((r) => r.pts === 1).length !== 2) {
+if (scored.filter((r) => r.pts === 4).length !== 54 || scored.filter((r) => r.pts === 3).length !== 6 || scored.filter((r) => r.pts === 1).length !== 3) {
   throw new Error('bucket counts');
 }
 
@@ -146,9 +146,9 @@ async function main() {
     const text = host ? host.innerText : '';
     if (!host || !host.querySelector('.score')) problems.push('score card missing');
     if (!text.includes('Custom wellness score')) problems.push('score label');
-    if (!text.includes('95')) problems.push('score number');
-    if (!text.includes('189')) problems.push('point total');
-    if (LABS.score !== '95') problems.push('data score ' + LABS.score);
+    if (!text.includes('94')) problems.push('score number');
+    if (!text.includes('237')) problems.push('point total');
+    if (LABS.score !== '94') problems.push('data score ' + LABS.score);
     const need = ['80', '4.8', '63', '67', '40', '76', '988', '206.7', '2.03', '1.2', '30', '34.5', '17.7', '51.2', '99.8', '11/02/2026 08:49', '11/05/2026 17:14'];
     need.forEach((n) => { if (!text.includes(n)) problems.push('missing ' + n); });
     if (!text.includes('Not a diagnosis') && !text.includes('not a diagnosis')) problems.push('disclaimer');
@@ -164,7 +164,7 @@ async function main() {
     if (/\\bTRT\\b|B12|folate|zinc|donate|05\\/20\\/1981|720-938|Mountain/.test(text)) problems.push('forbidden wording');
     if (text.includes(' MT')) problems.push('timezone added');
     const scored = LABS.secs.flatMap(s => s.rows).filter(r => r.pts != null);
-    if (scored.length !== 50) problems.push('scored ' + scored.length);
+    if (scored.length !== 63) problems.push('scored ' + scored.length);
     if (INV.length !== 0 || PAID !== 0 || DUE !== 0) problems.push('invoice changed');
     if (!CMP[0] || !CMP[0].n.includes('Testosterone Cypionate')) problems.push('protocol changed');
     if (!document.querySelector('script[src="/portal-plan-controls.js?v=2"]')) problems.push('plan controls missing');
@@ -185,7 +185,7 @@ async function main() {
     const layout = await evaluate(`(() => {
       const problems = [];
       const text = (document.getElementById('labsbody') || {}).innerText || '';
-      if (!text.includes('95') || !text.includes('Alkaline phosphatase')) problems.push('labs missing');
+      if (!text.includes('94') || !text.includes('Alkaline phosphatase')) problems.push('labs missing');
       const root = document.getElementById('scroll') || document.documentElement;
       if (root.scrollWidth > root.clientWidth + 2) problems.push('overflow ' + root.scrollWidth);
       if (document.documentElement.scrollWidth > window.innerWidth + 2) problems.push('page overflow');

@@ -1,12 +1,14 @@
-/* Quest panel for this portal only.
-   Collected 11/02/2026 08:49, reported 11/05/2026 17:14. No time zone was printed.
+/* Quest panel for this portal, plus earlier draws that are now scored too.
+   Nov 2026 panel collected 11/02/2026 08:49, reported 11/05/2026 17:14. No time
+   zone was printed. Markers carried over from earlier draws name their draw in
+   their own note, so the scored set deliberately mixes timepoints.
    Custom wellness score, not a diagnosis: 4 optimal on a printed cutoff or a
-   functional window inside the laboratory range, 3 inside the laboratory
-   range but at an edge of it or short of a printed optimal cutoff,
-   1 outside the laboratory range.
-   43×4 + 5×3 + 2×1 = 189. 189 / (50×4) × 100 = 94.5, rounded to 95.
-   Not scored: unreported BUN/creatinine ratio, the second albumin, both eAG
-   values, and five differential percentages with no printed range. */
+   functional window inside the reference range, 3 inside the reference range
+   but at an edge of it or short of a printed optimal cutoff,
+   1 outside the reference range.
+   54×4 + 6×3 + 3×1 = 237. 237 / (63×4) × 100 = 94.05, rounded to 94.
+   Not scored: the unreported BUN/creatinine ratio and the duplicate albumin
+   from the testosterone panel. */
 (function () {
   function prior(text) {
     return '<br>Earlier value already stored on this page. It is not part of this score and is not a trend: ' + text + '.';
@@ -37,7 +39,9 @@
       '03/26 86 mg/dL, reference 65–99'),
     opt('n2-a1c', 'Hemoglobin A1c', '4.8', '%', '<5.7',
       'Printed screening cutoff is under 5.7%. The report describes that range as consistent with a decreased risk of diabetes. This page already scored a result under 5.7 as optimal. Not a diagnosis.',
-      '05/26 4.6%')
+      '05/26 4.6%'),
+    opt('n2-eag', 'eAG', '91', 'mg/dL', 'optimal <114',
+      'Average glucose calculated from the 11/02/2026 hemoglobin A1c of 4.8%, and also reported as 5.0 mmol/L. Sits in the optimal window: 91 mg/dL is well under 114 mg/dL, the average glucose that corresponds to the 5.7% A1c screening cutoff. The mmol/L form is the same result and is not scored a second time.')
   ];
   var lipids = [
     opt('n2-tc', 'Cholesterol, total', '154', 'mg/dL', '<200',
@@ -60,7 +64,9 @@
       '03/26 100 mg/dL'),
     opt('n2-apob', 'Apolipoprotein B', '63', 'mg/dL', 'optimal <90',
       'This report labels under 90 mg/dL optimal. 63 meets that printed cutoff. Favorable on this report. Not a heart-risk calculation.',
-      '03/26 67 mg/dL')
+      '03/26 67 mg/dL'),
+    opt('hx-tgh', 'Triglyceride / HDL ratio', '1.0', '', 'optimal <2',
+      'Drawn 03/2026, not on the 11/02/2026 panel, which did not print this ratio. Sits in the optimal window: 1.0 is well under 2. The triglycerides of 40 and HDL of 76 mg/dL on the 11/02/2026 panel would give a lower ratio still, but that figure is not printed on the report and is not substituted here.')
   ];
   var kidney = [
     opt('n2-bun', 'Urea nitrogen (BUN)', '16', 'mg/dL', '7–25',
@@ -129,7 +135,17 @@
     opt('n2-eos', 'Absolute eosinophils', '140', 'cells/uL', '15–500',
       'Sits in the optimal window. 140 cells/uL is in the lower half of 15–500, the favorable direction for this marker.', null),
     opt('n2-baso', 'Absolute basophils', '40', 'cells/uL', '0–200',
-      'Sits in the optimal window. 40 cells/uL is in the lower half of 0–200, the favorable direction for this marker.', null)
+      'Sits in the optimal window. 40 cells/uL is in the lower half of 0–200, the favorable direction for this marker.', null),
+    opt('n2-npct', 'Neutrophils', '61.5', '%', '40–74',
+      'Sits in the optimal window. 61.5% is mid-range on 40–74, a standard reference range: this report printed no range for the differential percentages. The absolute neutrophil count is scored separately against the range the laboratory did print.'),
+    opt('n2-lpct', 'Lymphocytes', '26.3', '%', '14–46',
+      'Sits in the optimal window. 26.3% is mid-range on 14–46, a standard reference range, as this report printed no range for the differential percentages.'),
+    opt('n2-mpct', 'Monocytes', '8.6', '%', '4–12',
+      'Sits in the optimal window. 8.6% is mid-range on 4–12, a standard reference range, as this report printed no range for the differential percentages.'),
+    opt('n2-epct', 'Eosinophils', '2.8', '%', '0–7',
+      'Sits in the optimal window. 2.8% is in the lower half of 0–7, a standard reference range, as this report printed no range for the differential percentages.'),
+    opt('n2-bpct', 'Basophils', '0.8', '%', '0–3',
+      'Sits in the optimal window. 0.8% is in the lower half of 0–3, a standard reference range, as this report printed no range for the differential percentages.')
   ];
   var hormones = [
     opt('n2-tt', 'Testosterone, total', '988', 'ng/dL', '250–1100',
@@ -145,7 +161,17 @@
       'Sits in the optimal window. 23 nmol/L is in the lower-middle of 10–50, the band that leaves more testosterone unbound without running low.', '09/26 29 nmol/L, reference 17–56'),
     opt('n2-psa', 'PSA, total', '2.03', 'ng/mL', '≤4.00',
       'Sits in the optimal window, well under the printed limit of 4.00 ng/mL. The report says a PSA result should not be read as absolute evidence of the presence or absence of disease. No treatment status is assumed.',
-      null)
+      null),
+    mid('hx-e2', 'Estradiol', '60.26', 'pg/mL', '5.37–65.90',
+      'Drawn before the 11/02/2026 panel; the draw date was not recorded on this page. 60.26 pg/mL is inside 5.37–65.90 but in the upper third of it, and no optimal cutoff was printed, so it is not scored as optimal.'),
+    opt('hx-cort', 'Cortisol, morning', '11.8', 'mcg/dL', '4–22',
+      'Drawn 05/2026, not on the 11/02/2026 panel. Sits in the optimal window: 11.8 mcg/dL is mid-range on 4–22 for a morning draw. An earlier 01/2025 value of 23.2 is not scored.'),
+    opt('hx-dhea', 'DHEA-S', '253', 'mcg/dL', '61–442',
+      'Drawn 01/2025, the oldest result in this score and so the furthest from current. Sits in the optimal window: 253 mcg/dL is mid-range on 61–442.'),
+    out('hx-igf', 'IGF-1', '289', 'ng/mL', '74–227', 'hi', 'High', 'hi',
+      'Drawn 09/2026, not on the 11/02/2026 panel. 289 ng/mL is above the reference range 74–227. On growth-hormone therapy a result above that range is the expected and intended effect rather than a sign of disease, because the reference range describes people who are not being treated. It is a monitoring point: the usual practice is to keep IGF-1 from running far above the range and to recheck it periodically with a clinician. The 4/3/1 rule on this page scores any value outside its reference range as 1, so it scores 1 here even though it is expected. An earlier 03/2026 value of 141 is not scored. This is not a diagnosis and not a treatment recommendation.'),
+    opt('hx-gh', 'Growth hormone, random', '<0.1', 'ng/mL', '≤7.1',
+      'Drawn 01/2025. Sits in the optimal window: a random draw at or below 7.1 ng/mL is inside the reference range. Growth hormone is released in pulses, so a low or undetectable random value is the normal finding and not a deficiency, and a single random draw cannot establish deficiency or excess on its own.')
   ];
   var thyroid = [
     opt('n2-rt3', 'T3, reverse', '14', 'ng/dL', '8–25',
@@ -159,42 +185,18 @@
   ];
   var unscored = [
     skip('n2-bunr', 'BUN / creatinine ratio', 'Not reported', '', '6–22',
-      'The report says this ratio was not reported because BUN and creatinine are within the reference range. It is shown and not scored.'),
+      'The report says this ratio was not reported because BUN and creatinine are within the reference range. There is no value to score.'),
     skip('n2-alb2', 'Albumin (testosterone panel)', '4.6', 'g/dL', '3.6–5.1',
-      '4.6 g/dL, reference 3.6–5.1. This is the same analyte as the metabolic-panel albumin of 4.5 g/dL. It is shown and not scored a second time.'),
-    skip('n2-eag', 'eAG', '91', 'mg/dL', 'calculated from A1c',
-      '91 mg/dL, calculated from hemoglobin A1c. Also reported as 5.0 mmol/L. Shown and not scored.'),
-    skip('n2-npct', 'Neutrophils', '61.5', '%', 'no range printed',
-      '61.5%. No reference range was printed for this percentage. Shown and not scored.'),
-    skip('n2-lpct', 'Lymphocytes', '26.3', '%', 'no range printed',
-      '26.3%. No reference range was printed for this percentage. Shown and not scored.'),
-    skip('n2-mpct', 'Monocytes', '8.6', '%', 'no range printed',
-      '8.6%. No reference range was printed for this percentage. Shown and not scored.'),
-    skip('n2-epct', 'Eosinophils', '2.8', '%', 'no range printed',
-      '2.8%. No reference range was printed for this percentage. Shown and not scored.'),
-    skip('n2-bpct', 'Basophils', '0.8', '%', 'no range printed',
-      '0.8%. No reference range was printed for this percentage. Shown and not scored.')
+      '4.6 g/dL, reference 3.6–5.1. This is the same analyte as the metabolic-panel albumin of 4.5 g/dL, which is scored above, so it is not counted a second time.')
   ];
   var inflammation = [
     mid('n2-crp', 'hsCRP', '1.2', 'mg/L', 'optimal <1.0',
       'This report’s categories are optimal under 1.0, average 1.0–3.0, and higher above 3.0. 1.2 mg/L is the average relative cardiovascular-risk category. It is not evidence of an acute illness and not an overall cardiovascular-risk diagnosis.',
       null)
   ];
-  var earlier = [
-    row('hx-e2', 'Estradiol', '60.26', 'pg/mL', '5.37–65.90', 'normal', 'Earlier', 'normal', null,
-      '<strong>Estradiol.</strong> Earlier displayed result 60.26 pg/mL, reference 5.37–65.90. The stored date list on this page was incomplete, so it is not repeated. Not part of the Nov 2026 score.'),
-    row('hx-cort', 'Cortisol, morning', '11.8', 'mcg/dL', '4–22', 'normal', 'Earlier', 'normal', null,
-      '<strong>Cortisol.</strong> Earlier stored values: 01/25 23.2; 05/26 11.8 mcg/dL, reference 4–22. Not part of the Nov 2026 score and not a trend.'),
-    row('hx-dhea', 'DHEA-S', '253', 'mcg/dL', '61–442', 'normal', 'Earlier', 'normal', null,
-      '<strong>DHEA-S.</strong> Earlier stored value: 01/25 253 mcg/dL, reference 61–442. Not part of the Nov 2026 score.'),
-    row('hx-igf', 'IGF-1', '289', 'ng/mL', '74–227', 'normal', 'Earlier', 'normal', null,
-      '<strong>IGF-1.</strong> Earlier stored values: 03/26 141; 09/26 289 ng/mL, reference 74–227. Not part of the Nov 2026 score and not a trend.'),
-    row('hx-gh', 'Growth hormone, random', '<0.1', 'ng/mL', '≤7.1', 'normal', 'Earlier', 'normal', null,
-      '<strong>Growth hormone.</strong> Earlier stored value: 01/25 less than 0.1 ng/mL, reference at or below 7.1. Not part of the Nov 2026 score.'),
-    row('hx-d', 'Vitamin D, 25-OH', '69', 'ng/mL', '30–100', 'normal', 'Earlier', 'normal', null,
-      '<strong>Vitamin D.</strong> Earlier stored value: 05/26 69 ng/mL, reference 30–100. Not part of the Nov 2026 score.'),
-    row('hx-tgh', 'Triglyceride / HDL ratio', '1.0', '', '<2 on the prior page', 'normal', 'Earlier', 'normal', null,
-      '<strong>Triglyceride / HDL ratio.</strong> Earlier stored value: 03/26 1.0. This ratio was not printed on the Nov 2026 report, so it is not recalculated or scored.')
+  var vitamins = [
+    opt('hx-d', 'Vitamin D, 25-OH', '69', 'ng/mL', '30–100',
+      'Drawn 05/2026, not on the 11/02/2026 panel. Sits in the optimal window: 69 ng/mL is in the upper-middle of 30–100 and inside the band functional ranges target for 25-hydroxy vitamin D.')
   ];
 
   var groups = [
@@ -204,7 +206,8 @@
     ['Kidney, electrolytes, and liver', kidney],
     ['Hematology', heme],
     ['Hormones', hormones],
-    ['Thyroid', thyroid]
+    ['Thyroid', thyroid],
+    ['Vitamins', vitamins]
   ];
   function tally(list) {
     var pts = 0, n = 0;
@@ -223,22 +226,21 @@
     return { t: g[0] + ' · ' + t.score + '/100 · ' + t.n + ' scored', rows: g[1] };
   });
   secs.push({ t: 'Shown and not scored', rows: unscored });
-  secs.push({ t: 'Earlier results already on this page', rows: earlier });
 
   window.MP_LABS = {
     sub: 'Quest · collected 11/02/2026 08:49 · reported 11/05/2026 17:14 · fasting · no time zone printed',
     l: 'Custom wellness score',
     score: String(total.score),
     outof: '/100',
-    g: 'Strong panel · 95/100 · two lab flags to recheck',
-    c: 'Informational only, not a diagnosis. No urgent or critical result is apparent from this report alone. The laboratory flags are alkaline phosphatase 30 U/L, below 36–130, and MCH 34.5 pg, above 27.0–33.0. Discuss a repeat ALP and CBC with a clinician to confirm whether those results persist. Hemoglobin is 17.7 g/dL, exactly this lab’s upper limit, and hematocrit is 51.2%, inside 42.5–55.0; track both on a future CBC. hsCRP 1.2 mg/L is this lab’s average relative cardiovascular-risk category (optimal under 1.0), not an acute illness and not an overall cardiovascular-risk diagnosis. PSA 2.03 ng/mL is within the printed limit of 4.00. Testosterone results are inside the ranges on this report. Fasting glucose 80 mg/dL and A1c 4.8% are favorable on the printed ranges. ApoB 63, LDL 67, triglycerides 40, and HDL 76 mg/dL are favorable on the printed ranges. Kidney results and thyroid results are inside their printed ranges. AST and ALT are inside their printed ranges.',
+    g: 'Strong panel · 94/100 · three out of range, one expected on therapy',
+    c: 'Informational only, not a diagnosis. No urgent or critical result is apparent from this report alone. The out-of-range markers are alkaline phosphatase 30 U/L, below 36–130, and MCH 34.5 pg, above 27.0–33.0, both on the 11/02/2026 panel, and IGF-1 289 ng/mL, above 74–227, from the 09/2026 draw. Discuss a repeat ALP and CBC with a clinician to confirm whether those results persist. An IGF-1 above the untreated reference range is the expected effect of growth-hormone therapy rather than a disease finding and is a periodic monitoring point with a clinician, but the 4/3/1 rule still scores it 1. Hemoglobin is 17.7 g/dL, exactly this lab’s upper limit, and hematocrit is 51.2%, inside 42.5–55.0; track both on a future CBC. hsCRP 1.2 mg/L is this lab’s average relative cardiovascular-risk category (optimal under 1.0), not an acute illness and not an overall cardiovascular-risk diagnosis. PSA 2.03 ng/mL is within the printed limit of 4.00. Testosterone results are inside the ranges on this report. Fasting glucose 80 mg/dL and A1c 4.8% are favorable on the printed ranges. ApoB 63, LDL 67, triglycerides 40, and HDL 76 mg/dL are favorable on the printed ranges. Kidney results and thyroid results are inside their printed ranges. AST and ALT are inside their printed ranges.',
     domains: domains,
     bannerattr: '',
-    banner: 'Custom wellness score, not a validated diagnosis. A marker scores 4 when it meets an optimal or desirable cutoff printed on this report, an optimal cutoff already used on this page, or a functional window inside the laboratory range. It scores 3 when it is inside the laboratory range but sits at an edge of it or short of a printed optimal cutoff. It scores 1 when it is outside the laboratory range. This panel is 43 × 4 + 5 × 3 + 2 × 1 = 189 points. 189 ÷ 200 × 100 = 94.5, rounded to 95. Fifty results are scored. Not scored: the unreported BUN/creatinine ratio, the second albumin, both calculated eAG values, and five differential percentages with no printed range. Tap a marker for the printed range.',
+    banner: 'Custom wellness score, not a validated diagnosis. A marker scores 4 when it meets an optimal or desirable cutoff printed on this report, an optimal cutoff already used on this page, or a functional window inside the reference range. It scores 3 when it is inside the reference range but sits at an edge of it or short of a printed optimal cutoff. It scores 1 when it is outside the reference range. This panel is 54 × 4 + 6 × 3 + 3 × 1 = 237 points. 237 ÷ 252 × 100 = 94.05, rounded to 94. Sixty-three results are scored. The scored set is not one draw: estradiol, morning cortisol, DHEA-S, IGF-1, random growth hormone, vitamin D and the triglyceride / HDL ratio come from draws between 01/2025 and 09/2026, and each names its draw in its own note. The five differential percentages are scored against standard reference ranges because this report printed none. Not scored: the unreported BUN/creatinine ratio and the duplicate albumin from the testosterone panel. Tap a marker for its reference range.',
     secs: secs,
     note: 'Informational only, not a diagnosis or a treatment plan. An isolated low alkaline phosphatase is a recognized reason to repeat the test. Newcastle Hospitals low-ALP guidance, revision 4: <a href="https://laboratories.newcastle-hospitals.nhs.uk/wp-content/uploads/2024/10/Low-ALP-guidance-revision-4.pdf">laboratories.newcastle-hospitals.nhs.uk low-ALP guidance</a>. This page does not set a retest date.'
   };
-  if (total.score !== 95 || total.n !== 50 || total.pts !== 189) {
+  if (total.score !== 94 || total.n !== 63 || total.pts !== 237) {
     throw new Error('labs score mismatch ' + total.pts + ' ' + total.n + ' ' + total.score);
   }
 })();
