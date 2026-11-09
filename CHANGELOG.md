@@ -2,6 +2,12 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-09 — mpauldino labs re-graded on functional ranges
+- Re-graded the November 2026 panel scoring on one portal: 33 in-range markers promoted from the in-range helper to the optimal helper, five markers held and the two laboratory flags left as they were, per owner instruction. Score recomputed by the file's own tally from 78 to 95 of 100.
+- Paths: mpauldino/labs-nov2026.js, mpauldino/sw.js and tools/tests/mpauldino-labs-nov2026.mjs. No protocol, invoice, paid/due, ledger or stock change.
+- Commits 008ce1f8 and 528e4faf on main. The first Pages run built the artifact but its deploy job timed out in syncing_files and published nothing; the second commit forced a fresh run that succeeded.
+- Checks: node --check on both scripts, the labs file executed with its in-file guard passing, and the harness's pure-JavaScript assertions. The harness's headless-Chrome half could not run in this environment. Deployed and verified live byte-identical to origin. See PROJECT_STATUS.md for the wording changes flagged for owner review.
+
 ## 2026-11-05 — Permanent project memory setup
 - Added root AGENTS.md with mandatory session startup, dependency protection, existing design/functionality requirements, verification rules and honest publishing reports.
 - Added PROJECT_STATUS.md with source-backed recovery, project structure, outstanding questions and next-session instructions.

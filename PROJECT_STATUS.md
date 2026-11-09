@@ -1,6 +1,15 @@
 # Bio Linked Solutions — project status
 
-Last reviewed: 2026-11-08 (America/Denver).
+Last reviewed: 2026-11-09 (America/Denver).
+
+## mpauldino labs re-graded on functional ranges — 2026-11-09
+- Owner-requested re-grade of the November 2026 panel scoring on mpauldino only. Paths: mpauldino/labs-nov2026.js, mpauldino/sw.js, tools/tests/mpauldino-labs-nov2026.mjs. No protocol, schedule, invoice, paid/due, ledger or stock change; mpauldino/index.html was not touched.
+- Thirty-three in-range markers named by the owner moved from the mid() helper to opt(), so each scores 4 instead of 3, and each row's generic "Inside the printed range" rationale was replaced with an optimal rationale. Five markers were held at 3 and the two laboratory flags were left at 1, as the owner specified.
+- Buckets went from 10/38/2 to 43/5/2, so the file's own tally recomputed 156 to 189 points and the score 78 to 95 of 100. The scored count stays 50. Updated to match the new total: the header comment math block, the banner rubric and math sentence, the grade line, the in-file guard, and the numeric assertions in the test harness.
+- Two wording changes beyond the row list, both recorded for owner review. The banner previously said a 4 requires an optimal cutoff printed on the report or already used on the page; it now also allows a functional window inside the laboratory range, because most of the promoted markers have no printed optimal cutoff. The mid() helper's trailing "No separate optimal cutoff is applied" was dropped, as it was already untrue for the inflammation marker and is not the reason any of the five remaining 3s score 3; MCV gained a clause stating why it stays a 3.
+- Checks on 2026-11-09: node --check passed on both changed scripts. The labs file was executed under node and its own guard passed, returning score 95, 189 points, 50 scored, buckets 43/5/2. Domain scores recomputed to Metabolic 100, Lipids 100, Hormones 100, Thyroid 100, Kidney/electrolytes/liver 94, Hematology 90, Inflammation 75. The test harness's pure-JavaScript assertion block passed; its headless-Chrome half could not run in this session because it requires /usr/bin/google-chrome and /opt/cursor/artifacts. No browser device-width regression pass was run.
+- Commit 008ce1f8, on origin/main. Pages run 42555722454 built and uploaded the artifact but its deploy job stalled in syncing_files and GitHub aborted it on timeout, so nothing published. Commit 528e4faf bumped the mpauldino cache name to force a fresh run; Pages build 528e4faf reported built after 296188 ms, far slower than the 22-24 s of neighbouring builds but successful.
+- Deployed and verified on 2026-11-09: a no-cache read of the live labs script is byte-identical to the origin/main blob, executes with its guard passing, and reports 95 of 100 with 189 points and buckets 43/5/2; the live service worker serves the bumped cache name. Merged to main. No remaining work on this request.
 
 ## Mike McCarthy add-on quote — 2026-11-08
 - New unpaid quote on mmccarthy only. Paid Order 1 stays $164.99 and the Prime Stack stays paid $1,384.94. Paid to date stays $1,549.93. Quoted balance is $219.98. No paid status, ledger, or stock change.
