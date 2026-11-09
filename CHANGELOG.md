@@ -146,6 +146,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Mike McCarthy optional KLOW price
+- Changed the still-offered Prime Stack KLOW add-on from 2 vials at $40 ($80) to 2 vials at $60 ($120). The optional subtotal is $369.97 and the with-all-add-ons figure is $1,754.91. The paid $1,384.94 order, the $219.98 quote, and the dose were not changed.
+
 ## 2026-11-08 — Mike McCarthy add-on quote
 - Added one unpaid quote on mmccarthy for standard Wolverine (BPC-157 / TB-500 10 mg) × 2 at $30, KLOW 80 mg × 2 at $60, Cartalax 20 mg × 1 at $25, one 10 mL BAC bottle at $4.99, and 2-Day UPS at $9.99. Total $219.98. Paid orders stay as written. The current protocol title dropped the “2.0” and still shows 20 mg, 1 mg, 10 units, and 2 mL. The description text was not edited. See PROJECT_STATUS.md.
 

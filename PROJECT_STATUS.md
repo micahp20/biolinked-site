@@ -7,7 +7,10 @@ Last reviewed: 2026-11-08 (America/Denver).
 - Quote rows: standard Wolverine, BPC-157 / TB-500 · 10 mg, 2 vials at $30 ($60); KLOW Blend · 80 mg, 2 vials at $60 ($120); Cartalax · 20 mg, 1 vial at $25 ($25); BAC water · 10 mL, 1 bottle at $4.99; Shipping · 2-Day UPS $9.99. Total $219.98.
 - The current protocol title now reads Wolverine · 20 mg. The dose is still 1 mg, 10 units, and 2 mL. The description paragraph and the timing sentence were not edited. The paid Order 1 line still says Wolverine 2.0. Which physical vial was delivered is still not confirmed by a sale. Cartalax stays 1 mg, 10 units, 2 mL, daily 20-day course. KLOW stays the existing optional card, 4 mg, 15 units, 3 mL.
 - The Prime Stack BAC line still reads “BAC Water 3 mL × 17 vials” at $24.95. That amount matches five bottles at $4.99. The paid line was not rewritten.
-- Checks: invoice cents match the header. Desktop and phone loaded the invoice, opened a Monday schedule row, and opened a protocol card, with Supabase and every non-GET blocked. No date field. Not merged. Not deployed.
+- Checks: invoice cents match the header. Desktop and phone loaded the invoice, opened a Monday schedule row, and opened a protocol card, with Supabase and every non-GET blocked. No date field. Pull request #142 is merged. A public no-cache read on 2026-11-09 showed the $219.98 quote and the protocol title Wolverine · 20 mg.
+- The Prime Stack optional KLOW offer was still 2 vials at $40 ($80). That offer is not part of the paid $1,384.94. It is now 2 vials at $60 ($120). The optional subtotal is $369.97 and the with-all-add-ons figure is $1,754.91. Paid totals, the $219.98 quote, and the KLOW dose stay unchanged.
+
+
 
 
 
