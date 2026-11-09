@@ -11,7 +11,7 @@ Last reviewed: 2026-11-09 (America/Denver).
 - KLOW · 80 mg is an active Cycle 2 card: 4 mg, 15 units, 3 mL BAC water per vial · 26.7 mg/mL, Monday / Wednesday / Friday evening, SubQ. Those figures were already on the optional card. Cartalax · 20 mg was already active and is unchanged: 1 mg, 10 units, 2 mL BAC water per vial, daily 20-day course, night. No dose was left blank for lack of a source.
 - Monday’s day list is still the Rebuild cycle: GHK-Cu 10 units in the morning, Wolverine 20 units and Cartalax 10 units at night. KLOW is one of the 8 active compounds and stays on the Prime Stack card. The day list does not show Prime Stack compounds. No start or end date field. No internal cost on the page.
 - Checks on 2026-11-09: line cents match the headers. Inline scripts passed node --check. Headless Chrome at 1440 and 390, light and dark, with Supabase and every non-GET blocked. Leaked requests: 0. Console exceptions: 0. Opened the paid add-on, the Wolverine and KLOW and Cartalax cards, and the Monday Wolverine row.
-- Branch cursor/mmccarthy-paid-addon-472b. Not merged. Not deployed.
+- Commit ddfd6050 is on origin branch cursor/mmccarthy-paid-addon-472b. Pull request creation was rejected: the GitHub identity is not a collaborator, so no PR number exists. Not merged. Not deployed.
 
 ## mpauldino labs scoring expanded to the earlier draws — 2026-11-09
 - Owner-requested expansion on mpauldino only, following the same day's re-grade. Paths: mpauldino/labs-nov2026.js, mpauldino/sw.js, tools/tests/mpauldino-labs-nov2026.mjs. No protocol, schedule, invoice, paid/due, ledger or stock change; mpauldino/index.html was not touched.
