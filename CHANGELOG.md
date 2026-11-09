@@ -146,6 +146,11 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Corrected the invoice-only bdelorenzo/ addition by adding both quoted copper-peptide Protocol cards, descriptions and the owner's supplied recon/draw. Preserved the earlier active protocol and quote total. No active schedule or inventory change.
 - Saved a permanent completeness rule in AGENTS.md. Instruction applicability/timing clarification is pending; no vial strength or converted dose was invented. Renderer, syntax and source-preservation checks passed. See PROJECT_STATUS.md for limits and publishing state.
 
+## 2026-11-08 — Vial labels filled where the catalog had one size
+- Added a vial size to protocol and invoice labels that had none, only when the catalog lists one size for that exact product and the same client’s page does not already record a different size. Doses, recon, timing, prices, and paid history were not changed.
+- Matt Hartman’s 10 mg Wolverine, known 30 mL BAC lines, known 60 mg tirzepatide, and historical 10 mg Tesamorelin were left as recorded. Jamie Cress’s unsized Wolverine line now matches the Wolverine 2.0 · 20 mg already on his page.
+- Compounds with more than one catalog size, oral capsules, standalone BPC-157 or TB-500, plain Ipamorelin, and unspecified Melanotan stay unlabeled. The remaining list is in PROJECT_STATUS.md.
+
 ## 2026-11-08 — Plan dates removed from every portal
 - Removed start, end, save, cancel, clear, and Plan dates from the shared portal controls and from the remaining client protocol pages, including the older tracker and calendar pages. Remove and restore remain on the device. A previously saved start or end date no longer hides a compound. A calendar file is created only when that device already has a saved start date. No start date was invented.
 - Schedule rows expand again because the control is inside the detail panel. If removal unmounts the row, the schedule keeps a restore button. Add to My List stays in the calculator store.
