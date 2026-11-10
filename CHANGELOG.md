@@ -5,7 +5,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-10 — Annaleah quote is Retatrutide and KLOW only
 - Replaced the open Cycle 1 quote on annaleah with Retatrutide 30 mg × 1 at $50, KLOW 80 mg × 2 at $60, BAC water 10 mL × 1 at $4.99, and 2-Day UPS at $9.99. Total $184.98. Status stays quote. Paid is 0 and due is 184.98.
 - Retatrutide dosing is unchanged. KLOW is the catalog Monday / Wednesday / Friday evening dose, 4 mg, 15 units, 3 mL. Tesamorelin, MOTS-c, NAD+, KPV, and Cagrilintide are off her protocol and her page calculator list. No ledger, inventory, or other client page. Cache name is annaleah-reta-klow-v1-20261110.
-- Checks: line cents, node --check, and headless Chrome at desktop and phone width in light and dark, with non-GET requests blocked. See PROJECT_STATUS.md for the commit, pull request, and deploy state.
+- Checks: line cents, node --check, and headless Chrome at desktop and phone width in light and dark, with non-GET requests blocked. Commit a54d3883 is on origin branch cursor/annaleah-reta-klow-quote-e201. Pull request creation was rejected because the GitHub identity is not a collaborator. Not merged. Not deployed. See PROJECT_STATUS.md.
 
 ## 2026-11-09 — jsanders and kwells moved into current-layout client portals
 - With the owner's approval, the two standalone legacy protocol pages became folder portals at /jsanders/ and /kwells/. Each was built from dcoone/index.html and has its own manifest.json and a scoped sw.js.

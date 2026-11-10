@@ -10,7 +10,7 @@ Last reviewed: 2026-11-10 (America/Denver).
 - An unpaid quote still opens with nothing on the day schedule. After both compounds are switched on, Monday and Thursday mornings show Retatrutide and Monday, Wednesday, and Friday evenings show KLOW.
 - Cache name is annaleah-reta-klow-v1-20261110.
 - Checks on 2026-11-10: the four line amounts sum to 18498 cents. node --check passed on annaleah/sw.js and the four inline scripts. Headless Chrome at 1440 and 390, light and dark, with Supabase and every non-GET blocked. The invoice card, the pay sheet at $184.98, and both protocol cards rendered. No page exception. Aborted network calls produced resource errors only. A desktop screen recording of the same flow is saved with this change. No other client file changed.
-- Publishing state is filled in after the commit and pull request. Not merged. Not deployed.
+- Commit a54d3883 is on origin branch cursor/annaleah-reta-klow-quote-e201. Pull request creation was rejected: the GitHub identity is not a collaborator, so no PR number exists. Compare: https://github.com/micahp20/biolinked-site/compare/main...cursor/annaleah-reta-klow-quote-e201?expand=1. Not merged. Not deployed.
 
 ## Mike McCarthy add-on marked paid — 2026-11-09
 - Owner request: the latest quoted add-on is paid, the unsold optional add-on block comes off the page, and the protocol matches what was purchased. Inventory and the ledger were already recorded. This change writes no database, stock, or ledger row.
