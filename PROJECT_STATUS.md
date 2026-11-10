@@ -1,6 +1,16 @@
 # Bio Linked Solutions — project status
 
-Last reviewed: 2026-11-09 (America/Denver).
+Last reviewed: 2026-11-10 (America/Denver).
+
+## Annaleah quote replaced with Retatrutide and KLOW — 2026-11-10
+- Owner request: the open Cycle 1 quote on annaleah should contain only Retatrutide, two KLOW vials, one 10 mL BAC water, and shipping. Quote only. No ledger, inventory, Supabase, or other client page.
+- Started from origin/main 9379b651. Paths: annaleah/index.html and annaleah/sw.js, plus these two memory files.
+- The previous $434.96 quote is replaced. Lines are Retatrutide · 30 mg × 1 at $50, KLOW · 80 mg × 2 at $60, BAC Water · 10 mL × 1 at $4.99, and Shipping · 2-Day UPS at $9.99. Total $184.98. Status stays quote. PAID is 0. DUE is 184.98. The label stays Cycle 1 · Fat Loss. The summary names only those four lines.
+- Retatrutide · 30 mg is unchanged: morning, Monday and Thursday, start 0.5 mg and titrate, 5 units, 3 mL, with her existing start-slow note. KLOW · 80 mg uses the catalog dose: evening, Monday / Wednesday / Friday, 4 mg, 15 units, 3 mL. The card uses the standard blend definition (GHK-Cu, BPC-157, TB-500, and KPV) and notes that 80 mg in 3 mL is 26.7 mg/mL. Tesamorelin, MOTS-c, NAD+, KPV, and Cagrilintide are off her protocol arrays and her page calculator list. The shared dosing catalog that the calculator dropdown still loads is unchanged. Her older Tirzepatide history note was left in place. This portal was already on the Share page.
+- An unpaid quote still opens with nothing on the day schedule. After both compounds are switched on, Monday and Thursday mornings show Retatrutide and Monday, Wednesday, and Friday evenings show KLOW.
+- Cache name is annaleah-reta-klow-v1-20261110.
+- Checks on 2026-11-10: the four line amounts sum to 18498 cents. node --check passed on annaleah/sw.js and the four inline scripts. Headless Chrome at 1440 and 390, light and dark, with Supabase and every non-GET blocked. The invoice card, the pay sheet at $184.98, and both protocol cards rendered. No page exception. Aborted network calls produced resource errors only. A desktop screen recording of the same flow is saved with this change. No other client file changed.
+- Publishing state is filled in after the commit and pull request. Not merged. Not deployed.
 
 ## Mike McCarthy add-on marked paid — 2026-11-09
 - Owner request: the latest quoted add-on is paid, the unsold optional add-on block comes off the page, and the protocol matches what was purchased. Inventory and the ledger were already recorded. This change writes no database, stock, or ledger row.
