@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-10 — Tayla Henry open quote for Retatrutide 60 mg
+- thenry only: Order 2 quote $119.98 (Retatrutide 60 mg, BAC Water 30 mL at $9.99, shipping $9.99). Paid Order 1 unchanged. Active draw is 60 mg / 3 mL / 7u / 1.4 mg Monday AM, and the unit ladder is converted so the milligram steps stay the same. Cache thenry-reta60-v1-20261110. Commit 1e7253a3 on branch cursor/thenry-reta60-quote-c79a. Not merged. Not deployed.
+
 ## 2026-11-10 — Annaleah quote is Retatrutide and KLOW only
 - Replaced the open Cycle 1 quote on annaleah with Retatrutide 30 mg × 1 at $50, KLOW 80 mg × 2 at $60, BAC water 10 mL × 1 at $4.99, and 2-Day UPS at $9.99. Total $184.98. Status stays quote. Paid is 0 and due is 184.98.
 - Retatrutide dosing is unchanged. KLOW is the catalog Monday / Wednesday / Friday evening dose, 4 mg, 15 units, 3 mL. Tesamorelin, MOTS-c, NAD+, KPV, and Cagrilintide are off her protocol and her page calculator list. No ledger, inventory, or other client page. Cache name is annaleah-reta-klow-v1-20261110.
