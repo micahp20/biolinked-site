@@ -2,6 +2,11 @@
 
 Last reviewed: 2026-11-10 (America/Denver).
 
+## Tayla Henry Retatrutide 60 mg quote — 2026-11-10
+- Owner request: add an open quote on thenry only and move the active Retatrutide card from the 40 mg vial to 60 mg in 3 mL without jumping her milligram dose. Paid Order 1 stays $100. No ledger, inventory, or other client page.
+- Paths: thenry/index.html, thenry/sw.js. Order 2 is a quote for $119.98: Retatrutide 60 mg × 1 at $100, BAC Water 30 mL × 1 at $9.99, Shipping 2-Day UPS $9.99. PAID 100.0, DUE 119.98. Protocol and calculator: Monday AM, SubQ, Active, 1.4 mg, 7 units, 3 mL. Notes step 7 units, ceiling 40 units. Cache thenry-reta60-v1-20261110.
+- Checks: line cents sum to 11998; node --check passed on thenry/sw.js and the page's inline script. No browser pass, per this request. Branch cursor/thenry-reta60-quote-c79a. Not merged. Not deployed.
+
 ## Annaleah quote replaced with Retatrutide and KLOW — 2026-11-10
 - Owner request: the open Cycle 1 quote on annaleah should contain only Retatrutide, two KLOW vials, one 10 mL BAC water, and shipping. Quote only. No ledger, inventory, Supabase, or other client page.
 - Started from origin/main 9379b651. Paths: annaleah/index.html and annaleah/sw.js, plus these two memory files.
