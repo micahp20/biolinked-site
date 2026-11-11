@@ -2,10 +2,10 @@
 (function(){
  'use strict';
  if(!document.body.classList.contains('bl-public-gold'))return;
- const items=[['/','Home'],['/index/','Peptide Index'],['/stacks-blends.html','Stacks & Blends'],['/peptide-tracker.html','Tracker'],['/stack-analyzer.html','Analyzer'],['/biomarker-landing.html','Bloodwork']];
+ const items=[['/','Home'],['/index/','Peptide Index'],['/stacks-blends.html','Stacks & Blends'],['/peptide-tracker.html','Tracker'],['/biomarker-landing.html','Bloodwork']];
  const path=location.pathname.replace(/\.html$/,'').replace(/\/$/,'');
  const link=([href,label])=>'<a href="'+href+'"'+(path===href.replace(/\.html$/,'').replace(/\/$/,'')?' aria-current="page"':'')+'>'+label+'</a>';
- const desktop=items.filter((_,i)=>[0,1,2,4,5].includes(i));
+ const desktop=items;
  const old=document.querySelector('.bl-nav');
  const nav=document.createElement('nav');nav.className='bl-nav';nav.id='bl-nav';nav.setAttribute('aria-label','Main navigation');
  nav.innerHTML='<div class="bl-nav-inner"><a class="bl-nav-logo" href="/" aria-label="BioLinked home"><svg class="bl-nav-mark" viewBox="0 0 512 512" aria-hidden="true"><polygon points="256,82 404,169 404,343 256,430 108,343 108,169"/><circle cx="256" cy="82" r="16"/><circle cx="404" cy="169" r="16"/><circle cx="404" cy="343" r="16"/><circle cx="256" cy="430" r="16"/><circle cx="108" cy="343" r="16"/><circle cx="108" cy="169" r="16"/><text x="256" y="266">BL</text></svg><span class="bl-nav-logo-copy"><span class="bl-nav-logo-main">BIO LINKED</span><span class="bl-nav-logo-sub">PEPTIDE SOLUTIONS</span></span></a><div class="gold-nav-links">'+desktop.map(link).join('')+'</div><button class="gold-menu-button" type="button" aria-controls="gold-mobile-menu" aria-expanded="false">Menu</button></div><div class="gold-mobile-menu" id="gold-mobile-menu">'+items.map(link).join('')+'</div>';

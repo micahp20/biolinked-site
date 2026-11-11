@@ -14,7 +14,6 @@
 
   const tools = [
     {href:'/peptide-tracker.html', label:'Peptide Tracker'},
-    {href:'/stack-analyzer.html', label:'Stack Analyzer'},
     {href:'/biomarker-landing.html', label:'Biomarker Analysis'},
   ];
 
@@ -101,7 +100,6 @@
       <div style="font-size:11px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--gold,#7A6530);margin-bottom:12px;">Tools & Services</div>
       <div style="display:flex;flex-direction:column;gap:7px;">
         <a href="/peptide-tracker.html" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Peptide Tracker</a>
-        <a href="/stack-analyzer.html" style="font-size:13px;color:var(--muted,#444440);text-decoration:none;font-weight:400;padding:12px 0;display:flex;align-items:center;min-height:44px;">Stack Analyzer</a>
         <a href="/biomarker-landing.html" style="font-size:13px;color:var(--gold,#7A6530);text-decoration:none;font-weight:600;padding:12px 0;display:flex;align-items:center;min-height:44px;">Biomarker Analysis →</a>
       </div>
     </div>
