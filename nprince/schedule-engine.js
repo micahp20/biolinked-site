@@ -1,19 +1,35 @@
 /* Natasha Prince schedule engine. Storage and seed are hers only — do not
    reuse the mpauldino key or compound list. Server sync, if the page has a
    member key, is scoped by this page's slug. */
-var GK_STORAGE = "biolinked-sched-nprince-gk";
+var GK_STORAGE = "biolinked-sched-nprince-gk-v2";
+var GK_PROTOCOL_REV = 2;
 var GK_DAY = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 var GK_SHORT = ["S","M","T","W","T","F","S"];
 var gkSeed = {
   member: "Natasha",
+  protocolRev: 2,
   selected: new Date().getDay(),
   view: "schedule",
   open: null,
   compounds: [
-    {id:"reta", name:"Retatrutide · 60 mg", vial:"60 mg", dose:0.5, step:0.25, unit:"mg", draw:"2.5u", recon:"3 mL BAC water", block:"AM", days:[1,4], foundation:true, active:true},
-    {id:"cagri", name:"Cagrilintide · 10 mg", vial:"10 mg", dose:500, step:50, unit:"mcg", draw:"10u", recon:"2 mL BAC water", block:"AM", days:[1], foundation:false, active:true}
+    {id:"reta", name:"Retatrutide · 60 mg", vial:"60 mg", dose:1, step:0.25, unit:"mg", draw:"5u", recon:"3 mL BAC water", block:"AM", days:[1,3,5], foundation:true, active:true},
+    {id:"cagri", name:"Cagrilintide · 10 mg", vial:"10 mg", dose:250, step:50, unit:"mcg", draw:"5u", recon:"2 mL BAC water", block:"AM", days:[1,3,5], foundation:false, active:true}
   ]
 };
+
+function gkApplyProtocol(st){
+  if(!st) return st;
+  if(st.protocolRev===GK_PROTOCOL_REV) return st;
+  var byId={}; (gkSeed.compounds||[]).forEach(function(c){ byId[c.id]=c; });
+  (st.compounds||[]).forEach(function(c){
+    var s=byId[c.id]; if(!s) return;
+    c.dose=s.dose; c.unit=s.unit; c.draw=s.draw; c.days=s.days.slice();
+    c.block=s.block; if(typeof s.recon==="string") c.recon=s.recon;
+    if(typeof s.vial==="string") c.vial=s.vial;
+  });
+  st.protocolRev=GK_PROTOCOL_REV;
+  return st;
+}
 function gkLoad(){
   var st;
   try{ st = JSON.parse(localStorage.getItem(GK_STORAGE)) || JSON.parse(JSON.stringify(gkSeed)); }
@@ -27,7 +43,7 @@ function gkLoad(){
       if((!c.draw || c.draw==='\u2014') && sd[c.id] && sd[c.id]!=='\u2014') c.draw=sd[c.id];
     });
   }catch(e){}
-  return st;
+  return gkApplyProtocol(st);
 }
 /* Local write is the offline cache and happens immediately so the UI never
    waits. The server write is debounced and authoritative: if it refuses, we
@@ -79,7 +95,8 @@ function gkPayload(){
       });
     })(),
     selected: gkState.selected,
-    view: gkState.view
+    view: gkState.view,
+    protocolRev: gkState.protocolRev||GK_PROTOCOL_REV
   };
 }
 function gkPush(){
@@ -211,6 +228,8 @@ function gkHydrate(p){
   }
   if(typeof p.selected==='number') gkState.selected=p.selected;
   if(p.view) gkState.view=p.view;
+  if(typeof p.protocolRev==='number') gkState.protocolRev=p.protocolRev;
+  gkApplyProtocol(gkState);
 }
 var gkState = gkLoad();
 gkState.view = gkState.view || "schedule";
