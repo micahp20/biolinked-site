@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ogarza/.
-const CACHE = 'ogarza-master-sched1-v9-context-v1-controls-v1-calcact1';
+const CACHE = 'ogarza-master-sched1-v9-context-v1-controls-v1-calcact1-qklow1';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
