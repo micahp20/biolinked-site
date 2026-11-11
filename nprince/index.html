@@ -1419,15 +1419,15 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       </div>
       
     </div></section>
-    <section class="view" id="v-sched"><div class="pad">
-      <h1 class="scrn" id="greet">Schedule</h1>
+    <section class="view" id="v-sched"><div class="pad"><div class="gk">
+      <h1 class="gk-h" id="greet">Schedule</h1>
       <div class="cs-stat" id="csstat"></div>
-      <p class="sub" id="subline"></p>
+      <p class="gk-sub" id="subline"></p>
       <div id="duebar"></div>
-      <div class="days" id="daystrip"></div>
+      <div class="gk-days" id="daystrip"></div>
       <div id="doses"></div>
       <p class="note" id="dosenote"></p>
-    </div></section>
+    </div></div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Log meals in a few taps. Your numbers and targets sit further down. <span class="wk-sync" id="n2sync"></span></p>
@@ -2159,8 +2159,8 @@ function renderDays(){
   var now=new Date();
   var h='';
   for(var i=0;i<7;i++){
-    h+='<div class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+'" onclick="pickDay('+i+')">'+
-       '<div class="dw">'+DW[i]+'</div></div>';
+    h+='<button type="button" class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+'" onclick="pickDay('+i+')">'+
+       '<b>'+DW[i].toUpperCase()+'</b></button>';
   }
   document.getElementById('daystrip').innerHTML=h;
 }
@@ -2168,34 +2168,40 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
 /* A compound tagged BOTH (Ipamorelin) is a real second shot, so it shows in the
    Morning block and again in the Night block. */
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
+function doseMark(c){
+  var raw=String(c.d||c.u||'').trim();
+  var m=raw.match(/^([\d.]+)\s*(.*)$/);
+  var num=m?m[1]:raw, unit=m?m[2]:'';
+  var pull=(c.d&&c.u)?String(c.u).trim():'';
+  var h='<div class="dose-mark">'+num+(unit?('<small>'+unit+'</small>'):'');
+  if(pull) h+='<span class="dose-pull">'+(/u$/i.test(pull)?('pull '+pull):pull)+'</span>';
+  return h+'</div>';
+}
+function gkSchedCard(c){
+  var meta=[c.c].filter(Boolean).join(' \u00b7 ');
+  return '<article class="gk-card"><div class="gk-row">'+
+    doseMark(c)+
+    '<div><div class="gk-name">'+c.n+'</div>'+(meta?'<div class="gk-meta">'+meta+'</div>':'')+'</div>'+
+    '<button class="edit" type="button" data-ce-edit>Edit</button>'+
+    '</div></article>';
+}
 function renderDoses(){
   /* Only what the client has switched on, across whatever cycles, and only
      what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
   var host=document.getElementById('doses');
+  function head(label,n){ return '<div class="block-head"><h3>'+label+'</h3><em>'+n+' DUE</em></div>'; }
+  var am=rows.filter(function(c){return inBlock(c,'AM');});
+  var pm=rows.filter(function(c){return inBlock(c,'PM');});
   if(!rows.length){
-    host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
+    host.innerHTML='<div class="gk-empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
       ' is clear. Nothing is on your schedule for this day.</div></div>';
     document.getElementById('dosenote').textContent='';return;
   }
-  var h='', total=0;
-  [['AM','Morning'],['PM','Night']].forEach(function(g){
-    var set=rows.filter(function(c){return inBlock(c,g[0])});
-    if(!set.length) return;
-    total+=set.length;
-    h+='<div class="seclbl">'+g[1]+'<span class="cnt">'+set.length+' SHOT'+(set.length===1?'':'S')+
-       '</span></div><div class="dgrp">';
-    set.forEach(function(c){
-      h+='<div class="drow'+(g[0]==='PM'?' pm':'')+'">'+
-        '<div class="uu">'+(c.u||'')+'</div>'+
-        '<div><div class="nm">'+c.n+'</div><div class="mt">'+
-          [c.d,c.c].filter(Boolean).join(' \u00b7 ')+'</div></div></div>';
-    });
-    h+='</div>';
-  });
+  var h=head('MORNING',am.length)+(am.length?am.map(gkSchedCard).join(''):'<div class="gk-empty">Nothing scheduled this morning.</div>')+
+        head('NIGHT',pm.length)+(pm.length?pm.map(gkSchedCard).join(''):'<div class="gk-empty">Nothing scheduled tonight.</div>');
   host.innerHTML=h;
-  document.getElementById('dosenote').textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
-    '. This is a read-only view of your schedule.';
+  document.getElementById('dosenote').textContent='';
 }
 
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
@@ -6539,5 +6545,6 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 <script src="/portal-plan-controls.js?v=2"></script>
 
 
+<link rel="stylesheet" href="/nprince/protocol-consistency.css?v=1">
 <link rel="stylesheet" href="/client-schedule-controls.css?v=1">
-<script src="/nprince/schedule-controls.js?v=2"></script>
+<script src="/nprince/schedule-controls.js?v=3"></script>
