@@ -44,18 +44,17 @@ html body.bl-public-gold :is(.btn-gold,.btn.primary,.nbtn.primary,.bls-btn:not(.
    viewport-fit=cover it rides under the notch and the dynamic address bar
    so the first content reads as cut off, and it catches the scroll when the
    gesture reverses direction. Fixed positioning plus a matching offset on
-   the body avoids both. The bar's height lives in --blnav-h so the offset
-   can never drift away from the bar itself: 78px (76 inner + 2 rule), 74px
-   under 600px where the inner drops to 72.
+   the body avoids both. Do not promote the bar with transform, will-change,
+   or backface-visibility: that layer catches a reversed scroll on iOS even
+   after the bar is position:fixed. The bar's height lives in --blnav-h so
+   the offset can never drift away from the bar itself: 78px (76 inner + 2
+   rule), 74px under 600px where the inner drops to 72.
    ==================================================================== */
 html[data-public-gold],html body.bl-public-gold{--blnav-h:78px}
 @media(max-width:600px){html[data-public-gold],html body.bl-public-gold{--blnav-h:74px}}
 
 .bl-public-gold .bl-nav{
-  padding-top:env(safe-area-inset-top)!important;
-  -webkit-transform:translateZ(0);transform:translateZ(0);
-  will-change:transform;
-  -webkit-backface-visibility:hidden;backface-visibility:hidden}
+  padding-top:env(safe-area-inset-top)!important}
 
 html body.bl-public-gold{
   padding-top:calc(var(--blnav-h) + env(safe-area-inset-top))!important}
@@ -64,10 +63,25 @@ html body.bl-public-gold{
 html{scroll-padding-top:calc(78px + env(safe-area-inset-top))}
 @media(max-width:600px){html{scroll-padding-top:calc(74px + env(safe-area-inset-top))}}
 
-/* nothing may trap the scroll */
-html{overflow-y:auto;overscroll-behavior:auto;touch-action:auto;-webkit-overflow-scrolling:touch}
-html body.bl-public-gold{overflow:visible!important;position:static!important;height:auto!important;
-  overscroll-behavior:auto;touch-action:auto}
+/* The viewport scrolls the document. overflow-x:clip or hidden on html or
+   body, and overflow-y:auto beside a visible other axis, makes a scrollport
+   that iOS Safari freezes when the pan reverses. These selectors outrank
+   the copied phone-width clip rules still in some page styles. Wide tables
+   and tab strips keep their own overflow-x:auto. */
+html[data-public-gold],
+html:has(body.bl-public-gold){
+  overflow-x:visible !important;
+  overflow-y:visible !important;
+  height:auto !important;
+  overscroll-behavior:auto;
+  touch-action:auto}
+html body.bl-public-gold{
+  overflow:visible !important;
+  position:static !important;
+  height:auto !important;
+  max-width:100%;
+  overscroll-behavior:auto;
+  touch-action:auto}
 
 /* the drawer hangs off a fixed bar now, so cap it to the viewport */
 .bl-public-gold .gold-mobile-menu{
