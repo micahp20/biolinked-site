@@ -1420,13 +1420,12 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       
     </div></section>
     <section class="view" id="v-sched"><div class="pad"><div class="gk">
-      <h1 class="gk-h" id="greet">Schedule</h1>
-      <div class="cs-stat" id="csstat"></div>
-      <p class="gk-sub" id="subline"></p>
-      <div id="duebar"></div>
-      <div class="gk-days" id="daystrip"></div>
-      <div id="doses"></div>
-      <p class="note" id="dosenote"></p>
+      <h1 class="gk-h" id="gkGreet">Schedule</h1>
+      <p class="gk-sub" id="gkSummary"></p>
+      <div class="gk-note" id="gkNote" hidden></div>
+      <div class="gk-days" id="gkDayStrip"></div>
+      <button class="pc-add" id="gkAddBtn" type="button">+ Add compound</button>
+      <div id="gkList"></div>
     </div></div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -1828,6 +1827,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
     
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
+  <div class="gk-toast" id="gkToast"></div>
 </div>
 <script>
 var CMP=[];
@@ -2140,12 +2140,12 @@ function payCopyFallback(text,done){
 }
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
-(function(){var h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Natasha';
-  renderSubline();})();
+(function(){var ge=document.getElementById('greet'); if(ge){ var h=new Date().getHours();
+  ge.textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Natasha'; }
+  if(typeof renderSubline==='function') try{ renderSubline(); }catch(e){} })();
 
 function renderDue(){
-  var host=document.getElementById('duebar');
+  var host=document.getElementById('duebar'); if(!host) return;
   var unpaid=INV.filter(function(o){return o.status==='due'});
   if(!unpaid.length){host.innerHTML='';return;}
   var t=unpaid.reduce(function(a,x){return a+x.total},0);
@@ -2153,6 +2153,7 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
+  if(!document.getElementById('daystrip')) return;
   /* Days only, no calendar dates: a client rarely starts on the date shown,
      so a real date reads as a promise the schedule is not making. What matters
      is which weekdays carry a draw. "Today" is still marked, by weekday. */
@@ -2194,7 +2195,7 @@ function renderDoses(){
   /* Only what the client has switched on, across whatever cycles, and only
      what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
-  var host=document.getElementById('doses');
+  var host=document.getElementById('doses'); if(!host) return;
   function head(label,n){ return '<div class="block-head"><h3>'+label+'</h3><em>'+n+' DUE</em></div>'; }
   var am=rows.filter(function(c){return inBlock(c,'AM');});
   var pm=rows.filter(function(c){return inBlock(c,'PM');});
@@ -2208,12 +2209,12 @@ function renderDoses(){
         week.map(function(c){return gkSchedCard(c,'is-week');}).join('');
     }
     host.innerHTML=h;
-    document.getElementById('dosenote').textContent='';return;
+    var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent='';return;
   }
   var h=head('MORNING',am.length)+(am.length?am.map(gkSchedCard).join(''):'<div class="gk-empty">Nothing scheduled this morning.</div>')+
         head('NIGHT',pm.length)+(pm.length?pm.map(gkSchedCard).join(''):'<div class="gk-empty">Nothing scheduled tonight.</div>');
   host.innerHTML=h;
-  document.getElementById('dosenote').textContent='';
+  var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent='';
 }
 
 /* ---------- ALL COMPOUNDS -- full history, one flat A-Z list ----------
@@ -6557,6 +6558,7 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 <script src="/portal-plan-controls.js?v=2"></script>
 
 
-<link rel="stylesheet" href="/nprince/protocol-consistency.css?v=2">
+<link rel="stylesheet" href="/nprince/protocol-consistency.css?v=3">
 <link rel="stylesheet" href="/client-schedule-controls.css?v=1">
-<script src="/nprince/schedule-controls.js?v=4"></script>
+<script src="/nprince/schedule-engine.js?v=1"></script>
+<script src="/nprince/schedule-editor.js?v=1"></script>
