@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-10 — Tayla Henry Order 2 is paid
+- thenry only: Order 2 is paid at $119.98 (Retatrutide 60 mg, BAC Water 30 mL at $9.99, shipping $9.99). Paid to date is $219.98 and due is $0. Paid Order 1 and the Monday 1.4 mg / 7u / 3 mL protocol are unchanged. No ledger or inventory write. Cache thenry-order2-paid-v1-20261110. See PROJECT_STATUS.md.
+
 ## 2026-11-10 — Tayla Henry open quote for Retatrutide 60 mg
 - thenry only: Order 2 quote $119.98 (Retatrutide 60 mg, BAC Water 30 mL at $9.99, shipping $9.99). Paid Order 1 unchanged. Active draw is 60 mg / 3 mL / 7u / 1.4 mg Monday AM, and the unit ladder is converted so the milligram steps stay the same. Cache thenry-reta60-v1-20261110. Commit 1e7253a3 on branch cursor/thenry-reta60-quote-c79a. Not merged. Not deployed.
 

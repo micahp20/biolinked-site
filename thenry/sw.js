@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /thenry/.
-const CACHE = 'thenry-reta60-v1-20261110';
+const CACHE = 'thenry-order2-paid-v1-20261110';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
