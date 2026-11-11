@@ -2157,9 +2157,12 @@ function renderDays(){
      so a real date reads as a promise the schedule is not making. What matters
      is which weekdays carry a draw. "Today" is still marked, by weekday. */
   var now=new Date();
+  var _cur=(typeof cycCurrent==="function")?cycCurrent():null;
+  var week=schRows().filter(function(c){return !_cur||(typeof cycHas==="function"?cycHas(c,_cur):true);});
   var h='';
   for(var i=0;i<7;i++){
-    h+='<button type="button" class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+'" onclick="pickDay('+i+')">'+
+    var has=week.some(function(c){return due(c,i);});
+    h+='<button type="button" class="day'+(i===sel?' on':'')+(i===now.getDay()?' today':'')+(has?' has':'')+'" onclick="pickDay('+i+')">'+
        '<b>'+DW[i].toUpperCase()+'</b></button>';
   }
   document.getElementById('daystrip').innerHTML=h;
@@ -2177,14 +2180,16 @@ function doseMark(c){
   if(pull) h+='<span class="dose-pull">'+(/u$/i.test(pull)?('pull '+pull):pull)+'</span>';
   return h+'</div>';
 }
-function gkSchedCard(c){
+function gkSchedCard(c,extra){
   var meta=[c.c].filter(Boolean).join(' \u00b7 ');
-  return '<article class="gk-card"><div class="gk-row">'+
+  var edit=extra?'':'<button class="edit" type="button" data-ce-edit>Edit</button>';
+  return '<article class="gk-card'+(extra?(' '+extra):'')+'"><div class="gk-row">'+
     doseMark(c)+
     '<div><div class="gk-name">'+c.n+'</div>'+(meta?'<div class="gk-meta">'+meta+'</div>':'')+'</div>'+
-    '<button class="edit" type="button" data-ce-edit>Edit</button>'+
+    edit+
     '</div></article>';
 }
+
 function renderDoses(){
   /* Only what the client has switched on, across whatever cycles, and only
      what is due today. A cycle that is off never reaches the day view. */
@@ -2194,8 +2199,15 @@ function renderDoses(){
   var am=rows.filter(function(c){return inBlock(c,'AM');});
   var pm=rows.filter(function(c){return inBlock(c,'PM');});
   if(!rows.length){
-    host.innerHTML='<div class="gk-empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
-      ' is clear. Nothing is on your schedule for this day.</div></div>';
+    var week=schRows().filter(function(c){return !_cur||(typeof cycHas==="function"?cycHas(c,_cur):true);});
+    var h='<div class="gk-empty"><div class="t">Nothing due '+FULL[sel]+'</div><div class="d">'+
+      (week.length?'Your compounds are due on other days this week. Tap a gold-outlined day to see them.':FULL[sel]+' is clear, and nothing is on the weekly schedule yet.')+
+      '</div></div>';
+    if(week.length){
+      h+='<div class="block-head"><h3>THIS WEEK</h3><em>'+week.length+' ON SCHEDULE</em></div>'+
+        week.map(function(c){return gkSchedCard(c,'is-week');}).join('');
+    }
+    host.innerHTML=h;
     document.getElementById('dosenote').textContent='';return;
   }
   var h=head('MORNING',am.length)+(am.length?am.map(gkSchedCard).join(''):'<div class="gk-empty">Nothing scheduled this morning.</div>')+
@@ -6545,6 +6557,6 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 <script src="/portal-plan-controls.js?v=2"></script>
 
 
-<link rel="stylesheet" href="/nprince/protocol-consistency.css?v=1">
+<link rel="stylesheet" href="/nprince/protocol-consistency.css?v=2">
 <link rel="stylesheet" href="/client-schedule-controls.css?v=1">
-<script src="/nprince/schedule-controls.js?v=3"></script>
+<script src="/nprince/schedule-controls.js?v=4"></script>
