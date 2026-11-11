@@ -2,6 +2,14 @@
 
 Last reviewed: 2026-11-10 (America/Denver).
 
+## Public iPhone scroll no longer locks on a direction change — 2026-11-10
+- Owner report: on the public site, including the homepage, scrolling down or up on an iPhone 17 then freezes and will not scroll back. Started from origin/main b45ec48d.
+- The November 4 fixed header (5f736e0e) was left in place. The lock that remained was on the document: at phone width, bl-theme.css set `html, body { overflow-x: clip !important }`, and the homepage also set `overflow-y: auto` with `overflow-x: hidden`. Beside a non-visible axis, clip computes to hidden, so html became a scrollport. The fixed bar’s `translateZ(0)` / `will-change: transform` layer can catch the same reversed pan. Body on `.bl-public-gold` was already `overflow: visible`.
+- Public html and body now stay `overflow: visible`. The bar stays `position: fixed` with the existing `--blnav-h` and safe-area offset, and no compositing layer. Wide tables and tab strips still use their own `overflow-x: auto`. Stylesheet links are `bl-theme.css?v=45` and `public-gold.css?v=7`. The root service-worker cache name ends in `iosscroll1`. The current homepage does not register `/sw.js`; index-legacy.html still does.
+- Client protocol shells such as thenry were not edited. thenry still uses `overflow: hidden` on html/body plus an inner `.scroll`, and it does not load these stylesheets. admin.html and suppliers.html still have their own inline `overflow-x: clip` and are not in the public nav.
+- Checks on 2026-11-10, headless Chrome, phone widths 390 and 402 and desktop 1280: homepage, Peptide Index, Stacks, Tracker, Analyzer, Bloodwork, intake, and the product line compute overflow-x and overflow-y `visible` on html and body. The document (html) is the scroller. The nav is `position: fixed` with transform `none`. Body padding-top is 74px at phone width and 78px at 1280, and the first heading sits below the bar. Document scrollWidth matches the viewport. Scroll down and back to the top succeeds. The phone menu opens and closes. Stacks’ filter strip still scrolls sideways inside itself. Light and dark homepage overflow values match. Headless Chrome does not reproduce the iOS Safari touch-gesture freeze, so a real iPhone pass is still the owner’s confirmation.
+- Not merged. Not deployed.
+
 ## Tayla Henry Order 2 marked paid — 2026-11-10
 - Owner request: mark the latest thenry invoice, Order 2, paid in full. Leave Paid Order 1 and the protocol unchanged. No ledger, inventory, payment method, or other client page.
 - Started from origin/main ad9890b3, which already includes the Order 2 quote (PR #155). Paths: thenry/index.html and thenry/sw.js.

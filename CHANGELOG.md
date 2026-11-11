@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-10 — Public pages can scroll back up on iPhone
+- Removed the phone-width `overflow-x: clip` / `hidden` lock on the public document and the compositing layer on the fixed header. The header stays `position: fixed` with the existing notch offset. Shared CSS is now `bl-theme.css?v=45` and `public-gold.css?v=7`. Client protocol shells were not rewritten. Headless Chrome confirmed the document scrolls and the first heading clears the bar; it cannot reproduce the iOS gesture itself. Not merged. Not deployed. See PROJECT_STATUS.md.
+
 ## 2026-11-10 — Tayla Henry Order 2 is paid
 - thenry only: Order 2 is paid at $119.98 (Retatrutide 60 mg, BAC Water 30 mL at $9.99, shipping $9.99). Paid to date is $219.98 and due is $0. Paid Order 1 and the Monday 1.4 mg / 7u / 3 mL protocol are unchanged. No ledger or inventory write. Cache thenry-order2-paid-v1-20261110. Commit bdf2e894 on branch cursor/thenry-order2-paid-9ebe. Not merged. Not deployed. See PROJECT_STATUS.md.
 
