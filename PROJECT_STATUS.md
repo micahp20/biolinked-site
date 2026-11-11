@@ -2,6 +2,14 @@
 
 Last reviewed: 2026-11-10 (America/Denver).
 
+## Tayla Henry Order 2 marked paid — 2026-11-10
+- Owner request: mark the latest thenry invoice, Order 2, paid in full. Leave Paid Order 1 and the protocol unchanged. No ledger, inventory, payment method, or other client page.
+- Started from origin/main ad9890b3, which already includes the Order 2 quote (PR #155). Paths: thenry/index.html and thenry/sw.js.
+- Order 2 is now ✔ Paid Order 2 $119.98, status paid, total 119.98. The three lines are unchanged: Retatrutide 60 mg × 1 at $100, BAC Water 30 mL × 1 at $9.99, Shipping 2-Day UPS $9.99. The old “quoted” summary was cleared so the card matches Paid Order 1. PAID is 219.98. DUE is 0. Order 1 is still ✔ Paid Order 1 $100.00 with the single 40 mg line at $100 and total 100.0.
+- Protocol is unchanged: Monday morning, SubQ, 1.4 mg, 7 units, reconstituted with 3 mL. Cache name is thenry-order2-paid-v1-20261110.
+- This page change does not write the ledger or deduct stock. Quoted-to-paid on the portal is not an inventory pull.
+- Checks on 2026-11-10: line cents are 10000 + 999 + 999 = 11998, and 10000 + 11998 = 21998. node --check passed on thenry/sw.js and the three inline scripts. Headless Chrome at 1440 and 390, light and dark, with Supabase and non-GET requests blocked. Both invoices render Paid in full, Order 2’s sheet has no pay buttons, and Monday still opens to 1.4 mg / 7u / 3 mL. No page exception. Commit bdf2e894 on branch cursor/thenry-order2-paid-9ebe. Not merged. Not deployed.
+
 ## Tayla Henry Retatrutide 60 mg quote — 2026-11-10
 - Owner request: add an open quote on thenry only and move the active Retatrutide card from the 40 mg vial to 60 mg in 3 mL without jumping her milligram dose. Paid Order 1 stays $100. No ledger, inventory, or other client page.
 - Paths: thenry/index.html, thenry/sw.js. Order 2 is a quote for $119.98: Retatrutide 60 mg × 1 at $100, BAC Water 30 mL × 1 at $9.99, Shipping 2-Day UPS $9.99. PAID 100.0, DUE 119.98. Protocol and calculator: Monday AM, SubQ, Active, 1.4 mg, 7 units, 3 mL. Notes step 7 units, ceiling 40 units. Cache thenry-reta60-v1-20261110.
