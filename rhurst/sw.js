@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /rhurst/.
-const CACHE = 'rhurst-stripe-card-v1-20261111';
+const CACHE = 'rhurst-labs-restore-v1-20261111';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
