@@ -12,8 +12,8 @@
     albumin:    { n: 'Albumin', u: 'g/dL', ref: 4.5, why: 'Main blood protein made by the liver. Higher albumin is linked to better nutrition and lower risk, so it pulls the estimate younger.' },
     creatinine: { n: 'Creatinine', u: 'mg/dL', ref: 0.9, why: 'Muscle waste product the kidneys clear. Higher values push the estimate older; muscle mass and creatine use also raise it.' },
     glucose:    { n: 'Glucose (fasting)', u: 'mg/dL', ref: 85, why: 'Blood sugar at the draw. Higher fasting glucose pushes the estimate older.' },
-    crp:        { n: 'CRP', u: 'mg/L', ref: 0.5, why: 'Marker of inflammation. The formula uses its logarithm, so moving from 1 to 0.5 matters as much as 4 to 2. Lower is younger.' },
-    lymph:      { n: 'Lymphocytes', u: '%', ref: 30, why: 'Share of white cells that are lymphocytes. A higher share pulls the estimate younger; it tends to fall with age and stress.' },
+    crp:        { n: 'CRP', miss: 'CRP (hs-CRP)', u: 'mg/L', ref: 0.5, why: 'Marker of inflammation. The formula uses its logarithm, so moving from 1 to 0.5 matters as much as 4 to 2. Lower is younger.' },
+    lymph:      { n: 'Lymphocytes', miss: 'Lymphocyte %', u: '%', ref: 30, why: 'Share of white cells that are lymphocytes. A higher share pulls the estimate younger; it tends to fall with age and stress.' },
     mcv:        { n: 'MCV', u: 'fL', ref: 90, why: 'Average red-cell size. Larger cells push the estimate older; B12/folate status and alcohol can raise MCV.' },
     rdw:        { n: 'RDW', u: '%', ref: 12.5, why: 'How much red-cell size varies. It carries the largest weight in the formula; each 1% higher adds roughly 3–4 years to the estimate.' },
     alp:        { n: 'Alkaline phosphatase', u: 'U/L', ref: 70, why: 'Enzyme from liver and bone. Higher pushes the estimate older; a low value pulls it younger in the formula, even if the lab flags it low.' },
@@ -37,16 +37,16 @@
   }
   function missing(cfg) {
     var miss = [];
-    if (!(cfg && typeof cfg.age === 'number' && cfg.age > 0)) miss.push('age or date of birth');
     KEYS.forEach(function (k) {
       var m = cfg && cfg.m && cfg.m[k];
-      if (!m || typeof m.v !== 'number' || !(m.v > 0 || (k === 'lymph' && m.v >= 0))) miss.push(META[k].n);
+      if (!m || typeof m.v !== 'number' || !(m.v > 0 || (k === 'lymph' && m.v >= 0))) miss.push(META[k].miss || META[k].n);
     });
+    if (!(cfg && typeof cfg.age === 'number' && cfg.age > 0)) miss.push('age');
     return miss;
   }
   function compute(cfg) {
     var miss = missing(cfg);
-    if (miss.length) return { ok: false, missing: miss };
+    if (miss.length) return { ok: false, missing: miss, have: KEYS.filter(function (k) { return miss.indexOf(META[k].miss || META[k].n) < 0; }).map(function (k) { var m = cfg.m[k]; return (META[k].miss || META[k].n) + ' ' + bnd(m) + m.v + ' ' + (m.u || META[k].u); }) };
     var x = {};
     KEYS.forEach(function (k) { x[k] = cfg.m[k].v; });
     var pa = phenoAge(x, cfg.age);
@@ -57,6 +57,7 @@
     }).sort(function (a, b) { return Math.abs(b.d) - Math.abs(a.d); });
     return { ok: true, pheno: pa, diff: pa - cfg.age, contrib: contrib, x: x };
   }
+  function bnd(m) { return m.bound === '<' ? '&lt;' : m.bound === '>' ? '&gt;' : ''; }
   function f1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
   function css() {
     if (document.getElementById('bage-css')) return '';
@@ -71,14 +72,15 @@
     var foot = 'Estimated from 9 blood markers using the published PhenoAge formula (Levine 2018). Not a diagnosis.';
     if (!r.ok) {
       o.push('<div class="score bage"><div class="l">Biological age</div>' +
-        '<div class="n" style="font-size:26px">Needs ' + r.missing.length + ' more</div>' +
+        '<div class="n" style="font-size:26px">' + (r.missing.length <= 2 ? 'Needs ' + r.missing.join(' and ') : 'Needs ' + r.missing.length + ' more') + '</div>' +
         '<div class="g">Missing: ' + r.missing.join(', ') + '</div>' +
+        (r.have.length ? '<div class="c">On file: ' + r.have.join(', ') + '.</div>' : '') +
         '<div class="c">The estimate is not shown until every input is on a real lab report. Nothing is guessed. ' + foot + '</div></div>');
       return o.join('');
     }
     var younger = r.diff < 0, ad = Math.abs(r.diff);
     var flags = KEYS.filter(function (k) { return cfg.m[k].bound; }).map(function (k) {
-      return META[k].n + ' was reported as ' + cfg.m[k].bound + cfg.m[k].v + '; the bound was used';
+      return META[k].n + ' was reported as ' + bnd(cfg.m[k]) + cfg.m[k].v + '; the bound was used';
     });
     o.push('<div class="score bage"><div class="l">Biological age</div>' +
       '<div class="n">' + f1(r.pheno) + '<small>years</small></div>' +
@@ -96,7 +98,7 @@
       var w = max ? Math.max(2, Math.abs(c.d) / max * 50) : 0;
       var bar = zero ? '' : '<div class="bbar"><i style="' + (d > 0 ? 'left:50%' : 'right:50%') + ';width:' + w.toFixed(1) +
         '%;background:var(--' + (d > 0 ? 'warn' : 'ok') + ')"></i></div>';
-      var val = (m.bound || '') + m.v + ' ' + (m.u || mt.u);
+      var val = bnd(m) + m.v + ' ' + (m.u || mt.u);
       o.push('<div class="lrow" onclick="tt(\'' + id + '\')"><div class="lt"><span class="qm">?</span>' +
         '<span class="ln">' + mt.n + '</span><span class="lv ' + cls + '">' + sign + '<em> yrs</em></span></div>' +
         '<div class="lmeta"><span class="lref">' + val + ' · reference ' + mt.ref + ' ' + mt.u + '</span>' +
