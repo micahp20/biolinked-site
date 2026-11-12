@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /cpauldino/, which is now the real page: the app layout
 // was promoted here from the /cpauldino/app/ pilot.
-const CACHE = 'cpauldino-master-locked-v7-context-v1-controls-v1-calcact1-bioage1';
+const CACHE = 'cpauldino-master-locked-v7-context-v1-controls-v1-calcact1-bioage2';
 const ASSETS = [
   '/bio-age.js?v=2',
   '/calc-feedback.js?v=1',

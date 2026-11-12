@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bcox/.
-const CACHE = 'bcox-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage1';
+const CACHE = 'bcox-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage2';
 const ASSETS = [
   '/bio-age.js?v=2',
   '/calc-feedback.js?v=1',
