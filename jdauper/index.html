@@ -1419,14 +1419,15 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       </div>
       
     </div></section>
-    <section class="view" id="v-sched"><div class="pad">
-      <h1 class="scrn" id="greet">Schedule</h1>
-      <div class="cs-stat" id="csstat"></div>
-      <p class="sub" id="subline"></p>
+    <section class="view" id="v-sched"><div class="pad"><div class="gk">
+      <h1 class="gk-h" id="gkGreet">Schedule</h1>
+      <p class="gk-sub" id="gkSummary"></p>
+      <div class="gk-note" id="gkNote" hidden></div>
+      <div class="gk-days" id="gkDayStrip"></div>
+      <button class="pc-add" id="gkAddBtn" type="button">+ Add compound</button>
+      <div id="gkList"></div>
+    </div>
       <div id="duebar"></div>
-      <div class="days" id="daystrip"></div>
-      <div id="doses"></div>
-      <p class="note" id="dosenote"></p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -1828,6 +1829,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
     
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
+  <div class="gk-toast" id="gkToast"></div>
 </div>
 <script>
 var CMP=[{"n":"PT-141 · 10 mg","cad":"PRN","c":"As needed","d":"500 mcg","u":"15u","rec":"3 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>PT-141 (bremelanotide).</strong> A melanocortin-receptor agonist with central effects on sexual-desire signalling.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> PT-141 (bremelanotide) provides the melanocortin sexual-signalling component.</p><details class=\"bl-compound-notes\"><summary>Your existing protocol notes</summary><div>Bremelanotide — a melanocortin agonist. It acts centrally, in the hypothalamus, on the desire and arousal pathway rather than on blood flow the way a PDE5 inhibitor does. That is why it still works when stress or fatigue have flattened desire rather than plumbing. 10 mg in 3 mL is 3.33 mg/mL, so 15 units is 500 mcg.</div></details>","tag":"Cycle 2","b":"AM","days":[]},{"n":"Oxytocin · 10 mg","b":"PM","cad":"PRN","c":"As needed","d":"50 mcg","u":"5u","rec":"10 mL BAC water · gives 1 mg/mL","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Oxytocin.</strong> A naturally occurring peptide hormone involved in childbirth, milk release and social/reproductive signalling.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Oxytocin adds an oxytocin-receptor signalling component.</p>","tag":"Active","days":[]}];
@@ -2141,18 +2143,18 @@ function payCopyFallback(text,done){
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
 (function(){var h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Jerrod';
+  var _g=document.getElementById('greet'); if(_g)_g.textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Jerrod';
   renderSubline();})();
 
 function renderDue(){
-  var host=document.getElementById('duebar');
+  var host=document.getElementById('duebar'); if(!host) return;
   var unpaid=INV.filter(function(o){return o.status==='due'});
   if(!unpaid.length){host.innerHTML='';return;}
   var t=unpaid.reduce(function(a,x){return a+x.total},0);
   host.innerHTML='<div class="duebar" onclick="go(\'pay\')"><span>'+unpaid[0].label+' · '+unpaid[0].summary+
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
-function renderDays(){
+function renderDays(){ if(!document.getElementById('daystrip')) return;
   /* Days only, no calendar dates: a client rarely starts on the date shown,
      so a real date reads as a promise the schedule is not making. What matters
      is which weekdays carry a draw. "Today" is still marked, by weekday. */
@@ -2168,7 +2170,7 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
 /* A compound tagged BOTH (Ipamorelin) is a real second shot, so it shows in the
    Morning block and again in the Night block. */
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
-function renderDoses(){
+function renderDoses(){ if(!document.getElementById('doses')) return;
   /* Only what the client has switched on, across whatever cycles, and only
      what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
@@ -2176,7 +2178,7 @@ function renderDoses(){
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
       ' is clear. Nothing is on your schedule for this day.</div></div>';
-    document.getElementById('dosenote').textContent='';return;
+    var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent='';return;
   }
   var h='', total=0;
   [['AM','Morning'],['PM','Night']].forEach(function(g){
@@ -2194,7 +2196,7 @@ function renderDoses(){
     h+='</div>';
   });
   host.innerHTML=h;
-  document.getElementById('dosenote').textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
+  var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
     '. This is a read-only view of your schedule.';
 }
 
@@ -6568,3 +6570,13 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 <script src="/protocol-context.js?v=1"></script>
 <link rel="stylesheet" href="/portal-plan-controls.css?v=2">
 <script src="/portal-plan-controls.js?v=2"></script>
+<link rel="stylesheet" href="/schedule-protocol-consistency.css?v=1">
+<link rel="stylesheet" href="/client-schedule-controls.css?v=1">
+<script>
+var GK_STORAGE="biolinked-sched-jdauper-gk-v1";
+var GK_PROTOCOL_REV=1;
+var gkSeed={"member":"Jerrod","protocolRev":1,"selected":new Date().getDay(),"view":"schedule","open":null,"compounds":[{"id":"retatrutide","name":"Retatrutide · 40 mg × 2","vial":"40 mg","dose":8.0,"step":0.5,"unit":"mg","draw":"5u","recon":"3 mL BAC water per vial","block":"AM","days":[1],"foundation":false,"active":true},{"id":"tesamorelin","name":"Tesamorelin · 10 mg","vial":"10 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"20u","recon":"2 mL BAC water per vial","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"cagrilintide","name":"Cagrilintide · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"PM","days":[5],"foundation":false,"active":true},{"id":"mots-c","name":"MOTS-c · 40 mg","vial":"40 mg","dose":2.0,"step":0.5,"unit":"mg","draw":"15u","recon":"3 mL BAC water","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"pt-141","name":"PT-141 · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"15u","recon":"3 mL BAC water per vial","block":"AM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"oxytocin","name":"Oxytocin · 10 mg","vial":"10 mg","dose":50.0,"step":25,"unit":"mcg","draw":"5u","recon":"10 mL BAC water · gives 1 mg/mL","block":"PM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true}]};
+</script>
+<script src="/schedule-engine.js?v=1"></script>
+<script src="/schedule-editor.js?v=1"></script>
+

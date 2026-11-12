@@ -1,11 +1,15 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dholm/.
-const CACHE = 'dholm-paid500-20261106-context-v1-controls-v1-calcact1-addon1';
+const CACHE = 'dholm-paid500-20261106-context-v1-controls-v1-calcact1-addon1-sgk1';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',
   '/protocol-context.css?v=1',
+  '/schedule-protocol-consistency.css?v=1',
+  '/client-schedule-controls.css?v=1',
+  '/schedule-engine.js?v=1',
+  '/schedule-editor.js?v=1',
   '/compound-library.js?v=2',
   '/dholm/',
   '/dholm/index.html',
