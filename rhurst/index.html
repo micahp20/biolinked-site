@@ -649,6 +649,7 @@
   .paybtn.vm{background:#3D95CE;color:#ffffff}
   .paybtn.ca{background:#00D632;color:#06240f}
   .paybtn.zl{background:#6D1ED4;color:#ffffff}
+  .paybtn.cc{background:#0b0b0c;color:#CFB87C;border:1px solid #6f6130}
   .paybtn.copied{background:var(--ok);color:var(--card)}
   .paynote{font-size:13px;color:var(--muted);line-height:1.5;margin-top:9px}
 
@@ -2102,7 +2103,14 @@ function payAmt(n){ return (Math.round(n*100)%100===0) ? String(Math.round(n)) :
 function payButtons(amount,note){
   if(!(amount>0)) return '';
   var a=payAmt(amount), q=encodeURIComponent(note);
+  var card='';
+  if(Math.round(amount*100)===30999){
+    card='<a class="paybtn cc" target="_blank" rel="noopener" href="https://buy.stripe.com/bJe4gz9p2evxdNA7y57Vm04">'+
+      '<svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>'+
+      'Pay with card <span class="amt">$'+a+'</span></a>';
+  }
   return '<div class="payrow">'+
+    card+
     '<a class="paybtn vm" target="_blank" rel="noopener" data-note="'+attr(note)+'"'+
       ' onclick="return payVenmo(this,event)" href="'+venmoWeb()+'">'+
       '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'+
