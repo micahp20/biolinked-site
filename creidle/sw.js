@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /creidle/.
-const CACHE = 'creidle-v5-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1';
+const CACHE = 'creidle-v5-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -10,8 +10,8 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=1',
-  '/schedule-engine.js?v=2',
-  '/schedule-editor.js?v=1',
+  '/schedule-engine.js?v=3',
+  '/schedule-editor.js?v=2',
   '/compound-library.js?v=2',
   '/creidle/',
   '/creidle/index.html',

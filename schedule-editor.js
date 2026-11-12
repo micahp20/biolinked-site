@@ -24,7 +24,8 @@
  form(d)+'<p class="pe-error" role="alert" hidden></p><div class="pe-actions"><button type="button" class="pe-save" data-pe-action="save">Save changes</button><button type="button" data-pe-action="cancel">Cancel</button></div><button type="button" class="pe-remove" data-pe-action="remove">Remove from schedule</button>'+'</div>';}
  gkCard=function(c){var open=gkState.open===c.id, name=c.name;
   if(/^\s*\d/.test(c.vial||'')&&name.toLowerCase().indexOf(String(c.vial).toLowerCase())<0)name+=' · '+c.vial;
-  return '<div class="pe-item"><button type="button" class="drow pe-head'+(c.block==='PM'?' pm':'')+'" data-pe-open="'+esc(c.id)+'" aria-expanded="'+open+'" aria-controls="pe-panel-'+esc(c.id)+'"><span class="uu">'+esc(c.draw&&c.draw!=='—'?c.draw:gkFmt(c.dose)+' '+c.unit)+'</span><span class="pe-title"><span class="nm">'+esc(name)+'</span><span class="mt">'+esc(gkFmt(c.dose)+' '+c.unit+' · '+gkDayText(c.days))+'</span></span><span class="pe-chevron" aria-hidden="true">⌄</span></button>'+(open?panel(c):'')+'</div>';
+  var real=find(c.id);
+  return '<div class="pe-item"><button type="button" class="drow pe-head'+(c.block==='PM'?' pm':'')+'" data-nm="'+esc(c.name)+'" data-pe-open="'+esc(c.id)+'" aria-expanded="'+open+'" aria-controls="pe-panel-'+esc(c.id)+'"><span class="uu">'+esc(c.draw&&c.draw!=='—'?c.draw:gkFmt(c.dose)+' '+c.unit)+'</span><span class="pe-title"><span class="nm">'+esc(name)+'</span><span class="mt">'+esc([(gkFmt(c.dose)+' '+c.unit).trim(),gkDayText(c.days)].filter(Boolean).join(' · '))+'</span></span>'+(real?'<span class="pe-chevron" aria-hidden="true">⌄</span>':'')+'</button>'+(open&&real?panel(real):'')+'</div>';
  };
  gkDayView=function(rows){var html='';['AM','PM'].forEach(function(block){var list=rows.filter(function(c){return c.block===block;});html+='<div class="seclbl">'+(block==='AM'?'Morning':'Night')+'<span class="cnt">'+list.length+' COMPOUND'+(list.length===1?'':'S')+'</span></div><div class="dgrp">'+(list.length?list.map(gkCard).join(''):'<p class="pe-no-doses">Nothing scheduled '+(block==='AM'?'this morning':'tonight')+'.</p>')+'</div>';});return html+gkMedsSection();};
 
@@ -66,7 +67,7 @@
  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#gkAddBtn')){e.preventDefault();e.stopImmediatePropagation();openAdd();}},true);
  document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('button');if(!b)return;
-  if(b.hasAttribute('data-pe-open')){var id=b.getAttribute('data-pe-open');if(gkState.open===id){delete drafts[id];gkState.open=null;}else{if(gkState.open)delete drafts[gkState.open];gkState.open=id;draft(find(id));}gkCacheLocal();gkRender();focusRow(id);return;}
+  if(b.hasAttribute('data-pe-open')){var id=b.getAttribute('data-pe-open');if(!find(id))return;if(gkState.open===id){delete drafts[id];gkState.open=null;}else{if(gkState.open)delete drafts[gkState.open];gkState.open=id;draft(find(id));}gkCacheLocal();gkRender();focusRow(id);return;}
   if(b.hasAttribute('data-pe-mode')){if(!editable()||!addDraft)return;addDraft.mode=b.getAttribute('data-pe-mode');addView();return;}
   var host=b.closest('[data-pe-id]')||b.closest('#pe-add-host'), d=host?(host.id==='pe-add-host'?addDraft:drafts[host.getAttribute('data-pe-id')]):null;
   if(b.hasAttribute('data-pe-time')&&d&&editable()){d.block=b.getAttribute('data-pe-time');host.querySelectorAll('[data-pe-time]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});return;}
@@ -75,12 +76,13 @@
   if(!host||!d||!editable())return;
   var c=host.id==='pe-add-host'?null:find(host.getAttribute('data-pe-id'));
   if(action==='cancel'){delete drafts[c.id];gkState.open=null;gkRender();focusRow(c.id);return;}
-  if(action==='remove'){c.active=false;delete drafts[c.id];gkState.open=null;gkSave(true);gkRender();gkToast('Removed from schedule. Use Add back to restore it.');return;}
+  if(action==='remove'){c.active=false;if(typeof gkLegacySetOn==='function')gkLegacySetOn(c.name,false);delete drafts[c.id];gkState.open=null;gkSave(true);gkRender();gkToast('Removed from schedule. Use Add back to restore it.');return;}
   if(action==='save'){
    if(JSON.stringify(fields(c))!==d.base){error(host,'This entry changed while you were editing. Close and reopen it to use the latest values.');return;}
    if(!valid(d,c,host))return;
    Object.assign(c,{dose:Number(d.dose),unit:d.unit,draw:String(d.draw||'').trim()||'—',recon:String(d.recon||'').trim(),days:d.days.slice().sort(),block:d.block,runWeeks:d.runWeeks===''||d.runWeeks==null?null:Number(d.runWeeks)});
    if(c.days.indexOf(gkState.selected)<0)gkState.selected=c.days[0];
+   if(typeof gkLegacyEdit==='function')gkLegacyEdit(c);
    delete drafts[c.id];gkState.open=null;gkSave(true);gkRender();focusRow(c.id);gkToast('Schedule changes saved.');return;
   }
   if(action==='add'){
