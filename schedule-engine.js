@@ -236,6 +236,45 @@ function gkFmt(n){ if(n==null||n==="") return ""; n=Number(n); if(!Number.isFini
 function gkDayText(days){ if(days.length===7) return "Daily";
   return [1,2,3,4,5,6,0].filter(function(d){return days.indexOf(d)>=0;}).map(function(d){return GK_DAY[d];}).join(" / "); }
 function gkRound(n){ return Math.round(n*100)/100; }
+/* gkSeed is generated from the page's own ALL list, in order, one entry per
+   non-archived row (a BOTH row gives an AM and a PM entry), across EVERY cycle.
+   A cycle-based protocol lists the same compound once per cycle, so showing
+   every seed entry repeated HGH six times on a six-cycle plan. The schedule
+   shows what the pre-migration day view showed: rows of the current cycle plus
+   rows that run in every cycle (the page's own cycCurrent/cycHas), each compound
+   once per dose slot. Saved device or server state is filtered the same way, so
+   an existing visitor's phone corrects itself on the next load and a later cycle
+   change still finds its compounds. Member-added (calc-/man-) entries always show. */
+function gkPlanIds(){
+  try{
+    if(typeof ALL==="undefined"||!Array.isArray(ALL)||!gkSeed||!Array.isArray(gkSeed.compounds)) return null;
+    var cur=(typeof cycCurrent==="function")?cycCurrent():null;
+    var seed=gkSeed.compounds, p=0, ok={}, seen={};
+    for(var i=0;i<ALL.length;i++){
+      var r=ALL[i], took=[];
+      if(p<seed.length && seed[p].name===r.n){
+        took.push(seed[p++]);
+        if(r.b==="BOTH" && p<seed.length && seed[p].name===r.n && seed[p].block!==took[0].block) took.push(seed[p++]);
+      }
+      if(!took.length) continue;
+      if(cur && typeof cycHas==="function" && !cycHas(r,cur)) continue;
+      took.forEach(function(s){
+        var k=[s.name,s.block,(s.days||[]).slice().sort().join(","),s.dose,s.unit].join("|");
+        if(seen[k]) return; seen[k]=1; ok[s.id]=1;
+      });
+    }
+    return p===seed.length ? ok : null;
+  }catch(e){ return null; }
+}
+function gkPlanFilter(list){
+  var ok=gkPlanIds(), seen={};
+  return (list||[]).filter(function(c){
+    if(/^(calc|man)-/.test(c.id||"")) return true;
+    if(ok) return !!ok[c.id];
+    /* Unrecognised seed shape: never show the same compound twice in one slot. */
+    var k=c.name+"|"+c.block; if(seen[k]) return false; seen[k]=1; return true;
+  });
+}
 function gkRender(){
   if(!document.getElementById("gkList")) return;
   gkArchiveIfDue();
@@ -249,8 +288,8 @@ function gkRender(){
        reads as a promise the schedule is not making. */
     return '<button class="day'+(gkState.selected===i?" on":"")+'" data-gkday="'+i+'"><b>'+label.toUpperCase()+'</b></button>';
   }).join("");
-  /* Every compound is shown on its due days now -- there is no archive. */
-  var all=gkState.compounds;
+  /* Only the current plan reaches the screen (see gkPlanFilter). */
+  var all=gkPlanFilter(gkState.compounds);
   var onSched=all.filter(function(c){return c.active!==false;});
   var dueNow=onSched.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
   var off=all.filter(function(c){return c.active===false;});
