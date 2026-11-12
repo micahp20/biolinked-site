@@ -2,6 +2,11 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — ejirikils and cpauldino protocol view now matches mpauldino
+- Owner report: ejirikils' Protocol page did not look like mpauldino. Root cause: mpauldino draws its Protocol view with mpauldino/protocol-layout.js (inline compound cards grouped under section headings, notes in a closed "About this protocol" panel). 139 client pages draw the same card layout inline. ejirikils and cpauldino still drew the older collapsed "About This Protocol" group tiles (cgrp) because their pages carry ABOUT_GROUPS and nothing replaced the old renderer. Earlier audits only checked asset tags, overlap and errors, never the rendered structure.
+- Added a shared /protocol-layout.js (mpauldino's renderer, generalized to honor each page's own group rules: name lists, "rest" and tag). ejirikils/index.html and cpauldino/index.html each gain one script tag at the end; no other byte changed. sw.js cache names end in -layout1. mpauldino was not edited.
+- Checks: a rendered 142-page structural audit against mpauldino found only these two pages on the old renderer. Before/after headless Chrome comparison of both pages: Schedule, Invoice, Labs, Nutrition, Workout and More text identical; Protocol group membership identical; every card's recon, schedule, dose/draw and site equal the page's own ALL data; notes text identical. See PROJECT_STATUS.md.
+
 ## 2026-11-10 — Public pages can scroll back up on iPhone
 - Removed the phone-width `overflow-x: clip` / `hidden` lock on the public document and the compositing layer on the fixed header. The header stays `position: fixed` with the existing notch offset. Shared CSS is now `bl-theme.css?v=45` and `public-gold.css?v=7`. Client protocol shells were not rewritten. Headless Chrome confirmed the document scrolls and the first heading clears the bar; it cannot reproduce the iOS gesture itself. Commit c5e81316 on origin branch cursor/ios-public-scroll-5684. Pull request creation was rejected because the GitHub identity is not a collaborator. Not merged. Not deployed. See PROJECT_STATUS.md.
 

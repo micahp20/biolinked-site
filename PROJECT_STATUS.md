@@ -1,6 +1,13 @@
 # Bio Linked Solutions — project status
 
-Last reviewed: 2026-11-10 (America/Denver).
+Last reviewed: 2026-11-12 (America/Denver).
+
+## Protocol layout parity with mpauldino — 2026-11-12
+- Owner report: /ejirikils/ Protocol layout differs from /mpauldino/ (the reference). Started from origin/main 4a9cb7b.
+- Rendered audit of all 142 client protocol pages (excludes sample, workout-demo, mp-gold and redirect/picker folders) at 390px compared each tab's structure with mpauldino. Only ejirikils and cpauldino used the old collapsed group-tile Protocol renderer; the other 140 already used the inline compound-card layout.
+- Fix: shared /protocol-layout.js loaded at the end of ejirikils/index.html and cpauldino/index.html; sw.js cache names bumped (-layout1). Client data untouched (index.html = old file + one script line, byte-verified).
+- Remaining known differences that are data or pilot features, not layout: mpauldino has no Invoice tab/card and a Vitamins & Supplements tab (its own data); mpauldino and cpauldino show an Add-to-Home-Screen nudge and mpauldino's Nutrition tab has an Easy-reading toggle card that other pages do not have; tabs with no data show their standard empty states.
+- Commit/PR/deploy: see PR "Protocol view parity with mpauldino" on branch protocol-layout-parity.
 
 ## Public iPhone scroll no longer locks on a direction change — 2026-11-10
 - Owner report: on the public site, including the homepage, scrolling down or up on an iPhone 17 then freezes and will not scroll back. Started from origin/main b45ec48d.
