@@ -234,6 +234,23 @@
     outof: '/100',
     g: 'Strong panel · 94/100 · three out of range, one expected on therapy',
     c: 'Informational only, not a diagnosis. No urgent or critical result is apparent from this report alone. The out-of-range markers are alkaline phosphatase 30 U/L, below 36–130, and MCH 34.5 pg, above 27.0–33.0, both on the 11/02/2026 panel, and IGF-1 289 ng/mL, above 74–227, from the 09/2026 draw. Discuss a repeat ALP and CBC with a clinician to confirm whether those results persist. An IGF-1 above the untreated reference range is the expected effect of growth-hormone therapy rather than a disease finding and is a periodic monitoring point with a clinician, but the 4/3/1 rule still scores it 1. Hemoglobin is 17.7 g/dL, exactly this lab’s upper limit, and hematocrit is 51.2%, inside 42.5–55.0; track both on a future CBC. hsCRP 1.2 mg/L is this lab’s average relative cardiovascular-risk category (optimal under 1.0), not an acute illness and not an overall cardiovascular-risk diagnosis. PSA 2.03 ng/mL is within the printed limit of 4.00. Testosterone results are inside the ranges on this report. Fasting glucose 80 mg/dL and A1c 4.8% are favorable on the printed ranges. ApoB 63, LDL 67, triglycerides 40, and HDL 76 mg/dL are favorable on the printed ranges. Kidney results and thyroid results are inside their printed ranges. AST and ALT are inside their printed ranges.',
+    bioAge: {
+      /* Age at the 11/02/2026 draw, from the DOB and age printed on the Quest
+         report (report prints Age: 45). The DOB itself is not shown on the page. */
+      age: 45.45,
+      draw: 'Quest panel collected 11/02/2026',
+      m: {
+        albumin:    { v: 4.5,  u: 'g/dL',  src: 'metabolic panel 11/02/2026' },
+        creatinine: { v: 0.97, u: 'mg/dL', src: '11/02/2026' },
+        glucose:    { v: 80,   u: 'mg/dL', src: 'fasting, 11/02/2026' },
+        crp:        { v: 1.2,  u: 'mg/L',  src: 'hsCRP 11/02/2026' },
+        lymph:      { v: 26.3, u: '%',     src: '11/02/2026' },
+        mcv:        { v: 99.8, u: 'fL',    src: '11/02/2026' },
+        rdw:        { v: 13.1, u: '%',     src: '11/02/2026' },
+        alp:        { v: 30,   u: 'U/L',   src: '11/02/2026, flagged low' },
+        wbc:        { v: 5.0,  u: 'K/uL',  src: '11/02/2026' }
+      }
+    },
     domains: domains,
     bannerattr: '',
     banner: 'Custom wellness score, not a validated diagnosis. A marker scores 4 when it meets an optimal or desirable cutoff printed on this report, an optimal cutoff already used on this page, or a functional window inside the reference range. It scores 3 when it is inside the reference range but sits at an edge of it or short of a printed optimal cutoff. It scores 1 when it is outside the reference range. This panel is 54 × 4 + 6 × 3 + 3 × 1 = 237 points. 237 ÷ 252 × 100 = 94.05, rounded to 94. Sixty-three results are scored. The scored set is not one draw: estradiol, morning cortisol, DHEA-S, IGF-1, random growth hormone, vitamin D and the triglyceride / HDL ratio come from draws between 01/2025 and 09/2026, and each names its draw in its own note. The five differential percentages are scored against standard reference ranges because this report printed none. Not scored: the unreported BUN/creatinine ratio and the duplicate albumin from the testosterone panel. Tap a marker for its reference range.',
