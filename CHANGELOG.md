@@ -2,6 +2,12 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — Add to Home Screen nudge and Easy reading card on every client portal
+- Owner-approved rollout of the two mpauldino-only extras. New shared /portal-extras.css and /portal-extras.js. 140 client pages gain two tags at the end (CSS + JS); mpauldino and cpauldino, which already had both features, gain only the CSS line. No other byte of any index.html changed (byte-verified for all 142). Every touched sw.js cache name ends in -extras1.
+- Nudge: the page's existing #a2hs element moves to the top of the scroller and uses mpauldino's wording and styling; it shows outside an installed app until dismissed. The dismissal uses each page's existing KP+'a2hs' key.
+- Easy reading: Nutrition gets mpauldino's "Easy reading · same setting as Workout" card above the research-use note. Bigger text / High contrast apply to Nutrition and Workout. Stored only on this device under the client's own prefix (KP+'easyread'), so pages never share it and nothing syncs to the backend.
+- Layout fixes in the shared CSS: on desktop the nudge clears the fixed header (was tucked 2px under it, mpauldino included); the Nutrition "numbers" row no longer pushes the page sideways at 320px (pre-existing on every page). See PROJECT_STATUS.md.
+
 ## 2026-11-12 — ejirikils and cpauldino protocol view now matches mpauldino
 - Owner report: ejirikils' Protocol page did not look like mpauldino. Root cause: mpauldino draws its Protocol view with mpauldino/protocol-layout.js (inline compound cards grouped under section headings, notes in a closed "About this protocol" panel). 139 client pages draw the same card layout inline. ejirikils and cpauldino still drew the older collapsed "About This Protocol" group tiles (cgrp) because their pages carry ABOUT_GROUPS and nothing replaced the old renderer. Earlier audits only checked asset tags, overlap and errors, never the rendered structure.
 - Added a shared /protocol-layout.js (mpauldino's renderer, generalized to honor each page's own group rules: name lists, "rest" and tag). ejirikils/index.html and cpauldino/index.html each gain one script tag at the end; no other byte changed. sw.js cache names end in -layout1. mpauldino was not edited.

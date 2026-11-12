@@ -1,7 +1,9 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jckelley/.
-const CACHE = 'jckelley-master-sched1-v8-context-v1-controls-v1-calcact1-sgk1-bioage1';
+const CACHE = 'jckelley-master-sched1-v8-context-v1-controls-v1-calcact1-sgk1-bioage1-extras1';
 const ASSETS = [
+  '/portal-extras.css?v=1',
+  '/portal-extras.js?v=1',
   '/bio-age.js?v=2',
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
