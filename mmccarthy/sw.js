@@ -1,7 +1,9 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mmccarthy/.
-const CACHE = 'mmccarthy-master-sched1-v13-paid-addon-10mg-sgk1';
+const CACHE = 'mmccarthy-master-sched1-v13-paid-addon-10mg-sgk1-extras1';
 const ASSETS = [
+  '/portal-extras.css?v=1',
+  '/portal-extras.js?v=1',
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',

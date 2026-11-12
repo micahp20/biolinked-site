@@ -2,6 +2,11 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## Portal extras rollout (Add to Home Screen + Easy reading) — 2026-11-12
+- Owner approved rolling the mpauldino nudge and Nutrition Easy reading card out to all 142 client protocol pages. Files: portal-extras.css, portal-extras.js, each client index.html (appended tags only) and sw.js (cache -extras1).
+- cpauldino loads bl-client-skin.css twice (its --gold-soft is #f1f1f1) and lacks the shared schedule CSS. portal-extras.css pins the light-theme nudge tint to the reference #e5e1d8 and lets the Schedule day strip shrink, so cpauldino matches and no longer scrolls sideways at 320px.
+- Checks and PR: see the PR "Portal extras: Add to Home Screen nudge + Easy reading on all client portals".
+
 ## Protocol layout parity with mpauldino — 2026-11-12
 - Owner report: /ejirikils/ Protocol layout differs from /mpauldino/ (the reference). Started from origin/main 4a9cb7b.
 - Rendered audit of all 142 client protocol pages (excludes sample, workout-demo, mp-gold and redirect/picker folders) at 390px compared each tab's structure with mpauldino. Only ejirikils and cpauldino used the old collapsed group-tile Protocol renderer; the other 140 already used the inline compound-card layout.

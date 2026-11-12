@@ -1,7 +1,9 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /tmilbrath/.
-const CACHE = 'tmilbrath-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1';
+const CACHE = 'tmilbrath-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-extras1';
 const ASSETS = [
+  '/portal-extras.css?v=1',
+  '/portal-extras.js?v=1',
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',
