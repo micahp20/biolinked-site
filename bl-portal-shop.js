@@ -210,7 +210,8 @@ function openCart(){ if(pane==='cart') return; try{history.pushState({blo:'cart'
 function closeAll(){ if(history.state&&history.state.blo){ history.back(); } else showPane(null); }
 function renderBar(){
   var b=$('bls-cbar'), c=$('bls-ocart'); if(!b) return;
-  var n=cartCount();
+  var n=cartCount(), ov=$('bls-ov');
+  if(ov) ov.classList.toggle('bls-noitems',!n&&pane!=='cart');
   c.textContent=n?('Cart · '+n):'Cart';
   if(pane==='cart'){b.textContent='Keep shopping';b.className='bls-cbar alt';b.onclick=function(){history.back();};}
   else {b.className='bls-cbar';b.textContent=n?('View cart · '+n+' item'+(n===1?'':'s')+' · '+money(subtotal())):'Your cart is empty';b.disabled=!n;b.onclick=openCart;}
@@ -270,7 +271,7 @@ function renderShop(){
   if(!loaded){h.innerHTML=o.join('')+(failed?'<div class="bls-state"><b>Couldn’t load the product line</b>Check your connection and try again.<br><button type="button" class="bls-add" id="bls-retry">Try again</button></div>':'<div class="bls-state">Loading the product line…</div>');var r=$('bls-retry');if(r)r.onclick=function(){failed=false;renderShop();loadCatalog();};return;}
   var cyc=CYCLES.map(function(c,ci){var L=cycleLines(c),t=0,miss=0,av=0;L.forEach(function(l){if(!l.p){miss++;return;}t+=l.p.price*l.qty;if(l.p.inStock)av++;});if(miss)return '';
     return '<div class="bls-cyc"><div class="bls-dur">'+esc(c.dur||'')+'</div><p class="bls-ccat">'+esc(catLbl(c.cat||''))+'</p><h3>'+esc(c.name)+'</h3>'+(c.goal?'<p class="bls-goal"><span>Goal</span>'+esc(c.goal)+'</p>':'')+(c.why&&c.why.length?'<details class="bls-why"><summary>Why these work together</summary><ul>'+c.why.map(function(w){return '<li>'+w+'</li>';}).join('')+'</ul></details>':'')+
-      '<ul class="bls-items">'+L.map(function(l){var sp=splitName(l.p.name);return '<li'+(l.p.inStock?'':' class="oosl"')+'><span class="bls-lnm">'+infoBtn(l.p.name)+'<span>'+esc(sp.n)+(sp.s?' <small>'+esc(sp.s)+'</small>':'')+'</span></span><span>'+l.qty+' × '+money(l.p.price)+' = '+money(l.p.price*l.qty)+'</span></li>';}).join('')+'</ul>'+
+      '<ul class="bls-items">'+L.map(function(l){var sp=splitName(l.p.name);return '<li'+(l.p.inStock?'':' class="oosl"')+'><span class="bls-lnm">'+infoBtn(l.p.name)+'<span class="bls-ln">'+esc(sp.n)+(sp.s?' <small>'+esc(sp.s)+'</small>':'')+'</span></span><span class="bls-lq">'+l.qty+' × '+money(l.p.price)+' = <b>'+money(l.p.price*l.qty)+'</b></span></li>';}).join('')+'</ul>'+
       '<div class="bls-ft"><div class="bls-pr"><small>Cycle total</small>'+money(t)+'</div><button type="button" class="bls-add" data-cyc="'+ci+'"'+(av?'':' disabled')+'>Add cycle to cart</button></div></div>';}).join('');
   if(cyc) o.push('<h2 class="bls-sec">Pre-built cycles</h2><div class="bls-cycs">'+cyc+'</div>');
   var counts={};products.forEach(function(p){counts[p.cat]=(counts[p.cat]||0)+1;});
