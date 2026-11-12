@@ -275,6 +275,93 @@ function gkPlanFilter(list){
     var k=c.name+"|"+c.block; if(seen[k]) return false; seen[k]=1; return true;
   });
 }
+/* PRE-MIGRATION CHOICES. Before 14aa605 the day view was
+     schRows().filter(due(c,day) && cycHas(c, cycCurrent()))  split by inBlock(c,'AM'/'PM')
+   where schRows() carries the client's own saved on/off choices (device key
+   SCHKEY, replaced by the server copy from get_state when there is one, else the
+   paid-invoice default), their self-added compounds, dose overrides, and due()
+   carries their own weekday picks. All of that code still runs on every page, so
+   the schedule reads it again here and only the card UI is new. Editor actions
+   write back to the same stores (and so to the same server sync). */
+function gkLegacyOK(){
+  return typeof schRows==="function" && typeof due==="function" && typeof schGet==="function" &&
+         typeof schSave==="function" && typeof ALL!=="undefined" && Array.isArray(ALL);
+}
+function gkLegacyCur(){ return (typeof cycCurrent==="function")?cycCurrent():null; }
+function gkLegacyIn(c,cur){ return !cur || (typeof cycHas==="function" ? cycHas(c,cur) : true); }
+function gkLegacyBlocks(c){
+  return ["AM","PM"].filter(function(g){
+    return (typeof inBlock==="function") ? inBlock(c,g) : (c.b===g || c.b==="BOTH");
+  });
+}
+function gkLegacyDays(c){ var o=[]; for(var i=0;i<7;i++){ if(due(c,i)) o.push(i); } return o; }
+function gkLegacyLink(name,block,ok){
+  var best=null;
+  gkState.compounds.forEach(function(x){
+    if(x.name!==name || /^(calc|man)-/.test(x.id||"")) return;
+    if(ok && !ok[x.id]) return;
+    if(!best || (x.block===block && best.block!==block)) best=x;
+  });
+  return best;
+}
+function gkLegacyCard(r,g,ok){
+  var link=r.sa?null:gkLegacyLink(r.n,g,ok), days=gkLegacyDays(r);
+  if(link){ link.days=days.slice(); }   /* editor panel opens on the days actually shown */
+  return { id:link?link.id:("sa-"+String(r.sa||r.n)), legacy:true, name:r.n, vial:link?link.vial:"",
+           dose:"", unit:String(r.d||""), draw:String(r.u||""), recon:r.rec||"", days:days, block:g,
+           foundation:false, active:true };
+}
+function gkLegacyView(d){
+  var cur=gkLegacyCur(), ok=gkPlanIds(), on=schRows(), cards=[];
+  on.filter(function(c){ return due(c,d) && gkLegacyIn(c,cur); }).forEach(function(r){
+    gkLegacyBlocks(r).forEach(function(g){ cards.push(gkLegacyCard(r,g,ok)); });
+  });
+  /* Compounds the member added with the new editor since the migration. */
+  gkState.compounds.forEach(function(c){
+    if(/^(calc|man)-/.test(c.id||"") && c.active!==false && (c.days||[]).indexOf(d)>=0) cards.push(c);
+  });
+  var onN={}, seen={}, off=[];
+  on.forEach(function(c){ onN[c.n]=1; });
+  ALL.forEach(function(r){
+    if(onN[r.n] || seen[r.n]) return;
+    if(typeof cmpArch==="function" && cmpArch(r)) return;
+    if(!gkLegacyIn(r,cur)) return;
+    var l=gkLegacyLink(r.n,r.b,ok); if(!l) return;
+    seen[r.n]=1; off.push(l);
+  });
+  gkState.compounds.forEach(function(c){ if(/^(calc|man)-/.test(c.id||"") && c.active===false) off.push(c); });
+  return {due:cards, off:off};
+}
+function gkLegacySetOn(name,on){
+  if(!gkLegacyOK()) return;
+  var known=ALL.some(function(r){ return r.n===name; }); if(!known) return;
+  var st=schGet(); if(on) st[name]=1; else delete st[name];
+  schSave();
+}
+function gkLegacyEdit(c){
+  if(!gkLegacyOK() || !c || /^(calc|man)-/.test(c.id||"")) return;
+  var cur=gkLegacyCur(), row=null;
+  ALL.forEach(function(r){ if(!row && r.n===c.name && gkLegacyIn(r,cur)) row=r; });
+  if(!row) return;
+  var seed=(gkSeed.compounds||[]).filter(function(x){ return x.id===c.id; })[0]||{};
+  try{
+    if(typeof dpSet==="function"){
+      var proto=(typeof dpProto==="function"?dpProto(row):[]).join(), mine=(c.days||[]).slice().sort().join();
+      var own=(typeof dpOwn==="function")?dpOwn(row.n):null;
+      if(mine && mine!==proto) dpSet(row.n,c.days); else if(own) dpSet(row.n,null);
+    }
+    if(typeof schBlkGet==="function"){
+      var b=schBlkGet();
+      if(c.block && c.block!==seed.block) b[row.n]=c.block; else if(b[row.n]) delete b[row.n];
+      schSave();
+    }
+    if(typeof ovSet==="function"){
+      var changed=c.dose!==seed.dose || c.unit!==seed.unit || (c.draw||"")!==(seed.draw||"") || (c.recon||"")!==(seed.recon||"");
+      if(changed) ovSet(row.n,{d:gkFmt(c.dose)+" "+(String(c.unit).toLowerCase()==="iu"?"IU":c.unit), u:c.draw||"", rec:c.recon||""});
+      else if(typeof ovOwn==="function" && ovOwn(row.n)) ovSet(row.n,null);
+    }
+  }catch(e){}
+}
 function gkRender(){
   if(!document.getElementById("gkList")) return;
   gkArchiveIfDue();
@@ -289,10 +376,14 @@ function gkRender(){
     return '<button class="day'+(gkState.selected===i?" on":"")+'" data-gkday="'+i+'"><b>'+label.toUpperCase()+'</b></button>';
   }).join("");
   /* Only the current plan reaches the screen (see gkPlanFilter). */
-  var all=gkPlanFilter(gkState.compounds);
-  var onSched=all.filter(function(c){return c.active!==false;});
-  var dueNow=onSched.filter(function(c){return c.days.indexOf(gkState.selected)>=0;});
-  var off=all.filter(function(c){return c.active===false;});
+  var dueNow, off;
+  if(gkLegacyOK()){
+    var lv=gkLegacyView(gkState.selected); dueNow=lv.due; off=lv.off;
+  }else{
+    var all=gkPlanFilter(gkState.compounds);
+    dueNow=all.filter(function(c){return c.active!==false && c.days.indexOf(gkState.selected)>=0;});
+    off=all.filter(function(c){return c.active===false;});
+  }
   document.getElementById("gkSummary").textContent=dueNow.length+" due "+GK_DAY[gkState.selected]+" · off-days are hidden";
   var offHtml=off.length?(
     '<button type="button" class="gk-offtog" id="gkOffTog" onclick="gkToggleOff()">Not on schedule ('+off.length+')<span class="gk-offcv">›</span></button>'+
@@ -386,7 +477,7 @@ document.addEventListener("click",function(e){
   }
   if(t.dataset.gkrestore!=null){
     var cr=gkState.compounds.filter(function(x){return x.id===t.dataset.gkrestore;})[0]; if(!cr) return;
-    cr.active=true; cr.archivedOn=null; gkState.open=null; gkSave(true); gkRender(); gkToast(cr.name+" added back to your schedule."); return;
+    cr.active=true; cr.archivedOn=null; gkState.open=null; gkLegacySetOn(cr.name,true); gkSave(true); gkRender(); gkToast(cr.name+" added back to your schedule."); return;
   }
   if(t.dataset.gkmedremove!=null){
     var mr=null; (gkState.meds||[]).forEach(function(x){ if(x.id===t.dataset.gkmedremove) mr=x; });
@@ -410,7 +501,7 @@ document.addEventListener("click",function(e){
     c.days = c.days.indexOf(d)>=0 ? c.days.filter(function(x){return x!==d;}) : c.days.concat([d]);
     if(!c.days.length){ c.days=[d]; gkToast("Leave one day on, or remove it."); } }
   if(t.dataset.gkremove){
-    c.active=false; gkState.open=null; gkToast(c.name+" moved to All compounds \u2014 add it back anytime.");
+    c.active=false; gkState.open=null; gkLegacySetOn(c.name,false); gkToast(c.name+" moved to All compounds \u2014 add it back anytime.");
   }
   gkSave(mutates); gkRender();
 });
@@ -421,6 +512,12 @@ document.addEventListener("change",function(e){
 });
 
 var gkState = gkLoad();
+/* The legacy sync (csApply, the day/override/add merges) still calls
+   renderDoses() when the server copy arrives; route that to this schedule. */
+if(typeof renderDoses==="function"){
+  var gkRenderDosesOld=renderDoses;
+  renderDoses=function(){ try{ gkRenderDosesOld.apply(this,arguments); }catch(e){} try{ gkRender(); }catch(e){} };
+}
 if(document.readyState==="loading"){
   document.addEventListener("DOMContentLoaded", function(){ try{ gkRender(); }catch(e){ console.error(e); } });
 }else{

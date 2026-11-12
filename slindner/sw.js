@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /slindner/.
-const CACHE = 'slindner-c1-c7-paid-v1-20261111-sgk1-bioage1-extras1-dedupe1';
+const CACHE = 'slindner-c1-c7-paid-v1-20261111-sgk1-bioage1-extras1-dedupe1-legacy1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -11,8 +11,8 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=1',
-  '/schedule-engine.js?v=2',
-  '/schedule-editor.js?v=1',
+  '/schedule-engine.js?v=3',
+  '/schedule-editor.js?v=2',
   '/compound-library.js?v=2',
   '/slindner/',
   '/slindner/index.html',
