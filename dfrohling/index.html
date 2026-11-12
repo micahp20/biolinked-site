@@ -2296,6 +2296,15 @@ function schDefault(){
       }
     }
   }catch(e){}
+  /* Owner, 2026-11-12: this client's current cycle is supplied, so its
+     compounds start switched on when nothing is saved. Schedule default only;
+     invoices, totals and paid amounts are unchanged. */
+  try{
+    var _L=cycList(), _cur=null;
+    for(var _i=0;_i<_L.length;_i++){ if(!_L[_i].future && !_L[_i].arch){ _cur=_L[_i].n; break; } }
+    if(!_cur && _L.length) _cur=_L[0].n;
+    if(_cur) ALL.forEach(function(c){ if(!cmpArch(c) && cycHas(c,_cur)) o[c.n]=1; });
+  }catch(e){}
   return o;
 }
 function schLoad(){
