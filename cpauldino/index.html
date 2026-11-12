@@ -1513,6 +1513,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&amp;family=Outfit:wght@300;400;500;600&amp;display=swap" rel="stylesheet">
 <style id="p0-disc">.p0-disc{font-size:14px;line-height:1.4;text-align:center;padding:8px 12px;background:var(--cream,#f5f1e8);color:var(--ink,#1a1a1a);border-bottom:1px solid var(--line,#ddd)}.p0-disc.bot{border-top:1px solid var(--line,#ddd);border-bottom:0;margin-top:24px}</style><style id="p0-shell">@media(max-width:767px){.tabs .tab[data-v="pay"]{display:none!important}.tabs .tab{min-height:56px;font-size:13px}.top{min-height:56px;max-height:64px;padding-top:6px!important;padding-bottom:6px!important;box-sizing:border-box}.top .brand small{display:none}}</style><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Montserrat:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"><link rel="stylesheet" href="/bl-client-skin.css?v=4">
 <script src="/calc-feedback.js?v=1"></script>
+<script src="/bio-age.js?v=2"></script>
 </head>
 <body class="erica-tab-consistency"><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
@@ -2260,12 +2261,15 @@ function go(v){
 /* ---------- LABS (shared, data-driven) ----------
    One renderer for every page. LABS is null on a client with no bloodwork,
    in which case the static empty state already in the markup is left alone. */
+/* Biological age (PhenoAge) inputs: copied from this page's own lab rows; age only from a lab report. Missing = "Needs" card. */
+var BIOAGE_CFG={"m": {"albumin": {"v": 4.8, "u": "g/dL"}, "creatinine": {"v": 0.79, "u": "mg/dL"}, "glucose": {"v": 77, "u": "mg/dL"}, "crp": {"v": 0.2, "bound": "<", "u": "mg/L"}, "lymph": {"v": 38.4, "u": "%"}, "mcv": {"v": 94.0, "u": "fL"}, "rdw": {"v": 12.7, "u": "%"}, "alp": {"v": 49, "u": "U/L"}, "wbc": {"v": 4.7, "u": "K/uL"}}};
 function renderLabs(){
   var host=document.getElementById('labsbody');
   if(!host||typeof LABS==='undefined'||!LABS) return;
   var o=[];
   o.push('<h1 class="scrn">Labs</h1>');
   o.push('<p class="sub">'+LABS.sub+'</p>');
+  if(window.BioAge&&typeof BIOAGE_CFG!=='undefined') o.push(BioAge.renderCard(BIOAGE_CFG));
   if(typeof DEXA!=='undefined'&&DEXA) o.push(DEXA);
   if(LABS.score){
     o.push('<div class="score">');
