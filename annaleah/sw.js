@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /annaleah/.
-const CACHE = 'annaleah-reta-klow-v1-20261110-sgk1-extras1';
+const CACHE = 'annaleah-reta-klow-v1-20261110-sgk1-extras1-dedupe1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -10,7 +10,7 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=1',
-  '/schedule-engine.js?v=1',
+  '/schedule-engine.js?v=2',
   '/schedule-editor.js?v=1',
   '/compound-library.js?v=2',
   '/annaleah/',
