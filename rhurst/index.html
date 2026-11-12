@@ -1420,15 +1420,14 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       </div>
       
     </div></section>
-    <section class="view" id="v-sched"><div class="pad">
-      <h1 class="scrn" id="greet">Schedule</h1>
-      <div class="cs-stat" id="csstat"></div>
-      <p class="sub" id="subline"></p>
-      <div id="duebar"></div>
-      <div class="days" id="daystrip"></div>
-      <div id="doses"></div>
-      <p class="note" id="dosenote"></p>
-    </div></section>
+    <section class="view" id="v-sched"><div class="pad"><div class="gk">
+      <h1 class="gk-h" id="gkGreet">Schedule</h1>
+      <p class="gk-sub" id="gkSummary"></p>
+      <div class="gk-note" id="gkNote" hidden></div>
+      <div class="gk-days" id="gkDayStrip"></div>
+      <button class="pc-add" id="gkAddBtn" type="button">+ Add compound</button>
+      <div id="gkList"></div>
+    </div></div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
       <p class="sub">Log meals in a few taps. Your numbers and targets sit further down. <span class="wk-sync" id="n2sync"></span></p>
@@ -1829,6 +1828,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
     
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
+  <div class="gk-toast" id="gkToast"></div>
 </div>
 <script>
 var CMP=[{"n":"Retatrutide · 30 mg","b":"AM","cad":"MTH","c":"Mon / Thu","d":"2 mg (wk 1–2) → 2.5 mg (wk 3–4) → 3 mg (wk 5–6)","u":"20u → 25u → 30u","rec":"3 mL BAC water per vial · gives 10 mg/mL","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Retatrutide.</strong> An investigational medicine that activates GIP, GLP-1 and glucagon receptors, studied for effects on appetite, body weight and blood-sugar regulation.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Retatrutide is the appetite and metabolic-receptor component.</p><details class=\"bl-compound-notes\"><summary>Your existing protocol notes</summary><div>6 vials of 30 mg. Twice weekly, Monday and Thursday AM. Weeks 1–2: 2 mg (20u) per shot, 4 mg/week. Weeks 3–4: 2.5 mg (25u), 5 mg/week. Weeks 5–6: 3 mg (30u), 6 mg/week, only if tolerated.</div></details>","tag":"Active","days":[1,4]},{"n":"Tesamorelin · 20 mg","b":"PM","cad":"MF","c":"Mon-Fri","d":"2 mg","u":"20u","rec":"2 mL BAC water per vial · gives 10 mg/mL","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Tesamorelin.</strong> A growth hormone-releasing hormone (GHRH) analogue that stimulates pituitary growth hormone release.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Tesamorelin acts through the GHRH pathway, upstream of growth hormone.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"MOTS-c · 40 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"2 mg","u":"15u","rec":"3 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>MOTS-c.</strong> A peptide encoded by mitochondrial DNA, studied for cellular fuel-use and stress-response signalling, including pathways associated with AMPK.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> MOTS-c is studied as a signal affecting how cells handle fuel.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"KLOW Blend · 80 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"4 mg","u":"15u","rec":"3 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>KLOW.</strong> A four-peptide blend listed in this protocol as GHK-Cu, BPC-157, TB-500 and KPV. These ingredients are studied for different aspects of tissue and inflammatory signalling.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> KLOW provides the tissue-response research component, with copper-peptide, tissue-signalling and inflammation-related ingredients in one blend.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"5-Amino-1MQ · 50 mg","b":"AM","cad":"MF","c":"Mon-Fri","d":"~1.67 mg","u":"10u","rec":"3 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>5-Amino-1MQ.</strong> A research compound that inhibits NNMT, an enzyme involved in nicotinamide metabolism and cellular methyl-group use.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> 5-Amino-1MQ targets NNMT-related metabolism, a different research question from appetite-receptor signalling.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"DSIP · 10 mg","b":"PM","cad":"PRN","c":"As needed","d":"500 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>DSIP.</strong> Delta sleep-inducing peptide is a small peptide investigated in sleep and stress research. Human clinical evidence remains limited.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> DSIP adds a sleep-related research component.</p>","tag":"Active","days":[]},{"n":"BPC-157 · 10 mg","b":"PM","cad":"MF","c":"Mon-Fri","d":"1 mg","u":"10u","rec":"1 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>BPC-157.</strong> An experimental peptide studied mainly in laboratory and animal models of tissue injury and gastrointestinal biology. Human safety and effectiveness are not well established.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> BPC-157 is the tissue-response research component.</p>","tag":"Active","days":[1,2,3,4,5]}];
@@ -3180,12 +3180,12 @@ function payCopyFallback(text,done){
 }
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
-(function(){var h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Ronda';
-  renderSubline();})();
+(function(){var ge=document.getElementById('greet'); if(ge){ var h=new Date().getHours();
+  ge.textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Ronda'; }
+  if(typeof renderSubline==='function') try{ renderSubline(); }catch(e){} })();
 
 function renderDue(){
-  var host=document.getElementById('duebar');
+  var host=document.getElementById('duebar'); if(!host) return;
   var unpaid=INV.filter(function(o){return o.status==='due'});
   if(!unpaid.length){host.innerHTML='';return;}
   var t=unpaid.reduce(function(a,x){return a+x.total},0);
@@ -3193,6 +3193,7 @@ function renderDue(){
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
 function renderDays(){
+  if(!document.getElementById('daystrip')) return;
   /* Days only, no calendar dates: a client rarely starts on the date shown,
      so a real date reads as a promise the schedule is not making. What matters
      is which weekdays carry a draw. "Today" is still marked, by weekday. */
@@ -3212,11 +3213,11 @@ function renderDoses(){
   /* Only what the client has switched on, across whatever cycles, and only
      what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
-  var host=document.getElementById('doses');
+  var host=document.getElementById('doses'); if(!host) return;
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
       ' is clear. Nothing is on your schedule for this day.</div></div>';
-    document.getElementById('dosenote').textContent='';return;
+    var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent='';return;
   }
   var h='', total=0;
   [['AM','Morning'],['PM','Night']].forEach(function(g){
@@ -3234,7 +3235,7 @@ function renderDoses(){
     h+='</div>';
   });
   host.innerHTML=h;
-  document.getElementById('dosenote').textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
+  var _dn2=document.getElementById('dosenote'); if(_dn2) _dn2.textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
     '. This is a read-only view of your schedule.';
 }
 
@@ -7573,3 +7574,9 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 <script src="/protocol-context.js?v=1"></script>
 <link rel="stylesheet" href="/portal-plan-controls.css?v=2">
 <script src="/portal-plan-controls.js?v=2"></script>
+
+
+<link rel="stylesheet" href="/rhurst/protocol-consistency.css?v=1">
+<link rel="stylesheet" href="/client-schedule-controls.css?v=1">
+<script src="/rhurst/schedule-engine.js?v=1"></script>
+<script src="/rhurst/schedule-editor.js?v=1"></script>
