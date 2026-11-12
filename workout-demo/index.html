@@ -1382,14 +1382,15 @@ html:root .snav.on svg,html:root .snav:hover svg{stroke:#CFB87C!important}
         <li><b>Recheck your labs periodically</b> so your protocol can be adjusted. Your Labs tab tracks it.</li>
       </ul>
     </div></section>
-    <section class="view" id="v-sched"><div class="pad">
-      <h1 class="scrn" id="greet">Schedule</h1>
-      <div class="cs-stat" id="csstat"></div>
-      <p class="sub" id="subline"></p>
+    <section class="view" id="v-sched"><div class="pad"><div class="gk">
+      <h1 class="gk-h" id="gkGreet">Schedule</h1>
+      <p class="gk-sub" id="gkSummary"></p>
+      <div class="gk-note" id="gkNote" hidden></div>
+      <div class="gk-days" id="gkDayStrip"></div>
+      <button class="pc-add" id="gkAddBtn" type="button">+ Add compound</button>
+      <div id="gkList"></div>
+    </div>
       <div id="duebar"></div>
-      <div class="days" id="daystrip"></div>
-      <div id="doses"></div>
-      <p class="note" id="dosenote"></p>
       <div class="seclbl">All Compounds<span class="cnt" id="allcount"></span></div>
       <div id="cmplist"></div>
       <p class="note">Every compound across your cycles. Tap one to see reconstitution (mixing with BAC water), draw, injection site and timing.</p>
@@ -1790,6 +1791,7 @@ html:root .snav.on svg,html:root .snav:hover svg{stroke:#CFB87C!important}
     <button class="tab" data-v="pay" onclick="go('pay')"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20"/></svg>Invoice</button>
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
+  <div class="gk-toast" id="gkToast"></div>
 </div>
 <script>
 var CMP=[{"n":"Retatrutide · 30 mg","b":"AM","cad":"MON","c":"Mon","d":"0.5 mg","u":"5u","rec":"3 mL BAC water","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Retatrutide.</strong> An investigational medicine that activates GIP, GLP-1 and glucagon receptors, studied for effects on appetite, body weight and blood-sugar regulation.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Retatrutide is the appetite and metabolic-receptor component.</p><details class=\"bl-compound-notes\"><summary>Your existing protocol notes</summary><div>30 mg in 3 mL is 10 mg/mL, so a 5u draw is 0.5 mg. Start at 0.5 mg and titrate up slowly.</div></details>","tag":"Cycle 1","days":[1]},{"n":"Tesamorelin · 20 mg","b":"PM","cad":"MF","c":"Mon–Fri","d":"1 mg","u":"10u","rec":"2 mL BAC water","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Tesamorelin.</strong> A growth hormone-releasing hormone (GHRH) analogue that stimulates pituitary growth hormone release.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Tesamorelin acts through the GHRH pathway, upstream of growth hormone.</p><details class=\"bl-compound-notes\"><summary>Your existing protocol notes</summary><div>20 mg in 2 mL is 10 mg/mL, so a 10u draw is 1 mg.</div></details>","tag":"Cycle 1","days":[1,2,3,4,5]},{"n":"MOTS-c · 40 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"~1.33 mg","u":"10u","rec":"3 mL BAC water","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>MOTS-c.</strong> A peptide encoded by mitochondrial DNA, studied for cellular fuel-use and stress-response signalling, including pathways associated with AMPK.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> MOTS-c is studied as a signal affecting how cells handle fuel.</p><details class=\"bl-compound-notes\"><summary>Your existing protocol notes</summary><div>40 mg in 3 mL is 13.3 mg/mL, so a 10u draw is about 1.33 mg.</div></details>","tag":"Cycle 1","days":[1,3,5]},{"n":"NAD+ · 1000 mg","b":"AM","cad":"MWF","c":"Mon / Wed / Fri","d":"50 mg","u":"25u","rec":"5 mL BAC water","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>NAD+.</strong> Nicotinamide adenine dinucleotide is a cofactor used in cellular energy reactions and by enzymes involved in DNA repair and other processes. Its natural role does not by itself establish the benefit of injections.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> NAD+ adds the cellular energy-reaction cofactor component.</p><details class=\"bl-compound-notes\"><summary>Your existing protocol notes</summary><div>1000 mg in 5 mL is 200 mg/mL, so a 25u draw is 50 mg.</div></details>","tag":"Cycle 1","days":[1,3,5]}];
@@ -2100,18 +2102,18 @@ function payCopyFallback(text,done){
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
 (function(){var h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', John';
+  var _g=document.getElementById('greet'); if(_g)_g.textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', John';
   renderSubline();})();
 
 function renderDue(){
-  var host=document.getElementById('duebar');
+  var host=document.getElementById('duebar'); if(!host) return;
   var unpaid=INV.filter(function(o){return o.status==='due'});
   if(!unpaid.length){host.innerHTML='';return;}
   var t=unpaid.reduce(function(a,x){return a+x.total},0);
   host.innerHTML='<div class="duebar" onclick="go(\'pay\')"><span>'+unpaid[0].label+' · '+unpaid[0].summary+
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
-function renderDays(){
+function renderDays(){ if(!document.getElementById('daystrip')) return;
   /* Days only, no calendar dates -- a client rarely starts on the date shown.
      Today is still marked, by weekday. */
   var now=new Date();
@@ -2126,14 +2128,14 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
 /* A compound tagged BOTH (Ipamorelin) is a real second shot, so it shows in the
    Morning block and again in the Night block. */
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
-function renderDoses(){
+function renderDoses(){ if(!document.getElementById('doses')) return;
   /* Only what the client has on their schedule, and only what is due today. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
   var host=document.getElementById('doses');
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
       ' is clear, the weekday and Mon/Wed/Fri compounds are off and there is no nightly block today.</div></div>';
-    document.getElementById('dosenote').textContent='';return;
+    var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent='';return;
   }
   var h='', total=0;
   [['AM','Morning'],['PM','Night']].forEach(function(g){
@@ -2151,7 +2153,7 @@ function renderDoses(){
     h+='</div>';
   });
   host.innerHTML=h;
-  document.getElementById('dosenote').textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
+  var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
     '. This is a read-only view of your schedule.';
 }
 
@@ -6249,3 +6251,13 @@ try{ apD(); }catch(e){}
 <script src="/protocol-context.js?v=1"></script>
 <link rel="stylesheet" href="/portal-plan-controls.css?v=2">
 <script src="/portal-plan-controls.js?v=2"></script>
+<link rel="stylesheet" href="/schedule-protocol-consistency.css?v=1">
+<link rel="stylesheet" href="/client-schedule-controls.css?v=1">
+<script>
+var GK_STORAGE="biolinked-sched-workout-demo-gk-v1";
+var GK_PROTOCOL_REV=1;
+var gkSeed={"member":"John","protocolRev":1,"selected":new Date().getDay(),"view":"schedule","open":null,"compounds":[{"id":"retatrutide","name":"Retatrutide · 30 mg","vial":"30 mg","dose":0.5,"step":0.25,"unit":"mg","draw":"5u","recon":"3 mL BAC water","block":"AM","days":[1],"foundation":false,"active":true},{"id":"tesamorelin","name":"Tesamorelin · 20 mg","vial":"20 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"10u","recon":"2 mL BAC water","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"mots-c","name":"MOTS-c · 40 mg","vial":"40 mg","dose":1.33,"step":0.25,"unit":"mg","draw":"10u","recon":"3 mL BAC water","block":"AM","days":[1,3,5],"foundation":false,"active":true},{"id":"nad","name":"NAD+ · 1000 mg","vial":"1000 mg","dose":50.0,"step":1,"unit":"mg","draw":"25u","recon":"5 mL BAC water","block":"AM","days":[1,3,5],"foundation":false,"active":true},{"id":"cjc-ipa","name":"CJC-1295 / Ipamorelin · 5+5 mg","vial":"5 mg","dose":null,"step":0.25,"unit":"mg","draw":"10u","recon":"2 mL BAC water","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"igf-1-lr3","name":"IGF-1 LR3 · 1 mg","vial":"1 mg","dose":50.0,"step":25,"unit":"mcg","draw":"5u","recon":"1 mL BAC water","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"klow","name":"KLOW · 80 mg","vial":"80 mg","dose":4.0,"step":0.5,"unit":"mg","draw":"15u","recon":"3 mL BAC water","block":"PM","days":[1,3,5],"foundation":false,"active":true},{"id":"aod-9604","name":"AOD-9604 · 5 mg","vial":"5 mg","dose":250.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"5-amino-1mq","name":"5-Amino-1MQ · 50 mg","vial":"50 mg","dose":1.67,"step":0.25,"unit":"mg","draw":"10u","recon":"3 mL BAC water","block":"AM","days":[1,3,5],"foundation":false,"active":true},{"id":"bpc-157-tb-500","name":"BPC-157 + TB-500 · 10 mg","vial":"10 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"20u","recon":"2 mL BAC water","block":"PM","days":[1,3,5],"foundation":false,"active":true},{"id":"cartalax","name":"Cartalax · 20 mg","vial":"20 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"10u","recon":"2 mL BAC water","block":"PM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"kpv","name":"KPV · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water","block":"AM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"ghk-cu","name":"GHK-Cu · 50 mg","vial":"50 mg","dose":1.7,"step":0.25,"unit":"mg","draw":"10u","recon":"3 mL BAC water","block":"AM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"cortagen","name":"Cortagen · 20 mg","vial":"20 mg","dose":2.0,"step":0.5,"unit":"mg","draw":"20u","recon":"2 mL BAC water","block":"AM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"foxo4-dri","name":"FOXO4-DRI · 10 mg","vial":"10 mg","dose":3.0,"step":0.5,"unit":"mg","draw":"60u","recon":"2 mL BAC water","block":"AM","days":[1,3,5],"foundation":false,"active":true},{"id":"glutathione","name":"Glutathione · 1500 mg","vial":"1500 mg","dose":150.0,"step":1,"unit":"mg","draw":"50u","recon":"5 mL BAC water","block":"AM","days":[1],"foundation":false,"active":true},{"id":"cerebrolysin","name":"Cerebrolysin · 60 mg","vial":"60 mg","dose":6.0,"step":0.5,"unit":"mg","draw":"20u","recon":"2 mL BAC water","block":"AM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"dsip","name":"DSIP · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"epithalon","name":"Epithalon · 50 mg","vial":"50 mg","dose":2.5,"step":0.25,"unit":"mg","draw":"15u","recon":"3 mL BAC water","block":"PM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"pinealon","name":"Pinealon · 10 mg","vial":"10 mg","dose":2.0,"step":0.5,"unit":"mg","draw":"20u","recon":"1 mL BAC water","block":"PM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"n-acetyl-selank-amidate","name":"N-Acetyl Selank Amidate · 30 mg","vial":"30 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"10u","recon":"3 mL BAC water","block":"PM","days":[1,3,5],"foundation":false,"active":true}]};
+</script>
+<script src="/schedule-engine.js?v=1"></script>
+<script src="/schedule-editor.js?v=1"></script>
+

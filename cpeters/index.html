@@ -1419,14 +1419,15 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
       </div>
       
     </div></section>
-    <section class="view" id="v-sched"><div class="pad">
-      <h1 class="scrn" id="greet">Schedule</h1>
-      <div class="cs-stat" id="csstat"></div>
-      <p class="sub" id="subline"></p>
+    <section class="view" id="v-sched"><div class="pad"><div class="gk">
+      <h1 class="gk-h" id="gkGreet">Schedule</h1>
+      <p class="gk-sub" id="gkSummary"></p>
+      <div class="gk-note" id="gkNote" hidden></div>
+      <div class="gk-days" id="gkDayStrip"></div>
+      <button class="pc-add" id="gkAddBtn" type="button">+ Add compound</button>
+      <div id="gkList"></div>
+    </div>
       <div id="duebar"></div>
-      <div class="days" id="daystrip"></div>
-      <div id="doses"></div>
-      <p class="note" id="dosenote"></p>
     </div></section>
     <section class="view" id="v-nutr"><div class="pad">
       <h1 class="scrn">Nutrition</h1>
@@ -1828,6 +1829,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
     
     <button class="tab" data-v="more" onclick="go('more')"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/></svg>More</button>
   </nav>
+  <div class="gk-toast" id="gkToast"></div>
 </div>
 <script>
 var CMP=[{"n":"CJC-1295 + Ipamorelin · 5 mg + 5 mg","b":"BOTH","cad":"MF","c":"Mon-Fri","d":"250 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>CJC-1295 / ipamorelin.</strong> Two growth-hormone-releasing peptides: CJC-1295 acts through the growth hormone-releasing hormone pathway, and ipamorelin acts through the ghrelin receptor.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> CJC-1295 / ipamorelin pairs two signals involved in growth hormone release; this is different from administering growth hormone itself.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"Epitalon · 50 mg","b":"BOTH","cad":"MF","c":"Mon-Fri","d":"5 mg","u":"20u","rec":"2 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Epitalon (epithalon).</strong> A four-amino-acid research peptide investigated in cellular-aging and pineal-function research. Longevity benefits in humans are not established.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Epitalon (epithalon) adds a cellular-aging/pineal research component.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"Pinealon · 10 mg","b":"BOTH","cad":"MF","c":"Mon-Fri","d":"2 mg","u":"20u","rec":"1 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Pinealon.</strong> A three-amino-acid bioregulator peptide studied in neuronal and cellular-stress research.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Pinealon adds a neuronal-stress research component.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"BPC-157 · 10 mg","b":"BOTH","cad":"MF","c":"Mon-Fri","d":"1 mg","u":"20u","rec":"2 mL BAC water per vial","site":"Subq, abdomen (lower abdomen for gut targeting)","about":"<p class=\"bl-compound-definition\"><strong>BPC-157.</strong> An experimental peptide studied mainly in laboratory and animal models of tissue injury and gastrointestinal biology. Human safety and effectiveness are not well established.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> BPC-157 is the tissue-response research component.</p>","tag":"Active","days":[1,2,3,4,5]},{"n":"DSIP · 5 mg","b":"PM","cad":"PRN","c":"As needed","d":"","u":"","rec":"2 mL BAC water","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>DSIP.</strong> Delta sleep-inducing peptide is a small peptide investigated in sleep and stress research. Human clinical evidence remains limited.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> DSIP adds a sleep-related research component.</p>","tag":"Active","days":[]},{"n":"Selank · 10 mg","cad":"PRN","c":"As needed","d":"1 mg","u":"20u","rec":"2 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Selank.</strong> A synthetic tuftsin-related peptide studied for anxiety-related and nervous-system signalling.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Selank adds an anxiety/stress-signalling research component.</p>","tag":"Active","b":"AM","days":[]},{"n":"PT-141 (Bremelanotide) · 10 mg","b":"BOTH","cad":"MTH","c":"Mon + Thu","d":"500 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>PT-141 (bremelanotide).</strong> A melanocortin-receptor agonist with central effects on sexual-desire signalling.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> PT-141 (bremelanotide) provides the melanocortin sexual-signalling component.</p>","tag":"Active","days":[1,4]},{"n":"Kisspeptin-10 · 10 mg","b":"BOTH","cad":"MF","c":"Mon-Fri","d":"500 mcg","u":"10u","rec":"2 mL BAC water per vial","site":"SubQ","about":"<p class=\"bl-compound-definition\"><strong>Kisspeptin.</strong> A naturally occurring reproductive-signalling peptide that acts upstream of GnRH, LH and FSH release.</p><p class=\"bl-compound-role\"><strong>Role in this plan:</strong> Kisspeptin adds an upstream reproductive-hormone signalling component.</p>","tag":"Active","days":[1,2,3,4,5]}];
@@ -2141,18 +2143,18 @@ function payCopyFallback(text,done){
 
 /* ---------- SCHEDULE (day view + compounds) ---------- */
 (function(){var h=new Date().getHours();
-  document.getElementById('greet').textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Corrina';
+  var _g=document.getElementById('greet'); if(_g)_g.textContent=(h<12?'Good morning':(h<18?'Good afternoon':'Good evening'))+', Corrina';
   renderSubline();})();
 
 function renderDue(){
-  var host=document.getElementById('duebar');
+  var host=document.getElementById('duebar'); if(!host) return;
   var unpaid=INV.filter(function(o){return o.status==='due'});
   if(!unpaid.length){host.innerHTML='';return;}
   var t=unpaid.reduce(function(a,x){return a+x.total},0);
   host.innerHTML='<div class="duebar" onclick="go(\'pay\')"><span>'+unpaid[0].label+' · '+unpaid[0].summary+
     '</span><span class="amt">$'+t.toFixed(0)+'</span></div>';
 }
-function renderDays(){
+function renderDays(){ if(!document.getElementById('daystrip')) return;
   /* Days only, no calendar dates: a client rarely starts on the date shown,
      so a real date reads as a promise the schedule is not making. What matters
      is which weekdays carry a draw. "Today" is still marked, by weekday. */
@@ -2168,7 +2170,7 @@ function pickDay(i){sel=i;renderDays();renderDoses();}
 /* A compound tagged BOTH (Ipamorelin) is a real second shot, so it shows in the
    Morning block and again in the Night block. */
 function inBlock(c,g){var b=(typeof schBlk==='function'?schBlk(c):c.b);return b===g||b==='BOTH';}
-function renderDoses(){
+function renderDoses(){ if(!document.getElementById('doses')) return;
   /* Only what the client has switched on, across whatever cycles, and only
      what is due today. A cycle that is off never reaches the day view. */
   var _cur=(typeof cycCurrent==="function")?cycCurrent():null; var rows=schRows().filter(function(c){return due(c,sel)&&(!_cur||(typeof cycHas==="function"?cycHas(c,_cur):true));});
@@ -2176,7 +2178,7 @@ function renderDoses(){
   if(!rows.length){
     host.innerHTML='<div class="empty"><div class="t">Nothing scheduled</div><div class="d">'+FULL[sel]+
       ' is clear. Nothing is on your schedule for this day.</div></div>';
-    document.getElementById('dosenote').textContent='';return;
+    var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent='';return;
   }
   var h='', total=0;
   [['AM','Morning'],['PM','Night']].forEach(function(g){
@@ -2194,7 +2196,7 @@ function renderDoses(){
     h+='</div>';
   });
   host.innerHTML=h;
-  document.getElementById('dosenote').textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
+  var _dn=document.getElementById('dosenote'); if(_dn) _dn.textContent=total+' draw'+(total===1?'':'s')+' on '+FULL[sel]+
     '. This is a read-only view of your schedule.';
 }
 
@@ -6533,3 +6535,13 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 <script src="/protocol-context.js?v=1"></script>
 <link rel="stylesheet" href="/portal-plan-controls.css?v=2">
 <script src="/portal-plan-controls.js?v=2"></script>
+<link rel="stylesheet" href="/schedule-protocol-consistency.css?v=1">
+<link rel="stylesheet" href="/client-schedule-controls.css?v=1">
+<script>
+var GK_STORAGE="biolinked-sched-cpeters-gk-v1";
+var GK_PROTOCOL_REV=1;
+var gkSeed={"member":"Corrina","protocolRev":1,"selected":new Date().getDay(),"view":"schedule","open":null,"compounds":[{"id":"cjc-1295-ipamorelin-am","name":"CJC-1295 + Ipamorelin · 5 mg + 5 mg","vial":"5 mg","dose":250.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"cjc-1295-ipamorelin-pm","name":"CJC-1295 + Ipamorelin · 5 mg + 5 mg","vial":"5 mg","dose":250.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"epitalon-am","name":"Epitalon · 50 mg","vial":"50 mg","dose":5.0,"step":0.5,"unit":"mg","draw":"20u","recon":"2 mL BAC water per vial","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"epitalon-pm","name":"Epitalon · 50 mg","vial":"50 mg","dose":5.0,"step":0.5,"unit":"mg","draw":"20u","recon":"2 mL BAC water per vial","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"pinealon-am","name":"Pinealon · 10 mg","vial":"10 mg","dose":2.0,"step":0.5,"unit":"mg","draw":"20u","recon":"1 mL BAC water per vial","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"pinealon-pm","name":"Pinealon · 10 mg","vial":"10 mg","dose":2.0,"step":0.5,"unit":"mg","draw":"20u","recon":"1 mL BAC water per vial","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"bpc-157-am","name":"BPC-157 · 10 mg","vial":"10 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"20u","recon":"2 mL BAC water per vial","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"bpc-157-pm","name":"BPC-157 · 10 mg","vial":"10 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"20u","recon":"2 mL BAC water per vial","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"dsip","name":"DSIP · 5 mg","vial":"5 mg","dose":null,"step":0.25,"unit":"mg","draw":"","recon":"2 mL BAC water","block":"PM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"selank","name":"Selank · 10 mg","vial":"10 mg","dose":1.0,"step":0.25,"unit":"mg","draw":"20u","recon":"2 mL BAC water per vial","block":"AM","days":[0,1,2,3,4,5,6],"foundation":false,"active":true},{"id":"pt-141-bremelanotide-am","name":"PT-141 (Bremelanotide) · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"AM","days":[1,4],"foundation":false,"active":true},{"id":"pt-141-bremelanotide-pm","name":"PT-141 (Bremelanotide) · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"PM","days":[1,4],"foundation":false,"active":true},{"id":"kisspeptin-10-am","name":"Kisspeptin-10 · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"AM","days":[1,2,3,4,5],"foundation":false,"active":true},{"id":"kisspeptin-10-pm","name":"Kisspeptin-10 · 10 mg","vial":"10 mg","dose":500.0,"step":50,"unit":"mcg","draw":"10u","recon":"2 mL BAC water per vial","block":"PM","days":[1,2,3,4,5],"foundation":false,"active":true}]};
+</script>
+<script src="/schedule-engine.js?v=1"></script>
+<script src="/schedule-editor.js?v=1"></script>
+
