@@ -790,7 +790,7 @@ async function loadAll(){
     sb(CFG.TABLES.products,  "?select=*&order=name"),
     sb(CFG.TABLES.orders,    "?select=*&order=date.desc"),
     sb(CFG.TABLES.sales,     "?select=*&order=date.desc"),
-    sb(CFG.TABLES.clients,   "?select=*&order=name"),
+    sb(CFG.TABLES.clients,   "?select=id,name,venmo_handle,notes,last_contacted_at,created_at&order=name"),
     sb(CFG.TABLES.vendors,   "?select=*&order=name")
   ]);
   state.inventory = inv;
@@ -1197,7 +1197,7 @@ function renderPeople(){
   tbody.innerHTML = rows.map(p=>`
     <tr>
       <td><strong>${p.name||""}</strong></td>
-      <td>${p.email||""} ${p.phone?` · ${p.phone}`:""}</td>
+      <td>${isClients ? (p.venmo_handle||"") : `${p.email||""} ${p.phone?` · ${p.phone}`:""}`}</td>
       <td class="num gold">${fmt$(p._total)}</td>
       <td class="num">${p._tx}</td>
       <td>${p._last?fmtDate(new Date(p._last)):"—"}</td>
@@ -1395,10 +1395,7 @@ function buildForm(kind){
 
   if(kind==="client") return `
     <div class="field"><label>Client Name</label><input id="f-name" autofocus></div>
-    <div class="field-row">
-      <div class="field"><label>Email</label><input id="f-email" type="email"></div>
-      <div class="field"><label>Phone</label><input id="f-phone"></div>
-    </div>
+    <div class="field"><label>Cell &amp; email</label><div style="font-size:13px;opacity:.8;">Kept private on the <a href="/admin-customers.html" style="color:var(--gold);">Customers</a> page (sign-in required).</div></div>
     <div class="field"><label>Venmo Handle</label><input id="f-venmo" placeholder="@handle"></div>
     <div class="field"><label>Notes</label><input id="f-note"></div>`;
 
@@ -1430,6 +1427,9 @@ function onOrderProductChange(){
 
 // ===== SUPABASE WRITE HELPERS =====
 async function sbWrite(table, method, body, query=""){
+  // pl_clients phone/email/consent are private (admin-customers.html, signed-in RPCs only),
+  // so ask for the public columns back instead of the default "*".
+  if (table === CFG.TABLES.clients) query += (query ? "&" : "?") + "select=id,name,venmo_handle,notes,last_contacted_at,created_at";
   const url = `${CFG.SUPABASE_URL}/rest/v1/${table}${query}`;
   const res = await fetch(url, {
     method,
@@ -1676,8 +1676,6 @@ async function saveModal(){
       if (!name) { alert("Client name required."); return; }
       const body = {
         name,
-        email: vTrim("f-email") || null,
-        phone: vTrim("f-phone") || null,
         venmo_handle: vTrim("f-venmo") || null,
         notes: vTrim("f-note") || null
       };

@@ -2,6 +2,10 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## Private Customers page — 2026-11-13
+- /admin-customers.html is the only place client cell/email/text consent are read or edited. Real auth: Supabase email+password; admins = app_private.bl_admins (micahpauldino@gmail.com, biolinkedsolutions@gmail.com). Never put contact info in static files; never grant anon select on pl_clients phone/email/sms_* columns. Texting (Twilio) is a later task: only text rows with sms_consent = true and sms_opted_out = false.
+- The Admin Hub's own password gate (admin.html) is client-side only and is not security; the P&L tables other than pl_clients contact columns are still fully open to the anon key (see tools/supabase/02_pl_tables_lockdown_OPTIONAL.sql).
+
 ## Standing rule: every compound gets a real explanation — 2026-11-12
 - Owner: one-word "What this compound is" text is unacceptable. The schedule editor reads /protocol-copy.js (BLProtocolCopy.find by name regex); only if nothing matches does it fall back to the one-word BL_DOSING purpose. When a client gets a compound with no protocol-copy.js entry, add one: 2–3 plain-English sentences (what it is, what it is used/studied for, evidence caveat), no doses. Vilon added and the mpauldino compounds expanded (PR #196); all 58 entries brought to standard on 2026-11-13. compound-library.js still lists 52 compounds with no protocol-copy entry (none on any client schedule yet): add one before that compound goes on a schedule.
 
