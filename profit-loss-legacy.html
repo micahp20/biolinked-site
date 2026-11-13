@@ -976,6 +976,8 @@ const SUPA_URL = 'https://bfjydzealeethhcpdfxl.supabase.co';
 const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
 
 async function supa(table, method, body, query='') {
+  // pl_clients phone/email are private now (see /admin-customers.html): never ask for "*".
+  if (table === 'pl_clients' && !/[?&]select=/.test(query)) query += (query ? '&' : '?') + 'select=id,name,venmo_handle,notes,last_contacted_at,created_at';
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}${query}`, {
     method,
     headers: {
@@ -1053,7 +1055,7 @@ async function loadAll() {
       supa('pl_products', 'GET', null, '?order=name.asc'),
       supa('pl_orders',   'GET', null, '?order=date.desc'),
       supa('pl_sales',    'GET', null, '?order=date.desc'),
-      supa('pl_clients',  'GET', null, '?order=name.asc'),
+      supa('pl_clients',  'GET', null, '?select=id,name,venmo_handle,notes,last_contacted_at,created_at&order=name.asc'),
       supa('pl_vendors',  'GET', null, '?order=name.asc')
     ]);
     items = inv.map(r => ({
@@ -2319,8 +2321,6 @@ async function saveClient() {
   if (!name) { document.getElementById('cName').focus(); return; }
   const body = {
     name,
-    email: document.getElementById('cEmail').value.trim() || null,
-    phone: document.getElementById('cPhone').value.trim() || null,
     venmo_handle: document.getElementById('cVenmo').value.trim() || null,
     notes: document.getElementById('cNotes').value.trim() || null
   };

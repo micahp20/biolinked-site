@@ -2,6 +2,11 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-13 — Private Customers page (contacts + text consent)
+- Owner: a back-end customer profile to add cells (email optional) so reorder/promo texts can be launched later (Twilio not set up; nothing sent). New /admin-customers.html (noindex, linked from the Admin Hub): Supabase email+password sign-in, admin allowlist in app_private.bl_admins. Lists all pl_clients with search and filters, inline cell/email/slug edit (cell normalised to E.164 +1), Texts-OK checkbox (sets sms_consent, method 'verbal', time now), opt-out, protocol-page link (saved or suggested from the slug list), lifetime spend and last order from pl_sales, and Add client.
+- DB (tools/supabase/04_customers_admin.sql, additive): pl_clients gains sms_consent, sms_consent_at, sms_consent_method, sms_opted_out, portal_slug. phone/email/consent columns are no longer readable or writable with the anon key (column-level grants); the page reaches them only through admin_* SECURITY DEFINER RPCs that require a confirmed allowlisted login.
+- P&L (profit-loss.html, profit-loss-legacy.html) now asks pl_clients for explicit public columns and no longer edits client email/phone; it points to the Customers page instead. Ledger and inventory untouched.
+
 ## 2026-11-13 — Every compound explanation brought to full standard
 - Owner: bring the remaining /protocol-copy.js entries up to the PR #196 standard. The other 36 definitions (Cortagen, Cartalax, KLOW, GLOW, Wolverine, CJC/Ipamorelin, Tesamorelin, Semax, Selank, SS-31, PT-141, etc.) are now 2–3 plain-English sentences: what it is, what it is used/studied for, and how strong the evidence is. No doses. Same keys, regexes, labels, roles and groups. All 58 entries now meet the standard.
 - Scan: every compound name in every client page's schedule seed and calculator lists (144 pages), BL_DOSING, and the saved schedules (read-only SELECTs on public and app_private member_state) resolves to an entry. Only unmatched names are deleted test rows (ZZTestPeptide, Test Draw, demo). No page, seed, storage key or client data touched; pages pick up the shared file through its 10-minute cache.
