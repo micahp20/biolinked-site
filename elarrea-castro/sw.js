@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /elarrea-castro/.
-const CACHE = 'elarrea-castro-nonad-v2-20261112';
+const CACHE = 'elarrea-castro-tesamf-v3-20261112';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',

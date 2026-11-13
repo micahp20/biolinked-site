@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — Elvira Larrea Castro: Tesamorelin Mon–Fri
+- Owner (per prescriber): Tesamorelin is Monday–Friday, not daily. elarrea-castro card, calculator list, schedule default and cycle explainer now say Mon–Fri AM, 1 mg (10u). Master Dosing and Master Cycles sheets updated the same way. Quote unchanged (sheet still says 2 vials, $279.98). Schedule storage key and protocol revision deliberately NOT bumped, so the owner's own saved edit on her schedule is kept. Cache elarrea-castro-tesamf-v3-20261112. No other client page touched.
+
 ## 2026-11-12 — Elvira Larrea Castro: NAD+ removed
 - Owner request ("Remove NAD"): NAD+ 1000 mg is off elarrea-castro entirely (protocol card, schedule seed, calculator list, notes, cycle explainer, quote). Quote · Order 1 is now $279.98: Retatrutide $50, Tesamorelin 2 × $60, MOTS-c $50, Cagrilintide $40, BAC Water 30 mL $9.99 (12 mL recon), shipping $9.99. Schedule store bumped to gk-v2 / rev 2 so any saved copy reseeds; cache elarrea-castro-nonad-v2-20261112. No ledger or inventory write.
 
