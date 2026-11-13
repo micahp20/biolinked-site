@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — Full "What this compound is" explanations (mpauldino and all schedule pages)
+- Owner: mpauldino's schedule showed one-word explanations (Vilon said only "Bioregulator"). Shared /protocol-copy.js now has a Vilon entry and 2–3 sentence plain-English definitions (what it is + what it is used/studied for, no doses) for every compound on mpauldino's seed and saved schedule: Testosterone/TRT, Tirzepatide, HGH, BPC-157, Dihexa, HCG, DSIP, KPV, Ipamorelin, MOTS-c, 5-Amino-1MQ, Melanotan, Retatrutide, Vesugen, Epitalon, Pinealon, Vilon, AHK-Cu, NAD+, Glutathione, SLU-PP-332, Mazdutide. Same keys, roles and groups. mpauldino loads protocol-copy.js?v=2 and its cache is -explain1. No dose, schedule, seed, storage-key or client-data change. Saved schedule read read-only only.
+
 ## 2026-11-12 — Tesamorelin Mon–Fri on creidle, dholm, dianamaes
 - Owner: "Tesa should always be M-F." Tesamorelin moved from daily to Mon–Fri on creidle, dholm (both vials) and dianamaes: protocol cards, schedule defaults and notes. Same dose, draw and time of day. Saved-schedule keys unchanged; page caches bumped (-tesamf1). Standing rule recorded in PROJECT_STATUS.md.
 

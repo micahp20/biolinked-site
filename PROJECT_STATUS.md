@@ -2,6 +2,9 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## Standing rule: every compound gets a real explanation — 2026-11-12
+- Owner: one-word "What this compound is" text is unacceptable. The schedule editor reads /protocol-copy.js (BLProtocolCopy.find by name regex); only if nothing matches does it fall back to the one-word BL_DOSING purpose. When a client gets a compound with no protocol-copy.js entry, add one: 2–3 plain-English sentences (what it is, what it is used/studied for, evidence caveat), no doses. Vilon added and the mpauldino compounds expanded in this pass.
+
 ## Standing rule: Tesamorelin is always Mon–Fri — 2026-11-12
 - Owner (per prescriber): Tesamorelin is always Monday–Friday, never daily or 7 days. Applies to every new protocol, quote cycle and schedule default. Master Dosing (G13) and Master Cycles (H3) say Mon-Fri.
 - 2026-11-12: creidle, dholm (10 mg and 20 mg) and dianamaes changed from daily to Mon–Fri; doses, draws and AM/PM unchanged. Only cards, schedule defaults and notes changed; saved-data keys (GK_STORAGE / GK_PROTOCOL_REV) not bumped, so client-saved schedules are kept; sw caches end in -tesamf1. dholm keeps its existing "Daily" group heading (Ipamorelin, also Mon–Fri, sits under it too).
