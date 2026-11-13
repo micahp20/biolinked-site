@@ -2,6 +2,12 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — New client portal: Elvira Larrea Castro (/elarrea-castro/)
+- Owner request: build Elvira's protocol in the mpauldino layout, Cycle 1 Fat Loss only, plus Cagrilintide. New folder elarrea-castro/ (index.html, manifest.json, sw.js) built from the current shared-schedule portal shell (tlefree/index.html, same shell as the other 140 portals), with the bio-age include from the lab pages. Only the page data lines differ.
+- Cycle 1 is the saved Fat Loss goal cycle (The Shred Protocol) from the master sheet: Retatrutide 30 mg ×1, Tesamorelin 20 mg ×2, MOTS-c 40 mg ×1, NAD+ 1000 mg ×2, plus Cagrilintide 10 mg ×1. Vial, recon, dose, draw and timing come from Master Dosing / Master Cycles; Cagrilintide has no timing on the sheet, so its Monday AM slot is copied from mdowland.
+- One open Quote (not an invoice) at master sell prices plus BAC Water 30 mL $9.99 and 2-Day UPS $9.99; total $379.98. PAID 0. No ledger or inventory write. Schedule default turns on all Cycle 1 compounds (quotes do not gate it). No bloodwork, so Labs shows the standard empty state.
+- Registered on /share/ and /protocols/. Root sw.js cache name ends in -elarrea1. See PROJECT_STATUS.md.
+
 ## 2026-11-12 — Add to Home Screen nudge and Easy reading card on every client portal
 - Owner-approved rollout of the two mpauldino-only extras. New shared /portal-extras.css and /portal-extras.js. 140 client pages gain two tags at the end (CSS + JS); mpauldino and cpauldino, which already had both features, gain only the CSS line. No other byte of any index.html changed (byte-verified for all 142). Every touched sw.js cache name ends in -extras1.
 - Nudge: the page's existing #a2hs element moves to the top of the scroller and uses mpauldino's wording and styling; it shows outside an installed app until dismissed. The dismissal uses each page's existing KP+'a2hs' key.

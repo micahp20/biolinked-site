@@ -2,6 +2,14 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## New client portal: Elvira Larrea Castro — 2026-11-12
+- Owner request: new protocol page in the mpauldino layout; Cycle 1 Fat Loss only, add Cagrilintide. Started from origin/main 1d65f4e. Slug elarrea-castro (first initial + full hyphenated last name, like vbernal-quintana).
+- Paths: elarrea-castro/index.html, elarrea-castro/manifest.json, elarrea-castro/sw.js (cache elarrea-castro-cycle1-quote-v1-20261112), share/index.html, protocols/index.html (card + count 39), sw.js (root cache -elarrea1). Built by copying tlefree/index.html and replacing only the client data lines (names, nutrition defaults, CMP/ALL/MINE/NOTES/INV/PAID/DUE/CYCABOUT, KP/SCHKEY/CS_SLUG/edit key, GK_STORAGE biolinked-sched-elarrea-castro-gk-v1 and gkSeed); bio-age.js include, BIOAGE_CFG (no markers) and render hook copied from mdowland.
+- Protocol: Retatrutide 30 mg / 3 mL, 0.5 mg (5u) Mon + Thu AM, hold at least 4 weeks; Tesamorelin 20 mg / 2 mL, 1 mg (10u) daily AM; MOTS-c 40 mg / 3 mL, ~1.33 mg (10u) M/W/F AM; NAD+ 1000 mg / 5 mL, 50 mg (25u) M/W/F AM, push slowly; Cagrilintide 10 mg / 2 mL, 500 mcg (10u) Monday AM (timing from mdowland; the master sheet has none), titrate.
+- Quote · Order 1 $379.98: Retatrutide $50, Tesamorelin 2 × $60, MOTS-c $50, NAD+ 2 × $50, Cagrilintide $40, BAC Water 30 mL $9.99 (22 mL recon total), shipping $9.99. Quote only; no ledger, inventory or Supabase write.
+- Note for owner: existing Shred pages (jcollins, lcanino, mgeramanis) run Retatrutide Monday only and Tesamorelin Mon–Fri PM; this page follows the master sheet (Mon + Thu, daily AM) instead.
+- Checks: see the PR. Remaining: none known.
+
 ## Portal extras rollout (Add to Home Screen + Easy reading) — 2026-11-12
 - Owner approved rolling the mpauldino nudge and Nutrition Easy reading card out to all 142 client protocol pages. Files: portal-extras.css, portal-extras.js, each client index.html (appended tags only) and sw.js (cache -extras1).
 - cpauldino loads bl-client-skin.css twice (its --gold-soft is #f1f1f1) and lacks the shared schedule CSS. portal-extras.css pins the light-theme nudge tint to the reference #e5e1d8 and lets the Schedule day strip shrink, so cpauldino matches and no longer scrolls sideways at 320px.
