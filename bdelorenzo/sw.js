@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bdelorenzo/.
-const CACHE = 'bdelorenzo-master-sched1-v8-context-v1-controls-v1-calcact1-quote2-fees-protocol-paid-ahkmwf-sgk1-extras1-dedupe1-legacy1';
+const CACHE = 'bdelorenzo-master-sched1-v8-context-v1-controls-v1-calcact1-quote2-fees-protocol-paid-ahkmwf-sgk1-extras1-dedupe1-legacy1-o2due1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
