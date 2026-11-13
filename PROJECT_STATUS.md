@@ -10,6 +10,7 @@ Last reviewed: 2026-11-12 (America/Denver).
 - Note for owner: existing Shred pages (jcollins, lcanino, mgeramanis) run Retatrutide Monday only and Tesamorelin Mon–Fri PM; this page follows the master sheet (Mon + Thu, daily AM) instead.
 - Checks: see the PR. Remaining: none known.
 - Update 2026-11-12: owner said "Remove NAD". NAD+ removed everywhere on the page; quote now $279.98 (12 mL recon, one 30 mL BAC). Schedule key gk-v2 / rev 2; sw cache elarrea-castro-nonad-v2-20261112. The shared shop catalog and the calculator category label "Energy / NAD+" are sitewide and unchanged.
+- Update 2026-11-12: Tesamorelin is Mon–Fri AM per the prescriber (page default + master sheets). GK_STORAGE/rev left at gk-v2 / 2 so saved schedule edits survive; sw cache elarrea-castro-tesamf-v3-20261112. Other pages still showing Tesamorelin every day (not changed, awaiting owner): creidle, dholm, dianamaes.
 
 ## Portal extras rollout (Add to Home Screen + Easy reading) — 2026-11-12
 - Owner approved rolling the mpauldino nudge and Nutrition Easy reading card out to all 142 client protocol pages. Files: portal-extras.css, portal-extras.js, each client index.html (appended tags only) and sw.js (cache -extras1).
