@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /ngillan/.
-const CACHE = 'ngillan-master-sched1-v9-context-v1-controls-v1-calcact1-qreta1-qyear1-sgk1-extras1-dedupe1-legacy1';
+const CACHE = 'ngillan-master-sched1-v9-context-v1-controls-v1-calcact1-qreta1-qyear1-sgk1-extras1-dedupe1-legacy1-paid4';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
