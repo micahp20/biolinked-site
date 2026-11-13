@@ -2,6 +2,10 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-13 — Every compound explanation brought to full standard
+- Owner: bring the remaining /protocol-copy.js entries up to the PR #196 standard. The other 36 definitions (Cortagen, Cartalax, KLOW, GLOW, Wolverine, CJC/Ipamorelin, Tesamorelin, Semax, Selank, SS-31, PT-141, etc.) are now 2–3 plain-English sentences: what it is, what it is used/studied for, and how strong the evidence is. No doses. Same keys, regexes, labels, roles and groups. All 58 entries now meet the standard.
+- Scan: every compound name in every client page's schedule seed and calculator lists (144 pages), BL_DOSING, and the saved schedules (read-only SELECTs on public and app_private member_state) resolves to an entry. Only unmatched names are deleted test rows (ZZTestPeptide, Test Draw, demo). No page, seed, storage key or client data touched; pages pick up the shared file through its 10-minute cache.
+
 ## 2026-11-12 — Full "What this compound is" explanations (mpauldino and all schedule pages)
 - Owner: mpauldino's schedule showed one-word explanations (Vilon said only "Bioregulator"). Shared /protocol-copy.js now has a Vilon entry and 2–3 sentence plain-English definitions (what it is + what it is used/studied for, no doses) for every compound on mpauldino's seed and saved schedule: Testosterone/TRT, Tirzepatide, HGH, BPC-157, Dihexa, HCG, DSIP, KPV, Ipamorelin, MOTS-c, 5-Amino-1MQ, Melanotan, Retatrutide, Vesugen, Epitalon, Pinealon, Vilon, AHK-Cu, NAD+, Glutathione, SLU-PP-332, Mazdutide. Same keys, roles and groups. mpauldino loads protocol-copy.js?v=2 and its cache is -explain1. No dose, schedule, seed, storage-key or client-data change. Saved schedule read read-only only.
 
