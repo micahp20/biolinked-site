@@ -2,6 +2,10 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## Standing rule: Tesamorelin is always Mon–Fri — 2026-11-12
+- Owner (per prescriber): Tesamorelin is always Monday–Friday, never daily or 7 days. Applies to every new protocol, quote cycle and schedule default. Master Dosing (G13) and Master Cycles (H3) say Mon-Fri.
+- 2026-11-12: creidle, dholm (10 mg and 20 mg) and dianamaes changed from daily to Mon–Fri; doses, draws and AM/PM unchanged. Only cards, schedule defaults and notes changed; saved-data keys (GK_STORAGE / GK_PROTOCOL_REV) not bumped, so client-saved schedules are kept; sw caches end in -tesamf1. dholm keeps its existing "Daily" group heading (Ipamorelin, also Mon–Fri, sits under it too).
+
 ## New client portal: Elvira Larrea Castro — 2026-11-12
 - Owner request: new protocol page in the mpauldino layout; Cycle 1 Fat Loss only, add Cagrilintide. Started from origin/main 1d65f4e. Slug elarrea-castro (first initial + full hyphenated last name, like vbernal-quintana).
 - Paths: elarrea-castro/index.html, elarrea-castro/manifest.json, elarrea-castro/sw.js (cache elarrea-castro-cycle1-quote-v1-20261112), share/index.html, protocols/index.html (card + count 39), sw.js (root cache -elarrea1). Built by copying tlefree/index.html and replacing only the client data lines (names, nutrition defaults, CMP/ALL/MINE/NOTES/INV/PAID/DUE/CYCABOUT, KP/SCHKEY/CS_SLUG/edit key, GK_STORAGE biolinked-sched-elarrea-castro-gk-v1 and gkSeed); bio-age.js include, BIOAGE_CFG (no markers) and render hook copied from mdowland.
