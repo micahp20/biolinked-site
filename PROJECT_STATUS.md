@@ -9,6 +9,7 @@ Last reviewed: 2026-11-12 (America/Denver).
 - Quote · Order 1 $379.98: Retatrutide $50, Tesamorelin 2 × $60, MOTS-c $50, NAD+ 2 × $50, Cagrilintide $40, BAC Water 30 mL $9.99 (22 mL recon total), shipping $9.99. Quote only; no ledger, inventory or Supabase write.
 - Note for owner: existing Shred pages (jcollins, lcanino, mgeramanis) run Retatrutide Monday only and Tesamorelin Mon–Fri PM; this page follows the master sheet (Mon + Thu, daily AM) instead.
 - Checks: see the PR. Remaining: none known.
+- Update 2026-11-12: owner said "Remove NAD". NAD+ removed everywhere on the page; quote now $279.98 (12 mL recon, one 30 mL BAC). Schedule key gk-v2 / rev 2; sw cache elarrea-castro-nonad-v2-20261112. The shared shop catalog and the calculator category label "Energy / NAD+" are sitewide and unchanged.
 
 ## Portal extras rollout (Add to Home Screen + Easy reading) — 2026-11-12
 - Owner approved rolling the mpauldino nudge and Nutrition Easy reading card out to all 142 client protocol pages. Files: portal-extras.css, portal-extras.js, each client index.html (appended tags only) and sw.js (cache -extras1).

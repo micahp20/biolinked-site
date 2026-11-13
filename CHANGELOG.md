@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — Elvira Larrea Castro: NAD+ removed
+- Owner request ("Remove NAD"): NAD+ 1000 mg is off elarrea-castro entirely (protocol card, schedule seed, calculator list, notes, cycle explainer, quote). Quote · Order 1 is now $279.98: Retatrutide $50, Tesamorelin 2 × $60, MOTS-c $50, Cagrilintide $40, BAC Water 30 mL $9.99 (12 mL recon), shipping $9.99. Schedule store bumped to gk-v2 / rev 2 so any saved copy reseeds; cache elarrea-castro-nonad-v2-20261112. No ledger or inventory write.
+
 ## 2026-11-12 — New client portal: Elvira Larrea Castro (/elarrea-castro/)
 - Owner request: build Elvira's protocol in the mpauldino layout, Cycle 1 Fat Loss only, plus Cagrilintide. New folder elarrea-castro/ (index.html, manifest.json, sw.js) built from the current shared-schedule portal shell (tlefree/index.html, same shell as the other 140 portals), with the bio-age include from the lab pages. Only the page data lines differ.
 - Cycle 1 is the saved Fat Loss goal cycle (The Shred Protocol) from the master sheet: Retatrutide 30 mg ×1, Tesamorelin 20 mg ×2, MOTS-c 40 mg ×1, NAD+ 1000 mg ×2, plus Cagrilintide 10 mg ×1. Vial, recon, dose, draw and timing come from Master Dosing / Master Cycles; Cagrilintide has no timing on the sheet, so its Monday AM slot is copied from mdowland.
