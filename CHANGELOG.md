@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-12 — Tesamorelin Mon–Fri on creidle, dholm, dianamaes
+- Owner: "Tesa should always be M-F." Tesamorelin moved from daily to Mon–Fri on creidle, dholm (both vials) and dianamaes: protocol cards, schedule defaults and notes. Same dose, draw and time of day. Saved-schedule keys unchanged; page caches bumped (-tesamf1). Standing rule recorded in PROJECT_STATUS.md.
+
 ## 2026-11-12 — Elvira Larrea Castro: Tesamorelin Mon–Fri
 - Owner (per prescriber): Tesamorelin is Monday–Friday, not daily. elarrea-castro card, calculator list, schedule default and cycle explainer now say Mon–Fri AM, 1 mg (10u). Master Dosing and Master Cycles sheets updated the same way. Quote unchanged (sheet still says 2 vials, $279.98). Schedule storage key and protocol revision deliberately NOT bumped, so the owner's own saved edit on her schedule is kept. Cache elarrea-castro-tesamf-v3-20261112. No other client page touched.
 

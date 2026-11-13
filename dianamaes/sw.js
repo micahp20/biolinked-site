@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dianamaes/.
-const CACHE = 'dianamaes-master-sched1-v8-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1';
+const CACHE = 'dianamaes-master-sched1-v8-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-tesamf1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
