@@ -20,7 +20,7 @@ create table if not exists app_private.bl_admins (
 alter table app_private.bl_admins enable row level security;
 revoke all on app_private.bl_admins from public, anon, authenticated;
 insert into app_private.bl_admins(email) values
-  ('micahpauldino@gmail.com'), ('biolinkedsolutions@gmail.com')
+  ('micahpauldino@gmail.com'), ('biolinkedsolutions@gmail.com'), ('admin@biolinkedsolutions.com')
 on conflict do nothing;
 
 -- Column-level privileges: the P&L dashboard (anon key) keeps the columns it

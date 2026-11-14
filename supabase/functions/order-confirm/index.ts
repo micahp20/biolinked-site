@@ -3,8 +3,8 @@
 // is an email. The Resend key lives in Supabase Vault (read via
 // public.bl_resend_key(), service role only). Nothing secret is in this file.
 const ORIGINS = ["https://biolinkedsolutions.com", "https://www.biolinkedsolutions.com", "http://localhost:8812"];
-const OWNER = "biolinkedsolutions@gmail.com";
-const FROM = "BioLinked <onboarding@resend.dev>"; // switch to orders@biolinkedsolutions.com once the domain is verified in Resend
+const OWNER = "admin@biolinkedsolutions.com";
+const FROM = "BioLinked Solutions <admin@biolinkedsolutions.com>"; // verified Resend domain (biolinkedsolutions.com)
 const PAY: Record<string, string> = { "Venmo": "@micahp20", "Cash App": "$micahpauldino", "Zelle": "720-938-0698" };
 const SHIPPING = 9.99;
 const SB = Deno.env.get("SUPABASE_URL")!, SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
@@ -15,7 +15,7 @@ const esc = (s: unknown) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&
 const EMAIL = /[^\s@<>(),;:]+@[^\s@<>(),;:]+\.[a-z]{2,}/i;
 async function key() { const r = await fetch(`${SB}/rest/v1/rpc/bl_resend_key`, { method: "POST", headers: H, body: "{}" }); return r.ok ? await r.json() : null; }
 async function send(k: string, to: string, subject: string, html: string) {
-  const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${k}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: [to], subject, html }) });
+  const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${k}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: [to], reply_to: "admin@biolinkedsolutions.com", subject, html }) });
   const j = await r.json().catch(() => ({})); return r.ok ? { ok: true, id: j.id } : { ok: false, error: String(j.message || r.status).slice(0, 200) };
 }
 Deno.serve(async (req) => {
