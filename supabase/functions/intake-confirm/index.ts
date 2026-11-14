@@ -3,8 +3,8 @@
 // 'bloodwork' bucket under intake/), then emails the owner a notification
 // with 7-day signed links. Resend key comes from Supabase Vault.
 const ORIGINS = ["https://biolinkedsolutions.com", "https://www.biolinkedsolutions.com", "http://localhost:8812"];
-const OWNER = "biolinkedsolutions@gmail.com";
-const FROM = "BioLinked <onboarding@resend.dev>";
+const OWNER = "admin@biolinkedsolutions.com";
+const FROM = "BioLinked Solutions <admin@biolinkedsolutions.com>"; // verified Resend domain (biolinkedsolutions.com)
 const SB = Deno.env.get("SUPABASE_URL")!, SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const H = { apikey: SR, Authorization: `Bearer ${SR}`, "Content-Type": "application/json" };
 const cors = (o: string | null) => ({ "Access-Control-Allow-Origin": o && ORIGINS.includes(o) ? o : ORIGINS[0], "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "authorization, apikey, content-type", "Vary": "Origin" });
@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
   const kr = await fetch(`${SB}/rest/v1/rpc/bl_resend_key`, { method: "POST", headers: H, body: "{}" });
   const k = kr.ok ? await kr.json() : null; let emails: Record<string, unknown> = { error: "no key" };
   if (k) {
-    const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${k}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: [OWNER], subject: `${T}New BioLinked intake — ${first} ${last}`.trim(), html }) });
+    const r = await fetch("https://api.resend.com/emails", { method: "POST", headers: { Authorization: `Bearer ${k}`, "Content-Type": "application/json" }, body: JSON.stringify({ from: FROM, to: [OWNER], reply_to: "admin@biolinkedsolutions.com", subject: `${T}New BioLinked intake — ${first} ${last}`.trim(), html }) });
     const j = await r.json().catch(() => ({})); emails = { owner: r.ok ? { ok: true, id: j.id } : { ok: false, error: String(j.message || r.status).slice(0, 200) } };
   }
   await fetch(`${SB}/rest/v1/intake_submissions?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ emails }) });

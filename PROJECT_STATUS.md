@@ -3,7 +3,7 @@
 Last reviewed: 2026-11-12 (America/Denver).
 
 ## Private Customers page — 2026-11-13
-- /admin-customers.html is the only place client cell/email/text consent are read or edited. Real auth: Supabase email+password; admins = app_private.bl_admins (micahpauldino@gmail.com, biolinkedsolutions@gmail.com). Never put contact info in static files; never grant anon select on pl_clients phone/email/sms_* columns. Texting (Twilio) is a later task: only text rows with sms_consent = true and sms_opted_out = false.
+- /admin-customers.html is the only place client cell/email/text consent are read or edited. Real auth: Supabase email+password; admins = app_private.bl_admins (micahpauldino@gmail.com, biolinkedsolutions@gmail.com, admin@biolinkedsolutions.com). Never put contact info in static files; never grant anon select on pl_clients phone/email/sms_* columns. Texting (Twilio) is a later task: only text rows with sms_consent = true and sms_opted_out = false.
 - The Admin Hub's own password gate (admin.html) is client-side only and is not security; the P&L tables other than pl_clients contact columns are still fully open to the anon key (see tools/supabase/02_pl_tables_lockdown_OPTIONAL.sql).
 
 ## Standing rule: every compound gets a real explanation — 2026-11-12
