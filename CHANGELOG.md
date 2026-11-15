@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-15 — Texts OK checkbox actually saves on phone
+- Owner: the Texts OK checkbox on /admin-customers.html did not stay checked. The box was disabled (with no explanation) until a cell was already saved, and taps on the "Texts OK" label on iPhone never called the save. The box is now tappable, shows "Add a cell first" when needed, and saves on the checkbox change event. No consent values were changed. No database change.
+
 ## 2026-11-13 — Private Customers page (contacts + text consent)
 - Owner: a back-end customer profile to add cells (email optional) so reorder/promo texts can be launched later (Twilio not set up; nothing sent). New /admin-customers.html (noindex, linked from the Admin Hub): Supabase email+password sign-in, admin allowlist in app_private.bl_admins. Lists all pl_clients with search and filters, inline cell/email/slug edit (cell normalised to E.164 +1), Texts-OK checkbox (sets sms_consent, method 'verbal', time now), opt-out, protocol-page link (saved or suggested from the slug list), lifetime spend and last order from pl_sales, and Add client.
 - DB (tools/supabase/04_customers_admin.sql, additive): pl_clients gains sms_consent, sms_consent_at, sms_consent_method, sms_opted_out, portal_slug. phone/email/consent columns are no longer readable or writable with the anon key (column-level grants); the page reaches them only through admin_* SECURITY DEFINER RPCs that require a confirmed allowlisted login.
