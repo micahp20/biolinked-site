@@ -263,3 +263,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Expanded protocol and schedule compounds can take a start date, an end date, and remove/restore. That choice is stored on the device for that client and cycle. It does not change the catalog, the invoice, the ledger, or inventory.
 - Phone headings, program cards, and Back/Home are tightened. Gold, black, and gray stay as they are.
 - See PROJECT_STATUS.md for the page count, the pages left out, the checks, and the unpublished branch.
+
+## 2026-11-17
+- Added kburr (Katrina Burr) client portal from the annaleah template: Cycle 1 Accelerated Fat Loss quote, Retatrutide 30 mg x2 @ $50, MOTS-c 40 mg x1 @ $50, BAC water 30 mL x1 @ $9.99, hand delivery with no shipping fee. Total $159.99 due, unpaid. Ledger, sales and inventory untouched. Registered in admin-customers and share lists.
