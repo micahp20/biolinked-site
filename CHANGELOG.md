@@ -292,3 +292,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Sourced protocol review additions
 - Added a linked provider-review page to lprice/ using the recovered master-sheet references. Saved sheet locations for future sessions. Active medication, schedule, calculator and invoice data remain unchanged; unresolved source gaps are stated in the draft. See PROJECT_STATUS.md.
+
+
+## 2026-11-18 — Requested additions on the main protocol
+- Completed lprice/ main-page cycles and requested cognitive substitution rather than leaving the changes only on a review page. Synchronized source-backed Protocol entries, calculator, inactive schedule defaults and unpaid quotes. Preserved existing state and corrected the retired default locally. No inventory or payment changes. Static, isolated renderer/state and native Chromium checks passed; see PROJECT_STATUS.md.
