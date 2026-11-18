@@ -354,7 +354,7 @@
   .ocard{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);margin-bottom:11px;overflow:hidden;cursor:pointer}
   .ohd{display:flex;align-items:flex-start;gap:10px;padding:13px 14px 11px;border-bottom:1px solid var(--line2)}
   .ohd .ot{font-size:13px;font-weight:800}
-  .ohd .os{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .ohd .invoice-duration{font-size:13px;color:var(--muted);margin-top:2px;line-height:1.4}
   .irow{display:flex;gap:10px;padding:9px 14px;font-size:13px;color:var(--ink2);align-items:baseline}
   .irow .in{flex:1}
   .irow .iv{font-weight:700;flex:none}
@@ -1700,7 +1700,7 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
   </div>
   <div class="sheet" id="s-inv">
     <div class="stop"><div class="bk" onclick="closeSheet()">&lsaquo; Invoices</div><div class="ttl" id="i-tag"></div></div>
-    <div class="dpur" id="i-sum"></div><div class="dname" id="i-name"></div>
+    <div class="dpur" id="invoice-detail-duration"></div><div class="dname" id="i-name"></div>
     <div class="dl first">Line Items</div>
     <div style="padding:6px 16px 0" id="i-items"></div>
     <div style="padding:4px 16px 0" id="i-pay"></div>
@@ -2748,7 +2748,7 @@ function renderPay(){
     var pc=o.status==='due'?'due':(o.status==='free'?'free':(o.status==='quote'?'quote':'paid'));
     var pl=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
     return '<div class="ocard" onclick="openInv('+i+')"><div class="ohd"><div>'+
-      (invSum(o)?'<div class="os">'+invSum(o)+'</div>':'')+
+      (invSum(o)?'<div class="invoice-duration">'+invSum(o)+'</div>':'')+
       '<div class="ot">'+invTail(o.label)+'</div></div><span class="pill '+pc+'">'+pl+'</span></div>'+
       o.items.map(function(it){return '<div class="irow'+(it.amt===0?' freeln':'')+'"><span class="in">'+it.n+
         '</span><span class="iv">'+(it.amt===0?'FREE':money(it.amt))+'</span></div>'}).join('')+
@@ -2760,7 +2760,7 @@ function renderPay(){
 function openInv(i){
   var o=INV[i]; if(!o) return;
   document.getElementById('i-name').textContent=invTail(o.label);
-  document.getElementById('i-sum').textContent=invSum(o);
+  document.getElementById('invoice-detail-duration').textContent=invSum(o);
   document.getElementById('i-tag').textContent=o.status==='due'?'Quoted':(o.status==='free'?'Free':(o.status==='quote'?'Quote':'Paid'));
   document.getElementById('i-items').innerHTML=o.items.map(function(it){
     return '<div class="irow"><span class="in"><b>'+it.n+'</b>'+(it.sub?'<br><span style="color:var(--muted);font-size:13px">'+it.sub+'</span>':'')+
