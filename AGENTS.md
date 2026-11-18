@@ -83,3 +83,8 @@ These requirements are recovered from source and merged task records, not a comp
 - Record the owner's supplied instructions without inventing vial strength, dose conversion, route, weekday frequency or AM/PM timing. Clarify missing applicability/timing; do not turn proposed quote items into an active schedule or change existing treatment instructions implicitly.
 - Every compound on a protocol card and every compound line on an invoice must show the vial size or strength with its unit, such as mg, mcg, IU, or mL, separate from the per-dose amount. Use only a strength already recorded for that client or explicitly confirmed for that order. If the source does not give a strength, leave it unmarked and report it for resolution. Do not infer a strength from the price or the product name, copy another client's strength, or invent a reconstitution or dose.
 - Preserve earlier paid orders, clinical history, saved schedules and inventory. Permanent memory stores this workflow rule; client-specific instructions stay in the portal and its task record.
+
+
+## Saved cycle name — owner supplied 2026-11-18
+- “Holy Trinity” is the owner's name for a proposed grouping of TRT (testosterone), retatrutide and HGH (somatropin). This records a name and compound grouping only, not a validated safe cycle, prescription, standard dose or recommendation.
+- Do not copy another client's doses, injection instructions, annual quantities or pricing into a new client's plan by this name. Confirm client-specific clinical instructions and commercial quantities. Retatrutide is investigational; a muscle-gain goal alone does not establish an indication for this grouping. Keep unconfirmed treatment as a clinician-review draft rather than activating a schedule.

@@ -284,3 +284,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Explicit invoice supply label
 - Made the existing eprice/ invoice supply duration visible in the product line. Pricing, quantities and instructions are unchanged. See PROJECT_STATUS.md.
+
+
+## 2026-11-18 — Save proposed cycle name
+- Recorded the owner's Holy Trinity name as non-prescriptive grouping metadata, with client-specific confirmation required. Existing portal and Share entry already exist; no clinical, billing or inventory files changed.

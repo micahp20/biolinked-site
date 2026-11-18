@@ -434,3 +434,9 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Invoice supply-duration label — 2026-11-18 UTC
 - Owner requested an explicit supply-duration label on the existing eprice/ invoice product line. Changed only that line's display name and refreshed its scoped cache. Quantity, line amount, invoice totals, instructions and storage are unchanged. Exact parsed before/after invoice comparison confirms one label-only change.
 - Publishing: main via GitHub API; hosting and live label checked separately. No inventory or production client-state writes.
+
+
+## Saved cycle-name clarification — 2026-11-18 UTC
+- Owner requested a portal using referenced client layouts and a reusable cycle name. Read-only review found lprice/ already exists and is already linked once on Share. No duplicate portal was created, and no existing client doses, schedules, quotes, inventory or records were changed.
+- Saved the owner's Holy Trinity name and three-component grouping in AGENTS.md as proposed, non-prescriptive metadata. No regimen or safety validation was inferred. Client-specific clinical confirmation remains outstanding; asked the owner about prescriptions.
+- Checks: existing portal title and Share membership inspected on main b6b016532b1317d7edfb507ab4e5047fed980b3e. Documentation-only change; runtime tests not applicable. Saved remotely through GitHub API; this does not complete or clinically approve the existing treatment plan.
