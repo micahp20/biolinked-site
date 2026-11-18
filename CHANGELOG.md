@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-17 — Luke Price (lprice) client portal
+- Added lprice from the elarrea-castro shell: Cycle 1 Holy Trinity (testosterone x5 vials @ $120 as on rgreen, retatrutide 30 mg x4 vials with 2 mg Mondays as on cmyers, HGH 40 IU x13 vials 2 IU Mon–Fri AM fasted as on mhartman) plus optional Recovery & Healing and Cognitive cycles. Unpaid quote $1,704.95. Health Profile has no phone or email. Page uses lprice-only copies of protocol-copy.js and compound-library.js with no 'prescri' wording. Holy Trinity added to the builder catalog and Master Cycles sheet. Ledger and inventory untouched.
+
 ## 2026-11-15 — Texts OK checkbox actually saves on phone
 - Owner: the Texts OK checkbox on /admin-customers.html did not stay checked. The box was disabled (with no explanation) until a cell was already saved, and taps on the "Texts OK" label on iPhone never called the save. The box is now tappable, shows "Add a cell first" when needed, and saves on the checkbox change event. No consent values were changed. No database change.
 
