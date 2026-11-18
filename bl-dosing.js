@@ -153,7 +153,7 @@ window.BL_DOSING=[
 "bac": "2 ml",
 "dose": "1 mg",
 "units": "10",
-"timing": "",
+"timing": "PM fasted",
 "freq": "",
 "dur": ""
 },
@@ -165,7 +165,7 @@ window.BL_DOSING=[
 "bac": "2 ml",
 "dose": "500 mcg",
 "units": "10",
-"timing": "",
+"timing": "PM fasted",
 "freq": "Mon–Fri",
 "dur": ""
 },
@@ -201,7 +201,7 @@ window.BL_DOSING=[
 "bac": "",
 "dose": "2 IU men / 1 IU women",
 "units": "",
-"timing": "",
+"timing": "AM fasted",
 "freq": "",
 "dur": ""
 },
@@ -213,7 +213,7 @@ window.BL_DOSING=[
 "bac": "",
 "dose": "2 IU men / 1 IU women",
 "units": "",
-"timing": "",
+"timing": "AM fasted",
 "freq": "",
 "dur": ""
 },
@@ -225,7 +225,7 @@ window.BL_DOSING=[
 "bac": "",
 "dose": "2 IU men / 1 IU women",
 "units": "",
-"timing": "",
+"timing": "AM fasted",
 "freq": "",
 "dur": ""
 },
