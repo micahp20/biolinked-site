@@ -461,3 +461,8 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 - Added a page-scoped saved-state reconciliation that removes the obsolete default entry and adds new inactive defaults without resetting unrelated doses, days or custom additions. Existing storage identities remain unchanged; protocol revision stays unchanged to avoid broad seed overwrite.
 - Checks: all inline JavaScript syntax, 17-card Protocol renderer, before/after scope, every quote item sum, calculator/default replacement and saved-state migration passed. Native Chromium with all network blocked passed 17 cards, five muscle cards, two NAD+/glutathione cards, oral replacement, accordion interaction and 320/390/1280 layouts with no JS errors. This was not live backend or Safari testing.
 - Baseline main 81b076afa2c39f5853647f8051a13ec47f7a5099. Updated only lprice/index.html, provider-review.html, sw.js and project docs. Saved to main via GitHub API; hosting/live verification checked separately.
+
+
+## Existing quote and future-cycle addition — 2026-11-18
+- Updated vbernal-quintana/index.html from main 335a126e using the owner-selected reference cycle. Added two priced product lines to the existing open quote; kept prior orders, payment status, saved schedules, and charges unchanged. Added a future Protocol group reusing the existing compound records and descriptions. No inventory or ledger write.
+- Checks: exact scope comparison, prior-invoice equivalence, line-sum arithmetic, inline JavaScript compilation, isolated invoice/detail rendering and all three payment choices passed. Publishing through main via GitHub API; hosting and live delivery are checked separately. Full browser/Safari testing not performed.

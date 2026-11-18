@@ -299,3 +299,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Requested additions on the main protocol
 - Completed lprice/ main-page cycles and requested cognitive substitution rather than leaving the changes only on a review page. Synchronized source-backed Protocol entries, calculator, inactive schedule defaults and unpaid quotes. Preserved existing state and corrected the retired default locally. No inventory or payment changes. Static, isolated renderer/state and native Chromium checks passed; see PROJECT_STATUS.md.
+
+
+## 2026-11-18 — Add reference cycle to an existing quote
+- Added the requested reference cycle to the existing vbernal-quintana/ quote and future Protocol grouping. Preserved earlier orders, active instructions and schedules; kept standard charges once. Arithmetic, preservation, syntax and isolated invoice/payment rendering passed. See PROJECT_STATUS.md for release verification limits.
