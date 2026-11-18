@@ -280,3 +280,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Quote matches Protocol grouping
 - Consolidated the existing separate foundation quote into eprice/ anti-aging invoice, preserving all quantities, charges and the overall quote balance. No clinical, inventory or payment changes. Arithmetic, source preservation and inline syntax passed; see PROJECT_STATUS.md.
+
+
+## 2026-11-18 — Explicit invoice supply label
+- Made the existing eprice/ invoice supply duration visible in the product line. Pricing, quantities and instructions are unchanged. See PROJECT_STATUS.md.

@@ -429,3 +429,8 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Existing quote grouping correction — 2026-11-18 UTC
 - Owner clarified that eprice/ must group the existing foundation product into the anti-aging invoice as well as the Protocol. Moved its existing product line into that quote, combined the identical BAC-water lines with the exact existing quantities and charges, and removed the separate quote card. No new charges or changes to the overall balance, unpaid status, clinical data, schedule or inventory.
 - Baseline main 80b779ec2d77b345c16e8f538cd68f009d6d6aaa. Verified every quote equals its item sum, combined total equals the prior total, and only INV changed in the HTML. All inline JavaScript compiles. Scoped cache version refreshed. Publishing through main via GitHub API; hosting and live source checked separately.
+
+
+## Invoice supply-duration label — 2026-11-18 UTC
+- Owner requested an explicit supply-duration label on the existing eprice/ invoice product line. Changed only that line's display name and refreshed its scoped cache. Quantity, line amount, invoice totals, instructions and storage are unchanged. Exact parsed before/after invoice comparison confirms one label-only change.
+- Publishing: main via GitHub API; hosting and live label checked separately. No inventory or production client-state writes.
