@@ -466,3 +466,8 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Existing quote and future-cycle addition — 2026-11-18
 - Updated vbernal-quintana/index.html from main 335a126e using the owner-selected reference cycle. Added two priced product lines to the existing open quote; kept prior orders, payment status, saved schedules, and charges unchanged. Added a future Protocol group reusing the existing compound records and descriptions. No inventory or ledger write.
 - Checks: exact scope comparison, prior-invoice equivalence, line-sum arithmetic, inline JavaScript compilation, isolated invoice/detail rendering and all three payment choices passed. Publishing through main via GitHub API; hosting and live delivery are checked separately. Full browser/Safari testing not performed.
+
+
+## Combined quote refresh — 2026-11-18
+- vbernal-quintana/ already served both requested add-on lines in the same open quote, verified by a fresh live read against main ab82ff44. The owner screenshot showed the previous version. Made the quote heading name all additions explicitly and refreshed only this portal's scoped service-worker cache.
+- Checks: quote cents sum, inline and worker syntax, and preservation of all invoice lines/totals passed. Earlier orders, payment renderer, protocol, and saved schedules unchanged. Publishing via main; hosting/live delivery checked separately.

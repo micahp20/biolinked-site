@@ -303,3 +303,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Add reference cycle to an existing quote
 - Added the requested reference cycle to the existing vbernal-quintana/ quote and future Protocol grouping. Preserved earlier orders, active instructions and schedules; kept standard charges once. Arithmetic, preservation, syntax and isolated invoice/payment rendering passed. See PROJECT_STATUS.md for release verification limits.
+
+
+## 2026-11-18 — Refresh combined-quote delivery
+- Made the existing combined quote heading explicit on vbernal-quintana/ and refreshed its scoped cache after an older invoice screenshot was reported. Invoice amounts and contents unchanged; live source confirmed the requested products were together. See PROJECT_STATUS.md.
