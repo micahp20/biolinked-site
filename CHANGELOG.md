@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-18 — Invoice supply durations
+- Show the owner-confirmed supply duration above each cycle name on the invoice card and detail view. Two quotes show “12-month supply” and three show “8-week cycle.” See the source diff in `lprice/index.html` and the check record in PROJECT_STATUS.md.
+
 ## 2026-11-17 — Luke Price (lprice) client portal
 - Added lprice from the elarrea-castro shell: Cycle 1 Holy Trinity (testosterone x5 vials @ $120 as on rgreen, retatrutide 30 mg x4 vials with 2 mg Mondays as on cmyers, HGH 40 IU x13 vials 2 IU Mon–Fri AM fasted as on mhartman) plus optional Recovery & Healing and Cognitive cycles. Unpaid quote $1,704.95. Health Profile has no phone or email. Page uses lprice-only copies of protocol-copy.js and compound-library.js with no 'prescri' wording. Holy Trinity added to the builder catalog and Master Cycles sheet. Ledger and inventory untouched.
 

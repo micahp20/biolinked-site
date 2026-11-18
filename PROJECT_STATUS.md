@@ -2,6 +2,11 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## Invoice supply durations — 2026-11-18
+- On the edited client portal, all five quotes show their supply duration above the cycle title in the invoice list and detail view. The two year-long quotes say “12-month supply,” and the three optional quotes say “8-week cycle.” Existing quantities, totals, quote status, and schedule data are preserved.
+- Source: `lprice/index.html`. Based on `main` at `d465e497`. Checked inline script syntax, all five rendered card and detail labels, and invoice data equivalence apart from summary text.
+- Publishing: this change targets `main` for GitHub Pages. Check the Pages run and the live invoice views after the commit lands.
+
 ## Private Customers page — 2026-11-13
 - /admin-customers.html is the only place client cell/email/text consent are read or edited. Real auth: Supabase email+password; admins = app_private.bl_admins (micahpauldino@gmail.com, biolinkedsolutions@gmail.com, admin@biolinkedsolutions.com). Never put contact info in static files; never grant anon select on pl_clients phone/email/sms_* columns. Texting (Twilio) is a later task: only text rows with sms_consent = true and sms_opted_out = false.
 - The Admin Hub's own password gate (admin.html) is client-side only and is not security; the P&L tables other than pl_clients contact columns are still fully open to the anon key (see tools/supabase/02_pl_tables_lockdown_OPTIONAL.sql).

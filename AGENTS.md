@@ -70,6 +70,9 @@ These requirements are recovered from source and merged task records, not a comp
 - Whenever a new client protocol is created, add its correct name and URL to https://biolinkedsolutions.com/share/ as part of the same task. Inspect the current Share page implementation first, avoid duplicate entries, preserve its existing access behavior, and verify the new protocol link.
 - Before deducting inventory, show the owner the proposed items and quantities and obtain confirmation. Read-only inventory checks are allowed; do not infer permission to deduct from creating a protocol or marking an invoice paid.
 
+- As of 2026-11-18, the owner prefers routine, requested edits to existing Bio Linked Solutions pages to go live via the established GitHub Pages workflow without an extra conversational confirmation. Honor any task-specific publishing limits and applicable approval requirements.
+- For quotes with an owner-confirmed supply duration, show that duration above the cycle name in both the invoice list and detail. Keep duration specific to the quote and preserve the line items and billing state.
+
 ## Standard quote and order charges — owner confirmed 2026-11-07
 - Always include one Shipping line at $9.99 and one BAC water at $4.99 on each new quote/order, unless the owner explicitly overrides that charge for the specific request.
 - Include both charges in the displayed invoice total. Apply each once per order, not once per compound, and avoid duplicate lines when updating an existing quote.
