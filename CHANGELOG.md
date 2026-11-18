@@ -272,3 +272,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-17
 - Added eprice (Elizabeth Price) client portal from the elarrea-castro shell: three saved cycles (Sexual Health & Hormonal Balance, Longevity & Anti-Aging, Sleep & Stress) with testosterone left out (male-only), Health Profile from the intake, unpaid quotes $549.94 total (one $9.99 shipping charge). Ledger, sales and inventory untouched.
+
+
+## 2026-11-18 — Existing compound shown in its requested cycle
+- Corrected eprice/ Protocol grouping using the existing compound record. Instructions, year-round behavior, quote and storage ownership remain unchanged. Updated only its scoped cache version. See PROJECT_STATUS.md for checks and browser verification limits.
