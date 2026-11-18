@@ -1,19 +1,19 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /eprice/.
-const CACHE = 'eprice-cycles-quote-v3-20261117';
+const CACHE = 'eprice-cycles-quote-v4-20261117';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
   '/bio-age.js?v=2',
   '/calc-feedback.js?v=1',
-  '/protocol-copy.js?v=1',
+  '/eprice/protocol-copy.js?v=2',
   '/protocol-context.js?v=1',
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=1',
   '/schedule-engine.js?v=3',
   '/schedule-editor.js?v=2',
-  '/compound-library.js?v=2',
+  '/eprice/compound-library.js?v=2',
   '/eprice/',
   '/eprice/index.html',
   '/eprice/manifest.json',
