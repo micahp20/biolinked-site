@@ -47,18 +47,18 @@ window.PEPTIDE_DATA = [
   { name:'HGH Fragment 176-191',       cat:'fatloss', vial:'5mg',  bac:'2mL', dose:'500mcg',units:'20', schedule:'2x daily',          timing:'AM fasted / pre-bed', price:50, in_stock:false }, // not on product line
 
   // ───── GH AXIS ─────
-  { name:'Tesamorelin (10mg)',         cat:'gh',      vial:'10mg', bac:'2mL', dose:'1mg',   units:'20', schedule:'5 days on / 2 off', timing:'AM/PM',              price:55,  in_stock:true },
-  { name:'Tesamorelin (20mg)',         cat:'gh',      vial:'20mg', bac:'2mL', dose:'1mg',   units:'10', schedule:'5 days on / 2 off', timing:'AM/PM',              price:100, in_stock:true },
-  { name:'Ipamorelin',                 cat:'gh',      vial:'10mg', bac:'3mL', dose:'300mcg',units:'9',  schedule:'5 days on / 2 off', timing:'AM/PM',              price:40,  in_stock:false }, // not on product line (sold as CJC+Ipa blend)
-  { name:'CJC-1295 No DAC (5mg)',      cat:'gh',      vial:'5mg',  bac:'2mL', dose:'100mcg',units:'4',  schedule:'5 days on / 2 off', timing:'AM/PM',              price:45,  in_stock:true },
-  { name:'CJC-1295 No DAC (10mg)',     cat:'gh',      vial:'10mg', bac:'3mL', dose:'200mcg',units:'6',  schedule:'5 days on / 2 off', timing:'PM',                 price:90,  in_stock:true },
+  { name:'Tesamorelin (10mg)',         cat:'gh',      vial:'10mg', bac:'2mL', dose:'1mg',   units:'20', schedule:'5 days on / 2 off', timing:'PM fasted',         price:55,  in_stock:true },
+  { name:'Tesamorelin (20mg)',         cat:'gh',      vial:'20mg', bac:'2mL', dose:'1mg',   units:'10', schedule:'5 days on / 2 off', timing:'PM fasted',         price:100, in_stock:true },
+  { name:'Ipamorelin',                 cat:'gh',      vial:'10mg', bac:'3mL', dose:'300mcg',units:'9',  schedule:'5 days on / 2 off', timing:'PM fasted',         price:40,  in_stock:false }, // not on product line (sold as CJC+Ipa blend)
+  { name:'CJC-1295 No DAC (5mg)',      cat:'gh',      vial:'5mg',  bac:'2mL', dose:'100mcg',units:'4',  schedule:'5 days on / 2 off', timing:'PM fasted',         price:45,  in_stock:true },
+  { name:'CJC-1295 No DAC (10mg)',     cat:'gh',      vial:'10mg', bac:'3mL', dose:'200mcg',units:'6',  schedule:'5 days on / 2 off', timing:'PM fasted',            price:90,  in_stock:true },
   { name:'CJC-1295 with DAC',          cat:'gh',      vial:'5mg',  bac:'2mL', dose:'1mg',   units:'40', schedule:'2x per week',       timing:'AM',                 price:50,  in_stock:true },
-  { name:'CJC + Ipamorelin Blend',     cat:'gh',      vial:'5mg+5mg', bac:'2mL', dose:'250mcg ea', units:'10', schedule:'5 days on / 2 off', timing:'AM/PM fasted', price:45, in_stock:true },
+  { name:'CJC + Ipamorelin Blend',     cat:'gh',      vial:'5mg+5mg', bac:'2mL', dose:'250mcg ea', units:'10', schedule:'5 days on / 2 off', timing:'PM fasted', price:45, in_stock:true },
   { name:'Sermorelin (10mg)',          cat:'gh',      vial:'10mg', bac:'2mL', dose:'200-300mcg', units:'4-6', schedule:'Nightly',     timing:'Pre-sleep',          price:80,  in_stock:true },
   { name:'Sermorelin (5mg)',           cat:'gh',      vial:'5mg',  bac:'2mL', dose:'200-300mcg', units:'4-6', schedule:'Nightly',     timing:'Pre-sleep',          price:55,  in_stock:false }, // not on product line
   { name:'Hexarelin',                  cat:'gh',      vial:'5mg',  bac:'2mL', dose:'200mcg',units:'8',  schedule:'5 days on / 2 off', timing:'AM fasted / pre-sleep', price:40, in_stock:true },
-  { name:'HGH 10 IU',                  cat:'gh',      vial:'10 IU',bac:'1mL', dose:'1-4 IU',units:'10-40', schedule:'Daily',          timing:'AM or pre-bed',      price:150, in_stock:true },
-  { name:'HGH 15 IU',                  cat:'gh',      vial:'15 IU',bac:'1.5mL', dose:'1-4 IU', units:'10-40', schedule:'Daily',       timing:'AM or pre-bed',      price:200, in_stock:true },
+  { name:'HGH 10 IU',                  cat:'gh',      vial:'10 IU',bac:'1mL', dose:'1-4 IU',units:'10-40', schedule:'Daily',          timing:'AM fasted',           price:150, in_stock:true },
+  { name:'HGH 15 IU',                  cat:'gh',      vial:'15 IU',bac:'1.5mL', dose:'1-4 IU', units:'10-40', schedule:'Daily',       timing:'AM fasted',           price:200, in_stock:true },
 
   // ───── HEALING / RECOVERY ─────
   { name:'BPC-157 (10mg)',             cat:'healing', vial:'10mg', bac:'2mL', dose:'500mcg',units:'10', schedule:'Every day',         timing:'AM/PM',              price:35,  in_stock:true },
