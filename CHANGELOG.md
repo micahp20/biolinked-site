@@ -266,3 +266,6 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-17
 - Added kburr (Katrina Burr) client portal from the annaleah template: Cycle 1 Accelerated Fat Loss quote, Retatrutide 30 mg x2 @ $50, MOTS-c 40 mg x1 @ $50, BAC water 30 mL x1 @ $9.99, hand delivery with no shipping fee. Total $159.99 due, unpaid. Ledger, sales and inventory untouched. Registered in admin-customers and share lists.
+
+## 2026-11-17
+- Added eprice (Elizabeth Price) client portal from the elarrea-castro shell: three saved cycles (Sexual Health & Hormonal Balance, Longevity & Anti-Aging, Sleep & Stress) with testosterone left out (male-only), Health Profile from the intake, unpaid quotes $549.94 total (one $9.99 shipping charge). Ledger, sales and inventory untouched.
