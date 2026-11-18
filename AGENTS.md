@@ -88,3 +88,9 @@ These requirements are recovered from source and merged task records, not a comp
 ## Saved cycle name — owner supplied 2026-11-18
 - “Holy Trinity” is the owner's name for a proposed grouping of TRT (testosterone), retatrutide and HGH (somatropin). This records a name and compound grouping only, not a validated safe cycle, prescription, standard dose or recommendation.
 - Do not copy another client's doses, injection instructions, annual quantities or pricing into a new client's plan by this name. Confirm client-specific clinical instructions and commercial quantities. Retatrutide is investigational; a muscle-gain goal alone does not establish an indication for this grouping. Keep unconfirmed treatment as a clinician-review draft rather than activating a schedule.
+
+
+## Saved master-sheet locations — verified 2026-11-18
+- Master Cycles: https://docs.google.com/spreadsheets/d/1VuSp4WiGl3wvGTEb8fdU6UUlxwukF8A5rlLKyC30YdY/edit — native sheet tab Untitled, sheetId 841105339.
+- Master Dosing: https://docs.google.com/spreadsheets/d/1g1csit5UKXTAKY8IQiGaAdTmfqH1oi9E4pA_v8aM-Rw/edit — native sheet tab Untitled, sheetId 284623520.
+- Search these connected sources before asking the owner to resend them. Read current metadata/ranges; do not assume a generic master row is a client-specific prescription. Preserve missing timing as missing and surface contradictory entries rather than choosing one silently.

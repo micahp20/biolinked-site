@@ -288,3 +288,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Save proposed cycle name
 - Recorded the owner's Holy Trinity name as non-prescriptive grouping metadata, with client-specific confirmation required. Existing portal and Share entry already exist; no clinical, billing or inventory files changed.
+
+
+## 2026-11-18 — Sourced protocol review additions
+- Added a linked provider-review page to lprice/ using the recovered master-sheet references. Saved sheet locations for future sessions. Active medication, schedule, calculator and invoice data remain unchanged; unresolved source gaps are stated in the draft. See PROJECT_STATUS.md.
