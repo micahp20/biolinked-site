@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /kwells/.
-const CACHE = 'kwells-master-layout-v1-20261109-sgk1-extras1-dedupe1-legacy1-nostore1';
+const CACHE = 'kwells-paid-mots-v1-20261119';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
