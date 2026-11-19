@@ -2233,7 +2233,11 @@ var BL_KEY=(function(){
   try{ var m=location.search.match(/[?&]k=([^&#]+)/); if(m) k=decodeURIComponent(m[1]); }catch(e){}
   if(k){
     try{ localStorage.setItem(KP+'mkey',k); localStorage.setItem(KP+'unlocked','1'); }catch(e){}
-    try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){}
+    /* Inside the installed Home Screen app the key is wiped from the address bar. In a normal browser tab it
+       STAYS on the address, because that address is what the phone copies when you choose Add to Home Screen:
+       the new app then opens with the key and is connected the first time. */
+    var inApp=false; try{ inApp=!!(window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)); }catch(e){}
+    if(inApp){ try{ history.replaceState(null,'',location.pathname+location.hash); }catch(e){} }
     return k;
   }
   try{ return localStorage.getItem(KP+'mkey'); }catch(e){ return null; }
@@ -2262,7 +2266,7 @@ function blRpc(fn,body,signal){
    can actually do something about. */
 function blMessage(r){
   var m=(r && r.err && r.err.message) || '';
-  if(r && r.status===401) return 'That link is no longer valid. Open your personal link again.';
+  if(r && r.status===401) return 'That link is no longer valid. Open the connect link you were sent again.';
   if(/bad_day_index|days_must_be/.test(m)) return 'Those days could not be saved.';
   if(/version_conflict/.test(m)) return 'Updated from your other device.';
   if(/payload_too_large/.test(m)) return 'That is too large to save.';
@@ -6002,19 +6006,19 @@ function blLinkKey(raw){
 function blNote(){
   var el=document.getElementById('gkNote'); if(!el) return;
   if(!BL_KEY || BL_KEYBAD){
-    el.innerHTML='<b>'+(BL_KEYBAD?'This link is no longer valid.':'This app is not linked to your saved schedule yet.')+'</b> What shows here is the page default, and changes stay on this device only. Paste your personal link below to load your saved schedule.'
-      +'<div style="display:flex;gap:8px;margin-top:10px"><input id="blLinkIn" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your personal link" style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--gold-line);background:transparent;color:inherit;font-size:16px">'
-      +'<button type="button" id="blLinkGo" style="padding:10px 16px;border-radius:10px;border:1px solid var(--gold-line);background:var(--gold-soft);color:inherit;font-size:14px">Link</button></div>'
+    el.innerHTML='<b>'+(BL_KEYBAD?'This link is no longer valid.':'This app is not connected to your saved schedule yet.')+'</b> What shows here is the page default, and changes stay on this device only. Paste the connect link you were sent below to load your saved schedule.'
+      +'<div style="display:flex;gap:8px;margin-top:10px"><input id="blLinkIn" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your connect link" style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--gold-line);background:transparent;color:inherit;font-size:16px">'
+      +'<button type="button" id="blLinkGo" style="padding:10px 16px;border-radius:10px;border:1px solid var(--gold-line);background:var(--gold-soft);color:inherit;font-size:14px">Connect</button></div>'
       +'<div id="blLinkMsg" style="margin-top:6px;font-size:13px"></div>';
     el.hidden=false;
     var go=document.getElementById('blLinkGo'), inp=document.getElementById('blLinkIn'), msg=document.getElementById('blLinkMsg');
-    var run=function(){ if(blLinkKey(inp.value)){ msg.textContent='Linked. Loading your saved schedule\u2026'; setTimeout(function(){ location.replace(location.pathname); },400); } else { msg.textContent='That does not look like your personal link. Copy the whole link and paste it again.'; } };
+    var run=function(){ if(blLinkKey(inp.value)){ msg.textContent='Connected. Loading your saved schedule\u2026'; setTimeout(function(){ location.replace(location.pathname); },400); } else { msg.textContent='That does not look like your personal link. Copy the whole link you were sent and paste it again.'; } };
     if(go) go.onclick=run; if(inp) inp.onkeydown=function(e){ if(e.key==='Enter') run(); };
     return;
   }
   if(!blStandalone()){
     /* Keyed browser tab: offer the link for the home-screen app. */
-    el.innerHTML='<details><summary style="cursor:pointer;font-size:13px">Using the Home Screen app?</summary><div style="margin-top:8px">The app keeps its own storage, so copy your link here, then paste it into the app when it asks. <button type="button" id="blCopyLink" style="margin-left:6px;padding:6px 12px;border-radius:10px;border:1px solid var(--gold-line);background:var(--gold-soft);color:inherit;font-size:13px">Copy my link</button><span id="blCopyMsg" style="margin-left:8px;font-size:13px"></span></div></details>';
+    el.innerHTML='<details><summary style="cursor:pointer;font-size:13px">Using the Home Screen app?</summary><div style="margin-top:8px">Open this page from your connect link, then choose Add to Home Screen from this same page and the app connects by itself. If it ever asks for the link, copy it here and paste it in. <button type="button" id="blCopyLink" style="margin-left:6px;padding:6px 12px;border-radius:10px;border:1px solid var(--gold-line);background:var(--gold-soft);color:inherit;font-size:13px">Copy my link</button><span id="blCopyMsg" style="margin-left:8px;font-size:13px"></span></div></details>';
     el.hidden=false;
     var cb=document.getElementById('blCopyLink');
     if(cb) cb.onclick=function(){
