@@ -5600,33 +5600,43 @@ function gkPush(){
   }
   gkPushNow();
 }
+/* One save at a time: two overlapping saves would carry the same version and
+   the second would bounce. A save asked for while one is running waits, and
+   is skipped if nothing changed since the last accepted save. */
+var gkInFlight=false, gkAgain=false, gkSavedSig=null;
+function gkPushDone(){ gkInFlight=false; if(gkAgain){ gkAgain=false; gkPushNow(); } }
 function gkPushNow(retried){
+  if(gkInFlight && !retried){ gkAgain=true; return; }
+  var payload=gkPayload(), sig=JSON.stringify(payload);
+  if(!retried && sig===gkSavedSig){ try{ localStorage.removeItem(KP+'pending'); }catch(e){} return; }
+  gkInFlight=true;
   var attempt=JSON.stringify(gkState);
   blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',
-                             p_payload:gkPayload(), p_expected_version:BL_VER.schedule})
+                             p_payload:payload, p_expected_version:BL_VER.schedule})
     .then(function(r){
-      if(r.ok){
+      if(r.ok){ gkSavedSig=sig;
         BL_ONLINE=true; gkLastGood=attempt;
         try{ localStorage.removeItem(KP+'pending'); }catch(e){}
         if(r.data && typeof r.data.version==='number') BL_VER.schedule=r.data.version;
-        return;
+        gkPushDone(); return;
       }
-      if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); gkRollback(); return; }
+      if(r.status===401){ gkPushDone(); BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); gkRollback(); return; }
       /* Saved copy moved since this screen last read it (an app resumed from the
          background, or another device). The edit just made here is the member's
          latest action, so pick up the new version number and save it again
          instead of throwing the edit away. */
       if(blIsConflict(r)){
-        if(retried){ blResync(); return; }
+        if(retried){ gkPushDone(); blResync(); return; }
         blRpc('get_member_state',{p_slug:BL_SLUG}).then(function(g){
-          if(g.ok){ BL_VER=blUnwrap(g.data).versions||{}; gkPushNow(true); }
-        }).catch(function(){ BL_ONLINE=false; });
+          if(g.ok){ BL_VER=blUnwrap(g.data).versions||{}; gkPushNow(true); } else gkPushDone();
+        }).catch(function(){ BL_ONLINE=false; gkPushDone(); });
         return;
       }
+      gkPushDone();
       gkToast(blMessage(r));
       gkRollback();
     })
-    .catch(function(){ BL_ONLINE=false; });   /* offline: cache holds, retry on next edit */
+    .catch(function(){ BL_ONLINE=false; gkInFlight=false; gkAgain=false; });   /* offline: cache and unsent mark hold; pushed on reopen, resume or back online */
 }
 /* The server refused because someone else wrote since we last read. The other
    side's change is the newer one, so we take it rather than insisting -- this
@@ -6283,7 +6293,7 @@ try{ renderMeds(); }catch(e){}
             if(mine && mine!==seed && mine!==saved){ unsent=true; try{ localStorage.setItem(KP+'pending',String(Date.now())); }catch(e){} }
           }
           if(unsent){ BL_DIRTY=true; BL_PENDING=true; }   /* an edit made here never reached the server: it is the newer one, push it instead of overwriting it */
-          else gkHydrate(u.state.schedule);
+          else { gkHydrate(u.state.schedule); try{ gkSavedSig=JSON.stringify(gkPayload()); }catch(e){} }
           if(u.state.nutrition){ try{
             if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
             if(u.state.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(u.state.nutrition.plan));
