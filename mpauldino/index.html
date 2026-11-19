@@ -5522,7 +5522,7 @@ function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gk
    link and taps around has written nothing, and an existing member on a slow
    connection cannot clobber their own saved row before it has even arrived. */
 function gkSave(edit){
-  if(edit) BL_DIRTY=true;
+  if(edit){ BL_DIRTY=true; if(BL_KEY){ try{ localStorage.setItem(KP+'pending',String(Date.now())); }catch(e){} } }
   gkCacheLocal();
   if(!BL_KEY || BL_KEYBAD) return;
   if(!BL_DIRTY) return;
@@ -5580,6 +5580,7 @@ function gkPushNow(){
     .then(function(r){
       if(r.ok){
         BL_ONLINE=true; gkLastGood=attempt;
+        try{ localStorage.removeItem(KP+'pending'); }catch(e){}
         if(r.data && typeof r.data.version==='number') BL_VER.schedule=r.data.version;
         return;
       }
@@ -5608,6 +5609,7 @@ function blResync(){
       if(!r.ok) return;
       var u=blUnwrap(r.data);
       BL_VER=u.versions||{};
+      try{ localStorage.removeItem(KP+'pending'); }catch(e){}
       gkHydrate(u.state.schedule);
       if(u.state.nutrition){ try{
         if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
@@ -5986,16 +5988,41 @@ document.addEventListener("change",function(e){
   var v=inp.value.trim(); c.draw = v || "\u2014"; gkSave(true); gkRender();
 });
 
+function blStandalone(){ try{ return !!(window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches)); }catch(e){ return false; } }
+/* A home-screen app on iPhone has its own storage, separate from Safari, so it
+   starts with no member key and silently shows the page default schedule. Say so
+   and let the member paste their personal link (or just the key) to link it. */
+function blLinkKey(raw){
+  raw=String(raw||'').trim(); if(!raw) return false;
+  var m=raw.match(/[?&]k=([^&#\s]+)/), k=m?decodeURIComponent(m[1]):raw;
+  if(!/^[A-Za-z0-9._~-]{12,}$/.test(k)) return false;
+  try{ localStorage.setItem(KP+'mkey',k); localStorage.setItem(KP+'unlocked','1'); localStorage.removeItem(KP+'pending'); }catch(e){ return false; }
+  return true;
+}
 function blNote(){
   var el=document.getElementById('gkNote'); if(!el) return;
-  el.hidden=true; return; /* note suppressed on owner page */
-  if(BL_KEYBAD){
-    el.innerHTML='<b>This link is no longer valid.</b> Open your personal link again to pick your schedule back up. Changes made here stay on this device.';
-    el.hidden=false; return;
+  if(!BL_KEY || BL_KEYBAD){
+    el.innerHTML='<b>'+(BL_KEYBAD?'This link is no longer valid.':'This app is not linked to your saved schedule yet.')+'</b> What shows here is the page default, and changes stay on this device only. Paste your personal link below to load your saved schedule.'
+      +'<div style="display:flex;gap:8px;margin-top:10px"><input id="blLinkIn" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your personal link" style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--gold-line);background:transparent;color:inherit;font-size:16px">'
+      +'<button type="button" id="blLinkGo" style="padding:10px 16px;border-radius:10px;border:1px solid var(--gold-line);background:var(--gold-soft);color:inherit;font-size:14px">Link</button></div>'
+      +'<div id="blLinkMsg" style="margin-top:6px;font-size:13px"></div>';
+    el.hidden=false;
+    var go=document.getElementById('blLinkGo'), inp=document.getElementById('blLinkIn'), msg=document.getElementById('blLinkMsg');
+    var run=function(){ if(blLinkKey(inp.value)){ msg.textContent='Linked. Loading your saved schedule\u2026'; setTimeout(function(){ location.replace(location.pathname); },400); } else { msg.textContent='That does not look like your personal link. Copy the whole link and paste it again.'; } };
+    if(go) go.onclick=run; if(inp) inp.onkeydown=function(e){ if(e.key==='Enter') run(); };
+    return;
   }
-  if(!BL_KEY){
-    el.innerHTML='<b>Changes save on this device only.</b> Open your personal link to keep your schedule in step across your phone and laptop.';
-    el.hidden=false; return;
+  if(!blStandalone()){
+    /* Keyed browser tab: offer the link for the home-screen app. */
+    el.innerHTML='<details><summary style="cursor:pointer;font-size:13px">Using the Home Screen app?</summary><div style="margin-top:8px">The app keeps its own storage, so copy your link here, then paste it into the app when it asks. <button type="button" id="blCopyLink" style="margin-left:6px;padding:6px 12px;border-radius:10px;border:1px solid var(--gold-line);background:var(--gold-soft);color:inherit;font-size:13px">Copy my link</button><span id="blCopyMsg" style="margin-left:8px;font-size:13px"></span></div></details>';
+    el.hidden=false;
+    var cb=document.getElementById('blCopyLink');
+    if(cb) cb.onclick=function(){
+      var url=location.origin+location.pathname+'?k='+encodeURIComponent(BL_KEY), m=document.getElementById('blCopyMsg');
+      var done=function(ok){ if(m) m.textContent=ok?'Copied.':'Could not copy.'; };
+      try{ navigator.clipboard.writeText(url).then(function(){done(true);},function(){done(false);}); }catch(e){ done(false); }
+    };
+    return;
   }
   el.hidden=true;
 }
@@ -6201,7 +6228,9 @@ try{ renderMeds(); }catch(e){}
         if(r.data){
           var u=blUnwrap(r.data);
           BL_VER=u.versions||{};         /* remember what we saw, for the write check */
-          gkHydrate(u.state.schedule);
+          var unsent=false; try{ unsent=!!localStorage.getItem(KP+'pending'); }catch(e){}
+          if(unsent){ BL_DIRTY=true; BL_PENDING=true; }   /* an edit made here never reached the server: it is the newer one, push it instead of overwriting it */
+          else gkHydrate(u.state.schedule);
           if(u.state.nutrition){ try{
             if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
             if(u.state.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(u.state.nutrition.plan));
