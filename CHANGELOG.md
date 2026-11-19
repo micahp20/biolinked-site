@@ -2,6 +2,10 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-18 — mpauldino home-screen app kept resetting to the page default schedule
+- Cause: the schedule syncs through a member key that arrives once as ?k= and is saved in the browser's localStorage. An iPhone Home Screen app has its own storage, so it opens with no key, reads nothing from the server, shows the page default schedule, and keeps edits on that device only. The "saved on this device only" notice was switched off on this page, so nothing said so. Server row (v69, last written 2026-11-12) held the real schedule; backup in /workspace/backups/mpauldino-state/.
+- Fix (mpauldino/index.html, mpauldino/sw.js): the app now says when it is not linked and lets the member paste their personal link to link it; a keyed browser tab has a "Copy my link" helper; an edit that was saved locally but never reached the server is pushed on next open instead of being overwritten by the older server copy; the service worker fetches HTML with cache: no-store (network first). No compounds, doses, ledger or database rows changed.
+
 ## 2026-11-18 — Invoice supply durations
 - Show the owner-confirmed supply duration above each cycle name on the invoice card and detail view. Two quotes show “12-month supply” and three show “8-week cycle.” See the source diff in `lprice/index.html` and the check record in PROJECT_STATUS.md.
 
