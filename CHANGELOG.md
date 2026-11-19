@@ -7,6 +7,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Rocky Holm (rholm) client portal
 - Added rholm from the elarrea-castro shell (mpauldino layout), Cycle 1 only: Retatrutide 60 mg (3 mL, 0.5 mg start, 3u, Mon + Thu AM, titrate) and Cagrilintide 10 mg (2 mL, 500 mcg, 10u, Monday AM, titrate), per Master Dosing and the elarrea-castro precedent. Unpaid quote $159.98 (Reta $100, Cagrilintide $40, BAC Water 30 mL $9.99, shipping $9.99). No intake on file, so no Health Profile, and the nutrition calculator keeps the neutral defaults. Page uses rholm-only copies of compound-library.js and protocol-copy.js without the word "prescription". No ledger, inventory or sales write.
+- Update 2026-11-18: owner is hand-delivering, so the $9.99 shipping line is replaced by a $0 "Hand-delivered" line. Quote is now $149.99 (Reta 60 $100 + Cagrilintide $40 + BAC Water 30 mL $9.99). rholm sw cache bumped.
 
 ## 2026-11-17 — Luke Price (lprice) client portal
 - Added lprice from the elarrea-castro shell: Cycle 1 Holy Trinity (testosterone x5 vials @ $120 as on rgreen, retatrutide 30 mg x4 vials with 2 mg Mondays as on cmyers, HGH 40 IU x13 vials 2 IU Mon–Fri AM fasted as on mhartman) plus optional Recovery & Healing and Cognitive cycles. Unpaid quote $1,704.95. Health Profile has no phone or email. Page uses lprice-only copies of protocol-copy.js and compound-library.js with no 'prescri' wording. Holy Trinity added to the builder catalog and Master Cycles sheet. Ledger and inventory untouched.
