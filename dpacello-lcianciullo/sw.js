@@ -1,5 +1,5 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
-const CACHE = 'dpacello-lcianciullo-v40';
+const CACHE = 'dpacello-lcianciullo-v40-nostore1';
 const ASSETS = [
   '/dpacello-lcianciullo/',
   '/dpacello-lcianciullo/index.html',
@@ -27,7 +27,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));

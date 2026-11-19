@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /akelley/.
-const CACHE = 'akelley-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage1-extras1-dedupe1-legacy1';
+const CACHE = 'akelley-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage1-extras1-dedupe1-legacy1-nostore1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -41,7 +41,7 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
   if (!url.pathname.startsWith('/akelley/') && !url.pathname.startsWith('/icon-') && url.pathname !== '/calc-feedback.js' && url.pathname !== '/bio-age.js') return;
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));

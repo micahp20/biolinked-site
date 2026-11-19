@@ -5173,7 +5173,9 @@ function csPull(){
     var seen={};
     rows.forEach(function(row){
       seen[row.kind]=1; csVer[row.kind]=row.version;
-      csApply(row.kind,row.payload);
+      var unsent=false; try{ unsent=!!localStorage.getItem('bl-cs-pending:'+CS_SLUG+':'+row.kind); }catch(e){}
+      if(unsent){ csQueue(row.kind,true); }   /* newest wins: an edit made here that never reached the cloud is pushed, not overwritten */
+      else csApply(row.kind,row.payload);
     });
     csBooted=true;
     /* nothing in the cloud for a kind this device already has: lift it up
@@ -5191,6 +5193,8 @@ function csPull(){
 function csQueue(kind,now){
   if(CS_KINDS.indexOf(kind)<0) return;
   csWant[kind]=1;
+  /* remember on this device that an edit has not reached the cloud yet, so a reload or a Home Screen relaunch pushes it instead of overwriting it with the older cloud copy */
+  try{ localStorage.setItem('bl-cs-pending:'+CS_SLUG+':'+kind,String(Date.now())); }catch(e){}
   clearTimeout(csTimer[kind]);
   csTimer[kind]=setTimeout(function(){ csFlush(kind); }, now?60:900);
 }
@@ -5203,11 +5207,11 @@ function csFlush(kind){
                       p_expected_version:(csVer[kind]||0)}).then(function(r){
     csInFlight[kind]=0;
     if(r.status===200){
-      csVer[kind]=r.body; csWant[kind]=0; csStat('saved'); return;
+      csVer[kind]=r.body; csWant[kind]=0; try{ localStorage.removeItem('bl-cs-pending:'+CS_SLUG+':'+kind); }catch(e){} csStat('saved'); return;
     }
     if(r.status===409){
       /* another device moved first: take theirs, never clobber it */
-      csWant[kind]=0;
+      csWant[kind]=0; try{ localStorage.removeItem('bl-cs-pending:'+CS_SLUG+':'+kind); }catch(e){}
       return csRpc('get_state',{p_slug:CS_SLUG}).then(function(g){
         if(g.status!==200 || !Array.isArray(g.body)) return;
         g.body.forEach(function(row){
@@ -5218,7 +5222,7 @@ function csFlush(kind){
       });
     }
     if(r.status===0){ csStat('offline'); return; }   /* keep csWant set to retry */
-    csWant[kind]=0; csStat('error');
+    csWant[kind]=0; try{ localStorage.removeItem('bl-cs-pending:'+CS_SLUG+':'+kind); }catch(e){} csStat('error');
   }).catch(function(){ csInFlight[kind]=0; csStat('offline'); });
 }
 /* back online: push whatever never made it */

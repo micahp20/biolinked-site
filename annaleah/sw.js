@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /annaleah/.
-const CACHE = 'annaleah-tesa-klow-v5-ship1-20261115-pmfast1';
+const CACHE = 'annaleah-tesa-klow-v5-ship1-20261115-pmfast1-nostore1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -40,7 +40,7 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
   if (!url.pathname.startsWith('/annaleah/') && !url.pathname.startsWith('/icon-') && url.pathname !== '/calc-feedback.js') return;
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));

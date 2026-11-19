@@ -2,7 +2,7 @@
 // never stale. Scoped to /mp-gold/, the Gold Edition colour preview of
 // /mpauldino/. Its cache name is unique so it never collides with, or evicts,
 // the live /mpauldino/ page's own store.
-const CACHE = 'mp-gold-master-locked-v1-context-v1-controls-v1-calcact1';
+const CACHE = 'mp-gold-master-locked-v1-context-v1-controls-v1-calcact1-nostore1';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
@@ -37,7 +37,7 @@ self.addEventListener('fetch', e => {
   if (url.origin !== location.origin) return;
   if (!url.pathname.startsWith('/mp-gold/') && !url.pathname.startsWith('/icon-') && url.pathname !== '/calc-feedback.js') return;
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));

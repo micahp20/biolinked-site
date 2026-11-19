@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first to serve fresh updates on every visit.
 // Falls back to cache only when offline. Cache version bumped on each deploy to clear stale assets.
-const CACHE = 'workout-demo-v6-labdefs1-tapfix1-rel1-sch1-days1-font1-tp1-shop1-g1-ord2-o3-o4-ipad1-ctl20-homefix1-v3-context-v1-controls-v1-calcact1-sgk1-dedupe1-legacy1';
+const CACHE = 'workout-demo-v6-labdefs1-tapfix1-rel1-sch1-days1-font1-tp1-shop1-g1-ord2-o3-o4-ipad1-ctl20-homefix1-v3-context-v1-controls-v1-calcact1-sgk1-dedupe1-legacy1-nostore1';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
@@ -38,7 +38,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request).then(res => {
+    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
