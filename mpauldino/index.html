@@ -2246,7 +2246,31 @@ function blForgetKey(){ try{ localStorage.removeItem(KP+'mkey'); }catch(e){} BL_
 /* No key on this device = someone opened a shared (keyless) link: lock the page to view-only. */
 var GK_VIEWONLY=false; /* Schedule editing is available by default. */
 
+/* Plain-link sync (Nov 2026): this page now saves and loads by page address
+   through the same get_state / save_state functions every client page uses, so
+   the plain link and any Home Screen icon always read and write the saved
+   schedule. No connect key is needed; a key on the device is simply ignored.
+   The old keyed calls are translated here so the rest of the page is unchanged. */
 function blRpc(fn,body,signal){
+  if(fn==='get_member_state'){
+    return blRpcRaw('get_state',{p_slug:BL_SLUG},signal).then(function(r){
+      if(!r.ok) return r;
+      var st={}, vs={};
+      (Array.isArray(r.data)?r.data:[]).forEach(function(row){ if(row&&row.kind){ st[row.kind]=row.payload; vs[row.kind]=row.version; } });
+      return {ok:true,data:{state:st,versions:vs}};
+    });
+  }
+  if(fn==='save_member_state'){
+    return blRpcRaw('save_state',{p_slug:BL_SLUG,p_kind:body.p_kind,p_payload:body.p_payload,
+                                  p_expected_version:(typeof body.p_expected_version==='number'?body.p_expected_version:0)},signal)
+      .then(function(r){
+        if(r.ok && typeof r.data==='number') return {ok:true,data:{ok:true,kind:body.p_kind,version:r.data}};
+        return r;
+      });
+  }
+  return blRpcRaw(fn,body,signal);
+}
+function blRpcRaw(fn,body,signal){
   var opt={
     method:'POST',
     headers:{'apikey':BL_ANON,'Authorization':'Bearer '+BL_ANON,'Content-Type':'application/json'},
@@ -4083,7 +4107,7 @@ function blNutPayload(){
   nStore=function(k,v){
     var ok=local(k,v);
     BL_DIRTY=true;                      /* nStore is only reached from Save */
-    if(BL_KEY && !BL_KEYBAD && BL_READY && BL_SEEN){
+    if(BL_READY && BL_SEEN){
       clearTimeout(blNutT);
       blNutT=setTimeout(function(){
         blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'nutrition',
@@ -5526,9 +5550,8 @@ function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gk
    link and taps around has written nothing, and an existing member on a slow
    connection cannot clobber their own saved row before it has even arrived. */
 function gkSave(edit){
-  if(edit){ BL_DIRTY=true; if(BL_KEY){ try{ localStorage.setItem(KP+'pending',String(Date.now())); }catch(e){} } }
+  if(edit){ BL_DIRTY=true; try{ localStorage.setItem(KP+'pending',String(Date.now())); }catch(e){} }
   gkCacheLocal();
-  if(!BL_KEY || BL_KEYBAD) return;
   if(!BL_DIRTY) return;
   if(!BL_READY || !BL_SEEN){ BL_PENDING=true; return; }
   clearTimeout(gkPushT);
@@ -5577,7 +5600,7 @@ function gkPush(){
   }
   gkPushNow();
 }
-function gkPushNow(){
+function gkPushNow(retried){
   var attempt=JSON.stringify(gkState);
   blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',
                              p_payload:gkPayload(), p_expected_version:BL_VER.schedule})
@@ -5589,7 +5612,17 @@ function gkPushNow(){
         return;
       }
       if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); gkRollback(); return; }
-      if(blIsConflict(r)){ blResync(); return; }
+      /* Saved copy moved since this screen last read it (an app resumed from the
+         background, or another device). The edit just made here is the member's
+         latest action, so pick up the new version number and save it again
+         instead of throwing the edit away. */
+      if(blIsConflict(r)){
+        if(retried){ blResync(); return; }
+        blRpc('get_member_state',{p_slug:BL_SLUG}).then(function(g){
+          if(g.ok){ BL_VER=blUnwrap(g.data).versions||{}; gkPushNow(true); }
+        }).catch(function(){ BL_ONLINE=false; });
+        return;
+      }
       gkToast(blMessage(r));
       gkRollback();
     })
@@ -6005,6 +6038,7 @@ function blLinkKey(raw){
 }
 function blNote(){
   var el=document.getElementById('gkNote'); if(!el) return;
+  el.hidden=true; return;   /* plain link syncs on its own: no connect prompt */
   if(!BL_KEY || BL_KEYBAD){
     el.innerHTML='<b>'+(BL_KEYBAD?'This link is no longer valid.':'This app is not connected to your saved schedule yet.')+'</b> What shows here is the page default, and changes stay on this device only. Paste the connect link you were sent below to load your saved schedule.'
       +'<div style="display:flex;gap:8px;margin-top:10px"><input id="blLinkIn" type="text" inputmode="url" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Paste your connect link" style="flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--gold-line);background:transparent;color:inherit;font-size:16px">'
@@ -6211,7 +6245,18 @@ try{ renderAbout(); }catch(e){}
 try{ renderMeds(); }catch(e){}
 
 (function blBoot(){
-  if(!BL_KEY){ blReady(); return; }      /* local-only: nothing to read, nothing to push */
+  /* Always read the saved schedule -- no key needed. One-time carry-over: a
+     device that ran without a key kept its edits on the phone only and never
+     marked them unsent. If what it holds differs from both the page default and
+     the saved copy, those are the member's own edits, so push them up. */
+  var blCarry=false;
+  try{
+    if(!localStorage.getItem(KP+'pubsync1')){
+      localStorage.setItem(KP+'pubsync1','1');
+      if(!localStorage.getItem(KP+'mkey') && localStorage.getItem(GK_STORAGE) && !localStorage.getItem(KP+'pending')) blCarry=true;
+    }
+  }catch(e){}
+  var blSig=function(p){ try{ return JSON.stringify((p&&p.compounds||[]).filter(function(c){return c&&c.active!==false;}).map(function(c){return [c.id,c.dose,(c.days||[]).slice().sort().join(''),c.block,c.unit];}).sort()); }catch(e){ return ''; } };
 
   /* A provisional paint so a slow link does not stare at an empty tab. It is
      explicitly NOT "ready": it does not run nutInit, does not enable writes,
@@ -6233,6 +6278,10 @@ try{ renderMeds(); }catch(e){}
           var u=blUnwrap(r.data);
           BL_VER=u.versions||{};         /* remember what we saw, for the write check */
           var unsent=false; try{ unsent=!!localStorage.getItem(KP+'pending'); }catch(e){}
+          if(!unsent && blCarry && u.state.schedule){
+            var mine=blSig(gkPayload()), seed=blSig({compounds:gkSeed.compounds}), saved=blSig(u.state.schedule);
+            if(mine && mine!==seed && mine!==saved){ unsent=true; try{ localStorage.setItem(KP+'pending',String(Date.now())); }catch(e){} }
+          }
           if(unsent){ BL_DIRTY=true; BL_PENDING=true; }   /* an edit made here never reached the server: it is the newer one, push it instead of overwriting it */
           else gkHydrate(u.state.schedule);
           if(u.state.nutrition){ try{
@@ -6251,6 +6300,33 @@ try{ renderMeds(); }catch(e){}
       blReady();
     });
 })();
+
+
+/* Coming back to the app (Home Screen apps resume rather than reload) or back
+   online: an edit that has not reached the saved copy yet is pushed; otherwise
+   pick up a newer saved copy so the screen is never showing a stale schedule. */
+function blResume(){
+  if(!BL_READY) return;
+  var pend=false; try{ pend=!!localStorage.getItem(KP+'pending'); }catch(e){}
+  if(pend){ BL_DIRTY=true; gkPush(); return; }
+  if(gkState.open) return;
+  blRpc('get_member_state',{p_slug:BL_SLUG}).then(function(r){
+    if(!r.ok) return;
+    var still=false; try{ still=!!localStorage.getItem(KP+'pending'); }catch(e){}
+    if(still || gkState.open) return;
+    var u=blUnwrap(r.data), v=(u.versions||{}).schedule;
+    BL_SEEN=true; BL_ONLINE=true;
+    if(typeof v==='number' && v!==BL_VER.schedule){
+      BL_VER=u.versions||{}; gkHydrate(u.state.schedule); gkCacheLocal();
+      gkLastGood=JSON.stringify(gkState); try{ gkRender(); }catch(e){}
+    }
+  }).catch(function(){});
+}
+try{
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible') blResume(); });
+  window.addEventListener('online',blResume);
+  window.addEventListener('pageshow',function(e){ if(e.persisted) blResume(); });
+}catch(e){}
 
 
 var CS_URL='https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/rpc/';
