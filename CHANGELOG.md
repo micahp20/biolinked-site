@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-20 — Promo video on home page and intake
+- Added the BioLinked promo video (no autoplay, controls, poster) after the home hero and on both intake entry points above the form content. Shared styling in promo-embed.css.
+
 ## 2026-11-19 — Epithalon / Pinealon 20-day cycles (rgreen + masters)
 - rgreen Deep Reset: Pinealon now 2 mL BAC, 1 mg / 20u, 20 days (2 vials); Epithalon and Pinealon labelled 20-day cycles. Prices, quote ($289.99) and card link unchanged. Master Dosing and Master Cycles sheets updated; rule recorded in AGENTS.md. Other client pages unchanged. No ledger or inventory changes.
 
