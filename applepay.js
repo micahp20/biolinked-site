@@ -71,7 +71,7 @@
     }).catch(function(){});
   }
   function prepareCard(wallet){
-    if(wallet.dataset.client!=='dbarajas') return;
+    if(!['lprice','eprice','dbarajas'].includes(wallet.dataset.client)) return;
     var button=wallet.parentElement.querySelector('[data-cart-card],button[title="Card checkout pending"]');
     if(!button || button.dataset.bound) return;
     button.dataset.bound='1'; button.disabled=false; button.removeAttribute('title');
