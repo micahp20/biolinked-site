@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-19 — 3% card fee on open Stripe card links
+- vbernal-quintana: the "Pay remaining balance" card link moved from $220.98 to $227.61 (3% fee) with an "includes 3% card fee" note; invoice totals and the other payment methods are unchanged. rhurst's only card link is for an already-paid order and was left as is. Rule recorded in AGENTS.md.
+
 ## 2026-11-19 — rgreen: Sleep Stack added to the HGH quote and the protocol
 - Added the Deep Reset sleep cycle (Epithalon 50 mg and Pinealon 10 mg only, doses from the master cycles/dosing sheets) to the protocol, and added both to the open HGH quote: $289.99 total. Card payments carry a 3% fee through a new payment link; Venmo, Cash App and Zelle stay at the quote total. Evidence: PR on branch rgreen-sleep-stack-quote.
 

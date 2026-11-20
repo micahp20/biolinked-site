@@ -97,3 +97,9 @@ These requirements are recovered from source and merged task records, not a comp
 - Master Cycles: https://docs.google.com/spreadsheets/d/1VuSp4WiGl3wvGTEb8fdU6UUlxwukF8A5rlLKyC30YdY/edit — native sheet tab Untitled, sheetId 841105339.
 - Master Dosing: https://docs.google.com/spreadsheets/d/1g1csit5UKXTAKY8IQiGaAdTmfqH1oi9E4pA_v8aM-Rw/edit — native sheet tab Untitled, sheetId 284623520.
 - Search these connected sources before asking the owner to resend them. Read current metadata/ranges; do not assume a generic master row is a client-specific prescription. Preserve missing timing as missing and surface contradictory entries rather than choosing one silently.
+
+## Card payments carry a 3% fee — owner confirmed 2026-11-19
+- Every Stripe card Payment Link on a client page must charge the base amount x 1.03, rounded to the cent. Name the link like the base link plus " incl. 3% card fee"; keep the same redirect back to the client's page; put base amount, fee and client in the link metadata.
+- The page keeps the invoice total and the Venmo / Cash App / Zelle amounts at the base amount. Only the card button shows the higher amount, with a small note under it: `<div class="cardfee-note" style="width:100%;text-align:center;font-size:11px;opacity:.7;margin:-4px 0 2px">includes 3% card fee</div>`.
+- No shared template currently emits card buttons: each page that has one hard-codes it in its own `payButtons()` (see rgreen and vbernal-quintana). Copy that pattern and the fee note when a new card button is added.
+- Deactivate the superseded link only after the page is live. Links for amounts already paid are left alone. The $19.99 intake link is a flat intake fee and is not a quote payment.
