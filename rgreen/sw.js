@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /rgreen/.
-const CACHE = 'rgreen-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage1-extras1-dedupe1-legacy1-pay150-20261115-nostore1-hghq3-sleep1';
+const CACHE = 'rgreen-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage1-extras1-dedupe1-legacy1-pay125-20261119-nostore1-hghq3-sleep1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
