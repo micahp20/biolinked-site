@@ -334,3 +334,9 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Refresh combined-quote delivery
 - Made the existing combined quote heading explicit on vbernal-quintana/ and refreshed its scoped cache after an older invoice screenshot was reported. Invoice amounts and contents unchanged; live source confirmed the requested products were together. See PROJECT_STATUS.md.
+
+
+## 2026-11-20 — New saved-cycle review portal
+- Added dbarajas/index.html, sw.js and manifest.json using the cirilo layout; registered the portal on share/index.html and protocols/index.html. Root cache refreshed.
+- Seven catalog-reference cycles are quoted separately; no active schedule, individualized prescription, payment, laboratory score or inventory/ledger write. Contact information excluded. Bloodwork and clinician approval remain pending.
+- Checks: inline JavaScript compilation, quote arithmetic, contact/identity isolation and empty schedule passed. Native iPhone/browser verification not performed. Publishing via PR; hosting and live content checked separately.
