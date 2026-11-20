@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /dbarajas/.
-const CACHE = 'dbarajas-cycle-pay-v2-select1-water1-headercart';
+const CACHE = 'dbarajas-cycle-pay-v2-select1-water1-headercart-labs1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
