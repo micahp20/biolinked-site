@@ -86,9 +86,9 @@
     panel.innerHTML = '<h2>Choose cycles</h2><p>Select one or more cycles for one shipment.</p><div class="choices"></div><p aria-live="polite"></p><button type="button" class="invoice-pay-now" disabled>Pay now</button>';
     hero.before(panel);
     var choices = panel.querySelector('.choices');
-    function products(order) {
+    function merchandise(order) {
       return order.items.reduce(function(sum, item) {
-        return /^(Shipping|BAC Water)\b/i.test(item.n) ? sum : sum + Math.round(item.amt * 100);
+        return /^Shipping\b/i.test(item.n) ? sum : sum + Math.round(item.amt * 100);
       }, 0);
     }
     INV.forEach(function(order, i) {
@@ -106,12 +106,12 @@
     function selected() {
       return Array.from(choices.querySelectorAll('input:checked'), function(input){return INV[Number(input.value)]});
     }
-    function base(orders) {return orders.reduce(function(sum,o){return sum+products(o)},1498);}
+    function base(orders) {return orders.reduce(function(sum,o){return sum+merchandise(o)},999);}
     var button = panel.querySelector('button');
     function refresh() {
       var orders = selected();
       button.disabled = !orders.length;
-      panel.querySelector('[aria-live]').textContent = orders.length ? 'Order total '+money(base(orders)/100)+' · shipping and BAC water included once' : '';
+      panel.querySelector('[aria-live]').textContent = orders.length ? 'Order total '+money(base(orders)/100)+' · one shipping charge' : '';
     }
     choices.addEventListener('change', refresh);
     button.onclick = function() {
@@ -122,7 +122,14 @@
       document.getElementById('i-name').textContent = 'Selected cycles';
       document.getElementById('i-sum').textContent = '';
       document.getElementById('i-tag').textContent = 'Quoted';
-      var rows = orders.map(function(o){return [o.label,products(o)/100]}).concat([['BAC water · 10 mL',4.99],['2-Day UPS shipping',9.99],['Order total',total]]);
+      var rows = [];
+      orders.forEach(function(o){
+        var water = o.items.filter(function(item){return /^BAC Water\b/i.test(item.n)});
+        var waterCents = water.reduce(function(sum,item){return sum+Math.round(item.amt*100)},0);
+        rows.push([o.label,(merchandise(o)-waterCents)/100]);
+        water.forEach(function(item){rows.push([item.n,item.amt])});
+      });
+      rows.push(['2-Day UPS shipping',9.99],['Order total',total]);
       var items = document.getElementById('i-items');
       items.replaceChildren();
       rows.forEach(function(row){
