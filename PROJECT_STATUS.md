@@ -5,6 +5,9 @@ Last reviewed: 2026-11-12 (America/Denver).
 ## 3% card fee on open card links — 2026-11-19
 - Open card links now charge base x 1.03: rgreen (done earlier) and vbernal-quintana remaining balance ($220.98 -> $227.61). Paid-order links (rhurst $309.99, vbernal $299) untouched. No ledger or inventory change. See AGENTS.md for the standing rule.
 
+## Epithalon / Pinealon 20-day cycles — 2026-11-19
+- rgreen/index.html + sw.js: Pinealon 10 mg x 2 vials, 2 mL BAC, 1 mg / 20u daily PM, 20 days; Epithalon 50 mg x 1, 3 mL, ~2.5 mg / 15u, 20 days. Master sheets and AGENTS.md updated. Other clients untouched.
+
 ## rgreen Sleep Stack quote — 2026-11-19
 - Quote "HGH 40 IU x 5 + Sleep Stack": HGH 5 x $45, 20% friends & family off HGH only, Epithalon 50 mg x 1 @ $50, Pinealon 10 mg x 2 @ $25, shipping $9.99 = $289.99 (no extra BAC water or shipping). Card button uses a separate payment link that includes a 3% card fee; the page total stays $289.99. Quote only: no ledger or inventory change.
 - Protocol: cycle "The Deep Reset" (Epithalon ~2.5 mg / 15u, Pinealon 2 mg / 20u, PM daily, run straight, from the master Sleep & Stress cycle). Quoted compounds start off the schedule (same as eprice) until added back.
