@@ -2,6 +2,11 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## rgreen Sleep Stack quote — 2026-11-19
+- Quote "HGH 40 IU x 5 + Sleep Stack": HGH 5 x $45, 20% friends & family off HGH only, Epithalon 50 mg x 1 @ $50, Pinealon 10 mg x 2 @ $25, shipping $9.99 = $289.99 (no extra BAC water or shipping). Card button uses a separate payment link that includes a 3% card fee; the page total stays $289.99. Quote only: no ledger or inventory change.
+- Protocol: cycle "The Deep Reset" (Epithalon ~2.5 mg / 15u, Pinealon 2 mg / 20u, PM daily, run straight, from the master Sleep & Stress cycle). Quoted compounds start off the schedule (same as eprice) until added back.
+- Source: `rgreen/index.html`, `rgreen/sw.js`. Checks: inline render at phone width (protocol, schedule, invoice), no page errors. Publishing: merged via PR on branch rgreen-sleep-stack-quote.
+
 ## Invoice supply durations — 2026-11-18
 - On the edited client portal, all five quotes show their supply duration above the cycle title in the invoice list and detail view. The two year-long quotes say “12-month supply,” and the three optional quotes say “8-week cycle.” Existing quantities, totals, quote status, and schedule data are preserved.
 - Source: `lprice/index.html`. Based on `main` at `d465e497`. Checked inline script syntax, all five rendered card and detail labels, and invoice data equivalence apart from summary text.
