@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-19 — rgreen: Sleep Stack added to the HGH quote and the protocol
+- Added the Deep Reset sleep cycle (Epithalon 50 mg and Pinealon 10 mg only, doses from the master cycles/dosing sheets) to the protocol, and added both to the open HGH quote: $289.99 total. Card payments carry a 3% fee through a new payment link; Venmo, Cash App and Zelle stay at the quote total. Evidence: PR on branch rgreen-sleep-stack-quote.
+
 ## 2026-11-18 — Sitewide: Home Screen apps keep the newest saved schedule
 - Client pages sync their schedule, nutrition and calculator by page address (slug) with no key, so a Home Screen app on any client page already loads that client's saved plan on first open. The gap: an edit saved on the phone but not yet sent (offline, or the app closed first) was overwritten by the older cloud copy on the next open. Each of the 148 slug-synced client pages now remembers, on the device, which kinds have an unsent edit and pushes that edit on the next open instead of overwriting it (cloud still wins when nothing is unsent, and on a version conflict). The 154 standard client service workers now fetch HTML with cache: no-store (network first) and their cache names end -nostore1. The manifest start_url is unchanged: a static manifest is public, so a key can never go in it. mpauldino is the only member with a key (see the mpauldino entries above). No compounds, doses, invoices or ledger rows changed.
 
