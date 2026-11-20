@@ -43,8 +43,30 @@ Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors(origin) });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405, origin);
 
-  let body: { client?: string; quote?: string } = {};
+  let body: { client?: string; quote?: string; cancel?: string } = {};
   try { body = await req.json(); } catch { return json({ error: "bad_json" }, 400, origin); }
+
+  // Cancel an unpaid PaymentIntent that this function created (tests / abandoned sheets).
+  if (body.cancel) {
+    const id = String(body.cancel);
+    if (!/^pi_[A-Za-z0-9]+$/.test(id)) return json({ error: "bad_id" }, 400, origin);
+    const key = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!key) return json({ error: "not_configured" }, 503, origin);
+    const auth = { Authorization: `Bearer ${key}` };
+    const g = await fetch(`https://api.stripe.com/v1/payment_intents/${id}`, { headers: auth });
+    const pi = await g.json();
+    if (!g.ok || pi?.metadata?.source !== "applepay-button") return json({ error: "not_found" }, 404, origin);
+    if (!["requires_payment_method", "requires_confirmation", "requires_action"].includes(pi.status)) {
+      return json({ error: "not_cancelable", status: pi.status }, 409, origin);
+    }
+    const c = await fetch(`https://api.stripe.com/v1/payment_intents/${id}/cancel`, {
+      method: "POST",
+      headers: { ...auth, "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ cancellation_reason: "abandoned" }),
+    });
+    const cp = await c.json();
+    return json({ id, status: cp.status || "error" }, c.ok ? 200 : 502, origin);
+  }
   const slug = String(body.client || "").trim();
   const quoteId = String(body.quote || "").trim();
   const q = QUOTES[`${slug}/${quoteId}`];

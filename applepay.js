@@ -7,7 +7,7 @@
    and must match. Never marks the page paid — Micah records payments manually. */
 (function(){
   // Stripe live publishable key (public by design). Empty = button stays hidden.
-  var PK = '';
+  var PK = 'pk_live_51TMDWSHwQK95IJPpixddZyDAy6a2vVaNSdr8u8ydgEeTZlp92IfUGHkIoNNe87M8zcYASjbe3ZBtxa0AGZMGBSFH00BTgJwLtC';
   var FN = 'https://bfjydzealeethhcpdfxl.supabase.co/functions/v1/create-payment-intent';
   if (!PK) return;
   var stripeP = null;
