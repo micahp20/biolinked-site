@@ -74,3 +74,70 @@
  }
  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
+
+/* Select existing unpaid cycle quotes on the pilot portal. */
+(function () {
+  if (location.pathname.split('/')[1] !== 'dbarajas') return;
+  function setup() {
+    var hero = document.getElementById('payhero');
+    if (!hero || !Array.isArray(window.INV)) return;
+    var panel = document.createElement('section');
+    panel.className = 'ocard';
+    panel.innerHTML = '<h2>Choose cycles</h2><p>Select one or more cycles for one shipment.</p><div class="choices"></div><p aria-live="polite"></p><button type="button" class="invoice-pay-now" disabled>Pay now</button>';
+    hero.before(panel);
+    var choices = panel.querySelector('.choices');
+    function products(order) {
+      return order.items.reduce(function(sum, item) {
+        return /^(Shipping|BAC Water)\b/i.test(item.n) ? sum : sum + Math.round(item.amt * 100);
+      }, 0);
+    }
+    INV.forEach(function(order, i) {
+      if (!['due','quote'].includes(order.status)) return;
+      var label = document.createElement('label');
+      label.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid #8b733544';
+      var input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = i;
+      input.style.accentColor = '#8b7335';
+      label.append(input, document.createTextNode(order.label));
+      choices.append(label);
+    });
+    if (!choices.childElementCount) {panel.remove();return;}
+    function selected() {
+      return Array.from(choices.querySelectorAll('input:checked'), function(input){return INV[Number(input.value)]});
+    }
+    function base(orders) {return orders.reduce(function(sum,o){return sum+products(o)},1498);}
+    var button = panel.querySelector('button');
+    function refresh() {
+      var orders = selected();
+      button.disabled = !orders.length;
+      panel.querySelector('[aria-live]').textContent = orders.length ? 'Order total '+money(base(orders)/100)+' · shipping and BAC water included once' : '';
+    }
+    choices.addEventListener('change', refresh);
+    button.onclick = function() {
+      var orders = selected();
+      if (!orders.length) return;
+      if (orders.length === 1) {openInv(INV.indexOf(orders[0]));return;}
+      var total = base(orders)/100;
+      document.getElementById('i-name').textContent = 'Selected cycles';
+      document.getElementById('i-sum').textContent = '';
+      document.getElementById('i-tag').textContent = 'Quoted';
+      var rows = orders.map(function(o){return [o.label,products(o)/100]}).concat([['BAC water · 10 mL',4.99],['2-Day UPS shipping',9.99],['Order total',total]]);
+      var items = document.getElementById('i-items');
+      items.replaceChildren();
+      rows.forEach(function(row){
+        var line=document.createElement('div'), name=document.createElement('span'), value=document.createElement('strong');
+        line.className='irow'; name.textContent=row[0]; value.textContent=money(row[1]); line.append(name,value); items.append(line);
+      });
+      var pay=document.getElementById('i-pay'), amount=total.toFixed(2);
+      pay.innerHTML='<div class="cycle-pay"><a class="paybtn" target="_blank" rel="noopener">Venmo</a><a class="paybtn" target="_blank" rel="noopener">Cash App</a><button type="button" class="paybtn">Zelle</button><small role="status"></small></div>';
+      var links=pay.querySelectorAll('a');
+      links[0].href='https://venmo.com/u/'+PAY.venmo;
+      links[1].href='https://cash.app/$'+PAY.cashapp+'/'+amount;
+      var zelle=pay.querySelector('button'); zelle.dataset.amount=amount; zelle.onclick=function(){payZelle(zelle)};
+      sheet('inv');
+    };
+    refresh();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setup); else setup();
+})();
