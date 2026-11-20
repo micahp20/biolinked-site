@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /annaleah/.
-const CACHE = 'annaleah-tesa-klow-v5-ship1-20261115-pmfast1-nostore1';
+const CACHE = 'annaleah-tesa-klow-v5-ship1-20261115-pmfast1-nostore1-nopriceBtns1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',

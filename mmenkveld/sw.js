@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mmenkveld/.
-const CACHE = 'mmenkveld-protocol-v4-controls-v1-calcact1-quotelabel1-paid-20261107-sgk1-extras1-dedupe1-legacy1-nostore1';
+const CACHE = 'mmenkveld-protocol-v4-controls-v1-calcact1-quotelabel1-paid-20261107-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
