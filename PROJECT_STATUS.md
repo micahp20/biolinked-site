@@ -2,6 +2,10 @@
 
 Last reviewed: 2026-11-12 (America/Denver).
 
+## BioLinked promo video embed — 2026-11-20
+- Request: owner asked for the approved promo video on the home page and embedded on the intake form. Paths: assets/video/biolinked-promo.mp4 (6.4 MB, H.264/AAC, faststart), assets/video/biolinked-promo-poster.jpg, promo-embed.css, index.html (section after hero), intake.html and intake/index.html (below cover lead). Root sw.js cache bumped (promo1); video not precached. Form logic, promo code and fields untouched.
+- Checks: 390px and desktop headless screenshots of all three pages, no horizontal overflow. Merge/deploy state recorded in the PR.
+
 ## 3% card fee on open card links — 2026-11-19
 - Open card links now charge base x 1.03: rgreen (done earlier) and vbernal-quintana remaining balance ($220.98 -> $227.61). Paid-order links (rhurst $309.99, vbernal $299) untouched. No ledger or inventory change. See AGENTS.md for the standing rule.
 
