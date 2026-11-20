@@ -70,7 +70,42 @@
       });
     }).catch(function(){});
   }
-  function scan(){ document.querySelectorAll('.bl-applepay').forEach(init); }
+  function prepareCard(wallet){
+    if(wallet.dataset.client!=='dbarajas') return;
+    var button=wallet.parentElement.querySelector('[data-cart-card],button[title="Card checkout pending"]');
+    if(!button || button.dataset.bound) return;
+    button.dataset.bound='1'; button.disabled=false; button.removeAttribute('title');
+    button.onclick=async function(){
+      button.disabled=true;
+      var form=document.createElement('form'), field=document.createElement('div'), submit=document.createElement('button'), status=document.createElement('small');
+      field.style.cssText='background:white;padding:14px;border-radius:8px';
+      submit.className='paybtn'; submit.type='submit'; submit.textContent='Confirm card payment';
+      status.setAttribute('role','status');
+      form.onsubmit=function(event){event.preventDefault()}; form.append(field,submit,status); button.after(form);
+      var secret;
+      try{
+        var stripe=await loadStripe(), card=stripe.elements().create('card');
+        card.mount(field);
+        form.onsubmit=async function(event){
+          event.preventDefault(); if(submit.disabled) return;
+          submit.disabled=true;
+          try{
+            if(!secret){
+              var response=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client:wallet.dataset.client,quote:wallet.dataset.quote})});
+              var data=await response.json();
+              if(!response.ok || data.amount!==Math.round(Number(wallet.dataset.amount)*100)) throw Error('Unable to verify the cart total.');
+              secret=data.client_secret;
+            }
+            var result=await stripe.confirmCardPayment(secret,{payment_method:{card:card}});
+            if(result.error) throw result.error;
+            status.textContent=result.paymentIntent.status==='succeeded'?'Payment received.':'Payment submitted for processing.';
+            submit.hidden=true; card.unmount();
+          }catch(error){status.textContent=error.message || 'Please check the payment status before retrying.';submit.disabled=false;}
+        };
+      }catch(error){form.remove();button.disabled=false;button.title='Card form failed to load. Tap to retry.';}
+    };
+  }
+  function scan(){ document.querySelectorAll('.bl-applepay').forEach(prepareCard); document.querySelectorAll('.bl-applepay').forEach(init); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', scan); else scan();
   new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
 })();
