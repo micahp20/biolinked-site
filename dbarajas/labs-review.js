@@ -1,30 +1,490 @@
 window.LABS = {
-  "sub": "AI clinical decision-support review · November 10, 2026 · 2:19 p.m. · Fasting status unknown",
-  "l": "Overall clinical priority",
-  "score": "P2",
-  "outof": "",
-  "g": "Prompt primary care review",
-  "c": "Daytime exhaustion that interferes with your usual activities deserves assessment. The blood draw shows mild blood sugar elevation but does not establish the cause of the exhaustion.",
+  "sub": "Labcorp · collected November 10, 2026 at 2:19 p.m. · fasting status unknown",
+  "l": "Custom wellness score",
+  "score": "82",
+  "outof": "/100",
+  "g": "Two results above the laboratory range",
+  "c": "A1c was 5.8% and glucose was 102 mg/dL. Fasting status was not recorded. Clinical priority: P2 for daytime exhaustion affecting daily activities. Contact primary care this week to review sleep and follow-up testing.",
   "domains": [
     {
-      "v": "P2",
-      "n": "Fatigue"
-    },
-    {
-      "v": "P3",
+      "v": "25",
       "n": "Blood sugar"
     },
     {
-      "v": "P4",
+      "v": "85",
       "n": "Blood counts"
     },
     {
-      "v": "P4",
-      "n": "Kidney function"
+      "v": "88",
+      "n": "Kidney, liver and thyroid"
     }
   ],
-  "banner": "Overall priority is P2 because daytime exhaustion is affecting your daily activities. Your A1c of 5.8% is in the prediabetes range, and the meaning of your glucose of 102 mg/dL depends on whether you had eaten. Your hemoglobin and thyroid screening result were within the lab’s ranges. Contact primary care this week to review sleep quality, possible breathing pauses during sleep, and follow-up blood sugar testing.",
+  "banner": "BioLinked custom rubric: 4 points for a result in the portal’s preferred range, 3 for other in-range results, and 1 for a flagged result. 13 × 4 + 16 × 3 + 2 × 1 = 102 of 124 points across 31 markers. This educational score has no validated diagnostic or predictive meaning. Clinical urgency is assessed separately. Tap any marker for details.",
   "secs": [
+    {
+      "t": "Blood sugar · 25/100 · 2 scored",
+      "rows": [
+        {
+          "n": "A1c",
+          "v": "5.8",
+          "u": "%",
+          "ref": "4.8–5.6%",
+          "p": "High",
+          "pts": 1,
+          "tip": "In the prediabetes range. Ask your clinician about confirming this result. BioLinked rubric: 1 of 4 points.",
+          "id": "draw-0",
+          "pc": "hi",
+          "vc": "hi"
+        },
+        {
+          "n": "Glucose",
+          "v": "102",
+          "u": "mg/dL",
+          "ref": "70–99",
+          "p": "High",
+          "pts": 1,
+          "tip": "Flagged against the printed interval. Fasting status was not recorded, so this cannot establish impaired fasting glucose. BioLinked rubric: 1 of 4 points.",
+          "id": "draw-1",
+          "pc": "hi",
+          "vc": "hi"
+        }
+      ]
+    },
+    {
+      "t": "Blood counts · 85/100 · 15 scored",
+      "rows": [
+        {
+          "n": "WBC",
+          "v": "10.3",
+          "u": "× 10³/µL",
+          "ref": "3.4–10.8",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-3",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "RBC",
+          "v": "5.25",
+          "u": "× 10⁶/µL",
+          "ref": "4.14–5.80",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-4",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Hemoglobin",
+          "v": "16.5",
+          "u": "g/dL",
+          "ref": "13.0–17.7",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within range. Anemia is not evident on this draw. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-5",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Hematocrit",
+          "v": "47.2",
+          "u": "%",
+          "ref": "37.5–51.0",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-6",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "MCV",
+          "v": "90",
+          "u": "fL",
+          "ref": "79–97",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-7",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "MCH",
+          "v": "31.4",
+          "u": "pg",
+          "ref": "26.6–33.0",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-8",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "MCHC",
+          "v": "35",
+          "u": "g/dL",
+          "ref": "31.5–35.7",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-9",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "RDW",
+          "v": "11.9",
+          "u": "%",
+          "ref": "11.6–15.4",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-10",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Platelets",
+          "v": "280",
+          "u": "× 10³/µL",
+          "ref": "150–450",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-11",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Neutrophils (absolute)",
+          "v": "6.3",
+          "u": "× 10³/µL",
+          "ref": "1.4–7.0",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-25",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Lymphocytes (absolute)",
+          "v": "2.8",
+          "u": "× 10³/µL",
+          "ref": "0.7–3.1",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-27",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Monocytes (absolute)",
+          "v": "0.8",
+          "u": "× 10³/µL",
+          "ref": "0.1–0.9",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-29",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Eosinophils (absolute)",
+          "v": "0.4",
+          "u": "× 10³/µL",
+          "ref": "0.0–0.4",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-31",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Basophils (absolute)",
+          "v": "0.0",
+          "u": "× 10³/µL",
+          "ref": "0.0–0.2",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-33",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Immature granulocytes (absolute)",
+          "v": "0.0",
+          "u": "× 10³/µL",
+          "ref": "0.0–0.1",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-35",
+          "pc": "normal",
+          "vc": "normal"
+        }
+      ]
+    },
+    {
+      "t": "Kidney, liver and thyroid · 88/100 · 14 scored",
+      "rows": [
+        {
+          "n": "TSH",
+          "v": "3.46",
+          "u": "µIU/mL",
+          "ref": "0.450–4.500",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the printed thyroid screening range. No free T4 result is visible. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-2",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "BUN",
+          "v": "11",
+          "u": "mg/dL",
+          "ref": "6–24",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-12",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Creatinine",
+          "v": "1.09",
+          "u": "mg/dL",
+          "ref": "0.76–1.27",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-13",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "eGFR",
+          "v": "88",
+          "u": "mL/min/1.73 m²",
+          "ref": ">59",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-14",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "BUN/creatinine ratio",
+          "v": "10",
+          "u": "",
+          "ref": "9–20",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-15",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Sodium",
+          "v": "140",
+          "u": "mmol/L",
+          "ref": "134–144",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-16",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Potassium",
+          "v": "4.6",
+          "u": "mmol/L",
+          "ref": "3.5–5.2",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-17",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Chloride",
+          "v": "103",
+          "u": "mmol/L",
+          "ref": "96–106",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-18",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Carbon dioxide",
+          "v": "22",
+          "u": "mmol/L",
+          "ref": "17–26",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-19",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Calcium",
+          "v": "9.2",
+          "u": "mg/dL",
+          "ref": "8.7–10.2",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-20",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Total protein",
+          "v": "6.9",
+          "u": "g/dL",
+          "ref": "6.0–8.5",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-21",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Albumin",
+          "v": "4.4",
+          "u": "g/dL",
+          "ref": "4.1–5.1",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-22",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Globulin",
+          "v": "2.5",
+          "u": "g/dL",
+          "ref": "1.5–4.5",
+          "p": "Optimal · portal rubric",
+          "pts": 4,
+          "tip": "Within the laboratory interval. BioLinked rubric: 4 of 4 points.",
+          "id": "draw-23",
+          "pc": "ok",
+          "vc": "ok"
+        },
+        {
+          "n": "Total bilirubin",
+          "v": "0.6",
+          "u": "mg/dL",
+          "ref": "0.0–1.2",
+          "p": "In range",
+          "pts": 3,
+          "tip": "Within the laboratory interval. BioLinked rubric: 3 of 4 points.",
+          "id": "draw-24",
+          "pc": "normal",
+          "vc": "normal"
+        }
+      ]
+    },
+    {
+      "t": "Shown and not scored",
+      "rows": [
+        {
+          "n": "Neutrophils (%)",
+          "v": "61%",
+          "u": "",
+          "ref": "No interval supplied",
+          "p": "Unscored",
+          "pts": null,
+          "tip": "The absolute count is scored separately.",
+          "id": "draw-26",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Lymphocytes (%)",
+          "v": "27%",
+          "u": "",
+          "ref": "No interval supplied",
+          "p": "Unscored",
+          "pts": null,
+          "tip": "The absolute count is scored separately.",
+          "id": "draw-28",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Monocytes (%)",
+          "v": "8%",
+          "u": "",
+          "ref": "No interval supplied",
+          "p": "Unscored",
+          "pts": null,
+          "tip": "The absolute count is scored separately.",
+          "id": "draw-30",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Eosinophils (%)",
+          "v": "4%",
+          "u": "",
+          "ref": "No interval supplied",
+          "p": "Unscored",
+          "pts": null,
+          "tip": "The absolute count is scored separately.",
+          "id": "draw-32",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Basophils (%)",
+          "v": "0%",
+          "u": "",
+          "ref": "No interval supplied",
+          "p": "Unscored",
+          "pts": null,
+          "tip": "The absolute count is scored separately.",
+          "id": "draw-34",
+          "pc": "normal",
+          "vc": "normal"
+        },
+        {
+          "n": "Immature granulocytes (%)",
+          "v": "0%",
+          "u": "",
+          "ref": "No interval supplied",
+          "p": "Unscored",
+          "pts": null,
+          "tip": "The absolute count is scored separately.",
+          "id": "draw-36",
+          "pc": "normal",
+          "vc": "normal"
+        }
+      ]
+    },
     {
       "t": "Ranked findings",
       "rows": [
@@ -62,428 +522,6 @@ window.LABS = {
           "v": "Unrated",
           "ref": "Testosterone and CRP unavailable. Alkaline phosphatase heading visible; result cropped.",
           "tip": "A hormone assessment, complete liver panel review and biological-age calculation are unavailable from these images. Bring any additional results to the next visit."
-        }
-      ]
-    },
-    {
-      "t": "Blood sugar",
-      "rows": [
-        {
-          "n": "A1c",
-          "v": "5.8",
-          "u": "%",
-          "ref": "4.8–5.6%",
-          "p": "High",
-          "tip": "In the prediabetes range. Ask your clinician about confirming this result.",
-          "id": "draw-0",
-          "pc": "watch",
-          "vc": "watch"
-        },
-        {
-          "n": "Glucose",
-          "v": "102",
-          "u": "mg/dL",
-          "ref": "70–99",
-          "p": "High",
-          "tip": "Flagged against the printed interval. Fasting status was not recorded, so this cannot establish impaired fasting glucose.",
-          "id": "draw-1",
-          "pc": "watch",
-          "vc": "watch"
-        }
-      ]
-    },
-    {
-      "t": "Blood counts",
-      "rows": [
-        {
-          "n": "WBC",
-          "v": "10.3",
-          "u": "× 10³/µL",
-          "ref": "3.4–10.8",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-3",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "RBC",
-          "v": "5.25",
-          "u": "× 10⁶/µL",
-          "ref": "4.14–5.80",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-4",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Hemoglobin",
-          "v": "16.5",
-          "u": "g/dL",
-          "ref": "13.0–17.7",
-          "p": "In range",
-          "tip": "Within range. Anemia is not evident on this draw.",
-          "id": "draw-5",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Hematocrit",
-          "v": "47.2",
-          "u": "%",
-          "ref": "37.5–51.0",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-6",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "MCV",
-          "v": "90",
-          "u": "fL",
-          "ref": "79–97",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-7",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "MCH",
-          "v": "31.4",
-          "u": "pg",
-          "ref": "26.6–33.0",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-8",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "MCHC",
-          "v": "35",
-          "u": "g/dL",
-          "ref": "31.5–35.7",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-9",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "RDW",
-          "v": "11.9",
-          "u": "%",
-          "ref": "11.6–15.4",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-10",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Platelets",
-          "v": "280",
-          "u": "× 10³/µL",
-          "ref": "150–450",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-11",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Neutrophils (absolute)",
-          "v": "6.3",
-          "u": "× 10³/µL",
-          "ref": "1.4–7.0",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-25",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Neutrophils (%)",
-          "v": "61%",
-          "u": "",
-          "ref": "No interval supplied",
-          "p": "No lab interval",
-          "tip": "The absolute count is scored separately.",
-          "id": "draw-26",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Lymphocytes (absolute)",
-          "v": "2.8",
-          "u": "× 10³/µL",
-          "ref": "0.7–3.1",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-27",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Lymphocytes (%)",
-          "v": "27%",
-          "u": "",
-          "ref": "No interval supplied",
-          "p": "No lab interval",
-          "tip": "The absolute count is scored separately.",
-          "id": "draw-28",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Monocytes (absolute)",
-          "v": "0.8",
-          "u": "× 10³/µL",
-          "ref": "0.1–0.9",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-29",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Monocytes (%)",
-          "v": "8%",
-          "u": "",
-          "ref": "No interval supplied",
-          "p": "No lab interval",
-          "tip": "The absolute count is scored separately.",
-          "id": "draw-30",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Eosinophils (absolute)",
-          "v": "0.4",
-          "u": "× 10³/µL",
-          "ref": "0.0–0.4",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-31",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Eosinophils (%)",
-          "v": "4%",
-          "u": "",
-          "ref": "No interval supplied",
-          "p": "No lab interval",
-          "tip": "The absolute count is scored separately.",
-          "id": "draw-32",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Basophils (absolute)",
-          "v": "0.0",
-          "u": "× 10³/µL",
-          "ref": "0.0–0.2",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-33",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Basophils (%)",
-          "v": "0%",
-          "u": "",
-          "ref": "No interval supplied",
-          "p": "No lab interval",
-          "tip": "The absolute count is scored separately.",
-          "id": "draw-34",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Immature granulocytes (absolute)",
-          "v": "0.0",
-          "u": "× 10³/µL",
-          "ref": "0.0–0.1",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-35",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Immature granulocytes (%)",
-          "v": "0%",
-          "u": "",
-          "ref": "No interval supplied",
-          "p": "No lab interval",
-          "tip": "The absolute count is scored separately.",
-          "id": "draw-36",
-          "pc": "normal",
-          "vc": "normal"
-        }
-      ]
-    },
-    {
-      "t": "Kidney, liver and thyroid",
-      "rows": [
-        {
-          "n": "TSH",
-          "v": "3.46",
-          "u": "µIU/mL",
-          "ref": "0.450–4.500",
-          "p": "In range",
-          "tip": "Within the printed thyroid screening range. No free T4 result is visible.",
-          "id": "draw-2",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "BUN",
-          "v": "11",
-          "u": "mg/dL",
-          "ref": "6–24",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-12",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Creatinine",
-          "v": "1.09",
-          "u": "mg/dL",
-          "ref": "0.76–1.27",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-13",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "eGFR",
-          "v": "88",
-          "u": "mL/min/1.73 m²",
-          "ref": ">59",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-14",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "BUN/creatinine ratio",
-          "v": "10",
-          "u": "",
-          "ref": "9–20",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-15",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Sodium",
-          "v": "140",
-          "u": "mmol/L",
-          "ref": "134–144",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-16",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Potassium",
-          "v": "4.6",
-          "u": "mmol/L",
-          "ref": "3.5–5.2",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-17",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Chloride",
-          "v": "103",
-          "u": "mmol/L",
-          "ref": "96–106",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-18",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Carbon dioxide",
-          "v": "22",
-          "u": "mmol/L",
-          "ref": "17–26",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-19",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Calcium",
-          "v": "9.2",
-          "u": "mg/dL",
-          "ref": "8.7–10.2",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-20",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Total protein",
-          "v": "6.9",
-          "u": "g/dL",
-          "ref": "6.0–8.5",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-21",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Albumin",
-          "v": "4.4",
-          "u": "g/dL",
-          "ref": "4.1–5.1",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-22",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Globulin",
-          "v": "2.5",
-          "u": "g/dL",
-          "ref": "1.5–4.5",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-23",
-          "pc": "normal",
-          "vc": "normal"
-        },
-        {
-          "n": "Total bilirubin",
-          "v": "0.6",
-          "u": "mg/dL",
-          "ref": "0.0–1.2",
-          "p": "In range",
-          "tip": "Within the laboratory interval.",
-          "id": "draw-24",
-          "pc": "normal",
-          "vc": "normal"
         }
       ]
     },

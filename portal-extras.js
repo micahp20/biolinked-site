@@ -178,6 +178,6 @@
 /* Load this portal’s ranked review using the existing Labs renderer. */
 if (/^\/dbarajas\/(?:index\.html)?$/.test(location.pathname)) {
   const reader = document.createElement('script');
-  reader.src = '/dbarajas/labs-review.js?v=1';
+  reader.src = '/dbarajas/labs-review.js?v=2';
   document.head.appendChild(reader);
 }
