@@ -83,26 +83,35 @@
     if (!hero || !Array.isArray(window.INV)) return;
     var panel = document.createElement('section');
     panel.className = 'ocard';
-    panel.innerHTML = '<h2>Choose cycles</h2><p>Select one or more cycles for one shipment.</p><div class="choices"></div><p aria-live="polite"></p><button type="button" class="invoice-pay-now" disabled>Pay now</button>';
+    panel.innerHTML = '<div class="irow tot"><span class="in" aria-live="polite"></span><button type="button" class="invoice-pay-now">View cart</button></div>';
     hero.before(panel);
-    var choices = panel.querySelector('.choices');
+    var choices = document.getElementById('paylist');
     function merchandise(order) {
       return order.items.reduce(function(sum, item) {
         return /^Shipping\b/i.test(item.n) ? sum : sum + Math.round(item.amt * 100);
       }, 0);
     }
+    function addControls(){
     INV.forEach(function(order, i) {
       if (!['due','quote'].includes(order.status)) return;
-      var label = document.createElement('label');
-      label.style.cssText = 'display:flex;align-items:center;gap:10px;min-height:44px;border-bottom:1px solid #8b733544';
+      var header=choices.children[i]?.querySelector('.ohd');
+      if (!header || header.querySelector('.cart-add')) return;
+      var label=document.createElement('label');
+      label.className='cart-add';
+      header.style.flexWrap='wrap';
+      label.style.cssText='display:inline-flex;align-items:center;gap:5px;margin-left:auto;min-height:44px;font:600 12px Montserrat,sans-serif;white-space:nowrap;cursor:pointer';
+      label.onclick=function(event){event.stopPropagation()};
       var input = document.createElement('input');
       input.type = 'checkbox';
       input.value = i;
       input.style.accentColor = '#8b7335';
-      label.append(input, document.createTextNode(order.label));
-      choices.append(label);
+      input.setAttribute('aria-label','Add '+order.label+' to cart');
+      label.append(input, document.createTextNode('Add to cart'));
+      header.append(label);
     });
-    if (!choices.childElementCount) {panel.remove();return;}
+    }
+    addControls();
+    new MutationObserver(function(){addControls();refresh()}).observe(choices,{childList:true});
     function selected() {
       return Array.from(choices.querySelectorAll('input:checked'), function(input){return INV[Number(input.value)]});
     }
@@ -110,7 +119,7 @@
     var button = panel.querySelector('button');
     function refresh() {
       var orders = selected();
-      button.disabled = !orders.length;
+      panel.hidden = !orders.length; panel.style.display = orders.length ? '' : 'none';
       panel.querySelector('[aria-live]').textContent = orders.length ? 'Order total '+money(base(orders)/100)+' · one shipping charge' : '';
     }
     choices.addEventListener('change', refresh);
@@ -134,14 +143,22 @@
       items.replaceChildren();
       rows.forEach(function(row){
         var line=document.createElement('div'), name=document.createElement('span'), value=document.createElement('strong');
-        line.className='irow'; name.textContent=row[0]; value.textContent=money(row[1]); line.append(name,value); items.append(line);
+        line.className=row[0]==='Order total'?'irow tot':'irow'; name.className='in'; value.className='iv'; name.textContent=row[0]; value.textContent=money(row[1]); line.append(name,value); items.append(line);
       });
       var pay=document.getElementById('i-pay'), amount=total.toFixed(2);
       pay.innerHTML='<div class="cycle-pay"><a class="paybtn" target="_blank" rel="noopener">Venmo</a><a class="paybtn" target="_blank" rel="noopener">Cash App</a><button type="button" class="paybtn">Zelle</button><small role="status"></small></div>';
+      var methods=pay.firstElementChild;
+      var wallet=document.createElement('div');
+      wallet.className='bl-applepay'; wallet.dataset.client='dbarajas';
+      wallet.dataset.quote='cart-'+orders.map(function(o){return /^Cycle (\d+)/.exec(o.label)[1]}).join('-');
+      wallet.dataset.label='Selected cycles'; wallet.dataset.amount=(Math.round(base(orders)*103/100)/100).toFixed(2);
+      var card=document.createElement('button'); card.type='button'; card.className='paybtn'; card.textContent='Pay with card'; card.dataset.cartCard='1';
+      var fee=document.createElement('small'); fee.textContent='Apple Pay and card include a 3% fee';
+      methods.prepend(wallet,card,fee);
       var links=pay.querySelectorAll('a');
       links[0].href='https://venmo.com/u/'+PAY.venmo;
       links[1].href='https://cash.app/$'+PAY.cashapp+'/'+amount;
-      var zelle=pay.querySelector('button'); zelle.dataset.amount=amount; zelle.onclick=function(){payZelle(zelle)};
+      var zelle=pay.querySelector('button:not([data-cart-card])'); zelle.dataset.amount=amount; zelle.onclick=function(){payZelle(zelle)};
       sheet('inv');
     };
     refresh();

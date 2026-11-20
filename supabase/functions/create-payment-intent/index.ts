@@ -76,7 +76,15 @@ Deno.serve(async (req: Request) => {
   }
   const slug = String(body.client || "").trim();
   const quoteId = String(body.quote || "").trim();
-  const q = QUOTES[`${slug}/${quoteId}`];
+  let q = QUOTES[`${slug}/${quoteId}`];
+  if (slug === "dbarajas" && /^cart-[1-7](?:-[1-7]){1,6}$/.test(quoteId)) {
+    const ids = quoteId.slice(5).split("-");
+    const cycles = ids.map(id => QUOTES[`${slug}/cycle-${id}`]);
+    if (new Set(ids).size === ids.length && cycles.every(Boolean)) {
+      const base = cycles.reduce((sum, cycle) => sum + cycle.base, 0) - 999 * (ids.length - 1);
+      q = {client: slug, label: "Cycles " + ids.join(", "), base, charge: Math.round(base * 103 / 100)};
+    }
+  }
   if (!q) return json({ error: "unknown_quote" }, 404, origin);
 
   const key = Deno.env.get("STRIPE_SECRET_KEY");
