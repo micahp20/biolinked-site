@@ -1318,6 +1318,9 @@ html:root:not([data-theme="dark"]) .top .navbtn,
 html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!important;color:#303639!important}
 </style>
 <script src="/calc-feedback.js?v=1"></script>
+<link rel="stylesheet" href="/applepay.css">
+<style>.cycle-pay{display:grid;gap:6px;margin-top:12px}.cycle-pay .paybtn,.cycle-pay .apbtn{box-sizing:border-box;width:100%;min-height:44px;margin:0;border-radius:10px}.cycle-pay .paybtn{display:flex;justify-content:center;align-items:center;background:#242424;color:#f6f3ea;border:1px solid #8b7335}.cycle-pay .paybtn:disabled{opacity:.55}.cycle-pay small{text-align:center}.cycle-pay small:empty,.cycle-pay .bl-applepay:empty{display:none}</style>
+<script defer src="https://biolinkedsolutions.com/applepay.js?v=2"></script>
 </head>
 <body class="erica-tab-consistency"><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
@@ -2101,35 +2104,24 @@ function payVenmo(el,ev){
   return false;
 }
 function payAmt(n){ return (Math.round(n*100)%100===0) ? String(Math.round(n)) : n.toFixed(2); }
-function payButtons(amount,note){
-  if(!(amount>0)) return '';
-  var a=payAmt(amount), q=encodeURIComponent(note);
-  return '<div class="payrow">'+
-    '<a class="paybtn vm" target="_blank" rel="noopener" data-note="'+attr(note)+'"'+
-      ' onclick="return payVenmo(this,event)" href="'+venmoWeb()+'">'+
-      '<svg viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>'+
-      'Pay with Venmo</a>'+
-    '<a class="paybtn ca" target="_blank" rel="noopener" href="https://cash.app/$'+PAY.cashapp+'/'+a+'">'+
-      '<svg viewBox="0 0 24 24"><path d="M12 2v20"/><path d="M16 6.5A3.5 3.5 0 0012.5 4h-1a3.5 3.5 0 000 7h1a3.5 3.5 0 010 7h-1A3.5 3.5 0 018 17.5"/></svg>'+
-      'Pay with Cash App</a>'+
-    '<button class="paybtn zl" type="button" onclick="payZelle(this)">'+
-      '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M3 11h18M7 15h4"/></svg>'+
-      'Send via Zelle to '+PAY.zelle+'</button>'+
-    '</div>';
+function payButtons(o){
+  var cycle = /^Cycle (\d+) ·/.exec(o.label);
+  if (!cycle || !(o.total > 0)) return '';
+  var base = o.total.toFixed(2);
+  var charge = (Math.round(Math.round(o.total * 100) * 103 / 100) / 100).toFixed(2);
+  return '<div class="cycle-pay">'+
+    '<div class="bl-applepay" data-client="dbarajas" data-quote="cycle-'+cycle[1]+'" data-label="Cycle '+cycle[1]+'" data-amount="'+charge+'"></div>'+
+    '<button class="paybtn" type="button" disabled title="Card checkout pending">Pay with card</button>'+
+    '<small>Apple Pay and card include a 3% fee</small>'+
+    '<a class="paybtn" target="_blank" rel="noopener" href="https://venmo.com/u/Micahp20">Venmo</a>'+
+    '<a class="paybtn" target="_blank" rel="noopener" href="https://cash.app/$micahpauldino/'+base+'">Cash App</a>'+
+    '<button class="paybtn" type="button" data-amount="'+base+'" onclick="payZelle(this)">Zelle</button>'+
+    '<small role="status"></small></div>';
 }
-/* copy the Zelle number -- Zelle has no deep link to hand off to */
 function payZelle(btn){
-  var n=PAY.zelle, done=function(){
-    var old=btn.innerHTML;
-    btn.classList.add('copied');
-    btn.innerHTML='<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>Copied '+n;
-    setTimeout(function(){ btn.classList.remove('copied'); btn.innerHTML=old; },2200);
-  };
-  try{
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(n).then(done,function(){ payCopyFallback(n,done); });
-    } else payCopyFallback(n,done);
-  }catch(e){ payCopyFallback(n,done); }
+  var details = 'Zelle to '+PAY.zelle+' · $'+btn.dataset.amount;
+  btn.nextElementSibling.textContent = details;
+  if (navigator.clipboard) navigator.clipboard.writeText(details).catch(function(){});
 }
 function payCopyFallback(text,done){
   try{
@@ -2736,7 +2728,7 @@ function renderPay(){
     '</div><div class="o">'+dueO.map(function(o){return invTail(o.label)}).join(', ')+
     '</div><div class="np">'+dueO.length+' quoted order'+(dueO.length===1?'':'s')+
     ' · '+money(PAID)+' paid to date</div>'+
-    payButtons(dueT,'BioLinked \u2014 quoted')+'</div>')
+    '</div>')
     : (quoteO.length ? ('<div class="bal"><div class="l">Quoted</div><div class="n">'+money(quoteT)+
        '</div><div class="o">'+quoteO.map(function(o){return o.label.split(' \u00b7 ')[0]+' \u00b7 '+o.label.split(' \u00b7 ')[1]}).join(', ')+
        '</div></div>')
@@ -2765,7 +2757,7 @@ function openInv(i){
   }).join('')+'<div class="irow tot"><span class="in">Order total</span><span class="iv">'+money(o.total)+'</span></div>'+noteRows(o);
   var pay=document.getElementById('i-pay');
   pay.innerHTML = (o.status==='due'||o.status==='quote')
-    ? payButtons(o.total,'BioLinked \u2014 '+o.label.split(' \u00b7 ')[0])
+    ? payButtons(o)
     : '';
   sheet('inv');
 }
