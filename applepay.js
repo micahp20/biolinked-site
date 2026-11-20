@@ -38,8 +38,9 @@
       });
       pr.canMakePayment().then(function(r){
         if (!r || !r.applePay) return;   // Apple Pay only; card link stays as fallback
-        el.innerHTML = '<button type="button" class="apbtn" lang="en" aria-label="Pay with Apple Pay"></button>' +
-          '<div class="apnote">Apple Pay $' + (cents/100).toFixed(2) + ' · includes 3% card fee</div>';
+        el.innerHTML = '<button type="button" class="apbtn" lang="en" aria-label="Pay with Apple Pay"></button>';
+        // No price on the button and no separate note: the page's single
+        // "Apple Pay and card include a 3% fee" line sits under the card button.
         el.classList.add('ready');
         el.querySelector('.apbtn').addEventListener('click', function(){ pr.show(); });
         pr.on('paymentmethod', function(ev){

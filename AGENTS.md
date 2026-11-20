@@ -107,7 +107,7 @@ These requirements are recovered from source and merged task records, not a comp
 
 ## Card payments carry a 3% fee — owner confirmed 2026-11-19
 - Every Stripe card Payment Link on a client page must charge the base amount x 1.03, rounded to the cent. Name the link like the base link plus " incl. 3% card fee"; keep the same redirect back to the client's page; put base amount, fee and client in the link metadata.
-- The page keeps the invoice total and the Venmo / Cash App / Zelle amounts at the base amount. Only the card button shows the higher amount, with a small note under it: `<div class="cardfee-note" style="width:100%;text-align:center;font-size:11px;opacity:.7;margin:-4px 0 2px">includes 3% card fee</div>`.
+- The page keeps the invoice total and the Venmo / Cash App / Zelle amounts at the base amount (the Cash App link URL still carries the base amount).
 - No shared template currently emits card buttons: each page that has one hard-codes it in its own `payButtons()` (see rgreen and vbernal-quintana). Copy that pattern and the fee note when a new card button is added.
 - Deactivate the superseded link only after the page is live. Links for amounts already paid are left alone. The $19.99 intake link is a flat intake fee and is not a quote payment.
 
@@ -116,7 +116,14 @@ These requirements are recovered from source and merged task records, not a comp
 - Stripe: `biolinkedsolutions.com` is registered as a payment method domain (pmd_1UdhWIHwQK95IJPpzaupSFcp, Apple Pay active). `www` redirects to the apex, so only the apex is needed.
 - Frontend: `/applepay.js` + `/applepay.css` (load both on the page, bump the page's sw.js). Inside the page's `payButtons()`, for the matching amount, prepend
   `<div class="bl-applepay" data-client="<slug>" data-quote="<quote id>" data-amount="<base x 1.03>" data-label="<client + quote>"></div>` to `card`.
-  The script uses Stripe.js Payment Request (Apple Pay only), shows a black Apple Pay button with "includes 3% card fee", and on success shows a thank-you message. It never marks the page paid: record the payment in pl_sales and update the page as usual.
+  The script uses Stripe.js Payment Request (Apple Pay only), shows a black Apple Pay button (no price, no note), and on success shows a thank-you message. It never marks the page paid: record the payment in pl_sales and update the page as usual.
 - `applepay.js` holds the Stripe live publishable key (`PK`, public by design); if it is ever emptied the button stays hidden.
 - Backend: Supabase edge function `create-payment-intent` (source in `supabase/functions/create-payment-intent/index.ts`, deploy with verify_jwt=false). The browser sends only `{client, quote}`; the amount comes from the `QUOTES` allowlist (base and charge in cents, charge = round(base x 1.03)). Unknown keys get 404. Uses the Supabase secret `STRIPE_SECRET_KEY` (set 2026-11-19; restricted key, PaymentIntents write only, so the function only creates, retrieves and cancels PaymentIntents). POST `{"cancel":"pi_..."}` cancels an unpaid PaymentIntent the function created (metadata source=applepay-button); use it for test PIs. To add a page: add its allowlist entry, redeploy the function, then add the slot to the page. Remove entries once paid.
 - The `data-amount` must equal the allowlist charge; the script refuses to confirm on a mismatch.
+
+## Payment buttons: no prices, one fee line — owner confirmed 2026-11-19
+- No payment button shows a price: Apple Pay, "Pay with card" / "Pay remaining balance", "Pay with Venmo", "Pay with Cash App" and the Zelle button. The Order total line already shows the amount. Charged amounts and links are unchanged.
+- One small line goes directly under the Apple Pay + card buttons (after `card`, before Venmo) in `payButtons()`, only when a card button exists:
+  `card+(card?'<div class="cardfee-note" style="width:100%;text-align:center;font-size:11px;opacity:.7;margin:-4px 0 2px">Apple Pay and card include a 3% fee</div>':'')+`
+  It still shows when Apple Pay is hidden. Never add a separate note under Apple Pay or the card button.
+- Applied to all 152 client/template pages that render Cash App buttons (including sample/ and workout-demo/); copy this pattern for new pages.

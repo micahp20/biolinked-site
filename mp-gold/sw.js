@@ -2,7 +2,7 @@
 // never stale. Scoped to /mp-gold/, the Gold Edition colour preview of
 // /mpauldino/. Its cache name is unique so it never collides with, or evicts,
 // the live /mpauldino/ page's own store.
-const CACHE = 'mp-gold-master-locked-v1-context-v1-controls-v1-calcact1-nostore1';
+const CACHE = 'mp-gold-master-locked-v1-context-v1-controls-v1-calcact1-nostore1-nopriceBtns1';
 const ASSETS = [
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
