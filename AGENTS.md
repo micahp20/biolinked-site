@@ -127,3 +127,6 @@ These requirements are recovered from source and merged task records, not a comp
   `card+(card?'<div class="cardfee-note" style="width:100%;text-align:center;font-size:11px;opacity:.7;margin:-4px 0 2px">Apple Pay and card include a 3% fee</div>':'')+`
   It still shows when Apple Pay is hidden. Never add a separate note under Apple Pay or the card button.
 - Applied to all 152 client/template pages that render Cash App buttons (including sample/ and workout-demo/); copy this pattern for new pages.
+
+## Default invoice cart for new client portals
+Place Add to cart in each unpaid cycle header. Show View cart after selection, preserve each cycle’s quoted BAC water, and charge $9.99 shipping once per order. Offer Apple Pay, card, Venmo, Cash App and Zelle in that order. Keep prices off buttons and apply the 3% fee only to Apple Pay and card. Register each payable cycle on the server.

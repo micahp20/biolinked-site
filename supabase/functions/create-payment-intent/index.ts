@@ -13,6 +13,15 @@ const ALLOWED_ORIGINS = [
 type Quote = { client: string; label: string; base: number; charge: number };
 // key: "<slug>/<quote id>". base/charge in cents. charge = round(base * 1.03).
 const QUOTES: Record<string, Quote> = {
+  "lprice/cycle-1": { client: "lprice", label: "Cycle 1", base: 141497, charge: 145742 },
+  "lprice/cycle-2": { client: "lprice", label: "Cycle 2", base: 17998, charge: 18538 },
+  "lprice/cycle-3": { client: "lprice", label: "Cycle 3", base: 14498, charge: 14933 },
+  "lprice/cycle-4": { client: "lprice", label: "Cycle 4", base: 42997, charge: 44287 },
+  "lprice/cycle-5": { client: "lprice", label: "Cycle 5", base: 56496, charge: 58191 },
+  "eprice/cycle-1": { client: "eprice", label: "Cycle 1", base: 11997, charge: 12357 },
+  "eprice/cycle-2": { client: "eprice", label: "Cycle 2", base: 16498, charge: 16993 },
+  "eprice/cycle-3": { client: "eprice", label: "Cycle 3", base: 58497, charge: 60252 },
+  "eprice/cycle-4": { client: "eprice", label: "Cycle 4", base: 15998, charge: 16478 },
   "dbarajas/cycle-1": { client: "dbarajas", label: "Cycle 1", base: 33498, charge: 34503 },
   "dbarajas/cycle-2": { client: "dbarajas", label: "Cycle 2", base: 12998, charge: 13388 },
   "dbarajas/cycle-3": { client: "dbarajas", label: "Cycle 3", base: 17498, charge: 18023 },
@@ -77,7 +86,7 @@ Deno.serve(async (req: Request) => {
   const slug = String(body.client || "").trim();
   const quoteId = String(body.quote || "").trim();
   let q = QUOTES[`${slug}/${quoteId}`];
-  if (slug === "dbarajas" && /^cart-[1-7](?:-[1-7]){1,6}$/.test(quoteId)) {
+  if (["lprice","eprice","dbarajas"].includes(slug) && /^cart-[1-7](?:-[1-7]){1,6}$/.test(quoteId)) {
     const ids = quoteId.slice(5).split("-");
     const cycles = ids.map(id => QUOTES[`${slug}/cycle-${id}`]);
     if (new Set(ids).size === ids.length && cycles.every(Boolean)) {

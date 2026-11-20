@@ -77,7 +77,13 @@
 
 /* Select existing unpaid cycle quotes on the pilot portal. */
 (function () {
-  if (location.pathname.split('/')[1] !== 'dbarajas') return;
+  var slug=location.pathname.split('/')[1];
+  if (!['dbarajas','lprice','eprice'].includes(slug)) return;
+  if(slug!=='dbarajas'){
+    var script=document.createElement('script'); script.src='/applepay.js?v=price1'; document.head.append(script);
+    var css=document.createElement('link');css.rel='stylesheet';css.href='/applepay.css';document.head.append(css);
+    var style=document.createElement('style');style.textContent='.cycle-pay{display:grid;gap:6px}.cycle-pay .paybtn{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border-radius:10px;background:#242424;color:#f6f3ea;border:1px solid #8b7335}.cycle-pay small{text-align:center}';document.head.append(style);
+  }
   function setup() {
     var hero = document.getElementById('payhero');
     if (!hero || !Array.isArray(window.INV)) return;
@@ -123,16 +129,19 @@
       panel.querySelector('[aria-live]').textContent = orders.length ? 'Order total '+money(base(orders)/100)+' · one shipping charge' : '';
     }
     choices.addEventListener('change', refresh);
-    button.onclick = function() {
-      var orders = selected();
+    button.onclick=function(){checkout(selected())};
+    var originalOpen=window.openInv;
+    if(slug!=='dbarajas') window.openInv=function(i){var o=INV[i]; if(o && ['quote','due'].includes(o.status)) checkout([o]);else originalOpen(i)};
+    function checkout(orders){
       if (!orders.length) return;
-      if (orders.length === 1) {openInv(INV.indexOf(orders[0]));return;}
+      if (orders.length === 1 && slug==='dbarajas') {openInv(INV.indexOf(orders[0]));return;}
       var total = base(orders)/100;
-      document.getElementById('i-name').textContent = 'Selected cycles';
-      document.getElementById('i-sum').textContent = '';
+      document.getElementById('i-name').textContent = orders.length===1?orders[0].label:'Selected cycles';
+      (document.getElementById('invoice-detail-duration')||document.getElementById('i-sum')).textContent = orders.length===1?invSum(orders[0]):'';
       document.getElementById('i-tag').textContent = 'Quoted';
       var rows = [];
       orders.forEach(function(o){
+        if (orders.length===1){o.items.filter(function(it){return !/^Shipping\b/i.test(it.n)}).forEach(function(it){rows.push([it.n,it.amt])});return;}
         var water = o.items.filter(function(item){return /^BAC Water\b/i.test(item.n)});
         var waterCents = water.reduce(function(sum,item){return sum+Math.round(item.amt*100)},0);
         rows.push([o.label,(merchandise(o)-waterCents)/100]);
@@ -149,8 +158,8 @@
       pay.innerHTML='<div class="cycle-pay"><a class="paybtn" target="_blank" rel="noopener">Venmo</a><a class="paybtn" target="_blank" rel="noopener">Cash App</a><button type="button" class="paybtn">Zelle</button><small role="status"></small></div>';
       var methods=pay.firstElementChild;
       var wallet=document.createElement('div');
-      wallet.className='bl-applepay'; wallet.dataset.client='dbarajas';
-      wallet.dataset.quote='cart-'+orders.map(function(o){return /^Cycle (\d+)/.exec(o.label)[1]}).join('-');
+      wallet.className='bl-applepay'; wallet.dataset.client=slug;
+      wallet.dataset.quote=(orders.length===1?'cycle-':'cart-')+orders.map(function(o){return /^Cycle (\d+)/.exec(o.label)[1]}).join('-');
       wallet.dataset.label='Selected cycles'; wallet.dataset.amount=(Math.round(base(orders)*103/100)/100).toFixed(2);
       var card=document.createElement('button'); card.type='button'; card.className='paybtn'; card.textContent='Pay with card'; card.dataset.cartCard='1';
       var fee=document.createElement('small'); fee.textContent='Apple Pay and card include a 3% fee';
@@ -158,7 +167,7 @@
       var links=pay.querySelectorAll('a');
       links[0].href='https://venmo.com/u/'+PAY.venmo;
       links[1].href='https://cash.app/$'+PAY.cashapp+'/'+amount;
-      var zelle=pay.querySelector('button:not([data-cart-card])'); zelle.dataset.amount=amount; zelle.onclick=function(){payZelle(zelle)};
+      var zelle=pay.querySelector('button:not([data-cart-card])'); zelle.dataset.amount=amount; zelle.onclick=function(){var details='Zelle to '+PAY.zelle+' · '+money(total);zelle.nextElementSibling.textContent=details;if(navigator.clipboard)navigator.clipboard.writeText(details).catch(function(){})};
       sheet('inv');
     };
     refresh();
