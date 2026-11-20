@@ -98,6 +98,13 @@ These requirements are recovered from source and merged task records, not a comp
 - Master Dosing: https://docs.google.com/spreadsheets/d/1g1csit5UKXTAKY8IQiGaAdTmfqH1oi9E4pA_v8aM-Rw/edit — native sheet tab Untitled, sheetId 284623520.
 - Search these connected sources before asking the owner to resend them. Read current metadata/ranges; do not assume a generic master row is a client-specific prescription. Preserve missing timing as missing and surface contradictory entries rather than choosing one silently.
 
+## Epithalon and Pinealon are 20-day cycles — owner confirmed 2026-11-19
+- Standing rule for NEW protocols and quotes: Epithalon and Pinealon are each a 20-day cycle, daily PM, SubQ, run straight.
+- Epithalon 50 mg x 1 vial: 3 mL BAC water (16.7 mg/mL), about 2.5 mg = 15u daily, 20 days.
+- Pinealon 10 mg x 2 vials per cycle: 2 mL BAC water per vial (5 mg/mL), dose 1 mg = 20u daily, 20 days. (Older value of 1 mL / 2 mg was wrong.)
+- Master Dosing sheet (rows Epithalon 50 mg, Pinealon 10 mg) and Master Cycles sheet (Sleep & Stress rows) were updated to match. The Pinealon 20 mg dosing row was left untouched.
+- Existing clients keep their current protocols unless the owner asks for a change. First applied to rgreen "The Deep Reset".
+
 ## Card payments carry a 3% fee — owner confirmed 2026-11-19
 - Every Stripe card Payment Link on a client page must charge the base amount x 1.03, rounded to the cent. Name the link like the base link plus " incl. 3% card fee"; keep the same redirect back to the client's page; put base amount, fee and client in the link metadata.
 - The page keeps the invoice total and the Venmo / Cash App / Zelle amounts at the base amount. Only the card button shows the higher amount, with a small note under it: `<div class="cardfee-note" style="width:100%;text-align:center;font-size:11px;opacity:.7;margin:-4px 0 2px">includes 3% card fee</div>`.
