@@ -2,6 +2,9 @@
 
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
+## 2026-11-19 — Epithalon / Pinealon 20-day cycles (rgreen + masters)
+- rgreen Deep Reset: Pinealon now 2 mL BAC, 1 mg / 20u, 20 days (2 vials); Epithalon and Pinealon labelled 20-day cycles. Prices, quote ($289.99) and card link unchanged. Master Dosing and Master Cycles sheets updated; rule recorded in AGENTS.md. Other client pages unchanged. No ledger or inventory changes.
+
 ## 2026-11-19 — 3% card fee on open Stripe card links
 - vbernal-quintana: the "Pay remaining balance" card link moved from $220.98 to $227.61 (3% fee) with an "includes 3% card fee" note; invoice totals and the other payment methods are unchanged. rhurst's only card link is for an already-paid order and was left as is. Rule recorded in AGENTS.md.
 
@@ -328,6 +331,3 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 
 ## 2026-11-18 — Refresh combined-quote delivery
 - Made the existing combined quote heading explicit on vbernal-quintana/ and refreshed its scoped cache after an older invoice screenshot was reported. Invoice amounts and contents unchanged; live source confirmed the requested products were together. See PROJECT_STATUS.md.
-
-## 2026-11-19 — Epithalon / Pinealon 20-day cycles (rgreen + masters)
-- rgreen Deep Reset: Pinealon now 2 mL BAC, 1 mg / 20u, 20 days (2 vials); Epithalon and Pinealon labelled 20-day cycles. Prices, quote ($289.99) and card link unchanged. Master Dosing and Master Cycles sheets updated; rule recorded in AGENTS.md. Other client pages unchanged. No ledger or inventory changes.
