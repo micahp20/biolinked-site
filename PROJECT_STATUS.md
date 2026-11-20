@@ -486,3 +486,9 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## Combined quote refresh — 2026-11-18
 - vbernal-quintana/ already served both requested add-on lines in the same open quote, verified by a fresh live read against main ab82ff44. The owner screenshot showed the previous version. Made the quote heading name all additions explicitly and refreshed only this portal's scoped service-worker cache.
 - Checks: quote cents sum, inline and worker syntax, and preservation of all invoice lines/totals passed. Earlier orders, payment renderer, protocol, and saved schedules unchanged. Publishing via main; hosting/live delivery checked separately.
+
+
+## 2026-11-20 — New saved-cycle review portal
+- Added dbarajas/index.html, sw.js and manifest.json using the cirilo layout; registered the portal on share/index.html and protocols/index.html. Root cache refreshed.
+- Seven catalog-reference cycles are quoted separately; no active schedule, individualized prescription, payment, laboratory score or inventory/ledger write. Contact information excluded. Bloodwork and clinician approval remain pending.
+- Checks: inline JavaScript compilation, quote arithmetic, contact/identity isolation and empty schedule passed. Native iPhone/browser verification not performed. Publishing via PR; hosting and live content checked separately.
