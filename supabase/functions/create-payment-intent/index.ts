@@ -13,6 +13,13 @@ const ALLOWED_ORIGINS = [
 type Quote = { client: string; label: string; base: number; charge: number };
 // key: "<slug>/<quote id>". base/charge in cents. charge = round(base * 1.03).
 const QUOTES: Record<string, Quote> = {
+  "dbarajas/cycle-1": { client: "dbarajas", label: "Cycle 1", base: 33498, charge: 34503 },
+  "dbarajas/cycle-2": { client: "dbarajas", label: "Cycle 2", base: 12998, charge: 13388 },
+  "dbarajas/cycle-3": { client: "dbarajas", label: "Cycle 3", base: 17498, charge: 18023 },
+  "dbarajas/cycle-4": { client: "dbarajas", label: "Cycle 4", base: 28498, charge: 29353 },
+  "dbarajas/cycle-5": { client: "dbarajas", label: "Cycle 5", base: 11498, charge: 11843 },
+  "dbarajas/cycle-6": { client: "dbarajas", label: "Cycle 6", base: 42498, charge: 43773 },
+  "dbarajas/cycle-7": { client: "dbarajas", label: "Cycle 7", base: 17998, charge: 18538 },
   "rgreen/hgh-sleep-20261119": {
     client: "Ryan Green", label: "HGH + Sleep quote", base: 28999, charge: 29869,
   },
