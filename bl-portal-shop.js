@@ -433,11 +433,20 @@ function renderCart(){
   o.push('<div class="bls-list">'+items.map(function(it){return '<div class="bls-row"><div class="bls-rm"><div class="bls-nm">'+esc(it.name)+'</div><div class="bls-sub">'+money(it.price)+' each · '+money(it.price*it.qty)+'</div></div>'+stepper(it.id,it.qty)+'<button type="button" class="bls-x" data-del="'+esc(it.id)+'" aria-label="Remove '+esc(it.name)+'">&times;</button></div>';}).join('')+'</div>');
   var hasBac=items.some(function(i){return isBac(i.name);}), vials=items.reduce(function(s,i){return s+(needsRecon(i.name)?i.qty:0);},0), bp=bacProduct();
   if(!hasBac&&vials&&bp){var n=Math.max(1,Math.ceil(vials/3));o.push('<div class="bls-bac"><b>Need BAC water?</b><span>We suggest '+n+' × '+esc(bp.name)+' ('+money(bp.price)+' each) for your '+vials+' vial'+(vials===1?'':'s')+'. Optional.</span><button type="button" class="bls-btn" data-bac="'+esc(bp.id)+'" data-n="'+n+'">Add '+n+' BAC · '+money(bp.price*n)+'</button></div>');}
-  o.push('<div class="bls-tot"><div><span>Subtotal</span><span>'+money(subtotal())+'</span></div><div><span>Shipping — UPS 2-Day</span><span>'+money(SHIPPING)+'</span></div><div class="g"><span>Total</span><span>'+money(grandTotal())+'</span></div></div>');
+  o.push('<div class="bls-tot"><div><span>Subtotal</span><span>'+money(subtotal())+'</span></div><div><span>Shipping — UPS 2-Day</span><span id="bls-delivery-amount">'+money(deliveryFee())+'</span></div><div class="g"><span>Total</span><span id="bls-grand-amount">'+money(grandTotal())+'</span></div></div>');
   var nm=''; try{var w=document.querySelector('.who .wn');nm=w?w.textContent.trim():'';}catch(e){}
   o.push('<form id="bls-form" class="bls-form" novalidate><div class="seclbl">Your details</div>'+
     '<label class="bls-fld" id="bls-fn"><span>Name</span><input id="bls-name" autocomplete="name" value="'+esc(nm)+'"><em>Please add your name.</em></label>'+
     '<label class="bls-fld" id="bls-fc"><span>Email or phone</span><input id="bls-contact" autocomplete="email"><em>Add an email or phone so we can confirm.</em></label>'+
+    (optionalShipping()?'<div class="seclbl">Delivery</div>'+
+      '<label class="bls-delivery-check"><input id="bls-ship-check" type="checkbox"'+(deliveryShip?' checked':'')+'><span><strong>Ship my order — $9.99 UPS 2-Day</strong><small>Uncheck for free local pickup</small></span></label>'+
+      '<div id="bls-address-fields"'+(deliveryShip?'':' hidden')+'>'+
+        '<label class="bls-fld"><span>Street address</span><input id="bls-addr-line1" autocomplete="shipping address-line1" placeholder="Street address" value="'+esc(deliveryDraft.line1)+'"></label>'+
+        '<label class="bls-fld"><span>Apartment / suite (optional)</span><input id="bls-addr-line2" autocomplete="shipping address-line2" value="'+esc(deliveryDraft.line2)+'"></label>'+
+        '<label class="bls-fld"><span>City</span><input id="bls-addr-city" autocomplete="shipping address-level2" value="'+esc(deliveryDraft.city)+'"></label>'+
+        '<div class="bls-address-row"><label class="bls-fld"><span>State</span><input id="bls-addr-state" maxlength="2" autocomplete="shipping address-level1" placeholder="CO" value="'+esc(deliveryDraft.state)+'"></label>'+
+        '<label class="bls-fld"><span>ZIP code</span><input id="bls-addr-postal_code" inputmode="numeric" autocomplete="shipping postal-code" placeholder="80516" value="'+esc(deliveryDraft.postal_code)+'"></label></div>'+
+      '</div><p id="bls-fulfillment-note" class="bls-note">Uncheck shipping to pick up in person. No shipping fee will be charged.</p>':'')+
     '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+((SLUG==='mjohnson'||SLUG==='erica')?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
     ((SLUG==='mjohnson'||SLUG==='erica')?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
     '<div id="bls-card-total" class="bls-note" aria-live="polite"></div>'+
@@ -447,6 +456,14 @@ function renderCart(){
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
   $('bls-form').addEventListener('change',function(){refreshCheckoutAction();setupInlinePayment();});
+  if(optionalShipping()){
+    $('bls-ship-check').addEventListener('change',updateDeliveryUI);
+    ['line1','line2','city','state','postal_code'].forEach(function(k){
+      var field=$('bls-addr-'+k);if(!field)return;
+      field.addEventListener('input',function(){deliveryDraft[k]=field.value.trim();field.setCustomValidity('');inlineIntent=null;inlineIntentCart='';});
+    });
+    updateDeliveryUI();
+  }
   refreshCheckoutAction();
 }
 function refreshCheckoutAction(){
@@ -465,7 +482,9 @@ function submitOrder(e){
   var items=cartList(); if(!items.length) return;
   var name=$('bls-name').value.trim(), contact=$('bls-contact').value.trim(), pr=document.querySelector('input[name="bls-pay"]:checked'), ok=true;
   $('bls-fn').classList.toggle('bad',!name); $('bls-fc').classList.toggle('bad',!contact); $('bls-payerr').classList.toggle('on',!pr);
-  if(!name||!contact||!pr) ok=false; if(!ok) return;
+  if(!name||!contact||!pr) ok=false;
+  if(ok&&!checkDelivery())ok=false;
+  if(!ok) return;
   var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; var isCard=pr.value==='Apple Pay'||pr.value==='Pay with card'; btn.textContent=isCard?'Opening secure payment…':'Submitting order…';
   if(inlineSupported()&&isCard){
     if(pr.value==='Apple Pay'){
@@ -489,10 +508,10 @@ function submitOrder(e){
     return;
   }
 
-  var body={name:name,contact:contact,payment:{method:pr.value},items:items.map(function(i){return {name:i.name,qty:i.qty,price:i.price};})};
+  var body={name:name,contact:contact,payment:{method:pr.value},fulfillment:deliveryOrder(),items:items.map(function(i){return {name:i.name,qty:i.qty,price:i.price};})};
   fetch(ORDER_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON,Authorization:'Bearer '+ANON},body:JSON.stringify(body)})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
-  .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);cart={};saveCart();renderBar();showConfirm((isFinite(st)&&st>=SHIPPING)?st:grand,j.client_email==='sent');})
+  .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);cart={};saveCart();renderBar();showConfirm(isFinite(st)?st:grand,j.client_email==='sent');})
   .catch(function(){btn.disabled=false;refreshCheckoutAction();var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
 function verifyStripeReturn(){
@@ -513,7 +532,7 @@ function verifyStripeReturn(){
 
 function showConfirm(grand,mailed){
   var M=money(grand), amt=grand.toFixed(2);
-  $('bls-cart').innerHTML='<h1 class="bls-h">Order received</h1><p class="sub">Total '+M+' (includes $9.99 UPS 2-Day shipping). One tap to pay:</p>'+
+  $('bls-cart').innerHTML='<h1 class="bls-h">Order received</h1><p class="sub">Total '+M+(optionalShipping()?(deliveryShip?' (includes $9.99 shipping).':' (free local pickup).'):' (includes $9.99 UPS 2-Day shipping).')+' Choose a payment option:</p>'+
     '<a class="bls-btn bls-wide" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay with Cash App</a>'+
     '<a class="bls-btn bls-wide" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent('BioLinked Order')+'" target="_blank" rel="noopener">Pay with Venmo</a>'+
     '<button type="button" class="bls-btn bls-wide" id="bls-zelle">Copy Zelle payment details</button><p class="bls-note" id="bls-zs"></p>'+
