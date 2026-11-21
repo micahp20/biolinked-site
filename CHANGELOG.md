@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Repair R Holm schedule row expansion
+- Replaced inert daily schedule compound rows with tap-to-expand native details, reusing the page's recorded description/recon/draw/site/timing. Bumped `rholm/sw.js` cache. No client treatment, invoice, inventory or saved schedule data changed. Live iPhone verification pending.
+
+
 ## 2026-11-20 — In-cart Apple Pay and card payments
 - Replaced hosted checkout redirects on two client carts with native Apple Pay payment sheet and in-cart Stripe card field. Server verifies item prices and payment success before marking orders paid. Venmo/Cash App amounts remain prefilled; Zelle copies recipient and amount. Updated shared script and root/client caches, no ledger or stock changes. PR #271 merged and Edge Function v5 deployed; main JS syntax passed. Public-domain page could not be reached from verification tools and no payment was tested; iPhone verification remains pending.
 

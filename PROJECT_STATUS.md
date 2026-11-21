@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## R Holm schedule compound expansion — 2026-11-20
+- Fixed the Schedule daily compound rows so tapping a row expands native HTML details with the compound's existing description, reconstitution, draw, site and timing. Previous daily rows were static divs with no click handler. Client protocol values, dosing, paid invoices, stored schedule and inventory unchanged. Files: `rholm/index.html`, `rholm/sw.js`; cache `rholm-paid-v1-20261119-nopriceBtns1-doseExpand1`. All inline JS blocks passed syntax checks; iPhone/browser interaction and GitHub Pages deployment not yet verified. Branch `rholm-schedule-expand-20261120`; PR/commit verification to be recorded after merge.
+
+
 ## In-page portal payments — 2026-11-20
 - Request: cart Apple Pay should open the native payment sheet on the same client page; card entry and Pay should stay in cart. Added Stripe PaymentIntent actions with server-validated current product prices, quantities, shipping and 3% fee, and verification against site_orders before marking paid. Cash App and Venmo retain prefilled base amount; Zelle now copies recipient and amount instructions. Paths: `bl-portal-shop.js`, `supabase/functions/portal-stripe-checkout/index.ts`, `mjohnson/index.html`, `erica/index.html`, `mjohnson/sw.js`, `erica/sw.js`, `sw.js`, `PROJECT_STATUS.md`, `CHANGELOG.md`. Script version 12; scoped/root caches append `-inlinePay1`. Shared JS syntax checked. No real payment, customer submission, P&L, or inventory writes tested. PR #271 squash-merged (`e1c466d6630bbaf9289767ef41cf4183100b0458`); Supabase `portal-stripe-checkout` active v5. GitHub main file contents and JS syntax verified. Attempts to access the deployed custom-domain pages failed from available verification tools, so Pages deployment/iPhone wallet or card charging are NOT verified. No test charges/orders. Stripe webhook reconciliation remains pending.
 
