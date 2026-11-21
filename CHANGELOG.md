@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Client portal layout and script repair
+- Removed inadvertently embedded script markup from a source comment, restored service-worker registration in its intended script block and fixed mobile compound detail labels/text wrapping. Files: msalenti/index.html, msalenti/sw.js. No treatment data, payments or stock changed.
+
+
 ## 2026-11-20 — Client protocol master-source note alignment
 - Corrected one portal's active-cycle overview to show the exact recorded reconstitution, dose, draw and schedule from Master Dosing / Master Cycles; introduced its missing scoped service worker and manifest. Paths: `msalenti/index.html`, `msalenti/sw.js`, `msalenti/manifest.json`. Existing paid invoice, calculator and schedule values unchanged; no sales or stock writes. Source comparison done; production iPhone verification remains.
 
