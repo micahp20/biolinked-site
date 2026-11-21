@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-11-20 — Erica's cart gains secure checkout
-- Extended card and eligible Apple Pay choices to Erica's Shop & Reorder form, alongside Johnson, preserving Venmo/Cash App/Zelle. Corrected server-side client allowlist and return URLs, refreshed shared script references and scoped/root caches. No invoice, protocol, ledger or stock changes. Payment and mobile testing pending.
+- Extended card and eligible Apple Pay choices to Erica's Shop & Reorder form, alongside Johnson, preserving Venmo/Cash App/Zelle. Corrected server-side client allowlist and return URLs, refreshed shared script references and scoped/root caches. No invoice, protocol, ledger or stock changes. PR #268 merged; Supabase checkout function active v4. GitHub Pages and mobile checkout not independently verified; no real payments tested.
 
 
 ## 2026-11-20 — Add Stripe-hosted checkout to a client cart
