@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-20 — Client protocol master-source note alignment
+- Corrected one portal's active-cycle overview to show the exact recorded reconstitution, dose, draw and schedule from Master Dosing / Master Cycles; introduced its missing scoped service worker and manifest. Paths: `msalenti/index.html`, `msalenti/sw.js`, `msalenti/manifest.json`. Existing paid invoice, calculator and schedule values unchanged; no sales or stock writes. Source comparison done; production iPhone verification remains.
+
 Dates use America/Denver. Recovered entries describe repository evidence, not work performed by the memory-setup session. This is a selected history, not an exhaustive reconstruction.
 
 ## 2026-11-20 — Promo video on home page and intake
