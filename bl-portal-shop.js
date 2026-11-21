@@ -301,10 +301,10 @@ function renderCart(){
   o.push('<form id="bls-form" class="bls-form" novalidate><div class="seclbl">Your details</div>'+
     '<label class="bls-fld" id="bls-fn"><span>Name</span><input id="bls-name" autocomplete="name" value="'+esc(nm)+'"><em>Please add your name.</em></label>'+
     '<label class="bls-fld" id="bls-fc"><span>Email or phone</span><input id="bls-contact" autocomplete="email"><em>Add an email or phone so we can confirm.</em></label>'+
-    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+(SLUG==='mjohnson'?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
-    (SLUG==='mjohnson'?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
+    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+((SLUG==='mjohnson'||SLUG==='erica')?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
+    ((SLUG==='mjohnson'||SLUG==='erica')?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
     '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Submit order</button><em class="bls-err" id="bls-suberr"></em>'+
-    '<p class="bls-note">'+(SLUG==='mjohnson'?'Card and Apple Pay open secure Stripe checkout. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
+    '<p class="bls-note">'+((SLUG==='mjohnson'||SLUG==='erica')?'Card and Apple Pay open secure Stripe checkout. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
 }
@@ -315,7 +315,7 @@ function submitOrder(e){
   $('bls-fn').classList.toggle('bad',!name); $('bls-fc').classList.toggle('bad',!contact); $('bls-payerr').classList.toggle('on',!pr);
   if(!name||!contact||!pr) ok=false; if(!ok) return;
   var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; btn.textContent='Submitting…';
-  if(SLUG==='mjohnson'&&(pr.value==='Apple Pay'||pr.value==='Pay with card')){
+  if((SLUG==='mjohnson'||SLUG==='erica')&&(pr.value==='Apple Pay'||pr.value==='Pay with card')){
     fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'create',client:SLUG,name:name,contact:contact,items:items.map(function(i){return {id:i.id,qty:i.qty};})})})
     .then(function(r){return r.json().then(function(j){if(!r.ok||!j.url)throw Error(j.error||'checkout failed');return j;});})
     .then(function(j){window.location.assign(j.url);})
@@ -330,7 +330,7 @@ function submitOrder(e){
   .catch(function(){btn.disabled=false;btn.textContent='Submit order';var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
 function verifyStripeReturn(){
-  if(SLUG!=='mjohnson')return;
+  if((SLUG!=='mjohnson'&&SLUG!=='erica'))return;
   var qs=new URLSearchParams(location.search), state=qs.get('bl_checkout');
   if(!state)return;
   var sid=qs.get('session_id');
