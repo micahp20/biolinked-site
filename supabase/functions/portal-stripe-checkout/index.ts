@@ -72,17 +72,24 @@ Deno.serve(async (req: Request) => {
         return reply({ error: "invalid_items" }, 400, origin);
       ids.add(id); quantities.set(id, qty);
     }
-    const productQuery = "pl_products?select=id,name,sale,inventory_id,inventory(vials,status)&id=in.(" + [...ids].join(",") + ")";
+    const productQuery = "pl_products?select=id,name,sale,inventory_id&id=in.(" + [...ids].join(",") + ")";
     const res = await fetch(SB + "/rest/v1/" + productQuery, { headers: dbHeaders });
     if (!res.ok) throw new Error("product_lookup_failed");
     const products = await res.json();
     if (products.length !== ids.size) return reply({ error: "product_missing" }, 409, origin);
+    const stockIds = [...new Set(products.map((p: { inventory_id: number | null }) => p.inventory_id).filter((id: number | null) => id != null))];
+    const stockRes = stockIds.length
+      ? await fetch(SB + "/rest/v1/inventory?select=id,vials,status&id=in.(" + stockIds.join(",") + ")", { headers: dbHeaders })
+      : null;
+    if (stockRes && !stockRes.ok) throw new Error("stock_lookup_failed");
+    const stockRows = stockRes ? await stockRes.json() : [];
+    const stockById = new Map(stockRows.map((x: { id: number }) => [Number(x.id), x]));
     const items: { name: string; qty: number; price: number }[] = [];
     let subtotalCents = 0;
     for (const p of products) {
       const cents = Math.round(Number(p.sale) * 100);
       const qty = quantities.get(Number(p.id)) || 0;
-      const inventory = p.inventory;
+      const inventory = stockById.get(Number(p.inventory_id)) as { vials: number; status: string } | undefined;
       if (!Number.isInteger(cents) || cents < 500 || banned(p.name) || !inventory || inventory.status === "out" || Number(inventory.vials) < qty)
         return reply({ error: "item_unavailable", item: p.name }, 409, origin);
       items.push({ name: p.name, qty, price: cents / 100 });
