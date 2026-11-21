@@ -303,10 +303,24 @@ function renderCart(){
     '<label class="bls-fld" id="bls-fc"><span>Email or phone</span><input id="bls-contact" autocomplete="email"><em>Add an email or phone so we can confirm.</em></label>'+
     '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+((SLUG==='mjohnson'||SLUG==='erica')?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
     ((SLUG==='mjohnson'||SLUG==='erica')?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
-    '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Submit order</button><em class="bls-err" id="bls-suberr"></em>'+
+    '<div id="bls-card-total" class="bls-note" aria-live="polite"></div>'+
+    '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Choose payment method</button><em class="bls-err" id="bls-suberr"></em>'+
     '<p class="bls-note">'+((SLUG==='mjohnson'||SLUG==='erica')?'Card and Apple Pay open secure Stripe checkout. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
+  $('bls-form').addEventListener('change',refreshCheckoutAction);
+  refreshCheckoutAction();
+}
+function refreshCheckoutAction(){
+  var btn=$('bls-submit'), fee=$('bls-card-total'), selected=document.querySelector('input[name="bls-pay"]:checked');
+  if(!btn||!fee)return;
+  var choice=selected?selected.value:'';
+  var isCard=choice==='Apple Pay'||choice==='Pay with card';
+  var base=Math.round(grandTotal()*100);
+  var feeCents=Math.round(base*.03);
+  fee.textContent=isCard?'Order '+money(base/100)+' + card fee '+money(feeCents/100)+' = '+money((base+feeCents)/100):'';
+  btn.textContent=isCard?'Pay now securely':choice?'Submit order — Pay separately':'Choose payment method';
+  btn.disabled=!choice;
 }
 function submitOrder(e){
   e.preventDefault(); if(submitted) return;
@@ -314,12 +328,12 @@ function submitOrder(e){
   var name=$('bls-name').value.trim(), contact=$('bls-contact').value.trim(), pr=document.querySelector('input[name="bls-pay"]:checked'), ok=true;
   $('bls-fn').classList.toggle('bad',!name); $('bls-fc').classList.toggle('bad',!contact); $('bls-payerr').classList.toggle('on',!pr);
   if(!name||!contact||!pr) ok=false; if(!ok) return;
-  var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; btn.textContent='Submitting…';
+  var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; var isCard=pr.value==='Apple Pay'||pr.value==='Pay with card'; btn.textContent=isCard?'Opening secure payment…':'Submitting order…';
   if((SLUG==='mjohnson'||SLUG==='erica')&&(pr.value==='Apple Pay'||pr.value==='Pay with card')){
     fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'create',client:SLUG,name:name,contact:contact,items:items.map(function(i){return {id:i.id,qty:i.qty};})})})
     .then(function(r){return r.json().then(function(j){if(!r.ok||!j.url)throw Error(j.error||'checkout failed');return j;});})
     .then(function(j){window.location.assign(j.url);})
-    .catch(function(){btn.disabled=false;btn.textContent='Submit order';var er=$('bls-suberr');er.textContent='Secure checkout could not open. No payment was taken. Please try again.';er.classList.add('on');});
+    .catch(function(){btn.disabled=false;refreshCheckoutAction();var er=$('bls-suberr');er.textContent='Secure checkout could not open. No payment was taken. Please try again.';er.classList.add('on');});
     return;
   }
 
@@ -327,7 +341,7 @@ function submitOrder(e){
   fetch(ORDER_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON,Authorization:'Bearer '+ANON},body:JSON.stringify(body)})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
   .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);cart={};saveCart();renderBar();showConfirm((isFinite(st)&&st>=SHIPPING)?st:grand,j.client_email==='sent');})
-  .catch(function(){btn.disabled=false;btn.textContent='Submit order';var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
+  .catch(function(){btn.disabled=false;refreshCheckoutAction();var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
 function verifyStripeReturn(){
   if((SLUG!=='mjohnson'&&SLUG!=='erica'))return;
