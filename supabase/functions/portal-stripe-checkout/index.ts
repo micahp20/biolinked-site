@@ -133,7 +133,7 @@ Deno.serve(async (req: Request) => {
     }
     const baseCents = subtotalCents + shippingCents;
     const feeCents = Math.round(baseCents * 0.03);
-    if (baseCents < SHIPPING_CENTS || baseCents + feeCents > 2500000) return reply({ error: "total_out_of_range" }, 400, origin);
+    if (baseCents < 500 || baseCents + feeCents > 2500000) return reply({ error: "total_out_of_range" }, 400, origin);
     if (body.action === "intent") {
       const orderId = crypto.randomUUID();
       const charge = baseCents + feeCents;
@@ -146,7 +146,6 @@ Deno.serve(async (req: Request) => {
       params.set("metadata[order_id]", orderId);
       params.set("metadata[base_cents]", String(baseCents));
       params.set("metadata[fee_cents]", String(feeCents));
-    params.set("metadata[fulfillment]", fulfillment.method);
       params.set("metadata[source]", "portal-cart-inline");
       params.set("metadata[fulfillment]", fulfillment.method);
       const pi = await stripe("payment_intents", params);
@@ -176,6 +175,7 @@ Deno.serve(async (req: Request) => {
     params.set("metadata[order_id]", orderId);
     params.set("metadata[base_cents]", String(baseCents));
     params.set("metadata[fee_cents]", String(feeCents));
+    params.set("metadata[fulfillment]", fulfillment.method);
     const email = emailFrom(contact);
     if (email) params.set("customer_email", email);
     let index = 0;
