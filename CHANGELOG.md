@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — In-cart Apple Pay and card payments
+- Replaced hosted checkout redirects on two client carts with native Apple Pay payment sheet and in-cart Stripe card field. Server verifies item prices and payment success before marking orders paid. Venmo/Cash App amounts remain prefilled; Zelle copies recipient and amount. Updated shared script and root/client caches, no ledger or stock changes. Live payment verification pending.
+
+
 ## 2026-11-20 — Clarify portal single-payment checkout
 - Apple Pay and card now use a `Pay now securely` action and show the exact 3% fee-inclusive amount before checkout; manual payment methods remain `Submit order — Pay separately`. Preserves Stripe verification before marking paid; updates both portal script versions and scoped/root caches. Merged PR #270 (`266ebace`), with source and JS syntax checked; live browser checkout pending. No customer orders or inventory changes.
 

@@ -287,10 +287,114 @@ function renderShop(){
   $('bls-q').oninput=function(){query=this.value.trim().toLowerCase();renderShop();};
 }
 function setQtyQuiet(id,n){var p=productById(id);if(!p||!p.inStock)return;cart[id]={id:id,name:p.name,price:p.price,qty:Math.min(99,n)};}
+/* Inline Stripe payments for cart orders: native Apple Pay sheet and an embedded card field. */
+var INLINE_PK='pk_live_51TMDWSHwQK95IJPpixddZyDAy6a2vVaNSdr8u8ydgEeTZlp92IfUGHkIoNNe87M8zcYASjbe3ZBtxa0AGZMGBSFH00BTgJwLtC';
+var inlineStripePromise=null, inlineCard=null, inlineWallet=null, inlineWalletReady=false;
+var inlineIntent=null, inlineIntentCart='', inlineProcessing=false;
+function inlineSupported(){return SLUG==='mjohnson'||SLUG==='erica';}
+function getInlineStripe(){
+  if(inlineStripePromise)return inlineStripePromise;
+  inlineStripePromise=new Promise(function(resolve,reject){
+    if(window.Stripe)return resolve(window.Stripe(INLINE_PK));
+    var script=document.createElement('script');
+    script.src='https://js.stripe.com/v3/';script.async=true;
+    script.onload=function(){resolve(window.Stripe(INLINE_PK));};
+    script.onerror=function(){reject(new Error('Secure payment service is unavailable.'));};
+    document.head.appendChild(script);
+  }).catch(function(e){inlineStripePromise=null;throw e;});
+  return inlineStripePromise;
+}
+function inlineAmount(){var base=Math.round(grandTotal()*100);return base+Math.round(base*.03);}
+function inlineCartKey(){
+  return JSON.stringify(cartList().map(function(i){return [i.id,i.qty];}).sort(function(a,b){return String(a[0]).localeCompare(String(b[0]));}));
+}
+function inlineStatus(message){
+  var el=$('bls-suberr');if(!el)return;
+  el.textContent=message||'';el.classList.toggle('on',!!message);
+}
+function inlineReset(){
+  if(inlineCard){try{inlineCard.destroy();}catch(e){} inlineCard=null;}
+  inlineWallet=null;inlineWalletReady=false;inlineIntent=null;inlineIntentCart='';
+}
+function createInlineIntent(){
+  var key=inlineCartKey();
+  if(inlineIntent&&inlineIntentCart===key)return Promise.resolve(inlineIntent);
+  var name=$('bls-name').value.trim(),contact=$('bls-contact').value.trim();
+  return fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},
+    body:JSON.stringify({action:'intent',client:SLUG,name:name,contact:contact,
+      items:cartList().map(function(i){return {id:i.id,qty:i.qty};})})})
+  .then(function(r){return r.json().then(function(j){if(!r.ok||!j.client_secret||!j.intent_id)throw Error(j.error||'Unable to start payment.');return j;});})
+  .then(function(j){
+    if(j.amount!==inlineAmount())throw Error('The cart total changed. Please refresh and try again.');
+    inlineIntent=j;inlineIntentCart=key;return j;
+  });
+}
+function verifyInlinePaid(intentId){
+  return fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},
+    body:JSON.stringify({action:'verify_intent',client:SLUG,intent_id:intentId})})
+  .then(function(r){return r.json().then(function(j){if(!r.ok||!j.paid)throw Error('Payment confirmation is pending.');return j;});})
+  .then(function(){
+    submitted=true;cart={};saveCart();renderBar();
+    var h=$('bls-cart');
+    if(h)h.innerHTML='<h1 class="bls-h">Payment received — Order confirmed</h1><p class="bls-note">Your card or Apple Pay payment was verified. Your order is recorded and will be prepared after review.</p><button type="button" class="bls-btn bls-wide" id="bls-done-paid">Back to protocol</button>';
+    var btn=$('bls-done-paid');if(btn)btn.onclick=function(){window.go('proto');};
+  });
+}
+function inlinePaymentPending(){
+  inlineProcessing=true;
+  var btn=$('bls-submit');if(btn){btn.disabled=true;btn.textContent='Checking payment…';}
+  inlineStatus('Your payment status needs verification. Check your Stripe receipt before trying again to avoid a duplicate payment.');
+}
+function setupInlinePayment(){
+  if(!inlineSupported())return;
+  var radio=document.querySelector('input[name="bls-pay"]:checked'),choice=radio?radio.value:'';
+  var holder=$('bls-card-wrap');
+  if(holder)holder.hidden=choice!=='Pay with card';
+  if(choice==='Pay with card'&&!inlineCard){
+    getInlineStripe().then(function(stripe){
+      if(!document.getElementById('bls-card-field')||inlineCard)return;
+      inlineCard=stripe.elements().create('card',{hidePostalCode:false});
+      inlineCard.mount('#bls-card-field');
+      inlineStatus('');
+    }).catch(function(){inlineStatus('Secure card form could not load. Please try again.');});
+  }
+  if(choice==='Apple Pay'&&!inlineWallet){
+    getInlineStripe().then(function(stripe){
+      var request=stripe.paymentRequest({country:'US',currency:'usd',total:{label:'BioLinked order (including card fee)',amount:inlineAmount()},requestPayerName:true,requestPayerEmail:true});
+      return request.canMakePayment().then(function(supported){
+        if(!supported||!supported.applePay)throw Error('Apple Pay is not available in this browser. Please use Safari or choose a card.');
+        inlineWallet=request;inlineWalletReady=true;inlineStatus('');
+        request.on('paymentmethod',function(ev){
+          inlineProcessing=true;
+          createInlineIntent().then(function(intent){
+            return stripe.confirmCardPayment(intent.client_secret,{payment_method:ev.paymentMethod.id},{handleActions:false})
+              .then(function(result){
+                if(result.error){ev.complete('fail');throw result.error;}
+                ev.complete('success');
+                if(result.paymentIntent.status==='requires_action')return stripe.confirmCardPayment(intent.client_secret);
+                return result;
+              }).then(function(result){
+                if(result.error)throw result.error;
+                if(result.paymentIntent.status!=='succeeded')throw Error('Payment not completed.');
+                return verifyInlinePaid(intent.intent_id);
+              });
+          }).catch(function(err){
+            try{ev.complete('fail');}catch(e){}
+            if(inlineIntent){inlinePaymentPending();return;}
+            inlineProcessing=false;inlineStatus(err.message||'Apple Pay did not complete. Please try again.');
+            refreshCheckoutAction();
+          });
+        });
+      });
+    }).catch(function(e){inlineStatus(e.message||'Apple Pay unavailable.');});
+  }
+}
+
 /* ---------- render: cart + checkout ---------- */
 function bacProduct(){var best=null;products.forEach(function(p){if(!isBac(p.name)||!p.inStock)return;var t=/10\s*ml/i.test(p.name);if(!best||(t&&!/10\s*ml/i.test(best.name)))best=p;});return best;}
 function renderCart(){
-  var h=$('bls-cart'); if(!h||submitted) return;
+  var h=$('bls-cart'); if(!h||submitted||inlineProcessing) return;
+  if(inlineSupported())inlineReset();
   var items=cartList(), o=['<h1 class="bls-h">Your cart</h1>'];
   if(!items.length){h.innerHTML=o.join('')+'<div class="bls-state">Your cart is empty.<br><button type="button" class="bls-btn" onclick="history.back()">Keep shopping</button></div>';return;}
   o.push('<div class="bls-list">'+items.map(function(it){return '<div class="bls-row"><div class="bls-rm"><div class="bls-nm">'+esc(it.name)+'</div><div class="bls-sub">'+money(it.price)+' each · '+money(it.price*it.qty)+'</div></div>'+stepper(it.id,it.qty)+'<button type="button" class="bls-x" data-del="'+esc(it.id)+'" aria-label="Remove '+esc(it.name)+'">&times;</button></div>';}).join('')+'</div>');
@@ -304,11 +408,12 @@ function renderCart(){
     '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+((SLUG==='mjohnson'||SLUG==='erica')?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
     ((SLUG==='mjohnson'||SLUG==='erica')?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
     '<div id="bls-card-total" class="bls-note" aria-live="polite"></div>'+
+    (inlineSupported()?'<div id="bls-card-wrap" hidden><label class="bls-fld"><span>Credit or debit card</span><div id="bls-card-field" style="padding:14px;background:var(--card);border:1px solid var(--line);border-radius:9px;min-height:50px"></div></label><p class="bls-note">Your card is securely processed by Stripe. BioLinked never sees your card details.</p></div>':'')+
     '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Choose payment method</button><em class="bls-err" id="bls-suberr"></em>'+
-    '<p class="bls-note">'+((SLUG==='mjohnson'||SLUG==='erica')?'Card and Apple Pay open secure Stripe checkout. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
+    '<p class="bls-note">'+((SLUG==='mjohnson'||SLUG==='erica')?'Apple Pay opens a secure payment sheet here; cards are entered directly above. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
-  $('bls-form').addEventListener('change',refreshCheckoutAction);
+  $('bls-form').addEventListener('change',function(){refreshCheckoutAction();setupInlinePayment();});
   refreshCheckoutAction();
 }
 function refreshCheckoutAction(){
@@ -320,20 +425,34 @@ function refreshCheckoutAction(){
   var feeCents=Math.round(base*.03);
   fee.textContent=isCard?'Order '+money(base/100)+' + card fee '+money(feeCents/100)+' = '+money((base+feeCents)/100):'';
   btn.textContent=isCard?'Pay now securely':choice?'Submit order — Pay separately':'Choose payment method';
-  btn.disabled=!choice;
+  btn.disabled=!choice||inlineProcessing;
 }
 function submitOrder(e){
-  e.preventDefault(); if(submitted) return;
+  e.preventDefault(); if(submitted||inlineProcessing) return;
   var items=cartList(); if(!items.length) return;
   var name=$('bls-name').value.trim(), contact=$('bls-contact').value.trim(), pr=document.querySelector('input[name="bls-pay"]:checked'), ok=true;
   $('bls-fn').classList.toggle('bad',!name); $('bls-fc').classList.toggle('bad',!contact); $('bls-payerr').classList.toggle('on',!pr);
   if(!name||!contact||!pr) ok=false; if(!ok) return;
   var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; var isCard=pr.value==='Apple Pay'||pr.value==='Pay with card'; btn.textContent=isCard?'Opening secure payment…':'Submitting order…';
-  if((SLUG==='mjohnson'||SLUG==='erica')&&(pr.value==='Apple Pay'||pr.value==='Pay with card')){
-    fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'create',client:SLUG,name:name,contact:contact,items:items.map(function(i){return {id:i.id,qty:i.qty};})})})
-    .then(function(r){return r.json().then(function(j){if(!r.ok||!j.url)throw Error(j.error||'checkout failed');return j;});})
-    .then(function(j){window.location.assign(j.url);})
-    .catch(function(){btn.disabled=false;refreshCheckoutAction();var er=$('bls-suberr');er.textContent='Secure checkout could not open. No payment was taken. Please try again.';er.classList.add('on');});
+  if(inlineSupported()&&isCard){
+    if(pr.value==='Apple Pay'){
+      if(!inlineWalletReady){btn.disabled=false;refreshCheckoutAction();inlineStatus('Apple Pay is loading or unavailable. Try again or select a card.');return;}
+      btn.disabled=false;refreshCheckoutAction();
+      try{inlineWallet.show();}catch(e){inlineStatus('Unable to open Apple Pay. Please try Safari or select a card.');}
+      return;
+    }
+    if(!inlineCard){btn.disabled=false;refreshCheckoutAction();inlineStatus('The secure card form is loading. Please try again.');return;}
+    inlineProcessing=true;
+    getInlineStripe().then(function(stripe){
+      return createInlineIntent().then(function(intent){
+        return stripe.confirmCardPayment(intent.client_secret,{payment_method:{card:inlineCard,billing_details:{name:name,email:/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(contact)?contact:undefined}}})
+        .then(function(result){if(result.error)throw result.error;if(!result.paymentIntent||result.paymentIntent.status!=='succeeded')throw Error('Payment not completed.');return verifyInlinePaid(intent.intent_id);});
+      });
+    }).catch(function(err){
+      if(inlineIntent){inlinePaymentPending();return;}
+      inlineProcessing=false;inlineStatus(err.message||'Card payment could not be started.');
+      refreshCheckoutAction();
+    });
     return;
   }
 
@@ -362,12 +481,12 @@ function verifyStripeReturn(){
 function showConfirm(grand,mailed){
   var M=money(grand), amt=grand.toFixed(2);
   $('bls-cart').innerHTML='<h1 class="bls-h">Order received</h1><p class="sub">Total '+M+' (includes $9.99 UPS 2-Day shipping). One tap to pay:</p>'+
-    '<a class="bls-btn bls-wide" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay '+M+' in Cash App</a>'+
-    '<a class="bls-btn bls-wide" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent('BioLinked Order')+'" target="_blank" rel="noopener">Pay '+M+' in Venmo</a>'+
-    '<button type="button" class="bls-btn bls-wide" id="bls-zelle">Pay '+M+' via Zelle</button><p class="bls-note" id="bls-zs"></p>'+
+    '<a class="bls-btn bls-wide" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay with Cash App</a>'+
+    '<a class="bls-btn bls-wide" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent('BioLinked Order')+'" target="_blank" rel="noopener">Pay with Venmo</a>'+
+    '<button type="button" class="bls-btn bls-wide" id="bls-zelle">Copy Zelle payment details</button><p class="bls-note" id="bls-zs"></p>'+
     '<p class="bls-note">If a button doesn’t open, send '+M+' to Cash App $micahpauldino, Venmo @micahp20, or Zelle 720-938-0698. Your order ships once payment is confirmed.'+(mailed?' A confirmation email is on its way.':'')+'</p>'+
     '<button type="button" class="bls-btn bls-wide bls-ghost" id="bls-done">Back to my protocol</button>';
-  $('bls-zelle').onclick=function(){var n='720-938-0698',d=function(){$('bls-zs').textContent='Send '+M+' via Zelle to 720-938-0698 (number copied).';};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(n).then(d,d);else d();};
+  $('bls-zelle').onclick=function(){var n='720-938-0698',detail='Zelle recipient: '+n+' · Amount: '+M,d=function(){$('bls-zs').textContent='Zelle: '+n+' · Amount '+M+'. Details copied; enter the amount in your banking app.';};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(detail).then(d,d);else d();};
 }
 
 
