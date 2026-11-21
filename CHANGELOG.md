@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Optional shipping and local pickup in portal checkout
+- Added shipping checkbox and address form to Johnson's cart. Shipping checked: $9.99 UPS 2-Day plus address required. Pickup unchecked: shipping $0 and no address. Server-side Stripe and manual order totals now match the choice, with fulfillment/address kept in the order record; manual confirmation emails include fulfillment information. Updated shared cart CSS/JS, payment Edge Functions, portal assets, and root/scoped caches. No invoice, client protocol, inventory, or ledger changes; production payment test not performed.
+
+
 ## 2026-11-20 — Re-trigger R Holm Pages publish
 - Bumped only `rholm/sw.js` scoped cache to `rholm-paid-v1-20261119-nopriceBtns1-doseExpand1-publish2` (commit `6c26b1fa97d446f8cc325a6eaa0520521e7d3858`) to trigger a fresh GitHub Pages deployment for PR #272's existing schedule expansion fix. Live deployment/iPhone interaction remains unverified; no client protocol or financial changes.
 
