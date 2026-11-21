@@ -332,7 +332,9 @@ function updateDeliveryUI(){
   ['line1','line2','city','state','postal_code'].forEach(function(k){
     var el=$('bls-addr-'+k);if(el){el.required=deliveryShip&&k!=='line2';el.disabled=!deliveryShip;}
   });
-  var shipTotal=$('bls-delivery-amount'),grand=$('bls-grand-amount');
+  var shipTotal=$('bls-delivery-amount'),grand=$('bls-grand-amount'),shipLabel=$('bls-delivery-label'),note=$('bls-fulfillment-note');
+  if(shipLabel)shipLabel.textContent=deliveryShip?'Shipping — UPS 2-Day':'Local pickup — no shipping';
+  if(note)note.textContent=deliveryShip?'Enter the delivery address before placing your order.':'Free local pickup selected. No shipping charge or address required.';
   if(shipTotal)shipTotal.textContent=money(deliveryFee());
   if(grand)grand.textContent=money(grandTotal());
   inlineIntent=null;inlineIntentCart='';
@@ -433,7 +435,7 @@ function renderCart(){
   o.push('<div class="bls-list">'+items.map(function(it){return '<div class="bls-row"><div class="bls-rm"><div class="bls-nm">'+esc(it.name)+'</div><div class="bls-sub">'+money(it.price)+' each · '+money(it.price*it.qty)+'</div></div>'+stepper(it.id,it.qty)+'<button type="button" class="bls-x" data-del="'+esc(it.id)+'" aria-label="Remove '+esc(it.name)+'">&times;</button></div>';}).join('')+'</div>');
   var hasBac=items.some(function(i){return isBac(i.name);}), vials=items.reduce(function(s,i){return s+(needsRecon(i.name)?i.qty:0);},0), bp=bacProduct();
   if(!hasBac&&vials&&bp){var n=Math.max(1,Math.ceil(vials/3));o.push('<div class="bls-bac"><b>Need BAC water?</b><span>We suggest '+n+' × '+esc(bp.name)+' ('+money(bp.price)+' each) for your '+vials+' vial'+(vials===1?'':'s')+'. Optional.</span><button type="button" class="bls-btn" data-bac="'+esc(bp.id)+'" data-n="'+n+'">Add '+n+' BAC · '+money(bp.price*n)+'</button></div>');}
-  o.push('<div class="bls-tot"><div><span>Subtotal</span><span>'+money(subtotal())+'</span></div><div><span>Shipping — UPS 2-Day</span><span id="bls-delivery-amount">'+money(deliveryFee())+'</span></div><div class="g"><span>Total</span><span id="bls-grand-amount">'+money(grandTotal())+'</span></div></div>');
+  o.push('<div class="bls-tot"><div><span>Subtotal</span><span>'+money(subtotal())+'</span></div><div><span id="bls-delivery-label">Shipping — UPS 2-Day</span><span id="bls-delivery-amount">'+money(deliveryFee())+'</span></div><div class="g"><span>Total</span><span id="bls-grand-amount">'+money(grandTotal())+'</span></div></div>');
   var nm=''; try{var w=document.querySelector('.who .wn');nm=w?w.textContent.trim():'';}catch(e){}
   o.push('<form id="bls-form" class="bls-form" novalidate><div class="seclbl">Your details</div>'+
     '<label class="bls-fld" id="bls-fn"><span>Name</span><input id="bls-name" autocomplete="name" value="'+esc(nm)+'"><em>Please add your name.</em></label>'+
