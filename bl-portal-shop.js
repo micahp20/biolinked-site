@@ -481,12 +481,12 @@ function verifyStripeReturn(){
 function showConfirm(grand,mailed){
   var M=money(grand), amt=grand.toFixed(2);
   $('bls-cart').innerHTML='<h1 class="bls-h">Order received</h1><p class="sub">Total '+M+' (includes $9.99 UPS 2-Day shipping). One tap to pay:</p>'+
-    '<a class="bls-btn bls-wide" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay '+M+' in Cash App</a>'+
-    '<a class="bls-btn bls-wide" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent('BioLinked Order')+'" target="_blank" rel="noopener">Pay '+M+' in Venmo</a>'+
-    '<button type="button" class="bls-btn bls-wide" id="bls-zelle">Pay '+M+' via Zelle</button><p class="bls-note" id="bls-zs"></p>'+
+    '<a class="bls-btn bls-wide" href="https://cash.app/$micahpauldino/'+amt+'" target="_blank" rel="noopener">Pay with Cash App</a>'+
+    '<a class="bls-btn bls-wide" href="https://venmo.com/micahp20?txn=pay&amount='+amt+'&note='+encodeURIComponent('BioLinked Order')+'" target="_blank" rel="noopener">Pay with Venmo</a>'+
+    '<button type="button" class="bls-btn bls-wide" id="bls-zelle">Copy Zelle payment details</button><p class="bls-note" id="bls-zs"></p>'+
     '<p class="bls-note">If a button doesn’t open, send '+M+' to Cash App $micahpauldino, Venmo @micahp20, or Zelle 720-938-0698. Your order ships once payment is confirmed.'+(mailed?' A confirmation email is on its way.':'')+'</p>'+
     '<button type="button" class="bls-btn bls-wide bls-ghost" id="bls-done">Back to my protocol</button>';
-  $('bls-zelle').onclick=function(){var n='720-938-0698',d=function(){$('bls-zs').textContent='Send '+M+' via Zelle to 720-938-0698 (number copied).';};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(n).then(d,d);else d();};
+  $('bls-zelle').onclick=function(){var n='720-938-0698',detail='Zelle recipient: '+n+' · Amount: '+M,d=function(){$('bls-zs').textContent='Zelle: '+n+' · Amount '+M+'. Details copied; enter the amount in your banking app.';};if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(detail).then(d,d);else d();};
 }
 
 
