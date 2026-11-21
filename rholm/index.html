@@ -2192,10 +2192,18 @@ function renderDoses(){ if(!document.getElementById('doses')) return;
     h+='<div class="seclbl">'+g[1]+'<span class="cnt">'+set.length+' SHOT'+(set.length===1?'':'S')+
        '</span></div><div class="dgrp">';
     set.forEach(function(c){
-      h+='<div class="drow'+(g[0]==='PM'?' pm':'')+'">'+
-        '<div class="uu">'+(c.u||'')+'</div>'+
-        '<div><div class="nm">'+c.n+'</div><div class="mt">'+
-          [c.d,c.c].filter(Boolean).join(' \u00b7 ')+'</div></div></div>';
+      h+='<details class="drow dose-expand'+(g[0]==='PM'?' pm':'')+'">'+
+        '<summary class="dose-summary"><span class="uu">'+(c.u||'')+'</span>'+
+        '<span class="dose-heading"><span class="nm">'+c.n+'</span><span class="mt">'+
+          [c.d,c.c].filter(Boolean).join(' \\u00b7 ')+'</span></span><span class="dose-chevron" aria-hidden="true">›</span></summary>'+
+        '<div class="dose-expanded">'+
+          (c.about?'<div class="cx-ab">'+c.about+'</div>':'')+
+          '<div class="facts" style="margin:11px 0 0">'+
+          '<div class="frow"><div class="fl">Recon</div><div class="fchips"><b>'+(c.rec||'Not provided')+'</b></div></div>'+
+          '<div class="frow"><div class="fl">Draw</div><div class="fchips">'+(c.d?'<b>'+c.d+'</b>':'')+(c.u?'<b>'+c.u+'</b>':'')+'</div></div>'+
+          '<div class="frow"><div class="fl">Site</div><div class="fchips"><b>'+(c.site||'Not provided')+'</b></div></div>'+
+          '<div class="frow"><div class="fl">Timing</div><div class="fchips"><b>'+(c.c||'')+'</b><b>'+(c.b==='BOTH'?'AM + PM':c.b)+'</b></div></div>'+
+          '</div></div></details>';
     });
     h+='</div>';
   });
@@ -6531,6 +6539,18 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 
 
 
+
+
+/* Schedule compounds: accessible native tap-to-expand details. */
+#doses details.dose-expand{display:block;padding:0}
+#doses .dose-summary{display:flex;align-items:center;gap:13px;padding:12px 14px;cursor:pointer;list-style:none;min-height:52px;touch-action:manipulation}
+#doses .dose-summary::-webkit-details-marker{display:none}
+#doses .dose-summary::marker{content:''}
+#doses .dose-summary:focus-visible{outline:2px solid var(--gold);outline-offset:-3px}
+#doses .dose-heading{display:block;flex:1;min-width:0}
+#doses .dose-chevron{color:var(--gold);font-size:22px;line-height:1;transition:transform .2s}
+#doses .dose-expand[open] .dose-chevron{transform:rotate(90deg)}
+#doses .dose-expanded{padding:0 14px 14px}
 
 #cmplist .pastgrp{opacity:1}
 /* ---- condensed schedule list ----------------------
