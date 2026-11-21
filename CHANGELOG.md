@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Clarify portal single-payment checkout
+- Apple Pay and card now use a `Pay now securely` action and show the exact 3% fee-inclusive amount before checkout; manual payment methods remain `Submit order — Pay separately`. Preserves Stripe verification before marking paid; updates both portal script versions and scoped/root caches. No customer orders or inventory changes.
+
+
 ## 2026-11-20 — Erica's cart gains secure checkout
 - Extended card and eligible Apple Pay choices to Erica's Shop & Reorder form, alongside Johnson, preserving Venmo/Cash App/Zelle. Corrected server-side client allowlist and return URLs, refreshed shared script references and scoped/root caches. No invoice, protocol, ledger or stock changes. PR #268 merged; Supabase checkout function active v4. GitHub Pages and mobile checkout not independently verified; no real payments tested.
 
