@@ -1,5 +1,8 @@
 # Bio Linked Solutions — permanent project instructions
 
+## 2026-11-20 — Ryan Green portal is the reference layout
+- Owner confirmed `rgreen/index.html` is the master for existing and new client portal presentation, compound cards, schedule behavior, calculator, and mobile layout. Use the same renderer and styles while preserving each client's doses, invoices, labs, state and clinical review status. Never copy Ryan's actual treatment or transactions into another portal.
+
 ## Start every session here
 1. Read this entire file and PROJECT_STATUS.md before planning or editing. Read CHANGELOG.md for recent decisions.
 2. Confirm the repository is micahp20/biolinked-site, the current branch, remote, latest commits, and working-tree changes. Fetch current history when possible; never replace someone else's uncommitted work.
