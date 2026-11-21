@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-11-20 — Optional shipping and local pickup in portal checkout
-- Added shipping checkbox and address form to Johnson's cart. Shipping checked: $9.99 UPS 2-Day plus address required. Pickup unchecked: shipping $0 and no address. Server-side Stripe and manual order totals now match the choice, with fulfillment/address kept in the order record; manual confirmation emails include fulfillment information. Updated shared cart CSS/JS, payment Edge Functions, portal assets, and root/scoped caches. No invoice, client protocol, inventory, or ledger changes; production payment test not performed.
+- Added shipping checkbox and address form to Johnson's cart. Shipping checked: $9.99 UPS 2-Day plus address required. Pickup unchecked: shipping $0 and no address. Server-side Stripe and manual order totals now match the choice, with fulfillment/address kept in the order record; manual confirmation emails include fulfillment information. Updated shared cart CSS/JS, payment Edge Functions, portal assets, and root/scoped caches. No invoice, client protocol, inventory, or ledger changes; PR #273 merged; Supabase checkout v6 and order-confirm v5 deployed. Source/JS checks passed; live Pages/iPhone and real payment remain unverified.
 
 
 ## 2026-11-20 — Re-trigger R Holm Pages publish
