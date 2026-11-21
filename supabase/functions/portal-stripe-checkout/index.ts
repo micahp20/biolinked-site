@@ -60,7 +60,26 @@ Deno.serve(async (req: Request) => {
       }
       return reply({ paid: true }, 200, origin);
     }
-    if (body.action !== "create") return reply({ error: "action" }, 400, origin);
+    if (body.action === "verify_intent") {
+      const id = safe(body.intent_id, 150);
+      if (!/^pi_[a-zA-Z0-9]+$/.test(id)) return reply({ error: "invalid_intent" }, 400, origin);
+      const pi = await stripe("payment_intents/" + encodeURIComponent(id));
+      if (pi.metadata?.client !== client || pi.metadata?.source !== "portal-cart-inline" || pi.status !== "succeeded")
+        return reply({ paid: false }, 200, origin);
+      const response = await fetch(SB + "/rest/v1/site_orders?select=id,status,total&payment_handle=eq." + encodeURIComponent(id) + "&limit=1", { headers: dbHeaders });
+      if (!response.ok) throw new Error("order_lookup_failed");
+      const orders = await response.json();
+      if (orders.length !== 1 || Math.round(Number(orders[0].total) * 103) !== pi.amount)
+        return reply({ error: "order_mismatch" }, 409, origin);
+      if (orders[0].status === "new") {
+        const updated = await fetch(SB + "/rest/v1/site_orders?id=eq." + orders[0].id + "&status=eq.new", {
+          method: "PATCH", headers: { ...dbHeaders, Prefer: "return=representation" }, body: JSON.stringify({ status: "paid" }),
+        });
+        if (!updated.ok) throw new Error("order_update_failed");
+      }
+      return reply({ paid: true }, 200, origin);
+    }
+    if (body.action !== "create" && body.action !== "intent") return reply({ error: "action" }, 400, origin);
     const name = safe(body.name), contact = safe(body.contact, 300);
     const incoming = body.items;
     if (!name || !contact || !Array.isArray(incoming) || incoming.length < 1 || incoming.length > 50)
@@ -99,6 +118,35 @@ Deno.serve(async (req: Request) => {
     const baseCents = subtotalCents + SHIPPING_CENTS;
     const feeCents = Math.round(baseCents * 0.03);
     if (baseCents < SHIPPING_CENTS || baseCents + feeCents > 2500000) return reply({ error: "total_out_of_range" }, 400, origin);
+    if (body.action === "intent") {
+      const orderId = crypto.randomUUID();
+      const charge = baseCents + feeCents;
+      const params = new URLSearchParams();
+      params.set("amount", String(charge));
+      params.set("currency", "usd");
+      params.append("payment_method_types[]", "card");
+      params.set("description", "BioLinked portal cart · " + client + " · includes 3% card fee");
+      params.set("metadata[client]", client);
+      params.set("metadata[order_id]", orderId);
+      params.set("metadata[base_cents]", String(baseCents));
+      params.set("metadata[fee_cents]", String(feeCents));
+      params.set("metadata[source]", "portal-cart-inline");
+      const pi = await stripe("payment_intents", params);
+      const order = await fetch(SB + "/rest/v1/site_orders", {
+        method: "POST", headers: { ...dbHeaders, Prefer: "return=representation" },
+        body: JSON.stringify({
+          id: orderId, name, contact, email: emailFrom(contact), items,
+          subtotal: money(subtotalCents), shipping: money(SHIPPING_CENTS), total: money(baseCents),
+          payment_method: "Stripe inline", payment_handle: pi.id, status: "new", is_test: false,
+          emails: { stripe_intent: pi.id, fee: money(feeCents), checkout_status: "pending" },
+        }),
+      });
+      if (!order.ok) {
+        await stripe("payment_intents/" + pi.id + "/cancel", new URLSearchParams()).catch(() => null);
+        throw new Error("order_save_failed");
+      }
+      return reply({ client_secret: pi.client_secret, intent_id: pi.id, amount: charge }, 200, origin);
+    }
     const orderId = crypto.randomUUID();
     const params = new URLSearchParams();
     params.set("mode", "payment");
