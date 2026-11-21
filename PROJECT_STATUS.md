@@ -1,7 +1,7 @@
 # Bio Linked Solutions — project status
 
 ## Portal cart pay-now correction — 2026-11-20
-- Changed the checkout action on Erica and Johnson portals: selecting Apple Pay or card now shows the 3% fee-inclusive total and `Pay now securely`; manual methods show `Submit order — Pay separately`. An order is marked paid only after Stripe verifies payment, never simply on form submission. Files: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`; script v11 and scoped/root cache suffix `-paynow1`. No real payments, database or inventory writes were performed for testing. GitHub Pages and iPhone payment flow still require independent verification. Previous PR #269 conflicted with recently merged site edits; rebuilt this patch on the latest main in a clean branch.
+- Changed the checkout action on Erica and Johnson portals: selecting Apple Pay or card now shows the 3% fee-inclusive total and `Pay now securely`; manual methods show `Submit order — Pay separately`. An order is marked paid only after Stripe verifies payment, never simply on form submission. Files: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`; script v11 and scoped/root cache suffix `-paynow1`. No real payments, database or inventory writes were performed for testing. GitHub Pages and iPhone payment flow still require independent verification. Previous PR #269 conflicted with newly merged edits; rebuilt on latest main and merged PR #270 as commit `266ebacee8324e617ae7c12f10c477c86777efe3`. GitHub main and JavaScript syntax were checked. Live Pages delivery/iPhone checkout unverified; no charge performed.
 
 
 ## Erica checkout parity with Johnson — 2026-11-20
