@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## Client welcome headline correction — 2026-11-20
+- Replaced the draft-status hero title with the full-name welcome greeting to match Ryan's master. Files: `dbarajas/index.html`, `dbarajas/sw.js`; cache `dbarajas-welcome-header-v4-20261120`. No other page copy, clinical data, quotes, schedules or inventory changed. Source verified; live iPhone confirmation pending.
+
+
 ## Master-cycle reference details on client protocol — 2026-11-20
 - Replaced placeholder dose/reconstitution fields in one portal with exact values from the linked Master Cycles sheet for all 26 catalog compounds, retaining client-specific clinician-review caveats and keeping all seven cycles off the schedule. Paths: dbarajas/index.html, dbarajas/sw.js; cache dbarajas-master-dose-reference-v3-20261120. Paid status, invoice totals, lab data and cloud schedule untouched. Source match complete; live iPhone rendering and deployment not confirmed.
 
