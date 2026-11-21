@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-20 — Restore Ryan Green master portal presentation
+- msalenti: removed hard-coded protocol panels, restored the shared compound renderer, and separated quoted options from active scheduled items. dbarajas: standardized the master cycle presentation and direct Labs deep link. Updated both page caches and permanent project instructions. No inventory, invoice or dose changes.
+
 ## 2026-11-20 — Client portal layout and script repair
 - Removed inadvertently embedded script markup from a source comment, restored service-worker registration in its intended script block and fixed mobile compound detail labels/text wrapping. Files: msalenti/index.html, msalenti/sw.js. No treatment data, payments or stock changed.
 
