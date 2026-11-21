@@ -1,6 +1,7 @@
 # Bio Linked Solutions — project status
 
 ## Portal cart Stripe Checkout — 2026-11-20
+- Follow-up hardening: Stripe Checkout is restricted to card payment methods (eligible Apple Pay included), rather than potentially offering unrelated methods. Source: `supabase/functions/portal-stripe-checkout/index.ts`; no database writes or test charges. Original checkout PR #266 merged; later hardening PR pending.
 - Request: add card and eligible-device Apple Pay to one client portal's in-app Shop & Reorder cart without changing existing manual payment options. Source edits on branch `mjohnson-stripe-checkout-20261120`: `bl-portal-shop.js`, `mjohnson/index.html`, `mjohnson/sw.js`, `sw.js`, `supabase/functions/portal-stripe-checkout/index.ts`. Server recalculates totals against Supabase, records a pending order before redirect, and checks Stripe before marking paid on return; it does NOT write P&L or pull stock. Cache names end in `-jcheckout1`. JavaScript parse check passed; deployment and real payment were not tested. Follow-up: enable/verify Edge Function deployment and confirm live checkout flow on iPhone; Stripe notification/webhook reconciliation is not yet automated. PR and publish status to be updated after merge.
 
 

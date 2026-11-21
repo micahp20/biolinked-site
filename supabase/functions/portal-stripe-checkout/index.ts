@@ -101,6 +101,7 @@ Deno.serve(async (req: Request) => {
     const orderId = crypto.randomUUID();
     const params = new URLSearchParams();
     params.set("mode", "payment");
+    params.set("payment_method_types[0]", "card"); // Includes Apple Pay on supported Stripe Checkout devices.
     params.set("success_url", "https://biolinkedsolutions.com/mjohnson/?bl_checkout=success&session_id={CHECKOUT_SESSION_ID}");
     params.set("cancel_url", "https://biolinkedsolutions.com/mjohnson/?bl_checkout=cancel");
     params.set("client_reference_id", orderId);
