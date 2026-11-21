@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## Portal master-source directions — 2026-11-20
+- Request: replace generic active-cycle directions with the recorded master-sheet recon, dose, draw and timing in `msalenti/index.html`. Added `msalenti/sw.js` (`msalenti-master-notes-v1-20261120`) and `msalenti/manifest.json`. Paid invoices, inventory and existing schedule values unchanged. Checked four active compounds against both master sheets; live GitHub Pages/iPhone confirmation pending.
+
 Last reviewed: 2026-11-12 (America/Denver).
 
 ## BioLinked promo video embed — 2026-11-20
