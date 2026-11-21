@@ -315,11 +315,19 @@ function submitOrder(e){
   $('bls-fn').classList.toggle('bad',!name); $('bls-fc').classList.toggle('bad',!contact); $('bls-payerr').classList.toggle('on',!pr);
   if(!name||!contact||!pr) ok=false; if(!ok) return;
   var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; btn.textContent='Submitting…';
+  if(SLUG==='mjohnson'&&(pr.value==='Apple Pay'||pr.value==='Pay with card')){
+    fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'create',client:SLUG,name:name,contact:contact,items:items.map(function(i){return {id:i.id,qty:i.qty};})})})
+    .then(function(r){return r.json().then(function(j){if(!r.ok||!j.url)throw Error(j.error||'checkout failed');return j;});})
+    .then(function(j){window.location.assign(j.url);})
+    .catch(function(){btn.disabled=false;btn.textContent='Submit order';var er=$('bls-suberr');er.textContent='Secure checkout could not open. No payment was taken. Please try again.';er.classList.add('on');});
+    return;
+  }
+
   var body={name:name,contact:contact,payment:{method:pr.value},items:items.map(function(i){return {name:i.name,qty:i.qty,price:i.price};})};
   fetch(ORDER_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON,Authorization:'Bearer '+ANON},body:JSON.stringify(body)})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
   .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);cart={};saveCart();renderBar();showConfirm((isFinite(st)&&st>=SHIPPING)?st:grand,j.client_email==='sent');})
-  .catch(function(){btn.disabled=false;btn.textContent='Submit order · '+money(grand);var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
+  .catch(function(){btn.disabled=false;btn.textContent='Submit order';var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
 function showConfirm(grand,mailed){
   var M=money(grand), amt=grand.toFixed(2);
