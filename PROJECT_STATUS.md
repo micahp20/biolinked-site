@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## Portal cart pay-now correction — 2026-11-20
+- Changed the checkout action on Erica and Johnson portals: selecting Apple Pay or card now shows the 3% fee-inclusive total and `Pay now securely`; manual methods show `Submit order — Pay separately`. An order is marked paid only after Stripe verifies payment, never simply on form submission. Files: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`; script v11 and scoped/root cache suffix `-paynow1`. No real payments, database or inventory writes were performed for testing. GitHub Pages and iPhone payment flow still require independent verification. Previous PR #269 conflicted with recently merged site edits; rebuilt this patch on the latest main in a clean branch.
+
+
 ## Erica checkout parity with Johnson — 2026-11-20
 - Screenshot review confirmed cart was on `/erica/`, not `/mjohnson/`; prior Stripe integration was explicitly limited to Johnson. Extended secure checkout selection and server allowlist to both portals, preserving the existing manual methods and 3% card fee. Paths: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`, `supabase/functions/portal-stripe-checkout/index.ts`. Shared script v10; caches append `-ericaCheckout2`. JS syntax checked. No orders, payments, ledger rows, or inventory writes as tests. PR #268 squash-merged to `main` (`39a2f741`), Supabase Edge Function `portal-stripe-checkout` deployed ACTIVE v4. GitHub Pages completion and live iPhone checkout remain unverified; no real charges were used for testing. Webhook reconciliation remains a follow-up.
 
