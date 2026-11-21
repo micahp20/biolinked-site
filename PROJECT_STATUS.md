@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## In-page portal payments — 2026-11-20
+- Request: cart Apple Pay should open the native payment sheet on the same client page; card entry and Pay should stay in cart. Added Stripe PaymentIntent actions with server-validated current product prices, quantities, shipping and 3% fee, and verification against site_orders before marking paid. Cash App and Venmo retain prefilled base amount; Zelle now copies recipient and amount instructions. Paths: `bl-portal-shop.js`, `supabase/functions/portal-stripe-checkout/index.ts`, `mjohnson/index.html`, `erica/index.html`, `mjohnson/sw.js`, `erica/sw.js`, `sw.js`, `PROJECT_STATUS.md`, `CHANGELOG.md`. Script version 12; scoped/root caches append `-inlinePay1`. Shared JS syntax checked. No real payment, customer submission, P&L, or inventory writes tested. Need Pages/Edge deployment verification and iPhone wallet/card check; Stripe webhook reconciliation still pending.
+
+
 ## Portal cart pay-now correction — 2026-11-20
 - Changed the checkout action on Erica and Johnson portals: selecting Apple Pay or card now shows the 3% fee-inclusive total and `Pay now securely`; manual methods show `Submit order — Pay separately`. An order is marked paid only after Stripe verifies payment, never simply on form submission. Files: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`; script v11 and scoped/root cache suffix `-paynow1`. No real payments, database or inventory writes were performed for testing. GitHub Pages and iPhone payment flow still require independent verification. Previous PR #269 conflicted with newly merged edits; rebuilt on latest main and merged PR #270 as commit `266ebacee8324e617ae7c12f10c477c86777efe3`. GitHub main and JavaScript syntax were checked. Live Pages delivery/iPhone checkout unverified; no charge performed.
 
