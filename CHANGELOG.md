@@ -1,7 +1,7 @@
 # Changelog
 
 ## 2026-11-20 — Clarify portal single-payment checkout
-- Apple Pay and card now use a `Pay now securely` action and show the exact 3% fee-inclusive amount before checkout; manual payment methods remain `Submit order — Pay separately`. Preserves Stripe verification before marking paid; updates both portal script versions and scoped/root caches. No customer orders or inventory changes.
+- Apple Pay and card now use a `Pay now securely` action and show the exact 3% fee-inclusive amount before checkout; manual payment methods remain `Submit order — Pay separately`. Preserves Stripe verification before marking paid; updates both portal script versions and scoped/root caches. Merged PR #270 (`266ebace`), with source and JS syntax checked; live browser checkout pending. No customer orders or inventory changes.
 
 
 ## 2026-11-20 — Erica's cart gains secure checkout
