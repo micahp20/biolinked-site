@@ -21,6 +21,10 @@ var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6I
 var ORDER_FN=SB+'/functions/v1/order-confirm';
 var STRIPE_FN=SB+'/functions/v1/portal-stripe-checkout';
 var SHIPPING=9.99;
+var deliveryShip=true, deliveryDraft={line1:'',line2:'',city:'',state:'',postal_code:''};
+function optionalShipping(){return SLUG==='mjohnson';}
+function deliveryFee(){return optionalShipping()&&!deliveryShip?0:SHIPPING;}
+function deliveryOrder(){return !optionalShipping()?null:deliveryShip?{method:'shipping',address:deliveryDraft}:{method:'pickup'};}
 var SLUG=(location.pathname.split('/').filter(Boolean)[0]||'portal');
 var CKEY='bl-shop-cart-'+SLUG;
 var BLOCK=['cortexin','dihexa','ipamorelin','shipping','2-day ups'];
@@ -134,7 +138,7 @@ function loadCatalog(){
 function cartList(){return Object.keys(cart).map(function(k){return cart[k];}).filter(function(i){return i&&i.qty>0;});}
 function cartCount(){return cartList().reduce(function(s,i){return s+i.qty;},0);}
 function subtotal(){return Math.round(cartList().reduce(function(s,i){return s+i.price*i.qty;},0)*100)/100;}
-function grandTotal(){return cartList().length?Math.round((subtotal()+SHIPPING)*100)/100:0;}
+function grandTotal(){return cartList().length?Math.round((subtotal()+deliveryFee())*100)/100:0;}
 function setQty(id,n){var p=productById(id);if(!p)return;if(n<=0){delete cart[id];}else if(p.inStock){cart[id]={id:id,name:p.name,price:p.price,qty:Math.min(99,n)};}sync();}
 function addQty(id,d){var c=cart[id];setQty(id,(c?c.qty:0)+d);}
 function sync(){saveCart();renderShop();renderCart();renderBar();}
@@ -306,7 +310,36 @@ function getInlineStripe(){
 }
 function inlineAmount(){var base=Math.round(grandTotal()*100);return base+Math.round(base*.03);}
 function inlineCartKey(){
-  return JSON.stringify(cartList().map(function(i){return [i.id,i.qty];}).sort(function(a,b){return String(a[0]).localeCompare(String(b[0]));}));
+  return JSON.stringify({items:cartList().map(function(i){return [i.id,i.qty];}).sort(function(a,b){return String(a[0]).localeCompare(String(b[0]));}),fulfillment:deliveryOrder(),name:$('bls-name')?$('bls-name').value.trim():'',contact:$('bls-contact')?$('bls-contact').value.trim():''});
+}
+function checkDelivery(){
+  if(!optionalShipping()||!deliveryShip)return true;
+  var fields=['line1','city','state','postal_code'], valid=true;
+  fields.forEach(function(k){
+    var el=$('bls-addr-'+k);if(!el)return;
+    var val=el.value.trim();
+    var ok=!!val&&(k!=='state'||/^[A-Za-z]{2}$/.test(val))&&(k!=='postal_code'||/^\d{5}(-\d{4})?$/.test(val));
+    el.setCustomValidity(ok?'':'Enter a valid '+(k==='postal_code'?'ZIP code':k)+'.');
+    if(!ok){valid=false;el.reportValidity();}
+  });
+  return valid;
+}
+function updateDeliveryUI(){
+  var panel=$('bls-address-fields'),check=$('bls-ship-check');
+  if(!optionalShipping()||!check)return;
+  deliveryShip=check.checked;
+  if(panel)panel.hidden=!deliveryShip;
+  ['line1','line2','city','state','postal_code'].forEach(function(k){
+    var el=$('bls-addr-'+k);if(el){el.required=deliveryShip&&k!=='line2';el.disabled=!deliveryShip;}
+  });
+  var shipTotal=$('bls-delivery-amount'),grand=$('bls-grand-amount');
+  if(shipTotal)shipTotal.textContent=money(deliveryFee());
+  if(grand)grand.textContent=money(grandTotal());
+  inlineIntent=null;inlineIntentCart='';
+  inlineWallet=null;inlineWalletReady=false;
+  refreshCheckoutAction();
+  var radio=document.querySelector('input[name="bls-pay"]:checked');
+  if(radio&&radio.value==='Apple Pay')setupInlinePayment();
 }
 function inlineStatus(message){
   var el=$('bls-suberr');if(!el)return;
@@ -321,7 +354,7 @@ function createInlineIntent(){
   if(inlineIntent&&inlineIntentCart===key)return Promise.resolve(inlineIntent);
   var name=$('bls-name').value.trim(),contact=$('bls-contact').value.trim();
   return fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},
-    body:JSON.stringify({action:'intent',client:SLUG,name:name,contact:contact,
+    body:JSON.stringify({action:'intent',client:SLUG,name:name,contact:contact,fulfillment:deliveryOrder(),
       items:cartList().map(function(i){return {id:i.id,qty:i.qty};})})})
   .then(function(r){return r.json().then(function(j){if(!r.ok||!j.client_secret||!j.intent_id)throw Error(j.error||'Unable to start payment.');return j;});})
   .then(function(j){
