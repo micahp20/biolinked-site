@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## Client portal mobile layout repair — 2026-11-20
+- Repaired malformed script placement within an HTML comment and stacked long dosing instructions at full card width on iPhone. Paths: msalenti/index.html, msalenti/sw.js; cache msalenti-layout-fix-v2-20261120. Existing protocol numbers, schedule, quotes, paid invoices and inventory untouched. Source checks done; live iPhone confirmation pending.
+
+
 ## Portal master-source directions — 2026-11-20
 - Request: replace generic active-cycle directions with the recorded master-sheet recon, dose, draw and timing in `msalenti/index.html`. Added `msalenti/sw.js` (`msalenti-master-notes-v1-20261120`) and `msalenti/manifest.json`. Paid invoices, inventory and existing schedule values unchanged. Checked four active compounds against both master sheets; live GitHub Pages/iPhone confirmation pending.
 
