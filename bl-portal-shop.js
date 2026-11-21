@@ -301,9 +301,10 @@ function renderCart(){
   o.push('<form id="bls-form" class="bls-form" novalidate><div class="seclbl">Your details</div>'+
     '<label class="bls-fld" id="bls-fn"><span>Name</span><input id="bls-name" autocomplete="name" value="'+esc(nm)+'"><em>Please add your name.</em></label>'+
     '<label class="bls-fld" id="bls-fc"><span>Email or phone</span><input id="bls-contact" autocomplete="email"><em>Add an email or phone so we can confirm.</em></label>'+
-    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+['Cash App','Venmo','Zelle'].map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
-    '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Submit order · '+money(grandTotal())+'</button><em class="bls-err" id="bls-suberr"></em>'+
-    '<p class="bls-note">You pay after you submit, with Cash App, Venmo or Zelle. Your order ships once payment is confirmed.</p></form>');
+    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+(SLUG==='mjohnson'?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
+    (SLUG==='mjohnson'?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
+    '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Submit order</button><em class="bls-err" id="bls-suberr"></em>'+
+    '<p class="bls-note">'+(SLUG==='mjohnson'?'Card and Apple Pay open secure Stripe checkout. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
 }
