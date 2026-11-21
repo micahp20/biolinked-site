@@ -19,6 +19,7 @@ if(typeof window.go!=='function' || !document.getElementById('scroll')) return;
 var SB='https://bfjydzealeethhcpdfxl.supabase.co';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
 var ORDER_FN=SB+'/functions/v1/order-confirm';
+var STRIPE_FN=SB+'/functions/v1/portal-stripe-checkout';
 var SHIPPING=9.99;
 var SLUG=(location.pathname.split('/').filter(Boolean)[0]||'portal');
 var CKEY='bl-shop-cart-'+SLUG;
