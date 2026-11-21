@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Erica's cart gains secure checkout
+- Extended card and eligible Apple Pay choices to Erica's Shop & Reorder form, alongside Johnson, preserving Venmo/Cash App/Zelle. Corrected server-side client allowlist and return URLs, refreshed shared script references and scoped/root caches. No invoice, protocol, ledger or stock changes. Payment and mobile testing pending.
+
+
 ## 2026-11-20 — Add Stripe-hosted checkout to a client cart
 - Hardening follow-up: limit checkout to card payment method (including eligible Apple Pay) and exclude unrelated payment methods.
 - Added Apple Pay (on supported devices) and card choices to an existing portal's Shop & Reorder cart, keeping manual payment methods. Added a server-validated checkout endpoint and a paid-session return check; no P&L or inventory writes. Refreshed root and scoped service-worker caches. PRs #266 and #267 merged; Edge Function active v3. Live Pages deployment and iPhone checkout remain unverified. Payment reconciliation without a customer return still needs a webhook follow-up.
