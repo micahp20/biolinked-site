@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /rholm/.
-const CACHE = 'rholm-paid-v1-20261119-nopriceBtns1-doseExpand1';
+const CACHE = 'rholm-paid-v1-20261119-nopriceBtns1-doseExpand1-publish2';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
