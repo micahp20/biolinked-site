@@ -1,7 +1,7 @@
 # Bio Linked Solutions — project status
 
 ## Ryan-master portal alignment — 2026-11-20
-- Aligned two client portals to the Ryan Green layout: msalenti replaces a hardcoded overview with Ryan's compound renderer, preserves all paid schedule entries and displays quoted choices as inactive; dbarajas uses Ryan's presentation rules and honors ?tab=labs. Files: msalenti/index.html, msalenti/sw.js, dbarajas/index.html, dbarajas/sw.js, AGENTS.md. Cache: msalenti-ryan-master-v3-20261120 / dbarajas-ryan-parity-v2-20261120. No billing, ledger, stock or treatment changes. Source checks complete; deployment/browser testing remains unconfirmed.
+- Aligned two client portals to the Ryan Green layout: msalenti replaces a hardcoded overview with Ryan's compound renderer, preserves all paid schedule entries and displays quoted choices as inactive; dbarajas uses Ryan's presentation rules and honors ?tab=labs. Files: msalenti/index.html, msalenti/sw.js, dbarajas/index.html, dbarajas/sw.js, AGENTS.md. Cache: msalenti-ryan-master-v4-20261120 / dbarajas-ryan-parity-v2-20261120. No billing, ledger, stock or treatment changes. Script syntax and Ryan renderer checked on both portals; deployment/browser testing remains unconfirmed.
 
 ## Client portal mobile layout repair — 2026-11-20
 - Repaired malformed script placement within an HTML comment and stacked long dosing instructions at full card width on iPhone. Paths: msalenti/index.html, msalenti/sw.js; cache msalenti-layout-fix-v2-20261120. Existing protocol numbers, schedule, quotes, paid invoices and inventory untouched. Source checks done; live iPhone confirmation pending.
