@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Restore full-name welcome heading
+- Updated the client portal hero to match the Ryan master greeting; bumped its scoped cache. No other protocol or ledger changes.
+
+
 ## 2026-11-20 — Master Cycles reference details in client portal
 - One portal now displays recorded master-source dose, reconstitution, draw and timing values rather than repeated placeholders, while keeping the quote-only/clinician-review state. Bumped scoped service-worker cache; no changes to invoice totals, labs, stock or schedule.
 
