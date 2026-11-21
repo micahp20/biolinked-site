@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /msalenti/.
-const CACHE = 'msalenti-layout-fix-v2-20261120';
+const CACHE = 'msalenti-ryan-master-v3-20261120';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
