@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## R Holm Pages republish request — 2026-11-20 (America/Denver)
+- Confirmed `rholm/index.html` on `main` contains the tap-to-expand daily Schedule rows from PR #272. Triggered a fresh GitHub Pages publish by updating only `rholm/sw.js` cache from `rholm-paid-v1-20261119-nopriceBtns1-doseExpand1` to `rholm-paid-v1-20261119-nopriceBtns1-doseExpand1-publish2` (commit `6c26b1fa97d446f8cc325a6eaa0520521e7d3858`). No treatment, invoices, schedule values, inventory or database changes. GitHub content confirmed; GitHub Pages workflow-green status and live iPhone behavior could not be independently confirmed because live domain access failed in this session. Next: open cache-busted `/rholm/?v=273`, verify Schedule compound expands on iPhone.
+
+
 ## R Holm schedule compound expansion — 2026-11-20
 - Fixed the Schedule daily compound rows so tapping a row expands native HTML details with the compound's existing description, reconstitution, draw, site and timing. Previous daily rows were static divs with no click handler. Client protocol values, dosing, paid invoices, stored schedule and inventory unchanged. Files: `rholm/index.html`, `rholm/sw.js`; cache `rholm-paid-v1-20261119-nopriceBtns1-doseExpand1`. All inline JS blocks passed syntax checks; iPhone/browser interaction and GitHub Pages deployment not yet verified. Branch `rholm-schedule-expand-20261120`; PR/commit verification to be recorded after merge.
 
