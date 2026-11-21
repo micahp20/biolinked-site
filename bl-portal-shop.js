@@ -19,6 +19,7 @@ if(typeof window.go!=='function' || !document.getElementById('scroll')) return;
 var SB='https://bfjydzealeethhcpdfxl.supabase.co';
 var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
 var ORDER_FN=SB+'/functions/v1/order-confirm';
+var STRIPE_FN=SB+'/functions/v1/portal-stripe-checkout';
 var SHIPPING=9.99;
 var SLUG=(location.pathname.split('/').filter(Boolean)[0]||'portal');
 var CKEY='bl-shop-cart-'+SLUG;
@@ -300,9 +301,10 @@ function renderCart(){
   o.push('<form id="bls-form" class="bls-form" novalidate><div class="seclbl">Your details</div>'+
     '<label class="bls-fld" id="bls-fn"><span>Name</span><input id="bls-name" autocomplete="name" value="'+esc(nm)+'"><em>Please add your name.</em></label>'+
     '<label class="bls-fld" id="bls-fc"><span>Email or phone</span><input id="bls-contact" autocomplete="email"><em>Add an email or phone so we can confirm.</em></label>'+
-    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+['Cash App','Venmo','Zelle'].map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
-    '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Submit order · '+money(grandTotal())+'</button><em class="bls-err" id="bls-suberr"></em>'+
-    '<p class="bls-note">You pay after you submit, with Cash App, Venmo or Zelle. Your order ships once payment is confirmed.</p></form>');
+    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+(SLUG==='mjohnson'?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
+    (SLUG==='mjohnson'?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
+    '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Submit order</button><em class="bls-err" id="bls-suberr"></em>'+
+    '<p class="bls-note">'+(SLUG==='mjohnson'?'Card and Apple Pay open secure Stripe checkout. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
 }
@@ -313,12 +315,36 @@ function submitOrder(e){
   $('bls-fn').classList.toggle('bad',!name); $('bls-fc').classList.toggle('bad',!contact); $('bls-payerr').classList.toggle('on',!pr);
   if(!name||!contact||!pr) ok=false; if(!ok) return;
   var grand=grandTotal(), btn=$('bls-submit'); btn.disabled=true; btn.textContent='Submitting…';
+  if(SLUG==='mjohnson'&&(pr.value==='Apple Pay'||pr.value==='Pay with card')){
+    fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'create',client:SLUG,name:name,contact:contact,items:items.map(function(i){return {id:i.id,qty:i.qty};})})})
+    .then(function(r){return r.json().then(function(j){if(!r.ok||!j.url)throw Error(j.error||'checkout failed');return j;});})
+    .then(function(j){window.location.assign(j.url);})
+    .catch(function(){btn.disabled=false;btn.textContent='Submit order';var er=$('bls-suberr');er.textContent='Secure checkout could not open. No payment was taken. Please try again.';er.classList.add('on');});
+    return;
+  }
+
   var body={name:name,contact:contact,payment:{method:pr.value},items:items.map(function(i){return {name:i.name,qty:i.qty,price:i.price};})};
   fetch(ORDER_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON,Authorization:'Bearer '+ANON},body:JSON.stringify(body)})
   .then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json();})
   .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);cart={};saveCart();renderBar();showConfirm((isFinite(st)&&st>=SHIPPING)?st:grand,j.client_email==='sent');})
-  .catch(function(){btn.disabled=false;btn.textContent='Submit order · '+money(grand);var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
+  .catch(function(){btn.disabled=false;btn.textContent='Submit order';var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
+function verifyStripeReturn(){
+  if(SLUG!=='mjohnson')return;
+  var qs=new URLSearchParams(location.search), state=qs.get('bl_checkout');
+  if(!state)return;
+  var sid=qs.get('session_id');
+  try{history.replaceState(history.state||{},'',location.pathname);}catch(e){}
+  openCart();
+  if(state!=='success'||!sid)return;
+  var h=$('bls-cart');
+  h.innerHTML='<h1 class="bls-h">Verifying payment…</h1><p class="bls-note">Checking your secure Stripe payment. No additional charge will be made.</p>';
+  fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'verify',client:SLUG,session_id:sid})})
+  .then(function(r){return r.json().then(function(j){if(!r.ok||!j.paid)throw Error(j.error||'not verified');});})
+  .then(function(){submitted=true;cart={};saveCart();renderBar();h.innerHTML='<h1 class="bls-h">Payment received</h1><p class="bls-note">Stripe verified your payment. Your order is recorded and will be prepared after review.</p><button class="bls-btn bls-wide" type="button" id="bls-paid-done">Back to protocol</button>';var done=$('bls-paid-done');if(done)done.onclick=function(){window.go('proto');};})
+  .catch(function(){h.innerHTML='<h1 class="bls-h">Payment confirmation pending</h1><p class="bls-note">We could not confirm your payment automatically. Check your Stripe receipt before trying again to avoid a duplicate charge. Contact BioLinked for help.</p>';});
+}
+
 function showConfirm(grand,mailed){
   var M=money(grand), amt=grand.toFixed(2);
   $('bls-cart').innerHTML='<h1 class="bls-h">Order received</h1><p class="sub">Total '+M+' (includes $9.99 UPS 2-Day shipping). One tap to pay:</p>'+
@@ -372,7 +398,7 @@ function init(){
   ['bls-dock','bls-paycta','v-web'].forEach(function(id){var x=$(id);if(x)x.remove();});
   document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-order,.snav[data-v="shop"]').forEach(function(x){x.remove();});
   try{history.replaceState({blv:'proto'},'');}catch(e){}
-  renderShop(); renderCart(); renderBar(); loadCatalog();
+  renderShop(); renderCart(); renderBar(); loadCatalog(); verifyStripeReturn();
   window.BLShop={open:openShop,cart:function(){return cartList();},products:function(){return products;},protocol:function(){return protocolList();},cycleTotals:function(){return CYCLES.map(function(c){return [c.name,cycleTotal(c)];});}};
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();

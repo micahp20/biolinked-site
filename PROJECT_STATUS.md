@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## Portal cart Stripe Checkout — 2026-11-20
+- Request: add card and eligible-device Apple Pay to one client portal's in-app Shop & Reorder cart without changing existing manual payment options. Source edits on branch `mjohnson-stripe-checkout-20261120`: `bl-portal-shop.js`, `mjohnson/index.html`, `mjohnson/sw.js`, `sw.js`, `supabase/functions/portal-stripe-checkout/index.ts`. Server recalculates totals against Supabase, records a pending order before redirect, and checks Stripe before marking paid on return; it does NOT write P&L or pull stock. Cache names end in `-jcheckout1`. JavaScript parse check passed; deployment and real payment were not tested. Follow-up: enable/verify Edge Function deployment and confirm live checkout flow on iPhone; Stripe notification/webhook reconciliation is not yet automated. PR and publish status to be updated after merge.
+
+
 ## Client welcome headline correction — 2026-11-20
 - Replaced the draft-status hero title with the full-name welcome greeting to match Ryan's master. Files: `dbarajas/index.html`, `dbarajas/sw.js`; cache `dbarajas-welcome-header-v4-20261120`. No other page copy, clinical data, quotes, schedules or inventory changed. Source verified; live iPhone confirmation pending.
 

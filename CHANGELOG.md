@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Add Stripe-hosted checkout to a client cart
+- Added Apple Pay (on supported devices) and card choices to an existing portal's Shop & Reorder cart, keeping manual payment methods. Added a server-validated checkout endpoint and a paid-session return check; no P&L or inventory writes. Refreshed root and scoped service-worker caches. Integration remains subject to Edge Function deployment and live non-charge verification; payment reconciliation without a customer return needs a webhook follow-up.
+
+
 ## 2026-11-20 — Restore full-name welcome heading
 - Updated the client portal hero to match the Ryan master greeting; bumped its scoped cache. No other protocol or ledger changes.
 
