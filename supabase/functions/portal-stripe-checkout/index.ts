@@ -5,7 +5,7 @@ const SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const STRIPE = Deno.env.get("STRIPE_SECRET_KEY") || "";
 const ORIGINS = ["https://biolinkedsolutions.com", "https://www.biolinkedsolutions.com"];
 const SHIPPING_CENTS = 999;
-const CLIENT = "mjohnson";
+const CLIENTS = new Set(["mjohnson", "erica"]);
 const cors = (origin: string | null) => ({
   "Access-Control-Allow-Origin": origin && ORIGINS.includes(origin) ? origin : ORIGINS[0],
   "Access-Control-Allow-Headers": "content-type, apikey, authorization",
@@ -39,13 +39,14 @@ Deno.serve(async (req: Request) => {
   if (!origin || !ORIGINS.includes(origin)) return reply({ error: "origin" }, 403, origin);
   if (!SB || !SR || !STRIPE) return reply({ error: "payment_not_configured" }, 503, origin);
   const body = await req.json().catch(() => null);
-  if (body?.client !== CLIENT) return reply({ error: "unsupported_portal" }, 400, origin);
+  const client = safe(body?.client, 30);
+  if (!CLIENTS.has(client)) return reply({ error: "unsupported_portal" }, 400, origin);
   try {
     if (body.action === "verify") {
       const id = safe(body.session_id, 150);
       if (!/^cs_(?:live|test)_[a-zA-Z0-9]+$/.test(id)) return reply({ error: "invalid_session" }, 400, origin);
       const session = await stripe("checkout/sessions/" + encodeURIComponent(id));
-      if (session.metadata?.client !== CLIENT || session.payment_status !== "paid") return reply({ paid: false }, 200, origin);
+      if (session.metadata?.client !== client || session.payment_status !== "paid") return reply({ paid: false }, 200, origin);
       const rows = await fetch(SB + "/rest/v1/site_orders?select=id,status,total&payment_handle=eq." + encodeURIComponent(id) + "&limit=1", { headers: dbHeaders });
       if (!rows.ok) throw new Error("order_lookup_failed");
       const list = await rows.json();
@@ -102,10 +103,10 @@ Deno.serve(async (req: Request) => {
     const params = new URLSearchParams();
     params.set("mode", "payment");
     params.set("payment_method_types[0]", "card"); // Includes Apple Pay on supported Stripe Checkout devices.
-    params.set("success_url", "https://biolinkedsolutions.com/mjohnson/?bl_checkout=success&session_id={CHECKOUT_SESSION_ID}");
-    params.set("cancel_url", "https://biolinkedsolutions.com/mjohnson/?bl_checkout=cancel");
+    params.set("success_url", "https://biolinkedsolutions.com/" + client + "/?bl_checkout=success&session_id={CHECKOUT_SESSION_ID}");
+    params.set("cancel_url", "https://biolinkedsolutions.com/" + client + "/?bl_checkout=cancel");
     params.set("client_reference_id", orderId);
-    params.set("metadata[client]", CLIENT);
+    params.set("metadata[client]", client);
     params.set("metadata[order_id]", orderId);
     params.set("metadata[base_cents]", String(baseCents));
     params.set("metadata[fee_cents]", String(feeCents));
