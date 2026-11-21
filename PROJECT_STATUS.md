@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## Master-cycle reference details on client protocol — 2026-11-20
+- Replaced placeholder dose/reconstitution fields in one portal with exact values from the linked Master Cycles sheet for all 26 catalog compounds, retaining client-specific clinician-review caveats and keeping all seven cycles off the schedule. Paths: dbarajas/index.html, dbarajas/sw.js; cache dbarajas-master-dose-reference-v3-20261120. Paid status, invoice totals, lab data and cloud schedule untouched. Source match complete; live iPhone rendering and deployment not confirmed.
+
+
 ## Ryan-master portal alignment — 2026-11-20
 - Aligned two client portals to the Ryan Green layout: msalenti replaces a hardcoded overview with Ryan's compound renderer, preserves all paid schedule entries and displays quoted choices as inactive; dbarajas uses Ryan's presentation rules and honors ?tab=labs. Files: msalenti/index.html, msalenti/sw.js, dbarajas/index.html, dbarajas/sw.js, AGENTS.md. Cache: msalenti-ryan-master-v4-20261120 / dbarajas-ryan-parity-v2-20261120. No billing, ledger, stock or treatment changes. Script syntax and Ryan renderer checked on both portals; deployment/browser testing remains unconfirmed.
 
