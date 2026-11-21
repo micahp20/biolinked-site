@@ -28,21 +28,43 @@ Deno.serve(async (req) => {
   const method = String(b?.payment?.method || ""), handle = PAY[method];
   const items = Array.isArray(b?.items) ? b.items.slice(0, 80).map((i: any) => ({ name: String(i?.name || "").slice(0, 200), qty: Math.max(1, Math.min(99, Math.floor(+i?.qty || 1))), price: Math.max(0, Math.round((+i?.price || 0) * 100) / 100) })).filter((i: any) => i.name) : [];
   if (!name || !contact || !handle || !items.length) return out({ error: "missing fields" }, 400);
-  const subtotal = Math.round(items.reduce((s: number, i: any) => s + i.qty * i.price, 0) * 100) / 100, total = Math.round((subtotal + SHIPPING) * 100) / 100;
+  // Legacy clients continue to ship; the Johnson cart explicitly chooses pickup or shipping.
+  const rawFulfillment = b?.fulfillment;
+  let fulfillment: any = { method: "shipping" };
+  if (rawFulfillment != null) {
+    if (rawFulfillment.method === "pickup") fulfillment = { method: "pickup" };
+    else if (rawFulfillment.method === "shipping") {
+      const address = {
+        line1: String(rawFulfillment.address?.line1 || "").trim().slice(0, 160),
+        line2: String(rawFulfillment.address?.line2 || "").trim().slice(0, 100),
+        city: String(rawFulfillment.address?.city || "").trim().slice(0, 100),
+        state: String(rawFulfillment.address?.state || "").trim().toUpperCase().slice(0, 2),
+        postal_code: String(rawFulfillment.address?.postal_code || "").trim().slice(0, 10),
+      };
+      if (!address.line1 || !address.city || !/^[A-Z]{2}$/.test(address.state) || !/^\d{5}(-\d{4})?$/.test(address.postal_code))
+        return out({ error: "invalid_shipping_address" }, 400);
+      fulfillment = { method: "shipping", address };
+    } else return out({ error: "invalid_fulfillment" }, 400);
+  }
+  const shipping = fulfillment.method === "pickup" ? 0 : SHIPPING;
+  const subtotal = Math.round(items.reduce((s: number, i: any) => s + i.qty * i.price, 0) * 100) / 100, total = Math.round((subtotal + shipping) * 100) / 100;
   const email = (contact.match(EMAIL) || [])[0] || null, test = /^\[?test\b/i.test(name);
-  const ins = await fetch(`${SB}/rest/v1/site_orders`, { method: "POST", headers: { ...H, Prefer: "return=representation" }, body: JSON.stringify({ name, contact, email, items, subtotal, shipping: SHIPPING, total, payment_method: method, payment_handle: handle, is_test: test }) });
+  const ins = await fetch(`${SB}/rest/v1/site_orders`, { method: "POST", headers: { ...H, Prefer: "return=representation" }, body: JSON.stringify({ name, contact, email, items, subtotal, shipping, total, payment_method: method, payment_handle: handle, is_test: test, emails: { fulfillment } }) });
   if (!ins.ok) return out({ error: "save failed" }, 500);
   const row = (await ins.json())[0];
   const T = test ? "[TEST] " : "";
   const rows = items.map((i: any) => `<tr><td style="padding:6px 0;border-bottom:1px solid #eee">${i.qty} × ${esc(i.name)}</td><td align="right" style="padding:6px 0;border-bottom:1px solid #eee">${money(i.qty * i.price)}</td></tr>`).join("");
-  const table = `<table width="100%" style="border-collapse:collapse;font-size:14px">${rows}<tr><td style="padding:6px 0">Shipping (2-Day UPS)</td><td align="right">${money(SHIPPING)}</td></tr><tr><td style="padding:8px 0"><b>Total</b></td><td align="right"><b>${money(total)}</b></td></tr></table>`;
+  const table = `<table width="100%" style="border-collapse:collapse;font-size:14px">${rows}<tr><td style="padding:6px 0">${shipping ? "Shipping (2-Day UPS)" : "Local pickup"}</td><td align="right">${money(shipping)}</td></tr><tr><td style="padding:8px 0"><b>Total</b></td><td align="right"><b>${money(total)}</b></td></tr></table>`;
+  const fulfillmentText = fulfillment.method === "pickup" ? "Local pickup — no shipping fee" :
+    fulfillment.address ? "Ship to: " + [fulfillment.address.line1, fulfillment.address.line2, fulfillment.address.city, fulfillment.address.state, fulfillment.address.postal_code].filter(Boolean).join(", ") :
+    "Shipping (address not collected by legacy order form)";
   const wrap = (h: string) => `<div style="font-family:Montserrat,Arial,sans-serif;color:#000;max-width:560px">${h}<p style="color:#4a4a44;font-size:12px;margin-top:18px">For research use only. Not medical advice.</p></div>`;
   const k = await key(); const emails: Record<string, unknown> = {};
   if (!k) emails.error = "no key";
   else {
-    emails.owner = await send(k, OWNER, `${T}New BioLinked Order — ${money(total)} — ${name}`, wrap(`<h2 style="font-family:Georgia,serif;color:#7A6530">${T}New order</h2><p><b>${esc(name)}</b><br>Contact: ${esc(contact)}<br>Payment: ${esc(method)} ${esc(handle)}<br>Order ID: ${row.id}</p>${table}`));
-    if (email) emails.client = await send(k, email, `${T}Your BioLinked order — ${money(total)}`, wrap(`<h2 style="font-family:Georgia,serif;color:#7A6530">${T}We received your order</h2><p>Hi ${esc(name)}, thanks for your order.</p>${table}<p>Payment method: <b>${esc(method)} ${esc(handle)}</b><br>Send <b>${money(total)}</b> to ${esc(handle)} on ${esc(method)}.</p><p style="background:#faf7ef;border-left:3px solid #7A6530;padding:10px 12px"><b>Your order is NOT confirmed until payment is received.</b></p>`));
+    emails.owner = await send(k, OWNER, `${T}New BioLinked Order — ${money(total)} — ${name}`, wrap(`<h2 style="font-family:Georgia,serif;color:#7A6530">${T}New order</h2><p><b>${esc(name)}</b><br>Contact: ${esc(contact)}<br>Payment: ${esc(method)} ${esc(handle)}<br>Fulfillment: ${esc(fulfillmentText)}<br>Order ID: ${row.id}</p>${table}`));
+    if (email) emails.client = await send(k, email, `${T}Your BioLinked order — ${money(total)}`, wrap(`<h2 style="font-family:Georgia,serif;color:#7A6530">${T}We received your order</h2><p>Hi ${esc(name)}, thanks for your order.</p>${table}<p>${esc(fulfillmentText)}</p><p>Payment method: <b>${esc(method)} ${esc(handle)}</b><br>Send <b>${money(total)}</b> to ${esc(handle)} on ${esc(method)}.</p><p style="background:#faf7ef;border-left:3px solid #7A6530;padding:10px 12px"><b>Your order is NOT confirmed until payment is received.</b></p>`));
   }
-  await fetch(`${SB}/rest/v1/site_orders?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ emails }) });
+  await fetch(`${SB}/rest/v1/site_orders?id=eq.${row.id}`, { method: "PATCH", headers: H, body: JSON.stringify({ emails: { ...emails, fulfillment } }) });
   return out({ ok: true, id: row.id, total, client_email: email ? ((emails.client as any)?.ok ? "sent" : "failed") : "none" });
 });
