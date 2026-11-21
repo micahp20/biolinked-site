@@ -329,6 +329,22 @@ function submitOrder(e){
   .then(function(j){if(!j||!j.ok)throw new Error('bad');submitted=true;var st=Number(j.total);cart={};saveCart();renderBar();showConfirm((isFinite(st)&&st>=SHIPPING)?st:grand,j.client_email==='sent');})
   .catch(function(){btn.disabled=false;btn.textContent='Submit order';var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
+function verifyStripeReturn(){
+  if(SLUG!=='mjohnson')return;
+  var qs=new URLSearchParams(location.search), state=qs.get('bl_checkout');
+  if(!state)return;
+  var sid=qs.get('session_id');
+  try{history.replaceState(history.state||{},'',location.pathname);}catch(e){}
+  openCart();
+  if(state!=='success'||!sid)return;
+  var h=$('bls-cart');
+  h.innerHTML='<h1 class="bls-h">Verifying payment…</h1><p class="bls-note">Checking your secure Stripe payment. No additional charge will be made.</p>';
+  fetch(STRIPE_FN,{method:'POST',headers:{'Content-Type':'application/json',apikey:ANON},body:JSON.stringify({action:'verify',client:SLUG,session_id:sid})})
+  .then(function(r){return r.json().then(function(j){if(!r.ok||!j.paid)throw Error(j.error||'not verified');});})
+  .then(function(){submitted=true;cart={};saveCart();renderBar();h.innerHTML='<h1 class="bls-h">Payment received</h1><p class="bls-note">Stripe verified your payment. Your order is recorded and will be prepared after review.</p><button class="bls-btn bls-wide" type="button" id="bls-paid-done">Back to protocol</button>';var done=$('bls-paid-done');if(done)done.onclick=function(){window.go('proto');};})
+  .catch(function(){h.innerHTML='<h1 class="bls-h">Payment confirmation pending</h1><p class="bls-note">We could not confirm your payment automatically. Check your Stripe receipt before trying again to avoid a duplicate charge. Contact BioLinked for help.</p>';});
+}
+
 function showConfirm(grand,mailed){
   var M=money(grand), amt=grand.toFixed(2);
   $('bls-cart').innerHTML='<h1 class="bls-h">Order received</h1><p class="sub">Total '+M+' (includes $9.99 UPS 2-Day shipping). One tap to pay:</p>'+
@@ -382,7 +398,7 @@ function init(){
   ['bls-dock','bls-paycta','v-web'].forEach(function(id){var x=$(id);if(x)x.remove();});
   document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-order,.snav[data-v="shop"]').forEach(function(x){x.remove();});
   try{history.replaceState({blv:'proto'},'');}catch(e){}
-  renderShop(); renderCart(); renderBar(); loadCatalog();
+  renderShop(); renderCart(); renderBar(); loadCatalog(); verifyStripeReturn();
   window.BLShop={open:openShop,cart:function(){return cartList();},products:function(){return products;},protocol:function(){return protocolList();},cycleTotals:function(){return CYCLES.map(function(c){return [c.name,cycleTotal(c)];});}};
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
