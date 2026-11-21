@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-20 — Re-trigger R Holm Pages publish
+- Bumped only `rholm/sw.js` scoped cache to `rholm-paid-v1-20261119-nopriceBtns1-doseExpand1-publish2` (commit `6c26b1fa97d446f8cc325a6eaa0520521e7d3858`) to trigger a fresh GitHub Pages deployment for PR #272's existing schedule expansion fix. Live deployment/iPhone interaction remains unverified; no client protocol or financial changes.
+
+
 ## 2026-11-20 — Repair R Holm schedule row expansion
 - Replaced inert daily schedule compound rows with tap-to-expand native details, reusing the page's recorded description/recon/draw/site/timing. Bumped `rholm/sw.js` cache. No client treatment, invoice, inventory or saved schedule data changed. Live iPhone verification pending.
 
