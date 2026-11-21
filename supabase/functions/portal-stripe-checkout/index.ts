@@ -28,6 +28,19 @@ async function stripe(path: string, body?: URLSearchParams) {
 }
 const banned = (n: string) => ["cortexin", "dihexa", "ipamorelin", "shipping", "2-day ups"].some(x => n.toLowerCase().includes(x))
   || /(?:epitalon|epithalon).*10\s*mg/i.test(n);
+function validatedFulfillment(client: string, input: any) {
+  if (client !== "mjohnson") return { method: "shipping" } as const;
+  if (!input || (input.method !== "pickup" && input.method !== "shipping")) return null;
+  if (input.method === "pickup") return { method: "pickup" } as const;
+  const raw = input.address || {};
+  const address = {
+    line1: safe(raw.line1, 160), line2: safe(raw.line2, 100),
+    city: safe(raw.city, 100), state: safe(raw.state, 2).toUpperCase(),
+    postal_code: safe(raw.postal_code, 10),
+  };
+  if (!address.line1 || !address.city || !/^[A-Z]{2}$/.test(address.state) || !/^\d{5}(-\d{4})?$/.test(address.postal_code)) return null;
+  return { method: "shipping", address } as const;
+}
 function emailFrom(contact: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact) ? contact : null;
 }
@@ -81,6 +94,9 @@ Deno.serve(async (req: Request) => {
     }
     if (body.action !== "create" && body.action !== "intent") return reply({ error: "action" }, 400, origin);
     const name = safe(body.name), contact = safe(body.contact, 300);
+    const fulfillment = validatedFulfillment(client, body.fulfillment);
+    if (!fulfillment) return reply({ error: "invalid_shipping_address" }, 400, origin);
+    const shippingCents = fulfillment.method === "pickup" ? 0 : SHIPPING_CENTS;
     const incoming = body.items;
     if (!name || !contact || !Array.isArray(incoming) || incoming.length < 1 || incoming.length > 50)
       return reply({ error: "invalid_order" }, 400, origin);
@@ -115,7 +131,7 @@ Deno.serve(async (req: Request) => {
       items.push({ name: p.name, qty, price: cents / 100 });
       subtotalCents += cents * qty;
     }
-    const baseCents = subtotalCents + SHIPPING_CENTS;
+    const baseCents = subtotalCents + shippingCents;
     const feeCents = Math.round(baseCents * 0.03);
     if (baseCents < SHIPPING_CENTS || baseCents + feeCents > 2500000) return reply({ error: "total_out_of_range" }, 400, origin);
     if (body.action === "intent") {
@@ -130,15 +146,17 @@ Deno.serve(async (req: Request) => {
       params.set("metadata[order_id]", orderId);
       params.set("metadata[base_cents]", String(baseCents));
       params.set("metadata[fee_cents]", String(feeCents));
+    params.set("metadata[fulfillment]", fulfillment.method);
       params.set("metadata[source]", "portal-cart-inline");
+      params.set("metadata[fulfillment]", fulfillment.method);
       const pi = await stripe("payment_intents", params);
       const order = await fetch(SB + "/rest/v1/site_orders", {
         method: "POST", headers: { ...dbHeaders, Prefer: "return=representation" },
         body: JSON.stringify({
           id: orderId, name, contact, email: emailFrom(contact), items,
-          subtotal: money(subtotalCents), shipping: money(SHIPPING_CENTS), total: money(baseCents),
+          subtotal: money(subtotalCents), shipping: money(shippingCents), total: money(baseCents),
           payment_method: "Stripe inline", payment_handle: pi.id, status: "new", is_test: false,
-          emails: { stripe_intent: pi.id, fee: money(feeCents), checkout_status: "pending" },
+          emails: { stripe_intent: pi.id, fee: money(feeCents), checkout_status: "pending", fulfillment },
         }),
       });
       if (!order.ok) {
@@ -168,7 +186,7 @@ Deno.serve(async (req: Request) => {
       params.set("line_items[" + k + "][price_data][unit_amount]", String(Math.round(p.price * 100)));
       params.set("line_items[" + k + "][price_data][product_data][name]", p.name);
     }
-    for (const [label, amount] of [["Shipping · UPS 2-Day", SHIPPING_CENTS], ["Card / Apple Pay fee (3%)", feeCents]] as const) {
+    for (const [label, amount] of [["Shipping · UPS 2-Day", shippingCents], ["Card / Apple Pay fee (3%)", feeCents]] as const) {
       if (!amount) continue;
       const k = index++;
       params.set("line_items[" + k + "][quantity]", "1");
@@ -181,10 +199,10 @@ Deno.serve(async (req: Request) => {
       method: "POST", headers: { ...dbHeaders, Prefer: "return=representation" },
       body: JSON.stringify({
         id: orderId, name, contact, email, items, subtotal: money(subtotalCents),
-        shipping: money(SHIPPING_CENTS), total: money(baseCents),
+        shipping: money(shippingCents), total: money(baseCents),
         payment_method: "Stripe Checkout", payment_handle: session.id,
         status: "new", is_test: false,
-        emails: { stripe_session: session.id, fee: money(feeCents), checkout_status: "pending" },
+        emails: { stripe_session: session.id, fee: money(feeCents), checkout_status: "pending", fulfillment },
       }),
     });
     if (!order.ok) {
