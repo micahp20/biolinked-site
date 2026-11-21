@@ -1,7 +1,7 @@
 # Bio Linked Solutions — project status
 
 ## Erica checkout parity with Johnson — 2026-11-20
-- Screenshot review confirmed cart was on `/erica/`, not `/mjohnson/`; prior Stripe integration was explicitly limited to Johnson. Extended secure checkout selection and server allowlist to both portals, preserving the existing manual methods and 3% card fee. Paths: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`, `supabase/functions/portal-stripe-checkout/index.ts`. Shared script v10; caches append `-ericaCheckout2`. JS syntax checked. No orders, payments, ledger rows, or inventory writes as tests. Merge, Supabase deployment, Pages status, and iPhone checkout verification to be recorded separately; webhook reconciliation remains a follow-up.
+- Screenshot review confirmed cart was on `/erica/`, not `/mjohnson/`; prior Stripe integration was explicitly limited to Johnson. Extended secure checkout selection and server allowlist to both portals, preserving the existing manual methods and 3% card fee. Paths: `bl-portal-shop.js`, `erica/index.html`, `mjohnson/index.html`, `erica/sw.js`, `mjohnson/sw.js`, `sw.js`, `supabase/functions/portal-stripe-checkout/index.ts`. Shared script v11; caches append `-ericaCheckout2-paynow1`. Card choice shows the total including the 3% fee, button says `Pay now securely`, and manual methods say `Submit order — Pay separately`; payment is not marked paid until verified by Stripe. JS syntax checked. No orders, payments, ledger rows, or inventory writes as tests. Merge, Supabase deployment, Pages status, and iPhone checkout verification to be recorded separately; webhook reconciliation remains a follow-up.
 
 
 ## Portal cart Stripe Checkout — 2026-11-20
