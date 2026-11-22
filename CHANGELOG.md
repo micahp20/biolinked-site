@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-21 — Invoice card selection presentation
+- Moved cycle selection into individual invoice headers with Quote badges, itemized rows and Pay now footers, following the supplied visual reference. Removed the separate picker. Cycle headings use Master Cycles categories and numbers. Updated AGENTS.md and scoped cache gmahan-invoice-v117. Files: gmahan/index.html, gmahan/sw.js, AGENTS.md. Mock checkout checks passed at 390 and 1200 px, including multi-select, deselection, combined totals and duplicate handling. Inline script syntax and diff checks passed. Publishing through GitHub connector.
+
+
 ## 2026-11-21 — Combined cycle selection on invoices
 - Added titled checkboxes and combined checkout to one portal, with shared quantities, one standard water and one shipping charge. Saved the convention in AGENTS.md. Mock catalog checks passed at 390 and 1200 px, including deselection, totals and repeat adds. Files: gmahan/index.html, gmahan/sw.js, bl-portal-shop.js, sw.js. Deployment verification follows the push.
 

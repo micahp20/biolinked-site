@@ -1321,6 +1321,19 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
 <style>
 #protoabout .catalog-option .blp-ctl{display:none}
 .quote-status:not(:empty){display:block;padding:10px 14px;font-weight:600}
+
+/* Invoice selection follows the reference invoice cards. */
+.cycle-invoice .ohd{flex-wrap:wrap;align-items:center;padding:14px;gap:12px}
+.cycle-invoice .ot{flex:1 1 220px;font-size:13px;line-height:1.45}
+.cycle-invoice .pill{flex:none}
+.invoice-check{display:flex;align-items:center;justify-content:flex-end;gap:7px;min-height:44px;width:100%;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer}
+.invoice-check input{appearance:auto;width:22px;height:22px;margin:0;accent-color:var(--gold);cursor:pointer;flex:none}
+.cycle-invoice .irow{padding:12px 14px}
+.cycle-invoice .irow.tot{align-items:center;padding:11px 14px}
+.invoice-selection-summary{padding:8px 0 16px}
+.invoice-selection-summary:has(button:disabled){display:none}
+#selection-status:empty{display:none}
+
 .quote-title{background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .ohd .invoice-pay-now{margin-top:6px}
 </style></head>
@@ -2960,26 +2973,32 @@ function updateInvoiceSelection(){
   document.getElementById('selection-cart').disabled=!invoiceSelection.size;
   document.getElementById('selection-status').textContent='';
 }
-function invoicePicker(){
-  return '<section class="ocard"><h3>Choose your cycles</h3>'+savedCycles.map(function(cycle,index){
-    if(cycle.reviewOnly) return '';
-    return '<label style="display:flex;align-items:center;gap:.6rem;min-height:44px"><input type="checkbox" data-invoice-cycle="'+index+'"'+
-      (invoiceSelection.has(index)?' checked':'')+'> '+esc(cycle.goal)+'</label>';
-  }).join('')+'<p id="selection-total" aria-live="polite"></p><button type="button" class="btn" id="selection-cart">Add selected cycles to cart</button>'+
-    '<p id="selection-status" role="status"></p></section>';
+function paySelectedCycles(index){
+  var quote=invoiceSelection.size ? selectedInvoiceQuote() : savedCycles[index];
+  var message=window.BLShop ? BLShop.addCatalogQuote(quote) : 'The order form is loading. Please try again.';
+  document.getElementById('selection-status').textContent=message||'';
+}
+function cycleInvoiceTitle(cycle){
+  var numbers={'Fat Loss':1,'Cognitive Enhancement':2,'Recovery & Healing':3,
+    'Longevity & Anti-Aging':4,'Sexual Health & Hormonal Balance':5,'Muscle Building':6,'Sleep & Stress':7};
+  return 'Cycle '+numbers[cycle.goal]+' · '+cycle.goal;
 }
 function renderPay(){
   document.getElementById('paysum').textContent='Intake fee waived · No balance due';
   document.getElementById('payhero').innerHTML='';
-  document.getElementById('paylist').innerHTML=invoicePicker()+savedCycles.map(function(cycle,index){
+  document.getElementById('paylist').innerHTML=savedCycles.map(function(cycle,index){
     if(cycle.reviewOnly) return '';
     var rows=cycleQuoteRows(cycle);
-    return '<article class="ocard" onclick="openInv('+index+')"><div class="ohd"><div><div class="ot">'+
-      '<button type="button" class="quote-title" onclick="event.stopPropagation();openInv('+index+')">'+esc(cycle.name)+'</button></div>'+
-      quoteButton(index,true)+'</div><span class="pill quote">Quoted</span></div>'+
-      '<span class="quote-status" role="status"></span>'+quoteLines(rows)+'<div class="irow tot">'+
-      '<span class="in">Order total</span><span class="iv">'+quoteTotal(rows)+'</span></div></article>';
-  }).join('');
+    return '<article class="ocard cycle-invoice"><div class="ohd"><div class="ot">'+
+      '<button type="button" class="quote-title" onclick="openInv('+index+')">'+esc(cycleInvoiceTitle(cycle))+'</button></div>'+
+      '<span class="pill quote">Quote</span><label class="invoice-check"><input type="checkbox" data-invoice-cycle="'+index+'"'+
+      (invoiceSelection.has(index)?' checked':'')+'> <span>Add to cart</span></label></div>'+
+      quoteLines(rows)+'<div class="irow tot"><span class="in">'+
+      '<button type="button" class="invoice-pay-now" onclick="paySelectedCycles('+index+')">Pay now &rarr;</button>'+
+      '</span><span class="iv">'+quoteTotal(rows)+'</span></div></article>';
+  }).join('')+'<div class="invoice-selection-summary"><p id="selection-total" aria-live="polite"></p>'+
+    '<button type="button" class="invoice-pay-now" id="selection-cart">Pay selected cycles &rarr;</button>'+
+    '<p id="selection-status" role="status"></p></div>';
   document.querySelectorAll('[data-invoice-cycle]').forEach(function(input){
     input.onchange=function(){
       var index=Number(input.dataset.invoiceCycle);
@@ -2989,9 +3008,7 @@ function renderPay(){
     };
   });
   document.getElementById('selection-cart').onclick=function(){
-    if(!invoiceSelection.size) return;
-    document.getElementById('selection-status').textContent=window.BLShop
-      ? BLShop.addCatalogQuote(selectedInvoiceQuote()) : 'The order form is loading. Please try again.';
+    if(invoiceSelection.size) paySelectedCycles();
   };
   updateInvoiceSelection();
   document.getElementById('paynote').textContent='Combined orders include one BAC water and one shipping charge. Local pickup removes shipping.';
@@ -3001,7 +3018,7 @@ function openInv(index){
   if(!cycle||cycle.reviewOnly)return;
   var rows=cycleQuoteRows(cycle);
   document.getElementById('i-tag').textContent='Quoted';
-  document.getElementById('i-name').textContent=cycle.name;
+  document.getElementById('i-name').textContent=cycleInvoiceTitle(cycle);
   document.getElementById('i-sum').textContent='';
   document.getElementById('i-items').innerHTML=quoteLines(rows)+'<div class="irow tot"><span>Order total</span><span>'+quoteTotal(rows)+'</span></div>';
   document.getElementById('i-pay').innerHTML=quoteButton(index)+'<span class="quote-status" role="status"></span>';
