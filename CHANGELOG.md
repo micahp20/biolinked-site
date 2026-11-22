@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-21 — Schedule editor asset refresh
+- Refreshed scoped schedule engine, editor and controls asset URLs in rholm/index.html and its service-worker asset list. Cache rholm-schedule-editor-v4-20261121. Fresh-load testing already opened rows, so the reported stuck state was not reproduced. Isolated 390 px browser checks passed expansion, draft edit, calculated draw, save, reload and reopen using mocked networking. User's existing device cache and cloud save remain unverified. No production member data changed. Publishing the cache refresh via GitHub.
+
+
 ## 2026-11-21 — Invoice card selection presentation
 - Moved cycle selection into individual invoice headers with Quote badges, itemized rows and Pay now footers, following the supplied visual reference. Removed the separate picker. Cycle headings use Master Cycles categories and numbers. Updated AGENTS.md and scoped cache gmahan-invoice-v117. Files: gmahan/index.html, gmahan/sw.js, AGENTS.md. Mock checkout checks passed at 390 and 1200 px, including multi-select, deselection, combined totals and duplicate handling. Inline script syntax and diff checks passed. Publishing through GitHub connector.
 
