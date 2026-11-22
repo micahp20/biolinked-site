@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-22 — Standard protocol fact rows
+- Reused the master compound card renderer for annual and deferred entries. Verified renderer parity and inline syntax.
+
 ## 2026-11-22 — Protocol instructions
 - Added mixing and timing fields to two protocol cards and linked the weekday entry to its details. Inline syntax passed. Deferred regimen awaits confirmation.
 

@@ -2526,7 +2526,48 @@ function renderAbout(){
  var lbl=cycs.length?((typeof CYCBASE!=='undefined'&&CYCBASE)||'Also in your protocol'):'Your compounds';
  h+='<section class="jc-cycle"><header class="jc-cycle-head"><h2>'+esc(lbl)+'</h2></header>'+rest.map(aboutCompound).join('')+'</section>';
  }
- host.innerHTML="<section class=\"jc-cycle\"><header class=\"jc-cycle-head\"><h2>Annual program · Monday–Friday</h2></header><details class=\"jc-compound\"><summary>Bromantane</summary><p class=\"jc-description\">Animal studies suggest bromantane can affect how brain cells make dopamine, a chemical involved in motivation and movement. Its effects and long-term safety in people are uncertain.</p></details><details class=\"jc-compound\"><summary>Armodafinil · 250 mg tablet</summary><p class=\"jc-description\">Armodafinil promotes wakefulness. It slows the reuptake of dopamine in laboratory studies, although how it keeps people awake is still unclear.</p></details><details class=\"jc-compound\"><summary>Tadalafil · 5 mg tablet</summary><p class=\"jc-description\">Tadalafil blocks an enzyme called PDE5. This lets a chemical signal called cGMP last longer, helping smooth muscle relax and supporting blood flow.</p></details><details class=\"jc-compound\"><summary>HGH (somatropin) · 40 IU vial</summary><p class=\"jc-description\"><strong>Dose and timing</strong><br>2 IU Monday through Friday, in the morning while fasted.<br><strong>Mixing and draw</strong><br>The program reference lists 3 mL for a 40 IU vial. Confirm the diluent and volume on your dispensing label before mixing. At a final concentration of 40 IU in 3 mL, the 2 IU dose is 0.15 mL (15 marks on a U-100 insulin syringe). A different concentration requires a different draw.<br><br> Somatropin acts like human growth hormone. It activates growth hormone receptors and stimulates production of IGF-1, a signal involved in tissue growth and metabolism.</p></details></section><section class=\"jc-cycle\"><header class=\"jc-cycle-head\"><h2>For later · Off schedule</h2></header><details class=\"jc-compound\"><summary>Retatrutide (Reta) · 30 mg vial</summary><p class=\"jc-description\">Retatrutide is being studied for its effects on three hormone receptors involved in appetite and metabolism (GIP, GLP-1 and glucagon). <br><br><strong>Mixing</strong><br>The program references list 3 mL for the 30 mg vial. Leave the vial unmixed until your clinician confirms your individual instructions.<br><strong>Dose and timing</strong><br>On hold. Your clinician will confirm the intended regimen before you start.</p></details></section>"+h||'<div class="empty"><div class="t">Your protocol is on its way</div><div class="d">Your compounds and schedule will show here as soon as they are ready.</div></div>';
+ var annualCards = [
+  {
+    "n": "Bromantane",
+    "about": "Animal studies suggest bromantane can affect how brain cells make dopamine, a chemical involved in motivation and movement. Its effects and long-term safety in people are uncertain.",
+    "c": "Monday–Friday",
+    "rec": "Tablet · no mixing",
+    "d": "Follow individual prescription directions"
+  },
+  {
+    "n": "Armodafinil · 250 mg tablet",
+    "about": "Armodafinil promotes wakefulness. It slows the reuptake of dopamine in laboratory studies, although how it keeps people awake is still unclear.",
+    "c": "Monday–Friday",
+    "rec": "Tablet · no mixing",
+    "d": "Follow individual prescription directions"
+  },
+  {
+    "n": "Tadalafil · 5 mg tablet",
+    "about": "Tadalafil blocks an enzyme called PDE5. This lets a chemical signal called cGMP last longer, helping smooth muscle relax and supporting blood flow.",
+    "c": "Monday–Friday",
+    "rec": "Tablet · no mixing",
+    "d": "Follow individual prescription directions"
+  },
+  {
+    "n": "HGH (somatropin) · 40 IU vial",
+    "about": "Somatropin acts like human growth hormone. It activates growth hormone receptors and stimulates production of IGF-1, a signal involved in tissue growth and metabolism.",
+    "c": "Monday–Friday",
+    "rec": "40 IU vial · 3 mL per program reference. Confirm diluent and final volume on dispensing label.",
+    "b": "AM fasted",
+    "d": "2 IU",
+    "u": "0.15 mL at 40 IU in 3 mL (15 units on a U-100 syringe)"
+  }
+];
+ var deferredReta = {
+  "n": "Retatrutide (Reta) · 30 mg vial",
+  "about": "Retatrutide is being studied for its effects on three hormone receptors involved in appetite and metabolism (GIP, GLP-1 and glucagon). ",
+  "c": "Monday morning once activated · currently off schedule",
+  "rec": "30 mg vial · 3 mL per Holy Trinity reference. Confirm the dispensing instructions before mixing.",
+  "d": "2 mg",
+  "u": "0.20 mL at 30 mg in 3 mL (20 units on a U-100 syringe)"
+};
+ host.innerHTML = '<section class="jc-cycle"><header class="jc-cycle-head"><h2>Annual program · Monday–Friday</h2></header>' + annualCards.map(aboutCompound).join('') + '</section>' +
+   '<section class="jc-cycle"><header class="jc-cycle-head"><h2>Holy Trinity · For later</h2></header>' + aboutCompound(deferredReta) + '</section>' + h;
 }
 function cgTog(k){var e=document.getElementById('cg-'+k); if(e) e.classList.toggle('on');}
 /* A group re-renders whenever the cycle toggle moves, so remember which ones
