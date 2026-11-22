@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-22 — Protocol instructions
+- Added mixing and timing fields to two protocol cards and linked the weekday entry to its details. Inline syntax passed. Deferred regimen awaits confirmation.
+
 ## 2026-11-22 — Protocol labeling
 - Clarified tablet strengths and timing, added a deferred protocol entry and refreshed the portal cache. Inline script syntax passed.
 
