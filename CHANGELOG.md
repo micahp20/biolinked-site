@@ -387,3 +387,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 - Added dbarajas/index.html, sw.js and manifest.json using the cirilo layout; registered the portal on share/index.html and protocols/index.html. Root cache refreshed.
 - Seven catalog-reference cycles are quoted separately; no active schedule, individualized prescription, payment, laboratory score or inventory/ledger write. Contact information excluded. Bloodwork and clinician approval remain pending.
 - Checks: inline JavaScript compilation, quote arithmetic, contact/identity isolation and empty schedule passed. Native iPhone/browser verification not performed. Publishing via PR; hosting and live content checked separately.
+
+## 2026-11-21 — Portal cycle quote
+- Added source-backed Muscle Building Cycle 1 and one Retatrutide 60 mg vial as an unpaid, inactive quote; existing paid history and active schedule preserved. No inventory, ledger or payment writes.
+- Files: mberto/index.html; mberto/sw.js; PROJECT_STATUS.md; CHANGELOG.md. Master Cycles/Dosing checked; $524.98 quote arithmetic checked. Unassigned timing left blank; BAC quantity requires review before fulfillment. Publish/live verification pending.
