@@ -412,3 +412,7 @@ Added a member portal and directory entries with saved cycle options, stock-chec
 ## 2026-11-21 — Master portal layout correction
 
 Restored the master client landing, expandable compound rows and tappable invoice layout on the affected portal. Updated the master layout reference in AGENTS.md and refreshed the scoped worker. The 390 px visual comparison and checkout checks passed. [PR #279](https://github.com/micahp20/biolinked-site/pull/279).
+
+## 2026-11-21 — Additional saved review option
+
+Added a saved clinician-review option to the portal using the master compound cards. Existing billing and schedule state are preserved. Updated the scoped service worker. Mobile and desktop checks passed. [PR #280](https://github.com/micahp20/biolinked-site/pull/280).
