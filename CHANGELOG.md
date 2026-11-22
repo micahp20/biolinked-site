@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-22 — Protocol labeling
+- Clarified tablet strengths and timing, added a deferred protocol entry and refreshed the portal cache. Inline script syntax passed.
+
 ## 2026-11-22 — Weekday schedule and compound descriptions
 - Updated the portal schedule and protocol explanations and refreshed its service worker. Individual doses await confirmation.
 
