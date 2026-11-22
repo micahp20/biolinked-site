@@ -547,3 +547,8 @@ Recovered task summaries include previous Cursor PR descriptions and Git commit 
 ## 2026-11-21 — Two muscle-building options
 - Renamed the existing unpaid cycle to Advanced Muscle Building Stack and created an alternative Basic Muscle Building Stack excluding IGF-1 LR3 and AOD-9604, with separate quotes of $524.98 and $374.98. Existing $150 paid invoice and active schedule unchanged; research items remain inactive. No ledger, stock or payment changes.
 - Files: mberto/index.html, mberto/sw.js, PROJECT_STATUS.md, CHANGELOG.md. Master-derived entries preserved; basic quote arithmetic checked. Clinician review and BAC quantity review remain necessary. Deployment to be checked separately.
+
+## 2026-11-21 — Misha checkout parity with Michael Johnson
+- Enabled the existing inline Stripe card/Apple Pay cart checkout plus delivery address and pickup choice only for mberto. Added two Misha-specific alternative cycle add-to-cart presets, including one BAC Water 10 mL, using live catalog prices/stock and server-verified amounts. Advanced and Basic are mutually exclusive when added from the cycle controls.
+- Updated portal-stripe-checkout client allowlist and validated fulfillment for mberto, preserving the existing server-side price/stock verification and payment confirmation into site_orders. No live payment or stock/P&L write performed as a test; existing paid invoice unchanged.
+- Files: bl-portal-shop.js; mberto/index.html; mberto/sw.js; sw.js; supabase/functions/portal-stripe-checkout/index.ts; PROJECT_STATUS.md; CHANGELOG.md. Client/browser check and server deployment verification are separate release steps; order payment confirmation does not itself authorize inventory or pl_sales deductions.
