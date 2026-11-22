@@ -1319,9 +1319,10 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
 </style>
 <script src="/calc-feedback.js?v=1"></script>
 <style>
-.saved-cycle{padding:12px 14px}.saved-cycle summary{cursor:pointer}.saved-cycle .jc-cycle-head strong{display:block;font-size:1.1rem}
-.saved-cycle .seclbl{display:block;margin:0 0 5px}.saved-cycle li{margin:10px 0}.saved-cycle ul{padding-left:20px}
-.saved-cycle .btn,.ocard .btn{width:auto;margin:8px 12px}.quote-status:not(:empty){display:block;padding:10px 14px;font-weight:600}
+#protoabout .catalog-option .blp-ctl{display:none}
+.quote-status:not(:empty){display:block;padding:10px 14px;font-weight:600}
+.quote-title{background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.ohd .invoice-pay-now{margin-top:6px}
 </style></head>
 <body class="erica-tab-consistency"><div class="p0-disc" id="p0-disc-top" role="note">For research use only. Not medical advice.</div>
 <div class="device">
@@ -1403,11 +1404,10 @@ html:root:not([data-theme="dark"]) .top .bl-aa{border:2px solid #303639!importan
   <div class="scroll" id="scroll">
     <section class="view on" id="v-proto"><div class="pad">
       <div class="lx-hero">
-        <h1 class="lx-title">Welcome, Gary</h1>
-        <p class="lx-sub">Review your saved cycle options or open the order form.</p>
-        <button type="button" class="lx-cta" onclick="goCycles()">View saved cycles &darr;</button>
+        <h1 class="lx-title">Welcome back, Gary</h1>
+        <p class="lx-sub">A clearer view of your protocol and progress.</p>
+        <button type="button" class="lx-cta" onclick="goCycles()">Explore my protocol &darr;</button>
       </div>
-      <button type="button" class="btn ghost" onclick="BLShop.open()">Open order form</button>
       <div class="seclbl">Your Program</div><div class="bl-tiles"><button type="button" onclick="go('labs')" class="bl-tile" id="bt-labs"><span><span class="t">Bloodwork</span><span class="s" id="bts-labs">&nbsp;</span></span><span class="o">Open &rarr;</span></button><div class="bl-tile" id="bt-dna"><span><span class="t">DNA</span><span class="s" id="bts-dna">&nbsp;</span></span><span class="o"></span></div><button type="button" onclick="go('work')" class="bl-tile" id="bt-work"><span><span class="t">Workout</span><span class="s" id="bts-work">&nbsp;</span></span><span class="o">Open &rarr;</span></button><button type="button" onclick="go('nutr')" class="bl-tile" id="bt-nutr"><span><span class="t">Nutrition</span><span class="s" id="bts-nutr">&nbsp;</span></span><span class="o">Open &rarr;</span></button></div><div id="protoabout"></div>
       <div class="seclbl">What You&rsquo;ll Find</div>
       <div class="list">
@@ -2640,7 +2640,7 @@ function stkIx(name,ev){
 function aboutCompound(c){
  var sch=[c.c,c.b==='BOTH'?'AM + PM':c.b].filter(Boolean).join(' · ');
  return '<details class="jc-compound"><summary>'+esc(c.n)+'<span aria-hidden="true" class="jc-chevron"></span></summary><div class="jc-body">'+(c.about?'<div class="jc-description">'+c.about+'</div>':'')+'<dl class="jc-facts">'+
- [['Recon',c.rec],['Schedule',sch],['Dose / draw',[c.d,c.u].filter(Boolean).join(' · ')],['Site',c.site]].filter(function(r){return r[1];}).map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'</dl></div></details>';
+ (c.facts||[['Recon',c.rec],['Schedule',sch],['Dose / draw',[c.d,c.u].filter(Boolean).join(' · ')],['Site',c.site]]).filter(function(r){return r[1];}).map(function(r){return '<div><dt>'+r[0]+'</dt><dd>'+r[1]+'</dd></div>';}).join('')+'</dl></div></details>';
 }
 /* The hero button used to jump to the Schedule tab. It now walks the reader
    down the page they are already on, to their cycles. #protoabout always
@@ -2672,15 +2672,25 @@ function goCycles(){
 function renderAbout(){
   var host=document.getElementById('protoabout');
   if(!host) return;
-  host.innerHTML = '<h2 class="scrn">Saved cycles</h2><p class="sub">Catalog options for review. No dosing schedule or cycle length has been assigned.</p>' +
-    savedCycles.map(function(cycle,index){
-      var items=cycle.lines.map(function(line){
-        var entry=window.BLProtocolCopy && BLProtocolCopy.find(line.name);
-        return '<li>'+esc(line.name)+(entry?' <details><summary>About this compound</summary><p>'+esc(entry.definition)+'</p></details>':'')+'</li>';
-      }).join('');
-      return '<details class="jc-cycle saved-cycle"'+(index===0?' open':'')+'><summary class="jc-cycle-head"><span class="seclbl">'+(index===0?'Cycle 1 · ':'')+esc(cycle.goal)+'</span><strong>'+esc(cycle.name)+'</strong></summary><ul>'+items+'</ul>'+
-        (cycle.reviewOnly?'<p>Hormonal treatment requires individual clinician review.</p>':'<button type="button" class="btn ghost" onclick="showCycleQuote('+index+')">View quote</button>')+'</details>';
+  host.innerHTML=savedCycles.map(function(cycle,index){
+    var title=(index===0?'Cycle 1 · ':'')+cycle.name;
+    var intro=index===0
+      ? 'Muscle building is your primary goal. Review the compounds in this saved cycle with a clinician before starting a plan.'
+      : cycle.goal+' · Catalog option for clinician review.';
+    var note=cycle.reviewOnly
+      ? 'Hormonal treatment requires individual clinician review.'
+      : 'The quote includes one 10 mL BAC water and UPS 2-Day shipping. Local pickup removes the shipping charge.';
+    var compounds=cycle.lines.map(function(line){
+      var entry=window.BLProtocolCopy && BLProtocolCopy.find(line.name);
+      return aboutCompound({n:line.name,about:entry?'<p>'+esc(entry.definition)+'</p>':'',
+        facts:[['Catalog quantity',line.qty+(line.qty===1?' vial':' vials')]]});
     }).join('');
+    return '<section class="jc-cycle catalog-option"><header class="jc-cycle-head"><h2>'+esc(title)+'</h2></header>'+
+      '<p class="jc-intro">'+esc(intro)+'</p>'+compounds+
+      '<details class="jc-notes"><summary>About this cycle</summary><p>'+esc(note)+'</p>'+
+      '<p>No dosing schedule or cycle length has been assigned.</p>'+
+      (cycle.reviewOnly?'':'<button type="button" class="btn ghost" onclick="showCycleQuote('+index+')">View quote</button>')+'</details></section>';
+  }).join('');
 }
 function showCycleQuote(index){
   go('pay');
@@ -2911,9 +2921,9 @@ function quoteLines(rows){
 function quoteTotal(rows){
   return money(rows.reduce(function(total,row){return total+row.amount;},0)/100);
 }
-function quoteButton(index){
+function quoteButton(index,inHeader){
   var inCart=window.BLShop && BLShop.hasCatalogQuote(savedCycles[index]);
-  return '<button type="button" class="btn ghost" onclick="selectCycleQuote('+index+')">'+(inCart?'View cart':'Add to cart')+'</button>';
+  return '<button type="button" class="'+(inHeader?'invoice-pay-now':'btn ghost')+'" onclick="event.stopPropagation();selectCycleQuote('+index+')">'+(inCart?'View cart':'Add to cart')+'</button>';
 }
 function selectCycleQuote(index){
   var message=window.BLShop ? BLShop.addCatalogQuote(savedCycles[index]) : 'The order form is loading. Please try again.';
@@ -2926,8 +2936,11 @@ function renderPay(){
   document.getElementById('paylist').innerHTML=savedCycles.map(function(cycle,index){
     if(cycle.reviewOnly) return '';
     var rows=cycleQuoteRows(cycle);
-    return '<article class="ocard"><div class="ohd"><div class="ot">'+esc(cycle.name)+'</div><span class="pill quote">Quoted</span></div>'+
-      quoteButton(index)+'<span class="quote-status" role="status"></span>'+quoteLines(rows)+'<div class="irow tot"><span>Order total</span><span>'+quoteTotal(rows)+'</span></div></article>';
+    return '<article class="ocard" onclick="openInv('+index+')"><div class="ohd"><div><div class="ot">'+
+      '<button type="button" class="quote-title" onclick="event.stopPropagation();openInv('+index+')">'+esc(cycle.name)+'</button></div>'+
+      quoteButton(index,true)+'</div><span class="pill quote">Quoted</span></div>'+
+      '<span class="quote-status" role="status"></span>'+quoteLines(rows)+'<div class="irow tot">'+
+      '<span class="in">Order total</span><span class="iv">'+quoteTotal(rows)+'</span></div></article>';
   }).join('');
   document.getElementById('paynote').textContent='Each quote is a separate catalog option. Local pickup removes the shipping charge.';
 }

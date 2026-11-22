@@ -1,7 +1,8 @@
 # Bio Linked Solutions — permanent project instructions
 
-## 2026-11-20 — Ryan Green portal is the reference layout
-- Owner confirmed `rgreen/index.html` is the master for existing and new client portal presentation, compound cards, schedule behavior, calculator, and mobile layout. Use the same renderer and styles while preserving each client's doses, invoices, labs, state and clinical review status. Never copy Ryan's actual treatment or transactions into another portal.
+## 2026-11-21 — Michael Johnson is the master client portal
+- Use `mjohnson/index.html` as the master for client portal layout. Reuse its landing screen, navigation, program tiles, cycle sections, compound cards and invoice presentation. Use the current client’s own data, storage keys, checkout and clinical review status.
+- For layout changes, compare the rendered page with `/mjohnson/` at 390 px before publishing. Changes to the master layout require an explicit owner request.
 
 ## Start every session here
 1. Read this entire file and PROJECT_STATUS.md before planning or editing. Read CHANGELOG.md for recent decisions.
