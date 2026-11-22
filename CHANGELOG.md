@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-22 — Weekday schedule and compound descriptions
+- Updated the portal schedule and protocol explanations and refreshed its service worker. Individual doses await confirmation.
+
 ## 2026-11-22 — Annual program update
 - Updated one portal’s annual supply summary, nutrition defaults and local service worker. Verified the invoice arithmetic.
 
