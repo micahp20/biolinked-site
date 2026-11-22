@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-22 — Expanded card layout
+- Matched the reference card paragraph structure and compact four-row facts. Preserved deferred scheduling. Inline syntax passed.
+
 ## 2026-11-22 — Standard protocol fact rows
 - Reused the master compound card renderer for annual and deferred entries. Verified renderer parity and inline syntax.
 
