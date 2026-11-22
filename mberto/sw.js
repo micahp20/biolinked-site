@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mberto/.
-const CACHE = 'mberto-muscle1-reta60-20261121';
+const CACHE = 'mberto-muscle-advanced-basic-20261121-v2';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
