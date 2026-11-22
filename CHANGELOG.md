@@ -408,3 +408,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-21 — Saved-cycle portal and order form
 
 Added a member portal and directory entries with saved cycle options, stock-checked quotes, pickup or shipping and inline checkout. Both scoped and root caches refreshed. Mobile-width and desktop-width checkout checked with mocks. See [PR #278](https://github.com/micahp20/biolinked-site/pull/278) and PROJECT_STATUS.md for the changed paths and release checks.
+
+## 2026-11-21 — Master portal layout correction
+
+Restored the master client landing, expandable compound rows and tappable invoice layout on the affected portal. Updated the master layout reference in AGENTS.md and refreshed the scoped worker. The 390 px visual comparison and checkout checks passed. [PR #279](https://github.com/micahp20/biolinked-site/pull/279).
