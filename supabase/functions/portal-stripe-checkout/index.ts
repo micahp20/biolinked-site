@@ -5,7 +5,7 @@ const SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const STRIPE = Deno.env.get("STRIPE_SECRET_KEY") || "";
 const ORIGINS = ["https://biolinkedsolutions.com", "https://www.biolinkedsolutions.com"];
 const SHIPPING_CENTS = 999;
-const CLIENTS = new Set(["mjohnson", "erica", "mberto"]);
+const CLIENTS = new Set(["mjohnson", "erica", "mberto", "gmahan"]);
 const cors = (origin: string | null) => ({
   "Access-Control-Allow-Origin": origin && ORIGINS.includes(origin) ? origin : ORIGINS[0],
   "Access-Control-Allow-Headers": "content-type, apikey, authorization",
@@ -29,7 +29,7 @@ async function stripe(path: string, body?: URLSearchParams) {
 const banned = (n: string) => ["cortexin", "dihexa", "ipamorelin", "shipping", "2-day ups"].some(x => n.toLowerCase().includes(x))
   || /(?:epitalon|epithalon).*10\s*mg/i.test(n);
 function validatedFulfillment(client: string, input: any) {
-  if (client !== "mjohnson" && client !== "mberto") return { method: "shipping" } as const;
+  if (client !== "mjohnson" && client !== "mberto" && client !== "gmahan") return { method: "shipping" } as const;
   if (!input || (input.method !== "pickup" && input.method !== "shipping")) return null;
   if (input.method === "pickup") return { method: "pickup" } as const;
   const raw = input.address || {};
@@ -126,10 +126,14 @@ Deno.serve(async (req: Request) => {
       const cents = Math.round(Number(p.sale) * 100);
       const qty = quantities.get(Number(p.id)) || 0;
       const inventory = stockById.get(Number(p.inventory_id)) as { vials: number; status: string } | undefined;
-      if (!Number.isInteger(cents) || (cents < 500 && !(client === "mberto" && /^BAC Water - 10ml$/i.test(p.name))) || banned(p.name) || !inventory || inventory.status === "out" || Number(inventory.vials) < qty)
+      if (!Number.isInteger(cents) || (cents < 500 && !((client === "mberto" || client === "gmahan") && /^BAC Water - 10ml$/i.test(p.name))) || banned(p.name) || !inventory || inventory.status === "out" || Number(inventory.vials) < qty)
         return reply({ error: "item_unavailable", item: p.name }, 409, origin);
       items.push({ name: p.name, qty, price: cents / 100 });
       subtotalCents += cents * qty;
+    }
+    if (client === "gmahan" && (products.some((p: { name: string }) => /testosterone/i.test(p.name))
+        || !items.some(i => /^BAC Water - 10ml$/i.test(i.name) && i.qty === 1))) {
+      return reply({ error: "invalid_order_contents" }, 409, origin);
     }
     const baseCents = subtotalCents + shippingCents;
     const feeCents = Math.round(baseCents * 0.03);

@@ -22,7 +22,7 @@ var ORDER_FN=SB+'/functions/v1/order-confirm';
 var STRIPE_FN=SB+'/functions/v1/portal-stripe-checkout';
 var SHIPPING=9.99;
 var deliveryShip=true, deliveryDraft={line1:'',line2:'',city:'',state:'',postal_code:''};
-function optionalShipping(){return SLUG==='mjohnson'||SLUG==='mberto';}
+function optionalShipping(){return SLUG==='mjohnson'||SLUG==='mberto'||SLUG==='gmahan';}
 function deliveryFee(){return optionalShipping()&&!deliveryShip?0:SHIPPING;}
 function deliveryOrder(){return !optionalShipping()?null:deliveryShip?{method:'shipping',address:deliveryDraft}:{method:'pickup'};}
 var SLUG=(location.pathname.split('/').filter(Boolean)[0]||'portal');
@@ -67,7 +67,7 @@ if(window.BLS_HIDE&&window.BLS_HIDE.length){CAT_RULES.forEach(function(r){if(r[0
 var CAT_ORDER=CAT_RULES.map(function(r){return r[0];});
 function categorize(name){var n=String(name||'').toLowerCase();for(var i=0;i<CAT_RULES.length;i++){var k=CAT_RULES[i][1];for(var j=0;j<k.length;j++){if(n.indexOf(k[j])!==-1)return CAT_RULES[i][0];}}return 'Other Research & Supplies';}
 function catLbl(c){return String(c||'').replace(/fat[\s-]*loss/i,'Stubborn Weight Loss').replace(/\bfat\b/i,'Stubborn Weight');}
-function isSellable(p){var s=(typeof p.sale==='string')?parseFloat(p.sale):p.sale;if(typeof s!=='number'||isNaN(s)||(s<5&&!(SLUG==='mberto'&&/^BAC Water - 10ml$/i.test(String(p.name||'')))))return false;var n=String(p.name||'').toLowerCase();for(var i=0;i<BLOCK.length;i++){if(n.indexOf(BLOCK[i])!==-1)return false;}if((n.indexOf('epitalon')!==-1||n.indexOf('epithalon')!==-1)&&n.indexOf('10mg')!==-1)return false;return true;}
+function isSellable(p){var s=(typeof p.sale==='string')?parseFloat(p.sale):p.sale;if(typeof s!=='number'||isNaN(s)||(s<5&&!((SLUG==='mberto'||SLUG==='gmahan')&&/^BAC Water - 10ml$/i.test(String(p.name||'')))))return false;var n=String(p.name||'').toLowerCase();for(var i=0;i<BLOCK.length;i++){if(n.indexOf(BLOCK[i])!==-1)return false;}if((n.indexOf('epitalon')!==-1||n.indexOf('epithalon')!==-1)&&n.indexOf('10mg')!==-1)return false;return true;}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function money(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
 function $(id){return document.getElementById(id);}
@@ -137,10 +137,10 @@ function loadCatalog(){
   .then(function(res){
     var rows=res[0]||[], inv=res[1]||[], im={};
     inv.forEach(function(r){im[String(r.id)]=r;});
-    products=rows.filter(isSellable).map(function(p){var ir=p.inventory_id!=null?im[String(p.inventory_id)]:null;var v=ir?Number(ir.vials):0,st=ir?String(ir.status||'').toLowerCase():'';return {id:String(p.id),name:p.name,price:Number(p.sale),inStock:!!(ir&&!isNaN(v)&&v>0&&st!=='out'),cat:categorize(p.name)};});
+    products=rows.filter(isSellable).map(function(p){var ir=p.inventory_id!=null?im[String(p.inventory_id)]:null;var v=ir?Number(ir.vials):0,st=ir?String(ir.status||'').toLowerCase():'';return {id:String(p.id),name:p.name,price:Number(p.sale),available:v,inStock:!!(ir&&!isNaN(v)&&v>0&&st!=='out'),cat:categorize(p.name)};});
     loaded=true;
     Object.keys(cart).forEach(function(id){var p=productById(id);if(!p)delete cart[id];else cart[id].price=p.price;});
-    saveCart(); renderShop(); renderCart(); renderBar();
+    adjustStandardWater(); saveCart(); renderShop(); renderCart(); renderBar();
   }).catch(function(){failed=true;renderShop();renderCart();});
 }
 
@@ -149,9 +149,31 @@ function cartList(){return Object.keys(cart).map(function(k){return cart[k];}).f
 function cartCount(){return cartList().reduce(function(s,i){return s+i.qty;},0);}
 function subtotal(){return Math.round(cartList().reduce(function(s,i){return s+i.price*i.qty;},0)*100)/100;}
 function grandTotal(){return cartList().length?Math.round((subtotal()+deliveryFee())*100)/100:0;}
-function setQty(id,n){var p=productById(id);if(!p)return;if(n<=0){delete cart[id];}else if(p.inStock){cart[id]={id:id,name:p.name,price:p.price,qty:Math.min(99,n)};}sync();}
+function setQty(id,n){
+  var product=productById(id);
+  if(!product) return;
+  if(n<=0){
+    delete cart[id];
+    if(SLUG==='gmahan' && !isBac(product.name) && Object.keys(cart).length===1){
+      var water=standardWater();
+      if(water && cart[water.id]) delete cart[water.id];
+    }
+  } else if(product.inStock){
+    setQtyQuiet(id,n);
+  }
+  sync();
+}
 function addQty(id,d){var c=cart[id];setQty(id,(c?c.qty:0)+d);}
-function sync(){saveCart();renderShop();renderCart();renderBar();}
+function standardWater(){
+  return productByName('BAC Water - 10ml');
+}
+function adjustStandardWater(){
+  if(SLUG!=='gmahan'||!loaded) return;
+  var water=standardWater();
+  if(!water || !water.inStock) return;
+  if(Object.keys(cart).length) setQtyQuiet(water.id,1);
+}
+function sync(){adjustStandardWater();saveCart();renderShop();renderCart();renderBar();}
 
 /* ---------- in-app web view (site links open inside the app) ---------- */
 function ensureViews(){
@@ -291,11 +313,38 @@ function addPersonalQuote(name){
   sync();openCart();
   return true;
 }
+// Catalog quotes are compared with live SKUs, prices and stock before any cart change.
+function hasCatalogQuote(quote){
+  if(SLUG!=='gmahan'||!quote||quote.reviewOnly) return false;
+  var water=standardWater();
+  return !!(water && cart[water.id] && cart[water.id].qty===1 &&
+    quote.lines.every(function(line){return cart[line.id] && cart[line.id].qty>=line.qty;}));
+}
+function addCatalogQuote(quote){
+  if(SLUG!=='gmahan'||!quote||quote.reviewOnly) return 'This option is for clinician review.';
+  if(!loaded) return 'The catalog is unavailable. Open the order form and retry.';
+  if(hasCatalogQuote(quote)){openCart();return '';}
+  var water=standardWater();
+  if(!water || !water.inStock || Math.round(water.price*100)!==499) return 'The quoted BAC water is unavailable.';
+  for(var line of quote.lines){
+    var product=productById(String(line.id));
+    if(!product || Math.round(product.price*100)!==line.cents) return 'The catalog has changed. Please request an updated quote.';
+    var quantity=(cart[line.id] ? cart[line.id].qty : 0)+line.qty;
+    if(!product.inStock||quantity>product.available||quantity>99) return line.name+' is unavailable in the quoted quantity.';
+  }
+  quote.lines.forEach(function(line){
+    var id=String(line.id);
+    setQtyQuiet(id,(cart[id]?cart[id].qty:0)+line.qty);
+  });
+  sync();openCart();return '';
+}
 function cycleTotal(c){var t=0,ok=true;cycleLines(c).forEach(function(l){if(!l.p)ok=false;else t+=l.p.price*l.qty;});return ok?Math.round(t*100)/100:null;}
 function renderShop(){
   var h=$('bls-shop'); if(!h) return;
-  var o=['<div class="bls-kick">BioLinked</div><h1 class="bls-h">Product Line</h1><p class="bls-lede">Pre-built cycles and the full line. $9.99 UPS 2-Day shipping on every order.</p>'];
+  var deliveryText=optionalShipping()?'Choose $9.99 UPS 2-Day shipping or free local pickup.':'$9.99 UPS 2-Day shipping on every order.';
+  var o=['<div class="bls-kick">BioLinked</div><h1 class="bls-h">Product Line</h1><p class="bls-lede">'+deliveryText+'</p>'];
   if(!loaded){h.innerHTML=o.join('')+(failed?'<div class="bls-state"><b>Couldn’t load the product line</b>Check your connection and try again.<br><button type="button" class="bls-add" id="bls-retry">Try again</button></div>':'<div class="bls-state">Loading the product line…</div>');var r=$('bls-retry');if(r)r.onclick=function(){failed=false;renderShop();loadCatalog();};return;}
+  if(SLUG==='gmahan') CYCLES.sort(function(a,b){return Number(b.name==='The Titan Stack')-Number(a.name==='The Titan Stack');});
   var cyc=CYCLES.map(function(c,ci){var L=cycleLines(c),t=0,miss=0,av=0;L.forEach(function(l){if(!l.p){miss++;return;}t+=l.p.price*l.qty;if(l.p.inStock)av++;});if(miss)return '';
     return '<div class="bls-cyc"><div class="bls-dur">'+esc(c.dur||'')+'</div><p class="bls-ccat">'+esc(catLbl(c.cat||''))+'</p><h3>'+esc(c.name)+'</h3>'+(c.goal?'<p class="bls-goal"><span>Goal</span>'+esc(c.goal)+'</p>':'')+(c.why&&c.why.length?'<details class="bls-why"><summary>Why these work together</summary><ul>'+c.why.map(function(w){return '<li>'+w+'</li>';}).join('')+'</ul></details>':'')+
       '<ul class="bls-items">'+L.map(function(l){var sp=splitName(l.p.name);return '<li'+(l.p.inStock?'':' class="oosl"')+'><span class="bls-lnm">'+infoBtn(l.p.name)+'<span class="bls-ln">'+esc(sp.n)+(sp.s?' <small>'+esc(sp.s)+'</small>':'')+'</span></span><span class="bls-lq">'+l.qty+' × '+money(l.p.price)+' = <b>'+money(l.p.price*l.qty)+'</b></span></li>';}).join('')+'</ul>'+
@@ -317,7 +366,7 @@ function setQtyQuiet(id,n){var p=productById(id);if(!p||!p.inStock)return;cart[i
 var INLINE_PK='pk_live_51TMDWSHwQK95IJPpixddZyDAy6a2vVaNSdr8u8ydgEeTZlp92IfUGHkIoNNe87M8zcYASjbe3ZBtxa0AGZMGBSFH00BTgJwLtC';
 var inlineStripePromise=null, inlineCard=null, inlineWallet=null, inlineWalletReady=false;
 var inlineIntent=null, inlineIntentCart='', inlineProcessing=false;
-function inlineSupported(){return SLUG==='mjohnson'||SLUG==='erica'||SLUG==='mberto';}
+function inlineSupported(){return optionalShipping()||SLUG==='erica';}
 function getInlineStripe(){
   if(inlineStripePromise)return inlineStripePromise;
   inlineStripePromise=new Promise(function(resolve,reject){
@@ -454,8 +503,12 @@ function renderCart(){
   if(inlineSupported())inlineReset();
   var items=cartList(), o=['<h1 class="bls-h">Your cart</h1>'];
   if(!items.length){h.innerHTML=o.join('')+'<div class="bls-state">Your cart is empty.<br><button type="button" class="bls-btn" onclick="history.back()">Keep shopping</button></div>';return;}
-  o.push('<div class="bls-list">'+items.map(function(it){return '<div class="bls-row"><div class="bls-rm"><div class="bls-nm">'+esc(it.name)+'</div><div class="bls-sub">'+money(it.price)+' each · '+money(it.price*it.qty)+'</div></div>'+stepper(it.id,it.qty)+'<button type="button" class="bls-x" data-del="'+esc(it.id)+'" aria-label="Remove '+esc(it.name)+'">&times;</button></div>';}).join('')+'</div>');
+  o.push('<div class="bls-list">'+items.map(function(it){return '<div class="bls-row"><div class="bls-rm"><div class="bls-nm">'+esc(it.name)+'</div><div class="bls-sub">'+money(it.price)+' each · '+money(it.price*it.qty)+'</div></div>'+((SLUG==='gmahan' && it.name==='BAC Water - 10ml' && items.length>1)?'<span>1 per order</span>':stepper(it.id,it.qty)+'<button type="button" class="bls-x" data-del="'+esc(it.id)+'" aria-label="Remove '+esc(it.name)+'">&times;</button>')+'</div>';}).join('')+'</div>');
   var hasBac=items.some(function(i){return isBac(i.name);}), vials=items.reduce(function(s,i){return s+(needsRecon(i.name)?i.qty:0);},0), bp=bacProduct();
+  if(SLUG==='gmahan' && (!items.some(function(i){return i.name==='BAC Water - 10ml' && i.qty===1;}) ||
+      items.some(function(i){var p=productById(i.id);return !p||!p.inStock||p.available<i.qty;}))){
+    h.innerHTML=o.join('')+'<p class="bls-note" role="status">A required item is unavailable in the selected quantity. Please update your cart.</p>';return;
+  }
   if(!hasBac&&vials&&bp){var n=Math.max(1,Math.ceil(vials/3));o.push('<div class="bls-bac"><b>Need BAC water?</b><span>We suggest '+n+' × '+esc(bp.name)+' ('+money(bp.price)+' each) for your '+vials+' vial'+(vials===1?'':'s')+'. Optional.</span><button type="button" class="bls-btn" data-bac="'+esc(bp.id)+'" data-n="'+n+'">Add '+n+' BAC · '+money(bp.price*n)+'</button></div>');}
   o.push('<div class="bls-tot"><div><span>Subtotal</span><span>'+money(subtotal())+'</span></div><div><span id="bls-delivery-label">Shipping — UPS 2-Day</span><span id="bls-delivery-amount">'+money(deliveryFee())+'</span></div><div class="g"><span>Total</span><span id="bls-grand-amount">'+money(grandTotal())+'</span></div></div>');
   var nm=''; try{var w=document.querySelector('.who .wn');nm=w?w.textContent.trim():'';}catch(e){}
@@ -471,12 +524,12 @@ function renderCart(){
         '<div class="bls-address-row"><label class="bls-fld"><span>State</span><input id="bls-addr-state" maxlength="2" autocomplete="shipping address-level1" placeholder="CO" value="'+esc(deliveryDraft.state)+'"></label>'+
         '<label class="bls-fld"><span>ZIP code</span><input id="bls-addr-postal_code" inputmode="numeric" autocomplete="shipping postal-code" placeholder="80516" value="'+esc(deliveryDraft.postal_code)+'"></label></div>'+
       '</div><p id="bls-fulfillment-note" class="bls-note">Uncheck shipping to pick up in person. No shipping fee will be charged.</p>':'')+
-    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+((SLUG==='mjohnson'||SLUG==='erica'||SLUG==='mberto')?['Apple Pay','Pay with card','Cash App','Venmo','Zelle']:['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
-    ((SLUG==='mjohnson'||SLUG==='erica'||SLUG==='mberto')?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
+    '<div class="seclbl">Pay with</div><div class="bls-pays" id="bls-pays">'+(inlineSupported()?(SLUG==='gmahan'?['Apple Pay','Pay with card','Venmo','Cash App','Zelle']:['Apple Pay','Pay with card','Cash App','Venmo','Zelle']):['Cash App','Venmo','Zelle']).filter(function(m){return m!=='Apple Pay'||(window.ApplePaySession&&window.ApplePaySession.canMakePayments&&window.ApplePaySession.canMakePayments());}).map(function(m){return '<label class="bls-pay"><input type="radio" name="bls-pay" value="'+m+'"><span>'+m+'</span></label>';}).join('')+'</div><em class="bls-err" id="bls-payerr">Choose how you’ll pay.</em>'+
+    (inlineSupported()?'<p class="bls-note">Apple Pay and card include a 3% fee.</p>':'')+
     '<div id="bls-card-total" class="bls-note" aria-live="polite"></div>'+
     (inlineSupported()?'<div id="bls-card-wrap" hidden><label class="bls-fld"><span>Credit or debit card</span><div id="bls-card-field" style="padding:14px;background:var(--card);border:1px solid var(--line);border-radius:9px;min-height:50px"></div></label><p class="bls-note">Your card is securely processed by Stripe. BioLinked never sees your card details.</p></div>':'')+
     '<button type="submit" class="bls-btn bls-wide" id="bls-submit">Choose payment method</button><em class="bls-err" id="bls-suberr"></em>'+
-    '<p class="bls-note">'+((SLUG==='mjohnson'||SLUG==='erica'||SLUG==='mberto')?'Apple Pay opens a secure payment sheet here; cards are entered directly above. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
+    '<p class="bls-note">'+(inlineSupported()?'Apple Pay opens a secure payment sheet here; cards are entered directly above. ':'')+'For Cash App, Venmo or Zelle, you pay after submitting. Your order ships once payment is confirmed.</p></form>');
   h.innerHTML=o.join('');
   $('bls-form').onsubmit=submitOrder;
   $('bls-form').addEventListener('change',function(){refreshCheckoutAction();setupInlinePayment();});
@@ -539,7 +592,7 @@ function submitOrder(e){
   .catch(function(){btn.disabled=false;refreshCheckoutAction();var s=$('bls-suberr');s.textContent='Something went wrong submitting your order. Please try again, or message us directly.';s.classList.add('on');});
 }
 function verifyStripeReturn(){
-  if((SLUG!=='mjohnson'&&SLUG!=='erica'&&SLUG!=='mberto'))return;
+  if(!inlineSupported())return;
   var qs=new URLSearchParams(location.search), state=qs.get('bl_checkout');
   if(!state)return;
   var sid=qs.get('session_id');
@@ -597,6 +650,17 @@ document.addEventListener('click',function(e){
   if((a=t.getAttribute('data-del'))){setQty(a,0);return;}
   if((a=t.getAttribute('data-bac'))){var c=cart[a];setQty(a,Math.max(c?c.qty:0,parseInt(t.getAttribute('data-n'),10)||1));return;}
   if((a=t.getAttribute('data-cat'))&&t.classList.contains('bls-chip')){activeCat=a;renderShop();return;}
+  if(SLUG==='gmahan' && t.hasAttribute('data-cyc')){
+    var selected=CYCLES[Number(t.getAttribute('data-cyc'))];
+    var quote=selected && savedCycles.find(function(cycle){return cycle.name===selected.name;});
+    var message=addCatalogQuote(quote);
+    if(message){
+      var notice=$('bls-quote-status');
+      if(!notice){notice=document.createElement('p');notice.id='bls-quote-status';notice.setAttribute('role','status');}
+      t.after(notice);notice.textContent=message;
+    }
+    return;
+  }
   if(t.hasAttribute('data-cyc')){var cy=CYCLES[+t.getAttribute('data-cyc')];if(cy&&cy.personal){addPersonalQuote(cy.name);return;}if(cy){cycleLines(cy).forEach(function(l){if(l.p&&l.p.inStock){var c2=cart[l.p.id];setQtyQuiet(l.p.id,(c2?c2.qty:0)+l.qty);}});sync();}return;}
 });
 document.addEventListener('keydown',function(e){ if(e.key!=='Escape') return; var im=$('bls-im'); if(im&&im.classList.contains('on')){closeInfo();return;} if(pane){closeAll();return;} if(cur!=='proto'&&!document.querySelector('.sheet.on,.sheet.open')) goBack(); });
@@ -608,7 +672,7 @@ function init(){
   document.querySelectorAll('.bls-herocta,.bls-navshop,.bls-order,.snav[data-v="shop"]').forEach(function(x){x.remove();});
   try{history.replaceState({blv:'proto'},'');}catch(e){}
   renderShop(); renderCart(); renderBar(); loadCatalog(); verifyStripeReturn();
-  window.BLShop={open:openShop,addQuote:addPersonalQuote,cart:function(){return cartList();},products:function(){return products;},protocol:function(){return protocolList();},cycleTotals:function(){return CYCLES.map(function(c){return [c.name,cycleTotal(c)];});}};
+  window.BLShop={open:openShop,hasCatalogQuote:hasCatalogQuote,addCatalogQuote:addCatalogQuote,addQuote:addPersonalQuote,cart:function(){return cartList();},products:function(){return products;},protocol:function(){return protocolList();},cycleTotals:function(){return CYCLES.map(function(c){return [c.name,cycleTotal(c)];});}};
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
 })();
