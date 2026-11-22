@@ -391,3 +391,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-21 — Portal cycle quote
 - Added source-backed Muscle Building Cycle 1 and one Retatrutide 60 mg vial as an unpaid, inactive quote; existing paid history and active schedule preserved. No inventory, ledger or payment writes.
 - Files: mberto/index.html; mberto/sw.js; PROJECT_STATUS.md; CHANGELOG.md. Master Cycles/Dosing checked; $524.98 quote arithmetic checked. Unassigned timing left blank; BAC quantity requires review before fulfillment. Publish/live verification pending.
+
+## 2026-11-21 — Two muscle-building options
+- Renamed the existing unpaid cycle to Advanced Muscle Building Stack and created an alternative Basic Muscle Building Stack excluding IGF-1 LR3 and AOD-9604, with separate quotes of $524.98 and $374.98. Existing $150 paid invoice and active schedule unchanged; research items remain inactive. No ledger, stock or payment changes.
+- Files: mberto/index.html, mberto/sw.js, PROJECT_STATUS.md, CHANGELOG.md. Master-derived entries preserved; basic quote arithmetic checked. Clinician review and BAC quantity review remain necessary. Deployment to be checked separately.
