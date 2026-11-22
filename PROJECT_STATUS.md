@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-22 — Confirmed weekday schedule
+- Updated the protocol card and daily schedule to reflect confirmed weekdays. Preserved unspecified time of day. Inline syntax validated.
+
 ## 2026-11-22 — Protocol card correction
 - Filled documented preparation and dose fields on the card and calculator. Unspecified schedule fields remain pending. Inline JavaScript validated.
 
