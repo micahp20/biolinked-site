@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-22 — Protocol card correction
+- Filled documented preparation and dose fields on the card and calculator. Unspecified schedule fields remain pending. Inline JavaScript validated.
+
 ## 2026-11-22 — New member portal
 - Added a master-layout member portal and Share entry. Validated invoice data and inline JavaScript.
 
