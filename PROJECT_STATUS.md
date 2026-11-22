@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-22 — Annual program update
+- Updated one portal’s annual supply summary, nutrition defaults and local service worker. Verified the invoice arithmetic.
+
 ## 2026-11-21 — Schedule editor asset refresh
 - Refreshed scoped schedule engine, editor and controls asset URLs in rholm/index.html and its service-worker asset list. Cache rholm-schedule-editor-v4-20261121. Fresh-load testing already opened rows, so the reported stuck state was not reproduced. Isolated 390 px browser checks passed expansion, draft edit, calculated draw, save, reload and reopen using mocked networking. User's existing device cache and cloud save remain unverified. No production member data changed. Publishing the cache refresh via GitHub.
 
