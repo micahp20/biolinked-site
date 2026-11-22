@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-22 — Tablet strength label
+- Updated the confirmed strength on one protocol card and its weekday schedule. Refreshed the portal cache.
+
 ## 2026-11-22 — Expanded card layout
 - Matched the reference card paragraph structure and compact four-row facts. Preserved deferred scheduling. Inline syntax passed.
 
