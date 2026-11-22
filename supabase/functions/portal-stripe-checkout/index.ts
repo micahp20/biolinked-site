@@ -126,7 +126,7 @@ Deno.serve(async (req: Request) => {
       const cents = Math.round(Number(p.sale) * 100);
       const qty = quantities.get(Number(p.id)) || 0;
       const inventory = stockById.get(Number(p.inventory_id)) as { vials: number; status: string } | undefined;
-      if (!Number.isInteger(cents) || cents < 500 || banned(p.name) || !inventory || inventory.status === "out" || Number(inventory.vials) < qty)
+      if (!Number.isInteger(cents) || (cents < 500 && !(client === "mberto" && /^BAC Water - 10ml$/i.test(p.name))) || banned(p.name) || !inventory || inventory.status === "out" || Number(inventory.vials) < qty)
         return reply({ error: "item_unavailable", item: p.name }, 409, origin);
       items.push({ name: p.name, qty, price: cents / 100 });
       subtotalCents += cents * qty;

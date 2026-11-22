@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mberto/.
-const CACHE = 'mberto-inline-cart-shipping-wallet-20261121-v4';
+const CACHE = 'mberto-inline-cart-water-20261121-v5';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
