@@ -67,7 +67,7 @@ if(window.BLS_HIDE&&window.BLS_HIDE.length){CAT_RULES.forEach(function(r){if(r[0
 var CAT_ORDER=CAT_RULES.map(function(r){return r[0];});
 function categorize(name){var n=String(name||'').toLowerCase();for(var i=0;i<CAT_RULES.length;i++){var k=CAT_RULES[i][1];for(var j=0;j<k.length;j++){if(n.indexOf(k[j])!==-1)return CAT_RULES[i][0];}}return 'Other Research & Supplies';}
 function catLbl(c){return String(c||'').replace(/fat[\s-]*loss/i,'Stubborn Weight Loss').replace(/\bfat\b/i,'Stubborn Weight');}
-function isSellable(p){var s=(typeof p.sale==='string')?parseFloat(p.sale):p.sale;if(typeof s!=='number'||isNaN(s)||s<5)return false;var n=String(p.name||'').toLowerCase();for(var i=0;i<BLOCK.length;i++){if(n.indexOf(BLOCK[i])!==-1)return false;}if((n.indexOf('epitalon')!==-1||n.indexOf('epithalon')!==-1)&&n.indexOf('10mg')!==-1)return false;return true;}
+function isSellable(p){var s=(typeof p.sale==='string')?parseFloat(p.sale):p.sale;if(typeof s!=='number'||isNaN(s)||(s<5&&!(SLUG==='mberto'&&/^BAC Water - 10ml$/i.test(String(p.name||'')))))return false;var n=String(p.name||'').toLowerCase();for(var i=0;i<BLOCK.length;i++){if(n.indexOf(BLOCK[i])!==-1)return false;}if((n.indexOf('epitalon')!==-1||n.indexOf('epithalon')!==-1)&&n.indexOf('10mg')!==-1)return false;return true;}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 function money(n){return '$'+(Math.round(n*100)/100).toFixed(2);}
 function $(id){return document.getElementById(id);}
