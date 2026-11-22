@@ -1875,6 +1875,17 @@ var savedCycles = [
     ]
   },
   {
+    "name": "Holy Trinity",
+    "goal": "Hormone and metabolic research",
+    "reviewOnly": true,
+    "intro": "For clinician review. This saved grouping includes testosterone cypionate, retatrutide and human growth hormone.",
+    "lines": [
+      {"name": "Testosterone cypionate (TRT)"},
+      {"name": "Retatrutide"},
+      {"name": "HGH (somatropin)"}
+    ]
+  },
+  {
     "name": "The Shred Protocol",
     "goal": "Fat Loss",
     "reviewOnly": false,
@@ -2676,14 +2687,14 @@ function renderAbout(){
     var title=(index===0?'Cycle 1 · ':'')+cycle.name;
     var intro=index===0
       ? 'Muscle building is your primary goal. Review the compounds in this saved cycle with a clinician before starting a plan.'
-      : cycle.goal+' · Catalog option for clinician review.';
+      : (cycle.intro || cycle.goal+' · Catalog option for clinician review.');
     var note=cycle.reviewOnly
       ? 'Hormonal treatment requires individual clinician review.'
       : 'The quote includes one 10 mL BAC water and UPS 2-Day shipping. Local pickup removes the shipping charge.';
     var compounds=cycle.lines.map(function(line){
       var entry=window.BLProtocolCopy && BLProtocolCopy.find(line.name);
       return aboutCompound({n:line.name,about:entry?'<p>'+esc(entry.definition)+'</p>':'',
-        facts:[['Catalog quantity',line.qty+(line.qty===1?' vial':' vials')]]});
+        facts:line.qty==null?[]:[['Catalog quantity',line.qty+(line.qty===1?' vial':' vials')]]});
     }).join('');
     return '<section class="jc-cycle catalog-option"><header class="jc-cycle-head"><h2>'+esc(title)+'</h2></header>'+
       '<p class="jc-intro">'+esc(intro)+'</p>'+compounds+
