@@ -404,3 +404,7 @@ Dates use America/Denver. Recovered entries describe repository evidence, not wo
 ## 2026-11-21 — Misha BAC checkout eligibility correction
 - Allowed only Misha's existing BAC Water 10 mL $4.99 SKU through the portal cart's $5 product minimum and its Stripe backend guard; all other restrictions remain unchanged. This lets the two prefilled quote carts include exactly one 10 mL BAC bottle. Portal and root caches bumped.
 - Files: bl-portal-shop.js, supabase/functions/portal-stripe-checkout/index.ts, mberto/index.html, mberto/sw.js, sw.js, PROJECT_STATUS.md, CHANGELOG.md. No test orders, charges, inventory or ledger writes. Live UI and card payment verification remain owner-side.
+
+## 2026-11-21 — Saved-cycle portal and order form
+
+Added a member portal and directory entries with saved cycle options, stock-checked quotes, pickup or shipping and inline checkout. Both scoped and root caches refreshed. Mobile-width and desktop-width checkout checked with mocks. See [PR #278](https://github.com/micahp20/biolinked-site/pull/278) and PROJECT_STATUS.md for the changed paths and release checks.

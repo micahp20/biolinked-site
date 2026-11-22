@@ -3236,15 +3236,8 @@ function openInv(index){
      back into the calculator and the cross removes it. Device-local. */
   var saved = [], editing = null;
 
-  /* ---------- Calculator state ----------
-     The saved list and the inputs persist together under one per-slug key,
-     shaped as a 'calculator' payload so Phase 4 can push it to member_state
-     the same way schedule and nutrition will. Until then it is localStorage
-     only. Note the key: it was hardcoded to another client's prefix, so
-     every protocol shared one list on a given browser; anything found under
-     the old key is carried over once. */
+  /* Store only calculator entries created on this portal. */
   var CALCKEY = KP+'calc-v1';
-  var CALC_OLD = 'dh-app-calc-list-v1';
   var calcInputIds = ['pc-compound','pc-name','pc-vial','pc-bac','pc-dose','pc-doseunit','pc-syringe'];
   function calcPayload(){
     var inp={};
@@ -3259,10 +3252,7 @@ function openInv(index){
     var p=null;
     try{ p=JSON.parse(localStorage.getItem(CALCKEY)||'null'); }catch(_){ p=null; }
     if(!p || typeof p!=='object'){
-      /* first run on this slug: adopt whatever the shared key held */
-      var old=null;
-      try{ old=JSON.parse(localStorage.getItem(CALC_OLD)||'null'); }catch(_){}
-      p = {v:1, kind:'calculator', inputs:{}, saved:(old&&old.length?old:[])};
+      p = {v:1, kind:'calculator', inputs:{}, saved:[]};
     }
     if(!p.inputs || typeof p.inputs!=='object') p.inputs={};
     if(Object.prototype.toString.call(p.saved)!=='[object Array]') p.saved=[];
@@ -3937,20 +3927,6 @@ function gToOz(g){ return g/28.3495; }
 /* One app, one set of keys -- namespaced to this app rather than derived
      from the URL slug, since nothing here is shared with another page. */
 function nKey(k){ return KP+k; }
-/* The nutrition keys were hardcoded to another client's prefix, so every
-   protocol shared one plan on a given browser. Moving them per-slug would
-   orphan whatever is already saved, so anything under the old prefix is
-   copied across once and the old copy left alone. */
-(function nMigrate(){
-  try{
-    if(localStorage.getItem(KP+'nut-moved')) return;
-    ['nut-plan','nut-targets'].forEach(function(k){
-      var old=localStorage.getItem('dh-app-'+k);
-      if(old!=null && localStorage.getItem(KP+k)==null) localStorage.setItem(KP+k,old);
-    });
-    localStorage.setItem(KP+'nut-moved','1');
-  }catch(e){}
-})();
 function nStore(k,v){ try{ localStorage.setItem(nKey(k),JSON.stringify(v)); return true; }catch(e){ return false; } }
 function nLoad(k){ try{ var r=localStorage.getItem(nKey(k)); return r?JSON.parse(r):null; }catch(e){ return null; } }
 function nDrop(k){ try{ localStorage.removeItem(nKey(k)); }catch(e){} }
@@ -5350,7 +5326,9 @@ function csHasLocal(kind){
     try{ return !!localStorage.getItem(SCHKEY); }catch(e){ return false; }
   }
   if(kind==='nutrition') return p.plan!=null || p.targets!=null;
-  if(kind==='calculator') return (p.saved&&p.saved.length) || (p.inputs&&Object.keys(p.inputs).length);
+  if(kind==='calculator'){
+    try{return localStorage.getItem(KP+'calc-v1')!==null;}catch(e){return false;}
+  }
   return false;
 }
 function csApply(kind,payload){
