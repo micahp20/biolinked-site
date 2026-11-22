@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-22 — New member portal
+- Added a master-layout member portal and Share entry. Validated invoice data and inline JavaScript.
+
 ## 2026-11-22 — Tablet strength label
 - Updated the confirmed strength on one protocol card and its weekday schedule. Refreshed the portal cache.
 
