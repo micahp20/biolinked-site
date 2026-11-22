@@ -2941,10 +2941,37 @@ function selectCycleQuote(index){
   document.querySelectorAll('.quote-status').forEach(function(node){node.textContent=message||'';});
   if(!message){closeSheet();renderPay();}
 }
+var invoiceSelection=new Set();
+function selectedInvoiceQuote(){
+  var lines=new Map();
+  invoiceSelection.forEach(function(index){
+    savedCycles[index].lines.forEach(function(line){
+      var existing=lines.get(line.id);
+      if(existing) existing.qty+=line.qty;
+      else lines.set(line.id,Object.assign({},line));
+    });
+  });
+  return {lines:Array.from(lines.values()),combined:true};
+}
+function updateInvoiceSelection(){
+  var rows=cycleQuoteRows(selectedInvoiceQuote());
+  document.getElementById('selection-total').textContent=invoiceSelection.size
+    ? 'Selected total with shipping: '+quoteTotal(rows) : 'Select one or more cycles';
+  document.getElementById('selection-cart').disabled=!invoiceSelection.size;
+  document.getElementById('selection-status').textContent='';
+}
+function invoicePicker(){
+  return '<section class="ocard"><h3>Choose your cycles</h3>'+savedCycles.map(function(cycle,index){
+    if(cycle.reviewOnly) return '';
+    return '<label style="display:flex;align-items:center;gap:.6rem;min-height:44px"><input type="checkbox" data-invoice-cycle="'+index+'"'+
+      (invoiceSelection.has(index)?' checked':'')+'> '+esc(cycle.goal)+'</label>';
+  }).join('')+'<p id="selection-total" aria-live="polite"></p><button type="button" class="btn" id="selection-cart">Add selected cycles to cart</button>'+
+    '<p id="selection-status" role="status"></p></section>';
+}
 function renderPay(){
   document.getElementById('paysum').textContent='Intake fee waived · No balance due';
   document.getElementById('payhero').innerHTML='';
-  document.getElementById('paylist').innerHTML=savedCycles.map(function(cycle,index){
+  document.getElementById('paylist').innerHTML=invoicePicker()+savedCycles.map(function(cycle,index){
     if(cycle.reviewOnly) return '';
     var rows=cycleQuoteRows(cycle);
     return '<article class="ocard" onclick="openInv('+index+')"><div class="ohd"><div><div class="ot">'+
@@ -2953,7 +2980,21 @@ function renderPay(){
       '<span class="quote-status" role="status"></span>'+quoteLines(rows)+'<div class="irow tot">'+
       '<span class="in">Order total</span><span class="iv">'+quoteTotal(rows)+'</span></div></article>';
   }).join('');
-  document.getElementById('paynote').textContent='Each quote is a separate catalog option. Local pickup removes the shipping charge.';
+  document.querySelectorAll('[data-invoice-cycle]').forEach(function(input){
+    input.onchange=function(){
+      var index=Number(input.dataset.invoiceCycle);
+      if(input.checked) invoiceSelection.add(index);
+      else invoiceSelection.delete(index);
+      updateInvoiceSelection();
+    };
+  });
+  document.getElementById('selection-cart').onclick=function(){
+    if(!invoiceSelection.size) return;
+    document.getElementById('selection-status').textContent=window.BLShop
+      ? BLShop.addCatalogQuote(selectedInvoiceQuote()) : 'The order form is loading. Please try again.';
+  };
+  updateInvoiceSelection();
+  document.getElementById('paynote').textContent='Combined orders include one BAC water and one shipping charge. Local pickup removes shipping.';
 }
 function openInv(index){
   var cycle=savedCycles[index];
@@ -6688,7 +6729,7 @@ var w=window.innerWidth;window.addEventListener('resize',function(){if(window.in
 
 
 
-<link rel="stylesheet" href="/bl-portal-shop.css?v=7"><script>window.BLS_HIDE = ["testosterone"];</script><script src="/bl-portal-shop.js?v=16"></script>
+<link rel="stylesheet" href="/bl-portal-shop.css?v=7"><script>window.BLS_HIDE = ["testosterone"];</script><script src="/bl-portal-shop.js?v=17"></script>
 <style id="jc-inline-cycles">
 #protoabout{margin-top:28px}
 .jc-cycle{margin:0 0 22px;min-width:0}

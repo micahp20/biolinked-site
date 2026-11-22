@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-21 — Combined cycle selection on invoices
+- Added titled checkboxes and combined checkout to one portal, with shared quantities, one standard water and one shipping charge. Saved the convention in AGENTS.md. Mock catalog checks passed at 390 and 1200 px, including deselection, totals and repeat adds. Files: gmahan/index.html, gmahan/sw.js, bl-portal-shop.js, sw.js. Deployment verification follows the push.
+
+
 ## 2026-11-20 — Optional shipping and local pickup in portal checkout
 - Added shipping checkbox and address form to Johnson's cart. Shipping checked: $9.99 UPS 2-Day plus address required. Pickup unchecked: shipping $0 and no address. Server-side Stripe and manual order totals now match the choice, with fulfillment/address kept in the order record; manual confirmation emails include fulfillment information. Updated shared cart CSS/JS, payment Edge Functions, portal assets, and root/scoped caches. No invoice, client protocol, inventory, or ledger changes; PR #273 merged; Supabase checkout v6 and order-confirm v5 deployed. Source/JS checks passed; live Pages/iPhone and real payment remain unverified.
 

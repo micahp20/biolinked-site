@@ -326,15 +326,18 @@ function addCatalogQuote(quote){
   if(hasCatalogQuote(quote)){openCart();return '';}
   var water=standardWater();
   if(!water || !water.inStock || Math.round(water.price*100)!==499) return 'The quoted BAC water is unavailable.';
+  var quantities={};
   for(var line of quote.lines){
     var product=productById(String(line.id));
     if(!product || Math.round(product.price*100)!==line.cents) return 'The catalog has changed. Please request an updated quote.';
-    var quantity=(cart[line.id] ? cart[line.id].qty : 0)+line.qty;
+    var current=cart[line.id] ? cart[line.id].qty : 0;
+    var quantity=quote.combined ? Math.max(current,line.qty) : current+line.qty;
+    quantities[line.id]=quantity;
     if(!product.inStock||quantity>product.available||quantity>99) return line.name+' is unavailable in the quoted quantity.';
   }
   quote.lines.forEach(function(line){
     var id=String(line.id);
-    setQtyQuiet(id,(cart[id]?cart[id].qty:0)+line.qty);
+    setQtyQuiet(id,quantities[id]);
   });
   sync();openCart();return '';
 }

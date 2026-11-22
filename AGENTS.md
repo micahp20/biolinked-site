@@ -1,5 +1,8 @@
 # Bio Linked Solutions — permanent project instructions
 
+## Invoice cycle selection
+- On invoices with multiple eligible cycle quotes, use checkboxes with the exact Master Cycles titles and one combined cart action. Keep review-only cycles out of checkout. Count shared item quantities across selections and include standard BAC and shipping once per order.
+
 ## 2026-11-21 — Michael Johnson is the master client portal
 - Use `mjohnson/index.html` as the master for client portal layout. Reuse its landing screen, navigation, program tiles, cycle sections, compound cards and invoice presentation. Use the current client’s own data, storage keys, checkout and clinical review status.
 - For layout changes, compare the rendered page with `/mjohnson/` at 390 px before publishing. Changes to the master layout require an explicit owner request.
