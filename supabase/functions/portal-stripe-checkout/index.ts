@@ -5,7 +5,7 @@ const SR = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
 const STRIPE = Deno.env.get("STRIPE_SECRET_KEY") || "";
 const ORIGINS = ["https://biolinkedsolutions.com", "https://www.biolinkedsolutions.com"];
 const SHIPPING_CENTS = 999;
-const CLIENTS = new Set(["mjohnson", "erica"]);
+const CLIENTS = new Set(["mjohnson", "erica", "mberto"]);
 const cors = (origin: string | null) => ({
   "Access-Control-Allow-Origin": origin && ORIGINS.includes(origin) ? origin : ORIGINS[0],
   "Access-Control-Allow-Headers": "content-type, apikey, authorization",
@@ -29,7 +29,7 @@ async function stripe(path: string, body?: URLSearchParams) {
 const banned = (n: string) => ["cortexin", "dihexa", "ipamorelin", "shipping", "2-day ups"].some(x => n.toLowerCase().includes(x))
   || /(?:epitalon|epithalon).*10\s*mg/i.test(n);
 function validatedFulfillment(client: string, input: any) {
-  if (client !== "mjohnson") return { method: "shipping" } as const;
+  if (client !== "mjohnson" && client !== "mberto") return { method: "shipping" } as const;
   if (!input || (input.method !== "pickup" && input.method !== "shipping")) return null;
   if (input.method === "pickup") return { method: "pickup" } as const;
   const raw = input.address || {};
