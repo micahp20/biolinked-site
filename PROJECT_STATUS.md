@@ -1,5 +1,9 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-23 — Client portal rebuilt on the master layout
+- Rebuilt a client portal from the mpauldino master layout so shared layout scripts, chrome, tabs and styling match. Client-specific protocol and quote data were preserved. Owner-only labs, DNA results, personal supplements and dose-editing were omitted. Root service worker cache bumped. No ledger or inventory changes.
+
+
 ## 2026-11-23 — New member portal
 - Added a master-layout member portal and Share entry with an unpaid quote. Protocol details were copied from existing member pages. Registered the Apple Pay quote on the payment-function allowlist and bumped the root service worker cache. No ledger or inventory changes. Inline JavaScript validated. Deployment and live verification pending.
 
