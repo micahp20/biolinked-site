@@ -31,6 +31,7 @@
     + '#sa-pan [data-x="save"][data-bl-need="1"],#ed-addpan [data-eda="save"][data-bl-need="1"]{opacity:.55}'
     + '#a2hs{position:relative!important;inset:auto!important;left:auto!important;right:auto!important;bottom:auto!important;z-index:auto!important;width:auto!important;max-width:none!important;margin:12px 16px!important;transform:none!important}'
     + '#s-calc .pc-wrap{padding-bottom:140px}'
+    + '#pc-unit-help{margin:7px 0 0;font:500 12px/1.5 Montserrat,system-ui,sans-serif;color:var(--muted,#666)}'
     + '@media (prefers-reduced-motion:reduce){#bl-calc-toast{transition:none}}';
   (document.head || document.documentElement).appendChild(style);
 
@@ -217,7 +218,29 @@
     btn.setAttribute('data-bl-need', '1');
     setTimeout(function(){ delete btn.dataset.blRelaxing; }, 0);
   }
+  function clarifyUnits(){
+    var sel=$('pc-doseunit');
+    if(!sel)return;
+    /* iOS can hide disabled options entirely. Keep all three labels visible
+       but NEVER enable IU-to-mass conversions. The calculator owns the math. */
+    var iuOnly=false;
+    for(var j=0;j<sel.options.length;j++){
+      var opt=sel.options[j];
+      if(opt.hidden) opt.hidden=false;
+      if(opt.value==='iu' && !opt.disabled) iuOnly=true;
+    }
+    var row=sel.closest('.pc-dose-row'), note=$('pc-unit-help');
+    if(!row)return;
+    if(!note){note=document.createElement('p');note.id='pc-unit-help';
+      note.setAttribute('role','note');row.insertAdjacentElement('afterend',note);}
+    var msg=iuOnly
+      ? 'IU vial selected. mg and mcg are shown but unavailable because IU cannot be converted to a mass dose. Select a mg/mcg vial above to use them.'
+      : 'Choose mg or mcg for this vial. IU applies only to IU-labelled vials.';
+    if(note.textContent!==msg)note.textContent=msg;
+    if(sel.getAttribute('aria-describedby')!=='pc-unit-help')sel.setAttribute('aria-describedby','pc-unit-help');
+  }
   function relaxAll(){
+    clarifyUnits();
     var nodes = document.querySelectorAll('#sa-pan [data-x="save"], #ed-addpan [data-eda="save"]');
     for(var i = 0; i < nodes.length; i++) relax(nodes[i]);
   }
