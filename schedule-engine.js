@@ -296,13 +296,17 @@ function gkLegacyBlocks(c){
 }
 function gkLegacyDays(c){ var o=[]; for(var i=0;i<7;i++){ if(due(c,i)) o.push(i); } return o; }
 function gkLegacyLink(name,block,ok){
-  var best=null;
+  /* A current-cycle filter can omit a valid saved compound ID even though
+     the legacy day view is showing that row. Fall back to its same-name seed
+     so an edit arrow never disappears just because the plan filter differs. */
+  var best=null, fallback=null;
   gkState.compounds.forEach(function(x){
     if(x.name!==name || /^(calc|man)-/.test(x.id||"")) return;
+    if(!fallback || (x.block===block && fallback.block!==block)) fallback=x;
     if(ok && !ok[x.id]) return;
     if(!best || (x.block===block && best.block!==block)) best=x;
   });
-  return best;
+  return best||fallback;
 }
 function gkLegacyCard(r,g,ok){
   var link=r.sa?null:gkLegacyLink(r.n,g,ok), days=gkLegacyDays(r);

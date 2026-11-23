@@ -8,6 +8,23 @@
  function editable(){return true;}
  document.documentElement.classList.remove('gk-viewonly');
  function find(id){return gkState.compounds.find(function(c){return c.id===id;});}
+ /* Before the new editor, calculator-added rows were stored only in the
+    legacy schedule. Build an editable copy ONLY when that row is opened.
+    Save continues through gkSyncAdded/saPut; simply viewing changes no dose. */
+ function findForEdit(id){
+  var existing=find(id);if(existing)return existing;
+  if(!/^sa-/.test(id)||typeof schRows!=='function')return null;
+  var row=(schRows()||[]).find(function(r){return 'sa-'+String(r.sa||r.n)===id;});
+  if(!row)return null;
+  var dose=String(row.d||'').match(/^\s*(\d+(?:\.\d+)?)\s*(mg|mcg|iu|g|tab|cap|ml)\b/i);
+  var c={id:id,name:row.n,vial:'Custom',dose:dose?Number(dose[1]):0,
+   unit:dose?(dose[2].toLowerCase()==='ml'?'mL':dose[2].toLowerCase()):'mg',
+   draw:String(row.u||''),recon:String(row.rec||''),
+   days:typeof gkLegacyDays==='function'?gkLegacyDays(row):[gkState.selected],
+   block:row.b==='PM'?'PM':'AM',active:true,step:0.25,foundation:false};
+  gkState.compounds.push(c);
+  return c;
+ }
  function focusRow(id){var b=Array.from(document.querySelectorAll('[data-pe-open]')).find(function(el){return el.getAttribute('data-pe-open')===id;});if(b){b.focus();b.scrollIntoView({block:'nearest'});}}
  function fields(c){return {dose:c.dose,unit:c.unit,draw:c.draw||'',recon:c.recon||'',runWeeks:c.runWeeks==null?'':c.runWeeks,days:(c.days||[]).slice(),block:c.block==='PM'?'PM':'AM'};}
  function draft(c){if(!drafts[c.id]){drafts[c.id]=fields(c);drafts[c.id].base=JSON.stringify(fields(c));}return drafts[c.id];}
@@ -24,8 +41,8 @@
  form(d)+'<p class="pe-error" role="alert" hidden></p><div class="pe-actions"><button type="button" class="pe-save" data-pe-action="save">Save changes</button><button type="button" data-pe-action="cancel">Cancel</button></div><button type="button" class="pe-remove" data-pe-action="remove">Remove from schedule</button>'+'</div>';}
  gkCard=function(c){var open=gkState.open===c.id, name=c.name;
   if(/^\s*\d/.test(c.vial||'')&&name.toLowerCase().indexOf(String(c.vial).toLowerCase())<0)name+=' · '+c.vial;
-  var real=find(c.id);
-  return '<div class="pe-item"><button type="button" class="drow pe-head'+(c.block==='PM'?' pm':'')+'" data-nm="'+esc(c.name)+'" data-pe-open="'+esc(c.id)+'" aria-expanded="'+open+'" aria-controls="pe-panel-'+esc(c.id)+'"><span class="uu">'+esc(c.draw&&c.draw!=='—'?c.draw:gkFmt(c.dose)+' '+c.unit)+'</span><span class="pe-title"><span class="nm">'+esc(name)+'</span><span class="mt">'+esc([(gkFmt(c.dose)+' '+c.unit).trim(),gkDayText(c.days)].filter(Boolean).join(' · '))+'</span></span>'+(real?'<span class="pe-chevron" aria-hidden="true">⌄</span>':'')+'</button>'+(open&&real?panel(real):'')+'</div>';
+  var real=find(c.id), canEdit=!!real || /^sa-/.test(c.id||'');
+  return '<div class="pe-item"><button type="button" class="drow pe-head'+(c.block==='PM'?' pm':'')+'" data-nm="'+esc(c.name)+'" data-pe-open="'+esc(c.id)+'" aria-expanded="'+open+'" aria-controls="pe-panel-'+esc(c.id)+'"><span class="uu">'+esc(c.draw&&c.draw!=='—'?c.draw:gkFmt(c.dose)+' '+c.unit)+'</span><span class="pe-title"><span class="nm">'+esc(name)+'</span><span class="mt">'+esc([(gkFmt(c.dose)+' '+c.unit).trim(),gkDayText(c.days)].filter(Boolean).join(' · '))+'</span></span>'+(canEdit?'<span class="pe-chevron" aria-hidden="true">⌄</span>':'')+'</button>'+(open&&real?panel(real):'')+'</div>';
  };
  gkDayView=function(rows){var html='';['AM','PM'].forEach(function(block){var list=rows.filter(function(c){return c.block===block;});html+='<div class="seclbl">'+(block==='AM'?'Morning':'Night')+'<span class="cnt">'+list.length+' COMPOUND'+(list.length===1?'':'S')+'</span></div><div class="dgrp">'+(list.length?list.map(gkCard).join(''):'<p class="pe-no-doses">Nothing scheduled '+(block==='AM'?'this morning':'tonight')+'.</p>')+'</div>';});return html+gkMedsSection();};
 
@@ -67,7 +84,7 @@
  document.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('#gkAddBtn')){e.preventDefault();e.stopImmediatePropagation();openAdd();}},true);
  document.addEventListener('click',function(e){
   var b=e.target.closest&&e.target.closest('button');if(!b)return;
-  if(b.hasAttribute('data-pe-open')){var id=b.getAttribute('data-pe-open');if(!find(id))return;if(gkState.open===id){delete drafts[id];gkState.open=null;}else{if(gkState.open)delete drafts[gkState.open];gkState.open=id;draft(find(id));}gkCacheLocal();gkRender();focusRow(id);return;}
+  if(b.hasAttribute('data-pe-open')){var id=b.getAttribute('data-pe-open');if(!findForEdit(id))return;if(gkState.open===id){delete drafts[id];gkState.open=null;}else{if(gkState.open)delete drafts[gkState.open];gkState.open=id;draft(find(id));}gkCacheLocal();gkRender();focusRow(id);return;}
   if(b.hasAttribute('data-pe-mode')){if(!editable()||!addDraft)return;addDraft.mode=b.getAttribute('data-pe-mode');addView();return;}
   var host=b.closest('[data-pe-id]')||b.closest('#pe-add-host'), d=host?(host.id==='pe-add-host'?addDraft:drafts[host.getAttribute('data-pe-id')]):null;
   if(b.hasAttribute('data-pe-time')&&d&&editable()){d.block=b.getAttribute('data-pe-time');host.querySelectorAll('[data-pe-time]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b));});return;}

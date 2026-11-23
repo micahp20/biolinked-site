@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-23 — Portal calculator and schedule-control repair
+- Fixed shared schedule edit controls for legacy/current-cycle row matches and legacy calculator-added entries; clarified mg/mcg/IU choices on iPhone without permitting incompatible conversions.
+- Shared files: `schedule-engine.js`, `schedule-editor.js`, `calc-feedback.js`. Refreshed `ejirikils/sw.js` and root `sw.js` caches; all portals loading shared scripts receive the fixes.
+- No client dose, prescribed schedule, invoice, stock, storage key or database changes. PR: fix-portal-calc-edit-20261123; deployment and iPhone verification pending.
+
+
 ## 2026-11-22 — Portal cycle update
 - Updated invoice status, active schedule and portal cache.
 
