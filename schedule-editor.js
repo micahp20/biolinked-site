@@ -76,19 +76,21 @@
   if(!host||!d||!editable())return;
   var c=host.id==='pe-add-host'?null:find(host.getAttribute('data-pe-id'));
   if(action==='cancel'){delete drafts[c.id];gkState.open=null;gkRender();focusRow(c.id);return;}
-  if(action==='remove'){c.active=false;if(typeof gkLegacySetOn==='function')gkLegacySetOn(c.name,false);delete drafts[c.id];gkState.open=null;gkSave(true);gkRender();gkToast('Removed from schedule. Use Add back to restore it.');return;}
+  if(action==='remove'){c.active=false;if(typeof gkLegacySetOn==='function')gkLegacySetOn(c.name,false);if(typeof gkSyncAdded==='function')gkSyncAdded(c,true);delete drafts[c.id];gkState.open=null;gkSave(true);gkRender();gkToast('Removed from schedule. Use Add back to restore it.');return;}
   if(action==='save'){
    if(JSON.stringify(fields(c))!==d.base){error(host,'This entry changed while you were editing. Close and reopen it to use the latest values.');return;}
    if(!valid(d,c,host))return;
    Object.assign(c,{dose:Number(d.dose),unit:d.unit,draw:String(d.draw||'').trim()||'—',recon:String(d.recon||'').trim(),days:d.days.slice().sort(),block:d.block,runWeeks:d.runWeeks===''||d.runWeeks==null?null:Number(d.runWeeks)});
    if(c.days.indexOf(gkState.selected)<0)gkState.selected=c.days[0];
    if(typeof gkLegacyEdit==='function')gkLegacyEdit(c);
+   if(typeof gkSyncAdded==='function')gkSyncAdded(c,c.active===false);
    delete drafts[c.id];gkState.open=null;gkSave(true);gkRender();focusRow(c.id);gkToast('Schedule changes saved.');return;
   }
   if(action==='add'){
    if(!String(d.name||'').trim()){error(host,'Enter a compound name.');return;}
    if(!valid(d,d,host))return;
    var added={id:'man-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,6),name:String(d.name).trim(),vial:String(d.vial||'Custom').trim(),dose:Number(d.dose),unit:d.unit,draw:String(d.draw||'').trim()||'—',recon:String(d.recon||'').trim(),days:d.days.slice().sort(),block:d.block,step:0.25,foundation:false,active:true,runWeeks:d.runWeeks===''||d.runWeeks==null?null:Number(d.runWeeks)};
+   if(typeof gkSyncAdded==='function' && gkSyncAdded(added)){ gkState.selected=added.days[0];gkState.open=null;addDraft=null;closeSheet();go('sched'); try{ if(typeof renderDoses==='function') renderDoses(); }catch(e){} gkRender(); gkToast('Compound added. Tap its row to edit it.'); return; }
    gkState.compounds.push(added);gkState.selected=added.days[0];gkState.open=null;gkSave(true);addDraft=null;closeSheet();go('sched');gkRender();focusRow(added.id);gkToast('Compound added. Tap its row to edit it.');
   }
  });

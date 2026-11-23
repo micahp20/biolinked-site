@@ -55,17 +55,72 @@ function gkCacheLocal(){ try{ localStorage.setItem(GK_STORAGE, JSON.stringify(gk
    navigation and must not reach the server: a brand-new member who opens their
    link and taps around has written nothing, and an existing member on a slow
    connection cannot clobber their own saved row before it has even arrived. */
-function gkSave(edit){
-  if(edit && typeof BL_DIRTY!=="undefined") BL_DIRTY=true;
-  gkCacheLocal();
-  if(typeof blRpc!=="function") return;
-  if(typeof BL_KEY==="undefined" || !BL_KEY) return;
-  if(typeof BL_KEYBAD!=="undefined" && BL_KEYBAD) return;
-  if(typeof BL_DIRTY!=="undefined" && !BL_DIRTY) return;
-  if((typeof BL_READY!=="undefined" && !BL_READY) || (typeof BL_SEEN!=="undefined" && !BL_SEEN)){
-    if(typeof BL_PENDING!=="undefined") BL_PENDING=true;
-    return;
+
+/* Slug-only cloud sync for engines that are the source of truth (no legacy
+   schSave bridge). Uses get_state/save_state kind "engine" so it never
+   overwrites the existing schedule payload ({on, blk, add, days, ovr}). */
+var GK_CLOUD_KIND='engine';
+var gkCloudVer=0, gkCloudSeen=false;
+function gkCloudSlug(){
+  if(typeof BL_SLUG==="string" && BL_SLUG) return BL_SLUG;
+  if(typeof CS_SLUG==="string" && CS_SLUG) return CS_SLUG;
+  return "";
+}
+function gkCloudPendingKey(){ return "bl-cs-pending:"+gkCloudSlug()+":"+GK_CLOUD_KIND; }
+function gkCloudVerKey(){ return "bl-cs-ver:"+gkCloudSlug()+":"+GK_CLOUD_KIND; }
+function gkCloudPending(){ try{ return !!localStorage.getItem(gkCloudPendingKey()); }catch(e){ return false; } }
+function gkCloudMarkPending(on){
+  try{ if(on) localStorage.setItem(gkCloudPendingKey(), String(Date.now())); else localStorage.removeItem(gkCloudPendingKey()); }catch(e){}
+}
+function gkCloudLastVer(){ try{ return parseInt(localStorage.getItem(gkCloudVerKey())||"0",10)||0; }catch(e){ return 0; } }
+function gkCloudSetVer(v){ gkCloudVer=v||0; try{ localStorage.setItem(gkCloudVerKey(), String(gkCloudVer)); }catch(e){} }
+function gkCanCloud(){ return (typeof blRpc==="function" || typeof csRpc==="function") && !!gkCloudSlug(); }
+function gkCloudStat(s){
+  if(typeof csStat==="function"){
+    if(s==="wait") csStat("offline");
+    else if(s==="saving"||s==="saved"||s==="error"||s==="") csStat(s);
   }
+}
+function gkLocalEdited(){
+  try{
+    var raw=localStorage.getItem(GK_STORAGE); if(!raw) return false;
+    var loc=JSON.parse(raw), seed=JSON.parse(JSON.stringify(gkSeed));
+    function sig(st){
+      return JSON.stringify((st.compounds||[]).map(function(c){
+        return [c.id,c.dose,c.days,c.block,c.draw,c.unit,c.active,c.recon||"",c.runWeeks||null];
+      }));
+    }
+    return sig(loc)!==sig(seed);
+  }catch(e){ return false; }
+}
+function gkCloudRpc(fn,body){
+  if(typeof blRpc==="function") return blRpc(fn,body);
+  if(typeof csRpc!=="function") return Promise.resolve({ok:false,status:0});
+  if(fn==="get_member_state"){
+    return csRpc("get_state",{p_slug:body.p_slug}).then(function(r){
+      if(r.status===0) return {ok:false,status:0};
+      if(r.status!==200) return {ok:false,status:r.status,err:r.body};
+      var st={}, vs={};
+      (Array.isArray(r.body)?r.body:[]).forEach(function(row){ if(row&&row.kind){ st[row.kind]=row.payload; vs[row.kind]=row.version; } });
+      return {ok:true,data:{state:st,versions:vs}};
+    });
+  }
+  if(fn==="save_member_state"){
+    return csRpc("save_state",{p_slug:body.p_slug,p_kind:body.p_kind,p_payload:body.p_payload,p_expected_version:body.p_expected_version||0}).then(function(r){
+      if(r.status===200) return {ok:true,data:{ok:true,kind:body.p_kind,version:r.body}};
+      return {ok:false,status:r.status,err:r.body};
+    });
+  }
+  return Promise.resolve({ok:false,status:0});
+}
+
+function gkSave(edit){
+  if(edit) gkCloudMarkPending(true);
+  gkCacheLocal();
+  if(!edit) return;
+  if(!gkCanCloud()) return;
+  if(typeof BL_KEYBAD!=="undefined" && BL_KEYBAD) return;
+  if(typeof GK_VIEWONLY!=="undefined" && GK_VIEWONLY) return;
   clearTimeout(gkPushT);
   gkPushT=setTimeout(gkPush, 350);
 }
@@ -100,39 +155,43 @@ function gkPayload(){
   };
 }
 function gkPush(){
-  if(typeof blRpc!=="function") return;
-  if(typeof BL_KEY==="undefined" || !BL_KEY) return;
+  if(!gkCanCloud()) return;
   if(typeof BL_KEYBAD!=="undefined" && BL_KEYBAD) return;
-  if(typeof BL_DIRTY!=="undefined" && !BL_DIRTY) return;
-  if(typeof GK_VIEWONLY!=='undefined'&&GK_VIEWONLY) return;
-  /* If the boot read failed we still do not know what is on the server, so read
-     before writing rather than overwriting blind. The member's edit wins once
-     the read succeeds -- it is an explicit action on their own device. */
-  if(!BL_SEEN){
-    blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}).then(function(r){
-      if(r.ok){ BL_SEEN=true; BL_ONLINE=true; BL_VER=blUnwrap(r.data).versions||{}; gkPushNow(); }
-      else if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r));  }
-    }).catch(function(){ BL_ONLINE=false; });
+  if(typeof GK_VIEWONLY!=="undefined" && GK_VIEWONLY) return;
+  if(!gkCloudSeen){
+    gkCloudRpc("get_member_state",{p_slug:gkCloudSlug(),p_key:(typeof BL_KEY==="undefined"?null:BL_KEY)}).then(function(r){
+      if(r.ok){
+        var vs=(r.data&&r.data.versions)||{};
+        gkCloudSeen=true;
+        gkCloudVer=typeof vs[GK_CLOUD_KIND]==="number"?vs[GK_CLOUD_KIND]:0;
+        gkPushNow();
+      } else if(r.status===401){ if(typeof BL_KEYBAD!=="undefined") BL_KEYBAD=true; if(typeof blForgetKey==="function") blForgetKey(); if(typeof gkToast==="function"&&typeof blMessage==="function") gkToast(blMessage(r)); }
+      else gkCloudStat("wait");
+    }).catch(function(){ gkCloudStat("wait"); });
     return;
   }
   gkPushNow();
 }
 function gkPushNow(){
   var attempt=JSON.stringify(gkState);
-  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',
-                             p_payload:gkPayload(), p_expected_version:BL_VER.schedule})
+  gkCloudStat("saving");
+  gkCloudRpc("save_member_state",{p_slug:gkCloudSlug(),p_key:(typeof BL_KEY==="undefined"?null:BL_KEY),p_kind:GK_CLOUD_KIND,
+                             p_payload:gkPayload(), p_expected_version:gkCloudVer||0})
     .then(function(r){
       if(r.ok){
-        BL_ONLINE=true; gkLastGood=attempt;
-        if(r.data && typeof r.data.version==='number') BL_VER.schedule=r.data.version;
+        gkLastGood=attempt;
+        if(r.data && typeof r.data.version==="number") gkCloudSetVer(r.data.version);
+        gkCloudMarkPending(false);
+        gkCloudStat("saved");
         return;
       }
-      if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r)); gkRollback(); return; }
+      if(r.status===401){ if(typeof BL_KEYBAD!=="undefined") BL_KEYBAD=true; if(typeof blForgetKey==="function") blForgetKey(); if(typeof gkToast==="function"&&typeof blMessage==="function") gkToast(blMessage(r)); gkRollback(); return; }
       if(blIsConflict(r)){ blResync(); return; }
-      gkToast(blMessage(r));
+      if(r.status===0){ gkCloudStat("wait"); return; }
+      if(typeof gkToast==="function") gkToast(typeof blMessage==="function"?blMessage(r):"Could not save that change.");
       gkRollback();
     })
-    .catch(function(){ BL_ONLINE=false; });   /* offline: cache holds, retry on next edit */
+    .catch(function(){ gkCloudStat("wait"); });
 }
 /* The server refused because someone else wrote since we last read. The other
    side's change is the newer one, so we take it rather than insisting -- this
@@ -146,19 +205,19 @@ function blIsConflict(r){
 var blResyncing=false;
 function blResync(){
   if(blResyncing) return; blResyncing=true;
-  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY})
+  gkCloudRpc("get_member_state",{p_slug:gkCloudSlug(),p_key:(typeof BL_KEY==="undefined"?null:BL_KEY)})
     .then(function(r){
       blResyncing=false;
       if(!r.ok) return;
-      var u=blUnwrap(r.data);
-      BL_VER=u.versions||{};
-      gkHydrate(u.state.schedule);
-      if(u.state.nutrition){ try{
-        if(u.state.nutrition.targets) localStorage.setItem(nKey(NUT_CFG.STORE_TARGETS), JSON.stringify(u.state.nutrition.targets));
-        if(u.state.nutrition.plan)    localStorage.setItem(nKey(NUT_CFG.STORE_PLAN),    JSON.stringify(u.state.nutrition.plan));
-      }catch(e){} }
+      var u=r.data||{};
+      var vs=u.versions||{};
+      var st=(u.state||{})[GK_CLOUD_KIND];
+      if(typeof vs[GK_CLOUD_KIND]==="number") gkCloudSetVer(vs[GK_CLOUD_KIND]);
+      gkCloudSeen=true;
+      if(st) gkHydrate(st);
       gkCacheLocal();
       gkLastGood=JSON.stringify(gkState);
+      gkCloudMarkPending(false);
       gkRender();
       gkToast("Updated from your other device.");
     })
@@ -401,3 +460,53 @@ if(document.readyState==="loading"){
 }else{
   try{ gkRender(); }catch(e){ console.error(e); }
 }
+
+function gkCloudBoot(){
+  if(!gkCanCloud()) return;
+  gkCloudRpc("get_member_state",{p_slug:gkCloudSlug(),p_key:(typeof BL_KEY==="undefined"?null:BL_KEY)}).then(function(r){
+    if(!r.ok){ if(r.status===0) gkCloudStat("wait"); return; }
+    gkCloudSeen=true;
+    var vs=(r.data&&r.data.versions)||{};
+    var st=((r.data&&r.data.state)||{})[GK_CLOUD_KIND];
+    var cloudVer=typeof vs[GK_CLOUD_KIND]==="number"?vs[GK_CLOUD_KIND]:0;
+    var last=gkCloudLastVer();
+    var pending=gkCloudPending() || (gkLocalEdited() && last===0 && cloudVer===0);
+    gkCloudVer=cloudVer;
+    if(pending && !(cloudVer>last)){ gkPushNow(); return; }
+    if(st){
+      gkHydrate(st);
+      gkCacheLocal();
+      gkLastGood=JSON.stringify(gkState);
+      gkCloudSetVer(cloudVer);
+      gkCloudMarkPending(false);
+      try{ gkRender(); }catch(e){}
+    }
+  }).catch(function(){ gkCloudStat("wait"); });
+}
+function gkCloudResume(){
+  if(typeof document!=="undefined" && document.visibilityState && document.visibilityState!=="visible") return;
+  if(gkCloudPending()){ gkPush(); return; }
+  if(gkState && gkState.open) return;
+  if(!gkCanCloud()) return;
+  gkCloudRpc("get_member_state",{p_slug:gkCloudSlug(),p_key:(typeof BL_KEY==="undefined"?null:BL_KEY)}).then(function(r){
+    if(!r.ok) return;
+    var vs=(r.data&&r.data.versions)||{};
+    var st=((r.data&&r.data.state)||{})[GK_CLOUD_KIND];
+    var v=vs[GK_CLOUD_KIND];
+    gkCloudSeen=true;
+    if(typeof v==="number" && v!==gkCloudVer && st){
+      gkCloudSetVer(v);
+      gkHydrate(st);
+      gkCacheLocal();
+      gkLastGood=JSON.stringify(gkState);
+      try{ gkRender(); }catch(e){}
+    }
+  }).catch(function(){});
+}
+try{
+  document.addEventListener("visibilitychange", function(){ if(document.visibilityState==="visible") gkCloudResume(); });
+  window.addEventListener("online", gkCloudResume);
+  window.addEventListener("pageshow", function(e){ if(e.persisted) gkCloudResume(); });
+}catch(e){}
+try{ gkCloudBoot(); }catch(e){}
+

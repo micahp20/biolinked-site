@@ -1,15 +1,32 @@
 /* Per-client remove and restore for protocol and schedule rows.
-   Stored on this device. Does not edit catalog data, invoice amounts,
-   or dose text. Saved start and end dates are ignored and are not shown. */
+   Synced by page slug through save_state/get_state (kind 'plan').
+   localStorage is an offline cache only. Does not edit catalog data,
+   invoice amounts, or dose text. Saved start and end dates are ignored
+   and are not shown. */
 (function () {
   'use strict';
   if (window.__blPlanControls) return;
   window.__blPlanControls = true;
 
   function slug() {
-    return (typeof CS_SLUG === 'string' && CS_SLUG) ? CS_SLUG : 'portal';
+    if (typeof CS_SLUG === 'string' && CS_SLUG) return CS_SLUG;
+    if (typeof BL_SLUG === 'string' && BL_SLUG) return BL_SLUG;
+    return 'portal';
   }
   function storeKey() { return 'biolinked-planwin-' + slug(); }
+  function pendingKey() { return 'bl-cs-pending:' + slug() + ':plan'; }
+  function verKey() { return 'bl-cs-ver:' + slug() + ':plan'; }
+
+  function getPending() { try { return !!localStorage.getItem(pendingKey()); } catch (e) { return false; } }
+  function setPending(on) {
+    try {
+      if (on) localStorage.setItem(pendingKey(), String(Date.now()));
+      else localStorage.removeItem(pendingKey());
+    } catch (e) {}
+  }
+  function lastVer() { try { return parseInt(localStorage.getItem(verKey()) || '0', 10) || 0; } catch (e) { return 0; } }
+  function setLastVer(v) { try { localStorage.setItem(verKey(), String(v || 0)); } catch (e) {} }
+
   function load() {
     var data = { v: 1, items: {} };
     try {
@@ -25,12 +42,160 @@
         changed = true;
       }
     });
-    if (changed) save(data);
+    if (changed) saveLocal(data);
     return data;
   }
-  function save(data) {
-    try { localStorage.setItem(storeKey(), JSON.stringify(data)); } catch (e) {}
+  function saveLocal(data) {
+    try { localStorage.setItem(storeKey(), JSON.stringify({ v: 1, items: data.items || {} })); } catch (e) {}
   }
+  function hasLocalEdits(data) {
+    data = data || load();
+    return !!(data.items && Object.keys(data.items).length);
+  }
+
+  /* Reuse the page's existing RPC helper; never embed credentials here. */
+  function rpc(fn, body) {
+    if (typeof csRpc === 'function') return csRpc(fn, body);
+    if (typeof blRpcRaw === 'function') {
+      return blRpcRaw(fn, body).then(function (r) {
+        return { status: r && r.ok ? 200 : (r && r.status) || 0, body: r && (r.data !== undefined ? r.data : r.err) };
+      }).catch(function () { return { status: 0, body: null }; });
+    }
+    if (typeof CS_URL === 'string' && typeof CS_ANON === 'string') {
+      try {
+        return fetch(CS_URL + fn, {
+          method: 'POST',
+          headers: { 'apikey': CS_ANON, 'Authorization': 'Bearer ' + CS_ANON, 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        }).then(function (r) {
+          return r.text().then(function (t) {
+            var b = null; try { b = JSON.parse(t); } catch (e) { b = t; }
+            return { status: r.status, body: b };
+          });
+        }).catch(function () { return { status: 0, body: null }; });
+      } catch (e) { return Promise.resolve({ status: 0, body: null }); }
+    }
+    return Promise.resolve({ status: 0, body: null });
+  }
+
+  function hookStat() {
+    if (typeof csStat !== 'function' || csStat._blWait) return;
+    var orig = csStat;
+    csStat = function (s) {
+      orig.apply(this, arguments);
+      try {
+        if (s === 'offline') {
+          var e = document.getElementById('csstat');
+          if (e) e.textContent = 'Waiting to sync';
+        }
+      } catch (err) {}
+    };
+    csStat._blWait = true;
+    try { if (typeof window !== 'undefined') window.csStat = csStat; } catch (e) {}
+  }
+  hookStat();
+
+  function stat(s) {
+    hookStat();
+    if (typeof csStat === 'function') {
+      if (s === 'wait') csStat('offline');
+      else csStat(s);
+      return;
+    }
+    var el = document.getElementById('blp-sync');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'blp-sync';
+      el.className = 'blp-note';
+      var host = document.getElementById('dosenote') || document.getElementById('doses');
+      if (host && host.parentNode) host.parentNode.insertBefore(el, host.nextSibling);
+      else return;
+    }
+    var map = { saving: 'Saving\u2026', saved: 'Saved', wait: 'Waiting to sync', error: 'Save failed', '': '' };
+    el.textContent = map[s] || '';
+    if (s === 'saved') {
+      clearTimeout(stat._t);
+      stat._t = setTimeout(function () {
+        var x = document.getElementById('blp-sync');
+        if (x && x.textContent === 'Saved') x.textContent = '';
+      }, 1800);
+    }
+  }
+
+  var planVer = lastVer();
+  var pushing = false;
+  var wantPush = false;
+
+  function planRow(rows) {
+    var found = null;
+    (Array.isArray(rows) ? rows : []).forEach(function (row) {
+      if (row && row.kind === 'plan') found = row;
+    });
+    return found;
+  }
+
+  function applyCloud(row) {
+    var items = (row && row.payload && row.payload.items && typeof row.payload.items === 'object') ? row.payload.items : {};
+    var data = { v: 1, items: {} };
+    Object.keys(items).forEach(function (k) {
+      if (items[k] && items[k].removed) data.items[k] = { removed: true };
+    });
+    saveLocal(data);
+    if (typeof row.version === 'number') {
+      planVer = row.version;
+      setLastVer(planVer);
+    }
+    setPending(false);
+    try { refresh(); } catch (e) { try { mountAll(); } catch (e2) {} }
+  }
+
+  function push() {
+    if (pushing) { wantPush = true; return; }
+    var data = load();
+    pushing = true;
+    wantPush = false;
+    stat('saving');
+    rpc('save_state', {
+      p_slug: slug(),
+      p_kind: 'plan',
+      p_payload: { v: 1, items: data.items || {} },
+      p_expected_version: planVer || 0
+    }).then(function (r) {
+      pushing = false;
+      if (r.status === 200) {
+        planVer = typeof r.body === 'number' ? r.body : planVer + 1;
+        setLastVer(planVer);
+        setPending(false);
+        stat('saved');
+        if (wantPush) push();
+        return;
+      }
+      if (r.status === 409) {
+        return pull(true);
+      }
+      if (r.status === 0) { stat('wait'); return; }
+      stat('error');
+    }).catch(function () { pushing = false; stat('wait'); });
+  }
+
+  function pull(fromConflict) {
+    return rpc('get_state', { p_slug: slug() }).then(function (r) {
+      if (r.status === 0) { stat('wait'); return; }
+      if (r.status !== 200) return;
+      var row = planRow(r.body);
+      var cloudVer = row && typeof row.version === 'number' ? row.version : 0;
+      var pending = getPending() || (hasLocalEdits() && lastVer() === 0 && cloudVer === 0);
+      if (pending && !(cloudVer > lastVer())) {
+        planVer = cloudVer;
+        push();
+        return;
+      }
+      if (row) applyCloud(row);
+      else if (!pending) { planVer = 0; setLastVer(0); }
+      if (fromConflict) stat('');
+    }).catch(function () { stat('wait'); });
+  }
+
   function itemKey(cycle, name) { return String(cycle || 'plan') + '\u001f' + String(name || ''); }
   function recOf(cycle, name) { return load().items[itemKey(cycle, name)] || null; }
   function removedNow(rec) { return !!(rec && rec.removed); }
@@ -73,8 +238,9 @@
     var n = document.getElementById('dosenote');
     if (!n) return;
     n.textContent = n.textContent
-      .replace('This is a read-only view of your schedule.', 'Remove and restore apply to your plan on this device.')
-      .replace('Dates and removal apply to your plan on this device.', 'Remove and restore apply to your plan on this device.');
+      .replace('This is a read-only view of your schedule.', 'Remove and restore sync to your other devices.')
+      .replace('Dates and removal apply to your plan on this device.', 'Remove and restore sync to your other devices.')
+      .replace('Remove and restore apply to your plan on this device.', 'Remove and restore sync to your other devices.');
   }
 
   function controlHTML(rec) {
@@ -99,7 +265,9 @@
     var k = itemKey(cycle, name);
     if (removed) data.items[k] = { removed: true };
     else delete data.items[k];
-    save(data);
+    saveLocal(data);
+    setPending(true);
+    push();
   }
   function refresh() {
     try { if (typeof renderDoses === 'function') renderDoses(); } catch (e) {}
@@ -206,7 +374,7 @@
     box.className = 'blp-ctl';
     var note = document.createElement('p');
     note.className = 'blp-note';
-    note.textContent = 'Removed on this device. Restore puts a compound back. The invoice and catalog stay as they are.';
+    note.textContent = 'Removed from your plan. Restore puts a compound back. The invoice and catalog stay as they are.';
     box.appendChild(note);
     keys.forEach(function (k) {
       var name = k.split('\u001f').slice(1).join('\u001f') || k;
@@ -259,15 +427,29 @@
   function boot() {
     try { if (typeof renderDoses === 'function') renderDoses(); } catch (e) {}
     try { mountAll(); stripInvoice(); } catch (e) {}
+    try { pull(); } catch (e) {}
+  }
+  function resume() {
+    if (document.visibilityState && document.visibilityState !== 'visible') return;
+    if (getPending()) push();
+    else pull();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
   setTimeout(boot, 0);
+  try {
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') resume();
+    });
+    window.addEventListener('online', resume);
+    window.addEventListener('pageshow', function (e) { if (e.persisted) resume(); });
+  } catch (e) {}
 
   window.BLPlan = {
     key: itemKey,
     load: load,
     removed: removedNow,
-    mount: mountAll
+    mount: mountAll,
+    pull: pull
   };
 })();
