@@ -34,7 +34,7 @@ const QUOTES: Record<string, Quote> = {
   },
   "vbernal-quintana/hgh-remaining-20261119": {
     client: "Valeria Bernal-Quintana", label: "HGH quote remaining balance", base: 22098, charge: 22761,
-  },,
+  },
   "bcrider/trt-hgh-20261123": {
     client: "Bryce Crider", label: "TRT + HGH quote", base: 119499, charge: 123084,
   },
