@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-23 — New member portal
+- Added a master-layout member portal and Share entry with an unpaid quote. Protocol details were copied from existing member pages. Registered the Apple Pay quote on the payment-function allowlist and bumped the root service worker cache. No ledger or inventory changes. Inline JavaScript validated.
+
+
 ## 2026-11-23 — Portal calculator and schedule-control repair
 - Fixed shared schedule edit controls for legacy/current-cycle row matches and legacy calculator-added entries; clarified mg/mcg/IU choices on iPhone without permitting incompatible conversions.
 - Shared files: `schedule-engine.js`, `schedule-editor.js`, `calc-feedback.js`. Refreshed `ejirikils/sw.js` and root `sw.js` caches; all portals loading shared scripts receive the fixes.
