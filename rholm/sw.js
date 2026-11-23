@@ -11,7 +11,7 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=rholm-2',
-  '/schedule-engine.js?v=rholm-4',
+  '/schedule-engine.js?v=rholm-5',
   '/schedule-editor.js?v=rholm-3',
   '/rholm/compound-library.js?v=1',
   '/rholm/',

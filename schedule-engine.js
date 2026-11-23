@@ -45,7 +45,7 @@ function gkSave(edit){
   if(edit && typeof BL_DIRTY!=="undefined") BL_DIRTY=true;
   gkCacheLocal();
   if(typeof blRpc!=="function") return;
-  if(typeof BL_KEY==="undefined" || !BL_KEY) return;
+  /* A missing key is fine: sync is by page slug. A bad key still stops writes. */
   if(typeof BL_KEYBAD!=="undefined" && BL_KEYBAD) return;
   if(typeof BL_DIRTY!=="undefined" && !BL_DIRTY) return;
   if((typeof BL_READY!=="undefined" && !BL_READY) || (typeof BL_SEEN!=="undefined" && !BL_SEEN)){
@@ -87,7 +87,7 @@ function gkPayload(){
 }
 function gkPush(){
   if(typeof blRpc!=="function") return;
-  if(typeof BL_KEY==="undefined" || !BL_KEY) return;
+  /* A missing key is fine: sync is by page slug. A bad key still stops writes. */
   if(typeof BL_KEYBAD!=="undefined" && BL_KEYBAD) return;
   if(typeof BL_DIRTY!=="undefined" && !BL_DIRTY) return;
   if(typeof GK_VIEWONLY!=='undefined'&&GK_VIEWONLY) return;
@@ -95,7 +95,7 @@ function gkPush(){
      before writing rather than overwriting blind. The member's edit wins once
      the read succeeds -- it is an explicit action on their own device. */
   if(!BL_SEEN){
-    blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY}).then(function(r){
+    blRpc('get_member_state',{p_slug:BL_SLUG,p_key:(typeof BL_KEY==="undefined"?null:BL_KEY)}).then(function(r){
       if(r.ok){ BL_SEEN=true; BL_ONLINE=true; BL_VER=blUnwrap(r.data).versions||{}; gkPushNow(); }
       else if(r.status===401){ BL_KEYBAD=true; blForgetKey(); gkToast(blMessage(r));  }
     }).catch(function(){ BL_ONLINE=false; });
@@ -105,7 +105,7 @@ function gkPush(){
 }
 function gkPushNow(){
   var attempt=JSON.stringify(gkState);
-  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:BL_KEY,p_kind:'schedule',
+  blRpc('save_member_state',{p_slug:BL_SLUG,p_key:(typeof BL_KEY==="undefined"?null:BL_KEY),p_kind:'schedule',
                              p_payload:gkPayload(), p_expected_version:BL_VER.schedule})
     .then(function(r){
       if(r.ok){
@@ -132,7 +132,7 @@ function blIsConflict(r){
 var blResyncing=false;
 function blResync(){
   if(blResyncing) return; blResyncing=true;
-  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:BL_KEY})
+  blRpc('get_member_state',{p_slug:BL_SLUG,p_key:(typeof BL_KEY==="undefined"?null:BL_KEY)})
     .then(function(r){
       blResyncing=false;
       if(!r.ok) return;
@@ -318,7 +318,10 @@ function gkLegacyView(d){
   });
   /* Compounds the member added with the new editor since the migration. */
   gkState.compounds.forEach(function(c){
-    if(/^(calc|man)-/.test(c.id||"") && c.active!==false && (c.days||[]).indexOf(d)>=0) cards.push(c);
+    if(/^(calc|man)-/.test(c.id||"") && c.active!==false && (c.days||[]).indexOf(d)>=0){
+      if(typeof saFind==="function" && c.name && saFind(c.name)) return;
+      cards.push(c);
+    }
   });
   var onN={}, seen={}, off=[];
   on.forEach(function(c){ onN[c.n]=1; });
@@ -329,8 +332,48 @@ function gkLegacyView(d){
     var l=gkLegacyLink(r.n,r.b,ok); if(!l) return;
     seen[r.n]=1; off.push(l);
   });
-  gkState.compounds.forEach(function(c){ if(/^(calc|man)-/.test(c.id||"") && c.active===false) off.push(c); });
+  gkState.compounds.forEach(function(c){
+    if(/^(calc|man)-/.test(c.id||"") && c.active===false){
+      if(typeof saFind==="function" && c.name && saFind(c.name)) return;
+      off.push(c);
+    }
+  });
   return {due:cards, off:off};
+}
+
+/* Route editor-added compounds into the existing slug-only schedule sync
+   (payload.add via saPut) so they travel with on/blk/days/ovr. */
+function gkSyncAdded(c, removed){
+  if(typeof gkLegacyOK==="function" && !gkLegacyOK()) return false;
+  if(typeof saPut!=="function" || !c || !c.id) return false;
+  if(!/^(calc|man)-/.test(c.id)) return false;
+  if(removed){
+    if(typeof saRemove==="function") saRemove(c.id);
+    return true;
+  }
+  var doseTxt=(typeof gkFmt==="function"?gkFmt(c.dose):String(c.dose||""));
+  var unit=c.unit||"";
+  if(String(unit).toLowerCase()==="iu") unit="IU";
+  saPut({
+    id:c.id,
+    n:c.name,
+    d:doseTxt?(doseTxt+(unit?(" "+unit):"")):"",
+    u:c.draw||"",
+    rec:c.recon||"",
+    b:c.block==="PM"?"PM":"AM",
+    days:(c.days||[]).slice()
+  });
+  return true;
+}
+function gkMigrateAddedToSa(){
+  if(typeof gkLegacyOK==="function" && !gkLegacyOK()) return;
+  if(typeof saPut!=="function" || !gkState || !Array.isArray(gkState.compounds)) return;
+  var keep=[], moved=false;
+  gkState.compounds.forEach(function(c){
+    if(c && /^(calc|man)-/.test(c.id||"")){ gkSyncAdded(c, c.active===false); moved=true; }
+    else keep.push(c);
+  });
+  if(moved){ gkState.compounds=keep; gkCacheLocal(); }
 }
 function gkLegacySetOn(name,on){
   if(!gkLegacyOK()) return;
@@ -518,8 +561,10 @@ if(typeof renderDoses==="function"){
   var gkRenderDosesOld=renderDoses;
   renderDoses=function(){ try{ gkRenderDosesOld.apply(this,arguments); }catch(e){} try{ gkRender(); }catch(e){} };
 }
+
+try{ if(typeof gkMigrateAddedToSa==="function") gkMigrateAddedToSa(); }catch(e){}
 if(document.readyState==="loading"){
-  document.addEventListener("DOMContentLoaded", function(){ try{ gkRender(); }catch(e){ console.error(e); } });
+  document.addEventListener("DOMContentLoaded", function(){ try{ gkMigrateAddedToSa(); gkRender(); }catch(e){ console.error(e); } });
 }else{
   try{ gkRender(); }catch(e){ console.error(e); }
 }

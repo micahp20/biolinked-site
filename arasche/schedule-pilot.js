@@ -143,7 +143,14 @@
   csRead=function(k){var p=oldRead.apply(this,arguments);if(k==='schedule'&&p)p.planPilot=copy(get());return p;};
   var oldApply=csApply;
   csApply=function(k,p){
-    if(k==='schedule'&&p&&valid(p.planPilot)){state=copy(p.planPilot);if(!state.pausedAdded)state.pausedAdded={};write();}
+    if(k==='schedule'&&p&&valid(p.planPilot)){
+      var mine=get();
+      if(!mine.updated_at || Date.parse(p.planPilot.updated_at||0)>=Date.parse(mine.updated_at||0)){
+        state=copy(p.planPilot);if(!state.pausedAdded)state.pausedAdded={};write();
+      } else if(typeof csQueue==='function') csQueue('schedule');
+    } else if(k==='schedule' && p && !p.planPilot && get().updated_at && typeof csQueue==='function'){
+      csQueue('schedule');
+    }
     oldApply.apply(this,arguments);
     if(k==='schedule')refresh();
   };
@@ -181,4 +188,8 @@
   /* A cloud request may have finished before this late-loaded pilot attached.
      Pull through the new bridge so cycle state restores across devices. */
   csPull();
+  try{
+    document.addEventListener('visibilitychange', function(){ if(document.visibilityState==='visible') csPull(); });
+    window.addEventListener('online', function(){ if(typeof csFlushAll==='function') csFlushAll(); else csPull(); });
+  }catch(e){}
 })();

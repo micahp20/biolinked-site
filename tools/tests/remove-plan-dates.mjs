@@ -25,7 +25,7 @@ function walk(dir, out = []) {
 }
 const pages = walk(ROOT).map((p) => p.slice(ROOT.length)).filter((rel) => {
   const text = readFileSync(join(ROOT, rel), 'utf8');
-  return text.includes('portal-plan-controls.js?v=2');
+  return text.includes('portal-plan-controls.js?v=3');
 });
 const manifest = { pages: pages.length, invoicePages: 0, exceptions: [] };
 for (const rel of pages) {
