@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-22 — Portal cycle update
+- Updated invoice status, active schedule and portal cache.
+
 ## 2026-11-22 — Confirmed weekday schedule
 - Updated the protocol card and daily schedule to reflect confirmed weekdays. Preserved unspecified time of day. Inline syntax validated.
 
