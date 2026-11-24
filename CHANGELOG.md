@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-23 — Client portal layout match and quote update
+- Rebuilt a client portal from the Michael Johnson master layout so tabs, nav, sections, styles and shared scripts match. Updated an unpaid quote to drop shipping on a hand-delivered order and refreshed payment amounts including the card 3% fee. Root and portal service worker caches bumped. No ledger or inventory changes.
+
+
 ## 2026-11-23 — Settled annual invoice display
 - Clarified paid-in-full invoice summary and distinguished historical complimentary order from current settled annual program. Paths: `ttomlinson/index.html`, `ttomlinson/sw.js`. Main commits `80b9c4e`, `ee588f9`. Existing ledger entries verified; no duplicate ledger or inventory writes. Cache refreshed in source; live deployment and mobile check pending.
 
