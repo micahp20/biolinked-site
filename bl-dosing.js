@@ -51,10 +51,10 @@ window.BL_DOSING=[
 "purpose": "Fat loss · GLP-1/GIP",
 "vial": "30 mg",
 "bac": "3 mL",
-"dose": "start 0.5 mg, titrate",
-"units": "",
-"timing": "Mon + Thu",
-"freq": "Mon + Thu",
+"dose": "start 0.5 mg, titrate slow",
+"units": "5",
+"timing": "Mon + Thu, AM",
+"freq": "Mon + Thu, AM",
 "dur": "",
 "category": "Fat loss / metabolic",
 "row": 5
@@ -144,6 +144,20 @@ window.BL_DOSING=[
 "row": 11
 },
 {
+"name": "NAD+",
+"cat": "fatloss",
+"purpose": "Energy · metabolic",
+"vial": "1000 mg",
+"bac": "5 mL",
+"dose": "75 mg",
+"units": "37.5",
+"timing": "Mon / Wed / Fri, AM",
+"freq": "Mon / Wed / Fri, AM",
+"dur": "",
+"category": "Fat loss / metabolic",
+"row": 12
+},
+{
 "name": "Glutathione",
 "cat": "longevity",
 "purpose": "Antioxidant",
@@ -155,7 +169,7 @@ window.BL_DOSING=[
 "freq": "Mon / Wed / Fri",
 "dur": "",
 "category": "Fat loss / metabolic",
-"row": 12
+"row": 13
 },
 {
 "name": "Tesamorelin",
@@ -169,7 +183,7 @@ window.BL_DOSING=[
 "freq": "Mon-Fri, PM fasted",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 13
+"row": 14
 },
 {
 "name": "CJC-1295 / Ipamorelin",
@@ -183,7 +197,7 @@ window.BL_DOSING=[
 "freq": "PM fasted",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 14
+"row": 15
 },
 {
 "name": "IGF-1 LR3",
@@ -197,7 +211,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 15
+"row": 16
 },
 {
 "name": "HCG",
@@ -207,11 +221,11 @@ window.BL_DOSING=[
 "bac": "2 mL",
 "dose": "250 IU",
 "units": "10",
-"timing": "",
-"freq": "",
+"timing": "Mon / Wed / Fri, AM fasted",
+"freq": "Mon / Wed / Fri, AM fasted",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 16
+"row": 17
 },
 {
 "name": "HGH",
@@ -225,7 +239,7 @@ window.BL_DOSING=[
 "freq": "AM fasted only, land on even unit #",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 17
+"row": 18
 },
 {
 "name": "HGH",
@@ -239,7 +253,7 @@ window.BL_DOSING=[
 "freq": "AM fasted only, land on even unit #",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 18
+"row": 19
 },
 {
 "name": "HGH",
@@ -253,32 +267,18 @@ window.BL_DOSING=[
 "freq": "AM fasted only, land on even unit #",
 "dur": "",
 "category": "GH / IGF / TRT",
-"row": 19
-},
-{
-"name": "Testosterone Cyp",
-"cat": "sexual",
-"purpose": "Hormonal · oil, no mixing · men only",
-"vial": "250 mg/mL (10 mL)",
-"bac": "oil, no recon",
-"dose": "per plan",
-"units": "24-27",
-"timing": "AM only",
-"freq": "AM only",
-"dur": "",
-"category": "GH / IGF / TRT",
 "row": 20
 },
 {
-"name": "Powerbolic Testo-C",
+"name": "TRT Cypionate",
 "cat": "sexual",
 "purpose": "Hormonal · oil, no mixing · men only",
-"vial": "250 mg/mL (10 mL)",
+"vial": "250 mg/mL · 10 mL",
 "bac": "oil, no recon",
-"dose": "",
-"units": "",
-"timing": "",
-"freq": "",
+"dose": "66.7 mg",
+"units": "27",
+"timing": "Mon / Wed / Fri, AM",
+"freq": "Mon / Wed / Fri, AM",
 "dur": "",
 "category": "GH / IGF / TRT",
 "row": 21
@@ -295,7 +295,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 22
+"row": 23
 },
 {
 "name": "N-Acetyl Semax Amidate",
@@ -309,7 +309,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 23
+"row": 24
 },
 {
 "name": "N-Acetyl Selank Amidate",
@@ -323,7 +323,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 24
+"row": 25
 },
 {
 "name": "N-Acetyl Adamax Amidate",
@@ -337,7 +337,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 25
+"row": 26
 },
 {
 "name": "Semax",
@@ -351,7 +351,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 26
+"row": 27
 },
 {
 "name": "Semax",
@@ -365,7 +365,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 27
+"row": 28
 },
 {
 "name": "Selank",
@@ -379,7 +379,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 28
+"row": 29
 },
 {
 "name": "Adamax",
@@ -393,7 +393,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 29
+"row": 30
 },
 {
 "name": "Adamax",
@@ -407,7 +407,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 30
+"row": 31
 },
 {
 "name": "P21",
@@ -421,7 +421,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 31
+"row": 32
 },
 {
 "name": "PE-22-28",
@@ -435,7 +435,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Cognitive",
-"row": 32
+"row": 33
 },
 {
 "name": "BPC-157 + TB-500",
@@ -449,7 +449,7 @@ window.BL_DOSING=[
 "freq": "daily PM",
 "dur": "",
 "category": "Healing / repair",
-"row": 33
+"row": 34
 },
 {
 "name": "KLOW",
@@ -463,7 +463,7 @@ window.BL_DOSING=[
 "freq": "Mon-Fri",
 "dur": "",
 "category": "Healing / repair",
-"row": 34
+"row": 35
 },
 {
 "name": "GHK-Cu",
@@ -471,27 +471,27 @@ window.BL_DOSING=[
 "purpose": "Repair · skin",
 "vial": "50 mg",
 "bac": "3 mL",
-"dose": "1.7 mg",
+"dose": "~1.67 mg",
 "units": "10",
-"timing": "",
-"freq": "",
+"timing": "Mon–Fri, AM fasted",
+"freq": "Mon–Fri, AM fasted",
 "dur": "",
 "category": "Healing / repair",
-"row": 35
+"row": 36
 },
 {
 "name": "KPV",
 "cat": "healing",
 "purpose": "Gut · inflammation",
 "vial": "10 mg",
-"bac": "2 mL",
+"bac": "3 mL",
 "dose": "500 mcg",
-"units": "",
-"timing": "",
-"freq": "",
+"units": "15",
+"timing": "M/W/F, AM fasted",
+"freq": "M/W/F, AM fasted",
 "dur": "",
 "category": "Healing / repair",
-"row": 36
+"row": 37
 },
 {
 "name": "Cartalax",
@@ -505,7 +505,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Healing / repair",
-"row": 37
+"row": 38
 },
 {
 "name": "Wolverine 2.0",
@@ -519,7 +519,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Healing / repair",
-"row": 38
+"row": 39
 },
 {
 "name": "AHK-Cu",
@@ -533,7 +533,7 @@ window.BL_DOSING=[
 "freq": "M/W/F",
 "dur": "",
 "category": "Healing / repair",
-"row": 39
+"row": 40
 },
 {
 "name": "Testagen",
@@ -547,7 +547,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Healing / repair",
-"row": 40
+"row": 41
 },
 {
 "name": "Vesugen",
@@ -561,7 +561,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Healing / repair",
-"row": 41
+"row": 42
 },
 {
 "name": "Thymosin Alpha-1",
@@ -575,7 +575,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Healing / repair",
-"row": 42
+"row": 43
 },
 {
 "name": "VIP",
@@ -589,7 +589,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Healing / repair",
-"row": 43
+"row": 44
 },
 {
 "name": "Epithalon",
@@ -603,7 +603,7 @@ window.BL_DOSING=[
 "freq": "run straight, daily PM, 20-day cycle",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 44
+"row": 45
 },
 {
 "name": "Cerebrolysin",
@@ -617,7 +617,7 @@ window.BL_DOSING=[
 "freq": "run straight",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 45
+"row": 46
 },
 {
 "name": "Cortagen",
@@ -631,7 +631,7 @@ window.BL_DOSING=[
 "freq": "run straight",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 46
+"row": 47
 },
 {
 "name": "Pinealon",
@@ -645,7 +645,7 @@ window.BL_DOSING=[
 "freq": "daily PM, 20-day cycle",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 47
+"row": 48
 },
 {
 "name": "Pinealon",
@@ -659,7 +659,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 48
+"row": 49
 },
 {
 "name": "FOXO4-DRI",
@@ -673,7 +673,7 @@ window.BL_DOSING=[
 "freq": "every other day, 6 days until empty",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 49
+"row": 50
 },
 {
 "name": "SS-31",
@@ -687,7 +687,7 @@ window.BL_DOSING=[
 "freq": "Mon–Fri",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 50
+"row": 51
 },
 {
 "name": "Vilon",
@@ -701,7 +701,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Longevity / bioregulators",
-"row": 51
+"row": 52
 },
 {
 "name": "PT-141",
@@ -715,7 +715,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Sexual / hormonal / sleep",
-"row": 52
+"row": 53
 },
 {
 "name": "Kisspeptin-10",
@@ -729,7 +729,7 @@ window.BL_DOSING=[
 "freq": "run straight",
 "dur": "",
 "category": "Sexual / hormonal / sleep",
-"row": 53
+"row": 54
 },
 {
 "name": "Oxytocin",
@@ -743,7 +743,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Sexual / hormonal / sleep",
-"row": 54
+"row": 55
 },
 {
 "name": "Melanotan I",
@@ -757,7 +757,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Sexual / hormonal / sleep",
-"row": 55
+"row": 56
 },
 {
 "name": "DSIP",
@@ -771,7 +771,7 @@ window.BL_DOSING=[
 "freq": "PM",
 "dur": "",
 "category": "Sexual / hormonal / sleep",
-"row": 56
+"row": 57
 },
 {
 "name": "Tesofensine",
@@ -785,7 +785,7 @@ window.BL_DOSING=[
 "freq": "",
 "dur": "",
 "category": "Sexual / hormonal / sleep",
-"row": 57
+"row": 58
 }
 ];
 window.BL_DOSING_SOURCE={sheet:"BioLinked — Master Dosing",rows:56};

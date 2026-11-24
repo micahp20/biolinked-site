@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-24 — Master sheet values filled in; catalog regenerated
+- Owner filled in Master Dosing rows (NAD+ 1000 mg added; GHK-Cu, KPV, HCG, Tirzepatide 30 mg completed; testosterone cypionate listed brand-neutral as one "TRT Cypionate · 250 mg/mL · 10 mL" entry). Regenerated `bl-dosing.js` (56 entries; duplicate same-product rows merge into one). `?v=3` on 153 portals; root and portal SW caches bumped. No protocol, invoice, ledger or inventory changes.
+
 ## 2026-11-24 — Cloud sync turned on for one client portal
 - Owner approved turning on cross-device sync (schedule, nutrition, calculator) on `msalenti/`, which had it stubbed off since 2026-11-18. The cloud had no saved state for this slug, so existing on-device data is lifted up on first load (verified with a mocked backend). `msalenti/sw.js` and root `sw.js` caches bumped. No protocol, invoice, ledger or inventory changes.
 
