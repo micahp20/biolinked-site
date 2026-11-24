@@ -993,7 +993,7 @@
 .blkb{border:1px solid var(--line,#ddd);background:none;color:var(--muted,#888);border-radius:7px;padding:4px 10px;font-size:13px;font-weight:700;cursor:pointer;line-height:1;-webkit-tap-highlight-color:transparent}
 .blkb.on{background:var(--gold,#9a7b2f);border-color:var(--gold,#9a7b2f);color:#fff}
 </style>
-<script src="/bl-dosing.js?v=1"></script>
+<script src="/bl-dosing.js?v=2"></script>
 <script src="/compound-library.js?v=3"></script>
 <style id="wk-css">
 #v-work{--wkf:1}
@@ -3313,8 +3313,9 @@ function openInv(i){
     el('sa-name').textContent=name||'Custom';
     el('sa-dose').textContent=((el('pc-dose')&&el('pc-dose').value)||'')+' '+((el('pc-doseunit')&&el('pc-doseunit').value)||'');
     el('sa-draw').textContent=saDraw();
-    saDays=[]; saBlock='AM'; saOngoing=false;
-    el('sa-am').className='blkb on'; el('sa-pm').className='blkb';
+    /* days and timing default from the master sheet (Mon-Fri when it has none) */
+    saDays=(typeof blSheetDaysFor==='function')?blSheetDaysFor(name):[]; saBlock=(typeof blSheetBlockFor==='function')?blSheetBlockFor(name):'AM'; saOngoing=false;
+    setBlock(saBlock);
     el('sa-ongoing').className='blkb';
     var w=el('sa-weeks'); if(w){ w.disabled=false; }
     el('sa-err').hidden=true;
@@ -7003,3 +7004,4 @@ try{ apD(); }catch(e){}
 <script src="/portal-plan-controls.js?v=3"></script>
 <script src="/protocol-layout.js?v=1"></script>
 <link rel="stylesheet" href="/portal-extras.css?v=1">
+<script src="/bl-schedule-days.js?v=1"></script>

@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /lprice/.
-const CACHE = 'lprice-paid-invoice-20261123-v1';
+const CACHE = 'lprice-paid-invoice-20261123-v1-sheet1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -11,8 +11,8 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=1',
-  '/schedule-engine.js?v=4',
-  '/schedule-editor.js?v=3',
+  '/schedule-engine.js?v=5',
+  '/schedule-editor.js?v=4',
   '/lprice/compound-library.js?v=1',
   '/lprice/',
   '/lprice/index.html',

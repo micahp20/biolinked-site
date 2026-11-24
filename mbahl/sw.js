@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mbahl/.
-const CACHE = 'mbahl-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage2-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-cyc2-tad20';
+const CACHE = 'mbahl-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-bioage2-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-cyc2-tad20-sheet1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -11,8 +11,8 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=1',
-  '/schedule-engine.js?v=4',
-  '/schedule-editor.js?v=3',
+  '/schedule-engine.js?v=5',
+  '/schedule-editor.js?v=4',
   '/compound-library.js?v=2',
   '/mbahl/',
   '/mbahl/index.html',
