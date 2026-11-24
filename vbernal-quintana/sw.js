@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /vbernal-quintana/.
-const CACHE = 'vbernal-quintana-hgh299paid-20261119-v9-cardfee3-applepay1-nopriceBtns1-sheet1';
+const CACHE = 'vbernal-quintana-hgh299paid-20261119-v9-cardfee3-applepay1-nopriceBtns1-sheet1-sheet2';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',

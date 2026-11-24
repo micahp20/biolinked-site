@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jsanders/.
-const CACHE = 'jsanders-master-layout-v1-20261109-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1';
+const CACHE = 'jsanders-master-layout-v1-20261109-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1-sheet2';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',

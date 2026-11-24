@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jholm/.
-const CACHE = 'jholm-paid-in-full-20261106-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1';
+const CACHE = 'jholm-paid-in-full-20261106-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1-sheet2';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',

@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /mjohnson/.
-const CACHE = 'mjohnson-master-sched1-v8-context-v1-controls-v1-calcact1-sgk1-bioage2-nolabs-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-jcheckout1-ericaCheckout2-paynow1-inlinePay1-shipChoice1-sheet1';
+const CACHE = 'mjohnson-master-sched1-v8-context-v1-controls-v1-calcact1-sgk1-bioage2-nolabs-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-jcheckout1-ericaCheckout2-paynow1-inlinePay1-shipChoice1-sheet1-sheet2';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
