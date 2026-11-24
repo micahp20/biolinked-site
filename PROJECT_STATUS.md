@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-23 — Settled annual invoice display
+- Clarified paid-in-full invoice summary and distinguished historical complimentary order from current settled annual program. Paths: `ttomlinson/index.html`, `ttomlinson/sw.js`. Main commits `80b9c4e`, `ee588f9`. Existing ledger entries verified; no duplicate ledger or inventory writes. Cache refreshed in source; live deployment and mobile check pending.
+
 ## 2026-11-23 — Visible Invoice tab on a client portal
 - Added a visible Invoice tab to a client portal's main nav, welcome list and phone menu. The unpaid quote and payment buttons now render on that tab. Root and portal service worker caches bumped. No ledger or inventory changes.
 
