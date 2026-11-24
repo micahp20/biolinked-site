@@ -5094,14 +5094,30 @@ CYCS=cycList();
    answer to that is always to take the cloud copy -- another device wrote
    something newer.
    ====================================================================== */
+var CS_URL='https://bfjydzealeethhcpdfxl.supabase.co/rest/v1/rpc/';
+var CS_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmanlkemVhbGVldGhoY3BkZnhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1MjM1NTMsImV4cCI6MjA5MTA5OTU1M30.dPVJ8X7PQkq4UbG218JVoX-C96ezno5Z4lQECXxcbgQ';
 var CS_SLUG='msalenti';
-var CS_KINDS=[];
+var CS_KINDS=['schedule','nutrition','calculator'];
 var csVer={}, csTimer={}, csWant={}, csBooted=false, csInFlight={};
 /* set while a cloud value is being written into the local stores, so the
    write hooks do not mistake hydration for an edit and push it back */
 var csApplying=false;
 
-function csRpc(){return Promise.resolve({status:0,body:null});}
+function csRpc(fn,body){
+  try{
+    return fetch(CS_URL+fn,{
+      method:'POST',
+      headers:{'apikey':CS_ANON,'Authorization':'Bearer '+CS_ANON,'Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    }).then(function(r){
+      return r.text().then(function(t){
+        var b=null; try{ b=JSON.parse(t); }catch(e){ b=t; }
+        return {status:r.status, body:b};
+      });
+    }).catch(function(){ return {status:0, body:null}; });   /* offline */
+  }catch(e){ return Promise.resolve({status:0, body:null}); }
+}
+
 /* ---- status pill ---------------------------------------------------- */
 function csStat(s){
   try{

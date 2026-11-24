@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-24 — Cloud sync turned on for one client portal
+- Owner approved turning on cross-device sync (schedule, nutrition, calculator) on `msalenti/`, which had it stubbed off since 2026-11-18. The cloud had no saved state for this slug, so existing on-device data is lifted up on first load (verified with a mocked backend). `msalenti/sw.js` and root `sw.js` caches bumped. No protocol, invoice, ledger or inventory changes.
+
 ## 2026-11-24 — Dosing catalog matches the Master Dosing sheet; schedule and calculator adds save fully
 
 - `bl-dosing.js` is now generated from the Master Dosing Google Sheet (owner's source of truth) by a private script outside this repo. Names, vial sizes, recon, dose, draw and timing/schedule are copied verbatim; blank sheet cells stay blank; no prices or notes. The schedule Add compound list, the calculator dropdown and the Index tab on every protocol page read this one file.
