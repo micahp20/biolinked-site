@@ -1,7 +1,7 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bcrider/, which is now the real page: the app layout
 // was promoted here from the /bcrider/app/ pilot.
-const CACHE = 'bcrider-mpauldino-layout-v1-20261123-nopriceBtns1';
+const CACHE = 'bcrider-mpauldino-layout-v1-20261123-invoiceTab1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/calc-feedback.js?v=1',
