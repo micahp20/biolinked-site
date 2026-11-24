@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-11-24 — Mark Dustin Cycle 1 paid
+
+- Set Cycle 1 · Fat Loss ($334.98) to paid on `dbarajas/` and left Cycles 2–7 as quotes. Paid-to-date $334.98, quoted $1,309.88. Paths: `dbarajas/index.html`, `dbarajas/sw.js`, root `sw.js`. No ledger or inventory changes.
+
+
 ## 2026-11-23 — Invoice tab line-item layout and Apple Pay button size
 - Updated a client Invoice tab to the standard line-item invoice layout (serif header, Line Items rows, gold order total, payment buttons and the payment-app note). Sized the shared Apple Pay button to match the other payment buttons (full width, same height and radius). Root and portal service worker caches bumped. No ledger or inventory changes.
 
