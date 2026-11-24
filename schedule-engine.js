@@ -311,7 +311,8 @@ function gkLegacyLink(name,block,ok){
 function gkLegacyCard(r,g,ok){
   var link=r.sa?null:gkLegacyLink(r.n,g,ok), days=gkLegacyDays(r);
   if(link){ link.days=days.slice(); }   /* editor panel opens on the days actually shown */
-  return { id:link?link.id:("sa-"+String(r.sa||r.n)), legacy:true, name:r.n, vial:link?link.vial:"",
+  var rec=(r.sa&&typeof saGet==="function"&&saGet()[r.sa])||null;
+  return { id:link?link.id:("sa-"+String(r.sa||r.n)), legacy:true, name:r.n, vial:link?link.vial:(rec&&rec.v||""),
            dose:"", unit:String(r.d||""), draw:String(r.u||""), recon:r.rec||"", days:days, block:g,
            foundation:false, active:true };
 }
@@ -365,7 +366,10 @@ function gkSyncAdded(c, removed){
     u:c.draw||"",
     rec:c.recon||"",
     b:c.block==="PM"?"PM":"AM",
-    days:(c.days||[]).slice()
+    days:(c.days||[]).slice(),
+    /* keep the vial and planned weeks so the entry reopens exactly as saved */
+    v:(c.vial&&c.vial!=="Custom")?c.vial:"",
+    rw:(c.runWeeks==null||c.runWeeks==="")?null:Number(c.runWeeks)
   });
   return true;
 }

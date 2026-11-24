@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /rholm/.
-const CACHE = 'rholm-schedule-editor-v4-20261121';
+const CACHE = 'rholm-schedule-editor-v4-20261121-sheet1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
@@ -11,8 +11,8 @@ const ASSETS = [
   '/protocol-context.css?v=1',
   '/schedule-protocol-consistency.css?v=1',
   '/client-schedule-controls.css?v=rholm-2',
-  '/schedule-engine.js?v=rholm-5',
-  '/schedule-editor.js?v=rholm-3',
+  '/schedule-engine.js?v=rholm-6',
+  '/schedule-editor.js?v=rholm-4',
   '/rholm/compound-library.js?v=1',
   '/rholm/',
   '/rholm/index.html',

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-11-24 — Dosing catalog matches the Master Dosing sheet; schedule and calculator adds save fully
+
+- `bl-dosing.js` is now generated from the Master Dosing Google Sheet (owner's source of truth) by a private script outside this repo. Names, vial sizes, recon, dose, draw and timing/schedule are copied verbatim; blank sheet cells stay blank; no prices or notes. The schedule Add compound list, the calculator dropdown and the Index tab on every protocol page read this one file.
+- Schedule Add compound (`schedule-editor.js`, `schedule-engine.js`): the master pick keeps the vial in the name and prefills dose and days from the sheet (Mon–Fri when the sheet has no schedule). The vial and planned weeks are saved with the added compound. Editing or removing an added compound after a reload now updates that compound itself (previously it saved only to a local cache and could affect a protocol row with the same name).
+- Calculator (`bl-schedule-days.js`, new, loaded last on every portal): the vial stays with the compound name, and "+ Add to My List" continues to the weekday picker (sheet days, else Mon–Fri). Day choices are a personal override; protocol content is unchanged.
+- Older-family copies updated the same way: `mpauldino/`, `nprince/`, `rhurst/` editors; calculator day defaults on `mpauldino/`, `cpauldino/`, `mp-gold/`. Root and portal service worker caches bumped. No invoice, price, lab, ledger or inventory changes.
+
 ## 2026-11-24 — Mark Dustin Cycle 1 paid
 
 - Set Cycle 1 · Fat Loss ($334.98) to paid on `dbarajas/` and left Cycles 2–7 as quotes. Paid-to-date $334.98, quoted $1,309.88. Paths: `dbarajas/index.html`, `dbarajas/sw.js`, root `sw.js`. No ledger or inventory changes.
