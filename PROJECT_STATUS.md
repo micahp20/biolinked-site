@@ -1,5 +1,8 @@
 # Bio Linked Solutions — project status
 
+## 2026-11-23 — Portal invoice reconciliation
+- Updated two existing portal invoice statuses and paid/quoted totals to match confirmed payments; preserved unpaid quotes and item prices. Bumped both portal service worker caches. Paths: `lprice/index.html`, `lprice/sw.js`, `eprice/index.html`, `eprice/sw.js`. Main commits: `5187358`, `f1c1b46`, `a66afd1`, `e8c3c3e`. Invoice JSON parsed and totals recomputed; live deployment and mobile rendering not yet verified. No further ledger or inventory changes.
+
 ## 2026-11-23 — Client portal rebuilt on the master layout
 - Rebuilt a client portal from the mpauldino master layout so shared layout scripts, chrome, tabs and styling match. Client-specific protocol and quote data were preserved. Owner-only labs, DNA results, personal supplements and dose-editing were omitted. Root service worker cache bumped. No ledger or inventory changes.
 
