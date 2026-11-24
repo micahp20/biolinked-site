@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-23 — Invoice tab line-item layout and Apple Pay button size
+- Updated a client Invoice tab to the standard line-item invoice layout (serif header, Line Items rows, gold order total, payment buttons and the payment-app note). Sized the shared Apple Pay button to match the other payment buttons (full width, same height and radius). Root and portal service worker caches bumped. No ledger or inventory changes.
+
+
 ## 2026-11-23 — Client portal layout match and quote update
 - Rebuilt a client portal from the Michael Johnson master layout so tabs, nav, sections, styles and shared scripts match. Updated an unpaid quote to drop shipping on a hand-delivered order and refreshed payment amounts including the card 3% fee. Root and portal service worker caches bumped. No ledger or inventory changes.
 

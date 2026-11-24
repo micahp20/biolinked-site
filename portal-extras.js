@@ -81,7 +81,7 @@
   if (!['dbarajas','lprice','eprice'].includes(slug)) return;
   if(slug!=='dbarajas'){
     var script=document.createElement('script'); script.src='/applepay.js?v=price1'; document.head.append(script);
-    var css=document.createElement('link');css.rel='stylesheet';css.href='/applepay.css';document.head.append(css);
+    var css=document.createElement('link');css.rel='stylesheet';css.href='/applepay.css?v=3';document.head.append(css);
     var style=document.createElement('style');style.textContent='.cycle-pay{display:grid;gap:6px}.cycle-pay .paybtn{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;border-radius:10px;background:#242424;color:#f6f3ea;border:1px solid #8b7335}.cycle-pay small{text-align:center}';document.head.append(style);
   }
   function setup() {
