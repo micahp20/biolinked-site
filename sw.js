@@ -1,7 +1,7 @@
 // BioLinked Peptide Solutions — main site service worker.
 // Network-first strategy: always serves fresh content when online, falls back to cache when offline.
 // Each client folder also has its own service worker scoped to that path (which will take over within its scope).
-const CACHE = 'biolinked-root-portal-controls-v131';
+const CACHE = 'biolinked-root-portal-controls-v132-fresh1';
 const ASSETS = [
   '/',
   '/index.html',
@@ -46,7 +46,8 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request).then(res => {
+    // Pages skip the browser's 10-minute HTTP cache so a reopen always gets the latest publish.
+    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
       if (res && res.status === 200 && res.type === 'basic') {
         const clone = res.clone();
         caches.open(CACHE).then(c => c.put(e.request, clone));
