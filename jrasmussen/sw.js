@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jrasmussen/.
-const CACHE = 'jrasmussen-protocol-v1-20261124';
+const CACHE = 'jrasmussen-protocol-v2-20261124';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
