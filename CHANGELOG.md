@@ -1,5 +1,8 @@
 # Changelog
 
+## 2026-11-23 — Visible Invoice tab on a client portal
+- Added a visible Invoice tab to a client portal's main nav, welcome list and phone menu. The unpaid quote and payment buttons now render on that tab. Root and portal service worker caches bumped. No ledger or inventory changes.
+
 ## 2026-11-23 — Portal invoice reconciliation
 - Updated two existing portal invoice statuses and paid/quoted totals to match confirmed payments; preserved unpaid quotes and item prices. Bumped both portal service worker caches. Paths: `lprice/index.html`, `lprice/sw.js`, `eprice/index.html`, `eprice/sw.js`. Main commits: `5187358`, `f1c1b46`, `a66afd1`, `e8c3c3e`. Invoice JSON parsed and totals recomputed; live deployment and mobile rendering not yet verified. No further ledger or inventory changes.
 
