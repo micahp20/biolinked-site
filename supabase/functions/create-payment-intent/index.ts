@@ -38,6 +38,12 @@ const QUOTES: Record<string, Quote> = {
   "bcrider/trt-hgh-20261123": {
     client: "Bryce Crider", label: "TRT + HGH quote", base: 118500, charge: 122055,
   },
+  "ngillan/holy-trinity-20261124": {
+    client: "Nic Gillan", label: "Holy Trinity + Tadalafil quote", base: 154497, charge: 159132,
+  },
+  "jesse/paynow-6hgh-20261124": {
+    client: "Jesse Brown", label: "HGH + Wolverine + Reta pay now", base: 45000, charge: 46350,
+  },
 };
 
 function cors(origin: string | null) {
