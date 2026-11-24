@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /lprice/.
-const CACHE = 'lprice-invoice-labels-20261118-v4-nostore1-tab1-nopriceBtns1-pricecart';
+const CACHE = 'lprice-paid-invoice-20261123-v1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
