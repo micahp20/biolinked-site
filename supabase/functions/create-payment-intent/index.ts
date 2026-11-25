@@ -41,8 +41,8 @@ const QUOTES: Record<string, Quote> = {
   "ngillan/holy-trinity-20261124": {
     client: "Nic Gillan", label: "Holy Trinity + Tadalafil quote", base: 154497, charge: 159132,
   },
-  "jesse/paynow-6hgh-20261124": {
-    client: "Jesse Brown", label: "HGH + Wolverine + Reta pay now", base: 45000, charge: 46350,
+  "jesse/hgh-remaining-20261124": {
+    client: "Jesse Brown", label: "7 HGH balance due", base: 31500, charge: 32445,
   },
 };
 
