@@ -1,51 +1,17 @@
-// BioLinked client protocol service worker — network-first so the protocol is
-// never stale. Scoped to /jesse/.
-const CACHE = 'jesse-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-quote2-proto1-wolv05-unfreeze1-sheet1-sheet2-paynow1-paid460';
-const ASSETS = [
-  '/portal-extras.css?v=1',
-  '/portal-extras.js?v=1',
-  '/calc-feedback.js?v=1',
-  '/protocol-copy.js?v=1',
-  '/protocol-context.js?v=1',
-  '/protocol-context.css?v=1',
-  '/schedule-protocol-consistency.css?v=1',
-  '/client-schedule-controls.css?v=1',
-  '/schedule-engine.js?v=5',
-  '/schedule-editor.js?v=4',
-  '/compound-library.js?v=2',
-  '/jesse/',
-  '/jesse/index.html',
-  '/jesse/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
-];
+// Retired scope. /jesse/ moved to /jbrown/ — this worker exists only so already
+// installed clients get an update that unregisters them and drops the old cache,
+// instead of a 404 leaving a stale worker serving the old page indefinitely.
+self.addEventListener('install', () => self.skipWaiting());
 
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(() => {})));
-  self.skipWaiting();
-});
-
-// Prune only this page's own caches.
 self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys => Promise.all(
-    keys.filter(k => k.startsWith('jesse-') && k !== CACHE)
-        .map(k => caches.delete(k))
-  )));
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  const url = new URL(e.request.url);
-  if (url.origin !== location.origin) return;
-  if (!url.pathname.startsWith('/jesse/') && !url.pathname.startsWith('/icon-') && url.pathname !== '/calc-feedback.js') return;
-  e.respondWith(
-    fetch(e.request, (e.request.mode === 'navigate' || (e.request.headers.get('accept') || '').includes('text/html')) ? { cache: 'no-store' } : undefined).then(res => {
-      if (res && res.status === 200 && res.type === 'basic') {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-      }
-      return res;
-    }).catch(() => caches.match(e.request).then(r => r || caches.match('/jesse/index.html')))
-  );
+  e.waitUntil((async () => {
+    const keys = await caches.keys();
+    await Promise.all(keys.filter(k => k.startsWith('jesse-')).map(k => caches.delete(k)));
+    await self.registration.unregister();
+    const clients = await self.clients.matchAll({ type: 'window' });
+    for (const c of clients) {
+      const u = new URL(c.url);
+      c.navigate('/jbrown/' + u.search + u.hash);
+    }
+  })());
 });
