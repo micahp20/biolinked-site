@@ -1,6 +1,6 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /bcrider/.
-const CACHE = 'bcrider-mjohnson-layout-v1-20261123-invstyle1-sheet1-sheet2';
+const CACHE = 'bcrider-mjohnson-layout-v1-20261125-invocard1';
 const ASSETS = [
   '/portal-extras.css?v=1',
   '/portal-extras.js?v=1',
