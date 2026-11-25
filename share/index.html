@@ -76,6 +76,7 @@
   .card-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
   .card-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--on-accent,#0b0b0c);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;flex-shrink:0;letter-spacing:0.02em;text-transform:uppercase;}
   .card-slug{font-size:14.5px;font-weight:600;color:var(--text);letter-spacing:0;line-height:1.2;flex:1;min-width:0;word-break:break-all;}
+  .card-path{display:block;margin-top:3px;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:0;word-break:break-all;}
   .card-foot{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #f0ebe0;}
   .card-type{font-size:9px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-dim);border:1px solid var(--gold-border);padding:3px 9px;border-radius:99px;}
   .card-action{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);font-weight:500;display:inline-flex;align-items:center;gap:5px;}
@@ -158,7 +159,7 @@ var CLIENTS = [
 ['efry','f'],['ejirikils','f'],['elarrea-castro','f'],['eluna','f'],['eprice','f'],
   ['gliuzzi','f'],['gmahan','f'],['gpadilla','f'],
   ['hchase','f'],['hgarza','f'],
-  ['jcastellanos','f'],['jdauper','f'],['jdelorenzo','f'],['jemery','f'],['jbrown','f'],['jhall','f'],['jholm','f'],['jiis','f'],['jjohnston','f'],
+  ['jcastellanos','f'],['jdauper','f'],['jdelorenzo','f'],['jemery','f'],['jbrown','f','Jesse Brown'],['jhall','f'],['jholm','f'],['jiis','f'],['jjohnston','f'],
   ['jckelley','f'],['jcress','f'],['jliuzzi','f'],['jmaclean','f'],['jmaynes','f'],['jmyers','f'],['joelmaynes','f'],['jrasmussen','f'],['jsanders','f'],['kmatthiessen','f'],['knelson','f'],['kwells','f'],
   ['lbraketa','f'],['lcanino','f'],['lesparza','f'],['lmiera','f'],['losborne','f'],['lprice','f'],['lsantos','f'],
   ['mamaholm','f'],['mbahl','f'],['mbejar','f'],['mberto','f'],['mderby','f'],['mdowland','f'],['mgeramanis','f'],['mhartman','f'],['mholm','f'],['mjirikils','f'],['mjohnson','f'],['mmccarthy','f'],['mmenkveld','f'],['mmorehead','f'],['mnevermann','f'],['mpauldino','f'],['msalenti','f'],['mwatts','f'],['mwilson','f'],
@@ -222,21 +223,27 @@ function flashCopied(cardEl){
 function render(filter){
   list.innerHTML = '';
   var f = (filter || '').toLowerCase().trim();
-  var filtered = f ? CLIENTS.filter(function(c){ return c[0].indexOf(f) !== -1; }) : CLIENTS;
+  var filtered = f ? CLIENTS.filter(function(c){
+    var slug = c[0], name = (c[2] || '').toLowerCase();
+    return slug.indexOf(f) !== -1 || name.indexOf(f) !== -1;
+  }) : CLIENTS;
   countNum.textContent = filtered.length;
   if (filtered.length === 0){
     list.innerHTML = '<div class="empty">No matches.</div>';
     return;
   }
   filtered.forEach(function(c){
-    var slug = c[0], type = c[1];
-    var initial = slug.charAt(0).toUpperCase();
+    var slug = c[0], type = c[1], name = c[2] || '';
+    var label = name || slug;
+    var initial = label.charAt(0).toUpperCase();
     var card = document.createElement('div');
     card.className = 'card';
     card.innerHTML =
       '<div class="card-top">' +
         '<div class="card-avatar">' + initial + '</div>' +
-        '<div class="card-slug">' + slug + '</div>' +
+        '<div class="card-slug">' + label.replace(/[<>&]/g, function(ch){ return ({'<':'&lt;','>':'&gt;','&':'&amp;'})[ch]; }) +
+          (name ? '<span class="card-path">/' + slug + '/</span>' : '') +
+        '</div>' +
       '</div>' +
       '<div class="card-foot">' +
         '<span class="card-type">' + (type === 'h' ? '.html' : 'folder') + '</span>' +
