@@ -1,3 +1,7 @@
+## 2026-11-26 — John Emery Holy Trinity added to open quote
+- Added the Holy Trinity (TRT Cypionate 250 mg/mL · 10 mL ×5 at $120, Retatrutide 30 mg ×4 at $50, HGH 40 IU ×13 at $45, Tadalafil 5 mg 260 tablets at $195) to John Emery's existing unpaid gut-stack quote. Gut lines, BAC and the single shipping line were kept. Quote total is $1,724.98. Paid invoices unchanged. Protocol/schedule doses copied from /ngillan/. No inventory, ledger or P/L changes.
+- Files: `jemery/index.html`, `jemery/sw.js`; scoped cache refreshed.
+
 ## 2026-11-26 — Client portal protocol and quote update
 - Added the owner-confirmed gut-health compounds to the client-facing Protocol and active Monday–Friday Schedule, plus a separate unpaid quote. Existing paid history remains unchanged. A one-time schedule migration preserves prior selections while adding the new compounds and syncing the schedule.
 - Files: `jemery/index.html`, `jemery/sw.js`; scoped cache refreshed. PR #312 squash-merged to `main` as `03dd93e36e87ef818a825ad6e13c07330f0442d9`. Source-array parsing, quote arithmetic and inline JavaScript syntax checks passed. GitHub Pages completion, live rendering and iPhone review could not be independently verified. No database, inventory, P&L or payment changes.
