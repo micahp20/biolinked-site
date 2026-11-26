@@ -1,9 +1,9 @@
 // BioLinked client protocol service worker — network-first so the protocol is
 // never stale. Scoped to /jemery/.
-const CACHE = 'jemery-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1-sheet2-gutstack1-20261126-trinity1';
+const CACHE = 'jemery-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1-sheet2-gutstack1-20261126-trinity1-split1-cart1';
 const ASSETS = [
   '/portal-extras.css?v=1',
-  '/portal-extras.js?v=1',
+  '/portal-extras.js?v=2',
   '/calc-feedback.js?v=1',
   '/protocol-copy.js?v=1',
   '/protocol-context.js?v=1',

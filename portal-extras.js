@@ -78,7 +78,7 @@
 /* Select existing unpaid cycle quotes on the pilot portal. */
 (function () {
   var slug=location.pathname.split('/')[1];
-  if (!['dbarajas','lprice','eprice'].includes(slug)) return;
+  if (!['dbarajas','lprice','eprice','jemery'].includes(slug)) return;
   if(slug!=='dbarajas'){
     var script=document.createElement('script'); script.src='/applepay.js?v=price1'; document.head.append(script);
     var css=document.createElement('link');css.rel='stylesheet';css.href='/applepay.css?v=3';document.head.append(css);
@@ -159,7 +159,7 @@
       var methods=pay.firstElementChild;
       var wallet=document.createElement('div');
       wallet.className='bl-applepay'; wallet.dataset.client=slug;
-      wallet.dataset.quote=(orders.length===1?'cycle-':'cart-')+orders.map(function(o){return /^Cycle (\d+)/.exec(o.label)[1]}).join('-');
+      wallet.dataset.quote=(orders.length===1?'cycle-':'cart-')+orders.map(function(o){var m=/^Cycle (\d+)/.exec(o.label);return m?m[1]:String(o.label).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');}).join('-');
       wallet.dataset.label='Selected cycles'; wallet.dataset.amount=(Math.round(base(orders)*103/100)/100).toFixed(2);
       var card=document.createElement('button'); card.type='button'; card.className='paybtn'; card.textContent='Pay with card'; card.dataset.cartCard='1';
       var fee=document.createElement('small'); fee.textContent='Apple Pay and card include a 3% fee';
