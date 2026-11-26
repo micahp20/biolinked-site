@@ -1,6 +1,6 @@
 ## 2026-11-26 — Client portal protocol and quote update
 - Added the owner-confirmed gut-health compounds to the client-facing Protocol and active Monday–Friday Schedule, plus a separate unpaid quote. Existing paid history remains unchanged. A one-time schedule migration preserves prior selections while adding the new compounds and syncing the schedule.
-- Files: `jemery/index.html`, `jemery/sw.js`; scoped cache refreshed. PR #312. Source-array parsing and quote arithmetic checked; JavaScript syntax, mobile rendering, and live deployment verification remain pending. No database, inventory, P&L or payment changes.
+- Files: `jemery/index.html`, `jemery/sw.js`; scoped cache refreshed. PR #312 squash-merged to `main` as `03dd93e36e87ef818a825ad6e13c07330f0442d9`. Source-array parsing, quote arithmetic and inline JavaScript syntax checks passed. GitHub Pages completion, live rendering and iPhone review could not be independently verified. No database, inventory, P&L or payment changes.
 
 # Changelog
 
