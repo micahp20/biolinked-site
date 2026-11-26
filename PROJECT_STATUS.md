@@ -1,3 +1,10 @@
+## 2026-11-26 — John Emery protocol groups and eprice-style quote cart
+- /jemery/ protocol is grouped as Gut Healing Protocol and Holy Trinity Stack (Semax/Selank ungrouped; Cycle 1 past and Cycle 2 unchanged). Two unpaid quotes use the /eprice/ checkbox cart: Gut Healing $144.98 or Holy Trinity $1,589.99 alone (each includes shipping); both checked = $1,724.98 with shipping charged once. Paid $820.00 unchanged.
+- Paths: `jemery/index.html`, `jemery/sw.js`, `portal-extras.js`. Cache bumped with `cart1`. No inventory, ledger, P/L, or payment-allowlist changes.
+
+## Multi-quote shipping rule (all future pages)
+- Any client page with more than one unpaid quote must use the same checkbox cart as /eprice/ (`portal-extras.js`). Each quote may include a $9.99 2-Day UPS line so a single selected quote is priced with shipping. When the client checks more than one quote, the cart adds merchandise only and charges shipping once ($9.99). Never add $9.99 per selected quote in a combined cart.
+
 ## 2026-11-26 — John Emery Holy Trinity added to open quote
 - Added Holy Trinity line items to the existing unpaid Gut Health & Recovery quote on /jemery/ and added those compounds to Protocol/Schedule with /ngillan/ doses. Paid history, BAC and single shipping line preserved. Quote total $1,724.98. Due $1,724.98. Paid $820.00 unchanged.
 - Paths: `jemery/index.html`, `jemery/sw.js`. Cache bumped with `trinity1`. No database, inventory, ledger or payment-allowlist changes.

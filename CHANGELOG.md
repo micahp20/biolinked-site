@@ -1,3 +1,8 @@
+## 2026-11-26 — John Emery protocol groups and eprice-style quote cart
+- Split /jemery/ protocol cards into Gut Healing Protocol (KPV, BPC-157, VIP) and Holy Trinity Stack (TRT Cypionate, Retatrutide 30 mg, HGH 40 IU, Tadalafil). Semax/Selank stay ungrouped; Cycle 1 and Cycle 2 stay in place.
+- Replaced the combined unpaid quote with two quotes on the same checkbox cart used on /eprice/: Gut Healing Protocol $144.98 and Holy Trinity Stack $1,589.99 when paid alone (each includes $9.99 shipping). Checking both charges shipping once; cart total $1,724.98. Paid invoices ($820.00) unchanged. No inventory, ledger or P/L changes.
+- Files: `jemery/index.html`, `jemery/sw.js`, `portal-extras.js` (jemery added to the cart allowlist; Cycle-label quote ids unchanged for existing cart pages).
+
 ## 2026-11-26 — John Emery Holy Trinity added to open quote
 - Added the Holy Trinity (TRT Cypionate 250 mg/mL · 10 mL ×5 at $120, Retatrutide 30 mg ×4 at $50, HGH 40 IU ×13 at $45, Tadalafil 5 mg 260 tablets at $195) to John Emery's existing unpaid gut-stack quote. Gut lines, BAC and the single shipping line were kept. Quote total is $1,724.98. Paid invoices unchanged. Protocol/schedule doses copied from /ngillan/. No inventory, ledger or P/L changes.
 - Files: `jemery/index.html`, `jemery/sw.js`; scoped cache refreshed.
