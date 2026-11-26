@@ -1,3 +1,8 @@
+## 2026-11-26 — John Emery Holy Trinity added to open quote
+- Added Holy Trinity line items to the existing unpaid Gut Health & Recovery quote on /jemery/ and added those compounds to Protocol/Schedule with /ngillan/ doses. Paid history, BAC and single shipping line preserved. Quote total $1,724.98. Due $1,724.98. Paid $820.00 unchanged.
+- Paths: `jemery/index.html`, `jemery/sw.js`. Cache bumped with `trinity1`. No database, inventory, ledger or payment-allowlist changes.
+- State: branch `jemery-holy-trinity-20261126`.
+
 ## 2026-11-26 — Client portal protocol and quote update
 - Added three owner-approved compound entries to one existing client portal's Protocol and active weekday Schedule, plus a separate unpaid quote. Existing paid invoices and prior schedule selections are preserved; a one-time schedule migration adds the new entries and queues the schedule sync.
 - Paths: `jemery/index.html`, `jemery/sw.js`. Cache: `jemery-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1-sheet2-gutstack1-20261126`. PR #312; branch commit `3f939c9edba4b3d17883f827553486745daddb4b`.
