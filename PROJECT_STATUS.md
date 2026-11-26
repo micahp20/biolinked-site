@@ -1,3 +1,9 @@
+## 2026-11-26 — Client portal protocol and quote update
+- Added three owner-approved compound entries to one existing client portal's Protocol and active weekday Schedule, plus a separate unpaid quote. Existing paid invoices and prior schedule selections are preserved; a one-time schedule migration adds the new entries and queues the schedule sync.
+- Paths: `jemery/index.html`, `jemery/sw.js`. Cache: `jemery-master-sched1-v9-context-v1-controls-v1-calcact1-sgk1-extras1-dedupe1-legacy1-nostore1-nopriceBtns1-sheet1-sheet2-gutstack1-20261126`. PR #312; branch commit `3f939c9edba4b3d17883f827553486745daddb4b`.
+- Checks: source arrays parsed; quote line arithmetic reconciled; existing paid invoice count and paid total preserved; only the requested portal and its scoped cache changed. JavaScript syntax, rendered 390 px review, and live Pages verification remain pending. No production database, inventory, ledger, payment or client-submission writes.
+- State: committed on `jemery-gut-stack-20261126`; PR open; not yet merged or deployed.
+
 # Bio Linked Solutions — project status
 
 ## 2026-11-24 — Master sheet values filled in; catalog regenerated
