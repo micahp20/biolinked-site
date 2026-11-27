@@ -29,8 +29,8 @@ const QUOTES: Record<string, Quote> = {
   "dbarajas/cycle-5": { client: "dbarajas", label: "Cycle 5", base: 11498, charge: 11843 },
   "dbarajas/cycle-6": { client: "dbarajas", label: "Cycle 6", base: 42498, charge: 43773 },
   "dbarajas/cycle-7": { client: "dbarajas", label: "Cycle 7", base: 17998, charge: 18538 },
-  "rgreen/hgh-sleep-20261119": {
-    client: "Ryan Green", label: "HGH + Sleep quote", base: 28999, charge: 29869,
+  "rgreen/hgh-sleep-balance-20261127": {
+    client: "Ryan Green", label: "HGH + Sleep balance due", base: 18999, charge: 19569,
   },
   "vbernal-quintana/hgh-remaining-20261119": {
     client: "Valeria Bernal-Quintana", label: "HGH quote remaining balance", base: 22098, charge: 22761,

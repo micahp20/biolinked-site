@@ -1,3 +1,7 @@
+## 2026-11-27 — Ryan Green $100 payment toward HGH + Sleep quote
+- Recorded a $100 payment dated 2026-11-27 on /rgreen/ toward the open HGH 40 IU (20% friends & family) + Sleep Stack quote of $289.99. Paid to date is now $2,255.00; balance due is $189.99. Payment-history line and partly-paid invoice card follow the existing pattern; card/Apple Pay amount is the remaining balance plus the 3% fee ($195.69). Paid invoices unchanged. No inventory deducted.
+- Files: `rgreen/index.html`, `rgreen/sw.js`, `supabase/functions/create-payment-intent/index.ts` (new allowlist key; prior $289.99 key removed so a stale page cannot charge the old total).
+
 ## 2026-11-26 — John Emery protocol groups and eprice-style quote cart
 - Split /jemery/ protocol cards into Gut Healing Protocol (KPV, BPC-157, VIP) and Holy Trinity Stack (TRT Cypionate, Retatrutide 30 mg, HGH 40 IU, Tadalafil). Semax/Selank stay ungrouped; Cycle 1 and Cycle 2 stay in place.
 - Replaced the combined unpaid quote with two quotes on the same checkbox cart used on /eprice/: Gut Healing Protocol $144.98 and Holy Trinity Stack $1,589.99 when paid alone (each includes $9.99 shipping). Checking both charges shipping once; cart total $1,724.98. Paid invoices ($820.00) unchanged. No inventory, ledger or P/L changes.

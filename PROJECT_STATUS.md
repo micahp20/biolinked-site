@@ -1,3 +1,9 @@
+## 2026-11-27 — Ryan Green $100 payment toward HGH + Sleep quote
+- /rgreen/ open quote was $289.99 (HGH 40 IU ×5 at 20% friends-and-family off + Epithalon + Pinealon + shipping). After a $100 payment on 2026-11-27: paid to date $2,255.00, balance due $189.99. Card/Apple Pay charges $195.69 (balance + 3% fee).
+- Paths: `rgreen/index.html`, `rgreen/sw.js`, `supabase/functions/create-payment-intent/index.ts`. Cache bumped with `pay100-20261127`.
+- Ledger: $100 was already logged on 2026-11-20 as pl_sales 854–855 (Epithalon 50 mg ×1 @ $50 and Pinealon 10 mg ×2 @ $25, tag RGREEN-HGH-SLEEP-PAID-PULL-20261120, note said $189.99 due). No second sales row was added, and no inventory was deducted for this page update. The 11/20 note also named a full pull of 5 HGH 40 IU, but no HGH sales row exists.
+- State: branch `rgreen-100-partial-20261127`.
+
 ## 2026-11-26 — John Emery protocol groups and eprice-style quote cart
 - /jemery/ protocol is grouped as Gut Healing Protocol and Holy Trinity Stack (Semax/Selank ungrouped; Cycle 1 past and Cycle 2 unchanged). Two unpaid quotes use the /eprice/ checkbox cart: Gut Healing $144.98 or Holy Trinity $1,589.99 alone (each includes shipping); both checked = $1,724.98 with shipping charged once. Paid $820.00 unchanged.
 - Paths: `jemery/index.html`, `jemery/sw.js`, `portal-extras.js`. Cache bumped with `cart1`. No inventory, ledger, P/L, or payment-allowlist changes.
